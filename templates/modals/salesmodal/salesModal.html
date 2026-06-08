@@ -1,0 +1,87 @@
+
+<!-- Modal -->
+<div class="modal fade" id="salesModal" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sales Analytics</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <div class="btn-group mb-3" role="group">
+          <button class="btn btn-outline-primary" onclick="loadData('daily')">Daily</button>
+          <button class="btn btn-outline-primary" onclick="loadData('monthly')">Monthly</button>
+          <button class="btn btn-outline-primary" onclick="loadData('yearly')">Yearly</button>
+        </div>
+
+        <canvas id="salesChart" height="120"></canvas>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/Chart.umd.min.js"></script>
+<script>
+let chart;
+
+function renderChart(labels, liquor, grocery) {
+    const data = {
+        labels: labels,
+        datasets: [
+            {
+                label: 'Liquor Sales',
+                data: liquor,
+            },
+            {
+                label: 'Grocery Sales',
+                data: grocery,
+            }
+        ]
+    };
+
+    if (chart) chart.destroy();
+
+    const barDatalabelsPlugin = {
+        id: 'barDatalabels',
+        afterDatasetsDraw(chart) {
+            const { ctx } = chart;
+            chart.data.datasets.forEach((ds, i) => {
+                const meta = chart.getDatasetMeta(i);
+                if (meta.hidden) return;
+                meta.data.forEach((bar, idx) => {
+                    const val = ds.data[idx];
+                    if (val == null || val === 0) return;
+                    ctx.save();
+                    ctx.font = 'bold 11px sans-serif';
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillText(val, bar.x, bar.y - 5);
+                    ctx.restore();
+                });
+            });
+        }
+    };
+
+    chart = new Chart(document.getElementById('salesChart'), {
+        type: 'bar',
+        data: data,
+        plugins: [barDatalabelsPlugin],
+        options: {
+            layout: { padding: { top: 15 } }
+        }
+    });
+}
+
+async function loadData(type) {
+    const response = await fetch(`/get_sales_data?type=${type}`);
+    const result = await response.json();
+    renderChart(result.labels, result.liquor, result.grocery);
+}
+</script>
+
+
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+

@@ -1,0 +1,452 @@
+<!-- =========================================================
+     TODAY'S SCHEDULE MODAL
+========================================================= -->
+
+<style>
+
+    .schedule-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--card-background);
+        margin-bottom: 8px;
+        transition: 0.2s ease;
+    }
+    
+    .schedule-item:hover {
+        border-color: var(--primary-color);
+        transform: translateX(3px);
+    }
+    
+    .schedule-item.active-event {
+        border-color: var(--primary-color);
+        background: rgba(13,110,253,0.06);
+    }
+    
+    .schedule-item.done-event {
+        opacity: 0.45;
+    }
+    
+    .schedule-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+    
+    .schedule-sub {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 2px;
+    }
+    
+    .schedule-right {
+        text-align: right;
+        flex-shrink: 0;
+    }
+    
+    .schedule-time {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+    
+    .schedule-status {
+        font-size: 10px;
+        font-weight: 600;
+        margin-top: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    
+    .status-done {
+        color: #16a34a;
+    }
+    
+    .status-next {
+        color: var(--primary-color);
+    }
+    
+    .status-pending {
+        color: var(--text-secondary);
+    }
+    
+    .schedule-empty {
+        text-align: center;
+        padding: 35px 10px;
+        color: var(--text-secondary);
+    }
+    
+    .schedule-empty i {
+        font-size: 32px;
+        margin-bottom: 10px;
+        opacity: .5;
+    }
+    
+    </style>
+    
+    
+    <!-- =========================================================
+    MODAL
+    ========================================================= -->
+    
+    <div class="modal fade" id="scheduleModal" tabindex="-1">
+    
+        <div class="modal-dialog modal-dialog-centered">
+    
+            <div class="modal-content">
+    
+                <div class="modal-header">
+    
+                    <h5 class="modal-title">
+                        <i class="fa fa-calendar-check-o me-2"></i>
+                        Today's Schedule
+                    </h5>
+    
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"></button>
+    
+                </div>
+    
+                <div class="modal-body" id="scheduleList">
+    
+                    <!-- JS RENDERS HERE -->
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+    </div>
+    
+    
+    <script>
+    
+    // =========================================================
+    // GLOBAL SCHEDULE STORAGE
+    // =========================================================
+    
+    let schedules = [];
+    
+    
+    // =========================================================
+    // FETCH TODAY SCHEDULES
+    // =========================================================
+    
+    async function fetchSchedules() {
+    
+        try {
+    
+            const response = await fetch("/api/today/schedules");
+    
+            schedules = await response.json();
+    
+            // =============================================
+            // UPDATE SMALL CARD
+            // =============================================
+    
+            loadNextEvent();
+    
+            // =============================================
+            // UPDATE MODAL LIST
+            // =============================================
+    
+            renderSchedule();
+    
+        }
+    
+        catch (error) {
+    
+            console.error(
+                "Schedule fetch error:",
+                error
+            );
+        }
+    }
+    
+    
+    // =========================================================
+    // TIME TO MINUTES
+    // =========================================================
+    
+    function getEventMinutes(timeStr) {
+    
+        if (!timeStr) return 0;
+    
+        const parts = timeStr.split(":");
+    
+        const h = parseInt(parts[0]);
+    
+        const m = parseInt(parts[1]);
+    
+        return h * 60 + m;
+    }
+    
+    
+    // =========================================================
+    // FORMAT 24H -> 12H
+    // =========================================================
+    
+    function formatTime24to12(timeStr) {
+    
+        if (!timeStr) return "--";
+    
+        let [hour, minute] = timeStr.split(":");
+    
+        hour = parseInt(hour);
+    
+        const ampm =
+            hour >= 12 ? "PM" : "AM";
+    
+        hour = hour % 12 || 12;
+    
+        return `${hour}:${minute} ${ampm}`;
+    }
+    
+    
+    // =========================================================
+    // UPDATE NEXT EVENT CARD
+    // =========================================================
+    
+    function loadNextEvent() {
+    
+        const now = new Date();
+    
+        const currentMinutes =
+            now.getHours() * 60 +
+            now.getMinutes();
+    
+        const next = schedules.find(event =>
+            getEventMinutes(event.start_time)
+            > currentMinutes
+        );
+    
+        // =============================================
+        // TITLE
+        // =============================================
+    
+        const nextEventTitle = document.getElementById("nextEventTitle");
+
+if (nextEventTitle) {
+    nextEventTitle.innerText = next
+        ? next.title
+        : "All Tasks Completed";
+}
+    
+        // =============================================
+        // TIME
+        // =============================================
+    
+        const nextEventTime = document.getElementById("nextEventTime");
+
+if (nextEventTime) {
+    nextEventTime.innerText = next
+        ? formatTime24to12(next.start_time)
+        : "--";
+}
+    
+        // =============================================
+        // LOCATION
+        // =============================================
+    
+        const nextEventDesc = document.getElementById("nextEventDesc");
+
+if (nextEventDesc) {
+    nextEventDesc.innerText = next
+        ? next.location
+        : "No more schedules today";
+}
+    }
+    
+    
+    // =========================================================
+    // RENDER MODAL SCHEDULE LIST
+    // =========================================================
+    
+    function renderSchedule() {
+    
+        const now = new Date();
+    
+        const currentMinutes =
+            now.getHours() * 60 +
+            now.getMinutes();
+    
+        let nextFound = false;
+    
+        const container =
+            document.getElementById(
+                "scheduleList"
+            );
+    
+        container.innerHTML = "";
+    
+        // =====================================================
+        // EMPTY
+        // =====================================================
+    
+        if (!schedules.length) {
+    
+            container.innerHTML = `
+    
+                <div class="schedule-empty">
+    
+                    <i class="fa fa-calendar-times-o"></i>
+    
+                    <div>
+                        No schedules for today
+                    </div>
+    
+                </div>
+    
+            `;
+    
+            return;
+        }
+    
+        // =====================================================
+        // LOOP EVENTS
+        // =====================================================
+    
+        schedules.forEach(event => {
+    
+            const evMin =
+                getEventMinutes(
+                    event.start_time
+                );
+    
+            let cls = "";
+    
+            let statusCls =
+                "status-pending";
+    
+            let statusLabel =
+                "Scheduled";
+    
+            // =============================================
+            // DONE
+            // =============================================
+    
+            if (evMin < currentMinutes) {
+    
+                cls = "done-event";
+    
+                statusCls = "status-done";
+    
+                statusLabel = "Done";
+            }
+    
+            // =============================================
+            // NEXT
+            // =============================================
+    
+            else if (!nextFound) {
+    
+                cls = "active-event";
+    
+                statusCls = "status-next";
+    
+                statusLabel = "Next";
+    
+                nextFound = true;
+            }
+    
+            // =============================================
+            // APPEND
+            // =============================================
+    
+            container.innerHTML += `
+    
+                <div class="schedule-item ${cls}">
+    
+                    <div>
+    
+                        <div class="schedule-title">
+    
+                            ${event.title}
+    
+                        </div>
+    
+                        <div class="schedule-sub">
+    
+                            <i class="fa fa-map-marker"
+                               style="
+                                    font-size:11px;
+                                    margin-right:4px
+                               "></i>
+    
+                            ${event.location || "N/A"}
+    
+                        </div>
+    
+                    </div>
+    
+                    <div class="schedule-right">
+    
+                        <div class="schedule-time">
+    
+                            ${formatTime24to12(
+                                event.start_time
+                            )}
+    
+                        </div>
+    
+                        <div class="
+                            schedule-status
+                            ${statusCls}
+                        ">
+    
+                            ${statusLabel}
+    
+                        </div>
+    
+                    </div>
+    
+                </div>
+    
+            `;
+        });
+    }
+    
+    
+    // =========================================================
+    // INIT
+    // =========================================================
+    
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+    
+            // =============================================
+            // FETCH INITIAL DATA
+            // =============================================
+    
+            fetchSchedules();
+    
+            // =============================================
+            // REFRESH STATUS WHEN OPENING MODAL
+            // =============================================
+    
+            document
+                .getElementById("scheduleModal")
+                .addEventListener(
+                    "show.bs.modal",
+                    renderSchedule
+                );
+    
+            // =============================================
+            // AUTO REFRESH EVERY 60s
+            // =============================================
+    
+            setInterval(() => {
+    
+                fetchSchedules();
+    
+            }, 60000);
+        }
+    );
+    
+    </script>

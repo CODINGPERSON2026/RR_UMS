@@ -1,0 +1,544 @@
+<!-- =========================================================
+     HONOURS BOARD CARD - INLINE Redesign
+========================================================= -->
+
+<div class="hb-card" id="honoursCard">
+
+  <!-- HEADER -->
+  <div class="hb-header">
+    <span class="slabel">Appreciation Wall</span>
+  </div>
+  <div class="scard-divider"></div>
+
+  <!-- CONTENT VIEWPORT -->
+  <div class="hb-viewport" id="hbViewport">
+    <div class="hb-track" id="hbTrack">
+      <div class="hb-loading">
+        Loading appreciation entries...
+      </div>
+    </div>
+  </div>
+  <div class="scard-divider"></div>
+
+  <!-- NAVIGATION -->
+  <div class="hb-nav">
+    <button class="hb-btn" id="prevBtn" type="button">Prev</button>
+    <div class="hb-dots" id="dots"></div>
+    <button class="hb-btn" id="nextBtn" type="button">Next</button>
+  </div>
+
+</div>
+
+<!-- =========================================================
+     CSS FOR INLINE CARD
+========================================================= -->
+<style>
+  /* CARD CONTAINER */
+  .hb-card {
+    width: 100%;
+    background: var(--card-bg-solid);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    position: relative;
+    height: 340px; /* Fixed height to match Graphs Slider bottom level */
+  }
+
+  .hb-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
+    background-size: 200% 100%;
+    animation: shimmer 2.5s linear infinite;
+  }
+
+  .hb-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 15px -3px var(--shadow), 0 4px 6px -2px var(--shadow);
+  }
+
+  @keyframes highlightPulse {
+    0% { box-shadow: 0 4px 6px -1px var(--shadow); }
+    50% { box-shadow: 0 0 18px 4px var(--primary-color); }
+    100% { box-shadow: 0 4px 6px -1px var(--shadow); }
+  }
+  
+  .highlight-card {
+    animation: highlightPulse 2s ease-in-out;
+  }
+
+  /* HEADER */
+  .hb-header {
+    padding: 10px 14px 6px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* VIEWPORT & TRACK FOR HORIZONTAL SLIDING */
+  .hb-viewport {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    height: 232px; /* Set height to fit within 340px parent card */
+  }
+
+  .hb-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    height: 100%;
+  }
+
+  .hb-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+
+  .hb-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* AVATAR */
+  .hb-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  }
+  .hb-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hb-avatar-fallback {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  /* INFO */
+  .hb-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .hb-name {
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hb-unit {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+  .hb-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--nav-link-hover-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+
+  /* MEDAL */
+  .hb-medal {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255,215,0,.12), rgba(255,255,255,.04));
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .hb-medal i {
+    font-size: 20px;
+    color: #FFD700;
+  }
+  .hb-medal .fa-trophy { color: #facc15; }
+  .hb-medal .fa-medal { color: #fb923c; }
+  .hb-medal .fa-award { color: #60a5fa; }
+  .hb-medal .fa-star { color: #fde047; }
+  .hb-medal .fa-crown { color: #f59e0b; }
+  .hb-medal .fa-fire { color: #ef4444; }
+  .hb-medal .fa-gem { color: #38bdf8; }
+  .hb-medal .fa-shield-halved { color: #a78bfa; }
+  .hb-medal .fa-bolt { color: #facc15; }
+  .hb-medal .fa-chess-king { color: #f472b6; }
+  .hb-medal .fa-user-shield { color: #22c55e; }
+
+  /* COMMENDATION TEXT */
+  .hb-text {
+    background: var(--nav-link-hover-bg);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    line-height: 1.5;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    max-height: 130px; /* Increased to fit full text without inner scrollbar */
+    overflow-y: auto;
+  }
+
+  /* FOOTER */
+  .hb-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hb-date {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .hb-share {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: var(--nav-link-hover-bg);
+    color: var(--text-primary);
+    font-size: 11px;
+    transition: all .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hb-share:hover {
+    transform: translateY(-1px);
+    background: var(--primary-color);
+    color: #fff;
+  }
+
+  /* NAVIGATION */
+  .hb-nav {
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hb-btn {
+    border: none;
+    padding: 4px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    transition: transform .2s ease, opacity .2s ease;
+  }
+  .hb-btn:hover { transform: translateY(-1px); }
+  .hb-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+  /* DOTS */
+  .hb-dots { display: flex; align-items: center; gap: 5px; }
+  .hb-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border-color);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .hb-dot.active {
+    background: var(--primary-color);
+    transform: scale(1.2);
+  }
+
+  /* LOADING */
+  .hb-loading {
+    text-align: center;
+    padding: 20px 10px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+  }
+</style>
+
+<!-- =========================================================
+     SCRIPT - LOAD & SLIDE INLINE
+========================================================= -->
+<script>
+  (function () {
+    let entries = [];
+    let current = 0;
+    let honoursTimer = null;
+    const HONOURS_TICK = 6000; // 6 seconds auto-scroll, matches other sliders
+
+    const track = document.getElementById("hbTrack");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const dotsWrap= document.getElementById("dots");
+
+    async function loadHonoursBoard() {
+      // Hardcoded dummy data for appreciation board
+      entries = [
+        {
+          id: 1,
+          army_number: "A4203079F",
+          name: "Roshan Kesharwani",
+          rank: "AGV",
+          company: "1 Coy",
+          appreciation_type: "Service",
+          medal_icon: "fa-solid fa-award",
+          commendation: "Yeh jawan TTC trade ka hai. Yeh jawan IT clerk ka duty badi ruchi aur lagan ke saath kar raha hai. Saath hi Coy dwara diye gaye har kaam ko niyam aur nishtha se nibhata hai.",
+          image: "/static/dummy/1coy/Roshan.jpg"
+        },
+        {
+          id: 2,
+          army_number: "15718083X",
+          name: "N B Chakravorty",
+          rank: "Hav",
+          company: "2 Coy",
+          appreciation_type: "Excellence",
+          medal_icon: "fa-solid fa-gem",
+          commendation: "Yeh jawan TTC trade ka hai. Yeh jawan abhi CHQ sec me karya rat hai aur proj clk ka duty badi hi kushalta se kar raha hai. Saath hi is jawan ne Coy ke anya karyon mai bhi mahatvapoorna bhumika nibhata hai.",
+         
+          image: "/static/dummy/1coy/Chakravorty.jpg"
+        },
+        {
+          id: 3,
+          army_number: "15744869F",
+          name: "D K Trivedi",
+          rank: "NK",
+          company: "2 Coy",
+          appreciation_type: "Teamwork",
+          medal_icon: "fa-solid fa-user-shield",
+          commendation: "Yeh jawan abhi MCCS sec me karya rat hai tatha apne tradework ke sath MCCS shift mech ki duty bahut hi kushalta ke saath kar raha hai.",
+          
+          image: "/static/dummy/1coy/Trivedi.jpg"
+        },
+        {
+          id: 4,
+          army_number: "1574959ZX",
+          name: "Sarkat SK",
+          rank: "LNK",
+          company: "3 Coy",
+          appreciation_type: "Leadership",
+          medal_icon: "fa-solid fa-crown",
+          commendation: "Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath team netritva karne ka gun bhi rakhta hai. Lagbhag 1 mahine is jawan ne svc bn ke saath sys NCO ki duty bhi bahut achhe tarike se nibhayi hai.",
+         
+          image: "/static/dummy/1coy/Sarkat.jpg"
+        },
+        {
+          id: 5,
+          army_number: "A4353984F",
+          name: "Bhosale Rahul G",
+          rank: "AGV",
+          company: "3 Coy",
+          appreciation_type: "Innovation",
+          medal_icon: "fa-solid fa-fire",
+          commendation: "Yeh jawan DMV trade ka hai. Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath mess sec ki duty bahut hi achhe tarike se nibha raha hai. Yeh jawan Coy ke anya karyon mein bhi badh chadh kar hissa leta hai.",
+          
+          image: "/static/dummy/1coy/Rahul.jpg"
+        },
+        {
+          id: 6,
+          army_number: "A4351180N",
+          name: "Mohan Sarma",
+          rank: "AGV",
+          company: "HQ Coy",
+          appreciation_type: "Discipline",
+          medal_icon: "fa-solid fa-shield-halved",
+          commendation: "Yeh jawan OCC trade ka hai. Yeh jawan abhi posting clk ka duty bahut hi achhe tarike se nibha raha hai tatha FS check me apna dayitva nibhata hai.",
+         
+          image: "/static/dummy/1coy/Mohan.jpg"
+        },
+        {
+          id: 7,
+          army_number: "A4204917X",
+          name: "Pali Rohit Sharad",
+          rank: "AGV",
+          company: "HQ Coy",
+          appreciation_type: "Excellence",
+          medal_icon: "fa-solid fa-star",
+          commendation: "Yeh jawan DMV trade ka hai. Yeh jawan MT sec mai karyarat hai. Apne trade work ke saath-saath admin branch me bhi karya rat hai tatha vehicle maintenance me bhi apna aham yogdan de raha hai.",
+        
+          image: "/static/dummy/1coy/Rohit.jpg"
+        }
+      ];
+    }
+
+    function renderAllSlides() {
+      if (!track) return;
+      if (entries.length === 0) {
+        track.innerHTML = `<div class="hb-loading">No appreciation entries available.</div>`;
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        if (dotsWrap) dotsWrap.innerHTML = "";
+        return;
+      }
+
+      let trackHTML = "";
+      entries.forEach((item, index) => {
+        const initials = item.name
+          ? item.name.split(" ").map(w=>w[0]).join("").substring(0,2)
+          : "NA";
+
+        const imageHTML = item.image
+          ? `<img src="${item.image}" class="hb-avatar-img" alt="Profile">`
+          : `<div class="hb-avatar-fallback">${initials}</div>`;
+
+        trackHTML += `
+          <div class="hb-slide" data-slide-index="${index}">
+            <div class="hb-top">
+              <div class="hb-avatar">${imageHTML}</div>
+              <div class="hb-info">
+                <div class="hb-name">${item.rank||""} ${item.name||""}</div>
+                <div class="hb-unit">${item.company||""}</div>
+                <div class="hb-role">${item.appreciation_type||""}</div>
+              </div>
+              <div class="hb-medal">
+                <i class="${item.medal_icon||'fa-solid fa-award'}"></i>
+              </div>
+            </div>
+            <div class="hb-text">${item.commendation||""}</div>
+            <div class="hb-footer">
+              <div class="hb-date">${item.appreciation_date||""}</div>
+              <button class="hb-share" type="button" onclick="navigator.clipboard.writeText('${item.commendation || ''}').then(() => alert('Commendation copied to clipboard!'))">
+          
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      track.innerHTML = trackHTML;
+
+      if (dotsWrap) {
+        dotsWrap.innerHTML = entries.map((_, i) => `
+          <div class="hb-dot ${i===0?'active':''}" data-index="${i}"></div>
+        `).join("");
+      }
+
+      goHonours(0);
+    }
+
+    function goHonours(index) {
+      if (entries.length === 0) return;
+      current = ((index % entries.length) + entries.length) % entries.length;
+
+      if (track) {
+        track.style.transform = "translateX(-" + (current * 100) + "%)";
+      }
+
+      if (prevBtn) prevBtn.disabled = current === 0;
+      if (nextBtn) nextBtn.disabled = current === entries.length - 1;
+
+      const dots = document.querySelectorAll(".hb-dot");
+      dots.forEach((dot, idx) => {
+        if (idx === current) dot.classList.add("active");
+        else dot.classList.remove("active");
+      });
+    }
+
+    function startHonoursTimer() {
+      // Auto-scroll disabled by user request
+    }
+
+    function stopHonoursTimer() {
+      if (honoursTimer) {
+        clearInterval(honoursTimer);
+        honoursTimer = null;
+      }
+    }
+
+    window.openHonoursBoard = function() {
+      const card = document.getElementById("honoursCard");
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("highlight-card");
+        setTimeout(() => card.classList.remove("highlight-card"), 2000);
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", async function() {
+      await loadHonoursBoard();
+      renderAllSlides();
+      startHonoursTimer();
+
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          goHonours(current + 1);
+          startHonoursTimer();
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          goHonours(current - 1);
+          startHonoursTimer();
+        });
+      }
+
+      if (dotsWrap) {
+        dotsWrap.addEventListener("click", (e) => {
+          const dot = e.target.closest(".hb-dot");
+          if (!dot) return;
+          goHonours(Number(dot.dataset.index));
+          startHonoursTimer();
+        });
+      }
+
+      const honoursCard = document.getElementById("honoursCard");
+      if (honoursCard) {
+        honoursCard.addEventListener("mouseenter", stopHonoursTimer);
+        honoursCard.addEventListener("mouseleave", startHonoursTimer);
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const card = document.getElementById("honoursCard");
+      if (!card) return;
+      const rect = card.getBoundingClientRect();
+      if (rect.top > window.innerHeight || rect.bottom < 0) return;
+      if (e.key === "ArrowRight") {
+        goHonours(current + 1);
+        startHonoursTimer();
+      }
+      if (e.key === "ArrowLeft") {
+        goHonours(current - 1);
+        startHonoursTimer();
+      }
+    });
+  })();
+</script>

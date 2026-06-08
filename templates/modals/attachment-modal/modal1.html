@@ -1,0 +1,393 @@
+<!-- ================= ATTACHMENT DETAILS MODAL ================= -->
+<style>
+  /* ================= MODAL ================= */
+  .modal-content {
+    animation: slideUp 0.3s ease-in-out;
+    border-radius: 0.8rem;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.28);
+    border: none;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(25px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* ================= MODAL POSITION ================= */
+  #attachmentModal .modal-dialog {
+    margin-top: 40px !important;
+  }
+
+  /* ================= TABLE ================= */
+  #attachmentTable {
+    width: max-content;
+    min-width: 100%;   /* KEY FIX: columns distribute proportionally */
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  /* ================= COLUMN WIDTHS (sum = 100%) ================= */
+  #attachmentTable th:nth-child(1) { width: 15%; } /* Army No  */
+  #attachmentTable th:nth-child(2) { width: 15%;  } /* Rank     */
+  #attachmentTable th:nth-child(3) { width: 20%; } /* Name     */
+  #attachmentTable th:nth-child(4) { width: 11%; } /* Company  */
+  #attachmentTable th:nth-child(5) { width: 12%; } /* Location */
+  #attachmentTable th:nth-child(6) { width: 5%; } /* Authority*/
+  #attachmentTable th:nth-child(7) { width: 10%; } /* From Date*/
+  #attachmentTable th:nth-child(8) { width: 8%;  } /* Action   */
+
+  /* ================= HEADERS ================= */
+  #attachmentTable th {
+    padding: 14px 10px;
+    font-size: 0.88rem;
+    font-weight: 650;
+    letter-spacing: 0.3px;
+    background: linear-gradient(135deg, #0d6efd, #0a58ca);
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: none;
+  }
+
+  /* ================= BODY CELLS ================= */
+  #attachmentTable td {
+    padding: 2px 4px;
+    font-size: 0.88rem;
+    letter-spacing: 0.2px;
+    vertical-align: middle;
+    background: #ffffff;
+    border-color: #edf0f5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: inherit !important;
+  }
+ #attachmentTable td{
+  border: 1px solid rgb(230, 221, 221);
+ }
+  /* ================= ROW EFFECT ================= */
+  #attachmentTable tbody tr {
+    transition: all 0.2s ease;
+  }
+
+  #attachmentTable tbody tr:hover {
+    background: #f8f9fc;
+    transform: scale(1.002);
+  }
+
+  /* ================= ARMY NUMBER ================= */
+  #attachmentTable td:first-child {
+    font-weight: 700;
+    color: #466d58;
+  }
+
+  /* ================= NAME CELL ================= */
+  #attachmentModal .name-cell {
+    background: #eef3ee !important;
+    color: #2d4f3f;
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 6px 10px !important;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    
+    transition: all 0.2s ease;
+  }
+
+  #attachmentModal .name-cell:hover {
+    background: #e4ece4 !important;
+  }
+
+  /* ================= COMPANY BADGE ================= */
+  #attachmentModal .company-badge {
+    display: inline-block;
+    background: #dfe8ff;
+    color: #52755f;
+    border: 1px solid #c4d2ff;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.80rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  #attachmentModal .company-badge:hover {
+    background: #d3defd;
+    border-color: #abc1ff;
+  }
+
+  /* ================= RANK BADGE ================= */
+  #attachmentModal .rank-badge {
+    display: inline-block;
+    background: #f5e7a8;
+    color: #6f5900;
+    border: 1px solid #e1c54b;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.60rem;
+    font-weight: 500;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ================= BUTTON ================= */
+  #attachmentModal .delete-btn {
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 5px 12px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  #attachmentModal .delete-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  /* ================= SCROLL ================= */
+  #attachmentModal .table-responsive {
+    overflow-x: auto;   /* KEY FIX: no horizontal scroll on large screens */
+    max-height: 75vh;
+  }
+
+  /* ================= STATES ================= */
+  .loading-state,
+  .empty-state,
+  .error-state {
+    padding: 90px 20px !important;
+    font-size: 1.05rem;
+    font-weight: 500;
+  }
+</style>
+
+<!-- ================= MODAL ================= -->
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-hidden="true">
+
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+    <div class="modal-content">
+
+      <!-- ================= HEADER ================= -->
+      <div class="modal-header bg-primary text-white">
+
+        <h4 class="modal-title">
+          📎 Attachment Details
+        </h4>
+
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close">
+        </button>
+
+      </div>
+
+      <!-- ================= BODY ================= -->
+      <div class="modal-body p-0">
+
+        <div class="table-responsive">
+
+          <table
+            id="attachmentTable"
+            class="table table-bordered table-hover text-center align-middle mb-0">
+
+            <thead>
+              <tr>
+                <th>Army No</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Location</th>
+                <th>Authority</th>
+                <th>From Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody id="attachmentTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= JAVASCRIPT ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const modal = document.getElementById("attachmentModal");
+
+  modal.addEventListener("show.bs.modal", async function () {
+
+    const tbody = document.getElementById("attachmentTableBody");
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="loading-state text-center">
+          <div class="spinner-border spinner-border-sm me-2"></div>
+          Fetching attachment details...
+        </td>
+      </tr>
+    `;
+
+    try {
+
+      const res = await fetch("/stats/attachment-details");
+      const data = await res.json();
+
+      tbody.innerHTML = "";
+
+      if (!Array.isArray(data) || data.length === 0) {
+
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="empty-state text-center">
+              No attachment records found
+            </td>
+          </tr>
+        `;
+
+        return;
+      }
+
+      data.forEach(p => {
+
+        tbody.insertAdjacentHTML("beforeend", `
+
+          <tr id="row-${p.army_number}">
+
+            <td>
+              ${p.army_number || ""}
+            </td>
+
+            <td>
+              <span class="rank-badge">
+                ${p.rank || ""}
+              </span>
+            </td>
+
+            <td
+              class="name-cell"
+              title="${p.name || ''}">
+              ${p.name || ""}
+            </td>
+
+            <td>
+              <span
+                class="company-badge"
+                title="${p.company || ''}">
+                ${p.company || ""}
+              </span>
+            </td>
+
+            <td title="${p.location || ''}">
+              ${p.location || ""}
+            </td>
+
+            <td title="${p.authority || ''}">
+              ${p.authority || ""}
+            </td>
+
+            <td>
+              ${p.td_date || ""}
+            </td>
+
+            <td>
+
+              <button
+                class="btn btn-sm btn-outline-danger delete-btn"
+                onclick="deleteAttachment('${p.army_number}')">
+
+                Delete
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        `);
+
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="error-state text-center">
+            ❌ Failed to load data
+          </td>
+        </tr>
+      `;
+
+    }
+
+  });
+
+});
+
+/* ================= DELETE FUNCTION ================= */
+async function deleteAttachment(army_number) {
+
+  if (!confirm("Are you sure you want to delete this attachment?")) {
+    return;
+  }
+
+  try {
+
+    const res = await fetch(
+      `/stats/delete-attachment/${army_number}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    if (res.ok) {
+
+      document
+        .getElementById(`row-${army_number}`)
+        ?.remove();
+
+    } else {
+
+      alert("Delete failed");
+
+    }
+
+  } catch {
+
+    alert("Server error");
+
+  }
+
+}
+</script>

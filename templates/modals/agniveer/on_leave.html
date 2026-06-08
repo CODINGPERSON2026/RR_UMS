@@ -1,0 +1,315 @@
+<style>
+  /* ================= MODAL SIZE ================= */
+  #agniLeaveModalUniqueScope .custom-size {
+    max-width: 97% !important;
+    width: 97% !important;
+  }
+
+  /* ================= MODAL BODY ================= */
+  #agniLeaveModalUniqueScope .modal-body {
+    overflow: auto;
+  }
+
+  /* ================= TABLE WRAPPER ================= */
+  #agniLeaveModalUniqueScope .agniLeaveTableWrapperUniqueScope {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  /* ================= TABLE ================= */
+  #agniLeaveModalUniqueScope #agniLeaveTableUniqueScope {
+    table-layout: fixed;
+    width: 100%;
+    min-width: 600px;
+  }
+
+  #agniLeaveModalUniqueScope #agniLeaveTableUniqueScope th,
+  #agniLeaveModalUniqueScope #agniLeaveTableUniqueScope td {
+    overflow: hidden;
+    vertical-align: middle;
+    font-size: 0.84rem;
+    padding: 0.55rem 0.6rem;
+  }
+
+  #agniLeaveModalUniqueScope #agniLeaveTableUniqueScope th {
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* ================= CELL SCROLL ================= */
+  #agniLeaveModalUniqueScope .agniLeaveCellScrollUnique {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+
+  #agniLeaveModalUniqueScope .agniLeaveCellScrollUnique::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  #agniLeaveModalUniqueScope .agniLeaveCellScrollUnique::-webkit-scrollbar-thumb {
+    background: #c7c7c7;
+    border-radius: 20px;
+  }
+
+  /* ================= BADGES ================= */
+  #agniLeaveModalUniqueScope .agniLeaveCompanyBadgeUnique {
+    display: inline-block;
+    background: var(--nav-link-active-bg, #d1e7dd);
+    color: var(--primary-color, #0f5132);
+    border: 1px solid var(--border-color, #badbcc);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ================= NAME CELL ================= */
+  #agniLeaveModalUniqueScope .agniLeaveNameCellUnique {
+    font-weight: 600;
+    color: var(--text-primary, #212529);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 0;
+  }
+
+  /* ================= ARMY NUMBER ================= */
+  #agniLeaveModalUniqueScope .agniLeaveArmyNumberUnique {
+    font-weight: 700;
+    color: var(--primary-color, #0d6efd);
+  }
+
+  /* ================= COUNT BADGE ================= */
+  #agniLeaveModalUniqueScope .modal-dialog {
+    margin-top: 1px;
+  }
+  #agniLeaveModalUniqueScope .agniLeaveCountBadgeUnique {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+</style>
+
+<div class="modal fade" id="agniLeaveModalUniqueScope" tabindex="-1">
+  <div class="modal-dialog modal-xl custom-size">
+    <div class="modal-content" style="background-color: var(--card-bg-solid); border: 1px solid var(--border-color);">
+      <!-- ================= HEADER ================= -->
+      <div class="modal-header" style="background-color: var(--primary-color); border-bottom: 1px solid var(--border-color); color: #ffffff;">
+        <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="modal-title mb-0 fw-bold" style="color: #ffffff; font-weight: 700 !important;">
+              Agniveer on Leave Details
+            </h5>
+          </div>
+
+          <!-- ================= COMPANY FILTER ================= -->
+          <select
+            id="agniLeaveCompanyFilterUniqueScope"
+            class="form-select form-select-sm"
+            style="width: 200px; background-color: rgba(255, 255, 255, 0.15); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.25);">
+            <option value="" style="background-color: var(--card-bg-solid); color: var(--text-primary);">All Companies</option>
+          </select>
+
+          <!-- ================= TOTAL COUNT ================= -->
+          <div
+            class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
+            style="
+              background: rgba(255, 255, 255, 0.15);
+              border: 1px solid rgba(255, 255, 255, 0.25);
+            ">
+            <span
+              class="fw-semibold small"
+              style="color: #ffffff;">
+              Total Count
+            </span>
+            <span
+              id="agniLeaveTotalCountUniqueScope"
+              class="badge rounded-pill bg-light text-dark agniLeaveCountBadgeUnique">
+              0
+            </span>
+          </div>
+        </div>
+
+        <!-- ================= CLOSE BUTTON ================= -->
+        <button
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal">
+        </button>
+      </div>
+
+      <!-- ================= BODY ================= -->
+      <div class="modal-body">
+        <!-- ================= SPINNER ================= -->
+        <div
+          id="agniLeaveSpinnerUniqueScope"
+          class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <div class="mt-2" style="color: var(--text-secondary);">
+            Fetching data...
+          </div>
+        </div>
+
+        <!-- ================= TABLE ================= -->
+        <div class="agniLeaveTableWrapperUniqueScope">
+          <table
+            id="agniLeaveTableUniqueScope"
+            class="table table-bordered table-hover align-middle d-none"
+            style="border-color: var(--border-color); color: var(--text-primary);">
+            <thead style="background-color: var(--primary-color); color: #ffffff; border-color: var(--border-color);">
+              <tr style="border-color: var(--border-color);">
+                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Army Number</th>
+                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 40%;">Name</th>
+                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Company</th>
+                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Trade</th>
+              </tr>
+            </thead>
+            <tbody id="agniLeaveTableBodyUniqueScope"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const agniLeaveModalElementUniqueScope = document.getElementById("agniLeaveModalUniqueScope");
+  const agniLeaveTableBodyUniqueScope = document.getElementById("agniLeaveTableBodyUniqueScope");
+  const agniLeaveSpinnerUniqueScope = document.getElementById("agniLeaveSpinnerUniqueScope");
+  const agniLeaveTableUniqueScope = document.getElementById("agniLeaveTableUniqueScope");
+  const agniLeaveCompanyFilterUniqueScope = document.getElementById("agniLeaveCompanyFilterUniqueScope");
+  const agniLeaveCountBadgeUniqueScope = document.getElementById("agniLeaveTotalCountUniqueScope");
+
+  let agniLeaveFetchedDataUniqueScope = [];
+
+  /* ================= OPEN MODAL ================= */
+  document.getElementById("agniveer_on_leave")?.addEventListener("click", async function () {
+    const agniLeaveModalBootstrapUniqueScope = new bootstrap.Modal(agniLeaveModalElementUniqueScope);
+    agniLeaveModalBootstrapUniqueScope.show();
+    await loadAgniLeavePersonnelUniqueScope();
+  });
+
+  /* ================= FILTER EVENTS ================= */
+  agniLeaveCompanyFilterUniqueScope.addEventListener("change", function () {
+    renderAgniLeaveTableUniqueScope();
+  });
+
+  /* ================= LOAD PERSONNEL ================= */
+  async function loadAgniLeavePersonnelUniqueScope() {
+    agniLeaveSpinnerUniqueScope.classList.remove("d-none");
+    agniLeaveTableUniqueScope.classList.add("d-none");
+    agniLeaveTableBodyUniqueScope.innerHTML = "";
+
+    try {
+      const responseUniqueScope = await fetch("/api/agniveer_on_leave_details");
+      const resultUniqueScope = await responseUniqueScope.json();
+
+      if (resultUniqueScope.status !== "success") {
+        throw new Error("Failed");
+      }
+
+      agniLeaveFetchedDataUniqueScope = resultUniqueScope.data;
+
+      /* ================= POPULATE COMPANY FILTER ================= */
+      const currentSelectedCompany = agniLeaveCompanyFilterUniqueScope.value;
+      agniLeaveCompanyFilterUniqueScope.innerHTML = `<option value="">All Companies</option>`;
+      
+      const uniqueCompaniesUniqueScope = [
+        ...new Set(
+          agniLeaveFetchedDataUniqueScope
+            .map(item => item.company)
+            .filter(Boolean)
+        )
+      ];
+
+      uniqueCompaniesUniqueScope.forEach(company => {
+        agniLeaveCompanyFilterUniqueScope.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${company}" style="background-color: var(--card-bg-solid); color: var(--text-primary);">${company}</option>`
+        );
+      });
+      
+      // Preserve selection if it still exists in the new list
+      if (uniqueCompaniesUniqueScope.includes(currentSelectedCompany)) {
+        agniLeaveCompanyFilterUniqueScope.value = currentSelectedCompany;
+      }
+
+      renderAgniLeaveTableUniqueScope();
+    } catch (error) {
+      console.error(error);
+      agniLeaveSpinnerUniqueScope.innerHTML = `
+        <p class="text-danger fw-bold mt-3">
+          Failed to load data
+        </p>
+      `;
+    }
+  }
+
+  /* ================= RENDER TABLE ================= */
+  function renderAgniLeaveTableUniqueScope() {
+    agniLeaveTableBodyUniqueScope.innerHTML = "";
+    const selectedCompanyUniqueScope = agniLeaveCompanyFilterUniqueScope.value;
+    let filteredDataUniqueScope = [...agniLeaveFetchedDataUniqueScope];
+
+    /* ================= COMPANY FILTER ================= */
+    if (selectedCompanyUniqueScope) {
+      filteredDataUniqueScope = filteredDataUniqueScope.filter(
+        item => item.company === selectedCompanyUniqueScope
+      );
+    }
+
+    /* ================= COUNT ================= */
+    agniLeaveCountBadgeUniqueScope.textContent = filteredDataUniqueScope.length;
+
+    /* ================= EMPTY STATE ================= */
+    if (filteredDataUniqueScope.length === 0) {
+      agniLeaveTableBodyUniqueScope.innerHTML = `
+        <tr>
+          <td colspan="4" class="text-center py-4" style="color: var(--text-secondary);">
+            No personnel found
+          </td>
+        </tr>
+      `;
+    } else {
+      filteredDataUniqueScope.forEach(row => {
+        const titleCasedName = (row.name || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        
+        agniLeaveTableBodyUniqueScope.insertAdjacentHTML(
+          "beforeend",
+          `
+          <tr style="border-color: var(--border-color);">
+            <td style="border-color: var(--border-color); width: 20%;">
+              <div class="agniLeaveCellScrollUnique agniLeaveArmyNumberUnique">
+                ${row.army_number}
+              </div>
+            </td>
+            <td class="agniLeaveNameCellUnique" style="border-color: var(--border-color); width: 40%; max-width: 250px;">
+              ${titleCasedName}
+            </td>
+            <td style="border-color: var(--border-color); width: 20%;">
+              <div class="agniLeaveCellScrollUnique">
+                <span class="agniLeaveCompanyBadgeUnique">
+                  ${row.company}
+                </span>
+              </div>
+            </td>
+            <td style="border-color: var(--border-color); width: 20%;">
+              <div class="agniLeaveCellScrollUnique">
+                ${(row.trade || 'N/A').toUpperCase()}
+              </div>
+            </td>
+          </tr>
+          `
+        );
+      });
+    }
+
+    agniLeaveSpinnerUniqueScope.classList.add("d-none");
+    agniLeaveTableUniqueScope.classList.remove("d-none");
+  }
+});
+</script>

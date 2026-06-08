@@ -1,0 +1,597 @@
+<!-- ================= ATTACHMENT DETAILS MODAL ================= -->
+
+<style>
+
+  /* ================= MODAL SCOPED STYLES ================= */
+
+  #attachmentModalUniqueScope #attachmentTableUniqueScope {
+    table-layout: fixed;
+    width: 100%;
+  }
+
+  #attachmentModalUniqueScope #attachmentTableUniqueScope th,
+  #attachmentModalUniqueScope #attachmentTableUniqueScope td {
+    overflow: hidden;
+    vertical-align: middle;
+    font-size: 0.84rem;
+    padding: 0.55rem 0.6rem;
+  }
+
+  #attachmentModalUniqueScope #attachmentTableUniqueScope th {
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  /* ================= CELL SCROLL ================= */
+
+  #attachmentModalUniqueScope .attachmentCellScrollUnique {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
+  }
+
+  #attachmentModalUniqueScope .attachmentCellScrollUnique::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  #attachmentModalUniqueScope .attachmentCellScrollUnique::-webkit-scrollbar-thumb {
+    background: #c7c7c7;
+    border-radius: 20px;
+  }
+
+  /* ================= BADGES ================= */
+
+  #attachmentModalUniqueScope .attachmentRankBadgeUnique {
+    display: inline-block;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffe69c;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  #attachmentModalUniqueScope .attachmentCompanyBadgeUnique {
+    display: inline-block;
+    background: #d1e7dd;
+    color: #0f5132;
+    border: 1px solid #badbcc;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  /* ================= ARMY NUMBER ================= */
+
+  #attachmentModalUniqueScope .attachmentArmyNumberUnique {
+    font-weight: 700;
+    color: #0d6efd;
+  }
+
+  /* ================= NAME CELL ================= */
+
+  #attachmentModalUniqueScope .attachmentNameCellUnique {
+    font-weight: 600;
+    color: #212529;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    max-width: 0;
+  }
+
+  /* ================= COUNT BADGE ================= */
+
+  #attachmentModalUniqueScope .attachmentCountBadgeUnique {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  #attachmentModalUniqueScope .modal-dialog {
+    margin-top: 5px;
+  }
+  #attachmentModalUniqueScope .custom-size {
+    max-width: 99% !important;
+    width: 99% !important;
+  }
+</style>
+
+<!-- ================= MODAL ================= -->
+
+<div
+  class="modal fade"
+  id="attachmentModalUniqueScope"
+  tabindex="-1"
+  aria-hidden="true">
+
+  <div class="modal-dialog modal-xl custom-size modal-dialog-scrollable">
+
+    <div class="modal-content">
+
+      <!-- ================= HEADER ================= -->
+
+      <div class="modal-header">
+
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+
+          <!-- TITLE + COUNT -->
+
+          <div class="d-flex align-items-center gap-2">
+
+            <h5 class="modal-title mb-0">
+
+              Attachment Details
+
+            </h5>
+
+          </div>
+
+          <!-- COMPANY FILTER -->
+
+          <select
+            id="attachmentCompanyFilterUniqueScope"
+            class="form-select form-select-sm"
+            style="width: 190px;">
+
+            <option value="ALL">
+
+              All Companies
+
+            </option>
+
+          </select>
+          <div class="d-flex align-items-center gap-2">
+
+            <div
+              class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
+              style="
+                background: #eef4ff;
+                border: 1px solid #d6e4ff;
+              ">
+          
+              <span
+                class="fw-semibold small"
+                style="color:#315ca8;">
+          
+                Total Count
+          
+              </span>
+          
+              <span
+                id="attachmentCountUniqueScope"
+                class="badge rounded-pill bg-primary attachmentCountBadgeUnique">
+          
+                0
+          
+              </span>
+          
+            </div>
+          
+          </div>
+        </div>
+
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close">
+        </button>
+
+      </div>
+
+      <!-- ================= BODY ================= -->
+
+      <div class="modal-body">
+
+        <div class="table-responsive">
+
+          <table
+            id="attachmentTableUniqueScope"
+            class="table table-bordered table-hover align-middle">
+
+            <thead class="table-light">
+
+              <tr>
+
+                <th>Army No</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Company</th>
+                <th>Location</th>
+                <th>Authority</th>
+                <th>From Date</th>
+                <th>Action</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="attachmentTableBodyUniqueScope"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% include 'modals/success-modal/modal.html' %}
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const attachmentModalElementUniqueScope =
+    document.getElementById("attachmentModalUniqueScope");
+
+  const attachmentTableBodyUniqueScope =
+    attachmentModalElementUniqueScope.querySelector(
+      "#attachmentTableBodyUniqueScope"
+    );
+
+  const attachmentCountBadgeUniqueScope =
+    attachmentModalElementUniqueScope.querySelector(
+      "#attachmentCountUniqueScope"
+    );
+
+  const attachmentCompanyFilterUniqueScope =
+    attachmentModalElementUniqueScope.querySelector(
+      "#attachmentCompanyFilterUniqueScope"
+    );
+
+  let attachmentFetchedDataUniqueScope = [];
+
+  /* ================= RENDER TABLE ================= */
+
+  function renderAttachmentTableUniqueScope(
+    selectedCompany = "ALL"
+  ) {
+
+    attachmentTableBodyUniqueScope.innerHTML = "";
+
+    let filteredAttachmentDataUniqueScope =
+      attachmentFetchedDataUniqueScope;
+
+    if (selectedCompany !== "ALL") {
+
+      filteredAttachmentDataUniqueScope =
+        attachmentFetchedDataUniqueScope.filter(
+          item => item.company === selectedCompany
+        );
+
+    }
+
+    /* ================= COUNT ================= */
+
+    const totalCountUniqueScope =
+  filteredAttachmentDataUniqueScope.length;
+
+attachmentCountBadgeUniqueScope.textContent =
+  totalCountUniqueScope === 0
+    ? 0
+    : totalCountUniqueScope;
+
+    /* ================= EMPTY STATE ================= */
+
+    if (filteredAttachmentDataUniqueScope.length === 0) {
+
+      attachmentTableBodyUniqueScope.innerHTML = `
+        <tr>
+
+          <td colspan="8" class="text-center text-muted py-4">
+
+            No attachment records found
+
+          </td>
+
+        </tr>
+      `;
+
+      return;
+
+    }
+
+    /* ================= ROWS ================= */
+
+    filteredAttachmentDataUniqueScope.forEach(item => {
+
+      attachmentTableBodyUniqueScope.insertAdjacentHTML(
+        "beforeend",
+        `
+
+        <tr id="attachmentRowUniqueScope-${item.army_number}">
+
+          <!-- ARMY NUMBER -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique attachmentArmyNumberUnique">
+
+              ${item.army_number || ""}
+
+            </div>
+
+          </td>
+
+          <!-- RANK -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique">
+
+              <span class="attachmentRankBadgeUnique">
+
+                ${item.rank || ""}
+
+              </span>
+
+            </div>
+
+          </td>
+
+          <!-- NAME -->
+
+          <td class="attachmentNameCellUnique">
+
+            ${(item.name || "")
+  .toLowerCase()
+  .replace(/\b\w/g, c => c.toUpperCase())}
+
+          </td>
+
+          <!-- COMPANY -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique">
+
+              <span class="attachmentCompanyBadgeUnique">
+
+                ${item.company || ""}
+
+              </span>
+
+            </div>
+
+          </td>
+
+          <!-- LOCATION -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique">
+
+              ${item.location || ""}
+
+            </div>
+
+          </td>
+
+          <!-- AUTHORITY -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique">
+
+              ${(item.authority || "").charAt(0).toUpperCase() + (item.authority || "").slice(1).toLowerCase()}
+
+            </div>
+
+          </td>
+
+          <!-- DATE -->
+
+          <td>
+
+            <div class="attachmentCellScrollUnique">
+
+              ${item.td_date || ""}
+
+            </div>
+
+          </td>
+
+          <!-- ACTION -->
+
+          <td>
+
+            <button
+              class="btn btn-sm btn-outline-danger"
+              onclick="deleteAttachmentUniqueScope('${item.army_number}')">
+
+              Delete
+
+            </button>
+
+          </td>
+
+        </tr>
+
+        `
+      );
+
+    });
+
+  }
+
+  /* ================= FILTER EVENT ================= */
+
+  attachmentCompanyFilterUniqueScope.addEventListener(
+    "change",
+    function () {
+
+      renderAttachmentTableUniqueScope(this.value);
+
+    }
+  );
+
+  /* ================= MODAL OPEN ================= */
+
+  attachmentModalElementUniqueScope.addEventListener(
+    "show.bs.modal",
+    async function () {
+
+      attachmentCountBadgeUniqueScope.textContent = "0";
+
+      attachmentTableBodyUniqueScope.innerHTML = `
+        <tr>
+
+          <td colspan="8" class="text-center py-4">
+
+            <div class="spinner-border spinner-border-sm me-2"></div>
+
+            Fetching attachment details...
+
+          </td>
+
+        </tr>
+      `;
+
+      try {
+
+        const attachmentResponseUniqueScope =
+          await fetch("/stats/attachment-details");
+
+        attachmentFetchedDataUniqueScope =
+          await attachmentResponseUniqueScope.json();
+
+        /* ================= RESET FILTER ================= */
+
+        attachmentCompanyFilterUniqueScope.innerHTML = `
+          <option value="ALL">
+
+            All Companies
+
+          </option>
+        `;
+
+        /* ================= DISTINCT COMPANIES ================= */
+
+        const distinctCompaniesUniqueScope = [
+          ...new Set(
+            attachmentFetchedDataUniqueScope
+              .map(item => item.company.toLowerCase())
+              .filter(Boolean)
+          )
+        ];
+
+        distinctCompaniesUniqueScope.forEach(company => {
+
+          attachmentCompanyFilterUniqueScope
+            .insertAdjacentHTML(
+              "beforeend",
+              `
+                <option value="${company}">
+
+                  ${company.replace(/\b\w/g, c => c.toUpperCase() )}
+
+                </option>
+              `
+            );
+
+        });
+
+        /* ================= INITIAL RENDER ================= */
+
+        renderAttachmentTableUniqueScope();
+
+      } catch (error) {
+
+        console.error(error);
+
+        attachmentTableBodyUniqueScope.innerHTML = `
+          <tr>
+
+            <td colspan="8" class="text-center text-danger py-4">
+
+              Failed to load data
+
+            </td>
+
+          </tr>
+        `;
+
+      }
+
+    }
+  );
+
+});
+
+/* ================= DELETE FUNCTION ================= */
+
+async function deleteAttachmentUniqueScope(
+  armyNumberUniqueScope
+) {
+
+  if (
+    !confirm(
+      "Are you sure you want to delete this attachment?"
+    )
+  ) {
+    return;
+  }
+
+  try {
+
+    const deleteResponseUniqueScope =
+      await fetch(
+        `/stats/delete-attachment/${armyNumberUniqueScope}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+    if (deleteResponseUniqueScope.ok) {
+      showStatusModal('Removed from Attachment successfully','Red',2500)
+      document
+        .getElementById(
+          `attachmentRowUniqueScope-${armyNumberUniqueScope}`
+        )
+        ?.remove();
+
+      const attachmentModalUniqueScope =
+        document.getElementById(
+          "attachmentModalUniqueScope"
+        );
+
+      const attachmentCountBadgeUniqueScope =
+        attachmentModalUniqueScope.querySelector(
+          "#attachmentCountUniqueScope"
+        );
+
+      const currentCountUniqueScope =
+        parseInt(
+          attachmentCountBadgeUniqueScope.textContent
+        ) || 0;
+
+      attachmentCountBadgeUniqueScope.textContent =
+        Math.max(currentCountUniqueScope - 1, 0);
+
+    } else {
+
+      alert("Delete failed");
+
+    }
+
+  } catch {
+
+    alert("Server error");
+
+  }
+
+}
+
+</script>

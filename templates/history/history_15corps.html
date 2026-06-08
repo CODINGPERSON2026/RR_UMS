@@ -1,0 +1,52 @@
+{% extends "baseView.html" %}
+{% block content %}
+
+    <style>
+
+        body{
+            background:#f4f6f5;
+            font-family:system-ui;
+        }
+
+        .history-container{
+            
+            margin:50px auto;
+            background:white;
+            padding:40px;
+            border-radius:18px;
+            box-shadow:0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        .history-title{
+            font-size:2.3rem;
+            font-weight:700;
+            color:#2d6b42;
+            margin-bottom:25px;
+        }
+
+        .back-btn{
+            margin-top:35px;
+        }
+
+    </style>
+</head>
+<body>
+    {% set header = "History of 15 COR" %}
+{% set subscript = "Command History → Military Operations → Heritage → Structure" %}
+{% include 'navbar/navbar.html' %}
+    <div class="history-container">
+
+        <h1 class="history-title">
+            Revisit of 15 CORPS
+        </h1>
+
+        <p>
+        history of 15 CORPS here...
+        </p>
+
+        
+
+    </div>
+
+</body>
+{% endblock %}

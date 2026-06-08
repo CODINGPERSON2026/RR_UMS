@@ -1,0 +1,1049 @@
+<style>
+  .leave-modal-wide {
+    min-height: 40%;
+  }
+  /* Timeline container */
+.remarks-timeline {
+  position: relative;
+  padding-left: 20px;
+  border-left: 3px solid #e0e0e0;
+}
+
+/* Each remark item */
+.remark-item {
+  position: relative;
+  margin-bottom: 15px;
+  padding-left: 15px;
+}
+
+/* Circle dot */
+.remark-item::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  background: #0d6efd;
+  border-radius: 50%;
+}
+
+/* Card look */
+.remark-card {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+}
+
+/* Header (user + role) */
+.remark-header {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d6efd;
+  margin-bottom: 3px;
+}
+
+/* Remark text */
+.remark-text {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Optional role colors */
+.role-OC { color: #198754; }      /* green */
+.role-CO { color: #dc3545; }      /* red */
+.role-ADMIN { color: #6f42c1; }   /* purple */
+
+/* ── Leave History Popup Card ─────────────────────────────── */
+#leaveHistoryPopup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 10500;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+#leaveHistoryPopup.show { display: flex; }
+
+.lhp-card {
+  background: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  animation: lhpSlideIn .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes lhpSlideIn {
+  from { transform: translateY(40px) scale(.96); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);   opacity: 1; }
+}
+
+.lhp-header {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+  color: #fff;
+  padding: 1.4rem 1.75rem;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.lhp-header h4 { margin: 0; font-weight: 700; }
+
+.lhp-close {
+  background: rgba(255,255,255,.2);
+  border: none;
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s;
+}
+.lhp-close:hover { background: rgba(255,255,255,.35); }
+
+.lhp-body { padding: 1.5rem 1.75rem; }
+
+.lhp-year-block {
+  margin-bottom: 1.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+.lhp-year-heading {
+  background: linear-gradient(90deg, #eff6ff, #dbeafe);
+  padding: .75rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  border-bottom: 1px solid #bfdbfe;
+}
+.lhp-badge-year {
+  background: #2563eb;
+  color: #fff;
+  border-radius: 8px;
+  padding: .25rem .75rem;
+  font-weight: 700;
+  font-size: .95rem;
+}
+.lhp-table { width: 100%; border-collapse: collapse; }
+.lhp-table thead th {
+  background: #f8fafc;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #64748b;
+  padding: .65rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+.lhp-table tbody td {
+  padding: .75rem 1rem;
+  text-align: center;
+  font-size: .93rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.lhp-table tbody td:first-child { text-align: left; font-weight: 600; }
+
+.lhp-pill-total   { background: #dbeafe; color: #1d4ed8; border-radius: 999px; padding: .2rem .7rem; font-weight: 700; font-size: .85rem; display: inline-block; }
+.lhp-pill-taken   { background: #fce7f3; color: #be185d; border-radius: 999px; padding: .2rem .7rem; font-weight: 700; font-size: .85rem; display: inline-block; }
+.lhp-pill-balance { background: #d1fae5; color: #065f46; border-radius: 999px; padding: .2rem .7rem; font-weight: 700; font-size: .85rem; display: inline-block; }
+
+.lhp-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+/* View History button inside modal footer */
+.vbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0.45rem 1rem;
+  border-radius: 7px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.1s;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.vbtn:hover  { filter: brightness(0.92); }
+.vbtn:active { transform: scale(0.97); }
+
+.vbtn-history  { background: #fff;    border-color: #1e3a5f; color: #1e3a5f; }
+.vbtn-close    { background: #f1f5f9; border-color: #cbd5e1; color: #334155; }
+.vbtn-recommend{ background: #15803d; border-color: #15803d; color: #fff;    }
+.vbtn-reject   { background: #dc2626; border-color: #dc2626; color: #fff;    }
+
+.footer-gap { flex: 1; }
+</style>
+
+<!-- Leave Requests Modal -->
+<div class="modal fade" id="leaveRequestsModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Leave Requests</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-3">
+          <li class="nav-item">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab"
+              data-bs-target="#pending">Pending</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="recommended-tab" data-bs-toggle="tab"
+              data-bs-target="#recommended">Approved</button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="rejected-tab" data-bs-toggle="tab" data-bs-target="#rejected">Rejected</button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- Pending Tab -->
+          <div class="tab-pane fade show active" id="pending">
+            <div id="leaveRequestsSpinner" class="text-center my-3">
+              <div class="spinner-border text-primary"></div>
+            </div>
+            <table class="table table-striped d-none" id="leaveRequestsTable">
+              <thead>
+                <tr>
+                  <th>Army Number</th>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Company</th>
+                  <th>Leave Type</th>
+                  <th>Days</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leaveRequestsTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Recommended Tab -->
+          <div class="tab-pane fade" id="recommended">
+            <div id="recommendedSpinner" class="text-center my-3">
+              <div class="spinner-border text-success"></div>
+            </div>
+            <table class="table table-striped d-none" id="recommendedTable">
+              <thead>
+                <tr>
+                  <th>Army Number</th>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Company</th>
+                  <th>Leave Type</th>
+                  <th>Days</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="recommendedTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Rejected Tab -->
+          <div class="tab-pane fade" id="rejected">
+            <div id="rejectedSpinner" class="text-center my-3">
+              <div class="spinner-border text-danger"></div>
+            </div>
+            <table class="table table-striped d-none" id="rejectedTable">
+              <thead>
+                <tr>
+                  <th>Army Number</th>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Company</th>
+                  <th>Leave Type</th>
+                  <th>Days</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rejectedTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Leave Modal -->
+<div class="modal fade" id="viewLeaveModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable leave-modal-wide">
+    <div class="modal-content shadow-lg">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Leave Request Details</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div id="viewLeaveSpinner" class="text-center my-4">
+          <div class="spinner-border text-primary"></div>
+        </div>
+
+        <div id="viewLeaveContent" class="d-none">
+          <div class="row g-3">
+            <!-- Existing Applicant Details -->
+            <div class="col-md-6">
+              <label class="fw-bold">Army Number</label>
+              <div class="form-control bg-light" id="v_army_number"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Rank</label>
+              <div class="form-control bg-light" id="v_rank"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Name</label>
+              <div class="form-control bg-light" id="name"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Company</label>
+              <div class="form-control bg-light" id="v_company"></div>
+            </div>
+
+            <!-- Rest of your existing fields -->
+            <div class="col-md-6">
+              <label class="fw-bold">Leave Days</label>
+              <div class="form-control bg-light" id="v_leave_days"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Leave Type</label>
+              <div class="form-control bg-light" id="v_leave_type"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">From Date</label>
+              <div class="form-control bg-light" id="v_from_date"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">To Date</label>
+              <div class="form-control bg-light" id="v_to_date"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Prefix Date</label>
+              <div class="form-control bg-light" id="v_prefix_date"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Suffix Date</label>
+              <div class="form-control bg-light" id="v_suffix_date"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Prefix Days</label>
+              <div class="form-control bg-light" id="v_prefix_days"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Suffix Days</label>
+              <div class="form-control bg-light" id="v_suffix_days"></div>
+            </div>
+
+            <div class="mt-3">
+              <h6 class="fw-bold">Remarks</h6>
+              <div id="v_history" class="remarks-timeline"></div>
+            </div>
+
+            <!-- Reliever Section -->
+            <div class="col-12 mt-4">
+              <h6 class="fw-bold text-success border-bottom pb-2">👤 Reliever Details</h6>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Reliever Army Number</label>
+              <div class="form-control bg-light" id="v_reliever_army_number"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Reliever Rank</label>
+              <div class="form-control bg-light" id="v_reliever_rank"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Reliever Name</label>
+              <div class="form-control bg-light" id="v_reliever_name"></div>
+            </div>
+            <div class="col-md-6">
+              <label class="fw-bold">Reliever Company</label>
+              <div class="form-control bg-light" id="v_reliever_company"></div>
+            </div>
+
+            <div class="col-12">
+              <label class="fw-bold">Reason</label>
+              <div class="form-control bg-light" style="min-height:80px" id="v_reason"></div>
+            </div>
+
+            <!-- Rejection Reason -->
+            <div class="col-12 d-none" id="rejectionReasonContainer">
+              <label class="fw-bold text-danger">Rejection Reason</label>
+              <div class="form-control bg-light text-danger" style="min-height:80px" id="v_reject_reason"></div>
+            </div>
+
+            <div class="col-12">
+              <label class="fw-bold">Status</label>
+              <span class="badge fs-6" id="v_status"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="vbtn vbtn-history" id="viewHistoryBtn" onclick="openLeaveHistoryPopup()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Leave History
+        </button>
+        <div class="footer-gap"></div>
+        <button class="vbtn vbtn-close" data-bs-dismiss="modal">Close</button>
+        <button class="vbtn vbtn-recommend" id="recommend-button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+          Recommend
+        </button>
+        <button class="vbtn vbtn-reject" id="reject-button">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Leave History Popup Card (fixed overlay, no separate modal) ── -->
+<div id="leaveHistoryPopup">
+  <div class="lhp-card">
+    <div class="lhp-header">
+      <h4>📋 Leave History</h4>
+      <button class="lhp-close" onclick="closeLeaveHistoryPopup()">✕</button>
+    </div>
+    <div class="lhp-body" id="leaveHistoryPopupBody">
+      <div class="lhp-empty">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Reason Modal -->
+<div class="modal fade" id="rejectReasonModal" tabindex="-1">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h6 class="modal-title">Reject Leave</h6>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="fw-bold mb-1">Rejection Reason</label>
+        <textarea id="rejectReason" class="form-control" rows="3" placeholder="Enter reason..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-danger btn-sm" id="submitRejectBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remark Modal -->
+<div class="modal fade" id="remarkModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title">Add Remark <span class="fw-light fs-6">(Optional)</span></h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label class="fw-bold mb-1">Remark</label>
+        <textarea
+          id="remarkInput"
+          class="form-control"
+          placeholder="Enter remark (optional)"
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="skipRemarkBtn">Skip</button>
+        <button class="btn btn-success" id="submitRemarkBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variables
+  let currentLeaveId = null;
+  let rejectLeaveId = null;
+  let currentViewArmyNumber = null; // tracks army number for history popup
+
+  // Helper to hide/show rejection reason
+  function toggleRejectionReason(show, reason = '') {
+    const container = document.getElementById("rejectionReasonContainer");
+    const field = document.getElementById("v_reject_reason");
+    if (show) {
+      container.classList.remove("d-none");
+      field.innerText = reason || "No reason provided";
+    } else {
+      container.classList.add("d-none");
+    }
+  }
+
+  // ─── LEAVE HISTORY POPUP ─────────────────────────────────────────────────────
+
+  async function openLeaveHistoryPopup() {
+    if (!currentViewArmyNumber) {
+      alert("No army number available.");
+      return;
+    }
+
+    const popup = document.getElementById("leaveHistoryPopup");
+    const body  = document.getElementById("leaveHistoryPopupBody");
+
+    body.innerHTML = '<div class="lhp-empty">⏳ Loading history…</div>';
+    popup.classList.add("show");
+
+    try {
+      const res  = await fetch(`/apply_leave/leave_history/${currentViewArmyNumber}`);
+      const data = await res.json();
+      renderLeaveHistoryPopup(data);
+    } catch (err) {
+      body.innerHTML = '<div class="lhp-empty text-danger">❌ Failed to load history.</div>';
+    }
+  }
+
+  function closeLeaveHistoryPopup() {
+    document.getElementById("leaveHistoryPopup").classList.remove("show");
+  }
+
+  // Close popup when clicking backdrop
+  document.getElementById("leaveHistoryPopup")?.addEventListener("click", function(e) {
+    if (e.target === this) closeLeaveHistoryPopup();
+  });
+
+  function renderLeaveHistoryPopup(records) {
+    const body = document.getElementById("leaveHistoryPopupBody");
+
+    if (!records || records.length === 0) {
+      body.innerHTML = '<div class="lhp-empty">📭 No leave history found for this employee.</div>';
+      return;
+    }
+
+    const ENTITLEMENTS = { AL: 60, CL: 30, AAL: 20 };
+    let html = '';
+
+    records.forEach(row => {
+      const year     = row.year  || '—';
+      const alTotal  = row.AL   ?? 0;
+      const clTotal  = row.CL   ?? 0;
+      const aalTotal = row.AAL  ?? 0;
+      const remarks  = row.remarks || '';
+
+      const leaveTypes = [
+        { label: 'AL – Annual Leave',             total: ENTITLEMENTS.AL,  taken: alTotal  },
+        { label: 'CL – Casual Leave',             total: ENTITLEMENTS.CL,  taken: clTotal  },
+        { label: 'AAL – Additional Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
+      ];
+
+      html += `
+        <div class="lhp-year-block">
+          <div class="lhp-year-heading">
+            <span class="lhp-badge-year">${year}</span>
+            <span style="color:#1e40af; font-weight:600; font-size:.9rem;">Leave Summary</span>
+          </div>
+          <table class="lhp-table">
+            <thead>
+              <tr>
+                <th>Leave Type</th>
+                <th>Total Entitled</th>
+                <th>Taken</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      leaveTypes.forEach(lt => {
+        const balance = lt.total - lt.taken;
+        html += `
+          <tr>
+            <td>${lt.label}</td>
+            <td><span class="lhp-pill-total">${lt.total}</span></td>
+            <td><span class="lhp-pill-taken">${lt.taken}</span></td>
+            <td><span class="lhp-pill-balance">${balance}</span></td>
+          </tr>
+        `;
+      });
+
+      html += `</tbody></table>`;
+
+      if (remarks) {
+        html += `
+          <div style="padding:.6rem 1.2rem; font-size:.83rem; color:#64748b; border-bottom:1px solid #f1f5f9;">
+            📝 <em>${remarks}</em>
+          </div>`;
+      }
+
+      html += `</div>`;
+    });
+
+    body.innerHTML = html;
+  }
+
+  // ─── RECOMMEND WITH REMARK MODAL ────────────────────────────────────────────
+
+  document.getElementById("recommend-button")?.addEventListener("click", () => {
+    if (!currentLeaveId) return alert("Leave ID missing");
+    if (!confirm("Are you sure you want to recommend this leave?")) return;
+
+    document.getElementById("remarkInput").value = "";
+    new bootstrap.Modal(document.getElementById("remarkModal")).show();
+  });
+
+  async function submitRecommend(remark = "") {
+    try {
+      const payload = { leave_id: currentLeaveId };
+      if (remark) payload.remark = remark;
+
+      const res = await fetch("/apply_leave/recommend_leave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed");
+
+      alert("Leave recommended successfully");
+      bootstrap.Modal.getInstance(document.getElementById("remarkModal")).hide();
+      bootstrap.Modal.getInstance(document.getElementById("viewLeaveModal")).hide();
+      loadLeaveRequests();
+      loadRecommendedLeaves();
+    } catch (err) {
+      alert(err.message || "Server error");
+    }
+  }
+
+  document.getElementById("skipRemarkBtn")?.addEventListener("click", () => {
+    submitRecommend("");
+  });
+
+  document.getElementById("submitRemarkBtn")?.addEventListener("click", () => {
+    const remark = document.getElementById("remarkInput").value.trim();
+    submitRecommend(remark);
+  });
+
+  // ─── REJECT ─────────────────────────────────────────────────────────────────
+
+  document.getElementById("reject-button")?.addEventListener("click", () => {
+    if (!currentLeaveId) return alert("Leave ID missing");
+    rejectLeaveId = currentLeaveId;
+    document.getElementById("rejectReason").value = "";
+    new bootstrap.Modal(document.getElementById("rejectReasonModal")).show();
+  });
+
+  document.getElementById("submitRejectBtn")?.addEventListener("click", async () => {
+    const reason = document.getElementById("rejectReason").value.trim();
+    if (!reason) return alert("Please enter rejection reason");
+
+    try {
+      const res = await fetch("/apply_leave/reject_leave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leave_id: rejectLeaveId, reason })
+      });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed");
+
+      alert("Leave rejected successfully");
+      bootstrap.Modal.getInstance(document.getElementById("rejectReasonModal")).hide();
+      bootstrap.Modal.getInstance(document.getElementById("viewLeaveModal")).hide();
+      loadLeaveRequests();
+      loadRejectedLeaves();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Server error");
+    }
+  });
+
+  // ─── VIEW LEAVE (PENDING) ────────────────────────────────────────────────────
+
+  async function viewLeaveRequest(id) {
+    currentLeaveId = id;
+    const modal = new bootstrap.Modal(document.getElementById("viewLeaveModal"));
+    modal.show();
+
+    document.getElementById("viewLeaveSpinner").classList.remove("d-none");
+    document.getElementById("viewLeaveContent").classList.add("d-none");
+    toggleRejectionReason(false);
+
+    try {
+      const res = await fetch(`/apply_leave/get_leave_request/${id}`);
+      const result = await res.json();
+      
+      if (!result.success) {
+        alert(result.message || "Failed to load leave details");
+        return;
+      }
+
+      const data = result.data;
+      console.log("Leave Data:", data);
+
+      // Store army number for history popup
+      currentViewArmyNumber = data.army_number || null;
+
+      // Applicant Details
+      document.getElementById("v_army_number").innerText = data.army_number || "N/A";
+      document.getElementById("v_rank").innerText = data.rank || "NIL";
+      document.getElementById("name").innerText = data.name || "N/A";
+      document.getElementById("v_company").innerText = data.company || "NIL";
+
+      // Reliever Details
+      document.getElementById("v_reliever_army_number").innerText = data.reliever_army_number || "Not Assigned";
+      document.getElementById("v_reliever_rank").innerText = data.reliever_rank || "NIL";
+      document.getElementById("v_reliever_name").innerText = data.reliever_name || "NIL";
+      document.getElementById("v_reliever_company").innerText = data.reliever_company || "NIL";
+
+      // Leave Details
+      document.getElementById("v_leave_days").innerText = data.leave_days || 0;
+      document.getElementById("v_leave_type").innerText = data.leave_type || "N/A";
+      document.getElementById("v_from_date").innerText = data.from_date || "NIL";
+      document.getElementById("v_to_date").innerText = data.to_date || "NIL";
+      document.getElementById("v_prefix_date").innerText = data.prefix_date || "NIL";
+      document.getElementById("v_suffix_date").innerText = data.suffix_date || "NIL";
+      document.getElementById("v_prefix_days").innerText = data.prefix_days || 0;
+      document.getElementById("v_suffix_days").innerText = data.suffix_days || 0;
+      document.getElementById("v_reason").innerText = data.leave_reason || "No reason provided";
+
+      // History Remarks
+      const historyContainer = document.getElementById("v_history");
+      historyContainer.innerHTML = "";
+
+      if (data.history && data.history.length > 0) {
+        data.history.forEach(item => {
+          const wrapper = document.createElement("div");
+          wrapper.classList.add("remark-item");
+          const roleClass = item.recommended_by ? `role-${item.recommended_by.toUpperCase()}` : "";
+          wrapper.innerHTML = `
+            <div class="remark-card">
+              <div class="remark-header ${roleClass}">
+                ${item.recommended_by || "Unknown"}
+              </div>
+              <div class="remark-text">
+                ${item.star_remarks || "No remarks"}
+              </div>
+            </div>
+          `;
+          historyContainer.appendChild(wrapper);
+        });
+      } else {
+        historyContainer.innerHTML = `<span class="text-muted">No remarks available</span>`;
+      }
+
+      // Status Badge
+      const badge = document.getElementById("v_status");
+      badge.innerText = data.request_status || "Pending";
+      badge.className = `badge fs-6 ${data.request_status === 'Approved' ? 'bg-success' : data.request_status === 'Rejected' ? 'bg-danger' : 'bg-warning'}`;
+
+      // Show/Hide Rejection Reason
+      if (data.request_status === "Rejected" && data.reject_reason) {
+        document.getElementById("v_reject_reason").innerText = data.reject_reason;
+        document.getElementById("rejectionReasonContainer").classList.remove("d-none");
+      } else {
+        document.getElementById("rejectionReasonContainer").classList.add("d-none");
+      }
+
+      // Button Text Logic
+      document.getElementById("recommend-button").classList.remove("d-none");
+      document.getElementById("reject-button").classList.remove("d-none");
+
+      if (
+        data.leave_request_type === 'OR' &&
+        data.rank !== 'Subedar' &&
+        data.rank !== 'Naib Subedar' &&
+        data.rank !== 'Subedar Major'
+      ) {
+        document.getElementById('recommend-button').innerText = 'Sanction Leave';
+      } else if (data.leave_request_type === 'OFFICER') {
+        document.getElementById('recommend-button').innerText = 'Sanction Leave';
+      } else {
+        document.getElementById('recommend-button').innerText = 'Recommend';
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load details");
+    }
+
+    document.getElementById("viewLeaveSpinner").classList.add("d-none");
+    document.getElementById("viewLeaveContent").classList.remove("d-none");
+  }
+
+  // ─── VIEW RECOMMENDED LEAVE ──────────────────────────────────────────────────
+
+  async function viewRecommendedLeave(id) {
+    currentLeaveId = id;
+    const modal = new bootstrap.Modal(document.getElementById("viewLeaveModal"));
+    modal.show();
+
+    document.getElementById("viewLeaveSpinner").classList.remove("d-none");
+    document.getElementById("viewLeaveContent").classList.add("d-none");
+    toggleRejectionReason(false);
+
+    try {
+      const res = await fetch(`/apply_leave/get_leave_history/${id}`);
+      const data = await res.json();
+
+      // Store army number for history popup
+      currentViewArmyNumber = data.data.army_number || null;
+
+      document.getElementById("v_army_number").innerText = data.data.army_number;
+      document.getElementById("v_rank").innerText = data.data.rank || "NIL";
+      document.getElementById("name").innerText = data.data.name;
+      document.getElementById("v_company").innerText = data.data.company || "NIL";
+      document.getElementById("v_leave_days").innerText = data.data.leave_days;
+      document.getElementById("v_leave_type").innerText = data.data.leave_type;
+      document.getElementById("v_from_date").innerText = data.data.from_date;
+      document.getElementById("v_to_date").innerText = data.data.to_date;
+      document.getElementById("v_prefix_date").innerText = data.data.prefix_date || "NIL";
+      document.getElementById("v_suffix_date").innerText = data.data.suffix_date || "NIL";
+      document.getElementById("v_prefix_days").innerText = data.data.prefix_days || 0;
+      document.getElementById("v_suffix_days").innerText = data.data.suffix_days || 0;
+      document.getElementById("v_reason").innerText = data.data.leave_reason;
+
+      const badge = document.getElementById("v_status");
+      if (data.user_data.leave_request_type == 'OR') {
+        badge.innerText = "Leave has been Sanctioned";
+        badge.className = "badge fs-6 bg-success";
+      } else {
+        badge.innerText = data.data.request_status;
+        badge.className = "badge fs-6 bg-success";
+      }
+
+      document.getElementById("recommend-button").classList.add("d-none");
+      document.getElementById("reject-button").classList.add("d-none");
+    } catch (err) {
+      alert("Unable to load leave details");
+    }
+
+    document.getElementById("viewLeaveSpinner").classList.add("d-none");
+    document.getElementById("viewLeaveContent").classList.remove("d-none");
+  }
+
+  // ─── VIEW REJECTED LEAVE ─────────────────────────────────────────────────────
+
+  async function viewRejectedLeave(id) {
+    currentLeaveId = id;
+    const modal = new bootstrap.Modal(document.getElementById("viewLeaveModal"));
+    modal.show();
+
+    document.getElementById("viewLeaveSpinner").classList.remove("d-none");
+    document.getElementById("viewLeaveContent").classList.add("d-none");
+    toggleRejectionReason(false);
+
+    try {
+      const res = await fetch(`/apply_leave/get_leave_request/${id}`);
+      const { data } = await res.json();
+
+      // Store army number for history popup
+      currentViewArmyNumber = data.army_number || null;
+
+      document.getElementById("v_prefix_date").innerText = data.prefix_date || "NIL";
+      document.getElementById("v_suffix_date").innerText = data.suffix_date || "NIL";
+      document.getElementById("v_prefix_days").innerText = data.prefix_days || 0;
+      document.getElementById("v_suffix_days").innerText = data.suffix_days || 0;
+      document.getElementById("v_army_number").innerText = data.army_number;
+      document.getElementById("v_rank").innerText = data.rank || "NIL";
+      document.getElementById("name").innerText = data.name;
+      document.getElementById("v_company").innerText = data.company || "NIL";
+      document.getElementById("v_leave_days").innerText = data.leave_days;
+      document.getElementById("v_leave_type").innerText = data.leave_type;
+      document.getElementById("v_from_date").innerText = data.from_date;
+      document.getElementById("v_to_date").innerText = data.to_date;
+      document.getElementById("v_reason").innerText = data.leave_reason;
+
+      const badge = document.getElementById("v_status");
+      badge.innerText = data.request_status;
+      badge.className = "badge fs-6 bg-danger";
+
+      toggleRejectionReason(true, data.reject_reason);
+
+      document.getElementById("recommend-button").classList.add("d-none");
+      document.getElementById("reject-button").classList.add("d-none");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load rejected leave details");
+    }
+
+    document.getElementById("viewLeaveSpinner").classList.add("d-none");
+    document.getElementById("viewLeaveContent").classList.remove("d-none");
+  }
+
+  // ─── LOAD PENDING ────────────────────────────────────────────────────────────
+
+  async function loadLeaveRequests() {
+    const spinner = document.getElementById("leaveRequestsSpinner");
+    const table = document.getElementById("leaveRequestsTable");
+    const tbody = document.getElementById("leaveRequestsTableBody");
+
+    spinner.classList.remove("d-none");
+    table.classList.add("d-none");
+    tbody.innerHTML = "";
+
+    try {
+      const res = await fetch("/apply_leave/get_leave_requests");
+      const { data } = await res.json();
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No leave requests found</td></tr>`;
+      } else {
+        data.forEach(row => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${row.army_number}</td>
+              <td>${row.rank}</td>
+              <td>${row.name}</td>
+              <td>${row.company}</td>
+              <td>${row.leave_type}</td>
+              <td>${row.leave_days}</td>
+              <td><button class="btn btn-sm btn-primary" onclick="viewLeaveRequest(${row.id})">View</button></td>
+            </tr>`;
+        });
+      }
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load</td></tr>`;
+    }
+
+    spinner.classList.add("d-none");
+    table.classList.remove("d-none");
+  }
+
+  // ─── LOAD RECOMMENDED ────────────────────────────────────────────────────────
+
+  async function loadRecommendedLeaves() {
+    const spinner = document.getElementById("recommendedSpinner");
+    const table = document.getElementById("recommendedTable");
+    const tbody = document.getElementById("recommendedTableBody");
+
+    spinner.classList.remove("d-none");
+    table.classList.add("d-none");
+    tbody.innerHTML = "";
+
+    try {
+      const res = await fetch("/apply_leave/get_recommended_requests");
+      const data = await res.json();
+
+      if (!data.data || data.data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No recommended leaves found</td></tr>`;
+      } else {
+        data.data.forEach(row => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${row.army_number}</td>
+              <td>${row.rank}</td>
+              <td>${row.name}</td>
+              <td>${row.company}</td>
+              <td>${row.leave_type}</td>
+              <td>${row.leave_days}</td>
+              <td><button class="btn btn-sm btn-info" onclick="viewRecommendedLeave(${row.id})">View</button></td>
+            </tr>`;
+        });
+      }
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load</td></tr>`;
+    }
+
+    spinner.classList.add("d-none");
+    table.classList.remove("d-none");
+  }
+
+  // ─── LOAD REJECTED ───────────────────────────────────────────────────────────
+
+  async function loadRejectedLeaves() {
+    const spinner = document.getElementById("rejectedSpinner");
+    const table = document.getElementById("rejectedTable");
+    const tbody = document.getElementById("rejectedTableBody");
+
+    spinner.classList.remove("d-none");
+    table.classList.add("d-none");
+    tbody.innerHTML = "";
+
+    try {
+      const res = await fetch("/apply_leave/get_rejected_requests");
+      const { data } = await res.json();
+
+      if (!data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">No rejected leaves found</td></tr>`;
+      } else {
+        data.forEach(row => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${row.army_number}</td>
+              <td>${row.rank}</td>
+              <td>${row.name}</td>
+              <td>${row.company}</td>
+              <td>${row.leave_type}</td>
+              <td>${row.leave_days}</td>
+              <td>
+                <button class="btn btn-sm btn-danger me-1" onclick="viewRejectedLeave(${row.id})">View</button>
+                <button class="btn btn-sm btn-warning" onclick="undoReject(${row.id})">Undo</button>
+              </td>
+            </tr>`;
+        });
+      }
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Failed to load</td></tr>`;
+    }
+
+    spinner.classList.add("d-none");
+    table.classList.remove("d-none");
+  }
+
+  // ─── OPEN MODAL & LOAD ACTIVE TAB ───────────────────────────────────────────
+
+  document.getElementById("leaveRequestsBtn")?.addEventListener("click", () => {
+    const modal = new bootstrap.Modal(document.getElementById("leaveRequestsModal"));
+    modal.show();
+
+    const activeTab = document.querySelector("#leaveRequestsModal .nav-link.active");
+    if (activeTab.id === "pending-tab") loadLeaveRequests();
+    else if (activeTab.id === "recommended-tab") loadRecommendedLeaves();
+    else if (activeTab.id === "rejected-tab") loadRejectedLeaves();
+  });
+
+  // ─── UNDO REJECT ─────────────────────────────────────────────────────────────
+
+  async function undoReject(leaveId) {
+    alert(leaveId);
+    if (!confirm("Undo rejection and move back to pending?")) return;
+
+    try {
+      const res = await fetch("/apply_leave/undo_rejected_leave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ leave_id: leaveId })
+      });
+
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed");
+
+      alert("Leave moved back to pending");
+      loadRejectedLeaves();
+      loadLeaveRequests();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Server error");
+    }
+  }
+
+  // ─── TAB SWITCH LOADERS ──────────────────────────────────────────────────────
+
+  document.getElementById("pending-tab")?.addEventListener("shown.bs.tab", loadLeaveRequests);
+  document.getElementById("recommended-tab")?.addEventListener("shown.bs.tab", loadRecommendedLeaves);
+  document.getElementById("rejected-tab")?.addEventListener("shown.bs.tab", loadRejectedLeaves);
+</script>

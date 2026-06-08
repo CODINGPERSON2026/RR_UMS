@@ -1,0 +1,540 @@
+<link rel="stylesheet" href="/static/cropper.min.css">
+<div class="modal fade" id="addHonoursModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content honours-modal">
+      <div class="modal-header honours-header">
+        <div>
+          <h4 class="honours-title">Add Honour Entry</h4>
+          <div class="honours-subtitle">Create appreciation recognition for personnel</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="honoursForm" enctype="multipart/form-data">
+        <div class="modal-body honours-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="honours-label">Search Personnel</label>
+              <input type="hidden" name="army_number" id="armyNumberHidden">
+              <div class="ps-wrapper">
+                <i class="fa-solid fa-magnifying-glass ps-icon"></i>
+                <input
+                  type="text"
+                  id="personnelSearch"
+                  class="form-control honours-input ps-input"
+                  placeholder="Type name to search…"
+                  autocomplete="off"
+                >
+                <button type="button" id="psClear" class="ps-clear" style="display:none" title="Clear">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="ps-dropdown" id="psDropdown"></div>
+              <div class="ps-chip" id="psChip" style="display:none">
+                <div class="ps-chip-info">
+                  <span class="ps-chip-name" id="psChipName"></span>
+                  <span class="ps-chip-meta" id="psChipMeta"></span>
+                </div>
+                <button type="button" class="ps-chip-remove" id="psChipRemove" title="Remove">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="honours-label">Appreciation Type</label>
+              <select name="appreciation_type" class="form-select honours-input" required>
+                <option value="">Select Appreciation Type</option>
+                <option value="Leadership">Leadership</option>
+                <option value="Bravery">Bravery</option>
+                <option value="Discipline">Discipline</option>
+                <option value="Innovation">Innovation</option>
+                <option value="Service">Service</option>
+                <option value="Teamwork">Teamwork</option>
+                <option value="Excellence">Excellence</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="honours-label">Medal Icon</label>
+              <select name="medal_icon" id="medalSelect" class="form-select honours-input" required>
+                <option value="">Select Medal Icon</option>
+                <option value="fa-solid fa-trophy">🏆 Trophy</option>
+                <option value="fa-solid fa-medal">🥇 Medal</option>
+                <option value="fa-solid fa-award">🎖 Award</option>
+                <option value="fa-solid fa-star">⭐ Star</option>
+                <option value="fa-solid fa-shield-halved">🛡 Shield</option>
+                <option value="fa-solid fa-crown">👑 Crown</option>
+                <option value="fa-solid fa-fire">🔥 Valor</option>
+                <option value="fa-solid fa-gem">💎 Diamond</option>
+                <option value="fa-solid fa-bolt">⚡ Excellence</option>
+                <option value="fa-solid fa-flag">🚩 Service</option>
+                <option value="fa-solid fa-chess-king">♚ Leadership</option>
+                <option value="fa-solid fa-user-shield">🪖 Protection</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="honours-label">Appreciation Date</label>
+              <input type="date" name="appreciation_date" class="form-control honours-input" required>
+            </div>
+
+            <div class="col-md-6">
+              <label class="honours-label">Personnel Image</label>
+              <input type="file" id="imageInput" accept="image/*" class="form-control honours-input">
+            </div>
+
+            <div class="col-12" id="cropSection" style="display:none">
+              <label class="honours-label">Crop Preview</label>
+              <div class="crop-container">
+                <img id="cropPreview" class="crop-preview">
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label class="honours-label">Commendation</label>
+              <textarea
+                name="commendation"
+                rows="4"
+                class="form-control honours-input honours-textarea"
+                placeholder="Write commendation..."
+                required
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer honours-footer">
+          <button type="button" class="btn honours-cancel-btn" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn honours-submit-btn">
+            <i class="fa-solid fa-paper-plane"></i>
+            Submit Entry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .honours-modal{
+    border:none;
+    border-radius:24px;
+    overflow:hidden;
+    background:var(--card-bg-solid);
+  }
+  .honours-header{
+    border:none;
+    padding:20px 24px;
+    background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
+    color:#fff;
+  }
+  .honours-title{
+    margin:0;
+    font-size:24px;
+    font-weight:800;
+  }
+  .honours-subtitle{
+    margin-top:4px;
+    opacity:.85;
+    font-size:13.5px;
+  }
+  .honours-body{ 
+    padding:24px; 
+  }
+  .honours-label{
+    display:block;
+    margin-bottom:8px;
+    font-size:13px;
+    font-weight:700;
+    color:var(--text-primary);
+  }
+  .honours-input{
+    min-height:48px;
+    border-radius:12px;
+    border:1px solid var(--border-color);
+    background:var(--card-bg-solid);
+    color:var(--text-primary);
+    padding:10px 14px;
+    font-size:14px;
+    box-shadow:none !important;
+  }
+  .honours-input:focus{
+    border-color:var(--primary-color);
+    box-shadow:0 0 0 3px rgba(59,130,246,.15) !important;
+  }
+  .honours-textarea{ 
+    resize:none; 
+    min-height:110px;
+  }
+  .ps-wrapper{ position:relative; }
+  .ps-icon{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--text-secondary);
+    font-size:13px;
+    pointer-events:none;
+    z-index:2;
+  }
+  .ps-input{
+    padding-left:40px !important;
+    padding-right:40px !important;
+  }
+  .ps-clear{
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    border:none;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    font-size:13px;
+    padding:4px;
+    z-index:2;
+  }
+  .ps-clear:hover{ color:var(--text-primary); }
+  .ps-dropdown{
+    position:absolute;
+    width:100%;
+    background:var(--card-bg-solid);
+    border:1px solid var(--border-color);
+    border-radius:12px;
+    margin-top:6px;
+    overflow:hidden;
+    z-index:1050;
+    box-shadow:0 12px 32px rgba(0,0,0,.18);
+    display:none;
+  }
+  .ps-dropdown.open{ display:block; }
+  .ps-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 14px;
+    cursor:pointer;
+    transition:background .15s;
+    border-bottom:1px solid var(--border-color);
+  }
+  .ps-item:last-child{ border-bottom:none; }
+  .ps-item:hover{ background:var(--nav-link-hover-bg); }
+  .ps-avatar{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:800;
+    flex-shrink:0;
+  }
+  .ps-item-name{
+    font-size:14px;
+    font-weight:700;
+    color:var(--text-primary);
+    line-height:1.2;
+  }
+  .ps-item-meta{
+    font-size:12px;
+    color:var(--text-secondary);
+    margin-top:1px;
+  }
+  .ps-badge{
+    margin-left:auto;
+    font-size:11px;
+    font-weight:700;
+    padding:3px 9px;
+    border-radius:999px;
+    background:var(--nav-link-hover-bg);
+    color:var(--text-secondary);
+    border:1px solid var(--border-color);
+    flex-shrink:0;
+  }
+  .ps-empty{
+    padding:16px 14px;
+    font-size:13px;
+    color:var(--text-secondary);
+    text-align:center;
+  }
+  .ps-loading{
+    padding:16px 14px;
+    font-size:13px;
+    color:var(--text-secondary);
+    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .ps-chip{
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:11px 14px;
+    border-radius:12px;
+    border:1px solid var(--primary-color);
+    background:var(--nav-link-hover-bg);
+  }
+  .ps-chip-info{ display:flex; flex-direction:column; gap:2px; }
+  .ps-chip-name{
+    font-size:14px;
+    font-weight:700;
+    color:var(--text-primary);
+  }
+  .ps-chip-meta{
+    font-size:12px;
+    color:var(--text-secondary);
+  }
+  .ps-chip-remove{
+    border:none;
+    background:transparent;
+    color:var(--text-secondary);
+    cursor:pointer;
+    font-size:14px;
+    padding:4px 6px;
+    border-radius:8px;
+    transition:all .2s;
+  }
+  .ps-chip-remove:hover{
+    background:var(--border-color);
+    color:var(--text-primary);
+  }
+  .crop-container{
+    width:100%;
+    height:220px;
+    border-radius:14px;
+    overflow:hidden;
+    background:#111827;
+    border:1px solid var(--border-color);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .crop-preview{
+    max-width:100%;
+    display:none;
+  }
+  .honours-footer{
+    border:none;
+    padding:18px 24px;
+  }
+  .honours-cancel-btn{
+    border-radius:10px;
+    padding:10px 16px;
+    font-weight:700;
+  }
+  .honours-submit-btn{
+    border:none;
+    border-radius:10px;
+    padding:10px 22px;
+    font-weight:700;
+    color:#fff;
+    background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));
+  }
+</style>
+
+<script src="/static/cropper.min.js"></script>
+<script>
+  const psInput = document.getElementById("personnelSearch");
+  const psDropdown = document.getElementById("psDropdown");
+  const psChip = document.getElementById("psChip");
+  const psChipName = document.getElementById("psChipName");
+  const psChipMeta = document.getElementById("psChipMeta");
+  const psChipRemove = document.getElementById("psChipRemove");
+  const psClear = document.getElementById("psClear");
+  const armyHidden = document.getElementById("armyNumberHidden");
+  const cropSection = document.getElementById("cropSection");
+  const cropPreview = document.getElementById("cropPreview");
+  const imageInput = document.getElementById("imageInput");
+  let psTimer = null;
+  let psSelected = false;
+  let cropper = null;
+  let croppedBlob = null;
+
+  function getInitials(name){
+    return (name||"")
+      .split(" ")
+      .map(w=>w[0])
+      .join("")
+      .substring(0,2)
+      .toUpperCase();
+  }
+
+  function openDropdown(html){
+    psDropdown.innerHTML = html;
+    psDropdown.classList.add("open");
+  }
+
+  function closeDropdown(){
+    psDropdown.classList.remove("open");
+    psDropdown.innerHTML = "";
+  }
+
+  function selectPerson(person){
+    armyHidden.value = person.army_number;
+    psChipName.textContent = `${person.rank||""} ${person.name}`.trim();
+    psChipMeta.textContent = `${person.army_number} · ${person.company||""}`;
+    psChip.style.display = "flex";
+    psInput.style.display = "none";
+    psClear.style.display = "none";
+    psSelected = true;
+    closeDropdown();
+  }
+
+  function clearSelection(){
+    armyHidden.value = "";
+    psChip.style.display = "none";
+    psInput.style.display = "";
+    psInput.value = "";
+    psClear.style.display = "none";
+    psSelected = false;
+    psInput.focus();
+  }
+
+  function resetCrop(){
+    if(cropper){ cropper.destroy(); cropper = null; }
+    cropPreview.src = "";
+    cropPreview.style.display = "none";
+    cropSection.style.display = "none";
+    croppedBlob = null;
+    imageInput.value = "";
+  }
+
+  async function doSearch(q){
+    openDropdown(
+      `<div class="ps-loading">
+         <i class="fa-solid fa-spinner fa-spin"></i>
+         Searching…
+       </div>`
+    );
+    try{
+      const res = await fetch(`/hb/search_person?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      if(!data.results || data.results.length === 0){
+        openDropdown(`<div class="ps-empty">No personnel found for "${q}"</div>`);
+        return;
+      }
+      const rows = data.results.map(p=>`
+        <div
+          class="ps-item"
+          data-army="${p.army_number}"
+          data-name="${p.name}"
+          data-rank="${p.rank||""}"
+          data-company="${p.company||""}"
+        >
+          <div class="ps-avatar">${getInitials(p.name)}</div>
+          <div>
+            <div class="ps-item-name">
+              ${p.rank?`<span style="opacity:.7;font-weight:600">${p.rank} </span>`:""}
+              ${p.name}
+            </div>
+            <div class="ps-item-meta">${p.company||""}</div>
+          </div>
+          <div class="ps-badge">${p.army_number}</div>
+        </div>
+      `).join("");
+      openDropdown(rows);
+      psDropdown.querySelectorAll(".ps-item").forEach(el=>{
+        el.addEventListener("click",()=>{
+          selectPerson({
+            army_number : el.dataset.army,
+            name : el.dataset.name,
+            rank : el.dataset.rank,
+            company : el.dataset.company,
+          });
+        });
+      });
+    }catch(err){
+      openDropdown(`<div class="ps-empty">Search failed. Try again.</div>`);
+    }
+  }
+
+  psInput.addEventListener("input",()=>{
+    const q = psInput.value.trim();
+    psClear.style.display = q ? "" : "none";
+    clearTimeout(psTimer);
+    if(q.length < 2){ closeDropdown(); return; }
+    psTimer = setTimeout(()=>doSearch(q), 350);
+  });
+
+  psClear.addEventListener("click",()=>{
+    psInput.value = "";
+    psClear.style.display = "none";
+    closeDropdown();
+    psInput.focus();
+  });
+
+  psChipRemove.addEventListener("click", clearSelection);
+
+  document.addEventListener("click",(e)=>{
+    if(!psInput.contains(e.target) && !psDropdown.contains(e.target)){
+      closeDropdown();
+    }
+  });
+
+  document.getElementById("honoursForm")?.addEventListener("submit",(e)=>{
+    if(!armyHidden.value){
+      e.preventDefault();
+      psInput.focus();
+      psInput.classList.add("is-invalid");
+      setTimeout(()=>psInput.classList.remove("is-invalid"), 2000);
+    }
+  }, true);
+
+  imageInput.addEventListener("change",(e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event){
+      cropPreview.src = event.target.result;
+      cropPreview.style.display = "block";
+      cropSection.style.display = "";
+      if(cropper) cropper.destroy();
+      cropper = new Cropper(cropPreview,{
+        aspectRatio : 1,
+        viewMode : 1,
+        dragMode : "move",
+        autoCropArea : 1,
+        responsive : true,
+        background : false,
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById("honoursForm")?.addEventListener("submit", async function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+    if(cropper){
+      const canvas = cropper.getCroppedCanvas({ width:500, height:500 });
+      await new Promise(resolve=>{
+        canvas.toBlob(blob=>{ croppedBlob = blob; resolve(); });
+      });
+      formData.delete("image");
+      formData.set("image", croppedBlob, `${armyHidden.value}.png`);
+    }
+    try{
+      const response = await fetch("/api/add-honours-board",{
+        method : "POST",
+        body : formData,
+      });
+      const result = await response.json();
+      if(result.success){
+        alert("Honour entry added successfully.");
+        this.reset();
+        clearSelection();
+        resetCrop();
+        bootstrap.Modal.getInstance(document.getElementById("addHonoursModal")).hide();
+      }else{
+        alert(result.message || "Failed to add honour entry.");
+      }
+    }catch(error){
+      console.error(error);
+      alert("Server error occurred.");
+    }
+  });
+</script>

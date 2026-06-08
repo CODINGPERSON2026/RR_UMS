@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SmartHR Admin Dashboard</title>
+  <link rel="icon" type="image/png" href="/static/Logo1.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-7.1.0-web/css/all.min.css') }}" />
+
+  <script>
+    (function () {
+      try {
+        const savedTheme = localStorage.getItem('dashboardTheme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+      } catch (e) { }
+    })();
+  </script>
+
+  <style>
+    /* ==================== THEME VARIABLES ==================== */
+    :root {
+      --primary-color: #3b82f6;
+      --secondary-color: #2563eb;
+      --background: #f5f7fa;
+      --card-background: linear-gradient(135deg, #ffffff 0%, #f4f7f9 100%);
+      --card-bg-solid: #ffffff;
+      --sidebar-background: #f6f1f1;
+      --sidebar-border: #e2e8f0;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e2e8f0;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+      --icon-color: #3b82f6;
+      --nav-link-color: #475569;
+      --nav-link-hover-bg: #f1f5f9;
+      --nav-link-active-bg: #eff6ff;
+      --nav-link-active-color: #2563eb;
+      --nav-section-label-color: #94a3b8;
+      --logo-mark-bg: #3b82f6;
+      --modal-header-bg: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+      --tooltip-bg: #1e293b;
+      --sidebar-footer-border: #e2e8f0;
+    }
+
+    [data-theme="dark"] {
+      --primary-color: #60a5fa;
+      --secondary-color: #3b82f6;
+      --background: #0f172a;
+      --card-background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      --card-bg-solid: #1e293b;
+      --sidebar-background: #1e293b;
+      --sidebar-border: #334155;
+      --text-primary: #e2e8f0;
+      --text-secondary: #cbd5e1;
+      --border-color: #334155;
+      --shadow: rgba(0, 0, 0, 0.5);
+      --success-color: #34d399;
+      --danger-color: #f87171;
+      --icon-color: #60a5fa;
+      --nav-link-color: #94a3b8;
+      --nav-link-hover-bg: #273449;
+      --nav-link-active-bg: #1e3a5f;
+      --nav-link-active-color: #60a5fa;
+      --nav-section-label-color: #475569;
+      --logo-mark-bg: #3b82f6;
+      --modal-header-bg: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+      --tooltip-bg: #0f172a;
+      --sidebar-footer-border: #334155;
+    }
+
+    [data-theme="military"] {
+      --primary-color: #4a7c59;
+      --secondary-color: #2d5a3d;
+      --background: #e8f0e6;
+      --card-background: linear-gradient(135deg, #f5f9f4 0%, #e8f0e6 100%);
+      --card-bg-solid: #f5f9f4;
+      --sidebar-background: #ddeedd;
+      --sidebar-border: #b8d4c4;
+      --text-primary: #1a3d2a;
+      --text-secondary: #4a7c59;
+      --border-color: #b8d4c4;
+      --shadow: rgba(74, 124, 89, 0.2);
+      --success-color: #4a7c59;
+      --danger-color: #c44536;
+      --icon-color: #2d5a3d;
+      --nav-link-color: #2d5a3d;
+      --nav-link-hover-bg: #cce0d0;
+      --nav-link-active-bg: #b8d4c4;
+      --nav-link-active-color: #1a3d2a;
+      --nav-section-label-color: #7aab8a;
+      --logo-mark-bg: #2d5a3d;
+      --modal-header-bg: linear-gradient(135deg, #4a7c59 0%, #2d5a3d 100%);
+      --tooltip-bg: #1a3d2a;
+      --sidebar-footer-border: #b8d4c4;
+    }
+
+    [data-theme="ocean"] {
+      --primary-color: #0891b2;
+      --secondary-color: #0e7490;
+      --background: #ecfeff;
+      --card-background: linear-gradient(135deg, #ffffff 0%, #cffafe 100%);
+      --card-bg-solid: #f0feff;
+      --sidebar-background: #e0fafa;
+      --sidebar-border: #a5f3fc;
+      --text-primary: #164e63;
+      --text-secondary: #0e7490;
+      --border-color: #a5f3fc;
+      --shadow: rgba(8, 145, 178, 0.2);
+      --success-color: #14b8a6;
+      --danger-color: #f43f5e;
+      --icon-color: #06b6d4;
+      --nav-link-color: #0e7490;
+      --nav-link-hover-bg: #cffafe;
+      --nav-link-active-bg: #a5f3fc;
+      --nav-link-active-color: #164e63;
+      --nav-section-label-color: #67c7d4;
+      --logo-mark-bg: #0891b2;
+      --modal-header-bg: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+      --tooltip-bg: #164e63;
+      --sidebar-footer-border: #a5f3fc;
+    }
+
+    [data-theme="sunset"] {
+      --primary-color: #f59e0b;
+      --secondary-color: #d97706;
+      --background: #fef3c7;
+      --card-background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      --card-bg-solid: #fffbeb;
+      --sidebar-background: #fef8e1;
+      --sidebar-border: #fcd34d;
+      --text-primary: #78350f;
+      --text-secondary: #b45309;
+      --border-color: #fde68a;
+      --shadow: rgba(245, 158, 11, 0.2);
+      --success-color: #84cc16;
+      --danger-color: #dc2626;
+      --icon-color: #f59e0b;
+      --nav-link-color: #92400e;
+      --nav-link-hover-bg: #fde68a;
+      --nav-link-active-bg: #fcd34d;
+      --nav-link-active-color: #78350f;
+      --nav-section-label-color: #d97706;
+      --logo-mark-bg: #d97706;
+      --modal-header-bg: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      --tooltip-bg: #78350f;
+      --sidebar-footer-border: #fcd34d;
+    }
+
+    [data-theme="purple"] {
+      --primary-color: #9333ea;
+      --secondary-color: #7e22ce;
+      --background: #faf5ff;
+      --card-background: linear-gradient(135deg, #ffffff 0%, #f3e8ff 100%);
+      --card-bg-solid: #faf5ff;
+      --sidebar-background: #f5eeff;
+      --sidebar-border: #e9d5ff;
+      --text-primary: #581c87;
+      --text-secondary: #7e22ce;
+      --border-color: #e9d5ff;
+      --shadow: rgba(147, 51, 234, 0.2);
+      --success-color: #22c55e;
+      --danger-color: #ef4444;
+      --icon-color: #a855f7;
+      --nav-link-color: #6b21a8;
+      --nav-link-hover-bg: #ede9fe;
+      --nav-link-active-bg: #e9d5ff;
+      --nav-link-active-color: #581c87;
+      --nav-section-label-color: #a855f7;
+      --logo-mark-bg: #7e22ce;
+      --modal-header-bg: linear-gradient(135deg, #9333ea 0%, #7e22ce 100%);
+      --tooltip-bg: #3b0764;
+      --sidebar-footer-border: #e9d5ff;
+    }
+
+    /* ==================== BASE ==================== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background: var(--background);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+      margin: 0;
+    }
+
+    /* ==================== SIDEBAR ==================== */
+    /*
+      Responsive behaviour:
+        < 576px   mobile      — sidebar hidden, bottom nav bar shown
+        576-991px tablet      — 48px icon rail
+        992-1399px laptop     — 56px icon rail  (default)
+        1400-1919px large     — 64px icon rail
+        1920px+   4K/ultra    — 72px icon rail
+    */
+    :root { --sidebar-w: 56px; }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--sidebar-background);
+      border-right: 1px solid var(--sidebar-border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ==================== SIDEBAR HEADER ==================== */
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 0 16px;
+      border-bottom: 1px solid var(--sidebar-border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--logo-mark-bg);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      flex-shrink: 0;
+      cursor: default;
+    }
+
+    /* ==================== NAV BODY ==================== */
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px 0 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+    }
+
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+    /* Section Labels — hidden (icon-only rail) */
+    .nav-section-label { display: none; }
+
+    /* Nav Links */
+    .nav-link {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      padding: 13px 0 !important;
+      margin: 2px 6px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 450;
+      color: var(--nav-link-color) !important;
+      text-decoration: none !important;
+      white-space: nowrap;
+      position: relative;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      background: var(--nav-link-hover-bg);
+      color: var(--text-primary) !important;
+    }
+
+    .nav-link.active {
+      background: var(--nav-link-active-bg);
+      color: var(--nav-link-active-color) !important;
+      font-weight: 500;
+    }
+
+    .nav-link.active .nav-icon { color: var(--nav-link-active-color); }
+    .nav-link:hover .nav-icon  { color: var(--text-primary); }
+
+    /* Nav Icons */
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--nav-section-label-color);
+      transition: color 0.15s ease;
+      font-size: 17px;
+    }
+
+    /* Label text, badges, inline tooltip spans — always hidden */
+    .nav-label-text,
+    .nav-badge,
+    .nav-tooltip { display: none; }
+
+    /* Danger nav item */
+    .nav-link-danger:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+      color: #dc2626 !important;
+    }
+    .nav-link-danger:hover .nav-icon { color: #dc2626 !important; }
+
+    /* ==================== SIDEBAR FOOTER ==================== */
+    .sidebar-footer {
+      flex-shrink: 0;
+      border-top: 1px solid var(--sidebar-footer-border);
+      padding: 6px 0;
+    }
+
+    /* ==================== JS-INJECTED TOOLTIP ==================== */
+    #sidebar-tooltip {
+      position: fixed;
+      background: #1e293b;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 11px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 99999;
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    #sidebar-tooltip::before {
+      content: '';
+      position: absolute;
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 5px solid transparent;
+      border-right-color: #1e293b;
+    }
+
+    /* ==================== PAGE WRAPPER ==================== */
+    .page-wrapper {
+      margin-left: var(--sidebar-w);
+      padding: 1px 14px;
+      min-height: 100vh;
+    }
+
+    /* ==================== BOTTOM NAV (mobile only) ==================== */
+    .bottom-nav { display: none; }
+
+    /* ==================== RESPONSIVE BREAKPOINTS ==================== */
+
+    /* Mobile — hide sidebar, show bottom nav */
+    @media (max-width: 575.98px) {
+      :root { --sidebar-w: 0px; }
+      .sidebar { display: none; }
+      #sidebar-tooltip { display: none !important; }
+
+      .page-wrapper {
+        margin-left: 0;
+        padding: 6px 10px 70px;
+      }
+
+      .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 58px;
+        background: var(--sidebar-background);
+        border-top: 1px solid var(--sidebar-border);
+        z-index: 1000;
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 4px;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .bottom-nav::-webkit-scrollbar { display: none; }
+
+      .bottom-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 6px 10px;
+        border-radius: 10px;
+        color: var(--nav-link-color);
+        text-decoration: none;
+        font-size: 9px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+        transition: background 0.15s, color 0.15s;
+        flex-shrink: 0;
+      }
+      .bottom-nav-item i { font-size: 18px; line-height: 1; }
+      .bottom-nav-item:hover,
+      .bottom-nav-item.active {
+        color: var(--nav-link-active-color);
+        background: var(--nav-link-active-bg);
+      }
+    }
+
+    /* Small tablet: 576px – 991px — 48px rail */
+    @media (min-width: 576px) and (max-width: 991.98px) {
+      :root { --sidebar-w: 48px; }
+      .sidebar { width: 48px; }
+      .sidebar-logo-mark { width: 28px; height: 28px; font-size: 9px; }
+      .sidebar-header { padding: 14px 0 12px; }
+      .nav-link { padding: 11px 0 !important; margin: 1px 5px; }
+      .nav-icon  { width: 17px; height: 17px; font-size: 15px; }
+    }
+
+    /* Laptop: 992px – 1399px — 56px rail (default, no overrides needed) */
+
+    /* Large monitor: 1400px – 1919px — 64px rail */
+    @media (min-width: 1400px) and (max-width: 1919.98px) {
+      :root { --sidebar-w: 64px; }
+      .sidebar { width: 64px; }
+      .sidebar-logo-mark { width: 38px; height: 38px; font-size: 12px; }
+      .sidebar-header { padding: 20px 0 18px; }
+      .nav-link { padding: 15px 0 !important; margin: 3px 8px; }
+      .nav-icon  { width: 23px; height: 23px; font-size: 20px; }
+      .page-wrapper { padding: 8px 18px; }
+    }
+
+    /* 4K / ultrawide: 1920px+ — 72px rail */
+    @media (min-width: 1920px) {
+      :root { --sidebar-w: 72px; }
+      .sidebar { width: 72px; }
+      .sidebar-logo-mark { width: 42px; height: 42px; font-size: 13px; }
+      .sidebar-header { padding: 22px 0 20px; }
+      .nav-link { padding: 17px 0 !important; margin: 3px 10px; }
+      .nav-icon  { width: 26px; height: 26px; font-size: 22px; }
+      .page-wrapper { padding: 10px 24px; }
+    }
+
+    /* ==================== THEME SWITCHER ==================== */
+    .theme-switcher {
+      position: fixed;
+      top: 130px;
+      right: 20px;
+      z-index: 1050;
+      background: var(--card-bg-solid);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 6px;
+      box-shadow: 0 8px 30px var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    .theme-switcher-toggle {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .theme-switcher-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    .theme-options {
+      display: none;
+      margin-top: 12px;
+      gap: 8px;
+      flex-direction: column;
+      animation: slideDown 0.3s ease;
+    }
+
+    .theme-options.active { display: flex; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .theme-option {
+      padding: 10px 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card-bg-solid);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      min-width: 160px;
+    }
+
+    .theme-option:hover {
+      transform: translateX(5px);
+      border-color: var(--primary-color);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .theme-option.active {
+      border-color: var(--primary-color);
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .theme-option i { font-size: 1.2rem; }
+
+    /* ==================== CARDS ==================== */
+    .card {
+      border-radius: 18px;
+      border: none;
+      background: var(--card-background);
+      color: var(--text-primary);
+      box-shadow: 0 4px 15px var(--shadow);
+      transition: all 0.3s ease;
+    }
+
+    /* ==================== MODAL ==================== */
+    .modal-content {
+      border-radius: 15px;
+      background: var(--card-bg-solid);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-header {
+      background: var(--modal-header-bg);
+      color: white;
+      border-radius: 15px 15px 0 0;
+      border-bottom: none;
+      padding: 20px;
+    }
+
+    .modal-title { font-weight: 600; font-size: 1.25rem; }
+
+    .btn-close {
+      width: 40px !important;
+      height: 40px !important;
+      background-color: #f9f9f9 !important;
+      border-radius: 10px !important;
+      color: white !important;
+      filter: none !important;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+      transition: all 0.3s ease;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-size: 1.2rem !important;
+    }
+
+    .btn-close:hover {
+      background-color: #c82333 !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+      transform: translateY(-1px);
+    }
+
+    .btn-close:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .modal-body {
+      text-align: center;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border-color);
+      padding: 20px;
+      justify-content: center !important;
+      gap: 15px;
+    }
+
+    .modal-footer .btn {
+      border-radius: 25px;
+      padding: 10px 30px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .modal-footer .btn-primary {
+      background: var(--modal-header-bg);
+      border: none;
+    }
+
+    .modal-footer .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px var(--shadow);
+    }
+
+    .modal-footer .btn-secondary {
+      background: var(--text-secondary);
+      border: none;
+    }
+
+    /* ==================== FORMS ==================== */
+    label {
+      display: flex;
+      justify-content: start;
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .form-control,
+    .form-select {
+      background-color: var(--card-bg-solid);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+      background-color: var(--card-bg-solid);
+      color: var(--text-primary);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.15);
+    }
+
+    /* ==================== BUTTONS ==================== */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    .btn-outline-primary {
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+    }
+
+    /* ==================== TABLE ==================== */
+    .table { color: var(--text-primary); }
+
+    .table thead th {
+      background: var(--card-bg-solid);
+      color: var(--text-primary);
+      border-color: var(--border-color);
+    }
+
+    .table tbody tr { transition: all 0.3s ease; }
+    .table tbody tr:hover { background-color: var(--nav-link-hover-bg); }
+
+    /* ==================== ALERTS ==================== */
+    .alert {
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    /* ==================== MISC ==================== */
+    body.modal-open { padding-right: 0 !important; }
+
+    @media (max-width: 768px) {
+      .theme-switcher { top: 70px; right: 10px; }
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <div class="sidebar" id="sidebar">
+
+    <!-- Header / Brand -->
+    <div class="sidebar-header"
+         data-tiptext="{{role}} | {{current_user_name}} | {{company}}">
+      <div class="sidebar-logo-mark">UMS</div>
+    </div>
+
+    <!-- Nav Body -->
+    <nav class="sidebar-nav">
+
+      <!-- Main Section -->
+      <div class="nav-section-label">Main</div>
+
+      <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"
+         data-tiptext="Dashboard">
+        <span class="nav-icon"><i class="fas fa-th-large"></i></span>
+        <span class="nav-label-text">Dashboard</span>
+        <span class="nav-tooltip">Dashboard</span>
+      </a>
+
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ'] %}
+      <a class="nav-link {% if '/weight_system' in request.path %}active{% endif %}" href="/weight_system"
+         data-tiptext="Weight">
+        <span class="nav-icon"><i class="fas fa-weight"></i></span>
+        <span class="nav-label-text">Weight Management</span>
+        <span class="nav-tooltip">Weight</span>
+      </a>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
+      <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}" href="/personnel_information"
+         data-tiptext="Personnel">
+        <span class="nav-icon"><i class="fas fa-users"></i></span>
+        <span class="nav-label-text">Personnel Management</span>
+        <span class="nav-tooltip">Personnel</span>
+      </a>
+      {% endif %}
+
+      <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
+      <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"
+         data-tiptext="Tasks">
+        <span class="nav-icon"><i class="fas fa-tasks"></i></span>
+        <span class="nav-label-text">Task Management</span>
+        <span class="nav-tooltip">Tasks</span>
+      </a>
+      {% endif %} -->
+
+      <!-- Finance Section -->
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
+      <div class="nav-section-label">Finance &amp; Projects</div>
+      {% endif %}
+
+      {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
+      <a class="nav-link {% if '/projects' in request.path %}active{% endif %}" href="{{ url_for('projects_dashboard') }}"
+         data-tiptext="Projects">
+        <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>
+        <span class="nav-label-text">Project Management</span>
+        <span class="nav-tooltip">Projects</span>
+      </a>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] %}
+      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account"
+         data-tiptext="Accounts">
+        <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+        <span class="nav-label-text">Account Management</span>
+        <span class="nav-tooltip">Accounts</span>
+      </a>
+      {% endif %}
+
+      <!-- HR Section -->
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] or role == 'ONCO' or role == 'O CENTRE NCO' %}
+      <div class="nav-section-label">HR</div>
+      {% endif %}
+
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
+      <a class="nav-link {% if '/apply_leave' in request.path %}active{% endif %}" href="/apply_leave/"
+         data-tiptext="Leave">
+        <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
+        <span class="nav-label-text">Leave Management</span>
+        <span class="nav-tooltip">Leave</span>
+      </a>
+      {% endif %}
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
+      <a class="nav-link {% if '/apply_leave' in request.path %}active{% endif %}" href="/Nominal_Roll/"
+         data-tiptext="Nominal Roll">
+         <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
+        <span class="nav-label-text">Nominal Roll</span>
+        <span class="nav-tooltip">Nominal Roll</span>
+      </a>
+      {% endif %}
+
+      {% if role == 'ONCO' %}
+      <a class="nav-link {% if request.path == '/onco/manage_leave' %}active{% endif %}" href="/onco/manage_leave"
+         data-tiptext="Manage Leave">
+        <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
+        <span class="nav-label-text">Manage Leave</span>
+        <span class="nav-tooltip">Manage Leave</span>
+      </a>
+      {% endif %}
+
+      {% if role == 'O CENTRE NCO' %}
+      <a class="nav-link {% if request.path == '/gallery/manage' %}active{% endif %}" href="/gallery/manage"
+         data-tiptext="Gallery">
+        <span class="nav-icon"><i class="fas fa-images"></i></span>
+        <span class="nav-label-text">Manage Gallery</span>
+        <span class="nav-tooltip">Gallery</span>
+      </a>
+      {% endif %}
+
+    </nav>
+
+    <!-- Footer Nav (Settings + Logout) -->
+    <div class="sidebar-footer">
+      {% if role in ['CO', '2IC'] %}
+      <a class="nav-link {% if '/settings' in request.path %}active{% endif %}" href="/settings"
+         data-tiptext="Settings">
+        <span class="nav-icon"><i class="fas fa-cog"></i></span>
+        <span class="nav-label-text">Settings</span>
+        <span class="nav-tooltip">Settings</span>
+      </a>
+      {% endif %}
+
+      <a class="nav-link nav-link-danger" href="/logout" id="logoutLink"
+         data-tiptext="Logout">
+        <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
+        <span class="nav-label-text">Logout</span>
+        <span class="nav-tooltip">Logout</span>
+      </a>
+    </div>
+
+  </div>
+  <!-- ==================== END SIDEBAR ==================== -->
+
+  <!-- Global tooltip element injected into body — never clipped by sidebar overflow -->
+  <div id="sidebar-tooltip"></div>
+
+  <!-- Main Content -->
+  <div id="pageWrapper" class="page-wrapper">
+    {% block content %}{% endblock %}
+  </div>
+
+  <!-- Logout Modal -->
+  <div class="modal fade" id="logoutModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Logout</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">Are you sure you want to logout?</div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+          <button type="button" class="btn btn-primary" id="confirmLogout">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SCRIPTS ==================== -->
+
+  <!-- Theme Management (untouched) -->
+  <script>
+    const themeSwitcher = {
+      init() {
+        this.loadSavedTheme();
+        this.setupEventListeners();
+      },
+      loadSavedTheme() {
+        const savedTheme = localStorage.getItem('dashboardTheme') || 'light';
+        this.applyTheme(savedTheme);
+        this.updateActiveTheme(savedTheme);
+      },
+      applyTheme(themeName) {
+        document.documentElement.setAttribute('data-theme', themeName);
+        localStorage.setItem('dashboardTheme', themeName);
+      },
+      updateActiveTheme(themeName) {
+        document.querySelectorAll('.theme-option').forEach(option => {
+          option.classList.toggle('active', option.dataset.theme === themeName);
+        });
+      },
+      setupEventListeners() {
+        const toggle = document.getElementById('themeSwitcherToggle');
+        const options = document.getElementById('themeOptions');
+        if (!toggle || !options) return;
+
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          options.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!e.target.closest('.theme-switcher')) {
+            options.classList.remove('active');
+          }
+        });
+
+        document.querySelectorAll('.theme-option').forEach(option => {
+          option.addEventListener('click', () => {
+            const theme = option.dataset.theme;
+            this.applyTheme(theme);
+            this.updateActiveTheme(theme);
+            options.classList.remove('active');
+          });
+        });
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      themeSwitcher.init();
+    });
+  </script>
+
+  <!-- Logout Modal -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const logoutLink = document.getElementById('logoutLink');
+      const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+      const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+      if (logoutLink && confirmLogoutBtn) {
+        logoutLink.addEventListener('click', function (e) {
+          e.preventDefault();
+          logoutModal.show();
+        });
+
+        confirmLogoutBtn.addEventListener('click', function () {
+          window.location.href = '/logout';
+        });
+      }
+    });
+  </script>
+
+  <!-- ==================== SIDEBAR TOOLTIP (body-level, never clipped) ==================== -->
+  <script>
+    (function () {
+      const tip = document.getElementById('sidebar-tooltip');
+      let hideTimer = null;
+
+      // Read the current --tooltip-bg CSS variable from :root
+      function getTooltipBg() {
+        return getComputedStyle(document.documentElement)
+          .getPropertyValue('--tooltip-bg').trim() || '#1e293b';
+      }
+
+      function showTip(el) {
+        const text = el.getAttribute('data-tiptext');
+        if (!text) return;
+
+        clearTimeout(hideTimer);
+
+        const bg = getTooltipBg();
+        tip.textContent = text;
+        tip.style.background = bg;
+
+        // Update the arrow colour to match
+        // We use a pseudo-element so we set it via a custom property
+        tip.style.setProperty('--arrow-color', bg);
+
+        // Position: vertically centred on the element, 12px right of sidebar
+        const rect = el.getBoundingClientRect();
+        const sidebarWidth = 48;
+
+        tip.style.opacity = '0';
+        tip.style.display = 'block';
+
+        const tipH = tip.offsetHeight;
+        const top = rect.top + (rect.height / 2) - (tipH / 2);
+        const left = sidebarWidth + 12;
+
+        tip.style.top = top + 'px';
+        tip.style.left = left + 'px';
+        tip.style.opacity = '1';
+      }
+
+      function hideTip() {
+        hideTimer = setTimeout(function () {
+          tip.style.opacity = '0';
+        }, 80);
+      }
+
+      // Arrow colour driven by CSS var on the element itself
+      // We inject a tiny style rule so ::before picks up --arrow-color
+      const arrowStyle = document.createElement('style');
+      arrowStyle.textContent =
+        '#sidebar-tooltip::before { border-right-color: var(--arrow-color, #1e293b); }';
+      document.head.appendChild(arrowStyle);
+
+      // Attach to all sidebar items that have data-tiptext
+      document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('sidebar');
+
+        // Nav links + sidebar header
+        sidebar.querySelectorAll('[data-tiptext]').forEach(function (el) {
+          el.addEventListener('mouseenter', function () { showTip(el); });
+          el.addEventListener('mouseleave', hideTip);
+          el.addEventListener('focus',      function () { showTip(el); });
+          el.addEventListener('blur',       hideTip);
+        });
+
+        // Hide tooltip if mouse enters the tooltip itself (edge case)
+        tip.addEventListener('mouseenter', hideTip);
+      });
+    })();
+  </script>
+
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

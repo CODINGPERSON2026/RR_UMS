@@ -1,0 +1,544 @@
+<!-- =========================
+     FULLCALENDAR POPUP SYSTEM
+========================= -->
+
+<script src="/static/index.global.min.js"></script>
+
+<style>
+
+    /* =========================
+       CALENDAR POPUP (Compact Dropdown Card)
+    ========================= */
+
+    .calendar-popup {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        width: 350px;
+        height: 380px;
+        background: var(--card-bg-solid, #ffffff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px var(--shadow, rgba(0,0,0,0.12));
+        overflow: hidden;
+        flex-direction: column;
+        animation: popupFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popupFade {
+        from {
+            opacity: 0;
+            transform: translateY(4px) scale(0.97);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .calendar-popup-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        background: var(--card-background, #f9fafb);
+        border-bottom: 1px solid var(--border-color, #e5e7eb);
+        flex-shrink: 0;
+    }
+
+    .calendar-popup-header h3 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--text-primary, #111827);
+    }
+
+    /* =========================
+       CALENDAR AREA
+    ========================= */
+
+    #calendar {
+        flex: 1;
+        width: 100%;
+        padding: 6px;
+        overflow: hidden;
+        background: var(--card-bg-solid, #ffffff);
+    }
+
+    /* =========================
+       FULLCALENDAR OVERRIDES (Compact)
+    ========================= */
+
+    .fc {
+        height: 100% !important;
+        color: var(--text-primary, #111827) !important;
+        font-size: 0.74rem;
+    }
+
+    .fc-theme-standard td,
+    .fc-theme-standard th {
+        border-color: var(--border-color, #e5e7eb) !important;
+    }
+
+    .fc-scrollgrid {
+        border-color: var(--border-color, #e5e7eb) !important;
+    }
+
+    /* =========================
+       TOOLBAR
+    ========================= */
+
+    .fc .fc-toolbar {
+        margin-bottom: 6px !important;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--text-primary, #111827);
+    }
+
+    .fc .fc-button {
+        background: var(--primary-color, #2563eb) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: none !important;
+        transition: background 0.15s ease;
+        padding: 3px 6px !important;
+        font-size: 0.68rem !important;
+        border-radius: 4px !important;
+        font-weight: 600;
+    }
+
+    .fc .fc-button:hover {
+        background: var(--secondary-color, #1d4ed8) !important;
+    }
+
+    .fc .fc-button-active {
+        background: var(--secondary-color, #1d4ed8) !important;
+    }
+
+    /* =========================
+       DAY HEADERS
+    ========================= */
+
+    .fc .fc-col-header-cell {
+        background: var(--card-background, #f9fafb);
+    }
+
+    .fc .fc-col-header-cell-cushion {
+        color: var(--text-primary, #111827) !important;
+        text-decoration: none !important;
+        font-weight: 700;
+        padding: 4px 0 !important;
+        font-size: 0.7rem;
+    }
+
+    /* =========================
+       DAY CELLS
+    ========================= */
+
+    .fc .fc-daygrid-day-frame {
+        min-height: 42px !important;
+    }
+
+    .fc .fc-daygrid-day {
+        cursor: pointer;
+        transition: background 0.15s ease;
+        background: var(--card-bg-solid, #ffffff);
+    }
+
+    .fc .fc-daygrid-day:hover {
+        background: var(--nav-link-hover-bg, #f3f4f6);
+    }
+
+    /* =========================
+       DAY NUMBERS
+    ========================= */
+
+    .fc .fc-daygrid-day-number {
+        color: var(--text-primary, #111827) !important;
+        font-weight: 700;
+        text-decoration: none !important;
+        padding: 4px !important;
+        font-size: 0.72rem;
+    }
+
+    /* =========================
+       TODAY HIGHLIGHT
+    ========================= */
+
+    .fc .fc-day-today {
+        background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.08)) !important;
+    }
+
+    /* =========================
+       EVENTS
+    ========================= */
+
+    .fc-event {
+        border: none !important;
+        border-radius: 3px !important;
+        padding: 1px 4px !important;
+        margin: 1px !important;
+        background: var(--primary-color, #2563eb) !important;
+        color: white !important;
+        font-size: 0.65rem !important;
+        font-weight: 600;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    .fc-event:hover {
+        background: var(--secondary-color, #1d4ed8) !important;
+    }
+
+    .fc-event-title {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        display: block;
+        width: 100%;
+    }
+
+    /* =========================
+       MORE LINK
+    ========================= */
+
+    .fc-daygrid-more-link {
+        color: var(--primary-color, #2563eb) !important;
+        font-weight: 600;
+        text-decoration: none !important;
+        font-size: 0.65rem;
+    }
+
+    /* =========================
+       REMOVE BLUE LINKS
+    ========================= */
+
+    .fc a {
+        color: inherit !important;
+    }
+
+    /* =========================
+       EVENT DETAIL MODAL
+    ========================= */
+
+    .event-detail-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+    }
+
+    .event-card {
+        width: 100%;
+        max-width: 360px;
+        background: var(--card-bg-solid, #ffffff);
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 15px 40px var(--shadow, rgba(0,0,0,0.15));
+        animation: popupFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .event-card-header {
+        background: var(--card-background, #f9fafb);
+        border-bottom: 1px solid var(--border-color, #e5e7eb);
+        padding: 12px 16px;
+    }
+
+    .event-card-header h2 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-primary, #111827);
+    }
+
+    .event-card-body {
+        padding: 16px;
+        color: var(--text-primary, #111827);
+    }
+
+    .event-card-body p {
+        margin-bottom: 8px;
+        line-height: 1.4;
+        font-size: 0.8rem;
+    }
+
+    #detailDescription {
+        color: var(--text-secondary, #6b7280);
+    }
+
+    #closeDetail {
+        position: absolute;
+        top: 8px;
+        right: 12px;
+        cursor: pointer;
+        font-size: 24px;
+        line-height: 1;
+        color: var(--text-secondary, #6b7280);
+        transition: color 0.15s ease;
+        user-select: none;
+    }
+
+    #closeDetail:hover {
+        color: var(--danger-color, #ef4444);
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 480px) {
+        .calendar-popup {
+            width: 300px;
+            height: 340px;
+        }
+        .fc .fc-daygrid-day-frame {
+            min-height: 35px !important;
+        }
+    }
+
+</style>
+
+<!-- =========================
+     CALENDAR POPUP CONTAINER
+========================= -->
+
+<div id="calendarPopup" class="calendar-popup">
+
+    <div class="calendar-popup-header">
+
+        <h3>Upcoming Events</h3>
+
+    </div>
+
+    <div id="calendar"></div>
+
+</div>
+
+<!-- =========================
+     EVENT DETAIL MODAL
+========================= -->
+
+<div id="eventDetailModal" class="event-detail-modal">
+
+    <div class="event-card">
+
+        <span id="closeDetail">&times;</span>
+
+        <div class="event-card-header">
+
+            <h2 id="detailTitle"></h2>
+
+        </div>
+
+        <div class="event-card-body">
+
+            <p>
+                <strong>📅 Date:</strong>
+                <span id="detailDate"></span>
+            </p>
+
+            <p>
+                <strong>📍 Venue:</strong>
+                <span id="detailVenue"></span>
+            </p>
+
+            <p>
+                <strong>🏢 Company:</strong>
+                <span id="detailCompany"></span>
+            </p>
+
+            <hr style="margin-block: 8px; border-color: var(--border-color);">
+
+            <p>
+                <strong>Description:</strong>
+            </p>
+
+            <p id="detailDescription"></p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    let calendar = null;
+
+    // =========================
+    // SHOW EVENT DETAIL
+    // =========================
+
+    function showEventDetail(eventData) {
+
+        document.getElementById('detailTitle').textContent =
+            eventData.title || "No Event";
+
+        document.getElementById('detailDate').textContent =
+            eventData.start
+                ? eventData.start.toLocaleDateString('en-IN', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                })
+                : "N/A";
+
+        document.getElementById('detailVenue').textContent =
+            eventData.extendedProps?.venue || "N/A";
+
+        document.getElementById('detailCompany').textContent =
+            eventData.extendedProps?.company || "N/A";
+
+        document.getElementById('detailDescription').textContent =
+            eventData.extendedProps?.description ||
+            "No description available.";
+
+        document.getElementById('eventDetailModal')
+            .style.display = 'flex';
+    }
+
+    // =========================
+    // INITIALIZE CALENDAR
+    // =========================
+
+    function initCalendar() {
+        calendar = new FullCalendar.Calendar(
+            document.getElementById('calendar'),
+            {
+                initialView: 'dayGridMonth',
+                height: '100%',
+                events: '/hb/get_calendar_events',
+                dayMaxEvents: 1,
+                selectable: true,
+                headerToolbar: {
+                    left: 'prev',
+                    center: 'title',
+                    right: 'next'
+                },
+
+                // =========================
+                // DATE CLICK
+                // =========================
+
+                dateClick: function(info) {
+                    const clickedDate = info.dateStr;
+                    const events = calendar.getEvents().filter(event => {
+                        return event.startStr.split('T')[0] === clickedDate;
+                    });
+
+                    if (events.length > 0) {
+                        showEventDetail(events[0]);
+                    } else {
+                        showEventDetail({
+                            title: "No Event",
+                            start: info.date,
+                            extendedProps: {
+                                venue: "—",
+                                company: "—",
+                                description: "No events scheduled for this date."
+                            }
+                        });
+                    }
+                },
+
+                // =========================
+                // EVENT CLICK
+                // =========================
+
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    info.jsEvent.stopPropagation();
+                    showEventDetail(info.event);
+                }
+            }
+        );
+        calendar.render();
+    }
+
+    // =========================
+    // POPUP TOGGLE & POSITIONING
+    // =========================
+
+    var btn = document.getElementById('openCalendar');
+    var calPopup = document.getElementById('calendarPopup');
+
+    if (btn && calPopup) {
+        btn.addEventListener('click', function (e) {
+            
+            e.stopPropagation();
+            
+            if (calPopup.style.display === 'flex') {
+                calPopup.style.display = 'none';
+            } else {
+                // Dynamically position calPopup directly below the button
+                var rect = btn.getBoundingClientRect();
+                calPopup.style.top = (rect.bottom + window.scrollY + 8) + 'px';
+                calPopup.style.left = (rect.left + window.scrollX) + 'px';
+                calPopup.style.display = 'flex';
+                
+                if (calendar) {
+                    calendar.updateSize();
+                } else {
+                    initCalendar();
+                }
+            }
+        });
+    }
+
+    // =========================
+    // CLOSE EVENT DETAIL
+    // =========================
+
+    var closeDetailBtn = document.getElementById('closeDetail');
+    if (closeDetailBtn) {
+        closeDetailBtn.addEventListener('click', function () {
+            document.getElementById('eventDetailModal').style.display = 'none';
+        });
+    }
+
+    // =========================
+    // OUTSIDE CLICK CLOSE
+    // =========================
+
+    window.addEventListener('click', function(e) {
+        var detailModal = document.getElementById('eventDetailModal');
+        if (detailModal && e.target === detailModal) {
+            detailModal.style.display = 'none';
+        }
+        
+        if (calPopup && calPopup.style.display === 'flex') {
+            if (!calPopup.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                calPopup.style.display = 'none';
+            }
+        }
+    });
+
+    // =========================
+    // WINDOW RESIZE CLOSE
+    // =========================
+
+    window.addEventListener('resize', function() {
+        if (calPopup && calPopup.style.display === 'flex') {
+            calPopup.style.display = 'none';
+        }
+    });
+
+</script>

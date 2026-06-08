@@ -1,0 +1,1369 @@
+{% extends "baseView.html" %} {% block content %}
+
+<style>
+  /* ===== THREE-DOT LOADER OVERLAY ===== */
+  #pageLoader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--card-background, #fff);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    transition: opacity 0.45s ease, visibility 0.45s ease;
+  }
+
+  #pageLoader.hide {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .dot-loader {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .dot-loader span {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--primary-color, #0d6efd);
+    animation: dotBounce 1.2s ease-in-out infinite;
+  }
+
+  .dot-loader span:nth-child(1) { animation-delay: 0s; }
+  .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+  .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40%           { transform: scale(1.2); opacity: 1; }
+  }
+
+  .loader-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary, #888);
+  }
+
+  /* ===== FADE-IN ANIMATION HELPERS ===== */
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* stagger children */
+  .stagger-children > * {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.38s ease, transform 0.38s ease;
+  }
+  .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
+  .stagger-children.visible > *:nth-child(1)  { transition-delay: 0s; }
+  .stagger-children.visible > *:nth-child(2)  { transition-delay: 0.05s; }
+  .stagger-children.visible > *:nth-child(3)  { transition-delay: 0.1s; }
+  .stagger-children.visible > *:nth-child(4)  { transition-delay: 0.15s; }
+  .stagger-children.visible > *:nth-child(5)  { transition-delay: 0.2s; }
+  .stagger-children.visible > *:nth-child(6)  { transition-delay: 0.25s; }
+  .stagger-children.visible > *:nth-child(7)  { transition-delay: 0.3s; }
+  .stagger-children.visible > *:nth-child(8)  { transition-delay: 0.35s; }
+  .stagger-children.visible > *:nth-child(9)  { transition-delay: 0.4s; }
+  .stagger-children.visible > *:nth-child(10) { transition-delay: 0.45s; }
+  .stagger-children.visible > *:nth-child(11) { transition-delay: 0.5s; }
+  .stagger-children.visible > *:nth-child(12) { transition-delay: 0.55s; }
+  .stagger-children.visible > *:nth-child(13) { transition-delay: 0.6s; }
+  .stagger-children.visible > *:nth-child(14) { transition-delay: 0.65s; }
+  .stagger-children.visible > *:nth-child(15) { transition-delay: 0.7s; }
+  .stagger-children.visible > *:nth-child(16) { transition-delay: 0.75s; }
+
+  /* Stat card value pop */
+  @keyframes valPop {
+    0%   { transform: scale(0.7); opacity: 0; }
+    70%  { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .sc-val.popped {
+    animation: valPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Chart card slide-in */
+  .chart-card-wrap {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .chart-card-wrap.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+  /* ===== MODAL OVERRIDES ===== */
+  .modal-fullscreen .modal-dialog {
+    margin: 10px;
+    max-width: calc(100vw - 20px);
+    max-height: calc(100vh - 20px);
+  }
+  .modal-fullscreen .modal-content { height: 100%; }
+  .modal-backdrop { --bs-backdrop-opacity: 0.12; }
+
+  /* ===== DASHBOARD WRAPPER ===== */
+  .db-wrap {
+    padding: 1px 2px;
+    min-height: 100vh;
+  }
+
+  /* ===== ACTION BAR ===== */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-bottom: 12px;
+    padding-bottom: 2px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .action-bar.show { opacity: 1; transform: translateY(0); }
+  .action-bar::-webkit-scrollbar { display: none; }
+
+  .ab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    background: transparent;
+    flex-shrink: 0;
+    transition: background 0.15s, transform 0.15s;
+    line-height: 1;
+    text-decoration: none;
+  }
+  .ab-btn:active { transform: scale(0.96); }
+
+  .ab-btn .bdg {
+    min-width: 16px;
+    height: 16px;
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #dc3545;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ab-danger {
+    background: rgba(220, 53, 69, 0.08);
+    border-color: rgba(220, 53, 69, 0.35);
+    color: #dc3545;
+  }
+  .ab-danger:hover { background: rgba(220, 53, 69, 0.15); }
+
+  .ab-primary {
+    background: rgba(13, 110, 253, 0.08);
+    border-color: rgba(13, 110, 253, 0.35);
+    color: var(--primary-color, #0d6efd);
+  }
+  .ab-primary:hover { background: rgba(13, 110, 253, 0.15); }
+
+  .ab-blue {
+    background: rgba(0, 132, 255, 0.08);
+    border-color: rgba(0, 132, 255, 0.35);
+    color: #0084ff;
+  }
+  .ab-blue:hover { background: rgba(0, 132, 255, 0.15); }
+
+  .ab-amber {
+    background: rgba(122, 82, 10, 0.08);
+    border-color: rgba(122, 82, 10, 0.35);
+    color: #7a520a;
+  }
+  .ab-amber:hover { background: rgba(122, 82, 10, 0.15); }
+
+  .ab-teal {
+    background: rgba(15, 110, 86, 0.08);
+    border-color: rgba(15, 110, 86, 0.35);
+    color: #0f6e56;
+  }
+  .ab-teal:hover { background: rgba(15, 110, 86, 0.15); }
+
+  .ab-spacer { flex: 1; min-width: 4px; }
+
+  .ab-messenger {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0084ff;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    border: none;
+    transition: filter 0.15s;
+    position: relative;
+    font-size: 13px;
+  }
+  .ab-messenger:hover { filter: brightness(1.15); }
+
+  .ab-toggle {
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1;
+    transition: background 0.15s;
+  }
+  .ab-toggle:hover { background: var(--hover-bg, rgba(0, 0, 0, 0.04)); }
+
+  .ab-btn .bdg-pos {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    font-size: 10px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #dc3545;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== STATS GRID ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 7px;
+  }
+  .stats-grid.grid-hidden { display: none; }
+
+  /* ===== STAT CARD ===== */
+  .sc {
+    background: var(--card-background);
+    border: 0.5px solid var(--border-color);
+    border-radius: 8px;
+    padding: 9px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .sc:hover {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.03));
+    border-color: var(--border-hover-color, rgba(0, 0, 0, 0.2));
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
+  .sc:active { transform: translateY(0); }
+
+  .sc-label {
+    font-size: 11.5px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+    line-height: 1.25;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sc-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  .sc-val {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1;
+    white-space: nowrap;
+    min-width: 28px;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  /* inline mini dot loader for cards */
+  .val-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .val-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-secondary, #aaa);
+    animation: dotBounce 1.2s ease-in-out infinite;
+  }
+  .val-dots span:nth-child(1) { animation-delay: 0s; }
+  .val-dots span:nth-child(2) { animation-delay: 0.18s; }
+  .val-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+  .sc-sub {
+    font-size: 10px;
+    color: #dc3545;
+    margin-top: 2px;
+    line-height: 1;
+    white-space: nowrap;
+    min-height: 13px;
+  }
+
+  @media (max-width: 768px) {
+    .db-wrap { padding: 10px; }
+    .stats-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 5px;
+    }
+  }
+</style>
+
+<!-- ===== THREE-DOT LOADER OVERLAY ===== -->
+<div id="pageLoader">
+  <div class="dot-loader"><span></span><span></span><span></span></div>
+  <div class="loader-label">Loading your Dashboard…</div>
+</div>
+
+<div class="db-wrap">
+  <div style="margin: 0 auto; width: 100%">
+
+    <!-- ===== MODALS ===== -->
+    <div class="modal fade" id="eventModal" tabindex="-1">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">📅 Today's Events</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <ul id="eventList" class="list-group"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% set header = "15 CORPS ENGINEERING SIGNAL REGIMENT" %}
+    {% set subscript = 'Welcome ' ~ role ~ ' ' ~ current_user_name %}
+    {% include 'navbar/navbar.html' %}
+
+    <div style="margin-bottom: 8px">
+      {% if role in ['JCO','S/JCO'] %}
+        {% include 'modals/alarm/no_jco_kunba.html' %}
+      {% endif %}
+    </div>
+
+    <!-- ===== ACTION BAR ===== -->
+    <div class="action-bar" id="actionBar">
+
+       {%if role in ['PA']%}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+         ADD  SHEDULE
+      </button>
+     
+      {%endif%}
+
+      {%if role in ['O2']%}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#add_dues_in">
+        ADD DUES IN
+      </button>
+      <button class="ab-btn ab-danger" data-bs-toggle="modal" data-bs-target="#add_dues_out">
+        ADD DUES OUT
+      </button>
+      {%endif%}
+
+      {% if role in ['NCO PWR','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO OP','NCO PWR','NCO MW','NCO MCCS','NCO CHQ','SEC JCO','JCO LINE','S/JCO','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RP/NA','NCO QM','NCO LRW','JCO LRW','JCO QM','O CENTRAL NCO','JCO MW','PST CLK'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#personnelModal">
+        ASSIGN PERSONNEL
+      </button>
+      {% endif %}
+
+      {%if role == 'Subedar Major'%}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#view_company_interview_pending">
+        INTERVIEW PENDING
+      </button>
+      {%endif%}
+
+      {% if role in ['NCO PWR','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO OP','NCO PWR','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO LINE','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RP/NA','NCO QM','O CENTRE NCO'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
+        ROLL CALL POINTS
+      </button>
+      {% endif %}
+
+     
+
+      {% if role in ['O CENTRE NCO'] %}
+      <a href="/gallery/manage" class="ab-btn ab-primary">
+        <i class="fas fa-images" style="font-size:11px"></i> MANAGE GALLERY
+      </a>
+      {% endif %}
+
+      {% if role in ['TRGJCO'] %}
+      <a href="/oncourses/manage_course" class="ab-btn ab-primary">
+        <i class="fas fa-graduation-cap" style="font-size:11px"></i> MANAGE COURSE
+      </a>
+      {% endif %}
+
+      {% if role in ['', 'O CENTRE NCO'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#tradeModal">
+        <i class="fas fa-plus-circle" style="font-size:11px"></i> ADD TRADE
+      </button>
+      {% endif %}
+
+      {% if role|trim in ['NCO PWR','NCO QRT','NCO CHQ','NCO IT','NCO OP','JCO MW','NCO MW','NCO LRW','NCO MCCS','NCO LINE','NCO RHQ','NCO TM','NCO IT','NCO RHQ','NCO MT','NCO RP/NA','NCO QM','NCO SYS','JCO SYS','SEC JCO','JCO LINE','JCO LRW','JCO CHQ','JCO IT','JCO MT','JCO RHQ','JCO MCCS','JCO QM','S/JCO','ONCO','OC','2IC','JCO QRT','JCO TM','JCO PWR','JCO OP','JCO SYS','JCO DET','NCO DET','NCO SYS','Subedar Major','PA'] %}
+      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn">
+        LEAVE REQUESTS
+        <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
+      </button>
+      {% endif %}
+
+      
+
+      {% if role in ['O CENTRE NCO','ONCO','SEC NCO','CHM'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#paradeDataModal">
+        <i class="fas fa-clipboard-list" style="font-size:11px"></i>
+        {% if role in ['O CENTRE NCO'] %} PARADE DATA MANAGEMENT {% else %} ENTER PARADE DATA {% endif %}
+      </button>
+      {% endif %}
+
+      {% if role == 'ONCO' %}
+      <a href="/onco/manage_leave" class="ab-btn ab-amber">
+        <i class="fas fa-calendar-times" style="font-size:11px"></i> MANAGE LEAVE
+      </a>
+      <button
+  type="button"
+  class="ab-btn ab-primary"
+  data-bs-toggle="modal"
+  data-bs-target="#addHonoursModal"
+>
+  <span class="ahb-icon">🏅</span>
+
+  <span class="ahb-text">
+    Add Honour Entry
+  </span>
+</button>
+      {% endif %}
+
+      <div class="ab-spacer"></div>
+
+      <button class="ab-messenger position-relative" id="chatBtn" title="Messages">
+        <i class="fab fa-facebook-messenger"></i>
+        <span class="bdg-pos" id="unreadBadge" style="display:none">0</span>
+      </button>
+
+    </div>
+    <!-- /action-bar -->
+
+    <!-- ===== STATS GRID ===== -->
+    <div class="stats-grid stagger-children" id="statsGrid">
+
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC','ONCO'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
+        <span class="sc-label">Parade State</span>
+        <div class="sc-right">
+          <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO','ONCO','NCO CHQ','2IC','JCO MW','ADJUTANT','OC','S/JCO','HEAD CLK'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope">
+        <span class="sc-label">TD / Attachment</span>
+        <div class="sc-right">
+          <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
+        <span class="sc-label">Domain Specialization</span>
+        <div class="sc-right">
+          <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
+      <div class="sc" id="openCourses">
+        <span class="sc-label">On Course</span>
+        <div class="sc-right">
+          <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['JCO','S/JCO','SEC JCO','HEAD CLK'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#kunbaInterviewModal">
+        <span class="sc-label">Kunba Interview</span>
+        <div class="sc-right">
+          <span class="sc-val">
+            <span id="interview-Count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+            /
+            <span id="total-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          </span>
+          <span class="sc-sub" id="interview%">&nbsp;</span>
+        </div>
+      </div>
+
+      <div class="sc" id="task-assigned" data-bs-toggle="modal" data-bs-target="#taskModal">
+        <span class="sc-label">Task Pending</span>
+        <div class="sc-right">
+          <span class="sc-val" id="task-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-sub" id="task-pending">&nbsp;</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC','ONCO','ADJUTANT','OC','S/JCO'] %}
+      <div class="sc" id="viewDetailsBtn">
+        <span class="sc-label">Detachment</span>
+        <div class="sc-right">
+          <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC','OC','ADJUTANT','S/JCO'] %}
+      <div class="sc" id="openSensitive">
+        <span class="sc-label">Sensitive Indl</span>
+        <div class="sc-right">
+          <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'HEAD CLK', 'ADJUTANT'] %}
+      <div class="sc" id="openBoardDetails">
+        <span class="sc-label">BOOs</span>
+        <div class="sc-right">
+          <span class="sc-val" id="board-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {%if role in ["ONCO","Subedar Major","S/JCO","NCO PWR","NCO CHQ","NCO IT","NCO MW","NCO LINE","NCO OP","NCO MCCS","NCO RHQ","NCO LRW","NCO QM","NCO MT","NCO TM","NCO RP","JCO PWR","JCO CHQ","JCO IT","JCO MW","JCO LINE","JCO OP","JCO MCCS","JCO RHQ","JCO TM","JCO MT","JCO LRW","JCO QM","JCO CHQ","PA"]%}
+      <div class="sc" onclick="openLeaveModal()">
+        <span class="sc-label">Check Leaves</span>
+        <div class="sc-right">
+          <span class="sc-val"><i class="fas fa-calendar-check" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+        </div>
+      </div>
+      {%endif%}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal" id="loanDetailGraph">
+        <span class="sc-label">Active Loans</span>
+        <div class="sc-right">
+          <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
+      <div class="sc" id="openProjects">
+        <span class="sc-label">Total Projects</span>
+        <div class="sc-right">
+          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
+        <span class="sc-label">Central Roll Call</span>
+        <div class="sc-right">
+          <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['CO', '2IC', 'ADJUTANT','TRGJCO','OC','HEAD CLK','S/JCO'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal">
+        <span class="sc-label">Agniveer</span>
+        <div class="sc-right">
+          <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['TRGJCO'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#on_courses_modal">
+        <span class="sc-label">Add Indl On Course</span>
+        <div class="sc-right">
+          <span class="sc-val"><i class="fas fa-user-graduate" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+        </div>
+      </div>
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#fillupdetailsmodal">
+        <span class="sc-label">Fill Up Test Details</span>
+        <div class="sc-right">
+          <span class="sc-val"><i class="fas fa-clipboard-check" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['O2','OC'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
+        <span class="sc-label">Dues In</span>
+        <div class="sc-right">
+          <span class="sc-val" id="count-dues-in"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#duesOutListModal">
+        <span class="sc-label">Dues Out</span>
+        <div class="sc-right">
+          <span class="sc-val" id="count-dues-out"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
+
+
+
+      
+
+    </div>
+    <!-- /statsGrid -->
+
+    <!-- ===== ADD EVENT MODAL ===== -->
+    <div class="modal fade" id="addEventModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">📅 Add Event</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="eventForm">
+              <label>Event Date:</label>
+              <input type="date" class="form-control" name="event_date" value="{{ today }}" required />
+              <label class="mt-2">Event Name:</label>
+              <input type="text" class="form-control" name="event_name" required />
+              <label class="mt-2">Venue:</label>
+              <input type="text" class="form-control" name="venue" required />
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-success" onclick="saveEvent()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== ALL OTHER MODALS (unchanged) ===== -->
+    {% include 'modals/detachmentModal/detachment.html' %}
+    {% include 'modals/PA/schedule.html' %}
+    {% include 'modals/personnelModal/duty_search_modal.html' %}
+    {% include 'modals/personnelModal/personal_modal.html' %}
+    {% include 'modals/salesmodal/salesModal.html' %}
+    {% include 'modals/leaverequest/leave_request.html' %}
+    {% include 'modals/interview_pending/modal.html' %}
+    {% include 'modals/count_parade/modal.html' %}
+    {% include 'modals/attachment-modal/modal.html' %}
+    {% include 'modals/loan/loans.html' %}
+    {% include 'modals/roll_call/modal.html' %}
+    {% include 'modals/roll_call/view_roll_call.html' %}
+    {% include 'modals/course/courses.html' %}
+    {% include 'modals/interview_pending/jco-update-modal.html' %}
+    {% include 'modals/success-modal/modal.html' %}
+    {% include 'task_manager/update_task_by_jco.html' %}
+    {% include 'modals/adduser/user.html' %}
+    {% include 'modals/oncourses/modal.html' %}
+    {% include 'modals/messenger/modal.html' %}
+    {% include 'modals/Sanctioned_leaves/sanction_leave_modal.html' %}
+
+    {% if role in ['O CENTRE NCO'] %}
+    <div class="modal fade" id="tradeModal" tabindex="-1">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">{% include 'modals/trade/trade.html' %}</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if role in ['CO','2IC','ADJUTANT','TRGJCO','OC'] %}
+      {% include 'modals/agniveer/modal.html' %}
+      {% include 'modals/agniveer/fill_up_test_details.html' %}
+    {% endif %}
+
+    {% if role in ['O CENTRE NCO','ONCO'] %}
+      {% include 'modals/parade_data/index.html' %}
+      {% include 'modals/add_honours_entry/h_entry.html' %}
+
+    {% endif %}
+
+    {% if role == 'CO' %}
+      {% include 'modals/leaverequest/co-rejected-view.html' %}
+    {% endif %}
+
+    {% if role in ['CO','2IC','ADJUTANT','OC'] %}
+      {% include 'modals/alarm/agniveer_test_alarms.html' %}
+    {% endif %}
+
+    {% if role == 'Subedar Major' %}
+      {% include 'modals/coy_kunba/view_company_kunba.html' %}
+    {% endif %}
+
+    {% if role in ['O2','OC'] %}
+      {% include 'modals/ADD-DUES-IN/modal.html' %}
+      {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
+      {% include 'modals/ADD-DUES-OUT/modal.html' %}
+      {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
+    {% endif %}
+
+    <!-- Parade State Modal -->
+    <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Parade State</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            {% include 'modals/parade_state/index.html' %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CHARTS ROW ===== -->
+    {%if role not in ['ACCOUNT OFFICER','PROJECT OFFICER','PROJECT JCO','ACCOUNT JCO','TRGJCO']%}
+    <div class="row mt-3 g-3">
+
+      <!-- Bar Chart -->
+      <div class="col-lg-8 chart-card-wrap" id="barChartWrap" style="transition-delay:0.1s">
+        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+          <div class="card-body" style="padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
+              <h6 style="margin:0;font-weight:600;">Posted Strength</h6>
+              <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);">Total: --</span>
+            </div>
+            <div style="height:200px;">
+              <canvas id="barGraph"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Donut Chart -->
+      <div class="col-lg-4 chart-card-wrap" id="donutChartWrap" style="transition-delay:0.2s">
+        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+          <div class="card-body" style="padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <h6 style="margin:0;font-weight:600;">Detachment Stats</h6>
+              <span id="detachmentTotal" style="font-weight:600;color:var(--primary-color);">Total: --</span>
+            </div>
+            <div style="height:200px;position:relative;">
+              <canvas id="detachmentChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== SECOND ROW ===== -->
+    <div class="row mt-3 g-3">
+
+      <!-- Unfit Trend -->
+      <div class="col-lg-8 chart-card-wrap" style="transition-delay:0.15s">
+        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+          <div class="card-body" style="padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+              <h6 style="margin:0;font-weight:600;">Weight Based Monthly Comparison</h6>
+              <span style="font-weight:600;color:#dc2626;font-size:13px;">Trend Analysis</span>
+            </div>
+            <div style="height:220px;">
+              <canvas id="unfitTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fit / Unfit Bar -->
+      <div class="col-lg-4 chart-card-wrap" style="transition-delay:0.25s">
+        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+          <div class="card-body" style="padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+              <h6 style="margin:0;font-weight:600;">Fit vs UnFit (Weight)</h6>
+              <div style="display:flex;gap:12px;font-size:12px;font-weight:700;">
+                <span style="color:#2563eb;font-weight:900;">Fit: <span id="fitCount">--</span></span>
+                <span style="color:#dc2626;font-weight:900;">UnFit: <span id="unfitCount">--</span></span>
+              </div>
+            </div>
+            <div style="height:220px;">
+              <canvas id="fitUnfitChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    {%endif%}
+
+    {% include 'images_section/section.html' %}
+
+  </div>
+</div>
+<!-- /db-wrap -->
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+  /* ---- Clean up stray modal backdrops ---- */
+  document.addEventListener("hidden.bs.modal", function () {
+    document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+  });
+</script>
+
+<script>
+  /* ---- Page loader hide ---- */
+  function hidePageLoader() {
+    var loader = document.getElementById("pageLoader");
+    if (loader) loader.classList.add("hide");
+  }
+
+  /* ---- Show action bar ---- */
+  function showActionBar() {
+    var bar = document.getElementById("actionBar");
+    if (bar) bar.classList.add("show");
+  }
+
+  /* ---- Animate stats grid in ---- */
+  function showStatsGrid() {
+    var grid = document.getElementById("statsGrid");
+    if (grid) grid.classList.add("visible");
+  }
+
+  /* ---- Animate chart cards in ---- */
+  function showChartCards() {
+    document.querySelectorAll(".chart-card-wrap").forEach(function (el) {
+      el.classList.add("visible");
+    });
+  }
+
+  /* ---- Safe set (replaces mini dots with real value + pop animation) ---- */
+  function safeSet(id, val) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = val != null ? val : "0";
+    el.classList.remove("popped");
+    void el.offsetWidth;
+    el.classList.add("popped");
+  }
+
+  /* ---- Toggle grid ---- */
+  (function () {
+    var grid = document.getElementById("statsGrid");
+    var btn  = document.getElementById("toggleGrid");
+    var hidden = false;
+    if (btn && grid) {
+      btn.addEventListener("click", function () {
+        hidden = !hidden;
+        grid.classList.toggle("grid-hidden", hidden);
+        btn.innerHTML = hidden ? "&#8963;" : "&#8964;";
+      });
+    }
+  })();
+
+  /* ---- Navigation clicks ---- */
+  (function () {
+    var board = document.getElementById("openBoardDetails");
+    if (board) board.addEventListener("click", function () { window.location.href = "/board_details"; });
+
+    var sens = document.getElementById("openSensitive");
+    if (sens) sens.addEventListener("click", function () { window.location.href = "/mark_personnel"; });
+
+    var proj = document.getElementById("openProjects");
+    if (proj) proj.addEventListener("click", function () { window.location.href = "/projects"; });
+  })();
+
+  /* ---- HTML escape helper ---- */
+  function escapeHtml(t) {
+    if (!t) return "—";
+    var d = document.createElement("div");
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  /* ---- Save event ---- */
+  function saveEvent() {
+    var form = document.getElementById("eventForm");
+    if (!form) return;
+    var fd = new FormData(form);
+    fetch("/add_event", { method: "POST", body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (d.status === "success") { alert("Event Added!"); location.reload(); }
+        else { alert("Failed to add event."); }
+      })
+      .catch(function () { alert("Network error."); });
+  }
+
+  /* ---- Load today events ---- */
+  async function loadTodayEvents() {
+    try {
+      var r = await fetch("/api/today_event_alarm");
+      var d = await r.json();
+      var list = document.getElementById("eventList");
+      if (!list) return;
+      list.innerHTML = "";
+      if (!d.rows || d.rows.length === 0) {
+        list.innerHTML = '<li class="list-group-item text-muted text-center">No events today</li>';
+        return;
+      }
+      d.rows.forEach(function (ev) {
+        list.innerHTML += '<li class="list-group-item"><strong>' + escapeHtml(ev.event_name) +
+          '</strong><br><small class="text-muted">' + escapeHtml(ev.venue) + '</small></li>';
+      });
+    } catch (e) { console.warn("Events load failed:", e); }
+  }
+
+  /* ---- Load rejected leaves badge ---- */
+  async function updateRejectedLeaveCount() {
+    try {
+      var r = await fetch("/apply_leave/rejected_leaves");
+      var d = await r.json();
+      var cnt = (d.data || []).length;
+      var bdg = document.getElementById("coRejectedCount");
+      if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
+    } catch (e) {}
+  }
+
+  /* ---- Load leave request badge ---- */
+  async function updateLeaveRequestBadge() {
+    try {
+      var r = await fetch("/apply_leave/get_leave_requests");
+      var d = await r.json();
+      var cnt = (d.data || []).length;
+      var bdg = document.getElementById("leaveRequestBadge");
+      if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
+    } catch (e) {}
+  }
+
+  /* ---- Generic single-value card fetcher ---- */
+  async function fetchCardData(id, endpoint, key) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    try {
+      var r = await fetch(endpoint);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      var d = await r.json();
+      safeSet(id, d[key] != null ? d[key] : "0");
+    } catch (e) {
+      console.error("Error fetching " + id + ":", e);
+      safeSet(id, "—");
+    }
+  }
+
+  /* ---- Manpower ---- */
+  async function fetchManpowerData() {
+    var el = document.getElementById("mainPower");
+    if (!el) return;
+    try {
+      var r = await fetch("/api/dashboard/manpower");
+      var d = await r.json();
+      safeSet("mainPower", (d.officerCount || 0) + " – " + (d.jcoCount || 0) + " – " + (d.orCount || 0));
+    } catch (e) { safeSet("mainPower", "—"); }
+  }
+
+  /* ---- Interview data ---- */
+  async function fetchInterviewData() {
+    var pe = document.getElementById("interview-Count");
+    var te = document.getElementById("total-count");
+    var pr = document.getElementById("interview%");
+    if (!pe || !te || !pr) return;
+    try {
+      var r = await fetch("/api/dashboard/interviews");
+      var d = await r.json();
+      safeSet("interview-Count", d.pending_count || 0);
+      safeSet("total-count", d.total_count || 0);
+      pr.textContent = "Pending " + (d.percentage || 0) + "%";
+    } catch (e) {
+      safeSet("interview-Count", "0"); safeSet("total-count", "0");
+      if (pr) pr.textContent = "0%";
+    }
+  }
+
+  /* ---- Task data ---- */
+  async function fetchTasksData() {
+    var ce = document.getElementById("task-count");
+    var pe = document.getElementById("task-pending");
+    if (!ce || !pe) return;
+    try {
+      var r = await fetch("/api/dashboard/tasks");
+      var d = await r.json();
+      var pending = d.pending || 0;
+      var total   = d.total   || 0;
+      safeSet("task-count", pending + " / " + total);
+      var pct = total > 0 ? ((pending / total) * 100).toFixed(1) : 0;
+      pe.textContent = "Pending " + pct + "%";
+      pe.className = "sc-sub " + (pct < 50 ? "text-success" : "");
+    } catch (e) {
+      safeSet("task-count", "0 / 0");
+      if (pe) pe.textContent = "0%";
+    }
+  }
+
+  /* ---- Load all cards ---- */
+  async function loadAllDashboardCards() {
+    var simpleCards = [
+      { id: "locationCount",      endpoint: "/api/dashboard/detachments", key: "count" },
+      { id: "attachment-count",   endpoint: "/api/dashboard/attachments",  key: "count" },
+      { id: "agniveer_count",     endpoint: "/api/dashboard/agniveers",    key: "count" },
+      { id: "get_projects_count", endpoint: "/api/dashboard/projects",     key: "count" },
+      { id: "sensitive-count",    endpoint: "/api/dashboard/sensitive",    key: "count" },
+      { id: "active-loan-count",  endpoint: "/api/dashboard/loans",        key: "count" },
+      { id: "totalCoursesDone",   endpoint: "/api/dashboard/courses",      key: "count" },
+      { id: "center-roll-points", endpoint: "/api/dashboard/rollcall",     key: "points" },
+      { id: "count-dues-in",      endpoint: "/dues/count-dues-in",         key: "count_dues_in" },
+      { id: "count-dues-out",     endpoint: "/dues/count-dues-out",        key: "count_dues_out" },
+      { id: "board-count",        endpoint: "/api/dashboard/boards",       key: "count" },
+    ];
+
+    var promises = [];
+    simpleCards.forEach(function (c) {
+      if (document.getElementById(c.id)) promises.push(fetchCardData(c.id, c.endpoint, c.key));
+    });
+    if (document.getElementById("mainPower"))       promises.push(fetchManpowerData());
+    if (document.getElementById("interview-Count")) promises.push(fetchInterviewData());
+    if (document.getElementById("task-count"))      promises.push(fetchTasksData());
+
+    /* Domain specialisation — separate endpoint */
+    if (document.getElementById("duty-search-count")) {
+      promises.push(
+        fetch("/company_based_domain_sp")
+          .then(function (r) { return r.json(); })
+          .then(function (cnt) { safeSet("duty-search-count", cnt); })
+          .catch(function () {})
+      );
+    }
+
+    await Promise.allSettled(promises);
+  }
+
+  /* ---- Reveal UI after data ---- */
+  async function initializeDashboard() {
+    try {
+      await loadAllDashboardCards();
+      await Promise.allSettled([
+        updateRejectedLeaveCount(),
+        updateLeaveRequestBadge(),
+        loadTodayEvents(),
+      ]);
+    } catch (e) {
+      console.error("Dashboard init error:", e);
+    } finally {
+      hidePageLoader();
+      showActionBar();
+      showStatsGrid();
+      setTimeout(showChartCards, 120);
+    }
+  }
+
+  /* ---- Test details modal ---- */
+  document.addEventListener("DOMContentLoaded", function () {
+    var testModal = document.getElementById("testDetailsModal");
+    var modalBody = document.getElementById("testDetailsModalBody");
+
+    if (testModal && modalBody) {
+      testModal.addEventListener("show.bs.modal", function () {
+        modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>';
+        fetch("/fill-up-test-details")
+          .then(function (r) { return r.text(); })
+          .then(function (html) { modalBody.innerHTML = html; initFillUpTestForm(); })
+          .catch(function () { modalBody.innerHTML = "<p class='text-danger'>Failed to load form</p>"; });
+      });
+
+      function initFillUpTestForm() {
+        modalBody.querySelectorAll(".test-status").forEach(function (sel) {
+          sel.addEventListener("change", function () {
+            var di = this.closest(".row").querySelector(".test-date");
+            if (di) di.disabled = this.value !== "Done";
+          });
+        });
+        var form = modalBody.querySelector("#fillTestForm");
+        if (!form) return;
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          var payload = {
+            army_number: form.army_number.value,
+            tests: [
+              { test: "1st", status: form.test1.value,  date: form.test1_date.value },
+              { test: "2nd", status: form.test2.value,  date: form.test2_date.value },
+              { test: "3rd", status: form.test3.value,  date: form.test3_date.value },
+              { test: "4th", status: form.test4.value,  date: form.test4_date.value },
+            ],
+          };
+          fetch("/api/fill-up-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+            .then(function (r) { return r.json(); })
+            .then(function () { alert("Test details saved"); bootstrap.Modal.getInstance(testModal).hide(); location.reload(); })
+            .catch(function () { alert("Save failed"); });
+        });
+      }
+    }
+
+    /* Kick off */
+    initializeDashboard();
+  });
+</script>
+
+<script>
+  /* ===== CHARTS ===== */
+  let rankChartInstance     = null;
+  let detachmentChartInstance = null;
+  let unfitTrendChartInstance = null;
+  let fitUnfitChartInstance   = null;
+
+  let currUserCoy = "{{company}}";
+  if (currUserCoy === "Center") currUserCoy = "ALL";
+
+  async function loadRankChart(company = "ALL") {
+    try {
+      const res    = await fetch(`/get_posted_strength?company=${encodeURIComponent(company)}`);
+      const result = await res.json();
+      if (result.status !== "success") return;
+
+      const labels = result.data.map(r => r.rank);
+      const values = result.data.map(r => r.count);
+
+      const el = document.getElementById("rankTotalCount");
+      if (el) el.textContent = "Total: " + result.total;
+
+      const valueLabelPlugin = {
+        id: "valueLabelPlugin",
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            chart.getDatasetMeta(i).data.forEach((bar, idx) => {
+              ctx.save();
+              ctx.font = "bold 11px sans-serif";
+              ctx.fillStyle = "#000";
+              ctx.textAlign = "center";
+              ctx.fillText(ds.data[idx], bar.x, bar.y - 5);
+              ctx.restore();
+            });
+          });
+        },
+      };
+
+      const canvas = document.getElementById("barGraph");
+      if (!canvas) return;
+      if (rankChartInstance) rankChartInstance.destroy();
+      rankChartInstance = new Chart(canvas.getContext("2d"), {
+        type: "bar",
+        data: { labels, datasets: [{ data: values, backgroundColor: "#2563eb", borderColor: "#3b6fd8", borderWidth: 1, borderRadius: 6 }] },
+        plugins: [valueLabelPlugin],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: { top: 23 } },
+          animation: { duration: 700, easing: "easeOutQuart" },
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+      });
+    } catch (err) { console.error("Rank chart error:", err); }
+  }
+
+  async function loadDetachmentChart(company = "ALL") {
+    try {
+      const res    = await fetch(`/get_detachment_stats_for_graph?company=${encodeURIComponent(company)}`);
+      const result = await res.json();
+      if (result.status !== "success") return;
+
+      const labels = result.data.map(r => r.detachment);
+      const values = result.data.map(r => r.count);
+
+      const el = document.getElementById("detachmentTotal");
+      if (el) el.textContent = "Total: " + result.total;
+
+      const donutDatalabelsPlugin = {
+        id: 'donutDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((arc, j) => {
+              const val = ds.data[j];
+              if (val == null || val === 0) return;
+              const angle = arc.endAngle - arc.startAngle;
+              if (angle < 0.15) return;
+              ctx.save();
+              const midAngle = arc.startAngle + angle / 2;
+              const midRadius = arc.innerRadius + (arc.outerRadius - arc.innerRadius) / 2;
+              const x = arc.x + Math.cos(midAngle) * midRadius;
+              const y = arc.y + Math.sin(midAngle) * midRadius;
+              ctx.font = 'bold 11px sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+              ctx.shadowBlur = 4;
+              ctx.fillText(val, x, y);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      const canvas = document.getElementById("detachmentChart");
+      if (!canvas) return;
+      if (detachmentChartInstance) detachmentChartInstance.destroy();
+      detachmentChartInstance = new Chart(canvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: ["#2563eb","#dc2626","#16a34a","#f59e0b","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5","#0f766e","#be123c","#4338ca","#15803d","#b45309","#6d28d9","#1d4ed8","#c2410c","#0f172a","#a21caf"],
+            borderWidth: 2, borderColor: "#fff",
+          }],
+        },
+        plugins: [donutDatalabelsPlugin],
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: "65%",
+          animation: { animateRotate: true, duration: 800, easing: "easeOutQuart" },
+          plugins: { legend: { display:false } },
+        },
+      });
+    } catch (err) { console.error("Donut chart error:", err); }
+  }
+
+  async function loadUnfitTrend(company = "All") {
+    try {
+      const res    = await fetch(`/api/unfit_trend?company=${encodeURIComponent(company)}`);
+      const result = await res.json();
+      if (result.status !== "success") return;
+
+      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const labels = result.data.map(d => `${monthNames[d.month - 1]} ${d.year}`);
+      const values = result.data.map(d => d.unfit_count);
+
+      const lineDatalabelsPlugin = {
+        id: 'lineDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            if (meta.hidden) return;
+            meta.data.forEach((point, idx) => {
+              const val = ds.data[idx];
+              if (val == null) return;
+              ctx.save();
+              ctx.font = 'bold 11px sans-serif';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              ctx.fillText(val, point.x, point.y - 6);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      const canvas = document.getElementById("unfitTrendChart");
+      if (!canvas) return;
+      if (unfitTrendChartInstance) unfitTrendChartInstance.destroy();
+      unfitTrendChartInstance = new Chart(canvas.getContext("2d"), {
+        type: "line",
+        data: { labels, datasets: [{ label: "UnFit Personnel", data: values, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.12)", fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: "#dc2626", borderWidth: 3 }] },
+        plugins: [lineDatalabelsPlugin],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: { top: 15 } },
+          animation: { duration: 700, easing: "easeOutQuart" },
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+      });
+    } catch (err) { console.error("Trend chart error:", err); }
+  }
+
+  async function loadFitUnfitChart(company = "All") {
+    if (company === "ALL") company = "All";
+    try {
+      const res    = await fetch(`/weight_system/api/summary?company=${encodeURIComponent(company)}`);
+      const result = await res.json();
+      const fit    = result.Fit;
+      const unfit  = result.unFit;
+
+      const fc = document.getElementById("fitCount");
+      const uc = document.getElementById("unfitCount");
+      if (fc) fc.textContent = fit;
+      if (uc) uc.textContent = unfit;
+
+      const valueLabelPlugin = {
+        id: "valueLabelPlugin",
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            chart.getDatasetMeta(i).data.forEach((bar, idx) => {
+              ctx.save();
+              ctx.font = "bold 12px sans-serif";
+              ctx.fillStyle = "#000";
+              ctx.textAlign = "center";
+              ctx.fillText(ds.data[idx], bar.x, bar.y - 8);
+              ctx.restore();
+            });
+          });
+        },
+      };
+
+      const canvas = document.getElementById("fitUnfitChart");
+      if (!canvas) return;
+      if (fitUnfitChartInstance) fitUnfitChartInstance.destroy();
+      fitUnfitChartInstance = new Chart(canvas.getContext("2d"), {
+        type: "bar",
+        data: { labels: ["Fit","UnFit"], datasets: [{ data: [fit, unfit], backgroundColor: ["#2563eb","#dc2626"], borderColor: ["#3b6fd8","#b91c1c"], borderWidth: 1, borderRadius: 8, barThickness: 70 }] },
+        plugins: [valueLabelPlugin],
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          layout: { padding: { top: 23 } },
+          animation: { duration: 700, easing: "easeOutQuart" },
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+        },
+      });
+    } catch (err) { console.error("Fit/UnFit chart error:", err); }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    loadRankChart(currUserCoy);
+    loadDetachmentChart(currUserCoy);
+    loadUnfitTrend(currUserCoy);
+    loadFitUnfitChart(currUserCoy);
+  });
+</script>
+
+{% endblock %}

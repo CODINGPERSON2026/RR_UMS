@@ -1,0 +1,192 @@
+
+<!-- Add Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow border-0">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-calendar-event me-2"></i>
+                    Add Schedule
+                </h5>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal"
+                    aria-label="Close">
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="scheduleForm">
+
+                    <div class="row g-3">
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="title"
+                                placeholder="Enter schedule title"
+                                required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">
+                                Description
+                            </label>
+                            <textarea
+                                class="form-control"
+                                name="description"
+                                rows="3"
+                                placeholder="Enter schedule details">
+                            </textarea>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Location
+                            </label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                name="location"
+                                placeholder="Meeting Room / Office">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Date
+                            </label>
+                            <input
+                                type="date"
+                                class="form-control"
+                                name="schedule_date"
+                                required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Start Time
+                            </label>
+                            <input
+                                type="time"
+                                class="form-control"
+                                name="start_time"
+                                required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                End Time
+                            </label>
+                            <input
+                                type="time"
+                                class="form-control"
+                                name="end_time"
+                                required>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                Priority
+                            </label>
+                            <select
+                                class="form-select"
+                                name="priority">
+                                <option value="1">🟢 Low</option>
+                                <option value="2">🟡 Normal</option>
+                                <option value="3" selected>🟠 Medium</option>
+                                <option value="4">🔴 High</option>
+                                <option value="5">🚨 Critical</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn btn-light border"
+                    data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    form="scheduleForm"
+                    class="btn btn-primary">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Save Schedule
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+const scheduleForm = document.getElementById("scheduleForm");
+
+scheduleForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = {
+        title: scheduleForm.title.value.trim(),
+        description: scheduleForm.description.value.trim(),
+        location: scheduleForm.location.value.trim(),
+        schedule_date: scheduleForm.schedule_date.value,
+        start_time: scheduleForm.start_time.value,
+        end_time: scheduleForm.end_time.value,
+        priority: Number(scheduleForm.priority.value),
+        status: "pending"
+    };
+
+    try {
+        const response = await fetch("/api/schedules", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+
+            alert("Schedule added successfully");
+
+            scheduleForm.reset();
+
+            const modal =
+                bootstrap.Modal.getInstance(
+                    document.getElementById("scheduleModal")
+                );
+
+            modal.hide();
+
+            if (typeof loadSchedules === "function") {
+                loadSchedules();
+            }
+
+        } else {
+            alert(result.message || "Failed to add schedule");
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("Something went wrong");
+    }
+});
+</script>
+
