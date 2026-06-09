@@ -20,32 +20,32 @@
   .controls-bar {
     display: flex;
     align-items: center;
-    gap: 14px;
-    margin-bottom: 22px;
+    gap: 10px;
+    margin-bottom: 16px;
     flex-wrap: wrap;
   }
 
   .search-box {
     flex: 1;
-    min-width: 220px;
+    min-width: 200px;
     position: relative;
   }
 
   .search-box i {
     position: absolute;
-    left: 14px;
+    left: 11px;
     top: 50%;
     transform: translateY(-50%);
     color: var(--army-olive);
-    font-size: 0.9rem;
+    font-size: 0.82rem;
   }
 
   .search-box input {
     width: 100%;
-    padding: 10px 14px 10px 38px;
+    padding: 8px 12px 8px 32px;
     border: 1.5px solid var(--border-color);
-    border-radius: 10px;
-    font-size: 0.95rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
     font-weight: 500;
     background: #fff;
     color: var(--text-primary);
@@ -59,17 +59,17 @@
   }
 
   .filter-select {
-    padding: 10px 14px;
+    padding: 8px 12px;
     border: 1.5px solid var(--border-color);
-    border-radius: 10px;
-    font-size: 0.95rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
     font-weight: 600;
     background: #fff;
     color: var(--text-primary);
     cursor: pointer;
     outline: none;
     transition: border-color 0.2s;
-    min-width: 140px;
+    min-width: 130px;
   }
 
   .filter-select:focus {
@@ -79,9 +79,9 @@
   .stat-pill {
     background: var(--army-green);
     color: #fff;
-    padding: 8px 18px;
-    border-radius: 24px;
-    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -90,9 +90,9 @@
   /* ── TABLE CARD ── */
   .table-card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 20px rgba(26, 36, 16, 0.08);
+    box-shadow: 0 3px 14px rgba(26, 36, 16, 0.07);
     overflow: hidden;
   }
 
@@ -100,7 +100,7 @@
   .course-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.93rem;
+    font-size: 0.85rem;
   }
 
   .course-table thead {
@@ -108,10 +108,10 @@
   }
 
   .course-table thead th {
-    padding: 14px 16px;
+    padding: 11px 13px;
     text-align: left;
-    font-size: 0.78rem;
-    letter-spacing: 1.2px;
+    font-size: 0.72rem;
+    letter-spacing: 1.1px;
     color: var(--army-tan);
     text-transform: uppercase;
     font-weight: 600;
@@ -133,7 +133,7 @@
   }
 
   .course-table td {
-    padding: 13px 16px;
+    padding: 10px 13px;
     vertical-align: middle;
     color: var(--text-primary);
     font-weight: 500;
@@ -141,20 +141,20 @@
 
   /* ── ARMY NUMBER BADGE ── */
   .army-num {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--army-olive);
     background: #edf2e4;
-    padding: 3px 9px;
-    border-radius: 6px;
+    padding: 2px 8px;
+    border-radius: 5px;
     display: inline-block;
   }
 
   /* ── RANK BADGE ── */
   .rank-badge {
     display: inline-block;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 20px;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     background: linear-gradient(135deg, var(--army-green), var(--army-olive));
@@ -165,9 +165,9 @@
   /* ── COMPANY BADGE ── */
   .company-badge {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.5px;
     background: #fff8e6;
@@ -177,7 +177,7 @@
 
   /* ── DATE CELL ── */
   .date-cell {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: #555;
   }
 
@@ -185,26 +185,26 @@
   .status-active {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: #eaf7ee;
     color: var(--success-green);
     border: 1px solid #a3ddb1;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 20px;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
   }
 
   .status-completed {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     background: #f0f0f0;
     color: #777;
     border: 1px solid #ccc;
-    padding: 3px 10px;
+    padding: 2px 8px;
     border-radius: 20px;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 700;
   }
 
@@ -213,38 +213,38 @@
     background: linear-gradient(135deg, #c0392b, #962d22);
     color: #fff;
     border: none;
-    padding: 7px 15px;
-    border-radius: 8px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 7px;
+    font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: all 0.2s ease;
     text-transform: uppercase;
   }
 
   .btn-remove:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(192, 57, 43, 0.35);
+    box-shadow: 0 5px 14px rgba(192, 57, 43, 0.35);
   }
 
   /* ── EMPTY STATE ── */
   .empty-state {
     text-align: center;
-    padding: 60px 20px;
+    padding: 50px 20px;
     color: #9e9a88;
   }
 
   .empty-state i {
-    font-size: 3rem;
-    margin-bottom: 14px;
+    font-size: 2.6rem;
+    margin-bottom: 12px;
     color: #c8c4b0;
   }
 
   .empty-state p {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     margin: 0;
     font-family: 'Rajdhani', sans-serif;
@@ -253,20 +253,20 @@
 
   /* ── LOADING SHIMMER ── */
   .shimmer-row td {
-    padding: 14px 16px;
+    padding: 11px 13px;
   }
 
   .shimmer-block {
-    height: 14px;
-    border-radius: 6px;
+    height: 13px;
+    border-radius: 5px;
     background: linear-gradient(90deg, #eeebe0 25%, #e0ddd0 50%, #eeebe0 75%);
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite;
   }
 
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
   }
 
   /* ── CONFIRM MODAL ── */
@@ -286,45 +286,48 @@
 
   .confirm-box {
     background: #fff;
-    border-radius: 16px;
-    padding: 32px 36px;
-    max-width: 420px;
+    border-radius: 14px;
+    padding: 26px 28px;
+    max-width: 380px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-    border-top: 5px solid var(--danger-red);
+    box-shadow: 0 16px 50px rgba(0,0,0,0.22);
+    border-top: 4px solid var(--danger-red);
     animation: popIn 0.2s ease;
   }
 
   @keyframes popIn {
     from { transform: scale(0.85); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    to   { transform: scale(1);    opacity: 1; }
   }
 
   .confirm-box .confirm-icon {
-    width: 60px; height: 60px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: #fdecea;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 14px;
   }
 
   .confirm-box .confirm-icon i {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     color: var(--danger-red);
   }
 
   .confirm-box h5 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    margin: 0 0 8px;
+    margin: 0 0 7px;
     color: var(--text-primary);
   }
 
   .confirm-box p {
     color: #666;
-    font-size: 0.95rem;
-    margin: 0 0 22px;
+    font-size: 0.88rem;
+    margin: 0 0 20px;
     line-height: 1.5;
   }
 
@@ -335,17 +338,17 @@
 
   .confirm-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
   }
 
   .btn-cancel-confirm {
     flex: 1;
-    padding: 10px;
+    padding: 9px;
     border: 2px solid #ddd;
-    border-radius: 10px;
+    border-radius: 8px;
     background: #fff;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
     color: #555;
@@ -359,36 +362,36 @@
 
   .btn-confirm-remove {
     flex: 1;
-    padding: 10px;
+    padding: 9px;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     background: linear-gradient(135deg, var(--danger-red), #962d22);
     color: #fff;
-    font-size: 0.95rem;
+    font-size: 0.88rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .btn-confirm-remove:hover {
-    box-shadow: 0 4px 14px rgba(192,57,43,0.35);
+    box-shadow: 0 4px 12px rgba(192,57,43,0.35);
   }
 
   /* ── TOAST ── */
   .toast-msg {
     position: fixed;
-    bottom: 28px;
-    right: 28px;
-    padding: 14px 24px;
-    border-radius: 10px;
-    font-size: 1rem;
+    bottom: 24px;
+    right: 24px;
+    padding: 12px 20px;
+    border-radius: 9px;
+    font-size: 0.92rem;
     font-weight: 600;
     color: #fff;
     z-index: 10000;
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    gap: 9px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.18);
     transform: translateY(80px);
     opacity: 0;
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -403,25 +406,25 @@
   }
 
   @media (max-width: 768px) {
-    .controls-bar { gap: 10px; }
+    .controls-bar { gap: 8px; }
     .course-table thead { display: none; }
     .course-table tbody tr {
       display: block;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       border: 1px solid var(--border-color);
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
     }
     .course-table td {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 14px;
+      padding: 9px 12px;
       border-bottom: 1px solid #ede9d8;
     }
     .course-table td::before {
       content: attr(data-label);
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--army-olive);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -494,7 +497,6 @@
         </tr>
       </thead>
       <tbody id="tableBody">
-        <!-- Shimmer rows -->
         {% for i in range(5) %}
         <tr class="shimmer-row">
           <td><div class="shimmer-block" style="width:20px"></div></td>
@@ -506,16 +508,16 @@
           <td><div class="shimmer-block" style="width:130px"></div></td>
           <td><div class="shimmer-block" style="width:90px"></div></td>
           <td><div class="shimmer-block" style="width:90px"></div></td>
-          <td><div class="shimmer-block" style="width:70px"></div></td>
           <td><div class="shimmer-block" style="width:80px"></div></td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
 
+</div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
   let allCourses = [];
@@ -530,25 +532,20 @@
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
-  // ── STATUS BADGE (FROM DATABASE STATUS COLUMN) ──
+  // ── STATUS BADGE ──
   function getStatusBadge(status) {
-
-    if (!status) status = "active";
-
+    if (!status) status = 'active';
     status = status.toLowerCase();
-
-    if (status === "active") {
+    if (status === 'active') {
       return `<span class="status-active">
-                <i class="fas fa-circle" style="font-size:0.5rem"></i>ACTIVE
+                <i class="fas fa-circle" style="font-size:0.45rem"></i>ACTIVE
               </span>`;
     }
-
-    if (status === "completed") {
+    if (status === 'completed') {
       return `<span class="status-completed">
-                <i class="fas fa-check" style="font-size:0.65rem"></i>COMPLETED
+                <i class="fas fa-check" style="font-size:0.6rem"></i>COMPLETED
               </span>`;
     }
-
     return `<span class="status-completed">INACTIVE</span>`;
   }
 
@@ -556,7 +553,6 @@
   function populateCompanyFilter(courses) {
     const companies = [...new Set(courses.map(c => c.company).filter(c => c && c !== '—'))].sort();
     const sel = document.getElementById('companyFilter');
-
     companies.forEach(coy => {
       const opt = document.createElement('option');
       opt.value = coy;
@@ -567,14 +563,13 @@
 
   // ── RENDER TABLE ──
   function renderTable(courses) {
-
     const tbody = document.getElementById('tableBody');
     document.getElementById('totalCount').textContent = `TOTAL: ${courses.length}`;
 
     if (courses.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="11">
+          <td colspan="10">
             <div class="empty-state">
               <i class="fas fa-graduation-cap"></i>
               <p>NO PERSONNEL CURRENTLY ON COURSE</p>
@@ -586,171 +581,99 @@
 
     tbody.innerHTML = courses.map((c, idx) => `
       <tr data-id="${c.id}" data-company="${c.company}" data-search="${(c.name + c.army_number + c.course_name + c.rank + c.company).toLowerCase()}">
-        
         <td data-label="#">${idx + 1}</td>
-
-        <td data-label="Army No">
-          <span class="army-num">${c.army_number}</span>
-        </td>
-
-        <td data-label="Name">
-          <strong>${c.name}</strong>
-        </td>
-
-        <td data-label="Rank">
-          <span class="rank-badge">${c.rank}</span>
-        </td>
-
-        <td data-label="Coy">
-          <span class="company-badge">${c.company}</span>
-        </td>
-
-        <td data-label="Course">
-          ${c.course_name}
-        </td>
-
-        <td data-label="Institute">
-          ${c.institute_name}
-        </td>
-
-        <td data-label="Start Date">
-          <span class="date-cell">${formatDate(c.course_starting_date)}</span>
-        </td>
-
-        <td data-label="Status">
-          ${getStatusBadge(c.status)}
-        </td>
-
+        <td data-label="Army No"><span class="army-num">${c.army_number}</span></td>
+        <td data-label="Name"><strong>${c.name}</strong></td>
+        <td data-label="Rank"><span class="rank-badge">${c.rank}</span></td>
+        <td data-label="Coy"><span class="company-badge">${c.company}</span></td>
+        <td data-label="Course">${c.course_name}</td>
+        <td data-label="Institute">${c.institute_name}</td>
+        <td data-label="Start Date"><span class="date-cell">${formatDate(c.course_starting_date)}</span></td>
+        <td data-label="Status">${getStatusBadge(c.status)}</td>
         <td data-label="Action">
           <button class="btn-remove" onclick="askRemove(${c.id}, '${c.name.replace(/'/g, "\\'")}')">
             <i class="fas fa-user-times"></i> REMOVE
           </button>
         </td>
-
       </tr>
     `).join('');
   }
 
   // ── FILTER ──
   function filterTable() {
-
     const query = document.getElementById('searchInput').value.toLowerCase();
-    const coy = document.getElementById('companyFilter').value;
-
+    const coy   = document.getElementById('companyFilter').value;
     const filtered = allCourses.filter(c => {
-
       const matchSearch = (c.name + c.army_number + c.course_name + c.rank + c.company)
-        .toLowerCase()
-        .includes(query);
-
+        .toLowerCase().includes(query);
       const matchCoy = !coy || c.company === coy;
-
       return matchSearch && matchCoy;
     });
-
     renderTable(filtered);
   }
 
   // ── LOAD DATA ──
   async function loadCourses() {
-
     try {
-
-      const res = await fetch('/oncourses/get_courses');
+      const res  = await fetch('/oncourses/get_courses');
       const data = await res.json();
-
       if (data.status !== 'success') throw new Error(data.message);
-
       allCourses = data.data;
-
       populateCompanyFilter(allCourses);
-
       renderTable(allCourses);
-
     } catch (err) {
-
       console.error('Failed to load courses:', err);
-
       document.getElementById('tableBody').innerHTML = `
-        <tr><td colspan="11">
+        <tr><td colspan="10">
           <div class="empty-state">
             <i class="fas fa-exclamation-triangle"></i>
             <p>FAILED TO LOAD DATA. PLEASE REFRESH.</p>
           </div>
         </td></tr>`;
-
       document.getElementById('totalCount').textContent = 'ERROR';
     }
   }
 
   // ── CONFIRM REMOVE ──
   function askRemove(id, name) {
-
-    removeTargetId = id;
+    removeTargetId   = id;
     removeTargetName = name;
-
     document.getElementById('confirmName').textContent = name;
-
     document.getElementById('confirmOverlay').classList.add('active');
   }
 
   function closeConfirm() {
-
     document.getElementById('confirmOverlay').classList.remove('active');
-
-    removeTargetId = null;
+    removeTargetId   = null;
     removeTargetName = null;
   }
 
   async function confirmRemove() {
-
     if (!removeTargetId) return;
-
-    const id = removeTargetId;
+    const id   = removeTargetId;
     const name = removeTargetName;
-
     closeConfirm();
-
     try {
-
-      const res = await fetch(`/oncourses/remove_from_course/${id}`, {
-        method: 'DELETE'
-      });
-
+      const res  = await fetch(`/oncourses/remove_from_course/${id}`, { method: 'DELETE' });
       const data = await res.json();
-
       if (data.status !== 'success') throw new Error(data.message);
-
       allCourses = allCourses.filter(c => c.id !== id);
-
       filterTable();
-
       showToast(`${name} removed from course.`, 'success');
-
     } catch (err) {
-
       console.error('Remove failed:', err);
-
       showToast('Failed to remove. Please try again.', 'error');
     }
   }
 
   // ── TOAST ──
   function showToast(msg, type = 'success') {
-
     const toast = document.getElementById('toastMsg');
-    const icon = document.getElementById('toastIcon');
-
+    const icon  = document.getElementById('toastIcon');
     document.getElementById('toastText').textContent = msg;
-
-    toast.className = `toast-msg ${type}`;
-
-    icon.className = type === 'success'
-      ? 'fas fa-check-circle'
-      : 'fas fa-times-circle';
-
+    toast.className  = `toast-msg ${type}`;
+    icon.className   = type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle';
     setTimeout(() => toast.classList.add('show'), 10);
-
     setTimeout(() => toast.classList.remove('show'), 3200);
   }
 
@@ -761,6 +684,5 @@
 
   // ── INIT ──
   document.addEventListener('DOMContentLoaded', loadCourses);
-
 </script>
 {% endblock %}
