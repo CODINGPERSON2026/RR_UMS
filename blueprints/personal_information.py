@@ -147,17 +147,19 @@ def insert_dynamic_data(cursor, personnel_id, army_number, data):
     
     # Insert leaves
     for idx, leave in enumerate(data.get('leaves', []), 1):
+        print(leave)
         if any(leave.values()):
             cursor.execute("""
-                INSERT INTO leave_details (personnel_id, army_number, sr_no, year, al_days, cl_days, aal_days, total_days, remarks)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO leave_details (personnel_id, army_number, year, AL,CL,AAL,PL,`Annual Leave`, remarks)
+                VALUES (%s, %s, %s, %s, %s, %s, %s,%s,%s)
             """, (
-                personnel_id, army_number, idx,
+                personnel_id, army_number,
                 leave.get('leaveYear', ''),
                 int(leave.get('leaveAL', 0)) if leave.get('leaveAL') else None,
                 int(leave.get('leaveCL', 0)) if leave.get('leaveCL') else None,
                 int(leave.get('leaveAAL', 0)) if leave.get('leaveAAL') else None,
-                int(leave.get('leaveTotal', 0)) if leave.get('leaveTotal') else None,
+                int(leave.get('leavePL', 0)) if leave.get('leavePL') else None,
+                int(leave.get('leaveAnnualeave', 0)) if leave.get('leaveAnnualeave') else None,
                 leave.get('leaveRemarks', '')
             ))
     
@@ -223,14 +225,36 @@ def insert_dynamic_data(cursor, personnel_id, army_number, data):
 
 def delete_related_records(cursor, personnel_id, army_number):
     """Delete all related records for a personnel before updating/deleting"""
+
     tables = [
         'courses', 'units_served', 'loans', 'punishments',
         'detailed_courses', 'leave_details', 'family_members',
         'children', 'mobile_phones', 'marital_discord_cases',
         'personnel_sports'
     ]
+
+    print(f"\n========== DELETE START ==========")
+    print(f"Personnel ID : {personnel_id}")
+    print(f"Army Number  : {army_number}")
+    print(f"==================================\n")
+
     for table in tables:
-        cursor.execute(f"DELETE FROM {table} WHERE personnel_id = %s", (personnel_id,))
+        try:
+            query = f"DELETE FROM {table} WHERE personnel_id = %s"
+
+            print(f"\n[DEBUG] Processing table: {table}")
+            print(f"[DEBUG] Query: {query}")
+            print(f"[DEBUG] Parameter: {personnel_id}")
+
+            cursor.execute(query, (personnel_id,))
+
+            print(f"[DEBUG] Rows deleted from {table}: {cursor.rowcount}")
+
+        except Exception as e:
+            print(f"[ERROR] Failed deleting from {table}")
+            print(f"[ERROR] {str(e)}")
+
+    print("\n========== DELETE END ==========\n")
     cursor.execute("DELETE FROM weight_info WHERE army_number = %s", (army_number,))
 @personnel_info.route('/get_total_personnel_count_and_courses')
 def total_army_personnel__and_courses():
@@ -1225,6 +1249,7 @@ def update_personnel_page():
 @personnel_info.route('/api/personnel/search/<army_number>', methods=['GET'])
 def search_personnel(army_number):
     """Search for personnel by army number and return all details"""
+    print('in this route')
     connection = get_db_connection()
     if not connection:
         return jsonify({'success': False, 'message': 'Database connection failed'}), 500
@@ -1307,9 +1332,11 @@ def search_personnel(army_number):
        
         # Get leave details
         cursor.execute("""
-            SELECT * FROM leave_details WHERE personnel_id = %s ORDER BY sr_no
-        """, (personnel_id,))
+            SELECT * FROM leave_details WHERE army_number = %s LIMIT 1
+        """, (army_number,))
+        
         leaves = cursor.fetchall()
+        print('leave detasils are',leaves)
        
         # Get family members
         cursor.execute("""

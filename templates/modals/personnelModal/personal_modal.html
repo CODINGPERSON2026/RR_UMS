@@ -283,8 +283,23 @@ document.getElementById('searchBtn')?.addEventListener('click', async () => {
 
       // Check personnel availability
       const p = personnel[0];
-      if (p.posting_status || p.leave_status || p.det_status) {
-          warningMessage.innerText = "Personnel not available for assignment";
+
+      let reason = "";
+      
+      if (p.leave_status) {
+          reason = "Oops! This personnel is currently on Leave.";
+      } else if (p.course_status) {
+          reason = "Oops! This personnel is currently attending a Course.";
+      } else if (p.det_status) {
+          reason = "Oops! This personnel is currently on Detachment.";
+      } else if (p.td_status) {
+          reason = "Oops! This personnel is currently on Temporary Duty (TD).";
+      } else if (p.posting_status) {
+          reason = "Oops! This personnel has been Posted Out.";
+      }
+      
+      if (reason) {
+          warningMessage.innerText = reason;
           warningMessage.style.color = "red";
           assignBtn.disabled = true;
           return;

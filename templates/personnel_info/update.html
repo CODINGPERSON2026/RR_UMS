@@ -359,7 +359,7 @@
 
   /* Action column header */
   .table th.action-col {
-    background-color: #6c1010;
+    
     width: 80px;
     text-align: center;
   }
@@ -1263,7 +1263,9 @@
                       <thead class="table-light">
                         <tr>
                           <th>Sr No.</th><th>Year</th><th>AL (Days)</th><th>CL (Days)</th>
-                          <th>AAL (Days)</th><th>Total</th><th>Remarks</th>
+                          <th>AAL (Days)</th>
+                          <th>Annual Leave (Agniveer only)</th>
+                          <th>Remarks</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -2187,15 +2189,17 @@ document.addEventListener("DOMContentLoaded", function () {
   function populateLeaves(leaves) {
     const tbody = document.querySelector('#leaveTable tbody');
     tbody.innerHTML = '';
+    
     if (!leaves || leaves.length === 0) { addLeaveRow(); return; }
     leaves.forEach((l, i) => {
+      console.log(l['Annual Leave'])
       const tr = buildRow([
         td(i + 1),
         td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]" value="${esc(l.year)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]" value="${esc(l.al_days)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]" value="${esc(l.cl_days)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]" value="${esc(l.aal_days)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveTotal[]" value="${esc(l.total_days)}">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]" value="${esc(l.AL)}">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]" value="${esc(l.CL)}">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]" value="${esc(l.AAL)}">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveTotal[]" value="${l['Annual Leave']}">`),
         td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]" value="${esc(l.remarks)}">`)
       ], l.id, 'leave_details');
       tbody.appendChild(tr);
@@ -2360,7 +2364,7 @@ document.addEventListener("DOMContentLoaded", function () {
       td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]">`),
       td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]">`),
       td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]">`),
-      td(`<input type="number" class="form-control form-control-sm" name="leaveTotal[]">`),
+      td(`<input type="number" class="form-control form-control-sm" name="leaveAnnualeave[]">`),
       td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]">`)
     ], null, 'leave_details');
     tbody.appendChild(tr);
@@ -2628,7 +2632,7 @@ document.addEventListener("DOMContentLoaded", function () {
       loans:           collectTableData('loansTable',           ['loanType','loanAmount','loanBank','loanEMI','loanPending','loanRemarks']),
       punishments:     collectTableData('punishmentTable',      ['punishmentDate','punishment','punishmentAASec','punishmentRemarks']),
       detailedCourses: collectTableData('detailedCoursesTable', ['detailedCourseName','detailedCourseFrom','detailedCourseTo','detailedCourseRemarks']),
-      leaves:          collectTableData('leaveTable',           ['leaveYear','leaveAL','leaveCL','leaveAAL','leaveTotal','leaveRemarks']),
+      leaves:          collectTableData('leaveTable',           ['leaveYear','leaveAL','leaveCL','leaveAAL','leaveAnnualeave','leavePL']),
       family:          collectTableData('familyTable',          ['familyRelation','familyName','familyDOB','familyUID','familyPartII']),
       children:        collectTableData('childrenTable',        ['childName','childDOB','childClass','childPartII','childUID']),
       mobiles:         collectTableData('mobileTable',          ['mobileType','mobileNumber','mobileProvider','mobileRemarks']),

@@ -34,7 +34,9 @@ def get_personnel():
                 section,
                 UPPER(batch) AS batch,
                 onleave_status,
-                detachment_status
+                detachment_status,
+                oncourse_status,
+                td_status
             FROM personnel
             WHERE 1=1
         """
@@ -190,7 +192,9 @@ def search_personnel():
                 section,
                 UPPER(batch) AS batch,
                 onleave_status,
-                detachment_status
+                detachment_status,
+                oncourse_status,
+                td_status
             FROM personnel
             WHERE army_number LIKE %s OR name LIKE %s
             LIMIT 20

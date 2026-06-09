@@ -436,7 +436,9 @@
         <td>
           ${row.onleave_status ? '<span style="background:var(--danger-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON LEAVE</span>' : ''}
           ${row.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON DET</span>' : ''}
-          ${!row.onleave_status && !row.detachment_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
+          ${row.oncourse_status ? '<span style="background:var(--nav-link-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON COURSE</span>' : ''}
+          ${row.td_status ? '<span style="background:var(--text-secondary); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON TD</span>' : ''}
+          ${!row.onleave_status && !row.detachment_status && !row.oncourse_status &&!row.td_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
         </td>
       `;
       frag.appendChild(tr);
@@ -518,7 +520,7 @@
   window.exportCSV = function () {
     if (!sortedData.length) return;
 
-    const headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section'];
+    const headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section','Status'];
     const rows = sortedData.map((row, i) => [
       i + 1,
       row.army_number,
@@ -527,7 +529,7 @@
       row.trade,
       row.company,
       row.section,
-      row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : 'Present')
+      row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))
     ]);
 
     const csvContent = [headers, ...rows]
@@ -566,7 +568,7 @@
         <td>${esc(row.trade)}</td>
         <td>${esc(row.company)}</td>
         <td>${esc(row.section)}</td>
-        <td>${row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : 'Present')}</td>
+        <td>${row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))}</td>
       </tr>`).join('');
 
     printWin.document.write(`<!DOCTYPE html><html><head><title>Nominal Roll</title>
@@ -721,4 +723,4 @@
   loadFilters().then(loadPersonnel);
 })();
 </script>
-{% endblock %}
+{% endblock %}

@@ -36,3 +36,31 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+
+update 2 : 
+
+UPDATE leave_details ld
+JOIN personnel p
+    ON ld.army_number = p.army_number
+SET
+    ld.`Annual Leave` = ld.AL,
+    ld.AL = 0
+WHERE p.rank = 'Agniveer';
+
+
+
+
+
+
+
+
+
+
+## UPDATE 3 
+UPDATE leave_details ld
+JOIN personnel p
+    ON ld.army_number = p.army_number
+SET ld.personnel_id = p.id;

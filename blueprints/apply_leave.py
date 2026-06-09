@@ -792,10 +792,11 @@ def recommend_leave():
         print(returned_result,"we are here")
         if returned_result:
             army_number_fetched = returned_result['army_number']
-            cursor.execute('select trade,section from personnel where army_number = %s',(army_number_fetched,))
+            cursor.execute('select `rank`,trade,section from personnel where army_number = %s',(army_number_fetched,))
             result_fetched_for_trade = cursor.fetchone()
             soldier_trade = result_fetched_for_trade['trade']
             soldier_section = result_fetched_for_trade['section']
+            soldier_rank = result_fetched_for_trade['rank']
         print(soldier_trade,"this is soldiers trade")
         
 
@@ -879,7 +880,7 @@ def recommend_leave():
             year = str(datetime.now().year)
             army_number = leave['army_number']
 
-            al = cl = aal = pl = 0
+            al = cl = aal = pl = Annual_Leave = 0
             remarks_text = None
 
             leave_type_str = (leave['leave_type'] or '').strip().upper()
@@ -905,6 +906,8 @@ def recommend_leave():
                         aal += days
                     elif lt == 'PL':
                         pl += days
+                    elif lt == 'ANNUAL LEAVE':
+                        Annual_Leave = days
                     else:
                         if remarks_text:
                             remarks_text += f"; {lt}({days})"
@@ -923,12 +926,15 @@ def recommend_leave():
                     aal = days
                 elif lt == 'PL':
                     pl = days
+                elif lt == 'ANNUAL LEAVE':
+                    Annual_Leave = days
+
                 else:
                     remarks_text = f"{lt}: {days} days"
 
             # Update or Insert into leave_details
             cursor.execute("""
-                SELECT AL, CL, AAL, PL FROM leave_details
+                SELECT AL, CL, AAL, PL,`Annual Leave` FROM leave_details
                 WHERE army_number = %s AND year = %s
                 FOR UPDATE
             """, (army_number, year))
@@ -940,24 +946,25 @@ def recommend_leave():
                 new_cl = (existing['CL'] or 0) + cl
                 new_aal = (existing['AAL'] or 0) + aal
                 new_pl = (existing['PL'] or 0) + pl
+                new_Annual_leave = (existing['Annual Leave'] or 0) + Annual_Leave
 
                 cursor.execute("""
                     UPDATE leave_details
-                    SET AL = %s, CL = %s, AAL = %s, PL = %s,
+                    SET AL = %s, CL = %s, AAL = %s, PL = %s,`Annual Leave` = %s
                         remarks = CONCAT(IFNULL(remarks, ''), %s)
                     WHERE army_number = %s AND year = %s
                 """, (
-                    new_al, new_cl, new_aal, new_pl,
+                    new_al, new_cl, new_aal, new_pl,new_Annual_leave,
                     f"; {remarks_text}" if remarks_text else "",
                     army_number, year
                 ))
             else:
                 cursor.execute("""
                     INSERT INTO leave_details
-                    (army_number, year, AL, CL, AAL, PL, remarks, leave_start_date, leave_end_date)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    (army_number, year, AL, CL, AAL, PL,`Annual Leave`, remarks, leave_start_date, leave_end_date)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
                 """, (
-                    army_number, year, al, cl, aal, pl,
+                    army_number, year, al, cl, aal, pl,Annual_Leave,
                     remarks_text,
                     leave['from_date'],
                     leave['to_date']
@@ -2506,6 +2513,7 @@ def get_releiver_details():
 def get_leave_balance():
     army_number = request.args.get('army_number')
     leave_type = request.args.get('leave_type')   # AL, CL, AAL, PL
+    print(leave_type)
     year = request.args.get('year')
 
     if not army_number or not leave_type:
@@ -2520,7 +2528,7 @@ def get_leave_balance():
         with conn.cursor(dictionary=True) as cursor:
             # Fetch record from leave_details table
             cursor.execute("""
-                SELECT AL, CL, AAL, PL 
+                SELECT AL, CL, AAL, PL,`Annual Leave`
                 FROM leave_details 
                 WHERE army_number = %s AND year = %s
             """, (army_number, year))
@@ -2532,7 +2540,8 @@ def get_leave_balance():
                 "AL": 60,
                 "CL": 30,
                 "AAL": 20,
-                "PL": 15          # Change this if your PL entitlement is different
+                "PL": 15,
+                'Annual Leave':30       # Change this if your PL entitlement is different
             }
 
 
@@ -2548,6 +2557,8 @@ def get_leave_balance():
                     taken = record.get('AAL') or 0
                 elif leave_type == "PL":
                     taken = record.get('PL') or 0
+                elif leave_type == 'Annual Leave':
+                    taken = record.get('Annual Leave') or 0
 
             balance = max(0, entitled - taken)
 

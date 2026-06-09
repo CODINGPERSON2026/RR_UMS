@@ -309,7 +309,9 @@ def search_person():
                     company,
                     detachment_status AS det_status,
                     posting_status,
-                    onleave_status AS leave_status
+                    onleave_status AS leave_status,
+                    oncourse_status AS course_status,
+                    td_status
                 FROM personnel
                 WHERE army_number = %s
             """
@@ -646,6 +648,7 @@ def assign_personnel():
         # 🔎 Validate status before assignment
         for status in rows:
             pid = status['army_number']
+            
 
             if action_type == "det" and status['detachment_status'] == 1:
                 conn.rollback()
