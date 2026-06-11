@@ -475,7 +475,6 @@ function fetchInterviewPending() {
         applyFilters();
       })
       .catch((err) => {
-        console.log('Error:', err);
         const errRow = `
           <tr>
             <td colspan="7" class="text-center text-danger">

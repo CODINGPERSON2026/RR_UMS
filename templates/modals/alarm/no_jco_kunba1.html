@@ -157,7 +157,6 @@
             selectedHomeState = e.target.getAttribute("data-home_state");
             selectedArmyNumber = e.target.getAttribute("data-army_number");
     
-            console.log("DEBUG:", selectedHomeState, selectedArmyNumber); // 👈 check here
     
             document.getElementById("remarksInput").value = "";
     
@@ -168,10 +167,8 @@
     
     /* ✅ NEW: Open remarks modal */
     function openRemarksModal(home_state, army_number) {
-        console.log('in here im checking ')
         selectedHomeState = home_state;
         selectedArmyNumber = army_number;
-        console.log(selectedArmyNumber,selectedHomeState,"here")
         document.getElementById("remarksInput").value = "";
     
         const modal = new bootstrap.Modal(document.getElementById("remarksModal"));

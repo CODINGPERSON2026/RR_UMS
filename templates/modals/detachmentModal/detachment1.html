@@ -130,12 +130,10 @@
 
       const response = await fetch(url);
       const result = await response.json();
-      console.log(result, "this is result");
 
       if (result.status !== "success") throw new Error("Fetch failed");
 
       if (result.data.length === 0) {
-        console.log(result.data.length)
         tbody.innerHTML = `<tr><td colspan="7" class="text-center">No personnel found</td></tr>`;
       } else {
         result.data.forEach(row => {

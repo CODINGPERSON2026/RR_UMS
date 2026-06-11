@@ -47,7 +47,6 @@ def chat_bot():
 
 @app.route("/admin_login", methods=["POST",'GET'])
 def admin_login():
-    print('in this route of admin login')
     if request.method == 'GET':
         return render_template('/loginpage/loginpage.html')
     data = request.get_json()
@@ -66,7 +65,6 @@ def admin_login():
         return jsonify({"success": False, "error": "Invalid email or password"}), 401
     username  =  user['username']
     role = user['role']
-    print(role,"this is role")
     
     cursor.close()
     conn.close()
@@ -184,7 +182,6 @@ def dashboard():
     role = user['role']
     welcome_msg = f'Welcome {role} , {subscript}'
     if user_company == 'Admin':
-        print('entering co dashboard')
         return render_template('CO/co_dashboard.html', role = role,user_company=user_company)
     else:
         return render_template('dashboard.html', role = role,user_company=user_company)
@@ -201,7 +198,6 @@ def dashboard_heading():
         company = '2IC 15CESR'
     else:
         company = user['company']  # Example
-    print(company)
     
     
     return jsonify({"heading": company})
@@ -280,7 +276,6 @@ def view_personal():
 
 @app.route('/search_personnel', methods=['GET', 'POST'])
 def search_person():
-    print("in this route")
 
     # Get logged-in user
     user = require_login()
@@ -317,7 +312,6 @@ def search_person():
             """
         current_role = user['role']
         if current_role == 'Subedar Major':
-            print("this should be here")
             cursor.execute(get_query,(query,))  # Added company filter
         else:
             get_query += 'AND company = %s'
@@ -367,7 +361,6 @@ def search_person():
             results = cursor.fetchall()
             return jsonify(results)
         except Exception as e:
-            print("Error in specialization search:", str(e))
             return jsonify({"error": str(e)}), 500
         finally:
             cursor.close()
@@ -439,14 +432,12 @@ def get_dets():
 
 @app.route('/get_pending_interview_list')
 def get_pending_interview_list():
-    print("in this route")
 
     search = request.args.get("search", "").strip()
     company_filter = request.args.get("company", "all").strip()
 
     current_user = require_login()
     current_user_company = current_user['company']
-    print('Current user company:', current_user_company)
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -489,7 +480,6 @@ def get_pending_interview_list():
         count_result = cursor.fetchone()
         total_count = count_result['total']
 
-        print("🔵 Total Pending Interviews Count:", total_count)
 
         # =========================
         # 🔹 DATA QUERY
@@ -501,7 +491,6 @@ def get_pending_interview_list():
         cursor.execute(data_query, tuple(params))
         pending_data = cursor.fetchall()
 
-        print("🟢 Records Fetched:", len(pending_data))
 
         # =========================
         # 2️⃣ Collect home_states
@@ -582,7 +571,6 @@ def get_pending_interview_list():
         })
 
     except Exception as e:
-        print("❌ Error fetching pending interview list:", str(e))
         import traceback
         traceback.print_exc()
         return jsonify({"status": "error", "message": "Server error"}), 500
@@ -761,7 +749,6 @@ def get_personnel_details(army_number):
             return jsonify({"company": "N/A"}), 404
             
     except Exception as e:
-        print("Error:", e)
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
@@ -803,7 +790,6 @@ def get_sales_data():
         })
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"error": str(e)}), 500
     
 
@@ -942,7 +928,6 @@ def edit_board(board_id):
 
 @app.route("/get_board_members/<order_no>")
 def get_board_members(order_no):
-    print(order_no,'these are boards members')
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT * FROM board_members WHERE order_no=%s", (order_no,))
@@ -1014,7 +999,6 @@ def edit_member(member_id):
 def search_personnel():
     query = request.form.get("query", "").strip()
     
-    print("THIS IS INCOMING:", query)  # Should now print
     import sys
     sys.stdout.flush()
 
@@ -1047,11 +1031,9 @@ def search_personnel():
                 "company": row[3] or "N/A"
             })
 
-        print(f"Found {len(results)} results for '{query}'")
         return jsonify(results)
 
     except Exception as e:
-        print("Search error:", e)
         import traceback
         traceback.print_exc()  # This will show full error in console
         return jsonify({"error": "Database error"}), 500
@@ -1123,7 +1105,6 @@ def mark_sensitive():
 
     except Exception as e:
         conn.rollback()
-        print("ERROR in mark_sensitive:", e)
         return jsonify({"success": False, "error": "Database error"}), 500
     finally:
         cursor.close()
@@ -1151,7 +1132,6 @@ def update_sensitive_reason():
         return jsonify({"success": True, "message": "Reason updated successfully."})
     except Exception as e:
         conn.rollback()
-        print("Error:", e)
         return jsonify({"success": False, "error": "Update failed"}), 500
     finally:
         cursor.close()
@@ -1179,7 +1159,6 @@ def remove_sensitive():
 
     except Exception as e:
         conn.rollback()
-        print("ERROR in remove_sensitive:", e)
         return jsonify({"success": False, "error": "Remove failed"}), 500
     finally:
         cursor.close()
@@ -1201,7 +1180,6 @@ def get_sensitive_list():
             ORDER BY s.marked_on DESC
         """)
         rows = cursor.fetchall()
-        print(rows)
 
         sensitive_list = []
         for r in rows:
@@ -1213,11 +1191,9 @@ def get_sensitive_list():
                 "rank": r[5],
                 "company": r[6] or "N/A"
             })
-        print(sensitive_list,"this is sensitive list")
         return jsonify({"success": True, "data": sensitive_list})
     
     except Exception as e:
-        print("Error fetching sensitive list:", e)
         return jsonify({"success": False, "error": str(e)}), 500
     finally:
         cursor.close()
@@ -1348,7 +1324,6 @@ def assigned_alarm():
     try:
         user = require_login()  # Get logged-in user
         user_company = user['company']
-        print("Logged-in user's company:", user_company)
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -1385,7 +1360,6 @@ def assigned_alarm():
         return jsonify({"status": "success", "rows": rows})
 
     except Exception as e:
-        print("Error fetching assigned alarms:", e)
         return jsonify({"status": "error", "message": str(e)})
 
     finally:
@@ -1451,7 +1425,6 @@ def leave_pending_alarm():
         })
 
     except Exception as e:
-        print(str(e))
         return jsonify({
             "pending": 0,
             "error": str(e)
@@ -1523,7 +1496,6 @@ def leave_pending_details():
 def today_event_alarm():
     user = require_login()  # Get logged-in user
     user_company = user['company']
-    print("Logged-in user's company:", user_company)
 
     conn = None
     cursor = None
@@ -1547,11 +1519,9 @@ def today_event_alarm():
         cursor.execute(query, params)
         
         rows = cursor.fetchall()
-        print(rows,"these are todays events")
         return jsonify({"status": "success", "rows": rows})
 
     except Exception as e:
-        print("Error fetching today's events:", e)
         return jsonify({"status": "error", "message": str(e)})
 
     finally:
@@ -1581,7 +1551,6 @@ def assistant_test_alarm_api():
     """)
 
     rows = cursor.fetchall()
-    print(rows,"asistent test pending alarm")
     cursor.close()
     conn.close()
 
@@ -1652,7 +1621,6 @@ def get_cost_by_head():
         })
 
     except Error as e:
-        print(f"Database error: {e}")
         return jsonify({
             "status": "error",
             "message": str(e)
@@ -1670,7 +1638,6 @@ def get_cost_by_head():
 
 @app.route('/get_project_heads')
 def get_project_heads():
-    print("in this route of project heads")
     try:
      
         conn = get_db_connection()
@@ -1680,11 +1647,9 @@ def get_project_heads():
 
         cursor.close()
         conn.close()
-        print(heads)
         return jsonify(heads)  # Returns: [{"id": 1, "head_name": "Civil Works"}, ...]
 
     except Exception as e:
-        print(f"Error fetching heads: {e}")
         return jsonify([]), 500
 
 
@@ -1721,7 +1686,6 @@ def update_project_stage():
         conn.close()
         return jsonify({"status": "success"})
     except Exception as e:
-        print("Error updating stage:", e)
         return jsonify({"status": "error", "message": "Database error"}), 500
 
 
@@ -1761,7 +1725,6 @@ def search_officer():
     results = cursor.fetchall()
     cursor.close()
     conn.close()
-    print('results these are ',results)
     return jsonify(results)
 
 
@@ -1776,7 +1739,6 @@ def manPower():
         count = total_count['total_count']
         return jsonify({'count':count}),200
     except Exception as e:
-        print('There was an exception',str(e))
         return jsonify({'error':'Internal Server Error'}),500
 
 #-------------parade state count fuction--------------------------------------------
@@ -1818,7 +1780,6 @@ def get_parade_count():
 @app.route('/api/unfit-graph')
 def line_unfit_graph():
     company = request.args.get('company', 'All')
-    print('the value is',company)
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1837,7 +1798,6 @@ def line_unfit_graph():
 
 @app.route('/projects')
 def get_projects():
-    print('in this project route')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     user = require_login()
@@ -1867,7 +1827,6 @@ def get_projects():
         return render_template("projects/projects.html", projects=projects)
 
     except Exception as e:
-        print("Error fetching projects or heads:", str(e))
         return "Server Error", 500
 
     finally:
@@ -1899,7 +1858,6 @@ def dashboard_summary():
     current_user = user['army_number']
     company = user['company']
     role = user['role']
-    print("Logged-in user's company:", company)
     
     try:
         # 1️⃣ Detachments Count
@@ -1933,8 +1891,6 @@ def dashboard_summary():
         
         max_date_result = cursor.fetchone()
         cursor.fetchall()
-        print("max_date_result")
-        print(max_date_result)
         latest_date = max_date_result['max_date'] if max_date_result else None
 
         if latest_date:
@@ -1973,7 +1929,6 @@ def dashboard_summary():
         else:
             manpower = {"total": 0, "jcoCount": 0, "officerCount": 0, "orCount": 0}
 
-        print(manpower_result,"this is the main power result")
         # Check if we have valid data from parade_state_daily
         has_parade_data = manpower_result and (
             (manpower_result["officerCount"] or 0) > 0 or 
@@ -2194,8 +2149,6 @@ WHERE company = %s
 
 
 
-        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-        print(manpower,'this is result of man power')
 
         # Return combined JSON
         return jsonify({
@@ -2228,7 +2181,6 @@ WHERE company = %s
         }), 200
 
     except Exception as e:
-        print("Error fetching dashboard summary:", str(e))
         import traceback
         traceback.print_exc()
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
@@ -2261,7 +2213,6 @@ def get_agniveer_on_leave():
         count = result['count'] if result else 0
         return jsonify({"status": "success", "count": count})
     except Exception as e:
-        print("Error fetching agniveer on leave count:", str(e))
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -2290,7 +2241,6 @@ def get_agniveer_on_leave_details():
         data = cursor.fetchall()
         return jsonify({"status": "success", "data": data})
     except Exception as e:
-        print("Error fetching agniveer on leave details:", str(e))
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -2353,7 +2303,6 @@ def get_column_name(index):
 @app.route('/api/parade-state/get/<date_str>', methods=['GET'])
 def get_parade_state(date_str):
     """Get parade state with calculated columns"""
-    print(f"\n=== GET PARADE STATE for date: {date_str} ===")
     
     # Get current user
     user = get_current_user()
@@ -2364,7 +2313,6 @@ def get_parade_state(date_str):
     if not company:
         return jsonify({'success': False, 'error': 'No company assigned'}), 400
     
-    print(f"User: {user.get('username')}, Company: {company}")
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -2392,7 +2340,6 @@ def get_parade_state(date_str):
         
         # If no data found for today, try to get previous day's data
         if not row and requested_date == today_date:
-            print(f"No data found for today ({date_str}), trying previous day...")
             
             # Get previous day's date
             previous_date = today_date - timedelta(days=1)
@@ -2404,12 +2351,10 @@ def get_parade_state(date_str):
             row = cursor.fetchone()
             
             if row:
-                print(f"Using previous day's data ({previous_date}) as template")
                 row['is_previous_day_template'] = True
                 row['original_date'] = row['report_date']
                 row['report_date'] = date_str
             else:
-                print(f"No data found for date: {date_str} or previous day, company: {company}")
                 return jsonify({
                     'success': False,
                     'message': 'No data found for this date or previous day'
@@ -2455,7 +2400,6 @@ def get_parade_state(date_str):
         })
         
     except Exception as e:
-        print(f"Error: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -2528,8 +2472,6 @@ def get_co_all_dashboard_data(date_str):
             ORDER BY company
         """, tuple(params))
         leave_data = cursor.fetchall()
-        print(leave_data,"lets check the details")
-        print("we are checking here")
         
         cursor.execute(f"""
             SELECT 
@@ -2563,8 +2505,6 @@ def get_co_all_dashboard_data(date_str):
     round((jco_on_leave / total_jco_strength * 100), 2)
     if total_jco_strength > 0 else 0
 )
-        print(total_jco_strength,jco_on_leave,jco_leave_percentage)
-        print("PERFECT")
         
         for row in manpower_data:
             row['total'] = (row['officers'] or 0) + (row['jcos'] or 0) + (row['other_ranks'] or 0)
@@ -2612,7 +2552,6 @@ def get_co_all_dashboard_data(date_str):
         })
         
     except Exception as e:
-        print(f"Error fetching CO dashboard data: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -2624,7 +2563,6 @@ def get_co_all_dashboard_data(date_str):
 def get_co_aggregated_parade_table(date_str):
     """Get aggregated parade state data from all companies for CO view"""
     user = require_login()
-    print("in this route")
     role = user.get('role', '')
     if role not in ['CO', '2IC', 'OC']:
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
@@ -2687,7 +2625,6 @@ def get_co_aggregated_parade_table(date_str):
         })
         
     except Exception as e:
-        print(f"Error fetching CO aggregated parade table: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -2701,15 +2638,12 @@ def get_co_aggregated_parade_table(date_str):
 @app.route('/api/parade-data/get/<date_str>/<company>', methods=['GET'])
 def get_parade_data_by_company(date_str, company):
     """Get parade data for specific date and company - O CENTRE NCO & ONCO only"""
-    print(f"\n=== GET PARADE DATA BY COMPANY ===")
-    print(f"Date: {date_str}, Company: {company}")
     
     # Get current user
     user = get_current_user()
     
     # Check authentication
     if not user:
-        print("DEBUG: No user found - not authenticated")
         return jsonify({
             'success': False, 
             'error': 'Not authenticated. Please login again.'
@@ -2718,25 +2652,20 @@ def get_parade_data_by_company(date_str, company):
     user_role = user.get('role', '').strip()
     user_company = user.get('company', '').strip()
     
-    print(f"DEBUG: User: {user.get('username')}, Role: '{user_role}', Company: '{user_company}'")
     
     # Check authorization based on role
     if user_role == 'O CENTRE NCO':
         # O CENTRE NCO can access all companies
-        print("DEBUG: O CENTRE NCO access granted")
         pass
     elif user_role == 'ONCO':
         # ONCO can only access their own company
         if company != user_company:
-            print(f"DEBUG: ONCO access denied - trying to access {company} but belongs to {user_company}")
             return jsonify({
                 'success': False, 
                 'error': f'Access denied - ONCO can only access data for {user_company}'
             }), 403
-        print("DEBUG: ONCO access granted for own company")
     else:
         # Other roles cannot access
-        print(f"DEBUG: Access denied for role: {user_role}")
         return jsonify({
             'success': False, 
             'error': f'Access denied - Only O CENTRE NCO and ONCO can access parade data'
@@ -2749,14 +2678,12 @@ def get_parade_data_by_company(date_str, company):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        print(f"DEBUG: Querying database for date={date_str}, company={company}")
         
         # Check if table exists first
         cursor.execute("SHOW TABLES LIKE 'parade_state_daily'")
         table_exists = cursor.fetchone()
         
         if not table_exists:
-            print("DEBUG: parade_state_daily table doesn't exist")
             return jsonify({
                 'success': True,
                 'data': {
@@ -2773,10 +2700,8 @@ def get_parade_data_by_company(date_str, company):
         """, (date_str, company))
         
         row = cursor.fetchone()
-        print(f"DEBUG: Database query result: {row}")
         
         if not row:
-            print("DEBUG: No data found in database")
             return jsonify({
                 'success': True,
                 'data': {
@@ -2815,7 +2740,6 @@ def get_parade_data_by_company(date_str, company):
                 category_data.append(row.get(column_name, 0))
             result['data'][category] = category_data
         
-        print(f"DEBUG: Returning data for {company} on {date_str}")
         return jsonify({
             'success': True,
             'data': result,
@@ -2824,7 +2748,6 @@ def get_parade_data_by_company(date_str, company):
         }), 200
         
     except Exception as e:
-        print(f"ERROR in get_parade_data_by_company: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -2868,8 +2791,6 @@ def require_role(*allowed_roles):
 @require_role('O CENTRE NCO')  # Only O CENTRE NCO can view all companies
 def get_all_companies_parade_data(date_str):
     """Get aggregated parade data for all companies - O CENTRE NCO ONLY"""
-    print(f"\n=== GET ALL COMPANIES PARADE DATA ===")
-    print(f"Date: {date_str}")
     
     conn = None
     cursor = None
@@ -2951,7 +2872,6 @@ def get_all_companies_parade_data(date_str):
         }), 200
         
     except Exception as e:
-        print(f"ERROR in get_all_companies_parade_data: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -3029,8 +2949,6 @@ def save_parade_data():
     user_role = user.get('role', '').strip()
     user_company = user.get('company', '').strip()
     
-    print(f"\n=== SAVE PARADE DATA ===")
-    print(f"User: {user.get('username')}, Role: '{user_role}', Company: '{user_company}'")
     
     try:
         data = request.get_json()
@@ -3062,7 +2980,6 @@ def save_parade_data():
         if user_role == 'O CENTRE NCO':
             # O CENTRE NCO saves to the company they selected from dropdown
             final_company = selected_company
-            print(f"DEBUG: O CENTRE NCO saving to selected company: {final_company}")
             
             # Validate that O CENTRE NCO doesn't try to save for "All"
             if final_company == 'All':
@@ -3074,12 +2991,10 @@ def save_parade_data():
         elif user_role == 'ONCO':
             # ONCO ALWAYS saves to their own company, regardless of what frontend sends
             final_company = user_company  # Use logged-in user's company
-            print(f"DEBUG: ONCO detected. Overriding frontend company '{selected_company}' with user's company: '{final_company}'")
             
             # Optional: Warn if frontend is sending wrong company (for debugging)
             if selected_company != user_company:
-                print(f"WARNING: ONCO frontend sent company '{selected_company}' but saving to '{final_company}'")
-        
+                pass
         # Validate date restriction for ONCO
         if user_role == 'ONCO':
             requested_date = datetime.strptime(report_date_str, '%Y-%m-%d').date()
@@ -3100,7 +3015,6 @@ def save_parade_data():
         #         'error': 'Cannot save data for future dates'
         #     }), 400
         
-        print(f"DEBUG: Saving data for date: {report_date_str}, company: {final_company}, user role: {user_role}")
         
         # Continue with save logic...
         conn = get_db_connection()
@@ -3288,7 +3202,6 @@ def save_parade_data():
                 updated_at = NOW()
             """
             
-            print(f"Executing SQL for company: {final_company}")
             cursor.execute(sql, values)
             conn.commit()
             
@@ -3311,7 +3224,6 @@ def save_parade_data():
             
         except Exception as e:
             conn.rollback()
-            print(f"Database error in save: {str(e)}")
             import traceback
             traceback.print_exc()
             return jsonify({
@@ -3324,7 +3236,6 @@ def save_parade_data():
             conn.close()
             
     except Exception as e:
-        print(f"Error in save_parade_data: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -3512,7 +3423,6 @@ def export_parade_csv(date_str, company):
         )
         
     except Exception as e:
-        print(f"Export error: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -3527,7 +3437,6 @@ def export_parade_csv(date_str, company):
             conn.close()
 @app.route('/api/get_projects')
 def api_get_projects():
-    print("this is in new route of getting projects")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     user = require_login()
@@ -3552,7 +3461,6 @@ def api_get_projects():
         return jsonify(projects)  
 
     except Exception as e:
-        print("Error:", str(e))
         return jsonify([]), 500
     finally:
         cursor.close()
@@ -3562,7 +3470,6 @@ def api_get_projects():
     
 @app.route('/api/get-all-courses', methods=['GET'])
 def get_courses():
-    print("in this route")
     user = require_login()
     if not user:
         return jsonify([])
@@ -3586,8 +3493,6 @@ def get_courses():
     """)
   
     data = cursor.fetchall()
-    print("get all courses")
-    print("data",data)
     cursor.close()
     conn.close()
 
@@ -3778,7 +3683,6 @@ def upcomming_test_alarms():
 
     cursor.execute(query)
     rows = cursor.fetchall()
-    print(rows,"these are rows")
     cursor.close()
     conn.close()
 
@@ -3829,7 +3733,6 @@ def get_detachments_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching detachments count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -3878,7 +3781,6 @@ def get_duty_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching duty count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -3982,7 +3884,6 @@ def get_manpower_data():
         }), 200
         
     except Exception as e:
-        print("Error fetching manpower data:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4000,14 +3901,11 @@ def get_interview_data():
     company = user['company']
     role = user['role']
     current_user = user['army_number']
-    print("route and my role is ",role)
     try:
         if role in ['JCO', 'S/JCO']:
-            print("in this section of checking")
             cursor.execute('SELECT home_state FROM personnel WHERE army_number = %s', (current_user,))
             home_result = cursor.fetchone()
             home_state = home_result['home_state'] if home_result else None
-            print(home_state,"this is my home sta")
             query = """
                 SELECT 
                     COALESCE(SUM(interview_status = 0), 0) AS pending_count,
@@ -4039,7 +3937,6 @@ def get_interview_data():
             cursor.execute(query, params)
 
         result = cursor.fetchone()
-        print(result,"here ")
         pending_count = result['pending_count'] if result else 0
         total_count = result['total_count'] if result else 0
         percentage = round((pending_count / total_count) * 100, 2) if total_count > 0 else 0
@@ -4052,7 +3949,6 @@ def get_interview_data():
         }), 200
         
     except Exception as e:
-        print("Error fetching interview data:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4086,7 +3982,6 @@ def get_attachments_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching attachments count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4132,7 +4027,6 @@ def get_agniveer_count():
         }), 200
 
     except Exception as e:
-        print("Error fetching agniveer count:", str(e))
         return jsonify({
             "status": "error",
             "message": "Internal Server Error"
@@ -4170,7 +4064,6 @@ def get_projects_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching projects count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4209,7 +4102,6 @@ def get_sensitive_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching sensitive count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4248,7 +4140,6 @@ def get_sensitive_count():
             }), 200
             
         except Exception as e:
-            print("Error fetching loans count:", str(e))
             return jsonify({"status": "error", "message": "Internal Server Error"}), 500
         finally:
             cursor.close()
@@ -4286,7 +4177,6 @@ def get_courses_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching courses count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4312,7 +4202,6 @@ def get_rollcall_points():
         }), 200
         
     except Exception as e:
-        print("Error fetching rollcall points:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4338,7 +4227,6 @@ def get_boards_count():
         }), 200
         
     except Exception as e:
-        print("Error fetching boards count:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4377,7 +4265,6 @@ def get_tasks_data():
         }), 200
         
     except Exception as e:
-        print("Error fetching tasks data:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4428,7 +4315,6 @@ def get_assigned_alarm():
         }), 200
         
     except Exception as e:
-        print("Error fetching assigned alarm data:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -4629,7 +4515,6 @@ def save_trade_manpower():
         cursor.execute("SELECT id FROM trade_manpower_daily WHERE report_date = %s", (date,))
         existing = cursor.fetchone()
         
-        print(f"DEBUG: Saving for date {date}, existing: {existing}")
         
         # Create data dictionary for insertion
         insert_data = {'report_date': date}
@@ -4666,7 +4551,6 @@ def save_trade_manpower():
             trade_code = trade_mapping.get(trade_name)
             
             if not trade_code:
-                print(f"WARNING: No mapping for trade: {trade_name}")
                 continue
                 
             # Map each field to column name
@@ -4698,12 +4582,9 @@ def save_trade_manpower():
         totals = calculate_totals(insert_data)
         insert_data.update(totals)
         
-        print(f"DEBUG: insert_data keys: {list(insert_data.keys())[:5]}...")
-        print(f"DEBUG: insert_data sample values: {list(insert_data.values())[:5]}...")
         
         if existing:
             # Update existing record - FIXED VERSION
-            print(f"DEBUG: Updating existing record for {date}")
             
             # Create SET clause
             set_items = []
@@ -4723,14 +4604,11 @@ def save_trade_manpower():
                 WHERE report_date = %s
             """
             
-            print(f"DEBUG: UPDATE query: {query}")
-            print(f"DEBUG: UPDATE values: {set_values[:5]}...")
             
             cursor.execute(query, set_values)
             action = 'updated'
         else:
             # Insert new record
-            print(f"DEBUG: Inserting new record for {date}")
             
             columns = ', '.join(insert_data.keys())
             placeholders = ', '.join(['%s'] * len(insert_data))
@@ -4745,7 +4623,6 @@ def save_trade_manpower():
         
         conn.commit()
         
-        print(f"DEBUG: Data {action} successfully for {date}")
         
         return jsonify({
             'success': True,
@@ -4755,7 +4632,6 @@ def save_trade_manpower():
         })
         
     except Exception as e:
-        print(f"ERROR in save_trade_manpower: {str(e)}")
         import traceback
         traceback.print_exc()
         if 'conn' in locals():
@@ -5042,7 +4918,6 @@ def get_available_jcos():
         """,)
 
         jco_result = cursor.fetchall()
-        print(jco_result)
 
         return jsonify({
             "status": "success",
@@ -5087,13 +4962,9 @@ def assign_jco():
 def pending_kunda_assignments():
     user = require_login()
     army_number = user['army_number']
-    print(army_number)
-    print("this api is getting triggered")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    print('route hit')
-    print('------------------------')
 
     try:
         cursor.execute("""
@@ -5103,8 +4974,6 @@ def pending_kunda_assignments():
         """, (army_number,))  # ✅ Correctly pass parameters as a tuple
 
         rows = cursor.fetchall()
-        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-        print(rows)
 
     finally:
         cursor.close()
@@ -5116,7 +4985,6 @@ def pending_kunda_assignments():
 @app.route('/api/kunda_pending_personnel')
 def kunda_pending_personnel():
     conn = get_db_connection()
-    print("lets check this route")
     cursor = conn.cursor(dictionary=True)
 
     # Ensure the user is logged in
@@ -5131,15 +4999,12 @@ def kunda_pending_personnel():
     """, (army_number,))
     
     home_states = [row['additional_assigned_home_state'] for row in cursor.fetchall()]
-    print(home_states,"we are checking the home here")
     if not home_states:
         cursor.close()
         conn.close()
         return jsonify({"rows": []})
-    print('2 CHECK')
     # 2️⃣ Fetch personnel with all statuses = 0 and home_state in pending list
     placeholders = ",".join(["%s"] * len(home_states))
-    print(placeholders)
     query = f"""
         SELECT id, army_number, `rank`, name, home_state
         FROM personnel
@@ -5228,8 +5093,6 @@ def mark_interview_done():
         .lower()
     )
 
-    print(data, 'incoming data')
-    print(army_number_of_current_login)
 
     # Validation
     if not home_state or not army_number_front_end:
@@ -5300,7 +5163,6 @@ def mark_interview_done():
     except Exception as e:
         conn.rollback()
 
-        print("mark_interview_done error:", str(e))
 
         return jsonify({
             "success": False,
@@ -5334,26 +5196,18 @@ def save_gallery():
         if not user or user.get('role') not in ['O CENTRE NCO', 'Admin', 'CO']:
             return jsonify(success=False, message="Unauthorized"), 403
 
-        print("🟢 STEP 1: Request received")
 
         title = request.form.get("title", "").strip()
         subtitle = request.form.get("subtitle", "").strip()
         image = request.files.get("image")
 
-        print("🟢 STEP 2: Form data")
-        print("Title:", title)
-        print("Subtitle:", subtitle)
-        print("Image:", image)
 
         if not image or image.filename == "":
-            print("🔴 ERROR: No image selected")
             return jsonify(success=False, message="No image selected")
 
         if not allowed_file(image.filename):
-            print("🔴 ERROR: Invalid file type")
             return jsonify(success=False, message="Invalid image type")
 
-        print("🟢 STEP 3: File validation passed")
 
         filename = f"{int(time.time())}_{secure_filename(image.filename)}"
         upload_folder = os.path.join("static", "uploads", "gallery")
@@ -5362,12 +5216,10 @@ def save_gallery():
         image_path = os.path.join(upload_folder, filename)
         image.save(image_path)
 
-        print("🟢 STEP 4: Image saved at", image_path)
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        print("🟢 STEP 5: DB connected")
 
         cursor.execute(
             "INSERT INTO gallery_settings (title, subtitle, image) VALUES (%s, %s, %s)",
@@ -5375,17 +5227,14 @@ def save_gallery():
         )
 
         conn.commit()
-        print("🟢 STEP 6: DB commit success")
 
         cursor.close()
         conn.close()
 
-        print("✅ DONE: Gallery saved successfully")
 
         return jsonify(success=True, filename=filename)
 
     except Exception as e:
-        print("❌ Gallery upload error (FULL):", repr(e))
         return jsonify(success=False, message=str(e)), 500
     
 @app.route('/api/dashboard/birthdays', methods=['GET'])
@@ -5432,7 +5281,6 @@ def get_today_birthdays():
         return jsonify({"status": "success", "data": result}), 200
 
     except Exception as e:
-        print("Error fetching today's birthdays:", str(e))
         return jsonify({"status": "error", "message": "Internal Server Error"}), 500
     finally:
         cursor.close()
@@ -5467,7 +5315,6 @@ def get_gallery():
         return jsonify(data)
 
     except Exception as e:
-        print("❌ Gallery fetch error:", e)
         return jsonify([]), 500
 
 
@@ -5502,13 +5349,11 @@ def get_company_duty_count():
         cursor.execute(duty_query, (company,))
         duty_result = cursor.fetchone()
         duty_count = duty_result['count'] if duty_result else 0
-        print(duty_count)
 
         # Return only the count
         return jsonify(duty_count)
 
     except Exception as e:
-        print(str(e))
         return jsonify(0), 500
 
     finally:
@@ -5516,7 +5361,6 @@ def get_company_duty_count():
         conn.close()
 @app.route('/api/gallery/<int:id>', methods=['DELETE'])
 def delete_gallery(id):
-    print("🔥 DELETE API HIT:", id)  # DEBUG
 
     user = require_login()
     if not user:
@@ -5531,7 +5375,6 @@ def delete_gallery(id):
         row = cursor.fetchone()
 
         if not row:
-            print("❌ Image not found in DB")
             return jsonify({"success": False, "message": "Not found"}), 404
 
         # Delete file
@@ -5540,18 +5383,15 @@ def delete_gallery(id):
 
         if os.path.exists(image_path):
             os.remove(image_path)
-            print("🗑 File deleted:", image_path)
 
         # Delete DB record
         cursor.execute("DELETE FROM gallery_settings WHERE id = %s", (id,))
         conn.commit()
 
-        print("✅ Deleted from DB")
 
         return jsonify({"success": True})
 
     except Exception as e:
-        print("❌ DELETE ERROR:", str(e))
         return jsonify({"success": False})
 
     finally:
@@ -5573,7 +5413,6 @@ def get_posted_strength():
 
         # 👉 get company filter
         company = request.args.get("company", "ALL")
-        print(company)
         query = """
             SELECT 
                 `rank`, 
@@ -5621,7 +5460,6 @@ def get_posted_strength():
 def get_detachment_stats_for_graph():
 
     company = request.args.get("company", "ALL")
-    print("checking company for the filter",company)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -5852,7 +5690,6 @@ def add_honours_board():
 
     except Exception as e:
 
-        print(e)
 
         return jsonify({
             "success": False,
@@ -5904,7 +5741,6 @@ def search_person_hb():
 
     except Exception as e:
 
-        print(e)
 
         return jsonify({
             "success" : False,
@@ -5965,7 +5801,6 @@ def get_calendar_events():
 
     except Exception as e:
 
-        print(e)
 
         return jsonify({
             "success": False,
@@ -6103,7 +5938,6 @@ def create_schedule():
         })
 
     except Exception as e:
-        print("Create Schedule Error:", str(e))
 
         return jsonify({
             "success": False,

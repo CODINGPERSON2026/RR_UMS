@@ -27,8 +27,6 @@ def get_ideal_weight(age, height_cm, cursor):
                 return float(ideal_weight)
         except:
             continue
-    print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-    print(age,height_cm)
     return None
 
 def compute_authorization(company=None):
@@ -57,7 +55,6 @@ def compute_authorization(company=None):
         ideal_weight = get_ideal_weight(age, height_cm, cursor)
 
         if ideal_weight is None:
-            print("in this checkout @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             status = "No ideal weight found"
             lower = upper = None
             weight_deviation_percent = None
@@ -102,7 +99,6 @@ def compute_authorization(company=None):
     cursor.close()
     connection.close()
     return results
-    print("hjhjhjhj")
 # --- Validation functions ---
 def validate_alpha(value, field_name):
     """Validate that value contains only letters and spaces"""
@@ -126,7 +122,6 @@ def validate_numeric(value, field_name):
 
 def validate_integer(value, field_name, min_val=None, max_val=None):
     """Validate that value is a valid integer within range"""
-    print('this is triggered !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     try:
         int_val = int(value)
         if min_val is not None and int_val < min_val:
@@ -307,7 +302,6 @@ def add_user():
         }), 201
 
     except mysql.connector.Error as err:
-        print(f"Database error: {err}")
         if 'connection' in locals():
             connection.rollback()
             connection.close()
@@ -407,7 +401,6 @@ def api_status_summary():
         })
         
     except mysql.connector.Error as err:
-        print(f"Database error: {err}")
         return jsonify({'error': 'Database error occurred'}), 500
     finally:
         cursor.close()
@@ -446,7 +439,6 @@ def api_status_data():
             """, (status_type,))
         
         users = cursor.fetchall()
-        print(len(users))
         
         # Calculate fitness status for each user
         results = []
@@ -508,7 +500,6 @@ def api_status_data():
         })
         
     except mysql.connector.Error as err:
-        print(f"Database error: {err}")
         return jsonify({'error': 'Database error occurred'}), 500
     finally:
         cursor.close()
@@ -519,10 +510,6 @@ def api_bar_graph_data():
     fit_unfit_filter = request.args.get('fitUnfitFilter', 'Fit')
     safe_category_filter = request.args.get('safeCategoryFilter', 'shape')
 
-    print("\n================ API /bar-graph-data =================")
-    print("Company:", company)
-    print("Fit / Unfit Filter:", fit_unfit_filter)
-    print("Safe / Category Filter:", safe_category_filter)
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -534,13 +521,10 @@ def api_bar_graph_data():
         # 1. Fit / Unfit counts
         # ============================================================
         data = compute_authorization(company)
-        print("Total authorization records:", len(data))
 
         fit_count = sum(1 for d in data if d['status'] == "Fit")
         unfit_count = sum(1 for d in data if d['status'] == "UnFit")
 
-        print("Fit count:", fit_count)
-        print("UnFit count:", unfit_count)
 
         # ============================================================
         # 2. JCO / OR counts for selected Fit / UnFit
@@ -557,8 +541,6 @@ def api_bar_graph_data():
             and d['rank'] not in JCO_RANKS
         )
 
-        print("JCO", fit_unfit_filter, "count:", jco_status_count)
-        print("OR", fit_unfit_filter, "count:", or_status_count)
 
         # ============================================================
         # 3. Total Safe & Category counts
@@ -577,7 +559,6 @@ def api_bar_graph_data():
             """)
 
         total_safe_count = cursor.fetchone()['count'] or 0
-        print("Total SAFE count:", total_safe_count)
 
         if company != "All":
             cursor.execute("""
@@ -593,13 +574,11 @@ def api_bar_graph_data():
             """)
 
         total_category_count = cursor.fetchone()['count'] or 0
-        print("Total CATEGORY count:", total_category_count)
 
         # ============================================================
         # 4. JCO vs OR → Safe / Category
         # ============================================================
         if safe_category_filter == 'shape':
-            print("MODE: SHAPE (JCO vs OR)")
 
             if company != "All":
                 cursor.execute("""
@@ -617,7 +596,6 @@ def api_bar_graph_data():
                 """)
 
             rows = cursor.fetchall()
-            print("Shape rows:", rows)
 
             jco_val = sum(
                 r['cnt'] for r in rows
@@ -631,8 +609,6 @@ def api_bar_graph_data():
                 not in [x.lower() for x in JCO_RANKS]
             )
 
-            print("JCO Safe:", jco_val)
-            print("OR Safe:", or_val)
 
             jcoSafeOrCategory = {
                 "labels": ["JCO Shape I", "OR Shape I"],
@@ -640,7 +616,6 @@ def api_bar_graph_data():
             }
 
         else:
-            print("MODE: CATEGORY (Temporary / Permanent)")
 
             query = """
                 SELECT `rank`,
@@ -657,13 +632,10 @@ def api_bar_graph_data():
 
             query += " GROUP BY `rank`, category_type"
 
-            print("Executing CATEGORY query:", query)
-            print("Params:", params)
 
             cursor.execute(query, params)
             results = cursor.fetchall()
 
-            print("Category rows:", results)
 
             jco_temp = jco_perm = or_temp = or_perm = 0
 
@@ -674,7 +646,6 @@ def api_bar_graph_data():
 
                 is_jco = rank in JCO_RANKS
 
-                print(f"Row → Rank:{rank}, Type:{cat_type}, Count:{cnt}, Is JCO:{is_jco}")
 
                 if cat_type in ('temporary', 'temp'):
                     if is_jco:
@@ -688,11 +659,6 @@ def api_bar_graph_data():
                     else:
                         or_perm += cnt
 
-            print("FINAL COUNTS →",
-                  "JCO Temp:", jco_temp,
-                  "JCO Perm:", jco_perm,
-                  "OR Temp:", or_temp,
-                  "OR Perm:", or_perm)
 
             jcoSafeOrCategory = {
                 "labels": [
@@ -702,7 +668,6 @@ def api_bar_graph_data():
                 "data": [jco_temp, jco_perm, or_temp, or_perm]
             }
 
-        print("FINAL jcoSafeOrCategory:", jcoSafeOrCategory)
 
         # ============================================================
         # RESPONSE
@@ -724,7 +689,6 @@ def api_bar_graph_data():
         })
 
     except mysql.connector.Error as err:
-        print("❌ DB Error:", err)
         return jsonify({'error': 'Database error occurred'}), 500
 
     finally:
@@ -813,7 +777,6 @@ def auto_save_monthly_unfit():
             if d['status'] == "UnFit"
         )
 
-        print("THIS IS UNFIT COUNT", unFit)
 
         cursor.execute("""
             INSERT INTO monthly_medical_status (
@@ -932,7 +895,6 @@ def api_person_details(army_number):
         return jsonify(result)
         
     except mysql.connector.Error as err:
-        print(f"Database error: {err}")
         return jsonify({'error': 'Database error occurred'}), 500
     finally:
         cursor.close()

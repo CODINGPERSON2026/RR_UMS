@@ -8,7 +8,6 @@ personnel_info = Blueprint('personal', __name__, url_prefix='/personnel_informat
 @personnel_info.route('/')
 def dashboard():
     user = require_login()
-    print(user)
     if not user:
         return redirect(url_for('admin_login'))
     connection = get_db_connection()
@@ -26,14 +25,12 @@ def dashboard():
             LIMIT 5
         """)
         recent_personnel = cursor.fetchall()
-        print('telli hereerajsdfjdklfj ')
         return render_template('/personnel_info/dashboard.html',
                        
                              recent_personnel=recent_personnel,
                              active_tab='dashboard')
    
     except Error as e:
-        print(f"Database error: {e}")
         return f"Database error: {e}", 500
     finally:
         cursor.close()
@@ -147,7 +144,6 @@ def insert_dynamic_data(cursor, personnel_id, army_number, data):
     
     # Insert leaves
     for idx, leave in enumerate(data.get('leaves', []), 1):
-        print(leave)
         if any(leave.values()):
             cursor.execute("""
                 INSERT INTO leave_details (personnel_id, army_number, year, AL,CL,AAL,PL,`Annual Leave`, remarks)
@@ -233,28 +229,18 @@ def delete_related_records(cursor, personnel_id, army_number):
         'personnel_sports'
     ]
 
-    print(f"\n========== DELETE START ==========")
-    print(f"Personnel ID : {personnel_id}")
-    print(f"Army Number  : {army_number}")
-    print(f"==================================\n")
 
     for table in tables:
         try:
             query = f"DELETE FROM {table} WHERE personnel_id = %s"
 
-            print(f"\n[DEBUG] Processing table: {table}")
-            print(f"[DEBUG] Query: {query}")
-            print(f"[DEBUG] Parameter: {personnel_id}")
 
             cursor.execute(query, (personnel_id,))
 
-            print(f"[DEBUG] Rows deleted from {table}: {cursor.rowcount}")
 
         except Exception as e:
-            print(f"[ERROR] Failed deleting from {table}")
-            print(f"[ERROR] {str(e)}")
+            pass
 
-    print("\n========== DELETE END ==========\n")
     cursor.execute("DELETE FROM weight_info WHERE army_number = %s", (army_number,))
 @personnel_info.route('/get_total_personnel_count_and_courses')
 def total_army_personnel__and_courses():
@@ -297,7 +283,6 @@ def total_army_personnel__and_courses():
         }), 200
 
     except Exception as e:
-        print('Server error', str(e))
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -380,7 +365,6 @@ def view_personnel():
 
         medical_personnel = cursor.fetchall()
 
-        print(f'this is total medical category {total_medical}')
 
         return render_template(
             '/personnel_info/personnel.html',
@@ -391,7 +375,6 @@ def view_personnel():
         )
 
     except Error as e:
-        print(f"Database error: {e}")
         return f"Database error: {e}", 500
 
     finally:
@@ -427,12 +410,10 @@ def get_total_medical_category_count():
         result = cursor.fetchone()
         total_count = result['total_count'] if result else 0
 
-        print("this is total medical count", total_count)
 
         return jsonify({'total_medical_category_count': total_count}), 200
 
     except Exception as e:
-        print("Error fetching total medical category count:", e)
         return jsonify({'error': 'Internal Server Error'}), 500
 
     finally:
@@ -443,7 +424,6 @@ def get_total_medical_category_count():
 
 @personnel_info.route('/rank_based_bar_graph_')
 def rank_graph():
-    print("in this rank based bar graph")
 
     user = require_login()
     company = user['company']
@@ -472,12 +452,10 @@ def rank_graph():
             """, (company,))
 
         rank_distribution = cursor.fetchall()
-        print(rank_distribution)
 
         return jsonify({'rank_distribution': rank_distribution}), 200
 
     except Exception as e:
-        print('Internal server error', str(e))
         return jsonify({'message': "internal server error"}), 500
 
     finally:
@@ -556,12 +534,10 @@ def age_graph():
                 'percentage': percentage
             })
 
-        print(age_distribution)
 
         return jsonify({'age_distribution': age_distribution}), 200
 
     except Exception as e:
-        print(str(e))
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -649,7 +625,6 @@ def api_medical_personnel():
         })
    
     except Error as e:
-        print(f"Database error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
     finally:
@@ -698,7 +673,6 @@ def personnel_details(personnel_id):
                              active_tab='view-data')
    
     except Error as e:
-        print(f"Database error: {e}")
         return f"Database error: {e}", 500
     finally:
         cursor.close()
@@ -721,8 +695,6 @@ def create_personnel():
     try:
         data = request.get_json()
         army_number = data.get('armyNumber', '')
-        print("armynumber is ",army_number)
-        print("Received data:", data)
         cursor.execute("SELECT id FROM personnel WHERE army_number = %s", (army_number,))
         if cursor.fetchone():
             return jsonify({'success': False, 'message': 'Army number already exists'}), 409
@@ -886,7 +858,7 @@ def create_personnel():
         # NEW/UPDATED: Insert into weight_info with section status (shape/category), permanent/temporary (if category), and restrictions
         # Skip if core fields missing
         if not army_number or not get_value('name'):
-            print("Skipping weight_info insert: Missing core fields")
+            pass
         else:
             date_of_birth_str = get_date('dateOfBirth')
             age = None
@@ -921,13 +893,11 @@ def create_personnel():
         return jsonify({'success': True, 'personnel_id': personnel_id}), 201
     except Error as e:
         connection.rollback()
-        print(f"Database error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
     except Exception as e:
         connection.rollback()
-        print(f"General error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -978,7 +948,6 @@ def sports_distribution_chart():
         return jsonify({'sports_distribution': sports_distribution}), 200
 
     except Exception as e:
-        print(f"Error in sports distribution chart: {e}")
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -1024,7 +993,6 @@ def api_all_personnel():
         })
    
     except Error as e:
-        print(f"Database error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
@@ -1032,7 +1000,6 @@ def api_all_personnel():
 
 @personnel_info.route('/state_wise')
 def religion_chart():
-    print('in this route')
 
     user = require_login()
     company = user['company']
@@ -1058,11 +1025,9 @@ def religion_chart():
 
         result = cursor.fetchall()
 
-        print(result)
         return jsonify({'data': result}), 200
 
     except Exception as e:
-        print(str(e))
         return jsonify({"error": str(e)}), 500
 
     finally:
@@ -1153,7 +1118,6 @@ def years_in_service_chart():
         return jsonify({'service_distribution': service_distribution}), 200
 
     except Exception as e:
-        print(f"Error in years in service chart: {e}")
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -1234,7 +1198,6 @@ def loan_amounts_chart():
         return jsonify({'loan_distribution': loan_distribution}), 200
 
     except Exception as e:
-        print(f"Error in loan amounts chart: {e}")
         return jsonify({'error': str(e)}), 500
 
     finally:
@@ -1249,7 +1212,6 @@ def update_personnel_page():
 @personnel_info.route('/api/personnel/search/<army_number>', methods=['GET'])
 def search_personnel(army_number):
     """Search for personnel by army number and return all details"""
-    print('in this route')
     connection = get_db_connection()
     if not connection:
         return jsonify({'success': False, 'message': 'Database connection failed'}), 500
@@ -1336,7 +1298,6 @@ def search_personnel(army_number):
         """, (army_number,))
         
         leaves = cursor.fetchall()
-        print('leave detasils are',leaves)
        
         # Get family members
         cursor.execute("""
@@ -1408,7 +1369,6 @@ def search_personnel(army_number):
         }), 200
    
     except Error as e:
-        print(f"Database error: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
@@ -1423,7 +1383,6 @@ def update_personnel(army_number):
     cursor = connection.cursor()
     try:
         data = request.get_json()
-        print("Received update data:", json.dumps(data, indent=2))
        
         # First, get the personnel ID
         cursor.execute("SELECT id FROM personnel WHERE army_number = %s", (army_number,))
@@ -1585,21 +1544,16 @@ def update_personnel(army_number):
             army_number
         )
         
-        print("Executing personnel update query...")
         cursor.execute(personnel_query, personnel_values)
-        print(f"Personnel table updated. Rows affected: {cursor.rowcount}")
 
         # Delete old related records
-        print("Deleting old related records...")
         delete_related_records(cursor, personnel_id, army_number)
 
         # CRITICAL: Re-insert all dynamic data
-        print("Inserting dynamic data...")
         insert_dynamic_data(cursor, personnel_id, army_number, data)
 
         # Re-insert into weight_info
         if army_number and get_value('name'):
-            print("Updating weight_info...")
             date_of_birth_str = get_date('dateOfBirth')
             age = None
             if date_of_birth_str:
@@ -1628,21 +1582,17 @@ def update_personnel(army_number):
                 restrictions
             )
             cursor.execute(weight_query, weight_values)
-            print(f"Weight info updated. Rows affected: {cursor.rowcount}")
 
         connection.commit()
-        print("Transaction committed successfully!")
         return jsonify({'success': True, 'personnel_id': personnel_id, 'message': 'Personnel updated successfully'}), 200
         
     except Error as e:
         connection.rollback()
-        print(f"Database error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
     except Exception as e:
         connection.rollback()
-        print(f"General error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
@@ -1682,11 +1632,9 @@ def delete_personnel(army_number):
         return jsonify({'success': True, 'message': 'Personnel deleted successfully'}), 200
     except Error as e:
         connection.rollback()
-        print(f"Database error during deletion: {e}")
         return jsonify({'success': False, 'message': f"Database error: {str(e)}"}), 500
     except Exception as e:
         connection.rollback()
-        print(f"General error during deletion: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
@@ -1711,7 +1659,6 @@ def get_personnel():
         WHERE (army_number LIKE %s OR `rank` LIKE %s OR name LIKE %s)
     """
     params = [f"%{search}%", f"%{search}%", f"%{search}%"]
-    print(user['company'])
     # Apply company filter only if user is not Admin
     if user_company != "Admin" and user_company !='Center':
         query += " AND company = %s"
@@ -1786,11 +1733,9 @@ def delete_table_row(table_name, row_id):
  
     except Error as e:
         connection.rollback()
-        print(f"Database error deleting row from {table_name}: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
     except Exception as e:
         connection.rollback()
-        print(f"General error deleting row from {table_name}: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()

@@ -794,11 +794,9 @@
 
 <script>
     window.addEventListener('DOMContentLoaded', function () {
-        console.log('DOM fully loaded');
 
         const paradeModal = document.getElementById('paradeDataModal');
         if (!paradeModal) {
-            console.log('Parade modal not found on this page');
             return;
         }
 
@@ -808,13 +806,11 @@
             if (!paradeDataManagerInitialized) {
                 initializeParadeDataManager();
                 paradeDataManagerInitialized = true;
-                console.log('Parade Data Manager initialized');
             }
         });
     });
 
     function initializeParadeDataManager() {
-        console.log('Initializing Parade Data Manager');
 
         const ParadeDataManager = {
             currentMode: null,
@@ -864,7 +860,6 @@
                 this.setupUIForRole();
                 this.setupWelcomeScreen();
                 this.setupEventListeners();
-                console.log(`Initialized – role: ${this.userRole}, company: ${this.userCompany}`);
             },
 
             async getUserInfo() {
@@ -1043,7 +1038,6 @@
 
                 if (!date || !company) return;
 
-                console.log(`Auto-view triggered: date=${date}, company=${company}`);
 
                 this.currentMode    = 'view';
                 this.currentDate    = date;
@@ -1080,7 +1074,6 @@
                 }
 
                 const targetCompany = this.resolveCompany();
-                console.log(`Quick Update: copying ${yesterday} → ${today} for ${targetCompany}`);
 
                 this.showLoading(true);
 
@@ -1232,7 +1225,6 @@
 
             // ─── data loading ─────────────────────────────────────────────────────────
             async loadData() {
-                console.log(`Loading ${this.currentMode} – company: ${this.currentCompany}, date: ${this.currentDate}`);
 
                 this.showLoading(true);
                 const container = document.getElementById('paradeTableContainer');
@@ -1258,7 +1250,6 @@
                     }
 
                     const result = await response.json();
-                    console.log('API Response:', result);
 
                     if (result.success) {
                         if (result.is_empty) {
@@ -1352,7 +1343,6 @@
 
                 this.hideWelcomeScreen();
 
-                console.log('Table rendered');
             },
 
             // ─── calculations ─────────────────────────────────────────────────────────

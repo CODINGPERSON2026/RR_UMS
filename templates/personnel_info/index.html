@@ -3419,7 +3419,6 @@
     }
 
     async function submitFormData(formData) {
-      console.log("Form data to be sent:", JSON.stringify(formData, null, 2));
       const submitBtn = document.querySelector(".btn-submit");
       const originalText = submitBtn.innerHTML;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';

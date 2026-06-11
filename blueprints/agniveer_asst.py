@@ -300,7 +300,6 @@ WHERE batch = %s
         return jsonify({"success": True})
 
     except Exception as e:
-        print("Error updating assistant:", e)
         return jsonify({"success": False, "error": "Server error"}), 500
 
 from datetime import date, datetime, timedelta
@@ -390,7 +389,6 @@ def upcoming_test_alarms():
         })
 
     except Exception as e:
-        print("Error fetching upcoming alarms:", e)
 
         return jsonify({
             "success": False,

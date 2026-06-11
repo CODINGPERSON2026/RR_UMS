@@ -1078,6 +1078,7 @@
     showLoading();
     const res = await fetch(`/apply_leave/search_personnel?query=${searchArmyNumber.value}`);
     const data = await res.json();
+    
     resultsSection.style.display = "block";
     resultsTable.innerHTML = "";
     leaveHistoryBtnWrapper.style.display = "none";
@@ -1085,10 +1086,37 @@
     if (data.exists) {
       const leave = data.existing_leave;
       let html = `<tr><td colspan="7" style="text-align:center; padding:1.5rem;">`;
-      if (leave.request_status === "Approved") {
-        html += `✅ <b>${leave.leave_type}</b> leave APPROVED for <b>${leave.army_number}</b>.<br><br>
-                 <button class="btn btn-success" onclick="downloadCertificate('${leave.army_number}')">Download Certificate</button>`;
-      } else if (leave.request_status === "Pending") {
+        if (leave.request_status === "Approved") {
+
+          html += `✅ Approved Leave Records<br><br>`;
+      
+          data.approved_leaves.forEach(l => {
+              html += `
+                  <div class="mb-2">
+                      <b>${l.leave_type}</b>
+                      (${l.from_date} to ${l.to_date})
+      
+                      <button class="btn btn-success btn-sm ms-2"
+                              onclick="downloadCertificate('${l.id}')">
+                          Download Certificate
+                      </button>
+                  </div>
+              `;
+          });
+      
+          html += `
+              <br>
+              <button class="btn btn-primary"
+                      onclick="applyAnotherLeave(
+                          '${leave.army_number}',
+                          '${leave.rank || ''}',
+                          '${leave.name || ''}'
+                      )">
+                  Apply Another Leave
+              </button>
+          `;
+      }
+       else if (leave.request_status === "Pending") {
         html += `⏳ <b>${leave.leave_type}</b> leave is PENDING.<br><br>
                  <button class="btn btn-danger btn-sm" onclick="deleteLeaveRequest('${leave.army_number}')">Delete Request</button>`;
       } else if (leave.request_status === "Rejected") {
@@ -1124,8 +1152,8 @@
     hideLoading();
   };
 
-  function downloadCertificate(armyNumber) {
-    window.open(`/apply_leave/download_certificate/${armyNumber}?t=${Date.now()}`, '_blank');
+  function downloadCertificate(id) {
+    window.open(`/apply_leave/download_certificate/${id}?t=${Date.now()}`, '_blank');
   }
 
   /* ====================== MULTIPLE LEAVE BLOCKS ====================== */
@@ -1596,6 +1624,13 @@
       sameCheckbox.addEventListener('change', toggleAddressFields);
     }
   });
+  function applyAnotherLeave(armyNumber, rank, name) {
+    selectedPersonArmyNumber = armyNumber;
+    selectedPersonRank = rank;
+    personnel_name = name;
+    alert(selectedPersonArmyNumber,selectedPersonRank,personnel_name)
+    openLeaveApplicationModal();
+}
 </script>
 
 {% include 'apply_leave/leave_dashboard.html' %}

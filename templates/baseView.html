@@ -182,7 +182,11 @@
     }
 
     /* ==================== BASE ==================== */
-    *, *::before, *::after { box-sizing: border-box; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
 
     body {
       background: var(--background);
@@ -203,7 +207,9 @@
         1400-1919px large     — 64px icon rail
         1920px+   4K/ultra    — 72px icon rail
     */
-    :root { --sidebar-w: 56px; }
+    :root {
+      --sidebar-w: 56px;
+    }
 
     .sidebar {
       width: var(--sidebar-w);
@@ -255,12 +261,23 @@
       scrollbar-color: var(--border-color) transparent;
     }
 
-    .sidebar-nav::-webkit-scrollbar { width: 4px; }
-    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    .sidebar-nav::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
 
     /* Section Labels — hidden (icon-only rail) */
-    .nav-section-label { display: none; }
+    .nav-section-label {
+      display: none;
+    }
 
     /* Nav Links */
     .nav-link {
@@ -290,8 +307,13 @@
       font-weight: 500;
     }
 
-    .nav-link.active .nav-icon { color: var(--nav-link-active-color); }
-    .nav-link:hover .nav-icon  { color: var(--text-primary); }
+    .nav-link.active .nav-icon {
+      color: var(--nav-link-active-color);
+    }
+
+    .nav-link:hover .nav-icon {
+      color: var(--text-primary);
+    }
 
     /* Nav Icons */
     .nav-icon {
@@ -309,14 +331,19 @@
     /* Label text, badges, inline tooltip spans — always hidden */
     .nav-label-text,
     .nav-badge,
-    .nav-tooltip { display: none; }
+    .nav-tooltip {
+      display: none;
+    }
 
     /* Danger nav item */
     .nav-link-danger:hover {
       background: rgba(239, 68, 68, 0.1) !important;
       color: #dc2626 !important;
     }
-    .nav-link-danger:hover .nav-icon { color: #dc2626 !important; }
+
+    .nav-link-danger:hover .nav-icon {
+      color: #dc2626 !important;
+    }
 
     /* ==================== SIDEBAR FOOTER ==================== */
     .sidebar-footer {
@@ -339,7 +366,7 @@
       z-index: 99999;
       opacity: 0;
       transition: opacity 0.12s ease;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     }
 
     #sidebar-tooltip::before {
@@ -360,15 +387,25 @@
     }
 
     /* ==================== BOTTOM NAV (mobile only) ==================== */
-    .bottom-nav { display: none; }
+    .bottom-nav {
+      display: none;
+    }
 
     /* ==================== RESPONSIVE BREAKPOINTS ==================== */
 
     /* Mobile — hide sidebar, show bottom nav */
     @media (max-width: 575.98px) {
-      :root { --sidebar-w: 0px; }
-      .sidebar { display: none; }
-      #sidebar-tooltip { display: none !important; }
+      :root {
+        --sidebar-w: 0px;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      #sidebar-tooltip {
+        display: none !important;
+      }
 
       .page-wrapper {
         margin-left: 0;
@@ -391,7 +428,10 @@
         overflow-x: auto;
         scrollbar-width: none;
       }
-      .bottom-nav::-webkit-scrollbar { display: none; }
+
+      .bottom-nav::-webkit-scrollbar {
+        display: none;
+      }
 
       .bottom-nav-item {
         display: flex;
@@ -411,7 +451,12 @@
         transition: background 0.15s, color 0.15s;
         flex-shrink: 0;
       }
-      .bottom-nav-item i { font-size: 18px; line-height: 1; }
+
+      .bottom-nav-item i {
+        font-size: 18px;
+        line-height: 1;
+      }
+
       .bottom-nav-item:hover,
       .bottom-nav-item.active {
         color: var(--nav-link-active-color);
@@ -421,36 +466,108 @@
 
     /* Small tablet: 576px – 991px — 48px rail */
     @media (min-width: 576px) and (max-width: 991.98px) {
-      :root { --sidebar-w: 48px; }
-      .sidebar { width: 48px; }
-      .sidebar-logo-mark { width: 28px; height: 28px; font-size: 9px; }
-      .sidebar-header { padding: 14px 0 12px; }
-      .nav-link { padding: 11px 0 !important; margin: 1px 5px; }
-      .nav-icon  { width: 17px; height: 17px; font-size: 15px; }
+      :root {
+        --sidebar-w: 48px;
+      }
+
+      .sidebar {
+        width: 48px;
+      }
+
+      .sidebar-logo-mark {
+        width: 28px;
+        height: 28px;
+        font-size: 9px;
+      }
+
+      .sidebar-header {
+        padding: 14px 0 12px;
+      }
+
+      .nav-link {
+        padding: 11px 0 !important;
+        margin: 1px 5px;
+      }
+
+      .nav-icon {
+        width: 17px;
+        height: 17px;
+        font-size: 15px;
+      }
     }
 
     /* Laptop: 992px – 1399px — 56px rail (default, no overrides needed) */
 
     /* Large monitor: 1400px – 1919px — 64px rail */
     @media (min-width: 1400px) and (max-width: 1919.98px) {
-      :root { --sidebar-w: 64px; }
-      .sidebar { width: 64px; }
-      .sidebar-logo-mark { width: 38px; height: 38px; font-size: 12px; }
-      .sidebar-header { padding: 20px 0 18px; }
-      .nav-link { padding: 15px 0 !important; margin: 3px 8px; }
-      .nav-icon  { width: 23px; height: 23px; font-size: 20px; }
-      .page-wrapper { padding: 8px 18px; }
+      :root {
+        --sidebar-w: 64px;
+      }
+
+      .sidebar {
+        width: 64px;
+      }
+
+      .sidebar-logo-mark {
+        width: 38px;
+        height: 38px;
+        font-size: 12px;
+      }
+
+      .sidebar-header {
+        padding: 20px 0 18px;
+      }
+
+      .nav-link {
+        padding: 15px 0 !important;
+        margin: 3px 8px;
+      }
+
+      .nav-icon {
+        width: 23px;
+        height: 23px;
+        font-size: 20px;
+      }
+
+      .page-wrapper {
+        padding: 8px 18px;
+      }
     }
 
     /* 4K / ultrawide: 1920px+ — 72px rail */
     @media (min-width: 1920px) {
-      :root { --sidebar-w: 72px; }
-      .sidebar { width: 72px; }
-      .sidebar-logo-mark { width: 42px; height: 42px; font-size: 13px; }
-      .sidebar-header { padding: 22px 0 20px; }
-      .nav-link { padding: 17px 0 !important; margin: 3px 10px; }
-      .nav-icon  { width: 26px; height: 26px; font-size: 22px; }
-      .page-wrapper { padding: 10px 24px; }
+      :root {
+        --sidebar-w: 72px;
+      }
+
+      .sidebar {
+        width: 72px;
+      }
+
+      .sidebar-logo-mark {
+        width: 42px;
+        height: 42px;
+        font-size: 13px;
+      }
+
+      .sidebar-header {
+        padding: 22px 0 20px;
+      }
+
+      .nav-link {
+        padding: 17px 0 !important;
+        margin: 3px 10px;
+      }
+
+      .nav-icon {
+        width: 26px;
+        height: 26px;
+        font-size: 22px;
+      }
+
+      .page-wrapper {
+        padding: 10px 24px;
+      }
     }
 
     /* ==================== THEME SWITCHER ==================== */
@@ -496,11 +613,20 @@
       animation: slideDown 0.3s ease;
     }
 
-    .theme-options.active { display: flex; }
+    .theme-options.active {
+      display: flex;
+    }
 
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .theme-option {
@@ -531,7 +657,9 @@
       color: white;
     }
 
-    .theme-option i { font-size: 1.2rem; }
+    .theme-option i {
+      font-size: 1.2rem;
+    }
 
     /* ==================== CARDS ==================== */
     .card {
@@ -559,7 +687,10 @@
       padding: 20px;
     }
 
-    .modal-title { font-weight: 600; font-size: 1.25rem; }
+    .modal-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
 
     .btn-close {
       width: 40px !important;
@@ -670,7 +801,9 @@
     }
 
     /* ==================== TABLE ==================== */
-    .table { color: var(--text-primary); }
+    .table {
+      color: var(--text-primary);
+    }
 
     .table thead th {
       background: var(--card-bg-solid);
@@ -678,8 +811,13 @@
       border-color: var(--border-color);
     }
 
-    .table tbody tr { transition: all 0.3s ease; }
-    .table tbody tr:hover { background-color: var(--nav-link-hover-bg); }
+    .table tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    .table tbody tr:hover {
+      background-color: var(--nav-link-hover-bg);
+    }
 
     /* ==================== ALERTS ==================== */
     .alert {
@@ -688,10 +826,15 @@
     }
 
     /* ==================== MISC ==================== */
-    body.modal-open { padding-right: 0 !important; }
+    body.modal-open {
+      padding-right: 0 !important;
+    }
 
     @media (max-width: 768px) {
-      .theme-switcher { top: 70px; right: 10px; }
+      .theme-switcher {
+        top: 70px;
+        right: 10px;
+      }
     }
   </style>
 
@@ -704,8 +847,7 @@
   <div class="sidebar" id="sidebar">
 
     <!-- Header / Brand -->
-    <div class="sidebar-header"
-         data-tiptext="{{role}} | {{current_user_name}} | {{company}}">
+    <div class="sidebar-header" data-tiptext="{{role}} | {{current_user_name}} | {{company}}">
       <div class="sidebar-logo-mark">UMS</div>
     </div>
 
@@ -715,25 +857,26 @@
       <!-- Main Section -->
       <div class="nav-section-label">Main</div>
 
-      <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/"
-         data-tiptext="Dashboard">
+      <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/" data-tiptext="Dashboard">
         <span class="nav-icon"><i class="fas fa-th-large"></i></span>
         <span class="nav-label-text">Dashboard</span>
         <span class="nav-tooltip">Dashboard</span>
       </a>
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO
+      OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ'] %}
       <a class="nav-link {% if '/weight_system' in request.path %}active{% endif %}" href="/weight_system"
-         data-tiptext="Weight">
+        data-tiptext="Weight">
         <span class="nav-icon"><i class="fas fa-weight"></i></span>
         <span class="nav-label-text">Weight Management</span>
         <span class="nav-tooltip">Weight</span>
       </a>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
-      <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}" href="/personnel_information"
-         data-tiptext="Personnel">
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO LINE', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO
+      OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
+      <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}"
+        href="/personnel_information" data-tiptext="Personnel">
         <span class="nav-icon"><i class="fas fa-users"></i></span>
         <span class="nav-label-text">Personnel Management</span>
         <span class="nav-tooltip">Personnel</span>
@@ -750,13 +893,14 @@
       {% endif %} -->
 
       <!-- Finance Section -->
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT',
+      'PROJECT OFFICER', 'PROJECT JCO'] %}
       <div class="nav-section-label">Finance &amp; Projects</div>
       {% endif %}
 
       {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
-      <a class="nav-link {% if '/projects' in request.path %}active{% endif %}" href="{{ url_for('projects_dashboard') }}"
-         data-tiptext="Projects">
+      <a class="nav-link {% if '/projects' in request.path %}active{% endif %}"
+        href="{{ url_for('projects_dashboard') }}" data-tiptext="Projects">
         <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>
         <span class="nav-label-text">Project Management</span>
         <span class="nav-tooltip">Projects</span>
@@ -764,8 +908,7 @@
       {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] %}
-      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account"
-         data-tiptext="Accounts">
+      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Accounts">
         <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
         <span class="nav-label-text">Account Management</span>
         <span class="nav-tooltip">Accounts</span>
@@ -773,22 +916,31 @@
       {% endif %}
 
       <!-- HR Section -->
-      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] or role == 'ONCO' or role == 'O CENTRE NCO' %}
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO
+      PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW',
+      'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO
+      DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] or role == 'ONCO' or role == 'O CENTRE NCO' %}
       <div class="nav-section-label">HR</div>
       {% endif %}
 
-      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO
+      PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW',
+      'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO
+      DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
       <a class="nav-link {% if '/apply_leave' in request.path %}active{% endif %}" href="/apply_leave/"
-         data-tiptext="Leave">
+        data-tiptext="Leave">
         <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
         <span class="nav-label-text">Leave Management</span>
         <span class="nav-tooltip">Leave</span>
       </a>
       {% endif %}
-      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
+      {% if role in ['O PWR','O CENTRE NCO', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE',
+      'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO',
+      'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO
+      QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
       <a class="nav-link {% if '/apply_leave' in request.path %}active{% endif %}" href="/Nominal_Roll/"
-         data-tiptext="Nominal Roll">
-         <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
+        data-tiptext="Nominal Roll">
+        <span class="nav-icon"><i class="fas fa-user-shield"></i></span>
         <span class="nav-label-text">Nominal Roll</span>
         <span class="nav-tooltip">Nominal Roll</span>
       </a>
@@ -796,7 +948,7 @@
 
       {% if role == 'ONCO' %}
       <a class="nav-link {% if request.path == '/onco/manage_leave' %}active{% endif %}" href="/onco/manage_leave"
-         data-tiptext="Manage Leave">
+        data-tiptext="Manage Leave">
         <span class="nav-icon"><i class="fas fa-calendar-check"></i></span>
         <span class="nav-label-text">Manage Leave</span>
         <span class="nav-tooltip">Manage Leave</span>
@@ -805,7 +957,7 @@
 
       {% if role == 'O CENTRE NCO' %}
       <a class="nav-link {% if request.path == '/gallery/manage' %}active{% endif %}" href="/gallery/manage"
-         data-tiptext="Gallery">
+        data-tiptext="Gallery">
         <span class="nav-icon"><i class="fas fa-images"></i></span>
         <span class="nav-label-text">Manage Gallery</span>
         <span class="nav-tooltip">Gallery</span>
@@ -818,15 +970,14 @@
     <div class="sidebar-footer">
       {% if role in ['CO', '2IC'] %}
       <a class="nav-link {% if '/settings' in request.path %}active{% endif %}" href="/settings"
-         data-tiptext="Settings">
+        data-tiptext="Settings">
         <span class="nav-icon"><i class="fas fa-cog"></i></span>
         <span class="nav-label-text">Settings</span>
         <span class="nav-tooltip">Settings</span>
       </a>
       {% endif %}
 
-      <a class="nav-link nav-link-danger" href="/logout" id="logoutLink"
-         data-tiptext="Logout">
+      <a class="nav-link nav-link-danger" href="/logout" id="logoutLink" data-tiptext="Logout">
         <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>
         <span class="nav-label-text">Logout</span>
         <span class="nav-tooltip">Logout</span>
@@ -999,8 +1150,8 @@
         sidebar.querySelectorAll('[data-tiptext]').forEach(function (el) {
           el.addEventListener('mouseenter', function () { showTip(el); });
           el.addEventListener('mouseleave', hideTip);
-          el.addEventListener('focus',      function () { showTip(el); });
-          el.addEventListener('blur',       hideTip);
+          el.addEventListener('focus', function () { showTip(el); });
+          el.addEventListener('blur', hideTip);
         });
 
         // Hide tooltip if mouse enters the tooltip itself (edge case)
@@ -1012,4 +1163,5 @@
   {% block extra_js %}{% endblock %}
 
 </body>
+
 </html>

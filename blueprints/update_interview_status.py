@@ -21,9 +21,7 @@ def get_pending_kunba_interviews():
 
     home_state = result['home_state']
 
-    print(f"JCO Pending Interview Debug: User={user['username']}, Role={user['role']}, Company='{user_company}', Home State='{home_state}'")
 
-    print(f"DEBUG JCO Filter: Start. UserCompany='{user_company}', HomeState='{home_state}'")
 
     # STRICT FILTERING TEST - Case-insensitive and trimmed
     cursor.execute("""
@@ -100,7 +98,6 @@ def completed_interview_list():
         return jsonify(rows)
 
     except Exception as e:
-        print("Completed Interview List Error:", e)
         return jsonify([])
 
     finally:
@@ -258,7 +255,6 @@ def get_available_jcos():
         """,)
 
         jco_result = cursor.fetchall()
-        print(jco_result)
 
         return jsonify({
             "status": "success",
@@ -312,7 +308,6 @@ def get_remarks(id):
         row = cursor.fetchone()
         return jsonify({ 'remarks': row['interview_remarks'] if row else '' })
     except Exception as e:
-        print("Get Remarks Error:", e)
         return jsonify({ 'remarks': '' })
     finally:
         if cursor: cursor.close()
@@ -353,7 +348,6 @@ def my_completed_interviews():
         return jsonify(rows)
 
     except Exception as e:
-        print("My Completed Interviews Error:", e)
         return jsonify([])
 
     finally:
@@ -373,7 +367,6 @@ def get_remarks_by(army_number):
         row = cursor.fetchone()
         return jsonify({ 'remarks': row['interview_remarks'] if row else '' })
     except Exception as e:
-        print("Get Remarks Error:", e)
         return jsonify({ 'remarks': '' })
     finally:
         if cursor: cursor.close()

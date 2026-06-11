@@ -262,8 +262,6 @@
 
       // sanitize displayed values (fallback "")
       
-      console.log("boardsss", board);
-      console.log("board members ", board);
       tr.innerHTML = `
         <td>${idx + 1}</td>
         <td>${escapeHtml(board[1] || "")}</td>
@@ -399,7 +397,6 @@
 
   // ---------- open edit board ----------
   async function openEditBoard(board_id) {
-    console.log("edit board",boards);
     const b = boards.find(x => String(x[0]) === String(board_id));
     if (!b) {
       alert("Board not found.");
@@ -437,7 +434,6 @@
 
   // ---------- MEMBERS modal / actions ----------
   async function openMembersModal(boardId, orderNo) {
-    console.log('board id', boardId, orderNo);
     membersModalOrderNo.value = orderNo;
     membersModalOrderNo.textContent = orderNo || "";
     members_board_id.value = boardId;
@@ -467,7 +463,6 @@
       return;
     }
     membersList.innerHTML = "";
-    console.log("memberssssss", members);
     members.forEach(m => {
       const item = document.createElement("div");
       item.className = "list-group-item d-flex justify-content-between align-items-center";
@@ -488,7 +483,6 @@
   addMemberForm.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     const orderNo = membersModalOrderNo.value;
-    console.log("order no", orderNo);
     const name = document.getElementById("new_member_name").value.trim();
     const army = document.getElementById("new_member_army").value.trim();
     if (!name) { alert("Enter member name."); return; }
@@ -500,7 +494,6 @@
 
     try {
       const res = await fetch("/add_member", { method: "POST", body: fd });
-      console.log("response", res);
       const json = await res.json();
       if (res.ok && json.status === "success") {
         document.getElementById("new_member_name").value = "";
@@ -518,7 +511,6 @@
 
   // member list actions (edit/delete)
   membersList.addEventListener("click", (ev) => {
-    console.log("edit clicked");
     const btn = ev.target.closest("button");
     if (!btn) return;
     const action = btn.getAttribute("data-action");

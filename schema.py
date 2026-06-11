@@ -13,6 +13,7 @@ Table: users
 Purpose: Stores system login and role information for HRMS users.
 
 Columns:
+    pass
 - id (int, primary key, auto increment)
 - username (varchar(100), unique username for login)
 - email (varchar(150), user email address)
@@ -23,23 +24,27 @@ Columns:
 - army_number (varchar(100), NULL for officers)
 
 VALID ROLE VALUES:
+    pass
 Commissioned Officers  : CO, OC, 2IC, ADJUTANT
 JCO Roles             : JCO, S/JCO, JCO PWR, JCO CHQ, JCO IT, JCO MW, JCO LINE, JCO OP, JCO MCCS, JCO RHQ, JCO TM, JCO MT, JCO LRW, JA JCO, ACCOUNT JCO, PROJECT JCO
 NCO Roles             : NCO, ONCO, NCO PWR, NCO CHQ, NCO IT, NCO MW, NCO LINE, NCO OP, NCO MCCS, NCO RHQ, NCO LRW, NCO QM, NCO MT, NCO TM, NCO RP
 Other Roles           : admin, clerk, TRG, QM, HEAD CLK, PA, ACCOUNT OFFICER, PROJECT OFFICER, CENTRE
 
 COMPANY VALUES:
+    pass
 - '1 Company'
 - '2 Company'
 - '3 Company'
 - 'HQ Company'
 
 IMPORTANT:
+    pass
 - NEVER select password column
 - Only return username, role and company unless specifically asked for more
 - Role matching is case sensitive in DB
 
 EXAMPLE QUERIES:
+    pass
 
 Q: who is co
 SQL: SELECT username, role, company FROM users WHERE role = 'CO'
@@ -84,11 +89,13 @@ Table: personnel
 Purpose: Stores ONLY soldier data.
 
 IMPORTANT:
+    pass
 - `rank` is a reserved MySQL word — ALWAYS wrap in backticks: `rank`
 - Commissioned Officers DO NOT exist in this table
 - NEVER use rank without backticks
 
 Columns:
+    pass
 - id (int, primary key, auto increment)
 - army_number (varchar(100), unique army identifier)
 - name (varchar(100), soldier full name)
@@ -98,6 +105,7 @@ Columns:
 - detachment_status (tinyint, 1 = on detachment, 0 = not on detachment)
 
 VALID RANK VALUES (exact DB values):
+    pass
 - 'Agniveer'
 - 'HAV'
 - 'L HAV'
@@ -109,6 +117,7 @@ VALID RANK VALUES (exact DB values):
 - 'Subedar Major'
 
 RANK SHORT FORMS (user may type these):
+    pass
 - hav, havaldar, havl       → HAV
 - l hav, lance hav          → L HAV
 - l nk, lance nk, lance naik → L NK
@@ -120,12 +129,14 @@ RANK SHORT FORMS (user may type these):
 - agniveer                  → Agniveer
 
 COMPANY VALUES:
+    pass
 - '1 Company'
 - '2 Company'
 - '3 Company'
 - 'HQ Company'
 
 EXAMPLE QUERIES:
+    pass
 
 Q: how many soldiers are there
 SQL: SELECT COUNT(*) FROM personnel
@@ -215,22 +226,20 @@ def get_schema_for_question(question: str):
     # USERS TABLE FIRST
     for keyword in USERS_TABLE_KEYWORDS:
         if re.search(r'\b' + re.escape(keyword) + r'\b', q):
-            print(f"🟠 Keyword matched: '{keyword}' → using USERS_SCHEMA")
             return USERS_SCHEMA, keyword, "users"
 
     # PERSONNEL TABLE SECOND
     for keyword in PERSONNEL_TABLE_KEYWORDS:
         if re.search(r'\b' + re.escape(keyword) + r'\b', q):
-            print(f"🟣 Keyword matched: '{keyword}' → using PERSONNEL_SCHEMA")
             return PERSONNEL_SCHEMA, keyword, "personnel"
 
-    print("🟠 No keyword matched.")
     return None, None, None
 
 
 def get_schema_summary():
     return """
 HRMS Database Summary:
+    pass
 - Users table: Officers (CO, OC, 2IC, ADJUTANT), JCOs, NCOs, system users
 - Personnel table: Soldiers (Agniveer, HAV, L HAV, L NK, LOC NK, Naib Subedar, NK, Signal Man, Subedar Major)
 """

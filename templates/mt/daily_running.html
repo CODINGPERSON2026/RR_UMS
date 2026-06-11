@@ -105,7 +105,6 @@
 <script>
 document.getElementById("searchVehicle").addEventListener("click", function () {
     let vehicle_no = document.getElementById("vehicle_no").value.trim();
-    console.log('xyz', vehicle_no);
 
     if (!vehicle_no) {
         alert("Please enter a vehicle number");
@@ -144,7 +143,6 @@ document.getElementById("runningForm").addEventListener("submit", function (e) {
 
     let formElement = document.getElementById("runningForm");
     let formData = new FormData(formElement);
- console.log("form data", formData)
     fetch("/submit_running", {
         method: "POST",
         body: formData

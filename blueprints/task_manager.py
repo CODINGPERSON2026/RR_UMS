@@ -9,7 +9,6 @@ def home():
 @task_bp.route('/create-task', methods=['POST'])
 def update_task():
     data = request.get_json()
-    print(data,"this is data")
     task_name = data.get('task_name')
     description = data.get('description')
     priority = data.get('priority')
@@ -17,7 +16,6 @@ def update_task():
     due_date = data.get('due_date')
     user = require_login()
     admin = user['role']
-    print(admin)
 
     try:
         conn = get_db_connection()
@@ -76,10 +74,8 @@ def view_task():
 def get_task_details(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    print(id,"this is id")
     cursor.execute("SELECT * FROM tasks WHERE id=%s", (id,))
     task = cursor.fetchone()
-    print(task)
     cursor.close()
     conn.close()
 
@@ -93,7 +89,7 @@ def delete_task(id):
         query = 'DELETE FROM tasks where id = %s'
         cursor.execute(query,(id,))
     except Exception as e:
-        print('Exception',str(e))
+        pass
     return jsonify({'message': f'{id} deleted'}),200
 
 
@@ -104,7 +100,6 @@ def get_task(task_id):
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM tasks WHERE id=%s", (task_id,))
     task = cursor.fetchone()
-    print(task)
     cursor.close()
     conn.close()
     
@@ -124,7 +119,6 @@ def get_task(task_id):
 def edit_task(task_id):
     try:
         data = request.form  
-        print(data,"this is data from form")
 
         task_name = data.get("task_name")
         description = data.get("description")
@@ -151,7 +145,6 @@ def edit_task(task_id):
         return jsonify({"status": "success", "message": "Task updated successfully"}), 200
 
     except Exception as e:
-        print("Update Task Error:", e)
         return jsonify({"status": "error", "message": "Failed to update task"}), 500
     
 

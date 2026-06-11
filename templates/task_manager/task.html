@@ -419,7 +419,6 @@
   });
 
 function deleteTask(taskId){
-  console.log(taskId)
    let taskToDelete =  taskId
    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
    deleteModal.show()
@@ -462,7 +461,7 @@ confirmDeleteBtn.addEventListener('click', function () {
         }
         return res.json()
       })
-      .then((data) => console.log(data))
+      .then((data) => )
       .finally(() => {
         showStatusModal("Task Deleted", "Red", 2000);
 

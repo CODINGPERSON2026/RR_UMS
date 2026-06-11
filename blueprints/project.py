@@ -77,7 +77,6 @@ def api_get_all_projects():
         })
 
     except Exception as e:
-        print("Error fetching projects:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e),
@@ -149,7 +148,6 @@ def api_get_project_by_id(project_id):
         })
 
     except Exception as e:
-        print("Error fetching project:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -237,7 +235,6 @@ def api_update_project_stage():
 
     except Exception as e:
         conn.rollback()
-        print("Error updating project stage:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -310,7 +307,6 @@ def api_get_project_timeline(project_id):
             })
 
     except Exception as e:
-        print("Error fetching timeline:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e),
@@ -387,7 +383,6 @@ def api_get_project_stats():
         })
 
     except Exception as e:
-        print("Error fetching project stats:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -476,7 +471,6 @@ def api_search_projects():
         })
 
     except Exception as e:
-        print("Error searching projects:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e),
@@ -533,7 +527,6 @@ def api_delete_project(project_id):
 
     except Exception as e:
         conn.rollback()
-        print("Error deleting project:", str(e))
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -583,7 +576,6 @@ def cost_by_head():
         })
 
     except Error as err:
-        print(f"Query error: {err}")
         return jsonify({
             "status": "error",
             "message": str(err)
@@ -650,7 +642,6 @@ def create_project():
         return jsonify({"status": "success"})
 
     except Exception as e:
-        print("Project Create Error:", e)
         return jsonify({"status": "error", "message": "Database error"}), 500
 
     finally:

@@ -141,7 +141,6 @@ function loadLeaveStats() {
         .then(data => {
             const tbody = document.querySelector("#leaveTable tbody");
             tbody.innerHTML = "";
-            console.log("Leave", data);
             data.forEach(row => {
                 let percentClass = "";
                 if (row.leave_percentage >= 40) {
@@ -170,7 +169,6 @@ function loadCompanyStatus() {
         .then(response => response.json())
         .then(data => {
             const tbody = document.querySelector("#coyTable tbody");
-            console.log("Data for Coy", data);
             tbody.innerHTML = "";
             data.forEach(row => {
 
@@ -193,7 +191,6 @@ function loadDailyEvent() {
         .then(data => {
             const tbody = document.querySelector("#dailyEvent tbody");
             tbody.innerHTML = "";
-            console.log("Daily event", data);
             data.forEach(row => {
 
                 const tr = document.createElement("tr");

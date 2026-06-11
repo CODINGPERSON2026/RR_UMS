@@ -2192,7 +2192,6 @@ document.addEventListener("DOMContentLoaded", function () {
     
     if (!leaves || leaves.length === 0) { addLeaveRow(); return; }
     leaves.forEach((l, i) => {
-      console.log(l['Annual Leave'])
       const tr = buildRow([
         td(i + 1),
         td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]" value="${esc(l.year)}">`),

@@ -41,7 +41,6 @@ def add_on_course():
         return jsonify({"status": "success"}), 200
     except Exception as e:
         conn.rollback()
-        print(f"Error adding on course: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -99,7 +98,6 @@ def get_courses():
         return jsonify({"status": "success", "data": courses}), 200
 
     except Exception as e:
-        print(f"Error fetching courses: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -125,7 +123,6 @@ def remove_from_course(course_id):
 
     except Exception as e:
         conn.rollback()
-        print(f"Error removing from course: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -205,7 +202,6 @@ def get_reserved_courses():
         }), 200
 
     except Exception as e:
-        print(f"Error fetching reserved courses: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -242,7 +238,6 @@ def validate_army_number():
                 "exists": False
             }), 200
     except Exception as e:
-        print(f"Error validating army number: {e}")
         return jsonify({"status": "error", "message": "Database error"}), 500
     finally:
         cursor.close()
@@ -312,7 +307,6 @@ def get_upcoming_courses():
         return jsonify({"status": "success", "data": list(courses.values())}), 200
 
     except Exception as e:
-        print(f"Error fetching upcoming courses: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -333,7 +327,6 @@ def confirm_course(course_id):
         return jsonify({"status": "success", "message": "Course confirmed"}), 200
     except Exception as e:
         conn.rollback()
-        print(f"Error confirming course: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()

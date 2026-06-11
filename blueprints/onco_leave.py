@@ -64,7 +64,6 @@ def on_leave_persons():
         return jsonify({'status': 'success', 'data': rows})
 
     except Exception as e:
-        print("Error fetching on-leave persons:", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     finally:
@@ -109,7 +108,6 @@ def remove_leave():
     except Exception as e:
         if conn:
             conn.rollback()
-        print("Error removing leave:", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     finally:
@@ -222,7 +220,6 @@ def extend_leave():
     except Exception as e:
         if conn:
             conn.rollback()
-        print("Error extending leave:", e)
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
     finally:

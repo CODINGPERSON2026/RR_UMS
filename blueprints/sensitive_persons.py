@@ -22,7 +22,6 @@ def remove_sensitive():
 
     except Exception as e:
         conn.rollback()
-        print("ERROR in remove_sensitive:", e)
         return jsonify({"success": False, "error": "Remove failed"}), 500
     finally:
         cursor.close()
@@ -65,7 +64,6 @@ def mark_sensitive():
         return jsonify({"success": True, "message": "Personnel marked as sensitive successfully."})
     except Exception as e:
         conn.rollback()
-        print("ERROR in mark_sensitive:", e)
         return jsonify({"success": False, "error": "Database error"}), 500
     finally:
         cursor.close()
@@ -105,7 +103,6 @@ def update_sensitive_reason():
         return jsonify({"success": True, "message": "Reason added successfully."})
     except Exception as e:
         conn.rollback()
-        print("Error:", e)
         return jsonify({"success": False, "error": "Update failed"}), 500
     finally:
         cursor.close()

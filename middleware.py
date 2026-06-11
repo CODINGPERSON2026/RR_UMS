@@ -17,5 +17,4 @@ def require_login():
     except jwt.InvalidTokenError:
         return None  # Invalid token
     except Exception as e:
-        print(f"JWT decode error: {e}")
         return None

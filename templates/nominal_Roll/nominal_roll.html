@@ -64,10 +64,11 @@
 
   /* shared action button style */
   .nr-action-btn {
-    font-family: inherit; font-size: 13px; font-weight: 600;
-    border: none; padding: 8px 18px; cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
+    font-family: inherit; font-size: 11px; font-weight: 700;
+    border: none; padding: 6px 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
     transition: all .15s; border-radius: 6px;
+    text-transform: uppercase;
   }
   #nr-export-btn {
     background: var(--success-color, #10b981); color: #fff;
@@ -77,6 +78,14 @@
     background: var(--primary-color); color: #fff;
   }
   #nr-print-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  #nr-leave-history-btn {
+    background: #6366f1; color: #fff;
+  }
+  #nr-leave-history-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  #nr-back-to-roll {
+    background: var(--text-secondary); color: #fff; display: none;
+  }
+  #nr-back-to-roll:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
   /* ── STATUS BAR ── */
   #nr-status-bar {
@@ -226,12 +235,20 @@
   </div>
   <div class="nr-filter-spacer"></div>
   <button id="nr-export-btn" class="nr-action-btn" onclick="exportCSV()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+    <i class="fas fa-file-csv"></i>
     Export CSV
   </button>
   <button id="nr-print-btn" class="nr-action-btn" onclick="printAll()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+    <i class="fas fa-print"></i>
     Print
+  </button>
+  <button id="nr-leave-history-btn" class="nr-action-btn" onclick="toggleViewMode('leave_history')">
+    <i class="fas fa-history"></i>
+    Leave History
+  </button>
+  <button id="nr-back-to-roll" class="nr-action-btn" onclick="toggleViewMode('nominal')">
+    <i class="fas fa-list"></i>
+    Nominal Roll
   </button>
 </div>
 
@@ -240,6 +257,7 @@
   <span id="nr-loading"><span class="nr-spinner"></span> Loading...</span>
   <span>Total Strength:</span>
   <span id="nr-count-badge">0</span>
+  <span id="nr-company-note" style="margin-left: 15px; font-weight: 600; color: var(--primary-color); display: none;"></span>
   <span id="nr-filter-note"></span>
 </div>
 
@@ -317,6 +335,88 @@
   let sortCol    = null;
   let sortDir    = 'asc';
   let currentPage = 1;
+  let viewMode    = 'nominal'; // 'nominal' or 'leave_history'
+
+  const leaveHistoryBtn = document.getElementById('nr-leave-history-btn');
+  const backToRollBtn    = document.getElementById('nr-back-to-roll');
+  const topbarTitle      = document.getElementById('nr-topbar-title');
+  const statusLabel      = document.querySelector('#nr-status-bar span:nth-child(2)');
+  const rankFilterDiv    = document.querySelector('.nr-fg:has(#nr-sel-rank)');
+  const tradeFilterDiv   = document.querySelector('.nr-fg:has(#nr-sel-trade)');
+  const batchFilterDiv   = document.getElementById('nr-batch-container');
+
+  window.toggleViewMode = function(mode) {
+    viewMode = mode;
+    if (mode === 'leave_history') {
+      leaveHistoryBtn.style.display = 'none';
+      backToRollBtn.style.display = 'flex';
+      topbarTitle.textContent = 'Leave History Search';
+      statusLabel.textContent = 'Total Records:';
+      
+      // Hide filters that don't apply to leave history as much
+      if (rankFilterDiv) rankFilterDiv.style.display = 'none';
+      if (tradeFilterDiv) tradeFilterDiv.style.display = 'none';
+      if (batchFilterDiv) batchFilterDiv.style.display = 'none';
+
+      // Update table headers
+      document.querySelector('#nr-table thead tr').innerHTML = `
+        <th class="th-sno">S.No</th>
+        <th>Army Number</th>
+        <th>Rank</th>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Section</th>
+        <th>Leave Type</th>
+        <th>Duration</th>
+        <th>From</th>
+        <th>To</th>
+        <th>Status</th>
+      `;
+    } else {
+      leaveHistoryBtn.style.display = 'flex';
+      backToRollBtn.style.display = 'none';
+      topbarTitle.textContent = 'Nominal Roll';
+      statusLabel.textContent = 'Total Strength:';
+
+      if (rankFilterDiv) rankFilterDiv.style.display = 'flex';
+      if (tradeFilterDiv) tradeFilterDiv.style.display = 'flex';
+      if (selRank.value === 'Agniveer' && batchFilterDiv) batchFilterDiv.style.display = 'block';
+
+      // Restore Nominal Roll headers
+      document.querySelector('#nr-table thead tr').innerHTML = `
+        <th class="th-sno">S.No</th>
+        <th>Army Number</th>
+        <th class="sortable" data-col="rank">Rank <span class="sort-icon">⇅</span></th>
+        <th class="sortable" data-col="name">Name <span class="sort-icon">⇅</span></th>
+        <th>Trade</th>
+        <th>Company</th>
+        <th>Section</th>
+        <th>Status</th>
+      `;
+      
+      // re-attach sort listeners because we overwrote the HTML
+      attachSortListeners();
+    }
+    loadPersonnel();
+  };
+
+  function attachSortListeners() {
+    document.querySelectorAll('#nr-table thead th.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+          sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortCol = col;
+          sortDir = 'asc';
+        }
+        clearSortIcons();
+        th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+        th.querySelector('.sort-icon').textContent = sortDir === 'asc' ? '↑' : '↓';
+        applySort();
+      });
+    });
+  }
 
   /* ── filters ── */
   async function loadFilters() {
@@ -324,6 +424,19 @@
       const res  = await fetch('/Nominal_Roll/api/filters');
       const json = await res.json();
       if (json.status !== 'success') return;
+      
+      // If only one company, hide the selector as per user request
+      if (json.companies.length <= 1 && json.companies.length > 0) {
+        const coyDiv = document.querySelector('.nr-fg:has(#nr-sel-company)');
+        if (coyDiv) coyDiv.style.display = 'none';
+        
+        const coyNote = document.getElementById('nr-company-note');
+        if (coyNote) {
+            coyNote.textContent = `| Showing data for ${json.companies[0]}`;
+            coyNote.style.display = 'inline';
+        }
+      }
+      
       json.companies.forEach(c => selCompany.appendChild(new Option(c, c)));
       json.trades.forEach(t    => selTrade.appendChild(new Option(t, t)));
       json.sections.forEach(s  => selSection.appendChild(new Option(s, s)));
@@ -334,8 +447,11 @@
 
   /* ── fetch ── */
   async function loadPersonnel() {
-    // If search has content, we might want to prioritize it, but the user asked for search NEXT to filters.
-    // Let's make it so if search is active, it uses the search API, otherwise filters.
+    if (viewMode === 'leave_history') {
+        loadLeaveHistory();
+        return;
+    }
+
     if (searchInput.value.trim().length > 0) {
       performSearch();
       return;
@@ -424,23 +540,56 @@
     const frag = document.createDocumentFragment();
     slice.forEach((row, i) => {
       const tr = document.createElement('tr');
-      tr.addEventListener('click', () => showPersonnelDetails(row.army_number));
-      tr.innerHTML = `
-        <td class="td-sno">${start + i + 1}</td>
-        <td class="td-army">${esc(row.army_number)}</td>
-        <td class="td-rank">${esc(row.rank)}</td>
-        <td>${esc(row.name)}</td>
-        <td>${esc(row.trade)}</td>
-        <td class="td-company">${esc(row.company)}</td>
-        <td>${esc(row.section)}</td>
-        <td>
-          ${row.onleave_status ? '<span style="background:var(--danger-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON LEAVE</span>' : ''}
-          ${row.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON DET</span>' : ''}
-          ${row.oncourse_status ? '<span style="background:var(--nav-link-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON COURSE</span>' : ''}
-          ${row.td_status ? '<span style="background:var(--text-secondary); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON TD</span>' : ''}
-          ${!row.onleave_status && !row.detachment_status && !row.oncourse_status &&!row.td_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
-        </td>
-      `;
+      if (viewMode === 'nominal') {
+        tr.addEventListener('click', () => showPersonnelDetails(row.army_number));
+        tr.innerHTML = `
+          <td class="td-sno">${start + i + 1}</td>
+          <td class="td-army">${esc(row.army_number)}</td>
+          <td class="td-rank">${esc(row.rank)}</td>
+          <td>${esc(row.name)}</td>
+          <td>${esc(row.trade)}</td>
+          <td class="td-company">${esc(row.company)}</td>
+          <td>${esc(row.section)}</td>
+          <td>
+            ${row.onleave_status ? '<span style="background:var(--danger-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON LEAVE</span>' : ''}
+            ${row.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON DET</span>' : ''}
+            ${row.oncourse_status ? '<span style="background:var(--nav-link-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON COURSE</span>' : ''}
+            ${row.td_status ? '<span style="background:var(--text-secondary); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON TD</span>' : ''}
+            ${!row.onleave_status && !row.detachment_status && !row.oncourse_status &&!row.td_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
+          </td>
+        `;
+      } else {
+        const lt = (row.leave_type || '').toUpperCase();
+        let bg = '#555';
+        let displayText = row.leave_type;
+
+        if (lt === 'ANNUAL LEAVE') {
+            displayText = 'Agni AL';
+            bg = '#3b82f6'; // Blue
+        } else if (lt.includes('AL') && !lt.includes('AAL')) {
+            bg = '#3b82f6'; // Blue
+        } else if (lt.includes('CL')) {
+            bg = '#f59e0b'; // Amber/Orange
+        } else if (lt.includes('AAL')) {
+            bg = '#10b981'; // Green
+        } else if (lt.includes('PL')) {
+            bg = '#8b5cf6'; // Purple
+        }
+        
+        tr.innerHTML = `
+          <td class="td-sno">${start + i + 1}</td>
+          <td class="td-army">${esc(row.army_number)}</td>
+          <td class="td-rank">${esc(row.rank)}</td>
+          <td>${esc(row.name)}</td>
+          <td class="td-company">${esc(row.company)}</td>
+          <td>${esc(row.section)}</td>
+          <td><span class="leave-type-badge" style="background:${bg}; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700;">${esc(displayText)}</span></td>
+          <td><strong>${row.leave_days} days</strong></td>
+          <td>${esc(row.from_date)}</td>
+          <td>${esc(row.to_date)}</td>
+          <td><span style="font-size:10px; font-weight:700; color:${row.request_status === 'Approved' ? 'var(--success-color)' : 'inherit'}">${esc(row.request_status)}</span></td>
+        `;
+      }
       frag.appendChild(tr);
     });
     tbody.appendChild(frag);
@@ -632,7 +781,11 @@
         filterNote.style.color = '';
         loadPersonnel();
       } else {
-        performSearch();
+        if (viewMode === 'leave_history') {
+          loadLeaveHistory();
+        } else {
+          performSearch();
+        }
       }
     }, 400);
   });
@@ -640,6 +793,11 @@
   async function performSearch() {
     const q = searchInput.value.trim();
     if (!q) return;
+
+    if (viewMode === 'leave_history') {
+      loadLeaveHistory();
+      return;
+    }
 
     loader.classList.add('active');
     tbody.innerHTML = '';
@@ -666,6 +824,44 @@
     } finally {
       loader.classList.remove('active');
     }
+  }
+
+  async function loadLeaveHistory() {
+    loader.classList.add('active');
+    tbody.innerHTML = '';
+    emptyState.style.display = 'none';
+    pageInfo.textContent = '';
+    pageCtrl.innerHTML = '';
+
+    const params = new URLSearchParams({
+      company: selCompany.value,
+      section: selSection.value,
+      q:       searchInput.value.trim()
+    });
+
+    try {
+      const res  = await fetch('/Nominal_Roll/api/leave_history?' + params);
+      const json = await res.json();
+      if (json.status !== 'success') { console.error(json.message); return; }
+
+      allData    = json.data;
+      sortCol    = null;
+      sortDir    = 'asc';
+      currentPage = 1;
+      clearSortIcons();
+
+      countBadge.textContent = allData.length;
+
+      const active = [];
+      if (selCompany.value !== 'ALL') active.push('Coy: ' + selCompany.value);
+      if (selSection.value !== 'ALL') active.push('Sec: ' + selSection.value);
+      if (searchInput.value.trim()) active.push('Search: ' + searchInput.value.trim());
+      filterNote.textContent = active.length ? '| ' + active.join(' | ') : '';
+
+      applySort();
+
+    } catch (e) { console.error('Leave History load error:', e); }
+    finally { loader.classList.remove('active'); }
   }
 
   /* ── details modal ── */

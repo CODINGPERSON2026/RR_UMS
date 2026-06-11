@@ -15,7 +15,6 @@ def get_all_dets():
         dets = cursor.fetchall()
         return jsonify({"status": "success", "data": dets})
     except Exception as e:
-        print("Error fetching detachments:", e)
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()
@@ -30,10 +29,8 @@ def get_all_dets():
 def get_detachment_details():
     det_id = request.args.get("det_id")  # optional
     min_days = request.args.get("min_days", 0, type=int) # optional filter
-    print(det_id,"this is det id")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    print("in this route")
 
     # Get logged in user
     user = require_login()
@@ -68,7 +65,6 @@ def get_detachment_details():
         # ---------- COMPANY FILTER (Admin bypass) ----------
         
         if user['company'] != "Admin" and user['company'] !='Center':
-            print("check in this route for detachmetn")
             query += " AND p.company = %s"
             params.append(user['company'])
 
@@ -78,7 +74,6 @@ def get_detachment_details():
         return jsonify({"status": "success", "data": data})
 
     except Exception as e:
-        print("Error fetching detachment details:", e)
         return jsonify({"status": "error", "message": str(e)}), 500
 
     finally:
@@ -124,7 +119,6 @@ def delete_personnel():
         return jsonify({"status": "success", "message": f"{army_number} removed from detachment"})
 
     except Exception as e:
-        print(e)
         conn.rollback()  # rollback on error
         return jsonify({"status": "error", "message": "Database error"}), 500
 
@@ -143,7 +137,6 @@ def attachment_details():
 
     # role = user.get("role")
     company = user.get("company")
-    print(company)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -183,7 +176,6 @@ def attachment_details():
             """, (company,))
 
         rows = cursor.fetchall()
-        print('this is row for attachemnt details')
         # ✅ FORCE JSON SAFE DATE
         for r in rows:
             td = r.get("td_date")
@@ -192,7 +184,6 @@ def attachment_details():
         return jsonify(rows), 200
 
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
 
     finally:
@@ -213,7 +204,6 @@ def assigned_attachment_alarm():
         return jsonify({"error": "Unauthorized"}), 401
     if user['role'] != 'CO':
         return jsonify({"error":'Forbidded'}),403
-    print('IN THIS ROUTE')
 
     # company = user["company"]
 
@@ -238,7 +228,6 @@ def assigned_attachment_alarm():
         })
 
     except Exception as e:
-        print("Attachment alarm error:", e)
         return jsonify({"error": "Server error"}), 500
 
     finally:

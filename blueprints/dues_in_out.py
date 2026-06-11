@@ -34,7 +34,6 @@ def add_dues_in():
         return jsonify({"success": True})
 
     except Exception as e:
-        print(e)
         return jsonify({"success": False, "message": str(e)})
     
 
@@ -78,7 +77,6 @@ def add_dues_out():
         return jsonify({"success": True, "message": "Dues Out Added Successfully"})
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"success": False, "message": str(e)}), 500
     
 
@@ -106,7 +104,6 @@ def get_dues_in_count():
         })
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"success": False, "message": str(e)}), 500
     
 
@@ -114,7 +111,6 @@ def get_dues_in_count():
 
 @dues_bp.route('/dues_out_count', methods=['GET'])
 def get_dues_out_count():
-    print("in dues out")
     try:
         
 
@@ -299,7 +295,6 @@ def get_count_dues_in():
         }), 200
 
     except Exception as e:
-        print("Error fetching dues_in count:", str(e))
 
         return jsonify({
             "status": "error",
@@ -336,7 +331,6 @@ def get_count_dues_out():
         }), 200
 
     except Exception as e:
-        print("Error fetching dues_in count:", str(e))
 
         return jsonify({
             "status": "error",

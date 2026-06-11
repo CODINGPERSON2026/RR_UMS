@@ -3,6 +3,7 @@ Chatbot routes - Flask blueprint and chat API.
 Uses db_config.get_db_connection() for all database access.
 Read-only queries only; parameterized to prevent SQL injection.
 Supports any question: pattern-matched SQL first, then:
+    pass
 - LLM with schema + optional text-to-SQL (if configured), OR
 - Generic auto-answer that inspects the live schema and returns best-effort data.
 """
@@ -98,12 +99,15 @@ def _llm_fallback(user_question, schema_text, db_stats, history=None):
         system = """You are an HRMS assistant for a military unit. You answer ANY question about the project using the LIVE database.
 
 Database schema (use only these tables and columns):
+    pass
 """ + (schema_text or "Not available") + """
 
 Table row counts:
+    pass
 """ + (db_stats or "N/A") + """
 
 Rules:
+    pass
 1. Answer from this schema and stats. For counts, aggregations, or lookups, you MAY output a line starting with exactly "SQL:" followed by one MySQL SELECT statement (one line). Use backticks for reserved words like `rank`. We will run it and show results.
 2. After SQL: (if you use it), add a brief explanation in markdown.
 3. If the question needs live data and you can write a SELECT, do so. Otherwise answer from schema/stats or suggest how to rephrase.

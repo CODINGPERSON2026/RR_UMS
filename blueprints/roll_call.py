@@ -51,7 +51,6 @@ def submit_roll_call():
         return jsonify({"success": True})
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"success": False, "message": "Server error"}), 500
 
 
@@ -93,7 +92,6 @@ def get_pending_roll_call_points():
         '''
 
         params = [status]
-        print('compnay',company)
 
         # if company != "Admin" or company == 'Center':
         #     print('filtered')
@@ -104,13 +102,10 @@ def get_pending_roll_call_points():
 
         cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
-        print("gggggggggggggggggggggggggggggggggggggggggggggggg")
-        print(rows)
 
         return jsonify({"status": "success", "data": rows}), 200
 
     except Exception as e:
-        print("Roll call fetch error:", e)
         return jsonify({"status": "error"}), 500
 
     finally:
@@ -193,7 +188,6 @@ def update_roll_call_status():
         })
 
     except Exception as e:
-        print("Update Roll Call Status Error:", e)
         return jsonify({
             "status": "error",
             "message": "Server error"
@@ -237,7 +231,6 @@ def get_approved_roll_calls():
         })
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"success": False}), 500
 
     finally:
@@ -287,7 +280,6 @@ def check_army(army_no):
         return jsonify({"success": False})
 
     except Exception as e:
-        print("ERROR:", str(e))
         return jsonify({
             "success": False,
             "message": "Server error"

@@ -37,7 +37,6 @@ def get_leave_details():
             LIMIT 1
         """, (army_no,))
         leaveinfo = cursor.fetchone()
-        print(leaveinfo)
 
         if not leaveinfo:
             # If no record in leave_details, we can still show standard entitlements
@@ -145,69 +144,108 @@ def search_personnel():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # 🔍 Check if any leave exists for this army number
+        # Get all leave records for this person
         cursor.execute("""
-            SELECT army_number, request_status, leave_type, from_date, to_date
-            FROM leave_status_info
-            WHERE army_number = %s
-            ORDER BY from_date DESC
-            LIMIT 1
+            SELECT
+                lsi.id,
+                lsi.army_number,
+                p.name,
+                p.rank,
+                lsi.request_status,
+                lsi.leave_type,
+                lsi.from_date,
+                lsi.to_date
+            FROM leave_status_info lsi
+            JOIN personnel p
+                ON TRIM(lsi.army_number) = TRIM(p.army_number)
+            WHERE lsi.army_number = %s
+            ORDER BY lsi.from_date DESC
         """, (query,))
-        
-        existing = cursor.fetchone()
+
+        all_leaves = cursor.fetchall()
+
+        # Latest leave (keeps your current logic)
+        existing = all_leaves[0] if all_leaves else None
 
         if existing:
             status = (existing.get("request_status") or "").strip().lower()
 
-            # ✅ CASE 1: CLOSED → treat as NO ACTIVE LEAVE
+            # CASE 1: CLOSED → treat as NO ACTIVE LEAVE
             if status in ["closed", "leave closed"]:
                 cursor.execute("""
-                    SELECT name, army_number, `rank`, trade, company, section
+                    SELECT
+                        name,
+                        army_number,
+                        `rank`,
+                        trade,
+                        company,
+                        section
                     FROM personnel
                     WHERE army_number LIKE %s
                     LIMIT 1
                 """, (f"%{query}%",))
-                
+
                 results = cursor.fetchall()
                 return jsonify(results)
 
-            # ✅ CASE 2: ACTIVE LEAVE → normalize status
+            # CASE 2: ACTIVE LEAVE → normalize status
             if status.startswith("pending"):
                 existing["request_status"] = "Pending"
             elif status.startswith("approved"):
                 existing["request_status"] = "Approved"
             elif status.startswith("rejected"):
                 existing["request_status"] = "Rejected"
-            else:
-                # fallback (kept as original if unknown)
-                existing["request_status"] = existing.get("request_status")
+
+            # NEW: Collect all approved leaves
+            approved_leaves = []
+
+            for row in all_leaves:
+                row_status = (row.get("request_status") or "").strip().lower()
+
+                if row_status.startswith("approved"):
+                    approved_leaves.append({
+                        "id": row["id"],
+                        "army_number": row["army_number"],
+                        "name": row["name"],
+                        "rank": row["rank"],
+                        "leave_type": row["leave_type"],
+                        "from_date": row["from_date"].strftime("%Y-%m-%d") if row["from_date"] else None,
+                        "to_date": row["to_date"].strftime("%Y-%m-%d") if row["to_date"] else None
+                    })
+
 
             return jsonify({
                 "exists": True,
-                "existing_leave": existing
+                "existing_leave": existing,
+                "approved_leaves": approved_leaves
             })
 
-        # ✅ CASE 3: NO LEAVE FOUND → return personnel
+        # CASE 3: NO LEAVE FOUND → return personnel
         cursor.execute("""
-            SELECT name, army_number, `rank`, trade, company, section
+            SELECT
+                name,
+                army_number,
+                `rank`,
+                trade,
+                company,
+                section
             FROM personnel
             WHERE army_number LIKE %s
             LIMIT 1
         """, (f"%{query}%",))
-        
+
         results = cursor.fetchall()
         return jsonify(results)
 
     except Exception as e:
-        print("Error in search_personnel:", str(e))
         return jsonify({"error": str(e)}), 500
 
     finally:
         if cursor:
             cursor.close()
+
         if conn:
             conn.close()
-
 
 
 
@@ -218,7 +256,6 @@ from datetime import datetime
 @leave_bp.route("/submit_leave", methods=["POST"])
 def submit_leave_request():
     data = request.get_json()
-    print("Received data:", data)
     
 
     army_number = data.get("person_id")
@@ -399,7 +436,6 @@ def submit_leave_request():
     except Exception as e:
         if 'conn' in locals():
             conn.rollback()
-        print("Error:", str(e))
         return jsonify({"status": "error", "message": "Failed to submit leave", "error": str(e)}), 500
     finally:
         if 'cursor' in locals(): cursor.close()
@@ -479,7 +515,6 @@ def update_leave_status():
 
 @leave_bp.route("/get_leave_requests", methods=["GET"])
 def get_leave_requests():
-    print('in this route')
     
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -488,10 +523,8 @@ def get_leave_requests():
     current_user_role = user['role']
     current_user_company = user['company']
 
-    print("Current Role:", current_user_role)
 
     request_status = f'Pending at {current_user_role}'
-    print("Request Status:", request_status)
 
     try:
         # =========================
@@ -526,7 +559,6 @@ def get_leave_requests():
                 current_user_company
             ))
         elif current_user_role == 'Subedar Major':
-            print("in this route of Subedar Major CHECKED")
             query = '''
                 SELECT 
                     l.id,
@@ -588,7 +620,6 @@ def get_leave_requests():
 
         rows = cursor.fetchall()
 
-        print("Fetched Rows:", rows)
 
         return jsonify({
             "status": "success",
@@ -596,7 +627,6 @@ def get_leave_requests():
         })
 
     except Exception as e:
-        print("Error fetching leave requests:", e)
         return jsonify({
             "status": "error",
             "message": str(e)
@@ -749,7 +779,6 @@ def get_leave_request(leave_id):
         elif user['role'] == 'CO':
             leave['leave_request_type'] = 'OFFICER'
 
-        print("THIS IS LEAVE RETURNED", leave)
 
         return jsonify({
             "success": True,
@@ -757,7 +786,6 @@ def get_leave_request(leave_id):
         })
 
     except Exception as e:
-        print("Error in get_leave_request:", str(e))
         return jsonify({
             "success": False,
             "message": "Server error",
@@ -785,11 +813,8 @@ def recommend_leave():
 
     try:
         conn.start_transaction()
-        print('here')
         cursor.execute("""select army_number from leave_status_info where id = %s""",(leave_id,))
-        print('here2')
         returned_result = cursor.fetchone()
-        print(returned_result,"we are here")
         if returned_result:
             army_number_fetched = returned_result['army_number']
             cursor.execute('select `rank`,trade,section from personnel where army_number = %s',(army_number_fetched,))
@@ -797,7 +822,6 @@ def recommend_leave():
             soldier_trade = result_fetched_for_trade['trade']
             soldier_section = result_fetched_for_trade['section']
             soldier_rank = result_fetched_for_trade['rank']
-        print(soldier_trade,"this is soldiers trade")
         
 
         send_request_to = ''
@@ -820,7 +844,6 @@ def recommend_leave():
             if soldier_trade in ['COBBLER','W/MAN','STWD','CC','DSR','H/K','C/Com','CHEF COM','MESS KEEPER','CHEF MESS','W/M','DSR','STWD','MK','WM','HKEEPER','ARTSN(ww)',] or soldier_section == 'RP/NA':
                 send_request_to = 'Subedar Major'
                 request_status = f"Pending at {send_request_to}"
-                print("this is working")
             else:
                 send_request_to = 'OC'
                 request_status = f"Pending at {send_request_to}"
@@ -828,8 +851,6 @@ def recommend_leave():
         elif current_user_role == 'Subedar Major':
             send_request_to = 'OC'
             request_status = 'Pending at OC'
-        print(send_request_to)
-        print(request_status)
         # ================= FINAL APPROVAL LOGIC =================
         if current_user_role == 'OC':
             cursor.execute("""
@@ -862,7 +883,6 @@ def recommend_leave():
             WHERE id = %s
         """, (leave_id,))
         leave = cursor.fetchone()
-
         if not leave:
             conn.rollback()
             return jsonify({"message": "Leave request not found"}), 404
@@ -938,7 +958,6 @@ def recommend_leave():
                 WHERE army_number = %s AND year = %s
                 FOR UPDATE
             """, (army_number, year))
-
             existing = cursor.fetchone()
 
             if existing:
@@ -948,9 +967,10 @@ def recommend_leave():
                 new_pl = (existing['PL'] or 0) + pl
                 new_Annual_leave = (existing['Annual Leave'] or 0) + Annual_Leave
 
+                    
                 cursor.execute("""
                     UPDATE leave_details
-                    SET AL = %s, CL = %s, AAL = %s, PL = %s,`Annual Leave` = %s
+                    SET AL = %s, CL = %s, AAL = %s, PL = %s,`Annual Leave` = %s,
                         remarks = CONCAT(IFNULL(remarks, ''), %s)
                     WHERE army_number = %s AND year = %s
                 """, (
@@ -958,6 +978,7 @@ def recommend_leave():
                     f"; {remarks_text}" if remarks_text else "",
                     army_number, year
                 ))
+
             else:
                 cursor.execute("""
                     INSERT INTO leave_details
@@ -995,14 +1016,12 @@ def recommend_leave():
                 updated_at = NOW()
             WHERE id = %s
         """, (send_request_to, request_status, leave_id))
-
         conn.commit()
 
         return jsonify({"message": "Leave recommended successfully"}), 200
 
     except Exception as e:
         conn.rollback()
-        print("ERROR in recommend_leave:", e)
         return jsonify({"message": "Server error"}), 500
 
     finally:
@@ -1014,7 +1033,6 @@ def recommend_leave():
 
 @leave_bp.route("/get_recommended_requests")
 def get_recommended_requests():
-    print("in this recommended route")
 
     user = require_login()
     recommended_by = user['role']
@@ -1053,7 +1071,6 @@ def get_recommended_requests():
         cursor.execute(query, (recommended_by, user_company))
 
     data = cursor.fetchall()
-    print(data,"this is data")
 
     
     cursor.close()
@@ -1066,7 +1083,6 @@ def get_recommended_requests():
 def get_leave_history(id):
     user = require_login()
     recommended_by = user['role']
-    print(recommended_by)
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -1096,7 +1112,6 @@ def get_leave_history(id):
         """, (id, recommended_by))
 
         data = cursor.fetchone()
-        print(data, "from history")
 
         if not data:
             return jsonify({"message": "Record not found"}), 404
@@ -1190,7 +1205,6 @@ def get_leave_history(id):
         })
 
     except Exception as e:
-        print("Error in get_leave_history:", str(e))
         return jsonify({
             "message": "Server error",
             "error": str(e)
@@ -1315,7 +1329,6 @@ def reject_leave():
 
     except Exception as e:
         conn.rollback()
-        print("REJECT ERROR:", e)
         return jsonify({
             "message": "Internal server error"
         }), 500
@@ -1334,20 +1347,16 @@ def get_rejected_requests():
     company = user['company']
     role = user['role']
     army_number = user['army_number']
-    print(army_number,"this is users army number")
     cursor.execute('''
 select section from personnel where army_number = %s
 ''',(army_number,))
     result = cursor.fetchone()
-    print("result",result)
     if result:
         section_result = result['section']
-        print(section_result,"this is USERS SECTION")
     elif role not in ['2IC','OC','CO','Subedar Major'] and result == None:
         return jsonify({
             "error": 'User not found in personnel table'
         }), 400
-    print(role)
     query = """
     SELECT
         l.id,
@@ -1371,7 +1380,6 @@ select section from personnel where army_number = %s
         # 2IC → can see all companies
         if role in ['OC','2IC','CO','Subedar Major']:
             query += " ORDER BY l.updated_at DESC"
-            print("in this query")
             cursor.execute(query, (status_pattern,))
 
         # Other roles → restricted to their own company
@@ -1380,13 +1388,11 @@ select section from personnel where army_number = %s
             cursor.execute(query, (status_pattern, company,section_result))
         
         data = cursor.fetchall()
-        print('data',data)
         return jsonify({
             "data": data
         }), 200
 
     except Exception as e:
-        print("FETCH REJECTED ERROR:", e)
         return jsonify({
             "data": []
         }), 500
@@ -1404,7 +1410,6 @@ select section from personnel where army_number = %s
 def undo_reject_leave():
     data = request.get_json()
     leave_id = data.get("leave_id")
-    print("this is leave id",leave_id)
     if not leave_id:
         return jsonify({"message": "Leave ID missing"}), 400
 
@@ -1449,7 +1454,6 @@ def undo_reject_leave():
 
     except Exception as e:
         conn.rollback()
-        print("UNDO ERROR:", e)
         return jsonify({"message": "Server error"}), 500
 
     finally:
@@ -1464,7 +1468,6 @@ def undo_reject_leave():
 
 @leave_bp.route("/rejected_leaves", methods=["GET"])
 def co_rejected_leaves():
-    print("in this routed route")
     user = require_login()  # get current logged-in user
     if user['role'] != 'CO':
         return jsonify({"message": "Unauthorized"}), 403
@@ -1491,11 +1494,9 @@ def co_rejected_leaves():
             ORDER BY lsi.updated_at DESC
         """)
         leaves = cursor.fetchall()
-        print(leaves)
         return jsonify({"data": leaves}), 200
 
     except Exception as e:
-        print("Error fetching CO rejected leaves:", e)
         return jsonify({"message": "Server error"}), 500
 
     finally:
@@ -1862,13 +1863,12 @@ def co_rejected_leaves():
 #         if 'conn' in locals() and conn:
 #             conn.close()
 
-@leave_bp.route("/download_certificate/<army_number>")
-def download_leave_certificate(army_number):
+@leave_bp.route("/download_certificate/<leave_id>")
+def download_leave_certificate(leave_id):
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        print("in this download route")
 
         cursor.execute("""
             SELECT
@@ -1925,13 +1925,14 @@ def download_leave_certificate(army_number):
             LEFT JOIN mobile_phones m ON m.army_number = l.army_number
             LEFT JOIN leave_transport lt ON lt.leave_request_id = l.id
             LEFT JOIN leave_address la ON la.leave_request_id = l.id
-            WHERE l.army_number = %s
-              AND l.request_status = 'Approved'
+            WHERE l.id = %s
+              AND l.request_sent_to = 'Approved'
             ORDER BY l.created_at DESC
             LIMIT 1
-        """, (army_number,))
+        """, (leave_id,))
         
         data = cursor.fetchone()
+        army_number = data['army_number']
         if not data:
             return "No approved leave certificate found for this user.", 404
 
@@ -1953,7 +1954,6 @@ def download_leave_certificate(army_number):
             result = cursor.fetchone()
             total_al = result['AL'] if result and result['AL'] is not None else 0
 
-            print(f"AL used this year: {total_al}")
 
             remaining_al = 60 - total_al
 
@@ -2022,7 +2022,6 @@ def download_leave_certificate(army_number):
         if data.get('same_as_permanent') == 1 or data.get('same_as_permanent') ==True:
             # Build address from personnel table
             address_parts = []
-            print("fixed in the database")
             if data.get('home_house_no'):
                 address_parts.append(data['home_house_no'])
             if data.get('home_village'):
@@ -2057,7 +2056,6 @@ def download_leave_certificate(army_number):
             }
         else:
             # Use the address provided during leave application
-            print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
             address_parts = []
             if data.get('address_line1'):
                 address_parts.append(data['address_line1'])
@@ -2171,8 +2169,6 @@ def download_leave_certificate(army_number):
             "request_status": data['request_status']
         }
         
-        print(f"Certificate generated for {army_number} with ID: {data['leave_id']}")
-        print(leave_info)
 
         # ====================== FIX LOGO PATHS FOR PDF (pisa/xhtml2pdf) ======================
         import os
@@ -2204,7 +2200,6 @@ def download_leave_certificate(army_number):
                 white_bg.paste(img, mask=mask)
                 white_bg.save(chinar_rounded_path, "JPEG")
             except Exception as e:
-                print("Could not round logo:", e)
                 chinar_rounded_path = chinar_logo_path
         elif not os.path.exists(chinar_logo_path):
             chinar_rounded_path = chinar_logo_path
@@ -2234,7 +2229,6 @@ def download_leave_certificate(army_number):
         )
         
     except Exception as e:
-        print(f"Error generating certificate: {e}")
         import traceback
         traceback.print_exc()
         return str(e), 500
@@ -2272,7 +2266,6 @@ def get_leave(leave_id):
         return jsonify({"data": leave}), 200
 
     except Exception as e:
-        print("Error fetching leave details:", e)
         return jsonify({"message": "Server error"}), 500
 
     finally:
@@ -2352,7 +2345,6 @@ def get_leave_type_stats():
         return jsonify(stats)
 
     except Exception as e:
-        print("Error in leave-type-stats:", e)
         return jsonify({"error": "Failed to fetch stats"}), 500
 
     finally:
@@ -2404,7 +2396,6 @@ ORDER BY lsi.to_date ASC;
         return jsonify(result)
 
     except Exception as e:
-        print("Error in expiring-soon:", e)
         return jsonify({"error": "Failed to fetch expiring leaves"}), 500
 
     finally:
@@ -2466,7 +2457,6 @@ def get_leaves():
         })
 
     except Exception as e:
-        print("ERROR:", e)
         return jsonify({"error": "Something went wrong"}), 500
 
 
@@ -2504,7 +2494,6 @@ def get_releiver_details():
         return jsonify(results)
         
     except Exception as e:
-        print("Error fetching reliever details:", e)
         return jsonify([]), 500
 
 
@@ -2513,7 +2502,6 @@ def get_releiver_details():
 def get_leave_balance():
     army_number = request.args.get('army_number')
     leave_type = request.args.get('leave_type')   # AL, CL, AAL, PL
-    print(leave_type)
     year = request.args.get('year')
 
     if not army_number or not leave_type:
@@ -2572,7 +2560,6 @@ def get_leave_balance():
             })
 
     except Exception as e:
-        print(f"Error in get_leave_balance: {e}")
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
     
     finally:

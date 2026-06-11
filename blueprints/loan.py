@@ -3,7 +3,6 @@ loan_bp = Blueprint('loan_bp', __name__, url_prefix='/loan_details')
 
 @loan_bp.route("/summary")
 def loan_summary():
-    print("in this route")
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -68,7 +67,6 @@ def loans_by_range(range_key):
         cursor.execute(query, (low,))
 
     rows = cursor.fetchall()
-    print(rows)  # Debug: check if rank is included
     cursor.close()
     conn.close()
 

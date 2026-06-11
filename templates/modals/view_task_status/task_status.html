@@ -297,7 +297,6 @@
 
 <script>
    async function  viewModal(taskid){
-        console.log("in this function ", taskid)
 
        
     
@@ -306,7 +305,6 @@
   
     const res = await fetch(`/task_manager/get_task/${taskId}`);
     const task = await res.json();
-    console.log(task,'task detais')
   
     document.getElementById("taskModalTitle").innerText = task.task_name;
     document.getElementById("taskDescription").innerText = task.description;
@@ -320,7 +318,6 @@
     // Format date and time
     const dueDate = task.due_date;
 const dateOnly = new Date(dueDate).toISOString().split('T')[0];
-console.log(dateOnly); // "2025-12-02"
 
  
     document.getElementById("taskDueDate").innerText = dateOnly;

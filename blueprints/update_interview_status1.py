@@ -21,9 +21,7 @@ def get_pending_kunba_interviews():
 
     home_state = result['home_state']
 
-    print(f"JCO Pending Interview Debug: User={user['username']}, Role={user['role']}, Company='{user_company}', Home State='{home_state}'")
 
-    print(f"DEBUG JCO Filter: Start. UserCompany='{user_company}', HomeState='{home_state}'")
 
     # STRICT FILTERING TEST - Case-insensitive and trimmed
     cursor.execute("""
@@ -100,7 +98,6 @@ def completed_interview_list():
         return jsonify(rows)
 
     except Exception as e:
-        print("Completed Interview List Error:", e)
         return jsonify([])
 
     finally:

@@ -76,7 +76,6 @@ def accounts():
             if total_allotment > 0 else 0
         )
 
-        print("DASHBOARD DEBUG:", row['name'], total_allotment, fy)
 
     cursor.close()
     db.close()
@@ -147,7 +146,6 @@ def grant_summary():
             if total_allotment > 0 else 0
         )
 
-        print("SUMMARY DEBUG:", row['name'], total_allotment, fy)
 
     cursor.close()
     conn.close()
@@ -175,7 +173,6 @@ def add_grant():
     grant_id = cursor.lastrowid
     original_amount = float(data['allotment'] or 0)
 
-    print("Creating Grant:", data['name'], fy)
 
     cursor.execute("""
         INSERT INTO grant_allocations
@@ -253,7 +250,6 @@ def grant_detail(grant_id):
         if total_allotment > 0 else 0
     )
 
-    print("DETAIL DEBUG:", grant["name"], total_allotment, fy)
 
     cursor.close()
     conn.close()
@@ -296,7 +292,6 @@ def add_allocation(grant_id):
     cursor.close()
     conn.close()
 
-    print("Added Additional Allocation:", amount, fy)
 
     return jsonify({"success": True})
 
@@ -330,7 +325,6 @@ def add_expenditure(grant_id):
 
     current_balance = total_allotment - total_exp
 
-    print("EXP DEBUG - Balance:", current_balance, fy)
 
     if amount > current_balance:
         cursor.close()
