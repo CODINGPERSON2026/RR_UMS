@@ -2,7 +2,7 @@
 
 LEAVE_ROLES = {
     'NCO PWR','NCO CHQ','NCO IT','NCO OP','NCO MW','NCO MCCS',
-    'NCO LINE','NCO RHQ','NCO TM','NCO MT','NCO RP/NA','NCO QM',
+    'NCO LINE','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM',
     'SEC JCO','JCO LINE','JCO CHQ','JCO IT','S/JCO','ONCO','OC',
     'JCO TM','JCO MW','Subedar Major'
 }

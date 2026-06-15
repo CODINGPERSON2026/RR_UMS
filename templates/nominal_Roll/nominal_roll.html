@@ -86,6 +86,8 @@
     background: var(--text-secondary); color: #fff; display: none;
   }
   #nr-back-to-roll:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .mode-tab:hover { background: rgba(255,255,255,0.2) !important; }
+  .mode-tab.active:hover { background: white !important; }
 
   /* ── STATUS BAR ── */
   #nr-status-bar {
@@ -192,12 +194,20 @@
 
 <!-- TOP BAR -->
 <div id="nr-topbar">
-  <a href="javascript:history.back()" id="nr-back-btn">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-    Back
-  </a>
-  <span id="nr-topbar-title">Nominal Roll</span>
-  <span id="nr-topbar-unit">15 CESR &bull; INTERNAL USE</span>
+  <div style="display: flex; align-items: center; gap: 20px;">
+    <a href="javascript:history.back()" id="nr-back-btn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+    <div style="display: flex; gap: 8px; background: rgba(0,0,0,0.15); padding: 3px; border-radius: 8px;">
+        <button id="mode-tab-nominal" class="mode-tab active" onclick="toggleViewMode('nominal')" style="border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.3s; background:white; color:var(--primary-color);">NOMINAL ROLL</button>
+        <button id="mode-tab-history" class="mode-tab" onclick="toggleViewMode('leave_history')" style="border:none; padding:6px 16px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.3s; background:transparent; color:white;">LEAVE HISTORY</button>
+    </div>
+  </div>
+  <div style="text-align: right;">
+    <span id="nr-topbar-title" style="display: block; line-height: 1.2;">Nominal Roll</span>
+    <span id="nr-topbar-unit">15 CESR &bull; INTERNAL USE</span>
+  </div>
 </div>
 
 <!-- FILTER BAR -->
@@ -241,14 +251,6 @@
   <button id="nr-print-btn" class="nr-action-btn" onclick="printAll()">
     <i class="fas fa-print"></i>
     Print
-  </button>
-  <button id="nr-leave-history-btn" class="nr-action-btn" onclick="toggleViewMode('leave_history')">
-    <i class="fas fa-history"></i>
-    Leave History
-  </button>
-  <button id="nr-back-to-roll" class="nr-action-btn" onclick="toggleViewMode('nominal')">
-    <i class="fas fa-list"></i>
-    Nominal Roll
   </button>
 </div>
 
@@ -336,9 +338,6 @@
   let sortDir    = 'asc';
   let currentPage = 1;
   let viewMode    = 'nominal'; // 'nominal' or 'leave_history'
-
-  const leaveHistoryBtn = document.getElementById('nr-leave-history-btn');
-  const backToRollBtn    = document.getElementById('nr-back-to-roll');
   const topbarTitle      = document.getElementById('nr-topbar-title');
   const statusLabel      = document.querySelector('#nr-status-bar span:nth-child(2)');
   const rankFilterDiv    = document.querySelector('.nr-fg:has(#nr-sel-rank)');
@@ -347,9 +346,19 @@
 
   window.toggleViewMode = function(mode) {
     viewMode = mode;
+    const topbar = document.getElementById('nr-topbar');
+    const tabNominal = document.getElementById('mode-tab-nominal');
+    const tabHistory = document.getElementById('mode-tab-history');
+
     if (mode === 'leave_history') {
-      leaveHistoryBtn.style.display = 'none';
-      backToRollBtn.style.display = 'flex';
+      topbar.style.background = '#6366f1'; // Indigo for history
+      tabHistory.classList.add('active');
+      tabHistory.style.background = 'white';
+      tabHistory.style.color = '#6366f1';
+      tabNominal.classList.remove('active');
+      tabNominal.style.background = 'transparent';
+      tabNominal.style.color = 'white';
+
       topbarTitle.textContent = 'Leave History Search';
       statusLabel.textContent = 'Total Records:';
       
@@ -373,8 +382,14 @@
         <th>Status</th>
       `;
     } else {
-      leaveHistoryBtn.style.display = 'flex';
-      backToRollBtn.style.display = 'none';
+      topbar.style.background = 'var(--primary-color)';
+      tabNominal.classList.add('active');
+      tabNominal.style.background = 'white';
+      tabNominal.style.color = 'var(--primary-color)';
+      tabHistory.classList.remove('active');
+      tabHistory.style.background = 'transparent';
+      tabHistory.style.color = 'white';
+
       topbarTitle.textContent = 'Nominal Roll';
       statusLabel.textContent = 'Total Strength:';
 
@@ -669,17 +684,40 @@
   window.exportCSV = function () {
     if (!sortedData.length) return;
 
-    const headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section','Status'];
-    const rows = sortedData.map((row, i) => [
-      i + 1,
-      row.army_number,
-      row.rank,
-      row.name,
-      row.trade,
-      row.company,
-      row.section,
-      row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))
-    ]);
+    let headers, rows, filename;
+    const now = new Date();
+    const ts = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+    if (viewMode === 'nominal') {
+        headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section', 'Status'];
+        rows = sortedData.map((row, i) => [
+            i + 1,
+            row.army_number,
+            row.rank,
+            row.name,
+            row.trade,
+            row.company,
+            row.section,
+            row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course' : (row.td_status ? 'On TD' : 'Present')))
+        ]);
+        filename = '15CESR_NominalRoll_' + ts + '.csv';
+    } else {
+        headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Company', 'Section', 'Leave Type', 'Duration', 'From', 'To', 'Status'];
+        rows = sortedData.map((row, i) => [
+            i + 1,
+            row.army_number,
+            row.rank,
+            row.name,
+            row.company,
+            row.section,
+            row.leave_type,
+            row.leave_days + ' days',
+            row.from_date,
+            row.to_date,
+            row.request_status
+        ]);
+        filename = '15CESR_LeaveHistory_' + ts + '.csv';
+    }
 
     const csvContent = [headers, ...rows]
       .map(r => r.map(v => {
@@ -693,12 +731,8 @@
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    const now  = new Date();
-    const ts   = now.getFullYear() + '-' +
-                 String(now.getMonth()+1).padStart(2,'0') + '-' +
-                 String(now.getDate()).padStart(2,'0');
     a.href     = url;
-    a.download = '15CESR_NominalRoll_' + ts + '.csv';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -708,22 +742,45 @@
   /* ── print all ── */
   window.printAll = function () {
     const printWin = window.open('', '_blank');
-    const rows = sortedData.map((row, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${esc(row.army_number)}</td>
-        <td>${esc(row.rank)}</td>
-        <td>${esc(row.name)}</td>
-        <td>${esc(row.trade)}</td>
-        <td>${esc(row.company)}</td>
-        <td>${esc(row.section)}</td>
-        <td>${row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))}</td>
-      </tr>`).join('');
+    let title = viewMode === 'nominal' ? 'Nominal Roll' : 'Leave History';
+    let headers, rows;
 
-    printWin.document.write(`<!DOCTYPE html><html><head><title>Nominal Roll</title>
+    if (viewMode === 'nominal') {
+        headers = `<th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Trade</th><th>Company</th><th>Section</th><th>Status</th>`;
+        rows = sortedData.map((row, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${esc(row.army_number)}</td>
+            <td>${esc(row.rank)}</td>
+            <td>${esc(row.name)}</td>
+            <td>${esc(row.trade)}</td>
+            <td>${esc(row.company)}</td>
+            <td>${esc(row.section)}</td>
+            <td>${row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))}</td>
+          </tr>`).join('');
+    } else {
+        headers = `<th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Company</th><th>Section</th><th>Leave Type</th><th>Duration</th><th>From</th><th>To</th><th>Status</th>`;
+        rows = sortedData.map((row, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${esc(row.army_number)}</td>
+            <td>${esc(row.rank)}</td>
+            <td>${esc(row.name)}</td>
+            <td>${esc(row.company)}</td>
+            <td>${esc(row.section)}</td>
+            <td>${esc(row.leave_type)}</td>
+            <td>${row.leave_days} days</td>
+            <td>${esc(row.from_date)}</td>
+            <td>${esc(row.to_date)}</td>
+            <td>${esc(row.request_status)}</td>
+          </tr>`).join('');
+    }
+
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; color: #000; }
+      body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; color: #000; padding: 20px; }
+      h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 14px; }
       table { width: 100%; border-collapse: collapse; }
       thead th {
         font-family: Arial, Helvetica, sans-serif;
@@ -731,7 +788,7 @@
         text-transform: uppercase; letter-spacing: 1px;
         padding: 7px 10px; text-align: left;
         border-bottom: 2px solid #000;
-        background: #fff; color: #000;
+        background: #eee; color: #000;
       }
       tbody td {
         font-family: Arial, Helvetica, sans-serif;
@@ -740,15 +797,14 @@
         color: #000; background: #fff;
       }
     </style></head><body>
+    <h2>15 CORPS ENGINEERING SIGNAL REGIMENT - ${title.toUpperCase()}</h2>
     <table>
       <thead>
-        <tr>
-          <th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Trade</th><th>Company</th><th>Section</th><th>Status</th>
-        </tr>
+        <tr>${headers}</tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <script>window.onload=function(){window.print();}<\/script>
+    <script>window.onload=function(){window.print();window.close();}<\/script>
     </body></html>`);
     printWin.document.close();
   };

@@ -775,11 +775,11 @@
       {% endif %}
 
       <!-- HR Section -->
-      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] or role == 'ONCO' or role == 'O CENTRE NCO' %}
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RPNA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] or role == 'ONCO' or role == 'O CENTRE NCO' %}
       <div class="nav-section-label">HR</div>
       {% endif %}
 
-      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RP/NA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
+      {% if role in ['NCO PWR', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO LINE', 'NCO OP', 'NCO PWR', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO LINE', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW', 'ONCO', 'NCO RHQ', 'NCO TM', 'NCO MT', 'NCO RPNA', 'JCO MW', 'CHMHQ', 'CHM1', 'CHM2', 'CHM3', 'NCO QM', 'NCO DET', 'NCO SYS', 'JCO DET', 'JCO SYS'] %}
       <a class="nav-link {% if '/apply_leave' in request.path %}active{% endif %}" href="/apply_leave/">
         <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
         <span class="nav-label-text">Leave Management</span>

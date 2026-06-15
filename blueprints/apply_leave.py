@@ -841,7 +841,7 @@ def recommend_leave():
             request_status = f"Pending at {send_request_to}"
 
         elif current_user_role.startswith("S/JCO"):
-            if soldier_trade in ['COBBLER','W/MAN','STWD','CC','DSR','H/K','C/Com','CHEF COM','MESS KEEPER','CHEF MESS','W/M','DSR','STWD','MK','WM','HKEEPER','ARTSN(ww)',] or soldier_section == 'RP/NA':
+            if soldier_trade in ['COBBLER','W/MAN','STWD','CC','DSR','H/K','C/Com','CHEF COM','MESS KEEPER','CHEF MESS','W/M','DSR','STWD','MK','WM','HKEEPER','ARTSN(ww)',] or soldier_section == 'RPNA':
                 send_request_to = 'Subedar Major'
                 request_status = f"Pending at {send_request_to}"
             else:
