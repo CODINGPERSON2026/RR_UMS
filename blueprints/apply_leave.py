@@ -1092,7 +1092,7 @@ def get_recommended_requests():
 def get_leave_history(id):
     user = require_login()
     recommended_by = user['role']
-
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
@@ -2305,15 +2305,62 @@ def delete_leave(army_number):
 
     return jsonify({"status": "success"})
 
+
+
+# updatecd
 @leave_bp.route('/leave_history/<army_number>')
 def full_leave_history(army_number):
-    conn   = get_db_connection()
-    cursor = conn.cursor(dictionary=True)  # returns dicts, not tuples
-    cursor.execute("SELECT * FROM leave_details WHERE army_number = %s", (army_number,))
-    rows   = cursor.fetchall()             # actually fetches the rows
-    cursor.close()
-    conn.close()
-    return jsonify(rows)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        army_number_clean = army_number.strip()
+
+        # 1. Fetch Personnel Details (Always needed for the header)
+        cursor.execute("SELECT name, `rank` FROM personnel WHERE TRIM(army_number) = %s LIMIT 1", (army_number_clean,))
+        personnel = cursor.fetchone()
+
+        # 2. Fetch Detailed History (With dates and reasons)
+        cursor.execute("""
+            SELECT
+                YEAR(from_date) AS year,
+                leave_type,
+                from_date,
+                to_date,
+                leave_reason,
+                DATEDIFF(to_date, from_date) + 1 AS days_taken
+            FROM leave_status_info
+            WHERE TRIM(army_number) = %s
+              AND request_status = 'Approved'
+            ORDER BY from_date DESC
+        """, (army_number_clean,))
+        detailed_history = cursor.fetchall()
+        
+        # Format dates for JSON
+        for row in detailed_history:
+            if row['from_date']: row['from_date'] = row['from_date'].strftime('%Y-%m-%d')
+            if row['to_date']: row['to_date'] = row['to_date'].strftime('%Y-%m-%d')
+
+        # 3. Fetch Yearly Summary (For previous unit/manual entries)
+        cursor.execute("""
+            SELECT year, AL, CL, AAL, PL, `Annual Leave` as Annual_Leave
+            FROM leave_details
+            WHERE TRIM(army_number) = %s
+        """, (army_number_clean,))
+        yearly_summary = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "personnel": personnel or {"name": "Unknown", "rank": "N/A"},
+            "detailed_history": detailed_history,
+            "yearly_summary": yearly_summary
+        })
+
+    except Exception as e:
+        print(f"Error in full_leave_history: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 
 

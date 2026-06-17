@@ -161,10 +161,52 @@
 
 .lhp-empty {
   text-align: center;
-  padding: 2.5rem 1rem;
+  padding: 3rem 1rem;
   color: #94a3b8;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
 }
+
+/* 2x2 Summary Grid */
+.lhp-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.lhp-summary-item {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.lhp-summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.lhp-summary-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.lhp-summary-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+.lhp-summary-item.type-AL { border-top: 4px solid #3b82f6; }
+.lhp-summary-item.type-CL { border-top: 4px solid #10b981; }
+.lhp-summary-item.type-PL { border-top: 4px solid #f59e0b; }
+.lhp-summary-item.type-OTHER { border-top: 4px solid #64748b; }
 
 /* View History button inside modal footer */
 .vbtn {
@@ -190,15 +232,46 @@
 .vbtn-reject   { background: #dc2626; border-color: #dc2626; color: #fff;    }
 
 .footer-gap { flex: 1; }
+
+/* Table Styling */
+.table thead th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-top: none;
+}
+.table tbody td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+/* Modal Content Refinement */
+.form-control.bg-light {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-weight: 500;
+  color: #334155;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+label.fw-bold {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
 </style>
 
 <!-- Leave Requests Modal -->
 <div class="modal fade" id="leaveRequestsModal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-scrollable modal-fullscreen-sm-down">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Leave Requests</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
+      <div class="modal-header bg-gradient-primary text-white border-bottom-0" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+        <h5 class="modal-title fw-bold">📋 Leave Requests Management</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
@@ -290,8 +363,8 @@
 <div class="modal fade" id="viewLeaveModal" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable leave-modal-wide">
     <div class="modal-content shadow-lg">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">Leave Request Details</h5>
+      <div class="modal-header text-white border-bottom-0" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+        <h5 class="modal-title fw-bold">📄 Leave Request Detail View</h5>
         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
@@ -427,7 +500,10 @@
       <button class="lhp-close" onclick="closeLeaveHistoryPopup()">✕</button>
     </div>
     <div class="lhp-body" id="leaveHistoryPopupBody">
-      <div class="lhp-empty">Loading…</div>
+      <div class="lhp-empty">
+        <div class="spinner-border text-primary mb-3"></div>
+        <br>Fetching Leave History...
+      </div>
     </div>
   </div>
 </div>
@@ -508,15 +584,39 @@
     const popup = document.getElementById("leaveHistoryPopup");
     const body  = document.getElementById("leaveHistoryPopupBody");
 
-    body.innerHTML = '<div class="lhp-empty">⏳ Loading history…</div>';
+    body.innerHTML = `
+      <div class="lhp-empty text-primary">
+        <div class="spinner-border text-primary mb-3"></div>
+        <br>⏳ Loading history…
+      </div>
+    `;
     popup.classList.add("show");
 
     try {
-      const res  = await fetch(`/apply_leave/leave_history/${currentViewArmyNumber}`);
+      const armyFixed = currentViewArmyNumber.toString().trim();
+      const res = await fetch(`/apply_leave/leave_history/${armyFixed}`);
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Server returned ${res.status}`);
+      }
+
       const data = await res.json();
-      renderLeaveHistoryPopup(data);
+
+      if (data && data.success) {
+        renderLeaveHistoryPopup(data);
+      } else {
+        throw new Error(data.error || "Invalid response structure from server");
+      }
     } catch (err) {
-      body.innerHTML = '<div class="lhp-empty text-danger">❌ Failed to load history.</div>';
+      console.error("Leave History Error:", err);
+      body.innerHTML = `
+        <div class="lhp-empty text-danger">
+          <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+          <div>❌ Failed to load history.</div>
+          <div style="font-size: 0.85rem; margin-top: 8px; opacity: 0.8;">${err.message}</div>
+        </div>
+      `;
     }
   }
 
@@ -529,70 +629,199 @@
     if (e.target === this) closeLeaveHistoryPopup();
   });
 
-  function renderLeaveHistoryPopup(records) {
-    const body = document.getElementById("leaveHistoryPopupBody");
+  function scrollToLeaveSection(type) {
+    const el = document.getElementById(`section-${type}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Brief highlight effect
+      el.style.boxShadow = "0 0 20px rgba(37, 99, 235, 0.2)";
+      setTimeout(() => el.style.boxShadow = "0 2px 10px rgba(0,0,0,.05)", 800);
+    }
+  }
 
-    if (!records || records.length === 0) {
-      body.innerHTML = '<div class="lhp-empty">📭 No leave history found for this employee.</div>';
-      return;
+  function renderLeaveHistoryPopup(data) {
+    const body = document.getElementById("leaveHistoryPopupBody");
+    const records = data.detailed_history || [];
+    const yearly   = data.yearly_summary || [];
+    const personnel = data.personnel || {};
+
+    if (records.length === 0 && yearly.length === 0) {
+        body.innerHTML = `
+            <div class="lhp-empty">
+                📭 No leave history found in this system or records.
+            </div>
+        `;
+        return;
     }
 
-    const ENTITLEMENTS = { AL: 60, CL: 30, AAL: 20 };
-    let html = '';
+    const leaveLabels = {
+        AL: "Annual Leave",
+        CL: "Casual Leave",
+        AAL: "Advance of Annual Leave",
+        PL: "Paternity Leave"
+    };
 
-    records.forEach(row => {
-      const year     = row.year  || '—';
-      const alTotal  = row.AL   ?? 0;
-      const clTotal  = row.CL   ?? 0;
-      const aalTotal = row.AAL  ?? 0;
-      const remarks  = row.remarks || '';
+    const grouped = {};
+    const totals  = { AL: 0, CL: 0, PL: 0, OTHER: 0, ANNUAL_LEAVE: 0 };
 
-      const leaveTypes = [
-        { label: 'AL – Annual Leave',             total: ENTITLEMENTS.AL,  taken: alTotal  },
-        { label: 'CL – Casual Leave',             total: ENTITLEMENTS.CL,  taken: clTotal  },
-        { label: 'AAL – Advance of Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
-      ];
+    // 1. Process Detailed History first
+    records.forEach(record => {
+        const type = (record.leave_type || "OTHER").trim();
+        const days = Number(record.days_taken || 0);
+        const year = record.year;
 
+        if (!grouped[type]) grouped[type] = { total: 0, entries: [] };
+        grouped[type].entries.push({ ...record, source: 'detailed' });
+        grouped[type].total += days;
+
+        if (type === 'AL') totals.AL += days;
+        else if (type === 'CL') totals.CL += days;
+        else if (type === 'PL') totals.PL += days;
+        else if (type.toUpperCase() === 'ANNUAL LEAVE') totals.ANNUAL_LEAVE += days;
+        else totals.OTHER += days;
+    });
+
+    // 2. Process Yearly Summary and find "Mystery" days (Taken in Previous Unit)
+    yearly.forEach(row => {
+        const year = row.year;
+        const types = [
+          { key: 'AL', label: 'AL' },
+          { key: 'CL', label: 'CL' },
+          { key: 'PL', label: 'PL' },
+          { key: 'Annual_Leave', label: 'Annual Leave' },
+          { key: 'AAL', label: 'AAL' }
+        ];
+
+        types.forEach(t => {
+            const dbTotal = Number(row[t.key] || 0);
+            if (dbTotal > 0) {
+                // Find how many days of this type for this year are ALREADY in detailed records
+                const typeKey = t.label;
+                const detailedInThisYear = records
+                    .filter(r => r.year == year && (r.leave_type || '').trim().toUpperCase() === typeKey.toUpperCase())
+                    .reduce((sum, r) => sum + Number(r.days_taken || 0), 0);
+
+                const difference = dbTotal - detailedInThisYear;
+
+                if (difference > 0) {
+                    if (!grouped[typeKey]) grouped[typeKey] = { total: 0, entries: [] };
+                    
+                    grouped[typeKey].entries.push({
+                        year: year,
+                        days_taken: difference,
+                        leave_reason: "Taken in Previous Unit/Company",
+                        source: 'manual'
+                    });
+                    grouped[typeKey].total += difference;
+
+                    // Sync main totals
+                    if (t.key === 'AL') totals.AL += difference;
+                    else if (t.key === 'CL') totals.CL += difference;
+                    else if (t.key === 'PL') totals.PL += difference;
+                    else if (t.key === 'Annual_Leave') totals.ANNUAL_LEAVE += difference;
+                    else totals.OTHER += difference;
+                }
+            }
+        });
+    });
+
+    const limits = { AL: 60, CL: 30 };
+    const balAL = limits.AL - totals.AL;
+    const balCL = limits.CL - totals.CL;
+
+    const userRank = (personnel.rank || '').toUpperCase();
+    const isAgniveer = userRank.includes('AGNIVEER') || userRank === 'AV';
+
+    let html = "";
+
+    // Profile Header
+    html += `
+    <div style="background: linear-gradient(135deg,#1e3a8a,#2563eb); color:white; padding:12px 16px; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 12px rgba(30,58,138,0.15); display: flex; align-items: center; gap: 12px;">
+        <div style="background: rgba(255,255,255,0.2); width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👤</div>
+        <div>
+          <div style="font-size:1.05rem; font-weight:800; letter-spacing: -0.3px;">${personnel.rank || ''} ${personnel.name || ''}</div>
+          <div style="margin-top:0px; font-size:0.8rem; opacity:0.85; font-weight: 500;">Army Number: ${currentViewArmyNumber}</div>
+        </div>
+    </div>
+    `;
+
+    // Summary Grid
+    if (isAgniveer) {
+      const balAnn = 30 - totals.ANNUAL_LEAVE;
       html += `
-        <div class="lhp-year-block">
-          <div class="lhp-year-heading">
-            <span class="lhp-badge-year">${year}</span>
-            <span style="color:#1e40af; font-weight:600; font-size:.9rem;">Leave Summary</span>
-          </div>
-          <table class="lhp-table">
-            <thead>
-              <tr>
-                <th>Leave Type</th>
-                <th>Total Entitled</th>
-                <th>Taken</th>
-                <th>Balance</th>
-              </tr>
-            </thead>
-            <tbody>
+      <div class="lhp-summary-grid" style="grid-template-columns: 1fr;">
+        <div class="lhp-summary-item type-AL" onclick="scrollToLeaveSection('Annual Leave')" style="border-top-color: #3b82f6;">
+          <div class="lhp-summary-label">Annual Leave (Agniveer)</div>
+          <div class="lhp-summary-value">${totals.ANNUAL_LEAVE} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
+          <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-top:2px;">Remaining Balance: ${balAnn} / 30</div>
+        </div>
+      </div>
       `;
+    } else {
+      html += `
+      <div class="lhp-summary-grid">
+        <div class="lhp-summary-item type-AL" onclick="scrollToLeaveSection('AL')">
+          <div class="lhp-summary-label">AL</div>
+          <div class="lhp-summary-value">${totals.AL} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
+          <div style="font-size:0.75rem; font-weight:700; color:#2563eb; margin-top:2px;">Bal: ${balAL}</div>
+        </div>
+        <div class="lhp-summary-item type-CL" onclick="scrollToLeaveSection('CL')">
+          <div class="lhp-summary-label">CL</div>
+          <div class="lhp-summary-value">${totals.CL} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
+          <div style="font-size:0.75rem; font-weight:700; color:#059669; margin-top:2px;">Bal: ${balCL}</div>
+        </div>
+        <div class="lhp-summary-item type-PL" onclick="scrollToLeaveSection('PL')">
+          <div class="lhp-summary-label">PL</div>
+          <div class="lhp-summary-value">${totals.PL} <span style="font-size:0.7rem; opacity:0.6;">Days</span></div>
+        </div>
+        <div class="lhp-summary-item type-OTHER" onclick="scrollToLeaveSection('OTHER')">
+          <div class="lhp-summary-label">Others</div>
+          <div class="lhp-summary-value">${totals.OTHER} <span style="font-size:0.7rem; opacity:0.6;">Days</span></div>
+        </div>
+      </div>
+      `;
+    }
+    html += `<h6 style="font-size:0.85rem; font-weight:800; color:#64748b; margin-bottom:12px; padding:0 4px; text-transform:uppercase; letter-spacing:0.5px;">Detailed History</h6>`;
 
-      leaveTypes.forEach(lt => {
-        const balance = lt.total - lt.taken;
+    Object.keys(grouped).forEach(type => {
+        const gData = grouped[type];
         html += `
-          <tr>
-            <td>${lt.label}</td>
-            <td><span class="lhp-pill-total">${lt.total}</span></td>
-            <td><span class="lhp-pill-taken">${lt.taken}</span></td>
-            <td><span class="lhp-pill-balance">${balance}</span></td>
-          </tr>
+            <div class="lhp-year-block" id="section-${type}">
+                <div class="lhp-year-heading">
+                    <span class="lhp-badge-year">${type}</span>
+                    <span style="font-weight:700; color: #1e40af;">${leaveLabels[type] || type}</span>
+                    <span style="margin-left: auto; font-size: 0.85rem; color: #64748b; font-weight: 600;">Total: ${gData.total} Days</span>
+                </div>
+                <div style="padding:15px; background: #fff;">
         `;
-      });
 
-      html += `</tbody></table>`;
+        gData.entries.forEach(leave => {
+            const isManual = (leave.source === 'manual');
+            let dateStr = "";
+            if (isManual) {
+              dateStr = `Recorded in Year ${leave.year}`;
+            } else {
+              const fromDate = new Date(leave.from_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+              const toDate = new Date(leave.to_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+              dateStr = `${fromDate} <span style="color: #94a3b8; font-weight: 400; margin: 0 5px;">→</span> ${toDate}`;
+            }
 
-      if (remarks) {
-        html += `
-          <div style="padding:.6rem 1.2rem; font-size:.83rem; color:#64748b; border-bottom:1px solid #f1f5f9;">
-            📝 <em>${remarks}</em>
-          </div>`;
-      }
+            html += `
+                <div style="padding:12px 14px; margin-bottom:10px; background:#f8fafc; border-radius:10px; border: 1px solid #e2e8f0; border-left:5px solid ${isManual ? '#64748b' : '#2563eb'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="font-weight:700; color:#334155; font-size: 0.95rem;">${dateStr}</div>
+                      <div style="background: ${isManual ? '#f1f5f9' : '#e0f2fe'}; color: ${isManual ? '#475569' : '#0369a1'}; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">
+                          ${leave.days_taken} Days
+                      </div>
+                    </div>
+                    <div style="margin-top:8px; font-size:0.85rem; color:#64748b; font-style: ${isManual ? 'normal' : 'italic'};">
+                        ${isManual ? '🏢 ' : '" '} ${leave.leave_reason || 'No details'} ${isManual ? '' : ' "'}
+                    </div>
+                </div>
+            `;
+        });
 
-      html += `</div>`;
+        html += `</div></div>`;
     });
 
     body.innerHTML = html;
