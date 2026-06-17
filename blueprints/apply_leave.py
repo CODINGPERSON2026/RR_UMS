@@ -144,13 +144,15 @@ def search_personnel():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Get all leave records for this person
+        # 1. First, check if there's any active leave status for matches
         cursor.execute("""
             SELECT
                 lsi.id,
                 lsi.army_number,
                 p.name,
-                p.rank,
+                p.`rank`,
+                p.company,
+                p.section,
                 lsi.request_status,
                 lsi.leave_type,
                 lsi.from_date,
@@ -158,37 +160,29 @@ def search_personnel():
             FROM leave_status_info lsi
             JOIN personnel p
                 ON TRIM(lsi.army_number) = TRIM(p.army_number)
-            WHERE lsi.army_number = %s
+            WHERE lsi.army_number = %s OR p.name LIKE %s
             ORDER BY lsi.from_date DESC
-        """, (query,))
+        """, (query, f"%{query}%"))
 
         all_leaves = cursor.fetchall()
-
-        # Latest leave (keeps your current logic)
         existing = all_leaves[0] if all_leaves else None
 
         if existing:
             status = (existing.get("request_status") or "").strip().lower()
 
-            # CASE 1: CLOSED → treat as NO ACTIVE LEAVE
+            # CASE: CLOSED → treat as NO ACTIVE LEAVE (fetch all matches)
             if status in ["closed", "leave closed"]:
                 cursor.execute("""
-                    SELECT
-                        name,
-                        army_number,
-                        `rank`,
-                        trade,
-                        company,
-                        section
+                    SELECT name, army_number, `rank`, trade, company, section
                     FROM personnel
-                    WHERE army_number LIKE %s
-                    LIMIT 1
-                """, (f"%{query}%",))
+                    WHERE army_number LIKE %s OR name LIKE %s
+                    LIMIT 20
+                """, (f"%{query}%", f"%{query}%"))
 
                 results = cursor.fetchall()
                 return jsonify(results)
 
-            # CASE 2: ACTIVE LEAVE → normalize status
+            # CASE: ACTIVE LEAVE → normalize status
             if status.startswith("pending"):
                 existing["request_status"] = "Pending"
             elif status.startswith("approved"):
@@ -196,12 +190,10 @@ def search_personnel():
             elif status.startswith("rejected"):
                 existing["request_status"] = "Rejected"
 
-            # NEW: Collect all approved leaves
+            # Collect all approved leaves for the modal
             approved_leaves = []
-
             for row in all_leaves:
                 row_status = (row.get("request_status") or "").strip().lower()
-
                 if row_status.startswith("approved"):
                     approved_leaves.append({
                         "id": row["id"],
@@ -213,39 +205,30 @@ def search_personnel():
                         "to_date": row["to_date"].strftime("%Y-%m-%d") if row["to_date"] else None
                     })
 
-
             return jsonify({
                 "exists": True,
                 "existing_leave": existing,
                 "approved_leaves": approved_leaves
             })
 
-        # CASE 3: NO LEAVE FOUND → return personnel
+        # 2. If no leave info found, return all matching personnel
         cursor.execute("""
-            SELECT
-                name,
-                army_number,
-                `rank`,
-                trade,
-                company,
-                section
+            SELECT name, army_number, `rank`, trade, company, section
             FROM personnel
-            WHERE army_number LIKE %s
-            LIMIT 1
-        """, (f"%{query}%",))
+            WHERE army_number LIKE %s OR name LIKE %s
+            LIMIT 20
+        """, (f"%{query}%", f"%{query}%"))
 
         results = cursor.fetchall()
         return jsonify(results)
 
     except Exception as e:
+        print(f"Search Personnel Error: {e}")
         return jsonify({"error": str(e)}), 500
 
     finally:
-        if cursor:
-            cursor.close()
-
-        if conn:
-            conn.close()
+        if cursor: cursor.close()
+        if conn: conn.close()
 
 
 
@@ -2330,7 +2313,7 @@ def full_leave_history(army_number):
                 DATEDIFF(to_date, from_date) + 1 AS days_taken
             FROM leave_status_info
             WHERE TRIM(army_number) = %s
-              AND request_status = 'Approved'
+              AND request_status IN ('Approved', 'Leave Closed')
             ORDER BY from_date DESC
         """, (army_number_clean,))
         detailed_history = cursor.fetchall()

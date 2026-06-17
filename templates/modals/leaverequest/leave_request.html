@@ -658,7 +658,8 @@ label.fw-bold {
         AL: "Annual Leave",
         CL: "Casual Leave",
         AAL: "Advance of Annual Leave",
-        PL: "Paternity Leave"
+        PL: "Paternity Leave",
+        "Annual Leave": "Annual Leave (Agniveer)"
     };
 
     const grouped = {};
@@ -698,7 +699,11 @@ label.fw-bold {
                 // Find how many days of this type for this year are ALREADY in detailed records
                 const typeKey = t.label;
                 const detailedInThisYear = records
-                    .filter(r => r.year == year && (r.leave_type || '').trim().toUpperCase() === typeKey.toUpperCase())
+                    .filter(r => {
+                      const rType = (r.leave_type || '').trim().toUpperCase();
+                      const tType = typeKey.toUpperCase();
+                      return (r.year == year) && (rType === tType);
+                    })
                     .reduce((sum, r) => sum + Number(r.days_taken || 0), 0);
 
                 const difference = dbTotal - detailedInThisYear;

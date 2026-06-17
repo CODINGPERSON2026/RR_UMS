@@ -5,7 +5,7 @@
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   }
-  /* Leave History Modal Styles */
+  /* Modernized Leave History Modal Styles */
   #leaveHistoryModal {
     display: none;
     position: fixed;
@@ -22,8 +22,8 @@
     background: #ffffff;
     border-radius: 20px;
     width: 100%;
-    max-width: 780px;
-    max-height: 88vh;
+    max-width: 600px;
+    max-height: 85vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px rgba(0,0,0,0.25);
     animation: lhSlideIn .3s cubic-bezier(.34,1.56,.64,1) both;
@@ -33,95 +33,102 @@
     to { transform: translateY(0) scale(1); opacity: 1; }
   }
   .lh-header {
-    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
-    color: #fff;
-    padding: 1.4rem 1.75rem;
-    border-radius: 20px 20px 0 0;
+    background: #f8fafc;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
-  .lh-header h4 { margin: 0; font-weight: 700; }
+  .lh-header h4 { margin: 0; font-weight: 800; color: #1e293b; font-size: 1.1rem; }
   .lh-close {
-    background: rgba(255,255,255,.2);
+    background: #f1f5f9;
     border: none;
-    color: #fff;
-    width: 34px;
-    height: 34px;
+    color: #475569;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
   }
-  .lh-close:hover { background: rgba(255,255,255,.35); }
-  .lh-body { padding: 1.5rem 1.75rem; }
-  .year-block {
-    margin-bottom: 1.6rem;
+  .lh-close:hover { background: #e2e8f0; color: #1e293b; }
+  .lh-body { padding: 1.5rem; }
+
+  /* 2x2 Summary Grid */
+  .lhp-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .lhp-summary-item {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .lhp-summary-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .lhp-summary-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .lhp-summary-value {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1e293b;
+  }
+  .lhp-summary-item.type-AL { border-top: 4px solid #3b82f6; }
+  .lhp-summary-item.type-CL { border-top: 4px solid #10b981; }
+  .lhp-summary-item.type-PL { border-top: 4px solid #f59e0b; }
+  .lhp-summary-item.type-OTHER { border-top: 4px solid #64748b; }
+
+  .lhp-year-block {
+    margin-bottom: 20px;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0,0,0,.05);
   }
-  .year-heading {
-    background: linear-gradient(90deg, #eff6ff, #dbeafe);
-    padding: .75rem 1.2rem;
+  .lhp-year-heading {
+    background: linear-gradient(90deg, #f8fafc, #eff6ff);
+    padding: 10px 15px;
     display: flex;
     align-items: center;
-    gap: .6rem;
-    border-bottom: 1px solid #bfdbfe;
-  }
-  .year-heading .badge-year {
-    background: #2563eb;
-    color: #fff;
-    border-radius: 8px;
-    padding: .25rem .75rem;
-    font-weight: 700;
-    font-size: .95rem;
-  }
-  .lh-table { width: 100%; border-collapse: collapse; }
-  .lh-table thead th {
-    background: #f8fafc;
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    color: #64748b;
-    padding: .65rem 1rem;
-    text-align: center;
+    gap: 10px;
     border-bottom: 1px solid #e2e8f0;
   }
-  .lh-table tbody td {
-    padding: .75rem 1rem;
-    text-align: center;
-    font-size: .93rem;
-    border-bottom: 1px solid #f1f5f9;
-  }
-  .lh-table tbody td:first-child { text-align: left; font-weight: 600; }
-  .pill-total, .pill-taken, .pill-balance {
-    border-radius: 999px;
-    padding: .2rem .7rem;
-    font-weight: 700;
-    font-size: .85rem;
-    display: inline-block;
-  }
-  .pill-total { background: #dbeafe; color: #1d4ed8; }
-  .pill-taken { background: #fce7f3; color: #be185d; }
-  .pill-balance { background: #d1fae5; color: #065f46; }
-  .btn-process {
-    background: linear-gradient(135deg, #2563eb, #1e40af);
+  .lhp-badge-year {
+    background: #1e3a8a;
     color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: .35rem .9rem;
-    font-size: .82rem;
-    font-weight: 600;
-    cursor: pointer;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
   }
-  .btn-process:hover { opacity: .88; transform: scale(1.03); }
   .lh-empty {
     text-align: center;
-    padding: 2.5rem 1rem;
+    padding: 3rem 1rem;
     color: #94a3b8;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
   }
   /* Consistent Action Buttons */
   #checkLeaveHistoryBtn, #openLeaveModalBtn {
@@ -457,16 +464,34 @@
   <!-- SEARCH -->
    {%if role == 'ONCO'%}
   <div class="card p-4 mb-4">
-    <h5>🔍 Search Employee</h5>
-    <div class="input-group">
-      <input type="text" id="searchArmyNumber" class="form-control" placeholder="Enter Army Number">
-      <button class="btn btn-primary" id="searchBtn">Search</button>
+    <h5>🔍 Search Personnel</h5>
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <div class="reliever-container" style="margin-bottom: 0;">
+          <div class="input-group">
+            <input type="text" id="searchArmyNumber" class="form-control" placeholder="Search by Name or Army Number..." autocomplete="off">
+            <button class="btn btn-primary" id="searchBtn">Search</button>
+          </div>
+          <div id="searchDropdown" class="reliever-dropdown"></div>
+        </div>
+      </div>
+      <div class="col-md-6 mt-3 mt-md-0">
+        <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 12px 20px; border-left: 5px solid #0ea5e9; display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 1.5rem;">💡</div>
+          <p style="margin: 0; color: #075985; font-size: 0.95rem; font-weight: 600; line-height: 1.4;">
+            We have updated the search! You can now <strong style="color: #0369a1;">search by Name</strong> or Army Number with real-time suggestions.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
  {%endif%}
   <!-- RESULTS -->
-  <div id="resultsSection" class="card p-4 mb-4" style="display:none;">
-    <h5>👤 Select Employee</h5>
+  <div id="resultsSection" class="card p-4 mb-4" style="display:none; position: relative;">
+    <button type="button" class="btn-close" 
+            style="position: absolute; top: 15px; right: 15px; cursor: pointer; z-index: 10;" 
+            onclick="closeResultsSection()" aria-label="Close"></button>
+    <h5 class="mb-4">👤 Select Personnel</h5>
     <table class="table table-hover">
       <thead>
         <tr>
@@ -670,11 +695,11 @@
 <div id="leaveHistoryModal" onclick="closeModalOnBackdrop(event)">
   <div class="lh-card">
     <div class="lh-header">
-      <h4>📋 Leave History</h4>
+      <h4>📋 Employee Leave History</h4>
       <button class="lh-close" onclick="closeLeaveHistory()">✕</button>
     </div>
     <div class="lh-body" id="leaveHistoryBody">
-      <div class="lh-empty">Loading…</div>
+      <div class="lh-empty">⏳ Loading history…</div>
     </div>
   </div>
 </div>
@@ -746,6 +771,11 @@
             <small style="color:#64748b">(${data.entitled} entitled, ${data.taken} taken)</small>
           </span>
         `;
+        
+        // Store max balance for validation
+        const select = block.querySelector('.leave-type-select');
+        select.dataset.maxBalance = data.balance;
+        balanceDiv.dataset.baseHtml = balanceDiv.innerHTML;
 
         const isZeroBalance = data.balance <= 0;
 
@@ -1073,88 +1103,228 @@
   }
 
   /* ====================== SEARCH PERSONNEL ====================== */
-  searchBtn.onclick = async () => {
-    if (!searchArmyNumber.value.trim()) return alert("Enter Army Number");
-    showLoading();
-    const res = await fetch(`/apply_leave/search_personnel?query=${searchArmyNumber.value}`);
-    const data = await res.json();
+  async function performSearch(showAlert = true) {
+    const query = searchArmyNumber.value.trim();
+    const dropdown = document.getElementById('searchDropdown');
     
-    resultsSection.style.display = "block";
-    resultsTable.innerHTML = "";
-    leaveHistoryBtnWrapper.style.display = "none";
-
-    if (data.exists) {
-      const leave = data.existing_leave;
-      let html = `<tr><td colspan="7" style="text-align:center; padding:1.5rem;">`;
-        if (leave.request_status === "Approved") {
-
-          html += `✅ Approved Leave Records<br><br>`;
-      
-          data.approved_leaves.forEach(l => {
-            console.log(l)
-              html += `
-                  <div class="mb-2">
-                      <b>${l.leave_type}</b>
-                      (${l.from_date} to ${l.to_date})
-      
-                      <button class="btn btn-success btn-sm ms-2"
-                              onclick="downloadCertificate('${l.id}')">
-                          Download Certificate
-                      </button>
-                  </div>
-              `;
-          });
-      
-          html += `
-              <br>
-              <button class="btn btn-primary"
-                      onclick="applyAnotherLeave(
-                          '${leave.army_number}',
-                          '${leave.rank || ''}',
-                          '${leave.name || ''}'
-                      )">
-                  Apply Another Leave
-              </button>
-          `;
-      }
-       else if (leave.request_status === "Pending") {
-        html += `⏳ <b>${leave.leave_type}</b> leave is PENDING.<br><br>
-                 <button class="btn btn-danger btn-sm" onclick="deleteLeaveRequest('${leave.army_number}')">Delete Request</button>`;
-      } else if (leave.request_status === "Rejected") {
-        html += `❌ <b>${leave.leave_type}</b> leave REJECTED.<br><br>
-                 <button class="btn btn-danger btn-sm" onclick="deleteLeaveRequest('${leave.army_number}')">Delete Request</button>`;
-      }
-      html += `</td></tr>`;
-      resultsTable.innerHTML = html;
-      hideLoading();
+    if (!query) {
+      if (showAlert) alert("Please enter Name or Army Number.");
+      resultsSection.style.display = "none";
+      dropdown.classList.remove('show');
       return;
     }
 
-    data.forEach(p => {
-      const r = resultsTable.insertRow();
-      const radio = document.createElement("input");
-      radio.type = "radio";
-      radio.name = "selectPerson";
-      radio.onchange = () => {
+    showLoading();
+    try {
+      const res = await fetch(`/apply_leave/search_personnel?query=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      
+      // Clear dropdown
+      dropdown.innerHTML = "";
+      dropdown.classList.remove('show');
+
+      // We ALWAYS show the dropdown first as per user request "select one first"
+      // Even if data.exists is true, we show that person in the dropdown
+      
+      let matches = [];
+      if (data.exists) {
+        matches = [data.existing_leave];
+      } else if (Array.isArray(data)) {
+        matches = data;
+      }
+
+      if (matches.length > 0) {
+        matches.forEach(p => {
+          const div = document.createElement("div");
+          div.className = "reliever-item";
+          div.innerHTML = `
+            <div style="font-weight:700; color:#1e293b;">${p.rank} ${p.name}</div>
+            <div style="font-size:0.8rem; color:#64748b;">${p.army_number} | ${p.company} | ${p.section}</div>
+          `;
+          div.onclick = () => selectPersonnel(p.army_number);
+          dropdown.appendChild(div);
+        });
+        dropdown.classList.add('show');
+      } else if (showAlert) {
+        alert("No personnel found.");
+        resultsSection.style.display = "none";
+      }
+    } catch (err) {
+      console.error("Search Error:", err);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  async function selectPersonnel(armyNumber) {
+    document.getElementById('searchDropdown').classList.remove('show');
+    searchArmyNumber.value = armyNumber;
+    
+    showLoading();
+    try {
+      const res = await fetch(`/apply_leave/search_personnel?query=${encodeURIComponent(armyNumber)}`);
+      const data = await res.json();
+      displayPersonnelStatus(data);
+    } catch (err) {
+      console.error("Selection Error:", err);
+    } finally {
+      hideLoading();
+    }
+  }
+
+  function closeResultsSection() {
+    resultsSection.style.display = "none";
+    searchArmyNumber.value = "";
+    document.getElementById('searchDropdown').classList.remove('show');
+    selectedPersonArmyNumber = null;
+    personnel_name = null;
+    selectedPersonRank = null;
+  }
+
+  function displayPersonnelStatus(data) {
+    resultsSection.style.display = "block";
+    resultsTable.innerHTML = "";
+    
+    if (data.exists) {
+        // Hide global buttons if status card is showing (prevents duplication)
+        leaveHistoryBtnWrapper.style.display = "none";
+        
+        const leave = data.existing_leave;
+        selectedPersonArmyNumber = leave.army_number;
+        personnel_name = leave.name;
+        selectedPersonRank = leave.rank;
+
+        let statusHtml = "";
+        if (leave.request_status === "Approved") {
+          statusHtml = `
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 20px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: start; gap: 15px;">
+                <div style="background: #22c55e; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">✓</div>
+                <div style="flex: 1;">
+                  <h6 style="margin: 0; color: #166534; font-weight: 800; font-size: 1.1rem;">Approved Leave Records</h6>
+                  <p style="margin: 5px 0 15px 0; color: #4b6352; font-size: 0.9rem;">The personnel has active or historical approved leaves. You can download certificates or apply for a fresh period below.</p>
+                  
+                  <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                    ${data.approved_leaves.map(l => `
+                      <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 250px;">
+                        <div>
+                          <div style="font-weight: 700; color: #1e293b; font-size: 0.85rem;">${l.leave_type}</div>
+                          <div style="font-size: 0.75rem; color: #64748b;">${l.from_date} to ${l.to_date}</div>
+                        </div>
+                        <button class="btn btn-outline-success btn-sm" onclick="downloadCertificate('${l.id}')" style="font-weight: 700; font-size: 0.75rem;">
+                           Certificate ↓
+                        </button>
+                      </div>
+                    `).join('')}
+                  </div>
+
+                  <div style="display: flex; gap: 10px;">
+                     <button id="checkLeaveHistoryBtn" onclick="openLeaveHistory()" style="background: #1e293b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">📋 Check History</button>
+                     <button onclick="applyAnotherLeave('${leave.army_number}','${leave.rank || ''}','${leave.name || ''}')" style="background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s;">✨ Apply Another</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (leave.request_status === "Pending") {
+          statusHtml = `
+            <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: start; gap: 15px;">
+                <div style="background: #f59e0b; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">⏳</div>
+                <div style="flex: 1;">
+                  <h6 style="margin: 0; color: #92400e; font-weight: 800; font-size: 1.1rem;">Pending Leave Request</h6>
+                  <p style="margin: 5px 0 15px 0; color: #92400e; font-size: 0.95rem;">A <b>${leave.leave_type}</b> request is currently awaiting approval.</p>
+                  <div style="display: flex; gap: 10px;">
+                     <button id="checkLeaveHistoryBtn" onclick="openLeaveHistory()" style="background: #1e293b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">📋 Check History</button>
+                     <button onclick="deleteLeaveRequest('${leave.army_number}')" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">🗑️ Delete Request</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        } else if (leave.request_status === "Rejected") {
+          statusHtml = `
+            <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+              <div style="display: flex; align-items: start; gap: 15px;">
+                <div style="background: #ef4444; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">✕</div>
+                <div style="flex: 1;">
+                  <h6 style="margin: 0; color: #991b1b; font-weight: 800; font-size: 1.1rem;">Leave Request Rejected</h6>
+                  <p style="margin: 5px 0 15px 0; color: #991b1b; font-size: 0.95rem;">The previous <b>${leave.leave_type}</b> request was rejected. Please delete it to apply again.</p>
+                  <div style="display: flex; gap: 10px;">
+                     <button id="checkLeaveHistoryBtn" onclick="openLeaveHistory()" style="background: #1e293b; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">📋 Check History</button>
+                     <button onclick="deleteLeaveRequest('${leave.army_number}')" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; cursor: pointer;">🗑️ Delete Entry</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        resultsTable.innerHTML = `<tr><td colspan="7" style="padding:10px;">${statusHtml}</td></tr>`;
+    } else {
+      // Fresh selection - Show global action buttons
+      leaveHistoryBtnWrapper.style.display = "block";
+      const list = Array.isArray(data) ? data : [data];
+      list.forEach(p => {
+        const r = resultsTable.insertRow();
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "selectPerson";
+        radio.checked = true;
+        
         selectedPersonArmyNumber = p.army_number;
         personnel_name = p.name;
         selectedPersonRank = p.rank;
-        leaveHistoryBtnWrapper.style.display = "block";
-      };
-      r.insertCell().appendChild(radio);
-      r.insertCell().textContent = p.army_number;
-      r.insertCell().textContent = p.rank;
-      r.insertCell().textContent = p.name;
-      r.insertCell().textContent = p.trade;
-      r.insertCell().textContent = p.section;
-      r.insertCell().textContent = p.company;
-    });
-   
-    hideLoading();
+        
+        radio.onchange = () => {
+          selectedPersonArmyNumber = p.army_number;
+          personnel_name = p.name;
+          selectedPersonRank = p.rank;
+        };
+        r.insertCell().appendChild(radio);
+        r.insertCell().textContent = p.army_number || '';
+        r.insertCell().textContent = p.rank || '';
+        r.insertCell().textContent = p.name || '';
+        r.insertCell().textContent = p.trade || '';
+        r.insertCell().textContent = p.section || '';
+        r.insertCell().textContent = p.company || '';
+      });
+    }
+  }
+
+  // Event Listeners
+  searchBtn.onclick = () => performSearch(true);
+  
+  searchArmyNumber.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      const dropdown = document.getElementById('searchDropdown');
+      if (dropdown.classList.contains('show') && dropdown.firstChild) {
+         dropdown.firstChild.click();
+      } else {
+         performSearch(true);
+      }
+    }
   };
+
+  const debouncedPersonnelSearch = debounce(() => performSearch(false), 400);
+  searchArmyNumber.oninput = debouncedPersonnelSearch;
+
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('searchDropdown');
+    const searchInput = document.getElementById('searchArmyNumber');
+    if (dropdown && !dropdown.contains(e.target) && e.target !== searchInput) {
+      dropdown.classList.remove('show');
+    }
+  });
 
   function downloadCertificate(id) {
     window.open(`/apply_leave/download_certificate/${id}?t=${Date.now()}`, '_blank');
+  }
+
+  function applyAnotherLeave(armyNumber, rank, name) {
+    selectedPersonArmyNumber = armyNumber;
+    selectedPersonRank = rank;
+    personnel_name = name;
+    openLeaveApplicationModal();
   }
 
   /* ====================== MULTIPLE LEAVE BLOCKS ====================== */
@@ -1289,7 +1459,17 @@
     const blocks = document.querySelectorAll('.leave-block');
 
     blocks.forEach((block, i) => {
-      const leaveType = block.querySelector('.leave-type-select').value;
+      const select = block.querySelector('.leave-type-select');
+      const balanceDiv = document.getElementById(`balanceDisplay${select.dataset.index}`);
+      
+      // Reset visuals at start of each calculation
+      if (balanceDiv && balanceDiv.dataset.baseHtml) {
+        balanceDiv.innerHTML = balanceDiv.dataset.baseHtml;
+      }
+      block.querySelector('.from-date').style.borderColor = '';
+      block.querySelector('.to-date').style.borderColor = '';
+
+      const leaveType = select.value;
       const fromVal = block.querySelector('.from-date').value;
       const toVal = block.querySelector('.to-date').value;
      
@@ -1309,6 +1489,20 @@
      
       // IMPORTANT FIX: Same date now counts as 1 day
       const days = daysBetween(from, to) + 1;
+      
+      // NEW VALIDATION: Check against max balance
+      const maxBal = parseInt(block.querySelector('.leave-type-select').dataset.maxBalance);
+      if (!isNaN(maxBal) && days > maxBal) {
+        block.querySelector('.from-date').style.borderColor = '#dc2626';
+        block.querySelector('.to-date').style.borderColor = '#dc2626';
+        isValid = false;
+        
+        const balanceDiv = document.getElementById(`balanceDisplay${block.querySelector('.leave-type-select').dataset.index}`);
+        if (balanceDiv) {
+          balanceDiv.innerHTML += `<br><small style="color:#dc2626;font-weight:700;">⚠️ Request (${days}d) exceeds balance (${maxBal}d)</small>`;
+        }
+      }
+      
       totalDays += days;
      
       summaryHTML += `
@@ -1411,6 +1605,25 @@
 
     if (hasInvalidRange) {
       alert("From Date cannot be after To Date in any leave block.");
+      return;
+    }
+
+    // CHECK FOR BALANCE EXCEEDED
+    let hasBalanceError = false;
+    document.querySelectorAll('.leave-block').forEach(block => {
+      const from = block.querySelector('.from-date').value;
+      const to = block.querySelector('.to-date').value;
+      const select = block.querySelector('.leave-type-select');
+      const maxBal = parseInt(select.dataset.maxBalance);
+      
+      if (from && to && !isNaN(maxBal)) {
+        const days = daysBetween(new Date(from), new Date(to)) + 1;
+        if (days > maxBal) hasBalanceError = true;
+      }
+    });
+
+    if (hasBalanceError) {
+      alert("One or more leave types exceed the available balance. Please adjust your dates.");
       return;
     }
 
@@ -1526,94 +1739,222 @@
     }
   }
  
+  function scrollToLeaveSection(type) {
+    const el = document.getElementById(`section-${type}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.style.boxShadow = "0 0 20px rgba(37, 99, 235, 0.2)";
+      setTimeout(() => el.style.boxShadow = "0 2px 10px rgba(0,0,0,.05)", 800);
+    }
+  }
+
   async function openLeaveHistory() {
     if (!selectedPersonArmyNumber) {
-      alert("Please select an employee first.");
-      return;
+        alert("Please select an employee first.");
+        return;
     }
     document.getElementById('leaveHistoryModal').classList.add("show");
-    leaveHistoryBody.innerHTML = '<div class="lh-empty">⏳ Loading history…</div>';
+    document.getElementById('leaveHistoryBody').innerHTML = '<div class="lh-empty">⏳ Loading history…</div>';
+
     try {
       const res = await fetch(`/apply_leave/leave_history/${selectedPersonArmyNumber}`);
       const data = await res.json();
-      renderLeaveHistory(data);
+      
+      if (data && data.success) {
+        renderLeaveHistory(data);
+      } else {
+        throw new Error(data.error || "Failed to load history");
+      }
     } catch (err) {
-      leaveHistoryBody.innerHTML = '<div class="lh-empty text-danger">❌ Failed to load history.</div>';
+      document.getElementById('leaveHistoryBody').innerHTML = `
+        <div class="lh-empty text-danger">
+          ❌ Failed to load history. <br>
+          <small>${err.message}</small>
+        </div>`;
     }
+  }
+
+  function renderLeaveHistory(data) {
+    const body = document.getElementById("leaveHistoryBody");
+    const records = data.detailed_history || [];
+    const yearly   = data.yearly_summary || [];
+    const personnel = data.personnel || {};
+
+    if (records.length === 0 && yearly.length === 0) {
+        body.innerHTML = `<div class="lh-empty">📭 No leave history found for this personnel.</div>`;
+        return;
+    }
+
+    const leaveLabels = {
+        AL: "Annual Leave",
+        CL: "Casual Leave",
+        AAL: "Advance of Annual Leave",
+        PL: "Paternity Leave",
+        "Annual Leave": "Annual Leave (Agniveer)"
+    };
+
+    const grouped = {};
+    const totals  = { AL: 0, CL: 0, PL: 0, OTHER: 0, ANNUAL_LEAVE: 0 };
+
+    // 1. Process Detailed History
+    records.forEach(record => {
+        const type = (record.leave_type || "OTHER").trim();
+        const days = Number(record.days_taken || 0);
+        const year = record.year;
+
+        if (!grouped[type]) grouped[type] = { total: 0, entries: [] };
+        grouped[type].entries.push({ ...record, source: 'detailed' });
+        grouped[type].total += days;
+
+        if (type === 'AL') totals.AL += days;
+        else if (type === 'CL') totals.CL += days;
+        else if (type === 'PL') totals.PL += days;
+        else if (type.toUpperCase() === 'ANNUAL LEAVE') totals.ANNUAL_LEAVE += days;
+        else totals.OTHER += days;
+    });
+
+    // 2. Process Yearly Summary (Deductive Logic)
+    yearly.forEach(row => {
+        const year = row.year;
+        const types = [
+          { key: 'AL', label: 'AL' },
+          { key: 'CL', label: 'CL' },
+          { key: 'PL', label: 'PL' },
+          { key: 'Annual_Leave', label: 'Annual Leave' },
+          { key: 'AAL', label: 'AAL' }
+        ];
+
+        types.forEach(t => {
+            const dbTotal = Number(row[t.key] || 0);
+            if (dbTotal > 0) {
+                const typeKey = t.label;
+                const detailedInThisYear = records
+                    .filter(r => {
+                      const rType = (r.leave_type || '').trim().toUpperCase();
+                      const tType = typeKey.toUpperCase();
+                      return (r.year == year) && (rType === tType);
+                    })
+                    .reduce((sum, r) => sum + Number(r.days_taken || 0), 0);
+
+                const difference = dbTotal - detailedInThisYear;
+
+                if (difference > 0) {
+                    if (!grouped[typeKey]) grouped[typeKey] = { total: 0, entries: [] };
+                    grouped[typeKey].entries.push({
+                        year: year,
+                        days_taken: difference,
+                        leave_reason: "Taken in Previous Unit/Company",
+                        source: 'manual'
+                    });
+                    grouped[typeKey].total += difference;
+
+                    if (t.key === 'AL') totals.AL += difference;
+                    else if (t.key === 'CL') totals.CL += difference;
+                    else if (t.key === 'PL') totals.PL += difference;
+                    else if (t.key === 'Annual_Leave') totals.ANNUAL_LEAVE += difference;
+                    else totals.OTHER += difference;
+                }
+            }
+        });
+    });
+
+    const limits = { AL: 60, CL: 30 };
+    const balAL = limits.AL - totals.AL;
+    const balCL = limits.CL - totals.CL;
+
+    const userRank = (personnel.rank || '').toUpperCase();
+    const isAgniveer = userRank.includes('AGNIVEER') || userRank === 'AV';
+
+    let html = "";
+
+    // Summary Grid
+    if (isAgniveer) {
+      const balAnn = 30 - totals.ANNUAL_LEAVE;
+      html += `
+      <div class="lhp-summary-grid" style="grid-template-columns: 1fr;">
+        <div class="lhp-summary-item type-AL" onclick="scrollToLeaveSection('Annual Leave')" style="border-top-color: #3b82f6;">
+          <div class="lhp-summary-label">Annual Leave (Agniveer)</div>
+          <div class="lhp-summary-value">${totals.ANNUAL_LEAVE} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
+          <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-top:2px;">Balance: ${balAnn} / 30</div>
+        </div>
+      </div>
+      `;
+    } else {
+      html += `
+      <div class="lhp-summary-grid">
+        <div class="lhp-summary-item type-AL" onclick="scrollToLeaveSection('AL')">
+          <div class="lhp-summary-label">AL</div>
+          <div class="lhp-summary-value">${totals.AL} <small style="font-size:0.7rem; opacity:0.6;">D</small></div>
+          <div style="font-size:0.75rem; font-weight:700; color:#2563eb; margin-top:2px;">Bal: ${balAL}</div>
+        </div>
+        <div class="lhp-summary-item type-CL" onclick="scrollToLeaveSection('CL')">
+          <div class="lhp-summary-label">CL</div>
+          <div class="lhp-summary-value">${totals.CL} <small style="font-size:0.7rem; opacity:0.6;">D</small></div>
+          <div style="font-size:0.75rem; font-weight:700; color:#059669; margin-top:2px;">Bal: ${balCL}</div>
+        </div>
+        <div class="lhp-summary-item type-PL" onclick="scrollToLeaveSection('PL')">
+          <div class="lhp-summary-label">PL</div>
+          <div class="lhp-summary-value">${totals.PL} <small style="font-size:0.7rem; opacity:0.6;">D</small></div>
+        </div>
+        <div class="lhp-summary-item type-OTHER" onclick="scrollToLeaveSection('OTHER')">
+          <div class="lhp-summary-label">Others</div>
+          <div class="lhp-summary-value">${totals.OTHER} <small style="font-size:0.7rem; opacity:0.6;">D</small></div>
+        </div>
+      </div>
+      `;
+    }
+
+    Object.keys(grouped).forEach(type => {
+        const gData = grouped[type];
+        html += `
+            <div class="lhp-year-block" id="section-${type}">
+                <div class="lhp-year-heading">
+                    <span class="lhp-badge-year">${type}</span>
+                    <span style="font-weight:700; color: #1e40af;">${leaveLabels[type] || type}</span>
+                    <span style="margin-left: auto; font-size: 0.85rem; color: #64748b; font-weight: 600;">Total: ${gData.total} Days</span>
+                </div>
+                <div style="padding:15px; background: #fff;">
+        `;
+
+        gData.entries.forEach(leave => {
+            const isManual = (leave.source === 'manual');
+            let dateStr = "";
+            if (isManual) {
+              dateStr = `Recorded in Year ${leave.year}`;
+            } else {
+              const fromDate = new Date(leave.from_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+              const toDate = new Date(leave.to_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+              dateStr = `${fromDate} → ${toDate}`;
+            }
+
+            html += `
+                <div style="padding:10px 12px; margin-bottom:8px; background:#f8fafc; border-radius:8px; border: 1px solid #e2e8f0; border-left:4px solid ${isManual ? '#64748b' : '#2563eb'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="font-weight:700; color:#334155; font-size: 0.9rem;">${dateStr}</div>
+                      <div style="background: ${isManual ? '#f1f5f9' : '#e0f2fe'}; color: ${isManual ? '#475569' : '#0369a1'}; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">
+                          ${leave.days_taken} Days
+                      </div>
+                    </div>
+                    <div style="margin-top:5px; font-size:0.8rem; color:#64748b; font-style: ${isManual ? 'normal' : 'italic'};">
+                        ${isManual ? '🏢 ' : '" '} ${leave.leave_reason || 'No details'} ${isManual ? '' : ' "'}
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div></div>`;
+    });
+
+    body.innerHTML = html;
   }
 
   function closeLeaveHistory() {
     document.getElementById('leaveHistoryModal').classList.remove("show");
   }
- 
+
   function closeModalOnBackdrop(e) {
     if (e.target.id === 'leaveHistoryModal') closeLeaveHistory();
     if (e.target.id === 'leaveApplicationModal') closeLeaveApplicationModal();
-  }
-
-  function renderLeaveHistory(records) {
-    if (!records || records.length === 0) {
-      leaveHistoryBody.innerHTML = '<div class="lh-empty">📭 No leave history found for this employee.</div>';
-      return;
-    }
-    const ENTITLEMENTS = { AL: 60, CL: 30, AAL: 20 ,'Annual Leave':30};
-    let html = '';
-    records.forEach(row => {
-      const year = row.year || '—';
-      const alTotal = row.AL ?? 0;
-      const clTotal = row.CL ?? 0;
-      const aalTotal = row.AAL ?? 0;
-      const AgniLeaveTotal = row['Annual Leave']?? 0;
-      const remarks = row.remarks || '';
-      const leaveTypes = [
-        { label: 'AL – Annual Leave', total: ENTITLEMENTS.AL, taken: alTotal },
-        { label: 'CL – Casual Leave', total: ENTITLEMENTS.CL, taken: clTotal },
-        { label: 'AAL – Advance of Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
-        { label: 'AGNI VEER LEAVE ', total: ENTITLEMENTS['Annual Leave'], taken: AgniLeaveTotal }
-      ];
-      html += `
-        <div class="year-block">
-          <div class="year-heading">
-            <span class="badge-year">${year}</span>
-            <span style="color:#1e40af; font-weight:600; font-size:.9rem;">Leave Summary</span>
-          </div>
-          <table class="lh-table">
-            <thead>
-              <tr>
-                <th>Leave Type</th>
-                <th>Total Entitled</th>
-                <th>Taken</th>
-                <th>Balance</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-      `;
-      leaveTypes.forEach(lt => {
-        const balance = lt.total - lt.taken;
-        html += `
-        <tr>
-          <td>${lt.label}</td>
-          <td><span class="pill-total">${lt.total}</span></td>
-          <td><span class="pill-taken">${lt.taken}</span></td>
-          <td><span class="pill-balance">${balance}</span></td>
-          <td>
-            <button class="btn-process" onclick="processLeaveFromHistory('${lt.label.split('–')[0].trim()}', ${balance})">
-              Process
-            </button>
-          </td>
-        </tr>
-        `;
-      });
-      html += `</tbody></table>`;
-      if (remarks) {
-        html += `<div style="padding:.6rem 1.2rem; font-size:.83rem; color:#64748b; border-bottom:1px solid #f1f5f9;">
-                   📝 <em>${remarks}</em>
-                 </div>`;
-      }
-      html += `</div>`;
-    });
-    leaveHistoryBody.innerHTML = html;
   }
 
   function processLeaveFromHistory(leaveTypeCode, balance) {
@@ -1627,13 +1968,6 @@
       sameCheckbox.addEventListener('change', toggleAddressFields);
     }
   });
-  function applyAnotherLeave(armyNumber, rank, name) {
-    selectedPersonArmyNumber = armyNumber;
-    selectedPersonRank = rank;
-    personnel_name = name;
-    alert(selectedPersonArmyNumber,selectedPersonRank,personnel_name)
-    openLeaveApplicationModal();
-}
 </script>
 
 {% include 'apply_leave/leave_dashboard.html' %}
