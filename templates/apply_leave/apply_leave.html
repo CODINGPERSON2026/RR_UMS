@@ -1091,6 +1091,7 @@
           html += `✅ Approved Leave Records<br><br>`;
       
           data.approved_leaves.forEach(l => {
+            console.log(l)
               html += `
                   <div class="mb-2">
                       <b>${l.leave_type}</b>
@@ -1177,7 +1178,7 @@
             <option value="">Select Type</option>
             <option value="AL">AL - Annual Leave</option>
             <option value="CL">CL - Casual Leave</option>
-            <option value="AAL">AAL - Additional Annual Leave</option>
+            <option value="AAL">AAL - Advance of Annual Leave</option>
             <option value="PL">PL - Paternity Leave</option>
           </select>
           <div class="balance-display mt-2 small" id="balanceDisplay${index}" style="font-weight:600; min-height:1.2em;"></div>
@@ -1555,18 +1556,20 @@
       leaveHistoryBody.innerHTML = '<div class="lh-empty">📭 No leave history found for this employee.</div>';
       return;
     }
-    const ENTITLEMENTS = { AL: 60, CL: 30, AAL: 20 };
+    const ENTITLEMENTS = { AL: 60, CL: 30, AAL: 20 ,'Annual Leave':30};
     let html = '';
     records.forEach(row => {
       const year = row.year || '—';
       const alTotal = row.AL ?? 0;
       const clTotal = row.CL ?? 0;
       const aalTotal = row.AAL ?? 0;
+      const AgniLeaveTotal = row['Annual Leave']?? 0;
       const remarks = row.remarks || '';
       const leaveTypes = [
         { label: 'AL – Annual Leave', total: ENTITLEMENTS.AL, taken: alTotal },
         { label: 'CL – Casual Leave', total: ENTITLEMENTS.CL, taken: clTotal },
-        { label: 'AAL – Additional Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
+        { label: 'AAL – Advance of Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
+        { label: 'AGNI VEER LEAVE ', total: ENTITLEMENTS['Annual Leave'], taken: AgniLeaveTotal }
       ];
       html += `
         <div class="year-block">

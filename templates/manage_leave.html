@@ -429,7 +429,7 @@
             <option value="">— Select Leave Type —</option>
             <option value="AL">AL — Annual Leave</option>
             <option value="CL">CL — Casual Leave</option>
-            <option value="AAL">AAL — Additional Annual Leave</option>
+            <option value="AAL">AAL — Advance of Annual Leave</option>
             <option value="PL">PL — Paternity Leave</option>
           </select>
           <div class="form-text text-muted">
@@ -533,7 +533,7 @@
           <td><span class="days-badge" id="days-${row.army_number}">${row.leave_days} days</span></td>
           <td>
             <div class="d-flex gap-2 flex-wrap">
-              <button class="btn-remove" onclick="removeLeave('${row.army_number}', '${row.name}')">
+              <button class="btn-remove" onclick="removeLeave('${row.leave_id}','${row.army_number}', '${row.name}')">
                 <i class="fas fa-user-minus me-1"></i>Remove
               </button>
               <button class="btn-extend" onclick="openHistoryModal('${row.army_number}', '${row.name}', '${row.to_date}')">
@@ -550,37 +550,24 @@
   }
 
   // ─── REMOVE LEAVE ─────────────────────────────────────────────
-  async function removeLeave(armyNumber, name) {
+  async function removeLeave(leave_id,armyNumber, name) {
     if (!confirm(`Remove ${name} (${armyNumber}) from leave? This will set their leave status to inactive.`)) return;
 
     try {
       const res  = await fetch('/onco/remove_leave', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ army_number: armyNumber })
+        body: JSON.stringify({ leave_id:leave_id,army_number: armyNumber })
       });
       const json = await res.json();
 
       if (json.status === 'success') {
         const row = document.getElementById(`row-${armyNumber}`);
-        if (row) {
-          row.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-          row.style.opacity = '0';
-          row.style.transform = 'translateX(30px)';
-          setTimeout(() => {
-            row.remove();
-            const remaining = document.querySelectorAll('#leaveTableBody tr[id^="row-"]').length;
-            document.getElementById('totalOnLeave').textContent = remaining;
-            if (remaining === 0) {
-              document.getElementById('leaveTableBody').innerHTML = `
-                <tr><td colspan="10"><div class="ml-empty">
-                  <i class="fas fa-check-circle text-success"></i>
-                  <p class="fw-semibold">No personnel currently on leave.</p>
-                </div></td></tr>`;
-            }
-          }, 400);
-        }
+      
         showAlert(`${name} successfully removed from leave.`, 'success');
+        setTimeout(()=>{
+          window.location.reload();
+        },1000)
       } else {
         showAlert(json.message || 'Failed to remove leave.', 'danger');
       }
@@ -636,7 +623,7 @@
       const types = [
         { key: 'AL',  cls: 'al',  label: 'AL',  name: 'Annual Leave'            },
         { key: 'CL',  cls: 'cl',  label: 'CL',  name: 'Casual Leave'            },
-        { key: 'AAL', cls: 'aal', label: 'AAL', name: 'Additional Annual Leave' },
+        { key: 'AAL', cls: 'aal', label: 'AAL', name: 'Advance of Annual Leave' },
         { key: 'PL',  cls: 'pl',  label: 'PL',  name: 'Paternity Leave'         },
       ];
       grid.innerHTML = types.map(t => `

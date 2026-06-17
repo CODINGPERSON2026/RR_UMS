@@ -43,6 +43,10 @@ def on_leave_persons():
                 l.leave_type,
                 l.from_date,
                 l.to_date,
+                l.suffix_days,
+                l.prefix_days,
+                l.suffix_date,
+                l.prefix_date,
                 l.leave_days,
                 l.id AS leave_id
             FROM personnel p
@@ -50,7 +54,7 @@ def on_leave_persons():
             WHERE p.onleave_status = 1
               AND p.company = %s
               AND l.request_status = 'Approved'
-            ORDER BY l.from_date DESC
+            ORDER BY l.to_date
         """, (company,))
 
         rows = cursor.fetchall()
@@ -60,6 +64,14 @@ def on_leave_persons():
                 row['from_date'] = str(row['from_date'])
             if row.get('to_date'):
                 row['to_date'] = str(row['to_date'])
+
+
+
+            if row['suffix_days']:
+                row['to_date'] = str(row['suffix_date'])
+                
+            if row['prefix_days']:
+                row['from_date'] = str(row['prefix_date)'])
 
         return jsonify({'status': 'success', 'data': rows})
 
@@ -80,6 +92,7 @@ def remove_leave():
 
     data = request.get_json()
     army_number = data.get('army_number')
+    leave_id = data.get('leave_id')
 
     if not army_number:
         return jsonify({'status': 'error', 'message': 'Army number is required.'}), 400
@@ -97,7 +110,7 @@ def remove_leave():
         """, (army_number,))
         cursor.execute("""
         Update leave_status_info
-                    set request_status  = 'Leave Closed' where army_number = %s""",(army_number,)) 
+                    set request_status  = 'Leave Closed' where id = %s""",(leave_id,)) 
         conn.commit()
 
         if cursor.rowcount == 0:

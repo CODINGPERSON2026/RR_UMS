@@ -776,8 +776,14 @@ def get_leave_request(leave_id):
         user = require_login()
         if user['role'] == 'OC':
             leave['leave_request_type'] = 'OR'
+            leave['rankOfUser'] = user['role']
+
+        elif user['role'] == '2IC':
+            leave['leave_request_type'] = 'OFFICER'
+            leave['rankOfUser'] = user['role']
         elif user['role'] == 'CO':
             leave['leave_request_type'] = 'OFFICER'
+            leave['rankOfUser'] = user['role']
 
 
         return jsonify({
@@ -867,17 +873,20 @@ def recommend_leave():
                 send_request_to = '2IC'
                 request_status = 'Pending at 2IC'
 
-        elif current_user_role == '2IC':
-            send_request_to = 'CO'
-            request_status = 'Pending at CO'
+        # elif current_user_role == '2IC':
+        #     send_request_to = 'CO'
+        #     request_status = 'Pending at CO'
 
         elif current_user_role == 'CO':
+            send_request_to = 'Approved'
+            request_status = 'Approved'
+        elif current_user_role == '2IC':
             send_request_to = 'Approved'
             request_status = 'Approved'
 
         # ================= FETCH LEAVE =================
         cursor.execute("""
-            SELECT id, army_number, name, leave_type, leave_days,
+            SELECT id, army_number, name, leave_type,DATEDIFF(to_date,from_date) + 1 AS leave_days,
                    from_date, to_date, leave_reason
             FROM leave_status_info
             WHERE id = %s
@@ -1865,7 +1874,7 @@ def co_rejected_leaves():
 
 @leave_bp.route("/download_certificate/<leave_id>")
 def download_leave_certificate(leave_id):
-    
+    print(leave_id,"this is leave id")
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -1932,6 +1941,8 @@ def download_leave_certificate(leave_id):
         """, (leave_id,))
         
         data = cursor.fetchone()
+        print('this is data')
+        print(data)
         army_number = data['army_number']
         if not data:
             return "No approved leave certificate found for this user.", 404

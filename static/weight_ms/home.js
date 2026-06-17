@@ -167,18 +167,23 @@ async function fetchBarGraphData() {
 
 function drawBarGraphs(data) {
   console.group("📊 drawBarGraphs()");
+  console.log("Incoming data:", data);
 
   try {
     if (window.fitUnfitChartInstance) {
+      console.log("♻️ Destroying fitUnfitChart");
       window.fitUnfitChartInstance.destroy();
     }
     if (window.safeCategoryChartInstance) {
+      console.log("♻️ Destroying safeCategoryChart");
       window.safeCategoryChartInstance.destroy();
     }
     if (window.jcoOrFitChartInstance) {
+      console.log("♻️ Destroying jcoOrFitChart");
       window.jcoOrFitChartInstance.destroy();
     }
     if (window.jcoSafeOrCategoryChartInstance) {
+      console.log("♻️ Destroying jcoSafeOrCategoryChart");
       window.jcoSafeOrCategoryChartInstance.destroy();
     }
   } catch (err) {
@@ -190,6 +195,7 @@ function drawBarGraphs(data) {
 
   /* ================= FIT / UNFIT BAR ================= */
   console.group("📊 Fit / Unfit Bar Chart");
+  console.log("Data:", data.fitUnfit);
 
   const fitUnfitCanvas = document.getElementById('fitUnfitChart');
   if (!fitUnfitCanvas) {
@@ -213,11 +219,13 @@ function drawBarGraphs(data) {
       },
       options: commonBarOptions
     });
+    console.log("✅ Fit / Unfit Bar Chart Loaded");
   }
   console.groupEnd();
 
   /* ================= SAFE / CATEGORY BAR ================= */
   console.group("📊 Safe / Category Bar Chart");
+  console.log("Data:", data.safeCategory);
 
   const safeCategoryCanvas = document.getElementById('safeCategoryChart');
   if (!safeCategoryCanvas) {
@@ -241,11 +249,13 @@ function drawBarGraphs(data) {
       },
       options: commonBarOptions
     });
+    console.log("✅ Safe / Category Bar Chart Loaded");
   }
   console.groupEnd();
 
   /* ================= JCO / OR FIT DONUT ================= */
   console.group("🍩 JCO vs OR FIT Doughnut");
+  console.log("Data:", data.jcoOrFit);
 
   const jcoOrFitCanvas = document.getElementById('jcoOrFitChart');
   if (!jcoOrFitCanvas) {
@@ -270,11 +280,13 @@ function drawBarGraphs(data) {
       },
       options: commonDonutOptions
     });
+    console.log("✅ JCO vs OR FIT Doughnut Loaded");
   }
   console.groupEnd();
 
   /* ================= JCO / OR SAFE / CATEGORY DONUT ================= */
   console.group("🍩 JCO vs OR SAFE/CATEGORY Doughnut");
+  console.log("Data:", data.jcoSafeOrCategory);
 
   const jcoSafeCanvas = document.getElementById('jcoSafeOrCategoryChart');
   if (!jcoSafeCanvas) {
@@ -296,16 +308,19 @@ function drawBarGraphs(data) {
       },
       options: commonDonutOptions
     });
+    console.log("✅ JCO vs OR SAFE/CATEGORY Doughnut Loaded");
   }
   console.groupEnd();
 
   console.groupEnd(); // drawBarGraphs
 }
 function updateDoughnutCharts() {
+  console.log("🔄 updateDoughnutCharts() called");
 
   const jcoOrFilter = document.getElementById('jco-or-filter').value;
   const jcoSafeOrFilter = document.getElementById('jco-safe-or-filter').value;
 
+  console.log("📌 Selected Filters:", {
     jcoOrFilter,
     jcoSafeOrFilter,
     currentCompany
@@ -315,19 +330,24 @@ function updateDoughnutCharts() {
     ? `/weight_system/api/bar-graph-data?fitUnfitFilter=${jcoOrFilter}&safeCategoryFilter=${jcoSafeOrFilter}`
     : `/weight_system/api/bar-graph-data?company=${encodeURIComponent(currentCompany)}&fitUnfitFilter=${jcoOrFilter}&safeCategoryFilter=${jcoSafeOrFilter}`;
 
+  console.log("🌐 Fetch URL:", url);
 
   fetch(url)
     .then(res => {
+      console.log("📡 Fetch response status:", res.status);
       if (!res.ok) throw new Error("Failed to fetch bar graph data");
       return res.json();
     })
     .then(data => {
+      console.log("✅ API Response Data:", data);
 
       if (window.jcoOrFitChartInstance) {
+        console.log("🧹 Destroying existing JCO vs OR chart");
         window.jcoOrFitChartInstance.destroy();
       }
 
       if (window.jcoSafeOrCategoryChartInstance) {
+        console.log("🧹 Destroying existing JCO Safe/Category chart");
         window.jcoSafeOrCategoryChartInstance.destroy();
       }
 
@@ -350,6 +370,8 @@ function updateDoughnutCharts() {
         animation: { duration: 1000, easing: 'easeOutQuart' }
       };
 
+      console.log("🍩 Creating JCO vs OR Doughnut Chart");
+      console.log("📊 jcoOrFit data:", data.jcoOrFit);
 
       const jcoOrFitCtx = document.getElementById('jcoOrFitChart').getContext('2d');
       window.jcoOrFitChartInstance = new Chart(jcoOrFitCtx, {
@@ -370,6 +392,8 @@ function updateDoughnutCharts() {
         options: commonDonutOptions
       });
 
+      console.log("🍩 Creating JCO Safe/Category Doughnut Chart");
+      console.log("📊 jcoSafeOrCategory data:", data.jcoSafeOrCategory);
 
       const jcoSafeOrCategoryCtx = document.getElementById('jcoSafeOrCategoryChart').getContext('2d');
       window.jcoSafeOrCategoryChartInstance = new Chart(jcoSafeOrCategoryCtx, {
@@ -406,6 +430,7 @@ function updateDoughnutCharts() {
         }
       });
 
+      console.log("✅ Doughnut charts updated successfully");
     })
     .catch(err => {
       console.error("❌ Error updating doughnut charts:", err);
@@ -516,6 +541,7 @@ function renderTableRows(rows, statusClass, append = false) {
   }
 
   rows.forEach(r => {
+      console.log(r,"this is r")
       const ideal = r.ideal_weight ? r.ideal_weight.toFixed(2) : "—";
       const lower = r.lower_limit ? r.lower_limit.toFixed(2) : "—";
       const upper = r.upper_limit ? r.upper_limit.toFixed(2) : "—";
@@ -892,6 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function validateAlpha(input) {
+  console.log('within validate aplha')
   const value = input.value;
   const errorElement = document.getElementById(input.id + '-error');
   const regex = /^[a-zA-Z\s]*$/;
@@ -908,6 +935,7 @@ function validateAlpha(input) {
 }
 
 function validateAlphaNumeric(input) {
+  console.log("within alpha Numeric")
   const value = input.value;
   const errorElement = document.getElementById(input.id + '-error');
   const regex = /^[a-zA-Z0-9]*$/;
@@ -977,9 +1005,11 @@ function closeAddUserModal() {
 }
 
 function showSuccessToast(message) {
+  console.log(message,"this is msg")
   const toast = document.getElementById('success-toast');
   const toastMessage = document.getElementById('message-text');
   toast.textContent = message
+  console.log(toastMessage.textContent)
   toast.style.display = 'block';
   
   setTimeout(() => {
@@ -1118,6 +1148,7 @@ document.getElementsByClassName('button-update-cancel')[0].addEventListener('cli
 
 function closeUpdateUserModal() {
   const modal = document.getElementById('update-user-modal');
+  console.log("Update close model is called.....")
   modal.style.display = 'none';
   document.body.style.overflow = 'auto';
   resetEditForm();
@@ -1298,6 +1329,7 @@ document.getElementById('update-user-modal').addEventListener('click', function(
 
 // Person Details Modal Functions - Make globally accessible
 window.viewPersonDetails = async function(armyNumber, statusClass) {
+  console.log('🔍 viewPersonDetails called with:', { armyNumber, statusClass });
   
   if (!armyNumber || !statusClass) {
     console.error('❌ Missing required parameters:', { armyNumber, statusClass });
@@ -1333,6 +1365,7 @@ window.viewPersonDetails = async function(armyNumber, statusClass) {
   
   try {
     const url = `/weight_system/api/person-details/${encodeURIComponent(armyNumber)}?status_class=${encodeURIComponent(statusClass)}`;
+    console.log('🌐 Fetching from URL:', url);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -1341,6 +1374,7 @@ window.viewPersonDetails = async function(armyNumber, statusClass) {
       }
     });
     
+    console.log('📡 Response status:', response.status);
     
     if (!response.ok) {
       let errorText = 'Unknown error';
@@ -1355,6 +1389,7 @@ window.viewPersonDetails = async function(armyNumber, statusClass) {
     }
     
     const data = await response.json();
+    console.log('✅ Received data:', data);
     
     if (data.error) {
       body.innerHTML = `
@@ -1368,6 +1403,7 @@ window.viewPersonDetails = async function(armyNumber, statusClass) {
     
     // Render the details
     renderPersonDetails(data, statusClass);
+    console.log('✅ Person details rendered successfully');
     
   } catch (error) {
     console.error('❌ Error fetching person details:', error);
@@ -1383,6 +1419,7 @@ window.viewPersonDetails = async function(armyNumber, statusClass) {
 }
 
 // Make sure function is available immediately
+console.log('✅ viewPersonDetails function registered:', typeof window.viewPersonDetails);
 
 function renderPersonDetails(data, statusClass) {
   const body = document.getElementById('person-details-body');

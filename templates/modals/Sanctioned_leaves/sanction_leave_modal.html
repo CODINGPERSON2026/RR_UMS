@@ -423,6 +423,7 @@
       const to = r.to_date || r.end_date || '–';
       const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
       const days = r.leave_days;
+      const get_leave_id = r.id;
     
       return `
         <tr data-search="${(name + ltype).toLowerCase()}">
@@ -444,7 +445,7 @@
          
 <td>
     <button class="btn btn-sm btn-outline-primary"
-        onclick="downloadCertificate('${armyNumber}')"
+        onclick="downloadCertificate('${get_leave_id}')"
         title="Download Certificate">
         <i class="fa-solid fa-download"></i>
     </button>
@@ -602,8 +603,8 @@
 
     // For testing - remove comment if you want auto open
     // window.onload = () => openLeaveModal();
-function downloadCertificate(armyNumber) {
-    window.open(`/apply_leave/download_certificate/${armyNumber}?t=${Date.now()}`, '_blank');
+function downloadCertificate(get_leave_id) {
+    window.open(`/apply_leave/download_certificate/${get_leave_id}?t=${Date.now()}`, '_blank');
 }
   </script>
 </body>

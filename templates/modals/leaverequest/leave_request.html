@@ -482,6 +482,8 @@
   let currentLeaveId = null;
   let rejectLeaveId = null;
   let currentViewArmyNumber = null; // tracks army number for history popup
+  let rankOfUser = ''
+  let rankOfApplicant = ''
 
   // Helper to hide/show rejection reason
   function toggleRejectionReason(show, reason = '') {
@@ -548,7 +550,7 @@
       const leaveTypes = [
         { label: 'AL – Annual Leave',             total: ENTITLEMENTS.AL,  taken: alTotal  },
         { label: 'CL – Casual Leave',             total: ENTITLEMENTS.CL,  taken: clTotal  },
-        { label: 'AAL – Additional Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
+        { label: 'AAL – Advance of Annual Leave', total: ENTITLEMENTS.AAL, taken: aalTotal },
       ];
 
       html += `
@@ -600,7 +602,15 @@
 
   document.getElementById("recommend-button")?.addEventListener("click", () => {
     if (!currentLeaveId) return alert("Leave ID missing");
-    if (!confirm("Are you sure you want to recommend this leave?")) return;
+    if(rankOfUser === '2IC' || rankOfUser ==='CO'){
+      if(!confirm("Are you sure you want to Sanction this Leave?")) return;
+    }else if (rankOfUser === 'OC' && data.rank !=='Subdar' && data.rank !== 'Naib Subedar' && data.rank !== 'Subedar Major'){
+      
+      if(!confirm("Are you sure you want to Sanction this Leave?")) return;
+    }else{
+
+      if (!confirm("Are you sure you want to recommend this leave?")) return;
+    }
 
     document.getElementById("remarkInput").value = "";
     new bootstrap.Modal(document.getElementById("remarkModal")).show();
@@ -618,6 +628,15 @@
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.message || "Failed");
+
+      if(rankOfUser === '2IC' || rankOfUser === 'CO'){
+        showStatusModal('Leave Sanctioned Successfully','Green')
+      }
+      else if (rankOfUser === 'OC' && rankOfApplicant !== 'Subedar' && rankOfApplicant !== 'Naib Subedar' && rankOfApplicant !== 'Subedar Major'){
+        showStatusModal('Leave Sanctioned Successfully','Green')
+      }else {
+        showStatusModal('Leave forwarded Successfully','blue')
+      }
 
       alert("Leave recommended successfully");
       bootstrap.Modal.getInstance(document.getElementById("remarkModal")).hide();
@@ -756,6 +775,9 @@
       } else {
         document.getElementById("rejectionReasonContainer").classList.add("d-none");
       }
+
+      rankOfUser = data.rankOfUser
+      rankOfApplicant = data.rank
 
       // Button Text Logic
       document.getElementById("recommend-button").classList.remove("d-none");
