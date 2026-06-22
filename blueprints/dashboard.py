@@ -277,3 +277,39 @@ def delete_attachment(army_number):
         cursor.close()
         conn.close()
 
+
+@dashboard_bp.route("/get_honours_board", methods=["GET"])
+def get_honours_board():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT 
+                hb.army_number, 
+                p.name, 
+                p.rank, 
+                p.company, 
+                hb.medal_icon, 
+                hb.commendation, 
+                hb.appreciation_type, 
+                hb.appreciation_date, 
+                hb.image
+            FROM honours_board hb
+            JOIN personnel p ON hb.army_number = p.army_number
+            ORDER BY hb.appreciation_date DESC
+        """
+        cursor.execute(query)
+        data = cursor.fetchall()
+        
+        # Format date for JSON response
+        for row in data:
+            if row['appreciation_date']:
+                row['appreciation_date'] = row['appreciation_date'].strftime("%d-%m-%Y")
+                
+        return jsonify({"status": "success", "data": data})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+

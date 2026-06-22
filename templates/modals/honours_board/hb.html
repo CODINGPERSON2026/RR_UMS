@@ -88,25 +88,32 @@
     width: 100%;
     overflow: hidden;
     position: relative;
-    height: 232px; /* Set height to fit within 340px parent card */
+    height: 232px;
+    perspective: 1200px;
   }
 
   .hb-track {
-    display: flex;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
     width: 100%;
     height: 100%;
+    will-change: transform;
   }
 
   .hb-slide {
-    flex: 0 0 100%;
-    width: 100%;
-    padding: 12px 14px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    padding: 6px 8px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     height: 100%;
+    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1;
   }
 
   .hb-top {
@@ -213,7 +220,7 @@
     font-weight: 500;
     color: var(--text-primary);
     margin-bottom: 10px;
-    max-height: 130px; /* Increased to fit full text without inner scrollbar */
+    max-height: 155px; /* Increased height after removing share button */
     overflow-y: auto;
   }
 
@@ -310,6 +317,21 @@
     const dotsWrap= document.getElementById("dots");
 
     async function loadHonoursBoard() {
+      try {
+        const response = await fetch("/stats/get_honours_board");
+        const json = await response.json();
+        if (json.status === "success" && json.data && json.data.length > 0) {
+          entries = json.data;
+        } else {
+          setDummyEntries();
+        }
+      } catch (e) {
+        console.error("Failed to load honours board from DB", e);
+        setDummyEntries();
+      }
+    }
+
+    function setDummyEntries() {
       // Hardcoded dummy data for appreciation board
       entries = [
         {
@@ -434,9 +456,6 @@
             <div class="hb-text">${item.commendation||""}</div>
             <div class="hb-footer">
               <div class="hb-date">${item.appreciation_date||""}</div>
-              <button class="hb-share" type="button" onclick="navigator.clipboard.writeText('${item.commendation || ''}').then(() => alert('Commendation copied to clipboard!'))">
-          
-              </button>
             </div>
           </div>
         `;
@@ -457,17 +476,64 @@
       if (entries.length === 0) return;
       current = ((index % entries.length) + entries.length) % entries.length;
 
-      if (track) {
-        track.style.transform = "translateX(-" + (current * 100) + "%)";
-      }
+      const viewportWidth = track.parentElement.offsetWidth;
+      const slideWidth = viewportWidth * 0.60;
+      const offset = (viewportWidth - slideWidth) / 2;
+      const total = entries.length;
 
-      if (prevBtn) prevBtn.disabled = current === 0;
-      if (nextBtn) nextBtn.disabled = current === entries.length - 1;
+      const slides = track.querySelectorAll(".hb-slide");
+      slides.forEach((slide, idx) => {
+        let diff = idx - current;
+
+        // Seamless circular wrap-around logic
+        if (diff > total / 2) diff -= total;
+        if (diff <= -total / 2) diff += total;
+
+        const tx = offset + (diff * slideWidth);
+        
+        slide.classList.remove("active", "prev", "next");
+        
+        let scale = 0.85;
+        let rotY = 0;
+        let opacity = 0;
+        let zIndex = 1;
+        let filter = "blur(4px)";
+
+        if (diff === 0) {
+          slide.classList.add("active");
+          scale = 1.12;
+          opacity = 1;
+          zIndex = 10;
+          filter = "blur(0)";
+        } else if (diff === -1 || (total === 2 && current === 0 && idx === 1)) {
+          slide.classList.add("prev");
+          scale = 0.95;
+          rotY = 25;
+          opacity = 0.35;
+          zIndex = 5;
+          filter = "blur(1px)";
+        } else if (diff === 1 || (total === 2 && current === 1 && idx === 0)) {
+          slide.classList.add("next");
+          scale = 0.95;
+          rotY = -25;
+          opacity = 0.35;
+          zIndex = 5;
+          filter = "blur(1px)";
+        }
+
+        slide.style.transform = `translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg)`;
+        slide.style.opacity = opacity;
+        slide.style.zIndex = zIndex;
+        slide.style.filter = filter;
+        slide.style.pointerEvents = (diff === 0) ? "auto" : "none";
+      });
+
+      if (prevBtn) prevBtn.disabled = false;
+      if (nextBtn) nextBtn.disabled = false;
 
       const dots = document.querySelectorAll(".hb-dot");
       dots.forEach((dot, idx) => {
-        if (idx === current) dot.classList.add("active");
-        else dot.classList.remove("active");
+        dot.classList.toggle("active", idx === current);
       });
     }
 
@@ -495,6 +561,8 @@
       await loadHonoursBoard();
       renderAllSlides();
       startHonoursTimer();
+
+      window.addEventListener("resize", () => goHonours(current));
 
       if (nextBtn) {
         nextBtn.addEventListener("click", () => {
