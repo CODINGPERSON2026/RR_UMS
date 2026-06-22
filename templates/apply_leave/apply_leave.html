@@ -946,8 +946,16 @@
       prefixHint.textContent = '❌ Prefix date cannot be after first leave start date';
       return false;
     } else {
+      // Calculate and show the dates
+      let dates = [];
+      let tempDate = new Date(prefixDate);
+      while (tempDate < firstFromDate) {
+        dates.push(tempDate.getDate() + ' ' + tempDate.toLocaleString('default', { month: 'short' }));
+        tempDate.setDate(tempDate.getDate() + 1);
+      }
+      
       prefixHint.className = 'date-hint success';
-      prefixHint.textContent = '✅ Valid prefix date';
+      prefixHint.innerHTML = `✅ Valid prefix: <span style="font-weight:700;">${dates.join(', ')}</span>`;
       return true;
     }
   }
@@ -982,8 +990,17 @@
       suffixHint.textContent = '❌ Suffix date cannot be before last leave end date';
       return false;
     } else {
+      // Calculate and show the dates
+      let dates = [];
+      let tempDate = new Date(lastToDate);
+      tempDate.setDate(tempDate.getDate() + 1); // Start from day after leave ends
+      while (tempDate <= suffixDate) {
+        dates.push(tempDate.getDate() + ' ' + tempDate.toLocaleString('default', { month: 'short' }));
+        tempDate.setDate(tempDate.getDate() + 1);
+      }
+
       suffixHint.className = 'date-hint success';
-      suffixHint.textContent = '✅ Valid suffix date';
+      suffixHint.innerHTML = `✅ Valid suffix: <span style="font-weight:700;">${dates.join(', ')}</span>`;
       return true;
     }
   }
