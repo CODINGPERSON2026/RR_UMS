@@ -136,6 +136,21 @@
   font-weight: 700;
   font-size: .95rem;
 }
+.lhp-year-select {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1e40af;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: all 0.2s;
+}
+.lhp-year-select:hover { border-color: #2563eb; transform: translateY(-1px); }
+.lhp-year-select:focus { outline: 2px solid #2563eb; }
 .lhp-table { width: 100%; border-collapse: collapse; }
 .lhp-table thead th {
   background: #f8fafc;
@@ -672,9 +687,10 @@ label.fw-bold {
         const days = Number(record.days_taken || 0);
         const year = record.year;
 
-        if (!grouped[type]) grouped[type] = { total: 0, entries: [] };
+        if (!grouped[type]) grouped[type] = { total: 0, entries: [], yearTotals: {} };
         grouped[type].entries.push({ ...record, source: 'detailed' });
         grouped[type].total += days;
+        grouped[type].yearTotals[year] = (grouped[type].yearTotals[year] || 0) + days;
 
         // ONLY add to summary cards if it's the current year
         if (year == currentYear) {
@@ -713,7 +729,7 @@ label.fw-bold {
                 const difference = dbTotal - detailedInThisYear;
 
                 if (difference > 0) {
-                    if (!grouped[typeKey]) grouped[typeKey] = { total: 0, entries: [] };
+                    if (!grouped[typeKey]) grouped[typeKey] = { total: 0, entries: [], yearTotals: {} };
                     
                     grouped[typeKey].entries.push({
                         year: year,
@@ -722,6 +738,7 @@ label.fw-bold {
                         source: 'manual'
                     });
                     grouped[typeKey].total += difference;
+                    grouped[typeKey].yearTotals[year] = (grouped[typeKey].yearTotals[year] || 0) + difference;
 
                     // ONLY add to summary cards if it's the current year
                     if (year == currentYear) {
@@ -796,18 +813,34 @@ label.fw-bold {
 
     Object.keys(grouped).forEach(type => {
         const gData = grouped[type];
+        const years = Object.keys(gData.yearTotals).sort((a,b) => b-a);
+        const hasCurrentYear = years.includes(currentYear.toString());
+        const defaultYear = hasCurrentYear ? currentYear.toString() : (years.length > 0 ? years[0] : 'all');
+
         html += `
-            <div class="lhp-year-block" id="section-${type}">
+            <div class="lhp-year-block" id="section-${type}" data-type="${type}">
                 <div class="lhp-year-heading">
                     <span class="lhp-badge-year">${type}</span>
                     <span style="font-weight:700; color: #1e40af;">${leaveLabels[type] || type}</span>
-                    <span style="margin-left: auto; font-size: 0.85rem; color: #64748b; font-weight: 600;">Total: ${gData.total} Days</span>
+                    
+                    <div style="margin-left: auto; display: flex; align-items: center; gap: 12px;">
+                        <select class="lhp-year-select" onchange="window.filterLHPYear(this, '${type}')">
+                            <option value="all">All Years</option>
+                            ${years.map(y => `<option value="${y}" ${y == defaultYear ? 'selected' : ''}>Year ${y}</option>`).join('')}
+                        </select>
+                        <span class="lhp-type-total" style="font-size: 0.85rem; color: #64748b; font-weight: 700; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; min-width: 90px; text-align: center;">
+                           ${defaultYear === 'all' ? gData.total : (gData.yearTotals[defaultYear] || 0)} Days
+                        </span>
+                    </div>
                 </div>
-                <div style="padding:15px; background: #fff;">
+                <div class="lhp-entries-container" style="padding:15px; background: #fff;">
         `;
 
         gData.entries.forEach(leave => {
             const isManual = (leave.source === 'manual');
+            const entryYear = leave.year;
+            const isVisible = (defaultYear === 'all' || entryYear == defaultYear);
+            
             let dateStr = "";
             if (isManual) {
               dateStr = `Recorded in Year ${leave.year}`;
@@ -818,7 +851,7 @@ label.fw-bold {
             }
 
             html += `
-                <div style="padding:12px 14px; margin-bottom:10px; background:#f8fafc; border-radius:10px; border: 1px solid #e2e8f0; border-left:5px solid ${isManual ? '#64748b' : '#2563eb'};">
+                <div class="lhp-entry-item" data-year="${entryYear}" style="display: ${isVisible ? 'block' : 'none'}; padding:12px 14px; margin-bottom:10px; background:#f8fafc; border-radius:10px; border: 1px solid #e2e8f0; border-left:5px solid ${isManual ? '#64748b' : '#2563eb'};">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                       <div style="font-weight:700; color:#334155; font-size: 0.95rem;">${dateStr}</div>
                       <div style="background: ${isManual ? '#f1f5f9' : '#e0f2fe'}; color: ${isManual ? '#475569' : '#0369a1'}; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.8rem;">
@@ -836,6 +869,28 @@ label.fw-bold {
     });
 
     body.innerHTML = html;
+
+    if (!window.filterLHPYear) {
+      window.filterLHPYear = (select, type) => {
+        const year = select.value;
+        const block = document.getElementById(`section-${type}`);
+        const entries = block.querySelectorAll('.lhp-entry-item');
+        const totalSpan = block.querySelector('.lhp-type-total');
+        let filteredTotal = 0;
+
+        entries.forEach(item => {
+          if (year === 'all' || item.getAttribute('data-year') === year) {
+            item.style.display = 'block';
+            const days = parseInt(item.querySelector('div div:last-child').textContent) || 0;
+            filteredTotal += days;
+          } else {
+            item.style.display = 'none';
+          }
+        });
+        
+        totalSpan.textContent = `${filteredTotal} Days`;
+      };
+    }
   }
 
   // ─── RECOMMEND WITH REMARK MODAL ────────────────────────────────────────────

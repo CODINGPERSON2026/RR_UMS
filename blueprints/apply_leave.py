@@ -2553,56 +2553,61 @@ def get_leave_balance():
         year = str(datetime.now().year)
 
     conn = get_db_connection()
+    if not conn:
+        return jsonify({"error": "Database connection failed"}), 500
+
     try:
-        with conn.cursor(dictionary=True) as cursor:
-            # Fetch record from leave_details table
-            cursor.execute("""
-                SELECT AL, CL, AAL, PL,`Annual Leave`
-                FROM leave_details 
-                WHERE army_number = %s AND year = %s
-            """, (army_number, year))
-            
-            record = cursor.fetchone()
+        # Use buffered=True to avoid 'Unread result found' errors
+        cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("""
+            SELECT AL, CL, AAL, PL, `Annual Leave`
+            FROM leave_details 
+            WHERE army_number = %s AND year = %s
+        """, (army_number, year))
+        
+        record = cursor.fetchone()
 
-            # Define entitlements
-            entitlements = {
-                "AL": 60,
-                "CL": 30,
-                "AAL": 20,
-                "PL": 15,
-                'Annual Leave':30       # Change this if your PL entitlement is different
-            }
+        # Define entitlements
+        entitlements = {
+            "AL": 60,
+            "CL": 30,
+            "AAL": 20,
+            "PL": 15,
+            "Annual Leave": 30
+        }
 
+        entitled = entitlements.get(leave_type, 0)
+        taken = 0
 
-            entitled = entitlements.get(leave_type, 0)
-            taken = 0
+        if record:
+            if leave_type == "AL":
+                taken = record.get('AL') or 0
+            elif leave_type == "CL":
+                taken = record.get('CL') or 0
+            elif leave_type == "AAL":
+                taken = record.get('AAL') or 0
+            elif leave_type == "PL":
+                taken = record.get('PL') or 0
+            elif leave_type == "Annual Leave":
+                taken = record.get('Annual Leave') or 0
 
-            if record:
-                if leave_type == "AL":
-                    taken = record.get('AL') or 0
-                elif leave_type == "CL":
-                    taken = record.get('CL') or 0
-                elif leave_type == "AAL":
-                    taken = record.get('AAL') or 0
-                elif leave_type == "PL":
-                    taken = record.get('PL') or 0
-                elif leave_type == 'Annual Leave':
-                    taken = record.get('Annual Leave') or 0
+        balance = max(0, entitled - taken)
 
-            balance = max(0, entitled - taken)
-
-            return jsonify({
-                "success": True,
-                "leave_type": leave_type,
-                "entitled": entitled,
-                "taken": taken,
-                "balance": balance,
-                "year": year
-            })
+        return jsonify({
+            "success": True,
+            "leave_type": leave_type,
+            "entitled": entitled,
+            "taken": taken,
+            "balance": balance,
+            "year": year
+        })
 
     except Exception as e:
         return jsonify({"error": "Internal server error", "details": str(e)}), 500
     
     finally:
-        conn.close()
+        if conn:
+            if 'cursor' in locals():
+                cursor.close()
+            conn.close()
 
