@@ -892,7 +892,7 @@ def recommend_leave():
             year = str(datetime.now().year)
             army_number = leave['army_number']
 
-            al = cl = aal = pl = Annual_Leave = 0
+            al = cl = aal = ptl = Annual_Leave = 0
             remarks_text = None
 
             leave_type_str = (leave['leave_type'] or '').strip().upper()
@@ -916,8 +916,8 @@ def recommend_leave():
                         cl += days
                     elif lt == 'AAL':
                         aal += days
-                    elif lt == 'PL':
-                        pl += days
+                    elif lt == 'PTL':
+                        ptl += days
                     elif lt == 'ANNUAL LEAVE':
                         Annual_Leave = days
                     else:
@@ -937,7 +937,7 @@ def recommend_leave():
                 elif lt == 'AAL':
                     aal = days
                 elif lt == 'PL':
-                    pl = days
+                    ptl = days
                 elif lt == 'ANNUAL LEAVE':
                     Annual_Leave = days
 
@@ -956,7 +956,7 @@ def recommend_leave():
                 new_al = (existing['AL'] or 0) + al
                 new_cl = (existing['CL'] or 0) + cl
                 new_aal = (existing['AAL'] or 0) + aal
-                new_pl = (existing['PL'] or 0) + pl
+                new_ptl = (existing['PTL'] or 0) + ptl
                 new_Annual_leave = (existing['Annual Leave'] or 0) + Annual_Leave
 
                     
@@ -966,7 +966,7 @@ def recommend_leave():
                         remarks = CONCAT(IFNULL(remarks, ''), %s)
                     WHERE army_number = %s AND year = %s
                 """, (
-                    new_al, new_cl, new_aal, new_pl,new_Annual_leave,
+                    new_al, new_cl, new_aal, new_ptl,new_Annual_leave,
                     f"; {remarks_text}" if remarks_text else "",
                     army_number, year
                 ))
@@ -977,7 +977,7 @@ def recommend_leave():
                     (army_number, year, AL, CL, AAL, PL,`Annual Leave`, remarks, leave_start_date, leave_end_date)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
                 """, (
-                    army_number, year, al, cl, aal, pl,Annual_Leave,
+                    army_number, year, al, cl, aal, ptl,Annual_Leave,
                     remarks_text,
                     leave['from_date'],
                     leave['to_date']
