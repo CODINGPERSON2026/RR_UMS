@@ -2118,12 +2118,27 @@ def download_leave_certificate(leave_id):
         suffix_days = int(data.get('suffix_days', 0))
 
         prefix_details = "NIL"
-        if prefix_days > 0 and data.get('prefix_date'):
-            prefix_details = f"{prefix_days} day(s) w.e.f. {data['prefix_date'].strftime('%d-%m-%Y')}"
+        if prefix_days > 0 and data.get('prefix_date') and data.get('from_date'):
+            from datetime import timedelta
+            dates = []
+            curr = data['prefix_date']
+            while curr < data['from_date']:
+                dates.append(curr.strftime('%d %b'))
+                curr += timedelta(days=1)
+            date_list_str = ", ".join(dates)
+            prefix_details = f"{prefix_days} day(s) ({date_list_str}) w.e.f. {data['prefix_date'].strftime('%d-%m-%Y')}"
 
         suffix_details = "NIL"
-        if suffix_days > 0 and data.get('suffix_date'):
-            suffix_details = f"{suffix_days} day(s) w.e.f. {data['suffix_date'].strftime('%d-%m-%Y')}"
+        if suffix_days > 0 and data.get('suffix_date') and data.get('to_date'):
+            from datetime import timedelta
+            dates = []
+            curr = data['to_date'] + timedelta(days=1)
+            while curr <= data['suffix_date']:
+                dates.append(curr.strftime('%d %b'))
+                curr += timedelta(days=1)
+            date_list_str = ", ".join(dates)
+            suffix_start_date = (data['to_date'] + timedelta(days=1)).strftime('%d-%m-%Y')
+            suffix_details = f"{suffix_days} day(s) ({date_list_str}) w.e.f. {suffix_start_date}"
 
         # ====================== PREPARE CERTIFICATE DATA ======================
         current_year = datetime.now().year
