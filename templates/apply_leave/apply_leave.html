@@ -1795,6 +1795,7 @@
 
     const grouped = {};
     const totals  = { AL: 0, CL: 0, PL: 0, OTHER: 0, ANNUAL_LEAVE: 0 };
+    const currentYear = new Date().getFullYear();
 
     // 1. Process Detailed History
     records.forEach(record => {
@@ -1806,11 +1807,14 @@
         grouped[type].entries.push({ ...record, source: 'detailed' });
         grouped[type].total += days;
 
-        if (type === 'AL') totals.AL += days;
-        else if (type === 'CL') totals.CL += days;
-        else if (type === 'PL') totals.PL += days;
-        else if (type.toUpperCase() === 'ANNUAL LEAVE') totals.ANNUAL_LEAVE += days;
-        else totals.OTHER += days;
+        // Only current year for summary cards
+        if (year == currentYear) {
+            if (type === 'AL') totals.AL += days;
+            else if (type === 'CL') totals.CL += days;
+            else if (type === 'PL') totals.PL += days;
+            else if (type.toUpperCase() === 'ANNUAL LEAVE') totals.ANNUAL_LEAVE += days;
+            else totals.OTHER += days;
+        }
     });
 
     // 2. Process Yearly Summary (Deductive Logic)
@@ -1848,11 +1852,14 @@
                     });
                     grouped[typeKey].total += difference;
 
-                    if (t.key === 'AL') totals.AL += difference;
-                    else if (t.key === 'CL') totals.CL += difference;
-                    else if (t.key === 'PL') totals.PL += difference;
-                    else if (t.key === 'Annual_Leave') totals.ANNUAL_LEAVE += difference;
-                    else totals.OTHER += difference;
+                    // Only current year for summary cards
+                    if (year == currentYear) {
+                        if (t.key === 'AL') totals.AL += difference;
+                        else if (t.key === 'CL') totals.CL += difference;
+                        else if (t.key === 'PL') totals.PL += difference;
+                        else if (t.key === 'Annual_Leave') totals.ANNUAL_LEAVE += difference;
+                        else totals.OTHER += difference;
+                    }
                 }
             }
         });
