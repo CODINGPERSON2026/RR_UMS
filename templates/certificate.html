@@ -4,7 +4,7 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 1.2cm 1.5cm 1.2cm 1.5cm;
+            margin: 0.8cm 1.2cm 0.8cm 1.2cm;
         }
 
         * {
@@ -13,8 +13,8 @@
 
         body {
             font-family: "Times New Roman", serif;
-            font-size: 11.5pt;
-            line-height: 1.6;
+            font-size: 11pt;
+            line-height: 1.35;
             color: #000;
             margin: 0;
             padding: 0;
@@ -31,12 +31,13 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            page-break-inside: avoid;
         }
 
         .header-table td {
             text-align: center;
             vertical-align: middle;
-            padding-bottom: 20px;
+            padding-bottom: 10px;
         }
 
         h2 {
@@ -48,23 +49,23 @@
         }
 
         .sub-header {
-            font-size: 12.5pt;
-            margin-top: 8px;
+            font-size: 12pt;
+            margin-top: 5px;
             text-transform: uppercase;
             font-weight: bold;
             letter-spacing: 2px;
         }
 
         .info-header {
-            margin: 10px 0 15px 0;
-            font-size: 11pt;
+            margin: 5px 0 8px 0;
+            font-size: 10.5pt;
         }
 
         .cert-body {
-            margin-top: 15px;
+            margin-top: 10px;
             text-align: justify;
-            font-size: 11.5pt;
-            line-height: 1.5;
+            font-size: 11pt;
+            line-height: 1.35;
         }
 
         .cert-body strong {
@@ -72,7 +73,7 @@
         }
 
         .details-table td {
-            padding: 6px 5px;
+            padding: 4px 5px;
             vertical-align: top;
         }
 
@@ -83,60 +84,60 @@
 
         .breakdown-table {
             width: 100%;
-            margin: 18px 0;
+            margin: 10px 0;
             border: 1px solid #000;
         }
 
         .breakdown-table th {
             background: #e8e8e8;
-            padding: 7px 6px;
+            padding: 5px 6px;
             text-align: center;
             border: 1px solid #000;
-            font-size: 10.5pt;
+            font-size: 10pt;
         }
 
         .breakdown-table td {
-            padding: 7px 6px;
+            padding: 5px 6px;
             text-align: center;
             border: 1px solid #000;
-            font-size: 10.5pt;
+            font-size: 10pt;
         }
 
         .transport-section {
-            margin: 15px 0;
-            font-size: 10.8pt;
+            margin: 10px 0;
+            font-size: 10pt;
         }
 
         .transport-table td {
-            padding: 5px;
+            padding: 4px 5px;
             border: 1px solid #ccc;
         }
 
         .report-line {
-            margin: 10px 0;
-            padding: 8px 12px;
+            margin: 8px 0;
+            padding: 6px 10px;
             background: #fdf4f4;
             border-left: 4px solid #c00;
             font-weight: bold;
-            font-size: 11pt;
+            font-size: 10.5pt;
         }
 
         .signature-table {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 12px;
         }
 
         .seal-box {
-            border: 3.5px solid #c00;
+            border: 3px solid #c00;
             color: #c00;
-            width: 98px;
-            height: 98px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            font-size: 10.5pt;
+            font-size: 9.5pt;
             font-weight: bold;
             margin: 0 auto;
         }
@@ -144,18 +145,18 @@
         .digital-sig {
             border: 2px solid #c00;
             background: #fff9f9;
-            padding: 10px 12px;
-            font-size: 9.5pt;
+            padding: 6px 10px;
+            font-size: 9pt;
             text-align: center;
             border-radius: 3px;
         }
 
         .footer {
-            margin-top: 25px;
+            margin-top: 15px;
             text-align: center;
             border-top: 1px solid #000;
-            padding-top: 10px;
-            font-size: 9.5pt;
+            padding-top: 6px;
+            font-size: 9pt;
             font-weight: bold;
         }
 
@@ -174,14 +175,14 @@
 <table class="header-table" style="width: 100%;">
     <tr>
         <td width="20%" align="left" valign="middle">
-            <img src="{{ chinar_logo_path }}" width="100" height="100" style="border-radius:50%">
+            <img src="{{ chinar_logo_path }}" width="80" height="80" style="border-radius:50%">
         </td>
         <td width="60%" align="center" valign="middle">
             <h2 style="margin: 0;">LEAVE CERTIFICATE</h2>
-            <div class="sub-header" style="margin-top: 8px;">15 CORPS ENGG SIG REGT</div>
+            <div class="sub-header" style="margin-top: 5px;">15 CORPS ENGG SIG REGT</div>
         </td>
         <td width="20%" align="right" valign="middle">
-            <img src="{{ rt_logo_path }}" width="120" height="120">
+            <img src="{{ rt_logo_path }}" width="90" height="90">
         </td>
     </tr>
 </table>
@@ -304,7 +305,7 @@
         <table class="signature-table">
             <tr>
                 <td width="33%" style="vertical-align: bottom;">
-                    <br><br><br>
+                    <br><br>
                     ________________________<br>
                     <strong>Signature of Applicant</strong><br>
                     <span style="font-size:9pt;">(with date)</span>

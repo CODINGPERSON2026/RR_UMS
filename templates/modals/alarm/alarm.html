@@ -38,42 +38,673 @@
             left: 120%;
         }
     }
+
+    /* ================= DET ALARM MODAL STYLES ================= */
+
+    #detAlarmModalScope .custom-size {
+        max-width: 97% !important;
+        width: 97% !important;
+    }
+
+    #detAlarmModalScope .modal-body {
+        overflow: auto;
+    }
+
+    #detAlarmModalScope .modal-dialog {
+        margin-top: 1px;
+    }
+
+    #detAlarmModalScope .detAlarmTableWrapper {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    #detAlarmModalScope #detAlarmTable {
+        table-layout: fixed;
+        width: 100%;
+        min-width: 1100px;
+    }
+
+    #detAlarmModalScope #detAlarmTable th,
+    #detAlarmModalScope #detAlarmTable td {
+        overflow: hidden;
+        vertical-align: middle;
+        font-size: 0.84rem;
+        padding: 0.55rem 0.6rem;
+    }
+
+    #detAlarmModalScope #detAlarmTable th {
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+    #detAlarmModalScope .detAlarmCellScroll {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: thin;
+    }
+
+    #detAlarmModalScope .detAlarmCellScroll::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    #detAlarmModalScope .detAlarmCellScroll::-webkit-scrollbar-thumb {
+        background: #c7c7c7;
+        border-radius: 20px;
+    }
+
+    #detAlarmModalScope .detAlarmRankBadge {
+        display: inline-block;
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffe69c;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    #detAlarmModalScope .detAlarmCompanyBadge {
+        display: inline-block;
+        background: #d1e7dd;
+        color: #0f5132;
+        border: 1px solid #badbcc;
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 0.74rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    #detAlarmModalScope .detAlarmNameCell {
+        font-weight: 600;
+        color: #212529;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 0;
+    }
+
+    #detAlarmModalScope .detAlarmArmyNumber {
+        font-weight: 700;
+        color: #0d6efd;
+    }
+
+    #detAlarmModalScope .detAlarmCountBadge {
+        font-size: 0.78rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+    }
+
+    #detAlarmModalScope .detAlarmDangerDays {
+        color: #dc3545;
+        font-weight: 700;
+    }
 </style>
 
-<!-- Toast Container -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='fontawesome-free-7.1.0-web/css/all.min.css') }}" />
+
+<!-- ================= ALARM BADGE ================= -->
+
 <span id="alarmAlert" class="alarm-gradient d-none" style="cursor:pointer;">
     🔔 You have Detachment alarms!
 </span>
 
+<!-- ================= DET ALARM MODAL ================= -->
+
+<div class="modal fade" id="detAlarmModalScope" tabindex="-1">
+
+  <div class="modal-dialog modal-xl custom-size">
+
+    <div class="modal-content">
+
+      <!-- ================= HEADER ================= -->
+
+      <div class="modal-header">
+
+        <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+
+          <!-- ================= TITLE ================= -->
+
+          <div class="d-flex align-items-center gap-2">
+
+            <h5 class="modal-title mb-0">
+
+              ⚠️ Detachment Alarm — Over 90 Days
+
+            </h5>
+
+          </div>
+
+          <!-- ================= COMPANY FILTER ================= -->
+
+          <select
+            id="detAlarmCompanyFilter"
+            class="form-select form-select-sm"
+            style="width: 200px;">
+
+            <option value="">All Companies</option>
+
+          </select>
+
+          <!-- ================= DETACHMENT FILTER ================= -->
+
+          <select
+            id="detAlarmDetFilter"
+            class="form-select form-select-sm"
+            style="width: 220px;">
+
+            <option value="">All Detachments</option>
+
+          </select>
+
+          <!-- ================= TOTAL COUNT ================= -->
+
+          <div
+            class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
+            style="
+              background: #fff0f0;
+              border: 1px solid #ffd6d6;
+            ">
+
+            <span
+              class="fw-semibold small"
+              style="color:#a83131;">
+
+              Alert Count
+
+            </span>
+
+            <span
+              id="detAlarmTotalCount"
+              class="badge rounded-pill bg-danger detAlarmCountBadge">
+
+              0
+
+            </span>
+
+          </div>
+
+        </div>
+
+        <!-- ================= CLOSE BUTTON ================= -->
+
+        <button
+          class="btn-close"
+          data-bs-dismiss="modal">
+        </button>
+
+      </div>
+
+      <!-- ================= BODY ================= -->
+
+      <div class="modal-body">
+
+        <!-- ================= SPINNER ================= -->
+
+        <div
+          id="detAlarmSpinner"
+          class="text-center py-5">
+
+          <div class="spinner-border text-danger"></div>
+
+          <div class="mt-2 text-muted">
+
+            Fetching alarm data...
+
+          </div>
+
+        </div>
+
+        <!-- ================= TABLE ================= -->
+
+        <div class="detAlarmTableWrapper">
+
+          <table
+            id="detAlarmTable"
+            class="table table-bordered table-hover align-middle d-none">
+
+            <thead class="table-light">
+
+              <tr>
+
+                <th>Army Number</th>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Det Name</th>
+                <th>Days on Det</th>
+                <th>Company</th>
+                <th>Action</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="detAlarmTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= SCRIPT ================= -->
+{% include 'modals/success-modal/modal.html' %}
+
 <script>
-    async function showAssignedAlarms() {
-        try {
-            const res = await fetch('/api/assigned_alarm');
-            if (!res.ok) throw new Error("Network error");
 
-            const result = await res.json();
-            const alarmAlert = document.getElementById("alarmAlert");
+document.addEventListener("DOMContentLoaded", function () {
 
-            if (result.rows && result.rows.length > 0) {
-                alarmAlert.classList.remove("d-none");
-                alarmAlert.classList.add("alert-pulse");
-                alarmAlert.innerText = `🔔 You have ${result.rows.length} Detachment alarm(s)!`;
-            } else {
-                alarmAlert.classList.add("d-none");
-                alarmAlert.classList.remove("alert-pulse");
-            }
+  /* ================= DOM References ================= */
 
-        } catch (err) {
-            console.error("Error fetching assigned alarms:", err);
-        }
+  const alarmModalEl =
+    document.getElementById("detAlarmModalScope");
+
+  const alarmTableBody =
+    alarmModalEl.querySelector("#detAlarmTableBody");
+
+  const alarmSpinner =
+    alarmModalEl.querySelector("#detAlarmSpinner");
+
+  const alarmTable =
+    alarmModalEl.querySelector("#detAlarmTable");
+
+  const alarmDetFilter =
+    alarmModalEl.querySelector("#detAlarmDetFilter");
+
+  const alarmCompanyFilter =
+    alarmModalEl.querySelector("#detAlarmCompanyFilter");
+
+  const alarmCountBadge =
+    alarmModalEl.querySelector("#detAlarmTotalCount");
+
+  let alarmFetchedData = [];
+
+  /* ================= CHECK ALARM COUNT ================= */
+
+  async function showAssignedAlarms() {
+    try {
+      const res = await fetch('/api/assigned_alarm');
+      if (!res.ok) throw new Error("Network error");
+
+      const result = await res.json();
+      const alarmAlert = document.getElementById("alarmAlert");
+
+      if (result.rows && result.rows.length > 0) {
+        alarmAlert.classList.remove("d-none");
+        alarmAlert.classList.add("alert-pulse");
+        alarmAlert.innerText = `🔔 You have ${result.rows.length} Detachment alarm(s)!`;
+      } else {
+        alarmAlert.classList.add("d-none");
+        alarmAlert.classList.remove("alert-pulse");
+      }
+
+    } catch (err) {
+      console.error("Error fetching assigned alarms:", err);
+    }
+  }
+
+  showAssignedAlarms();
+
+  /* ================= OPEN MODAL ON ALARM CLICK ================= */
+
+  document.getElementById("alarmAlert")?.addEventListener("click", async function () {
+
+    const alarmModalBootstrap =
+      new bootstrap.Modal(alarmModalEl);
+
+    alarmModalBootstrap.show();
+
+    await loadAlarmDetachments();
+
+    loadAlarmPersonnel();
+
+  });
+
+  /* ================= FILTER EVENTS ================= */
+
+  alarmDetFilter.addEventListener(
+    "change",
+    function () {
+      renderAlarmTable();
+    }
+  );
+
+  alarmCompanyFilter.addEventListener(
+    "change",
+    function () {
+      renderAlarmTable();
+    }
+  );
+
+  /* ================= LOAD DETACHMENTS (for filter dropdown) ================= */
+
+  async function loadAlarmDetachments() {
+
+    try {
+
+      const response =
+        await fetch("/stats/get_all_dets");
+
+      const result =
+        await response.json();
+
+      if (result.status !== "success") {
+        throw new Error("Failed");
+      }
+
+      alarmDetFilter.innerHTML = `
+        <option value="">All Detachments</option>
+      `;
+
+      result.data.forEach(det => {
+
+        alarmDetFilter.insertAdjacentHTML(
+          "beforeend",
+          `
+            <option value="${det.det_id}">
+              ${det.det_name}
+            </option>
+          `
+        );
+
+      });
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Failed to load detachments");
+
     }
 
-    document.addEventListener('DOMContentLoaded', showAssignedAlarms);
+  }
 
-    document.getElementById("alarmAlert")?.addEventListener("click", function () {
-        const detModal = new bootstrap.Modal(document.getElementById('detModal'));
-        detModal.show();
-        load_det_personnel("", 90);
-        load_detachments();
-    });
+  /* ================= LOAD PERSONNEL (>90 days only) ================= */
+
+  async function loadAlarmPersonnel() {
+
+    alarmSpinner.classList.remove("d-none");
+
+    alarmTable.classList.add("d-none");
+
+    alarmTableBody.innerHTML = "";
+
+    try {
+
+      const response =
+        await fetch("/stats/get_detachment_details?min_days=90");
+
+      const result =
+        await response.json();
+
+      if (result.status !== "success") {
+        throw new Error("Failed");
+      }
+
+      alarmFetchedData = result.data;
+
+      /* ================= COMPANY FILTER ================= */
+
+      alarmCompanyFilter.innerHTML = `
+        <option value="">All Companies</option>
+      `;
+
+      const uniqueCompanies = [
+        ...new Set(
+          alarmFetchedData
+            .map(item => item.company)
+            .filter(Boolean)
+        )
+      ];
+
+      uniqueCompanies.forEach(company => {
+
+        alarmCompanyFilter
+          .insertAdjacentHTML(
+            "beforeend",
+            `
+              <option value="${company}">
+                ${company}
+              </option>
+            `
+          );
+
+      });
+
+      renderAlarmTable();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alarmSpinner.innerHTML = `
+        <p class="text-danger fw-bold mt-3">
+          Failed to load data
+        </p>
+      `;
+
+    }
+
+  }
+
+  /* ================= RENDER TABLE ================= */
+
+  function renderAlarmTable() {
+
+    alarmTableBody.innerHTML = "";
+
+    const selectedDet =
+      alarmDetFilter.value;
+
+    const selectedCompany =
+      alarmCompanyFilter.value;
+
+    let filteredData =
+      [...alarmFetchedData];
+
+    /* ================= DET FILTER ================= */
+
+    if (selectedDet) {
+
+      filteredData =
+        filteredData.filter(
+          item =>
+            String(item.det_id) ===
+            String(selectedDet)
+        );
+
+    }
+
+    /* ================= COMPANY FILTER ================= */
+
+    if (selectedCompany) {
+
+      filteredData =
+        filteredData.filter(
+          item =>
+            item.company ===
+            selectedCompany
+        );
+
+    }
+
+    /* ================= COUNT ================= */
+
+    alarmCountBadge.textContent =
+      filteredData.length;
+
+    /* ================= EMPTY ================= */
+
+    if (filteredData.length === 0) {
+
+      alarmTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center py-4">
+            No personnel found over 90 days
+          </td>
+        </tr>
+      `;
+
+    } else {
+
+      filteredData.forEach(row => {
+
+        const dangerClass =
+          row.days_on_det > 90
+            ? "detAlarmDangerDays"
+            : "";
+
+        alarmTableBody.insertAdjacentHTML(
+          "beforeend",
+          `
+
+          <tr>
+
+            <td>
+              <div class="detAlarmCellScroll detAlarmArmyNumber">
+                ${row.army_number}
+              </div>
+            </td>
+
+            <td>
+              <div class="detAlarmCellScroll">
+                <span class="detAlarmRankBadge">
+                  ${row.rank}
+                </span>
+              </div>
+            </td>
+
+            <td class="detAlarmNameCell">
+              ${(row.name || '').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+            </td>
+
+            <td class="${dangerClass}">
+              <div class="detAlarmCellScroll">
+                ${(row.det_name || "").toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+              </div>
+            </td>
+
+            <td class="${dangerClass}">
+              <div class="detAlarmCellScroll">
+                ${row.days_on_det}
+              </div>
+            </td>
+
+            <td>
+              <div class="detAlarmCellScroll">
+                <span class="detAlarmCompanyBadge">
+                  ${row.company}
+                </span>
+              </div>
+            </td>
+
+            <td>
+
+              <button
+                class="btn btn-sm btn-outline-danger detAlarmDeleteBtn"
+                data-army="${row.army_number}">
+
+                <i class="fas fa-trash"></i>
+
+              </button>
+
+            </td>
+
+          </tr>
+
+          `
+        );
+
+      });
+
+    }
+
+    alarmSpinner.classList.add("d-none");
+
+    alarmTable.classList.remove("d-none");
+
+    /* ================= DELETE BUTTONS ================= */
+
+    alarmModalEl
+      .querySelectorAll(".detAlarmDeleteBtn")
+      .forEach(btn => {
+
+        btn.addEventListener(
+          "click",
+          async function () {
+
+            const army_number =
+              this.dataset.army;
+
+            if (
+              !confirm(
+                `Are you sure you want to remove ${army_number} from detachment?`
+              )
+            ) {
+              return;
+            }
+
+            try {
+
+              const deleteResponse =
+                await fetch(
+                  "/stats/delete_personnel",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                      army_number
+                    })
+                  }
+                );
+
+              showStatusModal('Removed from Detachment successfully','Red',2500);
+
+              const deleteResult =
+                await deleteResponse.json();
+
+              if (
+                deleteResult.status ===
+                "success"
+              ) {
+
+                loadAlarmPersonnel();
+
+              } else {
+
+                alert("Failed to delete");
+
+              }
+
+            } catch (error) {
+
+              console.error(error);
+
+              alert("Error deleting personnel");
+
+            }
+
+          }
+        );
+
+      });
+
+  }
+
+});
+
 </script>

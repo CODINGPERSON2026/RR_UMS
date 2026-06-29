@@ -71,7 +71,7 @@ def on_leave_persons():
                 row['to_date'] = str(row['suffix_date'])
                 
             if row['prefix_days']:
-                row['from_date'] = str(row['prefix_date)'])
+                row['from_date'] = str(row['prefix_date'])
 
         return jsonify({'status': 'success', 'data': rows})
 
