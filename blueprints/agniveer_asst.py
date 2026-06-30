@@ -248,6 +248,8 @@ def update_assistant():
     emergency_type = data.get("emergency_type")
     new_date = data.get("new_date")
     remarks = data.get("remarks")
+    print(data)
+    
 
     if not batch or not test_no or status not in (0, 1):
         return jsonify({"success": False, "error": "Invalid input"}), 400
@@ -300,6 +302,7 @@ WHERE batch = %s
         return jsonify({"success": True})
 
     except Exception as e:
+        print(str(e))
         return jsonify({"success": False, "error": "Server error"}), 500
 
 from datetime import date, datetime, timedelta

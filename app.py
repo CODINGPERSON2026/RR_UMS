@@ -1892,13 +1892,14 @@ def dashboard_summary():
         max_date_result = cursor.fetchone()
         cursor.fetchall()
         latest_date = max_date_result['max_date'] if max_date_result else None
+        print(latest_date,"this is the latest date")
 
         if latest_date:
             query = """
                 SELECT 
-                    SUM(IFNULL(offr_present_unit, 0)) AS officerCount,
-                    SUM(IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0)) AS jcoCount,
-                    SUM(IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0)) AS orCount,
+                     SUM(IFNULL(offr_present_unit, 0) + IFNULL(offr_det, 0)) AS officerCount,
+                    SUM(IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0) + IFNULL(jco_det,0) + IFNULL(jcoEre_det,0)) AS jcoCount,
+                    SUM(IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0) + IFNULL(or_det,0) +IFNULL(orEre_det,0)) AS orCount,
                     SUM(
                         IFNULL(offr_present_unit, 0) + 
                         IFNULL(jco_present_unit, 0) + 
@@ -1916,6 +1917,7 @@ def dashboard_summary():
             
             cursor.execute(query, params)
             manpower_result = cursor.fetchone()
+            print(manpower_result,"this is result")
         else:
             manpower_result = None
 
@@ -3814,9 +3816,9 @@ def get_manpower_data():
         if latest_date:
             query = """
                 SELECT 
-                    SUM(IFNULL(offr_present_unit, 0)) AS officerCount,
-                    SUM(IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0)) AS jcoCount,
-                    SUM(IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0)) AS orCount,
+                     SUM(IFNULL(offr_present_unit, 0) + IFNULL(offr_det, 0)) AS officerCount,
+                    SUM(IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0) + IFNULL(jco_det,0) + IFNULL(jcoEre_det,0)) AS jcoCount,
+                    SUM(IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0) + IFNULL(or_det,0) +IFNULL(orEre_det,0)) AS orCount,
                     SUM(
                         IFNULL(offr_present_unit, 0) + 
                         IFNULL(jco_present_unit, 0) + 
