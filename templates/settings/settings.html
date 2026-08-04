@@ -400,8 +400,6 @@
         </div>
       </div>
 
-      </div>
-
       <!-- ══ SECURITY ══ -->
       <div class="settings-section" id="section-security">
 
@@ -546,15 +544,17 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ── Theme ── */
-  const savedTheme = localStorage.getItem('dashboardTheme') || 'light';
+  const savedTheme = localStorage.getItem('theme') || localStorage.getItem('dashboardTheme') || 'light';
   document.querySelectorAll('.theme-tile').forEach(tile => {
     if (tile.dataset.theme === savedTheme) tile.classList.add('active');
     tile.addEventListener('click', function () {
       const theme = this.dataset.theme;
       document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
       localStorage.setItem('dashboardTheme', theme);
       document.querySelectorAll('.theme-tile').forEach(t => t.classList.remove('active'));
       this.classList.add('active');
+      window.dispatchEvent(new Event('themechange'));
     });
   });
 

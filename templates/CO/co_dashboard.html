@@ -1460,7 +1460,6 @@ STATUS COLORS
         <span class="sc-label">Kunba Intrv</span>
         <div class="sc-right">
           <span class="sc-val" id="interview-Count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-sub" id="interview%" style="color:var(--danger-color)"></span>
         </div>
       </div>
     </div>
@@ -1822,7 +1821,6 @@ STATUS COLORS
       safeSet("totalCoursesDone", data.courses_count);
       safeSet("interview-Count", iv.pending_count);
       safeSet("total-count", iv.total_count);
-      safeSet("interview%", "Pending " + (iv.percentage || 0) + "%");
       safeSet("locationCount", data.detachments);
       safeSet("sensitive-count", data.sensitive_count);
       safeSet("board-count", data.boards_count);

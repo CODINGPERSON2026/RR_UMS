@@ -532,7 +532,6 @@
             /
             <span id="total-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           </span>
-          <span class="sc-sub" id="interview%">&nbsp;</span>
         </div>
       </div>
 
@@ -1001,17 +1000,14 @@
   async function fetchInterviewData() {
     var pe = document.getElementById("interview-Count");
     var te = document.getElementById("total-count");
-    var pr = document.getElementById("interview%");
-    if (!pe || !te || !pr) return;
+    if (!pe || !te) return;
     try {
       var r = await fetch("/api/dashboard/interviews");
       var d = await r.json();
       safeSet("interview-Count", d.pending_count || 0);
       safeSet("total-count", d.total_count || 0);
-      pr.textContent = "Pending " + (d.percentage || 0) + "%";
     } catch (e) {
       safeSet("interview-Count", "0"); safeSet("total-count", "0");
-      if (pr) pr.textContent = "0%";
     }
   }
 
