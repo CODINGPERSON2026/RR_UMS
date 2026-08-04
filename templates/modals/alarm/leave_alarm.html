@@ -5,86 +5,56 @@
     🔔 You have leave alarms!
 </span>
 
-
 <!-- ═══════════════════════════════
      CO PENDING LEAVE MODAL
      ═══════════════════════════════ -->
 <div class="modal fade" id="pendingLeaveModal" tabindex="-1"
      aria-labelledby="pendingLeaveModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content"
-         style="border:1px solid #e2e8f0;border-radius:18px;overflow:hidden;
-                font-family:'Segoe UI',sans-serif;">
+    <div class="modal-content plm-content">
 
       <!-- ── Header ── -->
-      <div class="modal-header flex-column align-items-stretch pb-0"
-           style="background:#ffffff;border-bottom:1px solid #f1f5f9;padding:22px 24px 0;">
+      <div class="modal-header plm-header flex-column align-items-stretch pb-0">
 
         <div class="d-flex align-items-center justify-content-between mb-4">
-          <div style="font-size:22px;font-weight:700;color:#1d4ed8;">
+          <div class="plm-title">
             Pending Leaves
           </div>
           <div class="d-flex align-items-center gap-2">
-            <span id="pendingLeaveBadge"
-                  style="background:#fef2f2;color:#991b1b;font-size:12px;font-weight:600;
-                         padding:5px 14px;border-radius:20px;border:1px solid #fecaca;">
-              0 Overdue
-            </span>
-            <button type="button" class="btn-close"
-                    data-bs-dismiss="modal" aria-label="Close"></button>
+            <span id="pendingLeaveBadge" class="plm-badge-overdue">0 Overdue</span>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>
 
         <!-- Summary stats -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
-          <div style="background:#fef2f2;border-radius:10px;padding:13px 16px;border-left:3px solid #ef4444;">
-            <div id="statCritical"
-                 style="font-size:26px;font-weight:700;color:#dc2626;line-height:1;">—</div>
-            <div style="font-size:12px;font-weight:500;color:#dc2626;opacity:0.7;margin-top:5px;">
-              Critical · 15+ days
-            </div>
+        <div class="plm-stats-grid">
+          <div class="plm-stat-card plm-stat-critical">
+            <div id="statCritical" class="plm-stat-num plm-stat-num-critical">—</div>
+            <div class="plm-stat-label plm-stat-label-critical">Critical · 15+ days</div>
           </div>
-          <div style="background:#fff7ed;border-radius:10px;padding:13px 16px;border-left:3px solid #f97316;">
-            <div id="statHigh"
-                 style="font-size:26px;font-weight:700;color:#ea580c;line-height:1;">—</div>
-            <div style="font-size:12px;font-weight:500;color:#ea580c;opacity:0.7;margin-top:5px;">
-              High · 8–14 days
-            </div>
+          <div class="plm-stat-card plm-stat-high">
+            <div id="statHigh" class="plm-stat-num plm-stat-num-high">—</div>
+            <div class="plm-stat-label plm-stat-label-high">High · 8–14 days</div>
           </div>
-          <div style="background:#f0fdf4;border-radius:10px;padding:13px 16px;border-left:3px solid #22c55e;">
-            <div id="statMod"
-                 style="font-size:26px;font-weight:700;color:#16a34a;line-height:1;">—</div>
-            <div style="font-size:12px;font-weight:500;color:#16a34a;opacity:0.7;margin-top:5px;">
-              Moderate · 7+ days
-            </div>
+          <div class="plm-stat-card plm-stat-mod">
+            <div id="statMod" class="plm-stat-num plm-stat-num-mod">—</div>
+            <div class="plm-stat-label plm-stat-label-mod">Moderate · 7+ days</div>
           </div>
         </div>
 
         <!-- Rank Filter -->
-        <div style="display:flex;align-items:center;gap:10px;padding-bottom:16px;">
-          <label style="font-size:12px;font-weight:700;color:#64748b;
-                        text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;">
-            Filter by Rank
-          </label>
-          <select id="rankFilter"
-                  onchange="applyRankFilter()"
-                  style="font-size:13px;padding:6px 32px 6px 12px;border-radius:8px;
-                         border:1px solid #e2e8f0;background:#f8fafc;color:#0f172a;
-                         cursor:pointer;outline:none;min-width:180px;
-                         appearance:none;-webkit-appearance:none;
-                         background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22%2364748b%22 d=%22M6 8L1 3h10z%22/></svg>');
-                         background-repeat:no-repeat;background-position:right 10px center;">
+        <div class="plm-filter-row">
+          <label class="plm-filter-label">Filter by Rank</label>
+          <select id="rankFilter" onchange="applyRankFilter()" class="plm-filter-select">
             <option value="ALL">All Ranks</option>
           </select>
-          <span id="filterCount" style="font-size:12px;color:#94a3b8;"></span>
+          <span id="filterCount" class="plm-filter-count"></span>
         </div>
 
       </div>
 
       <!-- ── Body ── -->
-      <div class="modal-body" id="pendingLeaveBody"
-           style="background:#f8fafc;padding:14px 20px;
-                  display:flex;flex-direction:column;gap:10px;">
+      <div class="modal-body plm-body" id="pendingLeaveBody">
         <div class="text-center py-5 text-muted">
           <div class="spinner-border spinner-border-sm me-2"></div>
           Loading…
@@ -92,32 +62,262 @@
       </div>
 
       <!-- ── Footer ── -->
-      <div class="modal-footer justify-content-between"
-           style="background:#ffffff;border-top:1px solid #f1f5f9;padding:13px 24px;">
+      <div class="modal-footer plm-footer justify-content-between">
         <div class="d-flex align-items-center gap-4">
-          <span class="d-flex align-items-center gap-2"
-                style="font-size:12px;color:#94a3b8;font-weight:500;">
-            <span style="width:9px;height:9px;border-radius:2px;
-                         background:#ef4444;display:inline-block;"></span> Critical
+          <span class="d-flex align-items-center gap-2 plm-legend-item">
+            <span class="plm-legend-dot" style="background:#ef4444;"></span> Critical
           </span>
-          <span class="d-flex align-items-center gap-2"
-                style="font-size:12px;color:#94a3b8;font-weight:500;">
-            <span style="width:9px;height:9px;border-radius:2px;
-                         background:#f97316;display:inline-block;"></span> High
+          <span class="d-flex align-items-center gap-2 plm-legend-item">
+            <span class="plm-legend-dot" style="background:#f97316;"></span> High
           </span>
-          <span class="d-flex align-items-center gap-2"
-                style="font-size:12px;color:#94a3b8;font-weight:500;">
-            <span style="width:9px;height:9px;border-radius:2px;
-                         background:#94a3b8;display:inline-block;"></span> Moderate
+          <span class="d-flex align-items-center gap-2 plm-legend-item">
+            <span class="plm-legend-dot" style="background:#94a3b8;"></span> Moderate
           </span>
         </div>
-        <small style="font-size:12px;color:#cbd5e1;">Sorted oldest first</small>
+        <small class="plm-footer-note">Sorted oldest first</small>
       </div>
 
     </div>
   </div>
 </div>
 
+<style>
+/* ── Pending Leaves Modal — Theme-aware Styles ── */
+.plm-content {
+  background: var(--card-bg-solid, #ffffff) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.plm-header {
+  background: var(--card-bg-solid, #ffffff) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 22px 24px 0 !important;
+}
+
+.plm-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.plm-badge-overdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Stats grid */
+.plm-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.plm-stat-card {
+  border-radius: 10px;
+  padding: 13px 16px;
+}
+
+.plm-stat-critical { background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; }
+.plm-stat-high     { background: rgba(249, 115, 22, 0.1); border-left: 3px solid #f97316; }
+.plm-stat-mod      { background: rgba(34, 197, 94, 0.1); border-left: 3px solid #22c55e; }
+
+.plm-stat-num      { font-size: 26px; font-weight: 700; line-height: 1; }
+.plm-stat-num-critical { color: #ef4444; }
+.plm-stat-num-high     { color: #f97316; }
+.plm-stat-num-mod      { color: #22c55e; }
+
+.plm-stat-label    { font-size: 12px; font-weight: 500; opacity: 0.8; margin-top: 5px; }
+.plm-stat-label-critical { color: #ef4444; }
+.plm-stat-label-high     { color: #f97316; }
+.plm-stat-label-mod      { color: #22c55e; }
+
+/* Filter row */
+.plm-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+}
+
+.plm-filter-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  white-space: nowrap;
+}
+
+.plm-filter-select {
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--nav-link-hover-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  min-width: 180px;
+}
+
+.plm-filter-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Modal body — 2-column grid */
+.plm-body {
+  background: var(--nav-link-hover-bg, #f8fafc) !important;
+  color: var(--text-primary) !important;
+  padding: 14px 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+/* Leave cards */
+.plm-card {
+  background: var(--card-bg-solid, #ffffff);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+
+.plm-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.plm-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.plm-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.plm-meta-badge {
+  background: var(--nav-link-hover-bg);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.plm-meta-sep { font-size: 12px; color: var(--text-secondary); }
+.plm-meta-txt { font-size: 12px; color: var(--text-secondary); }
+
+.plm-leave-type-badge {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--primary-color);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.plm-date-badge {
+  background: var(--nav-link-hover-bg);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.plm-pending-at-section {
+  flex-shrink: 0;
+  text-align: center;
+  border-left: 1px solid var(--border-color);
+  padding-left: 16px;
+  min-width: 120px;
+}
+
+.plm-pending-at-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.plm-pending-at-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #92400e;
+  background: rgba(252, 211, 77, 0.2);
+  border: 1px solid rgba(252, 211, 77, 0.5);
+  padding: 5px 14px;
+  border-radius: 20px;
+  display: inline-block;
+  letter-spacing: 0.3px;
+}
+
+/* Footer */
+.plm-footer {
+  background: var(--card-bg-solid, #ffffff) !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding: 13px 24px !important;
+}
+
+.plm-legend-item { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+.plm-legend-dot  { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+.plm-footer-note { font-size: 12px; color: var(--text-secondary); }
+
+/* Days pending badges */
+.plm-days-critical {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.plm-days-high {
+  background: rgba(249, 115, 22, 0.12);
+  color: #f97316;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.plm-days-mod {
+  background: var(--nav-link-hover-bg);
+  color: var(--text-secondary);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+</style>
 
 <script>
 /* ══════════════════════════════════════════
@@ -126,7 +326,7 @@
 let _allRequests = [];
 
 /* ══════════════════════════════════════════
-   1. Badge alarm check  — UNCHANGED
+   1. Badge alarm check
    ══════════════════════════════════════════ */
 async function showLeavePendingAlarm() {
     try {
@@ -192,42 +392,36 @@ function renderCards(requests) {
 
     if (!requests.length) {
         body.innerHTML = `
-          <div class="text-center py-5" style="color:#64748b;">
+          <div class="text-center py-5" style="grid-column: 1 / -1;">
             <svg width="44" height="44" viewBox="0 0 44 44" fill="none"
                  style="display:block;margin:0 auto 14px;">
-              <circle cx="22" cy="22" r="20" stroke="#94a3b8" stroke-width="1.5"/>
-              <path d="M14 22h16" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="22" cy="22" r="20" stroke="var(--border-color)" stroke-width="1.5"/>
+              <path d="M14 22h16" stroke="var(--text-secondary)" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            <div style="font-size:14px;font-weight:500;">No results for this rank</div>
-            <div style="font-size:12px;margin-top:4px;color:#94a3b8;">Try selecting a different filter</div>
+            <div style="font-size:14px;font-weight:500;color:var(--text-primary);">No results for this rank</div>
+            <div style="font-size:12px;margin-top:4px;color:var(--text-secondary);">Try selecting a different filter</div>
           </div>`;
         return;
     }
 
     const avatarColors = [
-        {bg:'#fef2f2', color:'#dc2626'},
-        {bg:'#fff7ed', color:'#ea580c'},
-        {bg:'#eff6ff', color:'#2563eb'},
-        {bg:'#f0fdf4', color:'#16a34a'},
-        {bg:'#fdf4ff', color:'#9333ea'},
+        {bg:'rgba(239,68,68,0.12)',   color:'#ef4444'},
+        {bg:'rgba(249,115,22,0.12)',  color:'#f97316'},
+        {bg:'rgba(59,130,246,0.12)',  color:'var(--primary-color)'},
+        {bg:'rgba(34,197,94,0.12)',   color:'#22c55e'},
+        {bg:'rgba(147,51,234,0.12)',  color:'#9333ea'},
     ];
 
-    const cardBorderColor = d => {
+    const borderColor = d => {
         if (d >= 15) return '#ef4444';
         if (d >= 8)  return '#f97316';
-        return              '#94a3b8';
+        return              'var(--border-color)';
     };
 
     const daysBadge = d => {
-        if (d >= 15) return `<span style="background:#fef2f2;color:#991b1b;font-size:12px;
-                                          font-weight:600;padding:3px 10px;border-radius:20px;">
-                               ${d} days pending</span>`;
-        if (d >= 8)  return `<span style="background:#fff7ed;color:#9a3412;font-size:12px;
-                                          font-weight:600;padding:3px 10px;border-radius:20px;">
-                               ${d} days pending</span>`;
-        return               `<span style="background:#f1f5f9;color:#64748b;font-size:12px;
-                                          padding:3px 10px;border-radius:20px;">
-                               ${d} days pending</span>`;
+        if (d >= 15) return `<span class="plm-days-critical">${d} days pending</span>`;
+        if (d >= 8)  return `<span class="plm-days-high">${d} days pending</span>`;
+        return               `<span class="plm-days-mod">${d} days pending</span>`;
     };
 
     const initials = name =>
@@ -235,60 +429,39 @@ function renderCards(requests) {
 
     body.innerHTML = requests.map((r, i) => {
         const av = avatarColors[i % avatarColors.length];
-        const bc = cardBorderColor(r.days_pending);
+        const bc = borderColor(r.days_pending);
         return `
-        <div style="background:#ffffff;border:1px solid #e2e8f0;border-left:4px solid ${bc};
-                    border-radius:12px;padding:16px;display:flex;gap:14px;align-items:center;">
+        <div class="plm-card" style="border-left: 4px solid ${bc};">
 
-          <!-- Avatar -->
-          <div style="width:44px;height:44px;border-radius:10px;flex-shrink:0;
-                      background:${av.bg};color:${av.color};
-                      display:flex;align-items:center;justify-content:center;
-                      font-size:14px;font-weight:700;">
-            ${initials(r.full_name)}
-          </div>
-
-          <!-- Info — left/center -->
-          <div style="flex:1;min-width:0;">
-            <div style="font-size:15px;font-weight:600;color:#0f172a;margin-bottom:4px;">
-              ${r.full_name}
+          <!-- Top: Avatar + Name/Rank -->
+          <div class="plm-card-top">
+            <div class="plm-avatar" style="background:${av.bg};color:${av.color};">
+              ${initials(r.full_name)}
             </div>
-            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
-              <span style="background:#f1f5f9;color:#475569;font-size:11px;font-weight:600;
-                           padding:2px 8px;border-radius:4px;">
-                ${r.rank}
-              </span>
-              <span style="font-size:12px;color:#94a3b8;">·</span>
-              <span style="font-size:12px;color:#94a3b8;">${r.army_number}</span>
-              <span style="font-size:12px;color:#94a3b8;">·</span>
-              <span style="font-size:12px;color:#94a3b8;">${r.company}</span>
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <span style="background:#eff6ff;color:#1d4ed8;font-size:12px;
-                           font-weight:500;padding:3px 10px;border-radius:20px;">
-                ${r.leave_type}
-              </span>
-              <span style="background:#f8fafc;color:#64748b;font-size:12px;
-                           padding:3px 10px;border-radius:20px;border:1px solid #e2e8f0;">
-                ${r.from_date} – ${r.to_date} &nbsp;(${r.leave_days} day${r.leave_days > 1 ? 's' : ''})
-              </span>
-              ${daysBadge(r.days_pending)}
+            <div style="flex:1;min-width:0;">
+              <div class="plm-name">${r.full_name}</div>
+              <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;">
+                <span class="plm-meta-badge">${r.rank}</span>
+                <span class="plm-meta-sep">·</span>
+                <span class="plm-meta-txt">${r.army_number}</span>
+              </div>
+              <div style="margin-top:3px;">
+                <span class="plm-meta-txt">${r.company}</span>
+              </div>
             </div>
           </div>
 
-          <!-- Pending at — RIGHT side -->
-          <div style="flex-shrink:0;text-align:center;
-                      border-left:1px solid #f1f5f9;padding-left:16px;min-width:120px;">
-            <div style="font-size:11px;color:#94a3b8;font-weight:500;
-                        text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">
-              Pending at
-            </div>
-            <span style="font-size:13px;font-weight:700;color:#92400e;
-                         background:#fef3c7;border:1px solid #fde68a;
-                         padding:5px 14px;border-radius:20px;
-                         display:inline-block;letter-spacing:0.3px;">
-              ${r.request_sent_to}
-            </span>
+          <!-- Badges row -->
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="plm-leave-type-badge">${r.leave_type}</span>
+            <span class="plm-date-badge">${r.from_date} – ${r.to_date} &nbsp;(${r.leave_days} day${r.leave_days > 1 ? 's' : ''})</span>
+            ${daysBadge(r.days_pending)}
+          </div>
+
+          <!-- Pending at -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border-color);">
+            <span class="plm-pending-at-label" style="margin-bottom:0;">Pending at</span>
+            <span class="plm-pending-at-value">${r.request_sent_to}</span>
           </div>
 
         </div>`;
@@ -319,7 +492,7 @@ function renderPendingLeaveModal(requests) {
 }
 
 /* ══════════════════════════════════════════
-   6. Run on page load  — UNCHANGED
+   6. Run on page load
    ══════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
     showLeavePendingAlarm();
@@ -347,7 +520,7 @@ document.getElementById("leave_alarm_alert")?.addEventListener("click", async ()
 });
 
 /* ══════════════════════════════════════════
-   8. Tab switching  — UNCHANGED
+   8. Tab switching
    ══════════════════════════════════════════ */
 document.getElementById("pending-tab")?.addEventListener("shown.bs.tab", loadLeaveRequests);
 document.getElementById("recommended-tab")?.addEventListener("shown.bs.tab", loadRecommendedLeaves);
