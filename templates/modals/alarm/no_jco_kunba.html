@@ -53,7 +53,7 @@
                         <tr>
                             <th>Army Number</th>
                             <th>Rank</th>
-                            <th>Name</th>
+                            <th style="text-align: left; text-transform: uppercase;">Name</th>
                             <th>Home State</th>
                             <th>Action</th>
                         </tr>
@@ -139,7 +139,7 @@
                     tr.innerHTML = `
                         <td>${r.army_number}</td>
                         <td>${r.rank}</td>
-                        <td>${r.name}</td>
+                        <td style="text-align: left; text-transform: uppercase;">${(r.name || '').toUpperCase()}</td>
                         <td>${r.home_state}</td>
                         <td>
                             <button class="btn btn-success btn-sm open-remarks-btn"

@@ -926,6 +926,20 @@
       return true;
     }
 
+    const prefixDate = new Date(prefixVal);
+    if (isNaN(prefixDate.getTime())) {
+      prefixHint.className = 'date-hint error';
+      prefixHint.textContent = '❌ Invalid date format';
+      return false;
+    }
+
+    const year = prefixDate.getFullYear();
+    if (year < 2000 || year > 2100) {
+      prefixHint.className = 'date-hint error';
+      prefixHint.textContent = '❌ Please enter a valid 4-digit year (e.g. 2026)';
+      return false;
+    }
+
     const blocks = document.querySelectorAll('.leave-block');
     if (blocks.length === 0) return true;
 
@@ -938,20 +952,22 @@
       return false;
     }
 
-    const prefixDate = new Date(prefixVal);
     const firstFromDate = new Date(firstFromVal);
+    if (isNaN(firstFromDate.getTime())) return true;
 
     if (prefixDate > firstFromDate) {
       prefixHint.className = 'date-hint error';
       prefixHint.textContent = '❌ Prefix date cannot be after first leave start date';
       return false;
     } else {
-      // Calculate and show the dates
+      // Calculate and show the dates safely
       let dates = [];
       let tempDate = new Date(prefixDate);
-      while (tempDate < firstFromDate) {
+      let safetyCounter = 0;
+      while (tempDate < firstFromDate && safetyCounter < 60) {
         dates.push(tempDate.getDate() + ' ' + tempDate.toLocaleString('default', { month: 'short' }));
         tempDate.setDate(tempDate.getDate() + 1);
+        safetyCounter++;
       }
       
       prefixHint.className = 'date-hint success';
@@ -970,6 +986,20 @@
       return true;
     }
 
+    const suffixDate = new Date(suffixVal);
+    if (isNaN(suffixDate.getTime())) {
+      suffixHint.className = 'date-hint error';
+      suffixHint.textContent = '❌ Invalid date format';
+      return false;
+    }
+
+    const year = suffixDate.getFullYear();
+    if (year < 2000 || year > 2100) {
+      suffixHint.className = 'date-hint error';
+      suffixHint.textContent = '❌ Please enter a valid 4-digit year (e.g. 2026)';
+      return false;
+    }
+
     const blocks = document.querySelectorAll('.leave-block');
     if (blocks.length === 0) return true;
 
@@ -982,21 +1012,23 @@
       return false;
     }
 
-    const suffixDate = new Date(suffixVal);
     const lastToDate = new Date(lastToVal);
+    if (isNaN(lastToDate.getTime())) return true;
 
     if (suffixDate < lastToDate) {
       suffixHint.className = 'date-hint error';
       suffixHint.textContent = '❌ Suffix date cannot be before last leave end date';
       return false;
     } else {
-      // Calculate and show the dates
+      // Calculate and show the dates safely
       let dates = [];
       let tempDate = new Date(lastToDate);
       tempDate.setDate(tempDate.getDate() + 1); // Start from day after leave ends
-      while (tempDate <= suffixDate) {
+      let safetyCounter = 0;
+      while (tempDate <= suffixDate && safetyCounter < 60) {
         dates.push(tempDate.getDate() + ' ' + tempDate.toLocaleString('default', { month: 'short' }));
         tempDate.setDate(tempDate.getDate() + 1);
+        safetyCounter++;
       }
 
       suffixHint.className = 'date-hint success';

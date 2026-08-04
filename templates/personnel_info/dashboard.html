@@ -67,22 +67,20 @@
   }
 
   .dashboard-loader {
-    position: absolute;
-    inset: 0;
-    background: rgba(248, 250, 252, 0.95);
-    backdrop-filter: blur(8px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #f8fafc;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    /* Move loader to top */
+    justify-content: center;
     align-items: center;
-    margin-top: 30px;
-    /* Optional: adjust spacing from top */
-    z-index: 1000;
-    border-radius: 12px;
+    z-index: 999999;
     opacity: 1;
     visibility: visible;
-    transition: opacity 0.6s ease;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
   }
 
   .dashboard-loader.hidden {
@@ -92,40 +90,46 @@
   }
 
   [data-theme="dark"] .dashboard-loader {
-    background: rgba(15, 23, 42, 0.97);
+    background: #0f172a;
   }
 
-  /* Beautiful Spinner */
-  .spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid #e0e7ff;
-    border-top: 5px solid #3b82f6;
+  /* Bouncing Dot Loader matching co_dashboard.html */
+  .dot-loader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .dot-loader span {
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    background: var(--primary-color, #3b82f6);
+    animation: dotBounce 1.2s ease-in-out infinite;
   }
 
-  [data-theme="dark"] .spinner {
-    border-color: #1e293b;
+  .dot-loader span:nth-child(1) { animation-delay: 0s; }
+  .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+  .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
 
-  }
-
-  .spinner-text {
-    margin-top: 20px;
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
+  @keyframes dotBounce {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+      opacity: 0.4;
     }
-
-    100% {
-      transform: rotate(360deg);
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
     }
+  }
+
+  .loader-label {
+    margin-top: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary, #888);
   }
 
   .page-header {
@@ -228,6 +232,50 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+  }
+
+  .expand-btn {
+    background: transparent;
+    border: 1px solid var(--border-color, rgba(255,255,255,0.2));
+    color: var(--text-primary, #cbd5e1);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .expand-btn:hover {
+    background: var(--primary-color, #3b82f6);
+    color: #ffffff;
+    border-color: var(--primary-color, #3b82f6);
+    transform: scale(1.05);
+  }
+
+  .graph-btn {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary-color, #3b82f6);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .graph-btn:hover {
+    background: var(--primary-color, #3b82f6);
+    color: #ffffff;
+    border-color: var(--primary-color, #3b82f6);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   }
 
   .chart-title {
@@ -387,6 +435,15 @@
 <script src="/static/Chart.umd.min.js"></script>
 <link rel="stylesheet" href="/static/fontawesome-free-7.1.0-web/css/all.min.css">
 
+<div class="dashboard-loader" id="dashboardLoader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+  <div class="dot-loader">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="loader-label">Loading Dashboard...</div>
+</div>
+
 <div class="wrapper">
   {% set header = "Personnel Management" %}
   {% set subscript = "Add Personnel → Update Personnel → View Personnel" %}
@@ -417,86 +474,83 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
 <div class="dashboard-container">
 
 
-  <div class="dashboard-loader" id="dashboardLoader">
-    <div class="spinner"></div>
-    <div class="spinner-text">Loading Dashboard...</div>
-  </div>
 
 
-  <div class="stats-grid">
-    <div class="stat-card" onclick="openPersonnelModal()" style="cursor:pointer;">
-  <div class="stat-icon"><i class="fas fa-users"></i></div>
-  <div class="stat-label">Total Personnel</div>
-  <div class="stat-value" id="totalPersonnelCount">Loading...</div>
-</div>
-    <!-- <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
-      <div class="stat-label">Det Duty</div>
-      <div class="stat-value" id="detDutyCount">0</div>
-    </div> -->
-    <!-- <div class="stat-card">
-      <div class="stat-icon"><i class="fas fa-medkit"></i></div>
-      <div class="stat-label">LOW MEDICAL</div>
-      <div class="stat-value" id="medical_count">Loading...</div>
-      <button class="view-btn" onclick="window.location.href='/personnel_information/personnel'">View Details</button>
-    </div> -->
+
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--card-bg); padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+    <!-- TOTAL PERSONNEL BUTTON -->
+    <button class="graph-btn" onclick="openPersonnelModal()" style="background: var(--primary-color); color: #ffffff; border-color: var(--primary-color);">
+      <i class="fas fa-users"></i> TOTAL PERSONNEL (<span id="totalPersonnelCount">Loading...</span>)
+    </button>
+
+    <button class="graph-btn" onclick="openChartModal('ageDonutChart', 'AGE DISTRIBUTION')">
+      <i class="fas fa-chart-pie"></i> AGE DISTRIBUTION
+    </button>
+    <button class="graph-btn" onclick="openChartModal('rankChart', 'RANK DISTRIBUTION')">
+      <i class="fas fa-chart-bar"></i> RANK DISTRIBUTION
+    </button>
+    <button class="graph-btn" onclick="openChartModal('stateChart', 'STATE WISE DISTRIBUTION')">
+      <i class="fas fa-globe-asia"></i> STATE WISE
+    </button>
+    <button class="graph-btn" onclick="openChartModal('sportsChart', 'SPORT DISTRIBUTION')">
+      <i class="fas fa-football-ball"></i> SPORTS
+    </button>
+    <button class="graph-btn" onclick="openChartModal('serviceChart', 'Years in Service')">
+      <i class="fas fa-business-time"></i> YEARS IN SERVICE
+    </button>
   </div>
 
   <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-header">
         <h3 class="chart-title">AGE DISTRIBUTION</h3>
-        <span class="chart-badge">Live</span>
+        <button class="expand-btn" onclick="openChartModal('ageDonutChart', 'AGE DISTRIBUTION')" title="Expand to Fullscreen">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
       </div>
       <div class="chart-container"><canvas id="ageDonutChart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header">
         <h3 class="chart-title">RANK DISTRIBUTION</h3>
-        <span class="chart-badge">Updated</span>
+        <button class="expand-btn" onclick="openChartModal('rankChart', 'RANK DISTRIBUTION')" title="Expand to Fullscreen">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
       </div>
       <div class="chart-container"><canvas id="rankChart"></canvas></div>
     </div>
-    <div class="chart-card">
+    <div class="chart-card" style="grid-column: 1 / -1;">
       <div class="chart-header">
         <h3 class="chart-title">STATE WISE DISTRIBUTION</h3>
-        <span class="chart-badge">Live</span>
+        <button class="expand-btn" onclick="openChartModal('stateChart', 'STATE WISE DISTRIBUTION')" title="Expand to Fullscreen">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
       </div>
-      <div class="chart-container"><canvas id="religionChart"></canvas></div>
+      <div class="chart-container"><canvas id="stateChart"></canvas></div>
     </div>
-    <!-- <div class="chart-card">
-      <div class="chart-header">
-        <h3 class="chart-title">EMPLOYMENT TYPE</h3>
-        <span class="chart-badge">Live</span>
-      </div>
-      <div class="chart-container"><canvas id="employmentChart"></canvas></div>
-    </div> -->
     <div class="chart-card">
       <div class="chart-header">
         <h3 class="chart-title">SPORT DISTRIBUTION</h3>
-        <span class="chart-badge">Live</span>
+        <button class="expand-btn" onclick="openChartModal('sportsChart', 'SPORT DISTRIBUTION')" title="Expand to Fullscreen">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
       </div>
       <div class="chart-container"><canvas id="sportsChart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header">
         <h3 class="chart-title">Years in Service</h3>
-        <span class="chart-badge">Updated</span>
+        <button class="expand-btn" onclick="openChartModal('serviceChart', 'Years in Service')" title="Expand to Fullscreen">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
       </div>
       <div class="chart-container"><canvas id="serviceChart"></canvas></div>
     </div>
-    <!-- <div class="chart-card">
-      <div class="chart-header">
-        <h3 class="chart-title">Loan Amounts</h3>
-        <span class="chart-badge">Live</span>
-      </div>
-      <div class="chart-container"><canvas id="loanChart"></canvas></div>
-    </div> -->
   </div>
 </div>
 
 <script>
-  let ageChart, rankChart, religionChart, employmentChart, serviceChart, loanChart, sportsChart;
+  let ageChart, rankChart, stateChart, employmentChart, serviceChart, loanChart, sportsChart;
 
   async function loadMedicalCases() {
     const el = document.getElementById('medical_count');
@@ -533,22 +587,61 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
   // }
 
   async function initializeCharts() {
-    [ageChart, rankChart, religionChart, employmentChart, serviceChart, loanChart, sportsChart].forEach(c => c && c.destroy && c.destroy());
+    [ageChart, rankChart, stateChart, employmentChart, serviceChart, loanChart, sportsChart].forEach(c => c && c.destroy && c.destroy());
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const textColor = isDark ? '#f1f5f9' : '#1e293b';
     const gridColor = isDark ? '#334155' : '#e2e8f0';
 
     const chartColors = [
-      'rgba(99,102,241,0.8)', 'rgba(16,185,129,0.8)', 'rgba(239,68,68,0.8)',
-      'rgba(245,158,11,0.8)', 'rgba(59,130,246,0.8)', 'rgba(168,85,247,0.8)',
-      'rgba(34,197,94,0.8)', 'rgba(236,72,153,0.8)'
-    ];
+    'rgba(99,102,241,0.8)',   // Indigo
+    'rgba(16,185,129,0.8)',   // Emerald
+    'rgba(239,68,68,0.8)',    // Red
+    'rgba(245,158,11,0.8)',   // Amber
+    'rgba(59,130,246,0.8)',   // Blue
+    'rgba(168,85,247,0.8)',   // Purple
+    'rgba(34,197,94,0.8)',    // Green
+    'rgba(236,72,153,0.8)',   // Pink
+    'rgba(14,165,233,0.8)',   // Sky
+    'rgba(249,115,22,0.8)',   // Orange
+    'rgba(132,204,22,0.8)',   // Lime
+    'rgba(217,70,239,0.8)',   // Fuchsia
+    'rgba(6,182,212,0.8)',    // Cyan
+    'rgba(124,58,237,0.8)',   // Violet
+    'rgba(220,38,38,0.8)',    // Dark Red
+    'rgba(21,128,61,0.8)',    // Dark Green
+    'rgba(2,132,199,0.8)',    // Dark Sky
+    'rgba(190,24,93,0.8)',    // Rose
+    'rgba(202,138,4,0.8)',    // Yellow
+    'rgba(55,65,81,0.8)',     // Gray
+    'rgba(0,200,83,0.8)',     // Bright Green
+    'rgba(255,87,34,0.8)',    // Deep Orange
+    'rgba(63,81,181,0.8)',    // Indigo Dark
+    'rgba(0,150,136,0.8)',    // Teal
+    'rgba(156,39,176,0.8)',   // Deep Purple
+    'rgba(233,30,99,0.8)',    // Hot Pink
+    'rgba(121,85,72,0.8)',    // Brown
+    'rgba(96,125,139,0.8)',   // Blue Grey
+    'rgba(255,193,7,0.8)',    // Gold
+    'rgba(0,188,212,0.8)',    // Light Cyan
+    'rgba(76,175,80,0.8)',    // Material Green
+    'rgba(255,152,0,0.8)',    // Material Orange
+    'rgba(103,58,183,0.8)',   // Material Purple
+    'rgba(3,169,244,0.8)',    // Light Blue
+    'rgba(205,220,57,0.8)',   // Lime Yellow
+    'rgba(158,158,158,0.8)',  // Grey
+    'rgba(255,99,132,0.8)',   // Coral Pink
+    'rgba(54,162,235,0.8)',   // Light Blue
+    'rgba(255,206,86,0.8)',   // Bright Yellow
+    'rgba(75,192,192,0.8)',   // Aqua
+    'rgba(153,102,255,0.8)',  // Lavender
+    'rgba(255,159,64,0.8)'    // Peach
+  ];
     const borderColors = chartColors.map(c => c.replace('0.8', '1'));
 
     try {
       const [
-        ageData, rankData, religionData,
+        ageData, rankData, stateWiseData,
         serviceData, loanData, sportsData
       ] = await Promise.all([
         fetch('/personnel_information/age_bar_graph').then(r => r.json()),
@@ -580,7 +673,34 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           });
         }
       };
-
+      const legendCountPlugin = {
+        id: 'legendCount',
+        afterDraw(chart) {
+          const legend = chart.legend;
+          if (!legend) return;
+          const ctx = chart.ctx;
+          const ds = chart.data.datasets[0];
+          if (!ds || !ds.data) return;
+          const total = ds.data.reduce((a, b) => a + (Number(b) || 0), 0);
+          const boxWidth = legend.options.labels.boxWidth || 50;
+          legend.legendItems.forEach((item, i) => {
+            const hit = legend.legendHitBoxes[i];
+            if (!hit) return;
+            const val = ds.data[item.index ?? i];
+            if (val == null) return;
+            const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+            ctx.save();
+            ctx.font = 'bold 9px sans-serif';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 2;
+            ctx.fillText(`${val} (${pct}%)`, hit.left + boxWidth / 2, hit.top + hit.height / 2);
+            ctx.restore();
+          });
+        }
+      };
       const donutDatalabelsPlugin = {
         id: 'donutDatalabels',
         afterDatasetsDraw(chart) {
@@ -616,11 +736,11 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           labels: ageData.age_distribution?.map(i => i.range) || [],
           datasets: [{ data: ageData.age_distribution?.map(i => i.count) || [], backgroundColor: chartColors, borderColor: borderColors, borderWidth: 2 }]
         },
-        plugins: [donutDatalabelsPlugin],
+        plugins: [donutDatalabelsPlugin, legendCountPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 11 } } } }
+          plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 11 }, boxWidth: 50 } } }
         }
       });
 
@@ -646,17 +766,25 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
         }
       });
 
-      religionChart = new Chart(document.getElementById('religionChart'), {
+      const rawStateList = stateWiseData.data || [];
+      const sortedStateList = [...rawStateList].sort((a, b) => (Number(b.home_state_count) || 0) - (Number(a.home_state_count) || 0));
+
+      stateChart = new Chart(document.getElementById('stateChart'), {
         type: 'doughnut',
         data: {
-          labels: religionData.data?.map(i => i.home_state) || [],
-          datasets: [{ data: religionData.data?.map(i => i.home_state_count) || [], backgroundColor: chartColors, borderColor: borderColors, borderWidth: 2 }]
+          labels: sortedStateList.map(i => i.home_state || 'Unknown'),
+          datasets: [{ data: sortedStateList.map(i => i.home_state_count || 0), backgroundColor: chartColors, borderColor: borderColors, borderWidth: 2 }]
         },
-        plugins: [donutDatalabelsPlugin],
+        plugins: [donutDatalabelsPlugin, legendCountPlugin],
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 11 } } } }
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: { color: textColor, font: { size: 11 }, boxWidth: 50 }
+            }
+          }
         }
       });
 
@@ -782,7 +910,71 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
       });
     }
   });
+
+  let fullscreenChartInstance = null;
+  function openChartModal(chartCanvasId, titleText) {
+    const modalEl = document.getElementById('chartFullscreenModal');
+    if (!modalEl) return;
+    
+    const titleEl = document.getElementById('fullscreenChartTitle');
+    if (titleEl) titleEl.textContent = titleText;
+    
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+
+    const sourceChart = Chart.getChart(chartCanvasId);
+    if (!sourceChart) return;
+
+    const fsCanvas = document.getElementById('fullscreenCanvas');
+    if (fullscreenChartInstance) {
+      fullscreenChartInstance.destroy();
+    }
+
+    setTimeout(() => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const textColor = isDark ? '#f8fafc' : '#1e293b';
+
+      fullscreenChartInstance = new Chart(fsCanvas.getContext('2d'), {
+        type: sourceChart.config.type,
+        data: JSON.parse(JSON.stringify(sourceChart.config.data)),
+        plugins: sourceChart.config.plugins || [],
+        options: {
+          ...sourceChart.config.options,
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            ...sourceChart.config.options.plugins,
+            legend: {
+              ...sourceChart.config.options.plugins?.legend,
+              labels: {
+                ...sourceChart.config.options.plugins?.legend?.labels,
+                color: textColor,
+                font: { size: 13, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+    }, 200);
+  }
 </script>
+
+<!-- Fullscreen Chart Modal -->
+<div class="modal fade" id="chartFullscreenModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content" style="background: var(--card-bg, #ffffff); color: var(--text-primary); border: none;">
+      <div class="modal-header border-bottom d-flex justify-content-between align-items-center" style="padding: 1rem 2rem; background: var(--card-bg, #ffffff); border-color: var(--border-color, #e2e8f0) !important;">
+        <h4 class="modal-title fw-bold" id="fullscreenChartTitle" style="color: var(--text-primary); margin: 0; font-size: 1.3rem;">Chart View</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4 d-flex align-items-center justify-content-center">
+        <div style="width: 95%; height: 82vh; position: relative;">
+          <canvas id="fullscreenCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% include 'modals/detachmentModal/detachment.html' %}
 {% include 'modals/view_all_personnel/modal.html' %}

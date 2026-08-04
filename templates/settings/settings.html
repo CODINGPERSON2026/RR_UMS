@@ -321,7 +321,7 @@
       <div class="spage-header-icon"><i class="fas fa-sliders-h"></i></div>
       <h1>Settings</h1>
     </div>
-    <p>Manage your appearance, display, and account security preferences.</p>
+    <p>Manage your appearance and account security preferences.</p>
   </div>
 
   <div class="settings-layout">
@@ -333,10 +333,6 @@
       <a class="snav-item active" data-section="appearance">
         <div class="snav-icon"><i class="fas fa-palette"></i></div>
         Appearance
-      </a>
-      <a class="snav-item" data-section="display">
-        <div class="snav-icon"><i class="fas fa-desktop"></i></div>
-        Display
       </a>
 
       <div class="snav-divider"></div>
@@ -404,55 +400,6 @@
         </div>
       </div>
 
-      <!-- ══ DISPLAY ══ -->
-      <div class="settings-section" id="section-display">
-        <div class="scard">
-          <div class="scard-header">
-            <div class="scard-header-icon"><i class="fas fa-desktop"></i></div>
-            <div class="scard-header-text">
-              <h3>Display Preferences</h3>
-              <p>Control how information is presented on screen.</p>
-            </div>
-          </div>
-          <div class="scard-body">
-            <div class="srow">
-              <div class="srow-label">
-                <span>Compact Mode</span>
-                <small>Reduce padding for a denser data view.</small>
-              </div>
-              <div class="srow-control">
-                <label class="stoggle"><input type="checkbox" id="toggleCompact"><span class="stoggle-slider"></span></label>
-              </div>
-            </div>
-            <div class="srow">
-              <div class="srow-label">
-                <span>Animations</span>
-                <small>Enable smooth transitions and motion effects.</small>
-              </div>
-              <div class="srow-control">
-                <label class="stoggle"><input type="checkbox" id="toggleAnimations" checked><span class="stoggle-slider"></span></label>
-              </div>
-            </div>
-            <div class="srow">
-              <div class="srow-label">
-                <span>Show Rank Badges</span>
-                <small>Display rank insignia next to personnel names.</small>
-              </div>
-              <div class="srow-control">
-                <label class="stoggle"><input type="checkbox" id="toggleBadges" checked><span class="stoggle-slider"></span></label>
-              </div>
-            </div>
-            <div class="srow">
-              <div class="srow-label">
-                <span>24-Hour Clock</span>
-                <small>Use military time format across all timestamps.</small>
-              </div>
-              <div class="srow-control">
-                <label class="stoggle"><input type="checkbox" id="toggle24hr" checked><span class="stoggle-slider"></span></label>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- ══ SECURITY ══ -->
@@ -612,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   /* ── Toggle persistence ── */
-  ['toggleCompact','toggleAnimations','toggleBadges','toggle24hr','toggleAutoLogout'].forEach(id => {
+  ['toggleAutoLogout'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     const saved = localStorage.getItem(id);

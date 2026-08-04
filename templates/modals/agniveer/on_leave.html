@@ -161,7 +161,7 @@
             <thead style="background-color: var(--primary-color); color: #ffffff; border-color: var(--border-color);">
               <tr style="border-color: var(--border-color);">
                 <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Army Number</th>
-                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 40%;">Name</th>
+                <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 40%; text-align: left; text-transform: uppercase;">Name</th>
                 <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Company</th>
                 <th style="background-color: var(--primary-color) !important; border-color: var(--border-color); color: #ffffff !important; width: 20%;">Trade</th>
               </tr>
@@ -276,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     } else {
       filteredDataUniqueScope.forEach(row => {
-        const titleCasedName = (row.name || '').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+        const uppercaseName = (row.name || '').toUpperCase();
         
         agniLeaveTableBodyUniqueScope.insertAdjacentHTML(
           "beforeend",
@@ -287,8 +287,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 ${row.army_number}
               </div>
             </td>
-            <td class="agniLeaveNameCellUnique" style="border-color: var(--border-color); width: 40%; max-width: 250px;">
-              ${titleCasedName}
+            <td class="agniLeaveNameCellUnique" style="border-color: var(--border-color); width: 40%; max-width: 250px; text-align: left; text-transform: uppercase;">
+              ${uppercaseName}
             </td>
             <td style="border-color: var(--border-color); width: 20%;">
               <div class="agniLeaveCellScrollUnique">

@@ -264,7 +264,7 @@
                             <tr>
                                 <th>Army No.</th>
                                 <th>Rank</th>
-                                <th>Name</th>
+                                <th style="text-align: left; text-transform: uppercase;">Name</th>
                                 <th>Company</th>
                                 <th>Remarks</th>
                                 <th class="text-center">Actions</th>
@@ -595,7 +595,7 @@ function refreshSensitiveList() {
                 row.innerHTML = `
                     <td><code class="text-primary fw-semibold" style="font-size:0.82rem;">${s.army_number}</code></td>
                     <td><span class="badge rounded-pill" style="background:#eef1fd;color:#4361ee;font-size:0.75rem;font-weight:600;">${s.rank}</span></td>
-                    <td><strong style="font-size:0.88rem;">${s.name}</strong></td>
+                    <td style="text-align: left; text-transform: uppercase;"><strong style="font-size:0.88rem;">${(s.name || '').toUpperCase()}</strong></td>
                     <td><span class="text-muted" style="font-size:0.85rem;">${s.company || 'N/A'}</span></td>
                     <td>
                         ${logsCount > 0

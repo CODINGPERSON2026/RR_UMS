@@ -202,7 +202,7 @@
 
                 <th>Army No</th>
                 <th>Rank</th>
-                <th>Name</th>
+                <th style="text-align: left; text-transform: uppercase;">Name</th>
                 <th>Company</th>
                 <th>Location</th>
                 <th>Authority</th>
@@ -343,11 +343,9 @@ attachmentCountBadgeUniqueScope.textContent =
 
           <!-- NAME -->
 
-          <td class="attachmentNameCellUnique">
+          <td class="attachmentNameCellUnique" style="text-align: left; text-transform: uppercase;">
 
-            ${(item.name || "")
-  .toLowerCase()
-  .replace(/\b\w/g, c => c.toUpperCase())}
+            ${(item.name || "").toUpperCase()}
 
           </td>
 

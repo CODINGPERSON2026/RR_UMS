@@ -203,9 +203,7 @@ def assigned_attachment_alarm():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
     if user['role'] != 'CO':
-        return jsonify({"error":'Forbidded'}),403
-
-    # company = user["company"]
+        return jsonify({"error": 'Forbidden'}), 403
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -213,14 +211,26 @@ def assigned_attachment_alarm():
     try:
         cursor.execute("""
             SELECT
-                id,
-                army_number,
-                remarks,
-                td_date
-            FROM td_table WHERE td_date <= NOW() - INTERVAL 90 DAY 
+                t.id,
+                t.army_number,
+                COALESCE(p.rank, 'N/A') AS `rank`,
+                COALESCE(p.name, 'N/A') AS `name`,
+                COALESCE(t.company, p.company, 'N/A') AS company,
+                COALESCE(t.location, 'N/A') AS location,
+                COALESCE(t.authority, 'N/A') AS authority,
+                t.td_date,
+                DATEDIFF(NOW(), t.td_date) AS days_on_td,
+                COALESCE(t.remarks, '') AS remarks
+            FROM td_table t
+            LEFT JOIN personnel p ON p.army_number = t.army_number
+            WHERE t.td_date <= NOW() - INTERVAL 90 DAY
+            ORDER BY t.td_date ASC
         """)
 
         rows = cursor.fetchall()
+        for r in rows:
+            if r['td_date']:
+                r['td_date'] = str(r['td_date'])
 
         return jsonify({
             "count": len(rows),
@@ -228,7 +238,7 @@ def assigned_attachment_alarm():
         })
 
     except Exception as e:
-        return jsonify({"error": "Server error"}), 500
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
     finally:
         cursor.close()

@@ -963,16 +963,65 @@
 
     /* Fullscreen Loader */
     .fullscreen-loader {
-        display: none;
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 9999;
+        width: 100vw;
+        height: 100vh;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        z-index: 999999;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .fullscreen-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    /* Bouncing Dot Loader matching co_dashboard.html */
+    .dot-loader {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .dot-loader span {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primary-color, #3b82f6);
+        animation: dotBounce 1.2s ease-in-out infinite;
+    }
+
+    .dot-loader span:nth-child(1) { animation-delay: 0s; }
+    .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotBounce {
+        0%, 80%, 100% {
+            transform: scale(0.6);
+            opacity: 0.4;
+        }
+        40% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+    }
+
+    .loader-label {
+        margin-top: 15px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--text-secondary, #888);
     }
 
    
@@ -1020,6 +1069,16 @@
     }
 </style>
 
+<!-- Fullscreen Loader -->
+<div class="fullscreen-loader" id="fullscreen-loader" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+    <div class="dot-loader">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="loader-label">Loading Weight Management...</div>
+</div>
+
 <div class="wrapper">
     {% set header = "Weight Management" %}
     {% set subscript = "View Weight Analysis → Update weight" %}
@@ -1034,10 +1093,7 @@
 
 
 <div class="weight-container" style="position: relative;">
-    <!-- Fullscreen Loader -->
-    <div class="fullscreen-loader" id="fullscreen-loader">
-        <div class="spinner"></div>
-    </div>
+
 
     <!-- Validation Popup Modal -->
     <div id="validation-popup" class="validation-popup" style="display: none;">
@@ -1165,19 +1221,21 @@
             </div>
             <div class="chart-column">
                 <div class="chart-box">
-                    <h3>Fitness Analysis</h3>
+                    <h3>Unit Fitness</h3>
                     <div class="bar-chart-wrapper" style="height: 300px;">
                         <canvas id="fitUnfitChart"></canvas>
                     </div>
                 </div>
                 <div class="chart-box">
-                    <h3>JCO vs OR Analysis</h3>
-                    <div class="chart-filter">
-                        <label for="jco-or-filter">Filter:</label>
-                        <select id="jco-or-filter" class="chart-select">
-                            <option value="Fit">FIT</option>
-                            <option value="UnFit">UNFIT</option>
-                        </select>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%;">
+                        <h3 style="margin: 0; white-space: nowrap;">JCO vs OR Analysis</h3>
+                        <div class="chart-filter" style="margin: 0; display: flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap;">
+                            <label for="jco-or-filter" style="margin: 0; white-space: nowrap;">Filter:</label>
+                            <select id="jco-or-filter" class="chart-select">
+                                <option value="Fit">FIT</option>
+                                <option value="UnFit">UNFIT</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="bar-chart-wrapper" style="height: 300px;">
                         <canvas id="jcoOrFitChart"></canvas>
@@ -1200,13 +1258,15 @@
                     </div>
                 </div>
                 <div class="chart-box">
-                    <h3>JCO vs OR Analysis</h3>
-                    <div class="chart-filter">
-                        <label for="jco-safe-or-filter">Filter:</label>
-                        <select id="jco-safe-or-filter" class="chart-select">
-                            <option value="shape">SHAPE I</option>
-                            <option value="category">CATEGORY</option>
-                        </select>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; width: 100%;">
+                        <h3 style="margin: 0; white-space: nowrap;">JCO vs OR Analysis</h3>
+                        <div class="chart-filter" style="margin: 0; display: flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap;">
+                            <label for="jco-safe-or-filter" style="margin: 0; white-space: nowrap;">Filter:</label>
+                            <select id="jco-safe-or-filter" class="chart-select">
+                                <option value="shape">SHAPE I</option>
+                                <option value="category">CATEGORY</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="bar-chart-wrapper" style="height: 300px;">
                         <canvas id="jcoSafeOrCategoryChart"></canvas>
@@ -1353,7 +1413,20 @@ let unfitDeviationChartInstance = null;
 // ============================================================
 function showLoader(id, show) {
     const el = document.getElementById(id);
-    if (el) el.style.display = show ? "flex" : "none";
+    if (!el) return;
+    if (show) {
+        el.classList.remove('hidden');
+        el.style.display = 'flex';
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+    } else {
+        el.classList.add('hidden');
+        setTimeout(() => {
+            if (el.classList.contains('hidden')) {
+                el.style.display = 'none';
+            }
+        }, 400);
+    }
 }
 
 function showValidationPopup(message) {
@@ -1587,24 +1660,36 @@ function drawBarGraphs(data) {
     const jcoOrFilter = document.getElementById("jco-or-filter").value;
     const jcoSafeOrFilter = document.getElementById("jco-safe-or-filter").value;
 
-    // Fit / Unfit bar
+    // Fit / Unfit pie chart
     const fitUnfitCanvas = document.getElementById("fitUnfitChart");
     if (fitUnfitCanvas) {
         window.fitUnfitChartInstance = new Chart(fitUnfitCanvas.getContext("2d"), {
-            type: "bar",
+            type: "pie",
             data: {
                 labels: data.fitUnfit?.labels || ["Fit", "Unfit"],
                 datasets: [{
                     data: data.fitUnfit?.data || [0, 0],
                     backgroundColor: ["#38a169", "#e53e3e"],
-                    borderColor: ["#2f855a", "#c53030"],
-                    borderWidth: 1,
-                    borderRadius: 4,
-                    barPercentage: 0.7
+                    borderColor: ["#fff", "#fff"],
+                    borderWidth: 2
                 }]
             },
-            plugins: [barDatalabelsPlugin],
-            options: makeBarOptions()
+            plugins: [donutDatalabelsPlugin],
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: "bottom",
+                        labels: { color: "#4a5568", font: { size: 13 }, boxWidth: 15, padding: 16 }
+                    },
+                    tooltip: {
+                        callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` }
+                    }
+                },
+                animation: { duration: 800, easing: "easeOutQuart" }
+            }
         });
     }
 

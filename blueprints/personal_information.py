@@ -422,6 +422,54 @@ def get_total_medical_category_count():
         if 'connection' in locals():
             connection.close()
 
+RANK_SENIORITY_ORDER = {
+    'subedar major': 1, 'sb maj': 1, 'sub major': 1,
+    'subedar': 2, 'sb': 2,
+    'naib subedar': 3, 'nb sub': 3, 'nb sb': 3,
+    'company quartermaster havildar': 4, 'cqmh': 4,
+    'company havildar major': 5, 'chm': 5,
+    'havildar': 6, 'hav': 6,
+    'local havildar': 7, 'loc hav': 7,
+    'lance havildar': 8, 'l hav': 8, 'l/hav': 8,
+    'naik': 9, 'nk': 9,
+    'local naik': 10, 'loc nk': 10,
+    'lance naik': 11, 'l nk': 11, 'l/nk': 11,
+    'craftsman': 12, 'cfn': 12,
+    'signalman': 13, 'sgl mn': 13, 'sglman': 13,
+    'agniveer': 14, 'agnl': 14, 'agni': 14,
+    'regimental havildar major': 99, 'rhm': 99
+}
+
+RANK_SHORT_MAP = {
+    'subedar major': 'Sb Maj', 'sb maj': 'Sb Maj', 'sub major': 'Sb Maj',
+    'subedar': 'Sb', 'sb': 'Sb',
+    'naib subedar': 'Nb Sub', 'nb sub': 'Nb Sub', 'nb sb': 'Nb Sub',
+    'company quartermaster havildar': 'CQMH', 'cqmh': 'CQMH',
+    'company havildar major': 'CHM', 'chm': 'CHM',
+    'havildar': 'Hav', 'hav': 'Hav',
+    'local havildar': 'Loc Hav', 'loc hav': 'Loc Hav',
+    'lance havildar': 'L Hav', 'l hav': 'L Hav', 'l/hav': 'L Hav',
+    'naik': 'NK', 'nk': 'NK',
+    'local naik': 'Loc NK', 'loc nk': 'Loc NK',
+    'lance naik': 'L NK', 'l nk': 'L NK', 'l/nk': 'L NK',
+    'craftsman': 'CFN', 'cfn': 'CFN',
+    'signalman': 'Sgl Mn', 'sgl mn': 'Sgl Mn', 'sglman': 'Sgl Mn',
+    'agniveer': 'Agnl', 'agnl': 'Agnl', 'agni': 'Agnl',
+    'regimental havildar major': 'RHM', 'rhm': 'RHM'
+}
+
+def get_rank_seniority(rank_str):
+    if not rank_str:
+        return 999
+    cleaned = str(rank_str).strip().lower()
+    return RANK_SENIORITY_ORDER.get(cleaned, 500)
+
+def get_rank_short_name(rank_str):
+    if not rank_str:
+        return ""
+    cleaned = str(rank_str).strip().lower()
+    return RANK_SHORT_MAP.get(cleaned, str(rank_str).strip())
+
 @personnel_info.route('/rank_based_bar_graph_')
 def rank_graph():
 
@@ -438,8 +486,6 @@ def rank_graph():
                 SELECT `rank`, COUNT(*) as count
                 FROM personnel
                 GROUP BY `rank`
-                ORDER BY count DESC
-                LIMIT 10
             """)
         else:
             cursor.execute("""
@@ -447,11 +493,16 @@ def rank_graph():
                 FROM personnel
                 WHERE company = %s
                 GROUP BY `rank`
-                ORDER BY count DESC
-                LIMIT 10
             """, (company,))
 
         rank_distribution = cursor.fetchall()
+
+        # Sort by Army Rank Seniority (Subedar Major first down to Agniveer)
+        rank_distribution.sort(key=lambda r: get_rank_seniority(r.get('rank')))
+
+        # Format rank names to standard UI Short Forms
+        for r in rank_distribution:
+            r['rank'] = get_rank_short_name(r.get('rank'))
 
         return jsonify({'rank_distribution': rank_distribution}), 200
 
@@ -465,25 +516,26 @@ def rank_graph():
 @personnel_info.route('/age_bar_graph')
 def age_graph():
     user = require_login()
-    company = user['company']
+    if not user:
+        return jsonify({'error': 'Unauthorized. Please log in first.'}), 401
+    company = user.get('company', 'Admin')
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
     try:
-
-        # TOTAL PERSONNEL
+        # TOTAL PERSONNEL WITH VALID DOB (PER COMPANY FILTER)
         if company == "Admin" or company == 'Center':
-            cursor.execute("SELECT COUNT(*) as total FROM personnel")
+            cursor.execute("SELECT COUNT(*) as total FROM personnel WHERE date_of_birth IS NOT NULL")
         else:
             cursor.execute(
-                "SELECT COUNT(*) as total FROM personnel WHERE company = %s",
+                "SELECT COUNT(*) as total FROM personnel WHERE date_of_birth IS NOT NULL AND company = %s",
                 (company,)
             )
 
         total_personnel = cursor.fetchone()['total']
 
-        # AGE DISTRIBUTION
+        # AGE DISTRIBUTION (PER COMPANY FILTER WITH NON-OVERLAPPING BRACKETS)
         if company == "Admin" or company == 'Center':
             cursor.execute("""
                 SELECT
@@ -492,8 +544,8 @@ def age_graph():
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 25 AND 30 THEN '25-30'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 31 AND 35 THEN '31-35'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 36 AND 40 THEN '36-40'
-                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 40 AND 50 THEN '40-50'
-                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 50 AND 60 THEN '50-60'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 41 AND 50 THEN '41-50'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 51 AND 60 THEN '51-60'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) > 60 THEN '60+'
                         ELSE 'Unknown'
                     END as age_range,
@@ -501,7 +553,6 @@ def age_graph():
                 FROM personnel
                 WHERE date_of_birth IS NOT NULL
                 GROUP BY age_range
-                ORDER BY age_range
             """)
         else:
             cursor.execute("""
@@ -511,8 +562,8 @@ def age_graph():
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 25 AND 30 THEN '25-30'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 31 AND 35 THEN '31-35'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 36 AND 40 THEN '36-40'
-                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 40 AND 50 THEN '40-50'
-                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 50 AND 60 THEN '50-60'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 41 AND 50 THEN '41-50'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 51 AND 60 THEN '51-60'
                         WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) > 60 THEN '60+'
                         ELSE 'Unknown'
                     END as age_range,
@@ -520,20 +571,26 @@ def age_graph():
                 FROM personnel
                 WHERE date_of_birth IS NOT NULL AND company = %s
                 GROUP BY age_range
-                ORDER BY age_range
             """, (company,))
 
-        age_data = cursor.fetchall()
+        fetched_rows = cursor.fetchall()
+        db_map = {row['age_range']: row['count'] for row in fetched_rows}
+
+        # Defined ordered age brackets
+        ordered_ranges = ['18-24', '25-30', '31-35', '36-40', '41-50', '51-60', '60+']
+        if 'Unknown' in db_map:
+            ordered_ranges.append('Unknown')
 
         age_distribution = []
-        for row in age_data:
-            percentage = round((row['count'] / total_personnel * 100), 1) if total_personnel > 0 else 0
-            age_distribution.append({
-                'range': row['age_range'],
-                'count': row['count'],
-                'percentage': percentage
-            })
-
+        for r in ordered_ranges:
+            count = db_map.get(r, 0)
+            if count > 0:
+                percentage = round((count / total_personnel * 100), 1) if total_personnel > 0 else 0
+                age_distribution.append({
+                    'range': r,
+                    'count': count,
+                    'percentage': percentage
+                })
 
         return jsonify({'age_distribution': age_distribution}), 200
 
@@ -1014,6 +1071,7 @@ def religion_chart():
                 SELECT home_state, COUNT(home_state) AS home_state_count
                 FROM personnel
                 GROUP BY home_state
+                ORDER BY home_state_count DESC
             """)
         else:
             cursor.execute("""
@@ -1021,6 +1079,7 @@ def religion_chart():
                 FROM personnel
                 WHERE company = %s
                 GROUP BY home_state
+                ORDER BY home_state_count DESC
             """, (company,))
 
         result = cursor.fetchall()

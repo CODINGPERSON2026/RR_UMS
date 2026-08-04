@@ -2001,6 +2001,8 @@
                 if (['CO', '2IC', 'ADJUTANT', 'OC'].includes(userRole)) {
                     const response = await fetch(`${API_BASE_URL}/api/co-dashboard/all-data/${date}`);
                     const result = await response.json();
+                    
+                    console.log(result)
 
                     if (response.ok && result.success && result.data) {
                         const coData = result.data;

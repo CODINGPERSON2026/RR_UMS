@@ -569,7 +569,7 @@
                   <th>#</th>
                   <th>Army No</th>
                   <th>Rank</th>
-                  <th>Name</th>
+                  <th style="text-align: left; text-transform: uppercase;">Name</th>
                   <th>Home State</th>
                   <th>Company</th>
                   <th>JCO Assigned</th>
@@ -673,7 +673,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <td><span class="cell-sr">${i + 1}</span></td>
             <td><span class="cell-army">${esc(item.army_number)}</span></td>
             <td><span class="rank-chip">${esc(item.rank)}</span></td>
-            <td><span class="cell-name">${esc(item.name)}</span></td>
+            <td style="text-align: left; text-transform: uppercase;"><span class="cell-name" style="text-transform: uppercase;">${esc((item.name || '').toUpperCase())}</span></td>
             <td><span class="cell-state">${esc(item.home_state)}</span></td>
             <td><span class="company-chip">${esc(item.company)}</span></td>
             <td>${jcoHTML}</td>

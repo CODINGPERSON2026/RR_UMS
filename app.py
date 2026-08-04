@@ -1042,8 +1042,16 @@ def search_personnel():
         cursor.close()
         conn.close()
 
+ALLOWED_SENSITIVE_ROLES = {'CO', '2IC', 'ADJUTANT', 'OC', 'Admin', 'admin'}
+
 @app.route("/mark_personnel", methods=["GET"])
 def mark_personnel():
+    user = require_login()
+    if not user:
+        return redirect(url_for('admin_login'))
+    if user.get("role") not in ALLOWED_SENSITIVE_ROLES:
+        return "Access Denied: Only OC, CO, Adjutant, and 2IC can access Sensitive Personnel.", 403
+
     conn = get_db_connection()
     cursor = conn.cursor()   
     cursor.execute("""
@@ -1080,6 +1088,12 @@ def mark_personnel():
 # AJAX: Mark as Sensitive
 @app.route("/mark_sensitive", methods=["POST"])
 def mark_sensitive():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Unauthorized. Please log in first."}), 401
+    if user.get("role") not in ALLOWED_SENSITIVE_ROLES:
+        return jsonify({"success": False, "error": "Access Denied: Only OC, CO, Adjutant, and 2IC can mark personnel as sensitive."}), 403
+
     army_number = request.form.get("army_number")
     reason = request.form.get("reason")
     
@@ -1114,6 +1128,12 @@ def mark_sensitive():
 # AJAX: Update Reason
 @app.route("/update_sensitive_reason", methods=["POST"])
 def update_sensitive_reason():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Unauthorized. Please log in first."}), 401
+    if user.get("role") not in ALLOWED_SENSITIVE_ROLES:
+        return jsonify({"success": False, "error": "Access Denied: Only OC, CO, Adjutant, and 2IC can update sensitive reasons."}), 403
+
     army_number = request.form.get("army_number")
     reason = request.form.get("reason")
     
@@ -1141,6 +1161,12 @@ def update_sensitive_reason():
 # AJAX: Remove from Sensitive List
 @app.route("/remove_sensitive", methods=["POST"])
 def remove_sensitive():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Unauthorized. Please log in first."}), 401
+    if user.get("role") not in ALLOWED_SENSITIVE_ROLES:
+        return jsonify({"success": False, "error": "Access Denied: Only OC, CO, Adjutant, and 2IC can remove sensitive personnel."}), 403
+
     army_number = request.form.get("army_number")
     
     if not army_number:
@@ -5401,11 +5427,72 @@ def delete_gallery(id):
         conn.close()
 
 RANK_SHORT_MAP = {
-    'naib subedar':"Nb Sb",
-    'agniveer':'Agni',
-    'subedar major':'Sb Maj',
-    'subedar':'Sb',
-    'signal man':'Sgl Mn',
+    'subedar major':            'Sb Maj',
+    'subedar':                  'Sb',
+    'naib subedar':             'Nb Sub',
+    'company quartermaster havildar': 'CQMH',
+    'cqmh':                     'CQMH',
+    'company havildar major':   'CHM',
+    'chm':                      'CHM',
+    'havildar':                 'Hav',
+    'hav':                      'Hav',
+    'local havildar':           'Loc Hav',
+    'loc havildar':             'Loc Hav',
+    'loc hav':                  'Loc Hav',
+    'lance havildar':           'L Hav',
+    'l havildar':               'L Hav',
+    'l hav':                    'L Hav',
+    'naik':                     'NK',
+    'nk':                       'NK',
+    'local naik':               'Loc NK',
+    'loc naik':                 'Loc NK',
+    'loc nk':                   'Loc NK',
+    'lance naik':               'L NK',
+    'l naik':                   'L NK',
+    'l nk':                     'L NK',
+    'craftsman':                'CFN',
+    'cfn':                      'CFN',
+    'signal man':               'Sgl Mn',
+    'signalman':                'Sgl Mn',
+    'sgl mn':                   'Sgl Mn',
+    'agniveer':                 'Agnl',
+    'agni':                     'Agnl',
+    'rhm':                      'RHM',
+}
+
+# Seniority order: lower number = more senior (used to sort bar chart)
+RANK_SENIORITY_ORDER = {
+    'subedar major':                    1,
+    'subedar':                          2,
+    'naib subedar':                     3,
+    'company quartermaster havildar':   4,
+    'cqmh':                             4,
+    'company havildar major':           5,
+    'chm':                              5,
+    'havildar':                         6,
+    'hav':                              6,
+    'local havildar':                   7,
+    'loc havildar':                     7,
+    'loc hav':                          7,
+    'lance havildar':                   8,
+    'l havildar':                       8,
+    'l hav':                            8,
+    'naik':                             9,
+    'nk':                               9,
+    'local naik':                       10,
+    'loc naik':                         10,
+    'loc nk':                           10,
+    'lance naik':                       11,
+    'l naik':                           11,
+    'l nk':                             11,
+    'craftsman':                        12,
+    'cfn':                              12,
+    'signal man':                       13,
+    'signalman':                        13,
+    'sgl mn':                           13,
+    'agniveer':                         14,
+    'agni':                             14,
+    'rhm':                              99,
 }
 @app.route('/get_posted_strength', methods=['GET'])
 def get_posted_strength():
@@ -5432,14 +5519,20 @@ def get_posted_strength():
 
         query += """
             GROUP BY `rank`
-            ORDER BY count DESC
         """
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
         for r in rows:
             full_rank = r['rank'].strip().lower()
-            r['rank'] = RANK_SHORT_MAP.get(full_rank,r['rank'])
+            r['_seniority'] = RANK_SENIORITY_ORDER.get(full_rank, 99)
+            r['rank'] = RANK_SHORT_MAP.get(full_rank, r['rank'])
+
+        # Sort by seniority: most senior rank first
+        rows.sort(key=lambda r: r['_seniority'])
+        # Remove the internal helper key before returning
+        for r in rows:
+            r.pop('_seniority', None)
 
         total = sum(r['count'] for r in rows)
 

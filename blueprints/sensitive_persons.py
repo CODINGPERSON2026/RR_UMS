@@ -1,17 +1,35 @@
 from imports import *
 from datetime import datetime
 
-sensitive_bp = Blueprint('sensitive_bp',__name__,url_prefix='/sensitive')
+sensitive_bp = Blueprint('sensitive_bp', __name__, url_prefix='/sensitive')
+
+# Only OC, CO, ADJUTANT, 2IC (and Admin) have rights to view or mark sensitive personnel
+ALLOWED_SENSITIVE_ROLES = {'CO', '2IC', 'ADJUTANT', 'OC', 'Admin', 'admin'}
+
+def check_sensitive_auth(user, is_json=True):
+    if not user:
+        if is_json:
+            return jsonify({"success": False, "error": "Unauthorized. Please log in first."}), 401
+        return redirect(url_for('admin_login'))
+    if user.get("role") not in ALLOWED_SENSITIVE_ROLES:
+        if is_json:
+            return jsonify({"success": False, "error": "Access Denied: Only OC, CO, Adjutant, and 2IC can access Sensitive Personnel."}), 403
+        return "Access Denied: Only OC, CO, Adjutant, and 2IC can access Sensitive Personnel.", 403
+    return None
+
 @sensitive_bp.route("/remove_sensitive", methods=["POST"])
 def remove_sensitive():
+    user = require_login()
+    auth_err = check_sensitive_auth(user, is_json=True)
+    if auth_err:
+        return auth_err
+
     army_number = request.form.get("army_number")
-    
     if not army_number:
         return jsonify({"success": False, "error": "Missing army number"}), 400
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    
     try:
         cursor.execute("DELETE FROM sensitive_marking WHERE army_number = %s", (army_number,))
         if cursor.rowcount == 0:
@@ -31,6 +49,10 @@ def remove_sensitive():
 @sensitive_bp.route("/mark_sensitive", methods=["POST"])
 def mark_sensitive():
     user = require_login()
+    auth_err = check_sensitive_auth(user, is_json=True)
+    if auth_err:
+        return auth_err
+
     army_number = request.form.get("army_number")
     reason = request.form.get("reason")
 
@@ -73,6 +95,10 @@ def mark_sensitive():
 @sensitive_bp.route("/update_sensitive_reason", methods=["POST"])
 def update_sensitive_reason():
     user = require_login()
+    auth_err = check_sensitive_auth(user, is_json=True)
+    if auth_err:
+        return auth_err
+
     army_number = request.form.get("army_number")
     reason = request.form.get("reason")
 
@@ -82,12 +108,10 @@ def update_sensitive_reason():
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        # Check exists in sensitive_marking
         cursor.execute("SELECT 1 FROM sensitive_marking WHERE army_number = %s", (army_number,))
         if not cursor.fetchone():
             return jsonify({"success": False, "error": "Personnel not found in sensitive list"}), 404
 
-        # Add new reason log entry (don't overwrite — append as new block)
         cursor.execute("""
             INSERT INTO sensitive_reason_log (army_number, reason, added_by, added_by_role, added_on)
             VALUES (%s, %s, %s, %s, %s)
@@ -111,17 +135,19 @@ def update_sensitive_reason():
 
 @sensitive_bp.route("/get_sensitive_list")
 def get_sensitive_list():
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    user = require_login()
+    auth_err = check_sensitive_auth(user, is_json=True)
+    if auth_err:
+        return auth_err
 
-    # Get logged-in user (adjust based on your auth system)
-    user = require_login() # or however you're storing it
     user_company = user.get("company")
     user_role = user.get("role")
 
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
     try:
-        # ✅ Admin → see all
-        if user_company == "Admin" or user_role == "admin":
+        if user_company == "Admin" or user_role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
             cursor.execute("""
                 SELECT s.army_number, s.marked_on,
                        p.name, p.rank, p.company
@@ -130,13 +156,12 @@ def get_sensitive_list():
                 ORDER BY s.marked_on DESC
             """)
         else:
-            # ✅ Non-admin → filter by company
             cursor.execute("""
                 SELECT s.army_number, s.marked_on,
                        p.name, p.rank, p.company
                 FROM sensitive_marking s
                 JOIN personnel p ON s.army_number = p.army_number
-                WHERE p.company = %s
+                WHERE LOWER(p.company) = LOWER(%s)
                 ORDER BY s.marked_on DESC
             """, (user_company,))
 
@@ -146,7 +171,6 @@ def get_sensitive_list():
         for r in rows:
             army_number = r[0]
 
-            # Fetch all reason logs for this person
             cursor.execute("""
                 SELECT reason, added_by, added_by_role, added_on
                 FROM sensitive_reason_log
@@ -177,9 +201,14 @@ def get_sensitive_list():
         cursor.close()
         conn.close()
 
+
 @sensitive_bp.route("/mark_personnel", methods=["GET"])
 def mark_personnel():
     user = require_login()
+    auth_err = check_sensitive_auth(user, is_json=False)
+    if auth_err:
+        return auth_err
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""

@@ -1448,12 +1448,14 @@ STATUS COLORS
           <span class="sc-val" id="dues_out_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC'] %}
       <div class="sc" style="cursor: pointer" id="openSensitive">
         <span class="sc-label">Sensitive Indl</span>
         <div class="sc-right">
           <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      {% endif %}
       <div class="sc" id="interview-card" style="cursor: pointer">
         <span class="sc-label">Kunba Intrv</span>
         <div class="sc-right">

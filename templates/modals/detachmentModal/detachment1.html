@@ -53,7 +53,7 @@
             <tr>
               <th>Army Number</th>
               <th>Rank</th>
-              <th>Name</th>
+              <th style="text-align: left; text-transform: uppercase;">Name</th>
               <th>Det Name</th>
               <th>Days on Det</th>
               <th>Company</th>
@@ -142,7 +142,7 @@
             <tr>
               <td>${row.army_number}</td>
               <td>${row.rank}</td>
-              <td>${row.name}</td>
+              <td style="text-align: left; text-transform: uppercase;">${(row.name || '').toUpperCase()}</td>
               <td class="${colorClass}">${row.det_name}</td>
               <td class="${colorClass}">${row.days_on_det}</td>
               <td>${row.company}</td>

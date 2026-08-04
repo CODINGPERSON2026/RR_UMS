@@ -274,7 +274,7 @@
 
                 <th>Army Number</th>
                 <th>Rank</th>
-                <th>Name</th>
+                <th style="text-align: left; text-transform: uppercase;">Name</th>
                 <th>Det Name</th>
                 <th>Days on Det</th>
                 <th>Company</th>
@@ -585,8 +585,8 @@ document.addEventListener("DOMContentLoaded", function () {
               </div>
             </td>
 
-            <td class="detAlarmNameCell">
-              ${(row.name || '').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+            <td class="detAlarmNameCell" style="text-align: left; text-transform: uppercase;">
+              ${(row.name || '').toUpperCase()}
             </td>
 
             <td class="${dangerClass}">

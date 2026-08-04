@@ -1,42 +1,175 @@
+<!-- Attachment Alarm Badge -->
+<span id="attachmentAlarmAlert" class="alert-gradient d-none" style="cursor:pointer;">
+    🔔 You have Attachment alarms!
+</span>
 
-    
-    <!-- Attachment Alarm Badge -->
-    <span id="attachmentAlarmAlert" class="alert-gradient d-none" style="cursor:pointer;">
-        🔔 You have Attachment alarms!
-    </span>
-    
-    <script>
-    async function showAssignedAttachmentAlarms() {
-        try {
-            const res = await fetch('/stats/assigned_attachment_alarm');
-            if (!res.ok) throw new Error("Network error");
-    
-            const result = await res.json();
-            const alarmAlert = document.getElementById("attachmentAlarmAlert");
-    
-            if (result.rows && result.rows.length > 0) {
-                alarmAlert.classList.remove("d-none");
-                alarmAlert.classList.add("alert-pulse");
-                alarmAlert.innerText =
-                    `🔔 You have ${result.rows.length} Attachment alarm(s)!`;
-            } else {
-                alarmAlert.classList.add("d-none");
-                alarmAlert.classList.remove("alert-pulse");
-            }
-    
-        } catch (err) {
-            console.error("Error fetching attachment alarms:", err);
+<!-- ================= ATTACHMENT ALARM OVER 90 DAYS MODAL ================= -->
+<div class="modal fade" id="attachmentAlarmModalScope" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl custom-size">
+    <div class="modal-content">
+      <!-- HEADER -->
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+          <div class="d-flex align-items-center gap-2">
+            <h5 class="modal-title mb-0">
+              ⚠️ Attachment Alarm — Over 90 Days
+            </h5>
+          </div>
+
+          <!-- COMPANY FILTER -->
+          <select id="attachAlarmCompanyFilter" class="form-select form-select-sm" style="width: 200px;">
+            <option value="">All Companies</option>
+          </select>
+
+          <!-- TOTAL COUNT BADGE -->
+          <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-3" style="background: #fff0f0; border: 1px solid #ffd6d6;">
+            <span class="fw-semibold small" style="color:#a83131;">Alert Count</span>
+            <span id="attachAlarmTotalCount" class="badge rounded-pill bg-danger">0</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body">
+        <!-- SPINNER -->
+        <div id="attachAlarmSpinner" class="text-center py-5">
+          <div class="spinner-border text-danger"></div>
+          <div class="mt-2 text-muted">Fetching attachment alarm data...</div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-responsive">
+          <table id="attachAlarmTable" class="table table-bordered table-hover align-middle d-none">
+            <thead class="table-light">
+              <tr>
+                <th>Army Number</th>
+                <th>Rank</th>
+                <th style="text-align: left; text-transform: uppercase;">Name</th>
+                <th>Company</th>
+                <th>Location</th>
+                <th>Days on Attachment</th>
+                <th>TD Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="attachAlarmTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let attachAlarmFetchedData = [];
+
+async function showAssignedAttachmentAlarms() {
+    try {
+        const res = await fetch('/stats/assigned_attachment_alarm');
+        if (!res.ok) throw new Error("Network error");
+
+        const result = await res.json();
+        attachAlarmFetchedData = result.rows || [];
+        const alarmAlert = document.getElementById("attachmentAlarmAlert");
+
+        if (attachAlarmFetchedData.length > 0) {
+            alarmAlert.classList.remove("d-none");
+            alarmAlert.classList.add("alert-pulse");
+            alarmAlert.innerText = `🔔 You have ${attachAlarmFetchedData.length} Attachment alarm(s)!`;
+        } else {
+            alarmAlert.classList.add("d-none");
+            alarmAlert.classList.remove("alert-pulse");
         }
+    } catch (err) {
+        console.error("Error fetching attachment alarms:", err);
     }
+}
+
+function renderAttachAlarmTable() {
+    const companyVal = document.getElementById("attachAlarmCompanyFilter")?.value || "";
+    const tbody = document.getElementById("attachAlarmTableBody");
+    const countBadge = document.getElementById("attachAlarmTotalCount");
     
-    document.addEventListener('DOMContentLoaded', showAssignedAttachmentAlarms);
-    
-    document.getElementById("attachmentAlarmAlert")?.addEventListener("click", function () {
-            const attachModal = new bootstrap.Modal(
-                document.getElementById('attachmentModal')
-            );
-            attachModal.show();
-            load_attachment_personnel();
-        });
-    </script>
-    
+    if (!tbody) return;
+
+    let filtered = attachAlarmFetchedData;
+    if (companyVal) {
+        filtered = filtered.filter(item => (item.company || '').toUpperCase() === companyVal.toUpperCase());
+    }
+
+    if (countBadge) countBadge.textContent = filtered.length;
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No attachment alarms over 90 days found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(item => `
+        <tr>
+            <td class="fw-bold">${item.army_number || 'N/A'}</td>
+            <td>${item.rank || 'N/A'}</td>
+            <td style="text-align: left; text-transform: uppercase;">${(item.name || 'N/A').toUpperCase()}</td>
+            <td><span class="badge bg-secondary">${item.company || 'N/A'}</span></td>
+            <td>${item.location || 'N/A'}</td>
+            <td><span class="badge bg-danger fs-6">${item.days_on_td || 0} days</span></td>
+            <td>${item.td_date || 'N/A'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteAttachmentAlarm('${item.army_number}')">
+                    <i class="fa fa-trash"></i> Remove
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function populateAttachCompanyFilter() {
+    const select = document.getElementById("attachAlarmCompanyFilter");
+    if (!select) return;
+    const companies = Array.from(new Set(attachAlarmFetchedData.map(i => i.company).filter(Boolean)));
+    select.innerHTML = '<option value="">All Companies</option>' + 
+        companies.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+
+async function deleteAttachmentAlarm(armyNumber) {
+    if (!confirm(`Are you sure you want to remove attachment for Army No: ${armyNumber}?`)) return;
+
+    try {
+        const res = await fetch(`/stats/delete-attachment/${armyNumber}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.status === "success" || data.message || res.ok) {
+            alert("Attachment removed successfully");
+            await showAssignedAttachmentAlarms();
+            populateAttachCompanyFilter();
+            renderAttachAlarmTable();
+        } else {
+            alert(data.error || "Failed to delete attachment");
+        }
+    } catch (e) {
+        alert("Error deleting attachment");
+    }
+}
+
+document.addEventListener('DOMContentLoaded', showAssignedAttachmentAlarms);
+
+document.getElementById("attachAlarmCompanyFilter")?.addEventListener("change", renderAttachAlarmTable);
+
+document.getElementById("attachmentAlarmAlert")?.addEventListener("click", async function () {
+    const modalEl = document.getElementById('attachmentAlarmModalScope');
+    if (modalEl) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+        
+        document.getElementById("attachAlarmSpinner")?.classList.remove("d-none");
+        document.getElementById("attachAlarmTable")?.classList.add("d-none");
+
+        await showAssignedAttachmentAlarms();
+        populateAttachCompanyFilter();
+        
+        document.getElementById("attachAlarmSpinner")?.classList.add("d-none");
+        document.getElementById("attachAlarmTable")?.classList.remove("d-none");
+        
+        renderAttachAlarmTable();
+    }
+});
+</script>
