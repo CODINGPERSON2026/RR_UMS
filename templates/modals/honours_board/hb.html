@@ -40,12 +40,11 @@
     background: var(--card-bg-solid, var(--card-bg));
     border-radius: 16px;
     border: 1px solid var(--border-color);
-    border-left: 5px solid var(--primary-color);
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
     position: relative;
-    height: 350px; /* Expanded height for zoomed card info */
+    height: 350px;
   }
 
   .hb-card::before {
@@ -62,7 +61,6 @@
 
   .hb-card:hover {
     transform: translateY(-2px);
-    border-color: var(--primary-color);
     box-shadow: 0 10px 20px -3px rgba(0,0,0,0.1);
   }
 
@@ -106,9 +104,8 @@
     backdrop-filter: blur(4px);
   }
 
-  .hb-card:hover .hb-overlay-nav,
   .hb-overlay-nav:hover {
-    opacity: 1; /* Full opacity on hover */
+    opacity: 1;
     background: var(--primary-color, #3b82f6);
     color: #ffffff;
     border-color: var(--primary-color, #3b82f6);
@@ -189,30 +186,30 @@
     min-width: 0;
   }
   .hb-name {
-    font-size: 17px; /* Increased font for zoomed active card */
-    font-weight: 800;
+    font-size: 13px;
+    font-weight: 700;
     line-height: 1.2;
     color: var(--text-primary);
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .hb-unit {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .hb-role {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
+    padding: 2px 8px;
     border-radius: 999px;
     background: var(--nav-link-hover-bg);
     border: 1px solid var(--border-color);
     color: var(--text-primary);
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     letter-spacing: .3px;
   }

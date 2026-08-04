@@ -18,8 +18,8 @@
 
       <div class="modal-body pt-2 pb-2">
 
-        <!-- Batch Filter — compact -->
-        <div class="row mb-2">
+        <!-- Batch Filter & Quick Search — compact -->
+        <div class="row mb-2 g-2">
           <div class="col-md-5">
             <div class="input-group input-group-sm shadow-sm">
               <span class="input-group-text bg-dark text-white">
@@ -31,6 +31,14 @@
               <button id="agni_ResetFilter" class="btn btn-outline-secondary btn-sm" type="button">
                 Reset
               </button>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="input-group input-group-sm shadow-sm">
+              <span class="input-group-text bg-secondary text-white">
+                <i class="bi bi-search"></i>
+              </span>
+              <input type="text" id="agni_SearchInput" class="form-control form-control-sm" placeholder="Search batch or board...">
             </div>
           </div>
         </div>
@@ -320,11 +328,21 @@
   let agni_isLoaded  = false;
   let agni_isLoading = false;
 
-  /* ── Modal open guard ─────────────────────────────── */
-  document.getElementById('agni_Modal')?.addEventListener('shown.bs.modal', function () {
-      if (agni_isLoaded || agni_isLoading) return;
-      agni_loadData();
+  /* ── Helper to standardize batch display ───────── */
+  function agni_formatBatchName(b) {
+    if (!b) return '';
+    let str = String(b).trim();
+    if (/^\d+$/.test(str)) return 'Batch ' + str;
+    return str.replace(/\b\w+/g, function (txt) {
+      return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
     });
+  }
+
+  /* ── Modal open listener ──────────────────────────── */
+  document.getElementById('agni_Modal')?.addEventListener('shown.bs.modal', function () {
+    if (agni_isLoading) return;
+    agni_loadData();
+  });
 
   /* ── Fetch in parallel ────────────────────────────── */
   function agni_loadData() {
@@ -335,8 +353,8 @@
       fetch('/agni/get_all_agniveers').then(r => r.json())
     ])
     .then(function ([batches, records]) {
+      agni_allData   = records || [];
       agni_populateBatchFilter(batches);
-      agni_allData   = records;
       agni_isLoaded  = true;
       agni_isLoading = false;
       agni_applyFilters();
@@ -350,18 +368,73 @@
   /* ── Batch dropdown ───────────────────────────────── */
   function agni_populateBatchFilter(batches) {
     const sel = document.getElementById('agni_BatchFilter');
+    if (!sel) return;
     const cur = sel.value;
+
+    const dataBatches = (agni_allData || []).map(b => b.batch).filter(Boolean);
+    const rawCombined = [...(batches || []), ...dataBatches];
+
+    // Standardize all batch entries to clean Title Case (e.g. "Batch 1")
+    const formattedMap = new Map();
+    rawCombined.forEach(b => {
+      if (!b) return;
+      const fmt = agni_formatBatchName(b);
+      if (fmt) formattedMap.set(fmt.toLowerCase(), fmt);
+    });
+
+    const combined = Array.from(formattedMap.values()).sort((a, b) =>
+      a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+    );
+
     sel.innerHTML = '<option value="all">All Batches</option>' +
-      batches.map(b => `<option value="${b}">${b}</option>`).join('');
-    if (cur) sel.value = cur;
+      combined.map(b => `<option value="${b}">${b}</option>`).join('');
+
+    if (cur && combined.some(c => c.toLowerCase() === cur.toLowerCase())) {
+      sel.value = combined.find(c => c.toLowerCase() === cur.toLowerCase());
+    } else {
+      sel.value = 'all';
+    }
   }
 
   /* ── Filter ───────────────────────────────────────── */
   function agni_applyFilters() {
-    const batch = document.getElementById('agni_BatchFilter').value;
-    agni_renderTable(
-      batch === 'all' ? agni_allData : agni_allData.filter(a => a.batch === batch)
-    );
+    const sel = document.getElementById('agni_BatchFilter');
+    const searchInp = document.getElementById('agni_SearchInput');
+
+    const rawSel = sel ? String(sel.value || 'all').trim() : 'all';
+    const selectedBatchFmt = agni_formatBatchName(rawSel).toLowerCase();
+    const query = searchInp ? String(searchInp.value || '').trim().toLowerCase() : '';
+
+    let filtered = agni_allData || [];
+
+    if (rawSel !== 'all' && selectedBatchFmt !== 'all batches') {
+      filtered = filtered.filter(function (a) {
+        const itemFmt = agni_formatBatchName(a.batch).toLowerCase();
+        if (!itemFmt) return false;
+
+        if (itemFmt === selectedBatchFmt) return true;
+
+        // Strip non-digits for numeric comparison (e.g. "batch 1" -> 1)
+        const numItem = parseInt(itemFmt.replace(/\D+/g, ''), 10);
+        const numSel  = parseInt(selectedBatchFmt.replace(/\D+/g, ''), 10);
+        if (!isNaN(numItem) && !isNaN(numSel) && numItem === numSel) return true;
+
+        if (itemFmt.includes(selectedBatchFmt) || selectedBatchFmt.includes(itemFmt)) return true;
+
+        return false;
+      });
+    }
+
+    if (query) {
+      filtered = filtered.filter(function (a) {
+        const batchMatch = String(a.batch || '').toLowerCase().includes(query);
+        const boardMatch = String(a.screening_board || '').toLowerCase().includes(query);
+        const remarksMatch = String(a.remarks || '').toLowerCase().includes(query);
+        return batchMatch || boardMatch || remarksMatch;
+      });
+    }
+
+    agni_renderTable(filtered);
   }
 
   /* ── Render rows ──────────────────────────────────── */
@@ -487,8 +560,12 @@
 
   /* ── Filter listeners ─────────────────────────────── */
   document.getElementById('agni_BatchFilter')?.addEventListener('change', agni_applyFilters);
+  document.getElementById('agni_SearchInput')?.addEventListener('input', agni_applyFilters);
   document.getElementById('agni_ResetFilter')?.addEventListener('click', function () {
-    document.getElementById('agni_BatchFilter').value = 'all';
+    const sel = document.getElementById('agni_BatchFilter');
+    const searchInp = document.getElementById('agni_SearchInput');
+    if (sel) sel.value = 'all';
+    if (searchInp) searchInp.value = '';
     agni_applyFilters();
   });
 

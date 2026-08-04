@@ -3,6 +3,18 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime, date
 agniveer_bp = Blueprint("agniveer_bp", __name__, url_prefix="/agni")
 
+def normalize_batch(b):
+    """Normalize batch name: 'batch 1', 'BATCH 1', '1' -> 'Batch 1'"""
+    if not b:
+        return b
+    s = str(b).strip()
+    import re
+    # If purely numeric, prefix with 'Batch'
+    if re.match(r'^\d+$', s):
+        return 'Batch ' + s
+    # Title-case everything else
+    return s.title()
+
 @agniveer_bp.route('/get_batches', methods=['GET'])
 def get_batches():
     try:
@@ -12,7 +24,14 @@ def get_batches():
         rows = cursor.fetchall()
         cursor.close()
         conn.close()
-        return jsonify([row['batch'] for row in rows])
+        # Normalize and deduplicate (case-insensitive)
+        seen = {}
+        for row in rows:
+            normed = normalize_batch(row['batch'])
+            if normed:
+                seen[normed.lower()] = normed
+        batches = sorted(seen.values(), key=lambda x: x.lower())
+        return jsonify(batches)
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -139,6 +158,10 @@ def get_all_agniveers():
         for key, value in row.items():
             if hasattr(value, "strftime"):
                 row[key] = value.strftime('%Y-%m-%d')
+
+        # Normalize batch name to Title Case
+        if row.get('batch'):
+            row['batch'] = normalize_batch(row['batch'])
 
         # 🔹 Compute "Assmt completed on / or such wef" dynamically
         # For 4 sub-columns (1st Yr, 2nd Yr, 3rd Yr, 4th Yr)
