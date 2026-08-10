@@ -1,16 +1,16 @@
 <!-- ================= HEADER WITH LEFT & RIGHT LOGO ================= -->
 
 <style>
-    /* ================= LIGHT THEME (UNCHANGED) ================= */
-    .page-title {
+    /* ================= LIGHT THEME ================= */
+    .page-title, [data-theme="light"] .page-title {
         height: 105px;
-        background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%) !important;
         color: white;
 
         padding: 1rem 1.5rem;
         border-radius: 15px;
 
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3) !important;
 
         display: flex;
         align-items: center;
@@ -23,32 +23,32 @@
 
     /* ================= DARK ================= */
     [data-theme="dark"] .page-title {
-        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.6);
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.6) !important;
     }
 
     /* ================= MILITARY ================= */
     [data-theme="military"] .page-title {
-        background: linear-gradient(135deg, #2f4f3e 0%, #4a7c59 100%);
-        box-shadow: 0 10px 30px rgba(47, 79, 62, 0.45);
+        background: linear-gradient(135deg, #1b382b 0%, #2f4f3e 100%) !important;
+        box-shadow: 0 10px 30px rgba(27, 56, 43, 0.5) !important;
     }
 
     /* ================= OCEAN ================= */
     [data-theme="ocean"] .page-title {
-        background: linear-gradient(135deg, #0f4c5c 0%, #1b7288 100%);
-        box-shadow: 0 10px 30px rgba(15, 76, 92, 0.45);
+        background: linear-gradient(135deg, #0f4c5c 0%, #1b7288 100%) !important;
+        box-shadow: 0 10px 30px rgba(15, 76, 92, 0.45) !important;
     }
 
     /* ================= SUNSET ================= */
     [data-theme="sunset"] .page-title {
-        background: linear-gradient(135deg, #92400e 0%, #d97706 100%);
-        box-shadow: 0 10px 30px rgba(146, 64, 14, 0.45);
+        background: linear-gradient(135deg, #7c2d12 0%, #c2410c 100%) !important;
+        box-shadow: 0 10px 30px rgba(124, 45, 18, 0.45) !important;
     }
 
     /* ================= PURPLE ================= */
     [data-theme="purple"] .page-title {
-        background: linear-gradient(135deg, #4c1d95 0%, #7e22ce 100%);
-        box-shadow: 0 10px 30px rgba(76, 29, 149, 0.45);
+        background: linear-gradient(135deg, #4c1d95 0%, #7e22ce 100%) !important;
+        box-shadow: 0 10px 30px rgba(76, 29, 149, 0.45) !important;
     }
 
     .title-section {
@@ -200,43 +200,47 @@
     }
 </style>
 
-<div class="page-title">
+{% set custom_bg_style = "" %}
+{% if navbar_config and navbar_config.bg_type == 'image' and navbar_config.bg_image %}
+    {% set custom_bg_style = "background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url('" ~ navbar_config.bg_image ~ "') center/cover no-repeat !important;" %}
+{% endif %}
+
+<div class="page-title" style="{{ custom_bg_style }}">
 
     <!-- LEFT LOGO -->
-    <a href="{{ url_for('history_15cesr') }}" class="logo-link">
-        <img src="/static/image_for_login_page/rt.jpg"
+    {% if not navbar_config or navbar_config.show_left_logo != false %}
+    <a href="{{ url_for('history_15cesr') }}" class="logo-link" id="nav-left-logo-container">
+        <img src="{{ navbar_config.left_logo if (navbar_config and navbar_config.left_logo) else '/static/image_for_login_page/rt.jpg' }}"
              class="org-logo"
-             alt="15 CESR Logo">
+             alt="15 CESR Logo"
+             id="nav-left-logo-img">
     </a>
+    {% endif %}
 
     <div class="title-section">
 
-        <h3 class="fw-bold">{{ header }}</h3>
+        <h3 class="fw-bold" id="nav-header-text">{% if navbar_config and 'header_text' in navbar_config %}{{ navbar_config.header_text }}{% else %}{{ header if header else '' }}{% endif %}</h3>
 
         <!-- SUBSCRIPT — OPTION 3: frosted pill with avatar initials -->
         <div class="sub-3">
             <div class="sub-3-inner">
-
-               
-
                 <span class="sub-3-greet">Welcome,</span>
                 <span class="sub-3-role">{{ role }}</span>
                 <span class="sub-3-name">{{ current_user_name }}</span>
-
             </div>
         </div>
-
-        <!-- REAL TIME DIGITAL CLOCK (uncomment to enable) -->
-      
 
     </div>
 
     <!-- RIGHT LOGO -->
-    <a href="{{ url_for('history_15cor') }}" class="logo-link">
-        <img src="/static/image_for_login_page/chinar.jpg"
+    {% if not navbar_config or navbar_config.show_right_logo != false %}
+    <a href="{{ url_for('history_15cor') }}" class="logo-link" id="nav-right-logo-container">
+        <img src="{{ navbar_config.right_logo if (navbar_config and navbar_config.right_logo) else '/static/image_for_login_page/chinar.jpg' }}"
              class="org-logo"
-             alt="15 COR Logo">
+             alt="15 COR Logo"
+             id="nav-right-logo-img">
     </a>
+    {% endif %}
 
 </div>
 

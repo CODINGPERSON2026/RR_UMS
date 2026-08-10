@@ -1,353 +1,686 @@
 <!-- =========================================================
-     HONOURS BOARD CARD - INLINE Redesign
+     HONOURS BOARD CARD - Ultra-Premium Modern Redesign
 ========================================================= -->
 
 <div class="hb-card" id="honoursCard">
 
   <!-- HEADER -->
   <div class="hb-header">
-    <span class="slabel">Appreciation Wall</span>
-    <div class="hb-dots" id="dots"></div>
-  </div>
-  <div class="scard-divider"></div>
+    <div class="hb-header-title">
+      <div class="hb-header-icon-wrap">
+        <i class="fa-solid fa-trophy hb-trophy-icon"></i>
+      </div>
+      <div class="hb-header-text">
+        <span class="hb-title">Appreciation Wall</span>
+        <span class="hb-subtitle">Hall of Fame & Citations</span>
+      </div>
+    </div>
 
-  <!-- CONTENT VIEWPORT -->
-  <div class="hb-viewport" id="hbViewport">
-    <!-- OVERLAY NAV BUTTONS DIRECTLY ON SIDE BLURRED CARDS -->
-    <button class="hb-overlay-nav prev-nav" id="prevBtn" type="button" title="Previous Entry">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <button class="hb-overlay-nav next-nav" id="nextBtn" type="button" title="Next Entry">
-      <i class="fas fa-chevron-right"></i>
-    </button>
-
-    <div class="hb-track" id="hbTrack">
-      <div class="hb-loading">
-        Loading appreciation entries...
+    <div class="hb-header-actions">
+      <div class="hb-counter" id="hbCounter">
+        <span class="curr">01</span><span class="sep">/</span><span class="total">07</span>
+      </div>
+      <div class="hb-nav-btns">
+        <button class="hb-nav-btn" id="prevBtn" type="button" title="Previous Citation" aria-label="Previous">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="hb-nav-btn" id="nextBtn" type="button" title="Next Citation" aria-label="Next">
+          <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- PROGRESS TIMER BAR -->
+  <div class="hb-progress-container">
+    <div class="hb-progress-bar" id="hbProgressBar"></div>
+  </div>
+
+  <!-- CONTENT VIEWPORT -->
+  <div class="hb-viewport" id="hbViewport">
+    <div class="hb-track" id="hbTrack">
+      <div class="hb-loading">
+        <div class="hb-spinner"></div>
+        <span>Loading appreciation citations...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER DOTS -->
+  <div class="hb-footer-dots" id="dots"></div>
+
 </div>
 
 <!-- =========================================================
-     CSS FOR INLINE CARD
+     STUNNING CSS FOR APPRECIATION WALL (THEME-SYNCHRONIZED)
 ========================================================= -->
 <style>
   /* CARD CONTAINER */
   .hb-card {
-    width: 100%;
-    background: var(--card-bg-solid, var(--card-bg));
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
     position: relative;
-    height: 350px;
-  }
-
-  .hb-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
-    background-size: 200% 100%;
-    animation: shimmer 2.5s linear infinite;
+    width: 100%;
+    height: 100%;
+    min-height: 350px;
+    background: var(--card-bg-solid, var(--card-background, #ffffff));
+    border-radius: 20px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+    box-shadow: 0 10px 30px -5px var(--shadow, rgba(0, 0, 0, 0.08));
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
   }
 
   .hb-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px -3px rgba(0,0,0,0.1);
-  }
-
-  @keyframes highlightPulse {
-    0% { box-shadow: 0 4px 6px -1px var(--shadow); }
-    50% { box-shadow: 0 0 18px 4px var(--primary-color); }
-    100% { box-shadow: 0 4px 6px -1px var(--shadow); }
-  }
-  
-  .highlight-card {
-    animation: highlightPulse 2s ease-in-out;
+    box-shadow: 0 16px 36px -6px var(--shadow, rgba(0, 0, 0, 0.12));
+    border-color: var(--primary-color, #f59e0b);
   }
 
   /* HEADER */
   .hb-header {
-    padding: 12px 18px 8px 18px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: linear-gradient(180deg, var(--nav-link-hover-bg, rgba(0, 0, 0, 0.03)) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+    gap: 12px;
   }
 
-  /* OVERLAY ICON BUTTONS ON BLURRED CARDS */
-  .hb-overlay-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 25;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-color, rgba(255,255,255,0.2));
-    color: var(--primary-color, #3b82f6);
+  .hb-header-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .hb-header-icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--nav-link-hover-bg, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.05));
+    flex-shrink: 0;
+  }
+
+  .hb-trophy-icon {
+    font-size: 16px;
+    color: var(--primary-color, #f59e0b);
+    filter: drop-shadow(0 2px 4px var(--shadow, rgba(245, 158, 11, 0.4)));
+    animation: hbTrophyGlow 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes hbTrophyGlow {
+    0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4)); }
+    100% { transform: scale(1.1); filter: drop-shadow(0 4px 10px rgba(245, 158, 11, 0.8)); }
+  }
+
+  .hb-header-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hb-title {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--text-primary, #1e293b);
+    line-height: 1.2;
+  }
+
+  .hb-subtitle {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary, #64748b);
+    letter-spacing: 0.2px;
+  }
+
+  .hb-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .hb-counter {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    background: var(--nav-link-hover-bg, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    color: var(--text-primary, #1e293b);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-feature-settings: "tnum";
+  }
+  .hb-counter .curr { color: var(--primary-color, #f59e0b); font-weight: 800; }
+  .hb-counter .sep { opacity: 0.4; margin: 0 1px; }
+  .hb-counter .total { color: var(--text-secondary, #64748b); }
+
+  .hb-nav-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .hb-nav-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color, rgba(0,0,0,0.1));
+    background: var(--card-bg-solid, #ffffff);
+    color: var(--text-primary, #334155);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    opacity: 0.35; /* Faded initially */
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
   }
 
-  .hb-overlay-nav:hover {
-    opacity: 1;
-    background: var(--primary-color, #3b82f6);
+  .hb-nav-btn:hover {
+    background: var(--primary-color, #f59e0b);
     color: #ffffff;
-    border-color: var(--primary-color, #3b82f6);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
+    border-color: var(--primary-color, #f59e0b);
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 12px var(--shadow, rgba(245, 158, 11, 0.35));
+  }
+  .hb-nav-btn:active {
+    transform: scale(0.95);
   }
 
-  .hb-overlay-nav.prev-nav { left: 8px; }
-  .hb-overlay-nav.next-nav { right: 8px; }
+  /* PROGRESS BAR */
+  .hb-progress-container {
+    width: 100%;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+  }
+  .hb-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color, #f59e0b), var(--secondary-color, #3b82f6));
+    border-radius: 0 2px 2px 0;
+    transition: width 0.1s linear;
+  }
 
-  /* VIEWPORT & TRACK FOR HORIZONTAL SLIDING */
+  /* VIEWPORT & TRACK */
   .hb-viewport {
+    position: relative;
+    flex: 1;
     width: 100%;
     overflow: hidden;
-    position: relative;
-    height: 285px; /* Maximize vertical height for zoomed card */
-    perspective: 1200px;
+    padding: 14px 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
   }
 
   .hb-track {
     position: relative;
     width: 100%;
     height: 100%;
-    will-change: transform;
+    min-height: 220px;
   }
 
+  /* SLIDES */
   .hb-slide {
     position: absolute;
     top: 0;
     left: 0;
-    width: 68%; /* Expanded width */
-    padding: 10px 12px;
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(30px) scale(0.98);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    height: 100%;
-    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-    opacity: 0;
+    justify-content: space-between;
+    box-sizing: border-box;
     pointer-events: none;
     z-index: 1;
   }
 
-  .hb-top {
+  .hb-slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0) scale(1);
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .hb-slide.prev-slide {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-30px) scale(0.98);
+  }
+
+  /* PERSONNEL HERO CARD */
+  .hb-hero-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: var(--nav-link-hover-bg, rgba(248, 250, 252, 0.8));
+    border: 1px solid var(--border-color, rgba(226, 232, 240, 0.8));
+    margin-bottom: 12px;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hb-hero-left {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 12px;
+    min-width: 0;
+    flex: 1;
   }
 
-  /* AVATAR */
-  .hb-avatar {
-    width: 48px;
-    height: 48px;
+  /* AVATAR RING */
+  .hb-avatar-ring {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--primary-color, #f59e0b), var(--secondary-color, #3b82f6));
+    box-shadow: 0 4px 12px var(--shadow, rgba(245, 158, 11, 0.25));
+    flex-shrink: 0;
+  }
+
+  .hb-avatar-ring::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color, rgba(245, 158, 11, 0.4)), transparent);
+    z-index: -1;
+    filter: blur(4px);
+  }
+
+  .hb-avatar-inner {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     overflow: hidden;
-    flex-shrink: 0;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--card-bg-solid, #ffffff);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,.15);
   }
+
   .hb-avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+
   .hb-avatar-fallback {
-    color: #fff;
-    font-size: 16px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6), var(--secondary-color, #1d4ed8));
+    color: #ffffff;
     font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
   }
 
-  /* INFO */
-  .hb-info {
-    flex: 1;
+  /* PERSONNEL INFO */
+  .hb-person-info {
     min-width: 0;
+    flex: 1;
   }
-  .hb-name {
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--text-primary);
-    margin-bottom: 2px;
+
+  .hb-person-name {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text-primary, #0f172a);
+    line-height: 1.25;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
-  .hb-unit {
+
+  .hb-rank-pill {
     font-size: 10px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 3px;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--primary-color, #f59e0b);
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px var(--shadow, rgba(0,0,0,0.15));
   }
-  .hb-role {
+
+  .hb-tags-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .hb-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--card-bg-solid, rgba(0,0,0,0.04));
+    border: 1px solid var(--border-color, rgba(0,0,0,0.08));
+    color: var(--text-secondary, #475569);
     display: inline-flex;
     align-items: center;
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: var(--nav-link-hover-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: .3px;
+    gap: 4px;
   }
 
-  /* MEDAL */
-  .hb-medal {
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
+  .hb-category-badge {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+
+  /* CATEGORY COLOR SCHEMES */
+  .hb-cat-leadership {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+  .hb-cat-excellence {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .hb-cat-service {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  .hb-cat-innovation {
+    background: rgba(6, 182, 212, 0.12);
+    color: #0891b2;
+    border: 1px solid rgba(6, 182, 212, 0.3);
+  }
+  .hb-cat-discipline {
+    background: rgba(139, 92, 246, 0.12);
+    color: #7c3aed;
+    border: 1px solid rgba(139, 92, 246, 0.3);
+  }
+  .hb-cat-teamwork {
+    background: rgba(244, 63, 94, 0.12);
+    color: #e11d48;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+  }
+
+  /* MEDAL ILLUMINATED BOX */
+  .hb-medal-box {
+    width: 44px;
+    height: 44px;
     border-radius: 12px;
+    background: var(--nav-link-active-bg, rgba(255, 215, 0, 0.15));
+    border: 1px solid var(--border-color, rgba(245, 158, 11, 0.3));
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(255,215,0,.15), rgba(255,255,255,.05));
-    border: 1px solid rgba(255,255,255,.12);
+    flex-shrink: 0;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 4px 10px var(--shadow, rgba(0,0,0,0.05));
+    transition: transform 0.3s ease;
   }
-  .hb-medal i {
-    font-size: 22px;
-    color: #FFD700;
+  .hb-slide:hover .hb-medal-box {
+    transform: rotate(6deg) scale(1.08);
   }
-  .hb-medal .fa-trophy { color: #facc15; }
-  .hb-medal .fa-medal { color: #fb923c; }
-  .hb-medal .fa-award { color: #60a5fa; }
-  .hb-medal .fa-star { color: #fde047; }
-  .hb-medal .fa-crown { color: #f59e0b; }
-  .hb-medal .fa-fire { color: #ef4444; }
-  .hb-medal .fa-gem { color: #38bdf8; }
-  .hb-medal .fa-shield-halved { color: #a78bfa; }
-  .hb-medal .fa-bolt { color: #facc15; }
-  .hb-medal .fa-chess-king { color: #f472b6; }
-  .hb-medal .fa-user-shield { color: #22c55e; }
+  .hb-medal-box i {
+    font-size: 20px;
+    color: var(--primary-color, #f59e0b);
+    filter: drop-shadow(0 2px 4px var(--shadow, rgba(245, 158, 11, 0.4)));
+  }
 
-  /* COMMENDATION TEXT */
-  .hb-text {
-    background: var(--nav-link-hover-bg);
-    border-left: 3px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 8px 12px;
-    line-height: 1.5;
-    font-size: 12px;
+  /* COMMENDATION CITATION BOX */
+  .hb-citation-card {
+    position: relative;
+    flex: 1;
+    background: var(--card-bg-solid, #ffffff);
+    border-radius: 12px;
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+    border-left: 4px solid var(--primary-color, #f59e0b);
+    padding: 12px 14px 10px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.02));
+    overflow: hidden;
+  }
+
+  .hb-quote-watermark {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    font-size: 70px;
+    font-family: Georgia, serif;
+    color: var(--primary-color, #f59e0b);
+    opacity: 0.12;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hb-citation-text {
+    position: relative;
+    z-index: 1;
+    font-size: 12.5px;
+    line-height: 1.55;
     font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 10px;
-    max-height: 155px; /* Increased height after removing share button */
+    color: var(--text-primary, #1e293b);
+    max-height: 100px;
     overflow-y: auto;
+    padding-right: 4px;
   }
 
-  /* FOOTER */
-  .hb-footer {
+  /* CUSTOM SCROLLBAR FOR CITATION TEXT */
+  .hb-citation-text::-webkit-scrollbar {
+    width: 3px;
+  }
+  .hb-citation-text::-webkit-scrollbar-thumb {
+    background: var(--primary-color, rgba(245, 158, 11, 0.4));
+    border-radius: 3px;
+  }
+
+  /* CITATION FOOTER */
+  .hb-citation-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border-color, rgba(0,0,0,0.08));
   }
-  .hb-date {
-    font-size: 11px;
+
+  .hb-citation-stamp {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--primary-color, #d97706);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .hb-citation-date {
+    font-size: 10.5px;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #64748b);
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
-  .hb-share {
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background: var(--nav-link-hover-bg);
-    color: var(--text-primary);
-    font-size: 11px;
-    transition: all .25s ease;
+
+  /* FOOTER DOTS */
+  .hb-footer-dots {
+    padding: 8px 0 10px 0;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .hb-share:hover {
-    transform: translateY(-1px);
-    background: var(--primary-color);
-    color: #fff;
+    gap: 6px;
   }
 
-  /* NAVIGATION */
-  .hb-nav {
-    padding: 8px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .hb-btn {
-    border: none;
-    padding: 4px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 11px;
-    font-weight: 700;
-    color: #fff;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    transition: transform .2s ease, opacity .2s ease;
-  }
-  .hb-btn:hover { transform: translateY(-1px); }
-  .hb-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-  /* DOTS */
-  .hb-dots { display: flex; align-items: center; gap: 5px; }
   .hb-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--border-color);
+    background: var(--border-color, rgba(0, 0, 0, 0.15));
     cursor: pointer;
-    transition: all .2s ease;
-  }
-  .hb-dot.active {
-    background: var(--primary-color);
-    transform: scale(1.2);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* LOADING */
+  .hb-dot.active {
+    width: 22px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--primary-color, #f59e0b), var(--secondary-color, #d97706));
+    box-shadow: 0 2px 6px var(--shadow, rgba(245, 158, 11, 0.4));
+  }
+
+  /* LOADING SPINNER */
   .hb-loading {
-    text-align: center;
-    padding: 20px 10px;
-    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 180px;
+    gap: 12px;
+    color: var(--text-secondary, #64748b);
     font-size: 12px;
     font-weight: 600;
+  }
+
+  .hb-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: var(--primary-color, #f59e0b);
+    border-radius: 50%;
+    animation: hbSpin 0.8s linear infinite;
+  }
+
+  @keyframes hbSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==================== THEME EXPLICIT OVERRIDES ==================== */
+  [data-theme="dark"] .hb-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] .hb-citation-card {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] .hb-hero-box {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] .hb-nav-btn {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] .hb-nav-btn:hover {
+    background: var(--primary-color, #60a5fa) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-color, #60a5fa) !important;
+  }
+  [data-theme="dark"] .hb-tag {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #cbd5e1 !important;
+  }
+  [data-theme="dark"] .hb-person-name {
+    color: #ffffff !important;
+  }
+  [data-theme="dark"] .hb-citation-text {
+    color: #f1f5f9 !important;
+  }
+
+  [data-theme="military"] .hb-hero-box {
+    background: #e1ede3 !important;
+    border-color: #b8d4c4 !important;
+  }
+  [data-theme="military"] .hb-citation-card {
+    background: #f5f9f4 !important;
+    border-color: #b8d4c4 !important;
+  }
+
+  [data-theme="ocean"] .hb-hero-box {
+    background: #e0fafa !important;
+    border-color: #a5f3fc !important;
+  }
+  [data-theme="ocean"] .hb-citation-card {
+    background: #f0feff !important;
+    border-color: #a5f3fc !important;
+  }
+
+  [data-theme="sunset"] .hb-hero-box {
+    background: #fef3c7 !important;
+    border-color: #fde68a !important;
+  }
+  [data-theme="sunset"] .hb-citation-card {
+    background: #fffbeb !important;
+    border-color: #fde68a !important;
+  }
+
+  [data-theme="purple"] .hb-hero-box {
+    background: #f3e8ff !important;
+    border-color: #e9d5ff !important;
+  }
+  [data-theme="purple"] .hb-citation-card {
+    background: #faf5ff !important;
+    border-color: #e9d5ff !important;
   }
 </style>
 
 <!-- =========================================================
-     SCRIPT - LOAD & SLIDE INLINE
+     SCRIPT - REDESIGNED APPRECIATION WALL LOGIC
 ========================================================= -->
 <script>
   (function () {
     let entries = [];
     let current = 0;
-    let honoursTimer = null;
-    const HONOURS_TICK = 6000; // 6 seconds auto-scroll, matches other sliders
+    let progressTimer = null;
+    let progressVal = 0;
+    const DURATION = 8000; // 8 seconds per slide for relaxed reading
 
     const track = document.getElementById("hbTrack");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
-    const dotsWrap= document.getElementById("dots");
+    const dotsWrap = document.getElementById("dots");
+    const counterEl = document.getElementById("hbCounter");
+    const progressBar = document.getElementById("hbProgressBar");
+    const honoursCard = document.getElementById("honoursCard");
 
     async function loadHonoursBoard() {
       try {
@@ -365,7 +698,6 @@
     }
 
     function setDummyEntries() {
-      // Hardcoded dummy data for appreciation board
       entries = [
         {
           id: 1,
@@ -376,6 +708,7 @@
           appreciation_type: "Service",
           medal_icon: "fa-solid fa-award",
           commendation: "Yeh jawan TTC trade ka hai. Yeh jawan IT clerk ka duty badi ruchi aur lagan ke saath kar raha hai. Saath hi Coy dwara diye gaye har kaam ko niyam aur nishtha se nibhata hai.",
+          appreciation_date: "04-08-2026",
           image: "/static/dummy/1coy/Roshan.jpg"
         },
         {
@@ -387,7 +720,7 @@
           appreciation_type: "Excellence",
           medal_icon: "fa-solid fa-gem",
           commendation: "Yeh jawan TTC trade ka hai. Yeh jawan abhi CHQ sec me karya rat hai aur proj clk ka duty badi hi kushalta se kar raha hai. Saath hi is jawan ne Coy ke anya karyon mai bhi mahatvapoorna bhumika nibhata hai.",
-         
+          appreciation_date: "05-08-2026",
           image: "/static/dummy/1coy/Chakravorty.jpg"
         },
         {
@@ -399,7 +732,7 @@
           appreciation_type: "Teamwork",
           medal_icon: "fa-solid fa-user-shield",
           commendation: "Yeh jawan abhi MCCS sec me karya rat hai tatha apne tradework ke sath MCCS shift mech ki duty bahut hi kushalta ke saath kar raha hai.",
-          
+          appreciation_date: "06-08-2026",
           image: "/static/dummy/1coy/Trivedi.jpg"
         },
         {
@@ -411,7 +744,7 @@
           appreciation_type: "Leadership",
           medal_icon: "fa-solid fa-crown",
           commendation: "Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath team netritva karne ka gun bhi rakhta hai. Lagbhag 1 mahine is jawan ne svc bn ke saath sys NCO ki duty bhi bahut achhe tarike se nibhayi hai.",
-         
+          appreciation_date: "08-08-2026",
           image: "/static/dummy/1coy/Sarkat.jpg"
         },
         {
@@ -423,7 +756,7 @@
           appreciation_type: "Innovation",
           medal_icon: "fa-solid fa-fire",
           commendation: "Yeh jawan DMV trade ka hai. Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath mess sec ki duty bahut hi achhe tarike se nibha raha hai. Yeh jawan Coy ke anya karyon mein bhi badh chadh kar hissa leta hai.",
-          
+          appreciation_date: "09-08-2026",
           image: "/static/dummy/1coy/Rahul.jpg"
         },
         {
@@ -435,7 +768,7 @@
           appreciation_type: "Discipline",
           medal_icon: "fa-solid fa-shield-halved",
           commendation: "Yeh jawan OCC trade ka hai. Yeh jawan abhi posting clk ka duty bahut hi achhe tarike se nibha raha hai tatha FS check me apna dayitva nibhata hai.",
-         
+          appreciation_date: "10-08-2026",
           image: "/static/dummy/1coy/Mohan.jpg"
         },
         {
@@ -447,58 +780,149 @@
           appreciation_type: "Excellence",
           medal_icon: "fa-solid fa-star",
           commendation: "Yeh jawan DMV trade ka hai. Yeh jawan MT sec mai karyarat hai. Apne trade work ke saath-saath admin branch me bhi karya rat hai tatha vehicle maintenance me bhi apna aham yogdan de raha hai.",
-        
+          appreciation_date: "10-08-2026",
           image: "/static/dummy/1coy/Rohit.jpg"
         }
       ];
     }
 
+    function getCategoryClass(type) {
+      const lower = (type || "").toLowerCase();
+      if (lower.includes("lead")) return "hb-cat-leadership";
+      if (lower.includes("excel")) return "hb-cat-excellence";
+      if (lower.includes("serv")) return "hb-cat-service";
+      if (lower.includes("innov")) return "hb-cat-innovation";
+      if (lower.includes("disc")) return "hb-cat-discipline";
+      if (lower.includes("team")) return "hb-cat-teamwork";
+      return "hb-cat-leadership";
+    }
+
+    function getCategoryIcon(type) {
+      const lower = (type || "").toLowerCase();
+      if (lower.includes("lead")) return "fa-crown";
+      if (lower.includes("excel")) return "fa-trophy";
+      if (lower.includes("serv")) return "fa-award";
+      if (lower.includes("innov")) return "fa-lightbulb";
+      if (lower.includes("disc")) return "fa-shield-halved";
+      if (lower.includes("team")) return "fa-users-gear";
+      return "fa-star";
+    }
+
     function renderAllSlides() {
       if (!track) return;
       if (entries.length === 0) {
-        track.innerHTML = `<div class="hb-loading">No appreciation entries available.</div>`;
-        if (prevBtn) prevBtn.disabled = true;
-        if (nextBtn) nextBtn.disabled = true;
+        track.innerHTML = `<div class="hb-loading"><span>No appreciation entries found.</span></div>`;
         if (dotsWrap) dotsWrap.innerHTML = "";
         return;
       }
 
-      let trackHTML = "";
+      let slidesHTML = "";
       entries.forEach((item, index) => {
         const initials = item.name
-          ? item.name.split(" ").map(w=>w[0]).join("").substring(0,2)
+          ? item.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase()
           : "NA";
 
         const imageHTML = item.image
-          ? `<img src="${item.image}" class="hb-avatar-img" alt="Profile">`
+          ? `<img src="${item.image}" class="hb-avatar-img" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+             <div class="hb-avatar-fallback" style="display:none;">${initials}</div>`
           : `<div class="hb-avatar-fallback">${initials}</div>`;
 
-        trackHTML += `
+        const catClass = getCategoryClass(item.appreciation_type);
+        const catIcon = getCategoryIcon(item.appreciation_type);
+        const medalIcon = item.medal_icon || ("fa-solid " + catIcon);
+        const displayDate = item.appreciation_date || "Official Citation";
+
+        const userRole = "{{ role if role else '' }}".toLowerCase();
+        const canManageHonours = ['jco it', 'jcoit', 'nco it', 'onco', 'co', '2ic'].includes(userRole);
+        const deleteBtnHTML = (canManageHonours && item.id) ? `
+          <button type="button" class="btn btn-sm btn-outline-danger px-2 py-1 ms-auto hb-delete-btn" data-id="${item.id}" data-name="${item.name || 'this personnel'}" style="font-size:0.85rem; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid rgba(239, 68, 68, 0.4); color:#ef4444; background:rgba(239,68,68,0.08);" title="Delete Entry">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        ` : '';
+
+        slidesHTML += `
           <div class="hb-slide" data-slide-index="${index}">
-            <div class="hb-top">
-              <div class="hb-avatar">${imageHTML}</div>
-              <div class="hb-info">
-                <div class="hb-name">${item.rank||""} ${item.name||""}</div>
-                <div class="hb-unit">${item.company||""}</div>
-                <div class="hb-role">${item.appreciation_type||""}</div>
+
+            <!-- HERO PERSONNEL BANNER -->
+            <div class="hb-hero-box">
+              <div class="hb-hero-left">
+                <div class="hb-avatar-ring">
+                  <div class="hb-avatar-inner">
+                    ${imageHTML}
+                  </div>
+                </div>
+                <div class="hb-person-info">
+                  <div class="hb-person-name">
+                    ${item.rank ? `<span class="hb-rank-pill">${item.rank}</span>` : ''}
+                    <span>${item.name || "Personnel"}</span>
+                  </div>
+                  <div class="hb-tags-row">
+                    ${item.company ? `<span class="hb-tag"><i class="fa-solid fa-building-user"></i> ${item.company}</span>` : ''}
+                    ${item.army_number ? `<span class="hb-tag"><i class="fa-solid fa-id-badge"></i> ${item.army_number}</span>` : ''}
+                    <span class="hb-category-badge ${catClass}">
+                      <i class="fa-solid ${catIcon}"></i> ${item.appreciation_type || "Commendation"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div class="hb-medal">
-                <i class="${item.medal_icon||'fa-solid fa-award'}"></i>
+
+              <!-- MEDAL BOX -->
+              <div class="hb-medal-box" title="${item.appreciation_type || 'Honour'}">
+                <i class="${medalIcon}"></i>
               </div>
             </div>
-            <div class="hb-text">${item.commendation||""}</div>
-            <div class="hb-footer">
-              <div class="hb-date">${item.appreciation_date||""}</div>
+
+            <!-- COMMENDATION CITATION CARD -->
+            <div class="hb-citation-card">
+              <div class="hb-quote-watermark">“</div>
+              <div class="hb-citation-text">
+                ${item.commendation || "No commendation text provided."}
+              </div>
+              <div class="hb-citation-footer">
+                <div class="hb-citation-stamp">
+                  <i class="fa-solid fa-ribbon"></i> Commander's Citation
+                </div>
+                <div class="hb-citation-date">
+                  <i class="far fa-calendar-alt"></i> ${displayDate}
+                </div>
+                ${deleteBtnHTML}
+              </div>
             </div>
+
           </div>
         `;
       });
 
-      track.innerHTML = trackHTML;
+      track.innerHTML = slidesHTML;
+
+      // Bind delete handlers
+      track.querySelectorAll('.hb-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+          e.stopPropagation();
+          const entryId = this.dataset.id;
+          const personName = this.dataset.name;
+          if (!confirm(`Are you sure you want to delete the honour entry for ${personName}?`)) return;
+
+          try {
+            let res = await fetch(`/stats/delete_honours_entry/${entryId}`, { method: 'DELETE' });
+            if (res.status === 404) {
+              res = await fetch(`/api/delete-honours-entry/${entryId}`, { method: 'DELETE' });
+            }
+            const data = await res.json();
+            if (data.status === 'success' || data.success) {
+              await loadHonoursBoard();
+            } else {
+              alert(data.message || 'Failed to delete honour entry.');
+            }
+          } catch (err) {
+            alert('Error deleting honour entry.');
+          }
+        });
+      });
 
       if (dotsWrap) {
         dotsWrap.innerHTML = entries.map((_, i) => `
-          <div class="hb-dot ${i===0?'active':''}" data-index="${i}"></div>
+          <div class="hb-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></div>
         `).join("");
       }
 
@@ -507,112 +931,99 @@
 
     function goHonours(index) {
       if (entries.length === 0) return;
-      current = ((index % entries.length) + entries.length) % entries.length;
-
-      const viewportWidth = track.parentElement.offsetWidth;
-      const slideWidth = viewportWidth * 0.70; // 70% width for prominent main card
-      const offset = (viewportWidth - slideWidth) / 2;
-      const total = entries.length;
 
       const slides = track.querySelectorAll(".hb-slide");
+      if (slides.length === 0) return;
+
+      slides[current].classList.remove("active");
+      slides[current].classList.add("prev-slide");
+
+      current = ((index % entries.length) + entries.length) % entries.length;
+
       slides.forEach((slide, idx) => {
-        let diff = idx - current;
-
-        // Seamless circular wrap-around logic
-        if (diff > total / 2) diff -= total;
-        if (diff <= -total / 2) diff += total;
-
-        const tx = offset + (diff * slideWidth);
-        
-        slide.classList.remove("active", "prev", "next");
-        
-        let scale = 0.82;
-        let rotY = 0;
-        let opacity = 0;
-        let zIndex = 1;
-        let filter = "blur(4px)";
-
-        if (diff === 0) {
+        if (idx === current) {
+          slide.classList.remove("prev-slide");
           slide.classList.add("active");
-          scale = 1.25; // Zoomed main visible active card
-          opacity = 1;
-          zIndex = 10;
-          filter = "blur(0)";
-        } else if (diff === -1 || (total === 2 && current === 0 && idx === 1)) {
-          slide.classList.add("prev");
-          scale = 0.88;
-          rotY = 18;
-          opacity = 0.25;
-          zIndex = 5;
-          filter = "blur(3px)";
-        } else if (diff === 1 || (total === 2 && current === 1 && idx === 0)) {
-          slide.classList.add("next");
-          scale = 0.88;
-          rotY = -18;
-          opacity = 0.25;
-          zIndex = 5;
-          filter = "blur(3px)";
+        } else {
+          slide.classList.remove("active");
         }
-
-        slide.style.transform = `translateX(${tx}px) scale(${scale}) rotateY(${rotY}deg)`;
-        slide.style.opacity = opacity;
-        slide.style.zIndex = zIndex;
-        slide.style.filter = filter;
-        slide.style.pointerEvents = (diff === 0) ? "auto" : "none";
       });
 
-      if (prevBtn) prevBtn.disabled = false;
-      if (nextBtn) nextBtn.disabled = false;
+      // Update counter
+      if (counterEl) {
+        const cNum = String(current + 1).padStart(2, '0');
+        const tNum = String(entries.length).padStart(2, '0');
+        counterEl.innerHTML = `<span class="curr">${cNum}</span><span class="sep">/</span><span class="total">${tNum}</span>`;
+      }
 
-      const dots = document.querySelectorAll(".hb-dot");
+      // Update dots
+      const dots = dotsWrap ? dotsWrap.querySelectorAll(".hb-dot") : [];
       dots.forEach((dot, idx) => {
         dot.classList.toggle("active", idx === current);
       });
+
+      resetProgress();
     }
 
-    function startHonoursTimer() {
-      stopHonoursTimer();
-      if (entries && entries.length > 1) {
-        honoursTimer = setInterval(() => {
+    function resetProgress() {
+      progressVal = 0;
+      if (progressBar) progressBar.style.width = "0%";
+    }
+
+    function startAutoScroll() {
+      stopAutoScroll();
+      resetProgress();
+
+      const stepTime = 100;
+      const stepInc = (stepTime / DURATION) * 100;
+
+      progressTimer = setInterval(() => {
+        progressVal += stepInc;
+        if (progressBar) progressBar.style.width = Math.min(progressVal, 100) + "%";
+        if (progressVal >= 100) {
           goHonours(current + 1);
-        }, 10000); // 10 seconds auto horizontal scroll
+        }
+      }, stepTime);
+    }
+
+    function stopAutoScroll() {
+      if (progressTimer) {
+        clearInterval(progressTimer);
+        progressTimer = null;
       }
     }
 
-    function stopHonoursTimer() {
-      if (honoursTimer) {
-        clearInterval(honoursTimer);
-        honoursTimer = null;
-      }
-    }
-
-    window.openHonoursBoard = function() {
-      const card = document.getElementById("honoursCard");
-      if (card) {
-        card.scrollIntoView({ behavior: "smooth", block: "center" });
-        card.classList.add("highlight-card");
-        setTimeout(() => card.classList.remove("highlight-card"), 2000);
+    window.openHonoursBoard = function () {
+      if (honoursCard) {
+        honoursCard.scrollIntoView({ behavior: "smooth", block: "center" });
+        honoursCard.style.boxShadow = "0 0 25px var(--primary-color, #f59e0b)";
+        setTimeout(() => {
+          honoursCard.style.boxShadow = "";
+        }, 2000);
       }
     };
 
-    document.addEventListener("DOMContentLoaded", async function() {
+    // Listen to global theme changes
+    window.addEventListener("themechange", () => {
+      resetProgress();
+    });
+
+    document.addEventListener("DOMContentLoaded", async function () {
       await loadHonoursBoard();
       renderAllSlides();
-      startHonoursTimer();
-
-      window.addEventListener("resize", () => goHonours(current));
+      startAutoScroll();
 
       if (nextBtn) {
         nextBtn.addEventListener("click", () => {
           goHonours(current + 1);
-          startHonoursTimer();
+          startAutoScroll();
         });
       }
 
       if (prevBtn) {
         prevBtn.addEventListener("click", () => {
           goHonours(current - 1);
-          startHonoursTimer();
+          startAutoScroll();
         });
       }
 
@@ -621,30 +1032,28 @@
           const dot = e.target.closest(".hb-dot");
           if (!dot) return;
           goHonours(Number(dot.dataset.index));
-          startHonoursTimer();
+          startAutoScroll();
         });
       }
 
-      const honoursCard = document.getElementById("honoursCard");
       if (honoursCard) {
-        honoursCard.addEventListener("mouseenter", stopHonoursTimer);
-        honoursCard.addEventListener("mouseleave", startHonoursTimer);
+        honoursCard.addEventListener("mouseenter", stopAutoScroll);
+        honoursCard.addEventListener("mouseleave", startAutoScroll);
       }
     });
 
     document.addEventListener("keydown", (e) => {
-      const card = document.getElementById("honoursCard");
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
+      if (!honoursCard) return;
+      const rect = honoursCard.getBoundingClientRect();
       if (rect.top > window.innerHeight || rect.bottom < 0) return;
       if (e.key === "ArrowRight") {
         goHonours(current + 1);
-        startHonoursTimer();
+        startAutoScroll();
       }
       if (e.key === "ArrowLeft") {
         goHonours(current - 1);
-        startHonoursTimer();
+        startAutoScroll();
       }
     });
   })();
-</script>
+</script>

@@ -464,6 +464,7 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
       <a href="/personnel_information/add-personnel" class="header-link">Add Personnel</a>
       <a href="/personnel_information/update-personnel" class="header-link">Update Personnel</a>
       <a href="/personnel_information/delete-personnel" class="header-link">Delete Personnel</a>
+      <a href="/settings" class="header-link"><i class="fas fa-cog"></i> Settings</a>
 
     </div>
     
@@ -762,7 +763,28 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
           plugins: { legend: { display: false } },
-          scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } }
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Rank',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Count',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            }
+          }
         }
       });
 
@@ -820,7 +842,29 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
           plugins: { legend: { display: false } },
-          scales: { x: { ticks: { color: textColor } }, y: { ticks: { color: textColor } } }
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Years',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Count',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              beginAtZero: true,
+              ticks: { color: textColor, precision: 0 },
+              grid: { color: gridColor }
+            }
+          }
         }
       });
 
@@ -844,7 +888,28 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
             maintainAspectRatio: false,
             layout: { padding: { top: 15 } },
             plugins: { legend: { display: false } },
-            scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } }
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Loan Category',
+                  color: textColor,
+                  font: { size: 12, weight: 'bold' }
+                },
+                ticks: { color: textColor },
+                grid: { color: gridColor }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Count',
+                  color: textColor,
+                  font: { size: 12, weight: 'bold' }
+                },
+                ticks: { color: textColor },
+                grid: { color: gridColor }
+              }
+            }
           }
         });
       }
@@ -868,8 +933,27 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           layout: { padding: { top: 15 } },
           plugins: { legend: { display: false } },
           scales: {
-            x: { ticks: { color: textColor }, grid: { display: false } },
-            y: { beginAtZero: true, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor } }
+            x: {
+              title: {
+                display: true,
+                text: 'Sports',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              ticks: { color: textColor },
+              grid: { display: false }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Count',
+                color: textColor,
+                font: { size: 12, weight: 'bold' }
+              },
+              beginAtZero: true,
+              ticks: { color: textColor, precision: 0 },
+              grid: { color: gridColor }
+            }
           }
         }
       });

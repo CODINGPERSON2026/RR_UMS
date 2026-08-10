@@ -170,39 +170,39 @@
   }
 
   .ab-danger {
-    background: rgba(220, 53, 69, 0.08);
-    border-color: rgba(220, 53, 69, 0.35);
-    color: #dc3545;
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: var(--danger-color, #ef4444);
   }
-  .ab-danger:hover { background: rgba(220, 53, 69, 0.15); }
+  .ab-danger:hover { background: var(--danger-color, #ef4444); color: #ffffff; }
 
   .ab-primary {
-    background: rgba(13, 110, 253, 0.08);
-    border-color: rgba(13, 110, 253, 0.35);
-    color: var(--primary-color, #0d6efd);
+    background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.12));
+    border-color: var(--primary-color, rgba(59, 130, 246, 0.35));
+    color: var(--primary-color, #3b82f6);
   }
-  .ab-primary:hover { background: rgba(13, 110, 253, 0.15); }
+  .ab-primary:hover { background: var(--primary-color, #3b82f6); color: #ffffff; }
 
   .ab-blue {
-    background: rgba(0, 132, 255, 0.08);
-    border-color: rgba(0, 132, 255, 0.35);
-    color: #0084ff;
+    background: var(--nav-link-active-bg, rgba(0, 132, 255, 0.12));
+    border-color: var(--primary-color, rgba(0, 132, 255, 0.35));
+    color: var(--primary-color, #0084ff);
   }
-  .ab-blue:hover { background: rgba(0, 132, 255, 0.15); }
+  .ab-blue:hover { background: var(--primary-color, #0084ff); color: #ffffff; }
 
   .ab-amber {
-    background: rgba(122, 82, 10, 0.08);
-    border-color: rgba(122, 82, 10, 0.35);
-    color: #7a520a;
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: var(--text-primary);
   }
-  .ab-amber:hover { background: rgba(122, 82, 10, 0.15); }
+  .ab-amber:hover { background: rgba(245, 158, 11, 0.25); color: var(--text-primary); }
 
   .ab-teal {
-    background: rgba(15, 110, 86, 0.08);
-    border-color: rgba(15, 110, 86, 0.35);
-    color: #0f6e56;
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.35);
+    color: var(--success-color, #10b981);
   }
-  .ab-teal:hover { background: rgba(15, 110, 86, 0.15); }
+  .ab-teal:hover { background: var(--success-color, #10b981); color: #ffffff; }
 
   .ab-spacer { flex: 1; min-width: 4px; }
 
@@ -264,8 +264,9 @@
 
   /* ===== STAT CARD ===== */
   .sc {
-    background: var(--card-background);
-    border: 0.5px solid var(--border-color);
+    background: var(--card-bg-solid, var(--card-background, #ffffff));
+    border: 1px solid var(--border-color, #e2e8f0);
+    color: var(--text-primary);
     border-radius: 8px;
     padding: 9px 13px;
     display: flex;
@@ -276,17 +277,17 @@
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
   }
   .sc:hover {
-    background: var(--hover-bg, rgba(0, 0, 0, 0.03));
-    border-color: var(--border-hover-color, rgba(0, 0, 0, 0.2));
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    background: var(--nav-link-hover-bg, rgba(59, 130, 246, 0.08));
+    border-color: var(--primary-color, #3b82f6);
+    box-shadow: 0 4px 14px var(--shadow, rgba(0, 0, 0, 0.12));
     transform: translateY(-1px);
   }
   .sc:active { transform: translateY(0); }
 
   .sc-label {
     font-size: 11.5px;
-    font-weight: 400;
-    color: var(--text-secondary);
+    font-weight: 600;
+    color: var(--text-secondary, #6b7280);
     text-transform: uppercase;
     letter-spacing: 0.45px;
     line-height: 1.25;
@@ -303,8 +304,8 @@
 
   .sc-val {
     font-size: 17px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 700;
+    color: var(--text-primary, #1f2937);
     line-height: 1;
     white-space: nowrap;
     min-width: 28px;
@@ -333,12 +334,52 @@
 
   .sc-sub {
     font-size: 10px;
-    color: #dc3545;
+    color: var(--danger-color, #dc3545);
     margin-top: 2px;
     line-height: 1;
     white-space: nowrap;
     min-height: 13px;
   }
+
+  /* ===== THEME OVERRIDES FOR DASHBOARD CONTENT ===== */
+  [data-theme="dark"] .sc {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+  }
+  [data-theme="dark"] .sc:hover {
+    background: #273449 !important;
+    border-color: #60a5fa !important;
+  }
+  [data-theme="dark"] .sc-label { color: #cbd5e1 !important; }
+  [data-theme="dark"] .sc-val { color: #ffffff !important; }
+
+  [data-theme="military"] .sc {
+    background: #f5f9f4 !important;
+    border-color: #b8d4c4 !important;
+  }
+  [data-theme="military"] .sc-label { color: #4a7c59 !important; }
+  [data-theme="military"] .sc-val { color: #1a3d2a !important; }
+
+  [data-theme="ocean"] .sc {
+    background: #f0feff !important;
+    border-color: #a5f3fc !important;
+  }
+  [data-theme="ocean"] .sc-label { color: #0e7490 !important; }
+  [data-theme="ocean"] .sc-val { color: #164e63 !important; }
+
+  [data-theme="sunset"] .sc {
+    background: #fffbeb !important;
+    border-color: #fde68a !important;
+  }
+  [data-theme="sunset"] .sc-label { color: #b45309 !important; }
+  [data-theme="sunset"] .sc-val { color: #78350f !important; }
+
+  [data-theme="purple"] .sc {
+    background: #faf5ff !important;
+    border-color: #e9d5ff !important;
+  }
+  [data-theme="purple"] .sc-label { color: #7e22ce !important; }
+  [data-theme="purple"] .sc-val { color: #581c87 !important; }
 
   @media (max-width: 768px) {
     .db-wrap { padding: 10px; }
@@ -377,9 +418,14 @@
     {% set subscript = 'Welcome ' ~ role ~ ' ' ~ current_user_name %}
     {% include 'navbar/navbar.html' %}
 
+    <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
+      {% endif %}
+
+      {% if role in ['CO','2IC','ADJUTANT','OC'] %}
+        {% include 'modals/alarm/agniveer_test_alarms.html' %}
       {% endif %}
     </div>
 
@@ -460,18 +506,21 @@
       <a href="/onco/manage_leave" class="ab-btn ab-amber">
         <i class="fas fa-calendar-times" style="font-size:11px"></i> MANAGE LEAVE
       </a>
-      <button
-  type="button"
-  class="ab-btn ab-primary"
-  data-bs-toggle="modal"
-  data-bs-target="#addHonoursModal"
->
-  <span class="ahb-icon">🏅</span>
+      {% endif %}
 
-  <span class="ahb-text">
-    Add Honour Entry
-  </span>
-</button>
+      {% if role in ['ONCO', 'JCO IT', 'jcoit', 'JCOIT', 'NCO IT', 'nco it'] or (role and role|lower in ['jco it', 'jcoit', 'nco it']) %}
+      <button
+        type="button"
+        class="ab-btn ab-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#addHonoursModal"
+      >
+        <span class="ahb-icon">🏅</span>
+
+        <span class="ahb-text">
+          Add Honour Entry
+        </span>
+      </button>
       {% endif %}
 
       <div class="ab-spacer"></div>
@@ -600,7 +649,7 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
-        <span class="sc-label">Central Roll Call</span>
+        <span class="sc-label">Roll Call</span>
         <div class="sc-right">
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
@@ -716,16 +765,14 @@
 
     {% if role in ['O CENTRE NCO','ONCO'] %}
       {% include 'modals/parade_data/index.html' %}
-      {% include 'modals/add_honours_entry/h_entry.html' %}
+    {% endif %}
 
+    {% if role in ['O CENTRE NCO','ONCO','JCO IT','jcoit','JCOIT','NCO IT','nco it'] or (role and role|lower in ['jco it','jcoit','nco it']) %}
+      {% include 'modals/add_honours_entry/h_entry.html' %}
     {% endif %}
 
     {% if role == 'CO' %}
       {% include 'modals/leaverequest/co-rejected-view.html' %}
-    {% endif %}
-
-    {% if role in ['CO','2IC','ADJUTANT','OC'] %}
-      {% include 'modals/alarm/agniveer_test_alarms.html' %}
     {% endif %}
 
     {% if role == 'Subedar Major' %}
@@ -1135,7 +1182,7 @@
 </script>
 
 <script>
-  /* ===== CHARTS ===== */
+  /* ===== CHARTS & THEME SYNC ===== */
   let rankChartInstance     = null;
   let detachmentChartInstance = null;
   let unfitTrendChartInstance = null;
@@ -1143,6 +1190,19 @@
 
   let currUserCoy = "{{company}}";
   if (currUserCoy === "Center") currUserCoy = "ALL";
+
+  function getThemeChartColors() {
+    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const colors = {
+      light:    { primary: '#3b82f6', border: '#2563eb', bg: 'rgba(59, 130, 246, 0.15)', text: '#1e293b', grid: 'rgba(0, 0, 0, 0.06)' },
+      dark:     { primary: '#60a5fa', border: '#3b82f6', bg: 'rgba(96, 165, 250, 0.2)', text: '#ffffff', grid: 'rgba(255, 255, 255, 0.08)' },
+      military: { primary: '#4a7c59', border: '#2d5a3d', bg: 'rgba(74, 124, 89, 0.22)', text: '#1a3d2a', grid: 'rgba(45, 90, 61, 0.12)' },
+      ocean:    { primary: '#0891b2', border: '#0e7490', bg: 'rgba(8, 145, 178, 0.2)', text: '#164e63', grid: 'rgba(14, 116, 144, 0.12)' },
+      sunset:   { primary: '#f59e0b', border: '#d97706', bg: 'rgba(245, 158, 11, 0.2)', text: '#78350f', grid: 'rgba(217, 119, 6, 0.12)' },
+      purple:   { primary: '#9333ea', border: '#7e22ce', bg: 'rgba(147, 51, 234, 0.2)', text: '#581c87', grid: 'rgba(126, 34, 206, 0.12)' }
+    };
+    return colors[theme] || colors.light;
+  }
 
   async function loadRankChart(company = "ALL") {
     try {
@@ -1156,6 +1216,8 @@
       const el = document.getElementById("rankTotalCount");
       if (el) el.textContent = "Total: " + result.total;
 
+      const tc = getThemeChartColors();
+
       const valueLabelPlugin = {
         id: "valueLabelPlugin",
         afterDatasetsDraw(chart) {
@@ -1164,7 +1226,7 @@
             chart.getDatasetMeta(i).data.forEach((bar, idx) => {
               ctx.save();
               ctx.font = "bold 11px sans-serif";
-              ctx.fillStyle = "#000";
+              ctx.fillStyle = tc.text;
               ctx.textAlign = "center";
               ctx.fillText(ds.data[idx], bar.x, bar.y - 5);
               ctx.restore();
@@ -1178,14 +1240,17 @@
       if (rankChartInstance) rankChartInstance.destroy();
       rankChartInstance = new Chart(canvas.getContext("2d"), {
         type: "bar",
-        data: { labels, datasets: [{ data: values, backgroundColor: "#2563eb", borderColor: "#3b6fd8", borderWidth: 1, borderRadius: 6 }] },
+        data: { labels, datasets: [{ data: values, backgroundColor: tc.primary, borderColor: tc.border, borderWidth: 1, borderRadius: 6 }] },
         plugins: [valueLabelPlugin],
         options: {
           responsive: true, maintainAspectRatio: false,
           layout: { padding: { top: 23 } },
           animation: { duration: 700, easing: "easeOutQuart" },
           plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+          scales: {
+            x: { ticks: { color: tc.text }, grid: { color: tc.grid } },
+            y: { beginAtZero: true, ticks: { precision: 0, color: tc.text }, grid: { color: tc.grid } }
+          },
         },
       });
     } catch (err) { console.error("Rank chart error:", err); }
@@ -1202,6 +1267,9 @@
 
       const el = document.getElementById("detachmentTotal");
       if (el) el.textContent = "Total: " + result.total;
+
+      const tc = getThemeChartColors();
+      const isDark = (document.documentElement.getAttribute('data-theme') === 'dark');
 
       const donutDatalabelsPlugin = {
         id: 'donutDatalabels',
@@ -1242,7 +1310,7 @@
           datasets: [{
             data: values,
             backgroundColor: ["#2563eb","#dc2626","#16a34a","#f59e0b","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5","#0f766e","#be123c","#4338ca","#15803d","#b45309","#6d28d9","#1d4ed8","#c2410c","#0f172a","#a21caf"],
-            borderWidth: 2, borderColor: "#fff",
+            borderWidth: 2, borderColor: isDark ? "#1e293b" : "#fff",
           }],
         },
         plugins: [donutDatalabelsPlugin],
@@ -1265,6 +1333,8 @@
       const labels = result.data.map(d => `${monthNames[d.month - 1]} ${d.year}`);
       const values = result.data.map(d => d.unfit_count);
 
+      const tc = getThemeChartColors();
+
       const lineDatalabelsPlugin = {
         id: 'lineDatalabels',
         afterDatasetsDraw(chart) {
@@ -1277,8 +1347,7 @@
               if (val == null) return;
               ctx.save();
               ctx.font = 'bold 11px sans-serif';
-              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-              ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
+              ctx.fillStyle = tc.text;
               ctx.textAlign = 'center';
               ctx.textBaseline = 'bottom';
               ctx.fillText(val, point.x, point.y - 6);
@@ -1293,14 +1362,17 @@
       if (unfitTrendChartInstance) unfitTrendChartInstance.destroy();
       unfitTrendChartInstance = new Chart(canvas.getContext("2d"), {
         type: "line",
-        data: { labels, datasets: [{ label: "UnFit Personnel", data: values, borderColor: "#dc2626", backgroundColor: "rgba(220,38,38,0.12)", fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: "#dc2626", borderWidth: 3 }] },
+        data: { labels, datasets: [{ label: "UnFit Personnel", data: values, borderColor: tc.border, backgroundColor: tc.bg, fill: true, tension: 0.4, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: tc.primary, borderWidth: 3 }] },
         plugins: [lineDatalabelsPlugin],
         options: {
           responsive: true, maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
           animation: { duration: 700, easing: "easeOutQuart" },
           plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+          scales: {
+            x: { ticks: { color: tc.text }, grid: { color: tc.grid } },
+            y: { beginAtZero: true, ticks: { precision: 0, color: tc.text }, grid: { color: tc.grid } }
+          },
         },
       });
     } catch (err) { console.error("Trend chart error:", err); }
@@ -1319,6 +1391,8 @@
       if (fc) fc.textContent = fit;
       if (uc) uc.textContent = unfit;
 
+      const tc = getThemeChartColors();
+
       const valueLabelPlugin = {
         id: "valueLabelPlugin",
         afterDatasetsDraw(chart) {
@@ -1327,7 +1401,7 @@
             chart.getDatasetMeta(i).data.forEach((bar, idx) => {
               ctx.save();
               ctx.font = "bold 12px sans-serif";
-              ctx.fillStyle = "#000";
+              ctx.fillStyle = tc.text;
               ctx.textAlign = "center";
               ctx.fillText(ds.data[idx], bar.x, bar.y - 8);
               ctx.restore();
@@ -1341,24 +1415,37 @@
       if (fitUnfitChartInstance) fitUnfitChartInstance.destroy();
       fitUnfitChartInstance = new Chart(canvas.getContext("2d"), {
         type: "bar",
-        data: { labels: ["Fit","UnFit"], datasets: [{ data: [fit, unfit], backgroundColor: ["#2563eb","#dc2626"], borderColor: ["#3b6fd8","#b91c1c"], borderWidth: 1, borderRadius: 8, barThickness: 70 }] },
+        data: { labels: ["Fit","UnFit"], datasets: [{ data: [fit, unfit], backgroundColor: [tc.primary,"#dc2626"], borderColor: [tc.border,"#b91c1c"], borderWidth: 1, borderRadius: 8, barThickness: 70 }] },
         plugins: [valueLabelPlugin],
         options: {
           responsive: true, maintainAspectRatio: false,
           layout: { padding: { top: 23 } },
           animation: { duration: 700, easing: "easeOutQuart" },
           plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+          scales: {
+            x: { ticks: { color: tc.text }, grid: { color: tc.grid } },
+            y: { beginAtZero: true, ticks: { precision: 0, color: tc.text }, grid: { color: tc.grid } }
+          },
         },
       });
     } catch (err) { console.error("Fit/UnFit chart error:", err); }
   }
 
+  function reloadDashboardCharts() {
+    if (typeof currUserCoy !== 'undefined') {
+      loadRankChart(currUserCoy);
+      loadDetachmentChart(currUserCoy);
+      loadUnfitTrend(currUserCoy);
+      loadFitUnfitChart(currUserCoy);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    loadRankChart(currUserCoy);
-    loadDetachmentChart(currUserCoy);
-    loadUnfitTrend(currUserCoy);
-    loadFitUnfitChart(currUserCoy);
+    reloadDashboardCharts();
+  });
+
+  window.addEventListener('themechange', function() {
+    reloadDashboardCharts();
   });
 </script>
 

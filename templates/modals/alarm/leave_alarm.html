@@ -105,14 +105,25 @@
 }
 
 .plm-badge-overdue {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  background: #dc3545 !important;
+  color: #ffffff !important;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 5px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid #b02a37 !important;
+  box-shadow: 0 2px 5px rgba(220, 53, 69, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
+
+[data-theme="dark"] .plm-badge-overdue {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #f87171 !important;
+}
+
 
 /* Stats grid */
 .plm-stats-grid {
@@ -273,13 +284,19 @@
 .plm-pending-at-value {
   font-size: 13px;
   font-weight: 700;
-  color: #92400e;
-  background: rgba(252, 211, 77, 0.2);
-  border: 1px solid rgba(252, 211, 77, 0.5);
+  color: #92400e !important;
+  background: rgba(252, 211, 77, 0.3) !important;
+  border: 1px solid rgba(252, 211, 77, 0.6) !important;
   padding: 5px 14px;
   border-radius: 20px;
   display: inline-block;
   letter-spacing: 0.3px;
+}
+
+[data-theme="dark"] .plm-pending-at-value {
+  color: #fef08a !important;
+  background: rgba(180, 83, 9, 0.4) !important;
+  border-color: rgba(253, 224, 71, 0.5) !important;
 }
 
 /* Footer */
@@ -295,25 +312,26 @@
 
 /* Days pending badges */
 .plm-days-critical {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  background: #dc3545 !important;
+  color: #ffffff !important;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
 }
 .plm-days-high {
-  background: rgba(249, 115, 22, 0.12);
-  color: #f97316;
+  background: #f97316 !important;
+  color: #ffffff !important;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
 }
 .plm-days-mod {
-  background: var(--nav-link-hover-bg);
-  color: var(--text-secondary);
+  background: #64748b !important;
+  color: #ffffff !important;
   font-size: 12px;
+  font-weight: 600;
   padding: 3px 10px;
   border-radius: 20px;
 }

@@ -295,6 +295,7 @@ def get_honours_board():
     try:
         query = """
             SELECT 
+                hb.id,
                 hb.army_number, 
                 p.name, 
                 p.rank, 
@@ -318,6 +319,30 @@ def get_honours_board():
                 
         return jsonify({"status": "success", "data": data})
     except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@dashboard_bp.route("/delete_honours_entry/<int:entry_id>", methods=["DELETE", "POST"])
+def delete_honours_entry_stats(entry_id):
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    user_role = str(user.get('role', '')).lower()
+    allowed_roles = ['jco it', 'jcoit', 'nco it', 'onco', 'co', '2ic']
+    if user_role not in allowed_roles:
+        return jsonify({"status": "error", "message": "Access denied"}), 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM honours_board WHERE id = %s", (entry_id,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "Honour entry deleted successfully"})
+    except Exception as e:
+        conn.rollback()
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
         cursor.close()

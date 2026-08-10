@@ -5315,6 +5315,129 @@ def get_today_birthdays():
         conn.close()
 
 
+from werkzeug.utils import secure_filename
+
+NAVBAR_CONFIG_FILE = os.path.join(app.static_folder, 'uploads', 'navbar', 'config.json')
+
+DEFAULT_NAVBAR_CONFIG = {
+    "header_text": "15 CORPS ENGINEERING SIGNAL REGIMENT",
+    "show_left_logo": True,
+    "show_right_logo": True,
+    "left_logo": "/static/image_for_login_page/rt.jpg",
+    "right_logo": "/static/image_for_login_page/chinar.jpg",
+    "bg_type": "gradient",
+    "bg_gradient": "linear-gradient(135deg, #3c425c 0%, #764ba2 100%)",
+    "bg_image": ""
+}
+
+def load_navbar_config():
+    if os.path.exists(NAVBAR_CONFIG_FILE):
+        try:
+            with open(NAVBAR_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                config = DEFAULT_NAVBAR_CONFIG.copy()
+                config.update(data)
+                return config
+        except Exception:
+            pass
+    return DEFAULT_NAVBAR_CONFIG.copy()
+
+def save_navbar_config(config):
+    folder = os.path.dirname(NAVBAR_CONFIG_FILE)
+    os.makedirs(folder, exist_ok=True)
+    with open(NAVBAR_CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(config, f, indent=2)
+
+@app.context_processor
+def inject_navbar_config():
+    return dict(navbar_config=load_navbar_config())
+
+@app.route('/api/settings/navbar', methods=['GET', 'POST'])
+def api_settings_navbar():
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    user_role = str(user.get('role', '')).lower()
+    if request.method == 'POST' and user_role not in ['jco it', 'jcoit', 'nco it']:
+        return jsonify({"status": "error", "message": "Access denied. Only JCO IT can modify navbar settings."}), 403
+
+    if request.method == 'GET':
+        return jsonify({"status": "success", "config": load_navbar_config()})
+    
+    if request.method == 'POST':
+        try:
+            current_config = load_navbar_config()
+            action = request.form.get('action', 'update')
+            
+            if action == 'reset':
+                save_navbar_config(DEFAULT_NAVBAR_CONFIG)
+                return jsonify({"status": "success", "message": "Navbar settings reset to default", "config": DEFAULT_NAVBAR_CONFIG})
+            
+            # Text update (if empty string is submitted, keep it empty as requested)
+            header_text = request.form.get('header_text')
+            if header_text is not None:
+                current_config['header_text'] = header_text.strip()
+            
+            # Logo Show / Disable Toggles
+            current_config['show_left_logo'] = request.form.get('show_left_logo') in ['true', 'on', '1']
+            current_config['show_right_logo'] = request.form.get('show_right_logo') in ['true', 'on', '1']
+            
+            # Background type & gradient
+            bg_type = request.form.get('bg_type')
+            if bg_type in ['gradient', 'image']:
+                current_config['bg_type'] = bg_type
+            
+            bg_gradient = request.form.get('bg_gradient')
+            if bg_gradient:
+                current_config['bg_gradient'] = bg_gradient
+            
+            # File uploads directory
+            upload_dir = os.path.join(app.static_folder, 'uploads', 'navbar')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            allowed_exts = {'png', 'jpg', 'jpeg', 'svg', 'webp', 'gif'}
+            def allowed_file(filename):
+                return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_exts
+            
+            # Left Logo upload
+            if 'left_logo_file' in request.files:
+                file = request.files['left_logo_file']
+                if file and file.filename and allowed_file(file.filename):
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    filename = f"left_logo.{ext}"
+                    filepath = os.path.join(upload_dir, filename)
+                    file.save(filepath)
+                    current_config['left_logo'] = f"/static/uploads/navbar/{filename}?v={int(datetime.now().timestamp())}"
+
+            # Right Logo upload
+            if 'right_logo_file' in request.files:
+                file = request.files['right_logo_file']
+                if file and file.filename and allowed_file(file.filename):
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    filename = f"right_logo.{ext}"
+                    filepath = os.path.join(upload_dir, filename)
+                    file.save(filepath)
+                    current_config['right_logo'] = f"/static/uploads/navbar/{filename}?v={int(datetime.now().timestamp())}"
+
+            # Background Image upload
+            if 'bg_image_file' in request.files:
+                file = request.files['bg_image_file']
+                if file and file.filename and allowed_file(file.filename):
+                    ext = file.filename.rsplit('.', 1)[1].lower()
+                    filename = f"bg_image.{ext}"
+                    filepath = os.path.join(upload_dir, filename)
+                    file.save(filepath)
+                    current_config['bg_image'] = f"/static/uploads/navbar/{filename}?v={int(datetime.now().timestamp())}"
+                    current_config['bg_type'] = 'image'
+
+            save_navbar_config(current_config)
+            return jsonify({"status": "success", "message": "Navbar settings saved successfully", "config": current_config})
+        
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+
 @app.route('/settings')
 def settings_page():
     """Settings page - theme and other preferences."""
@@ -5322,6 +5445,7 @@ def settings_page():
     if not user:
         return redirect(url_for('admin_login'))
     return render_template('settings/settings.html', role=user['role'])
+
 
 @app.route("/api/gallery", methods=["GET"])
 def get_gallery():
@@ -5790,6 +5914,32 @@ def add_honours_board():
             "success": False,
             "message": str(e)
         }), 500
+
+@app.route('/api/delete-honours-entry/<int:entry_id>', methods=['DELETE', 'POST'])
+@app.route('/stats/delete_honours_entry/<int:entry_id>', methods=['DELETE', 'POST'])
+def delete_honours_entry(entry_id):
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    user_role = str(user.get('role', '')).lower()
+    allowed_roles = ['jco it', 'jcoit', 'nco it', 'onco', 'co', '2ic']
+    if user_role not in allowed_roles:
+        return jsonify({"status": "error", "message": "Access denied. Only JCO IT / ONCO can delete honours entries."}), 403
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM honours_board WHERE id = %s", (entry_id,))
+        conn.commit()
+        return jsonify({"status": "success", "message": "Honour entry deleted successfully"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/hb/search_person', methods=['GET'])
 def search_person_hb():
 

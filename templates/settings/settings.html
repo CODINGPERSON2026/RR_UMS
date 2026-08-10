@@ -1,5 +1,6 @@
 {% extends "baseView.html" %}
 {% block content %}
+<link rel="stylesheet" href="/static/cropper.min.css">
 <style>
   /* @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap'); */
 
@@ -334,6 +335,12 @@
         <div class="snav-icon"><i class="fas fa-palette"></i></div>
         Appearance
       </a>
+      {% if role and (role|lower in ['jco it', 'jcoit', 'nco it']) %}
+      <a class="snav-item" data-section="navbar">
+        <div class="snav-icon"><i class="fas fa-heading"></i></div>
+        Navbar
+      </a>
+      {% endif %}
 
       <div class="snav-divider"></div>
       <div class="snav-group-label">Account</div>
@@ -400,7 +407,142 @@
         </div>
       </div>
 
-      <!-- ══ SECURITY ══ -->
+      {% if role and (role|lower in ['jco it', 'jcoit', 'nco it']) %}
+      <!-- ══ NAVBAR CUSTOMIZATION ══ -->
+      <div class="settings-section" id="section-navbar">
+        <div class="scard">
+          <div class="scard-header">
+            <div class="scard-header-icon"><i class="fas fa-heading"></i></div>
+            <div class="scard-header-text">
+              <h3>Navbar Customization</h3>
+              <p>Customize the header title text, left/right unit crest logos, and background image/gradient.</p>
+            </div>
+          </div>
+          <div class="scard-body">
+
+            <form id="navbarSettingsForm" enctype="multipart/form-data">
+              <!-- Header Text -->
+              <div class="pw-field">
+                <label class="form-label fw-bold">Navbar Header Text</label>
+                <div class="pw-inner">
+                  <i class="fas fa-font pw-icon"></i>
+                  <input type="text" id="nb-header-text" name="header_text" placeholder="Enter navbar title (leave blank for empty space)" value="{{ navbar_config.header_text if (navbar_config and 'header_text' in navbar_config) else '' }}">
+                </div>
+                <small class="text-muted mt-1 d-block">This title appears centrally on the top navbar across all application pages.</small>
+              </div>
+
+              <div class="row g-4 mt-2">
+                <!-- Left Logo Toggle -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Left Logo (15 CESR Crest)</label>
+                  <div class="d-flex align-items-center justify-content-between p-3 border rounded-3 bg-light">
+                    <div class="d-flex align-items-center gap-3">
+                      <img id="preview-left-logo" src="{{ navbar_config.left_logo if (navbar_config and navbar_config.left_logo) else '/static/image_for_login_page/rt.jpg' }}" alt="Left Logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 12px; background: rgba(0,0,0,0.05); padding: 4px; flex-shrink: 0;">
+                      <div>
+                        <span class="fw-semibold d-block">15 CESR Logo</span>
+                        <small class="text-muted d-block" id="left-logo-status-text">{% if not navbar_config or navbar_config.show_left_logo != false %}Enabled (Visible){% else %}Disabled (Hidden){% endif %}</small>
+                      </div>
+                    </div>
+                    <div class="form-check form-switch ms-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="show_left_logo" name="show_left_logo" style="width: 2.8em; height: 1.5em; cursor: pointer;" {% if not navbar_config or navbar_config.show_left_logo != false %}checked{% endif %}>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Logo Toggle -->
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Right Logo (Chinar Corps Crest)</label>
+                  <div class="d-flex align-items-center justify-content-between p-3 border rounded-3 bg-light">
+                    <div class="d-flex align-items-center gap-3">
+                      <img id="preview-right-logo" src="{{ navbar_config.right_logo if (navbar_config and navbar_config.right_logo) else '/static/image_for_login_page/chinar.jpg' }}" alt="Right Logo" style="width: 60px; height: 60px; object-fit: contain; border-radius: 12px; background: rgba(0,0,0,0.05); padding: 4px; flex-shrink: 0;">
+                      <div>
+                        <span class="fw-semibold d-block">15 Corps Logo</span>
+                        <small class="text-muted d-block" id="right-logo-status-text">{% if not navbar_config or navbar_config.show_right_logo != false %}Enabled (Visible){% else %}Disabled (Hidden){% endif %}</small>
+                      </div>
+                    </div>
+                    <div class="form-check form-switch ms-3">
+                      <input class="form-check-input" type="checkbox" role="switch" id="show_right_logo" name="show_right_logo" style="width: 2.8em; height: 1.5em; cursor: pointer;" {% if not navbar_config or navbar_config.show_right_logo != false %}checked{% endif %}>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Navbar Background Image -->
+              <div class="mt-4 p-3 border rounded-3 bg-light">
+                <label class="form-label fw-bold">Navbar Background Image</label>
+                <div class="d-flex align-items-center gap-2 mt-1">
+                  <input type="file" id="bg_image_file" name="bg_image_file" accept="image/*" class="form-control form-control-sm">
+                  <button type="button" class="btn btn-sm btn-outline-primary crop-trigger-btn" data-input="bg_image_file" data-preview="preview-bg-image" data-aspect="free" title="Crop Background Image">
+                    <i class="fas fa-crop-alt"></i> Crop
+                  </button>
+                </div>
+                <div class="mt-2">
+                  <small class="text-muted d-block mb-1">Current Background Image:</small>
+                  <img id="preview-bg-image" src="{{ navbar_config.bg_image if (navbar_config and navbar_config.bg_image) else '' }}" alt="Navbar Background" style="width: 100%; height: 60px; object-fit: cover; border-radius: 8px; {% if not navbar_config or not navbar_config.bg_image %}display:none;{% endif %}">
+                </div>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary px-4 fw-bold" id="saveNavbarBtn">
+                  <i class="fas fa-save me-1"></i> Save Changes
+                </button>
+                <button type="button" class="btn btn-outline-danger px-3" id="resetNavbarBtn">
+                  <i class="fas fa-undo me-1"></i> Reset to Default
+                </button>
+              </div>
+
+              <!-- Success & Error Alert Messages -->
+              <div class="sfeedback mt-3" id="nbError" style="display:none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="nbErrorText"></span>
+              </div>
+              <div class="sfeedback mt-3" id="nbSuccess" style="display:none;">
+                <i class="fas fa-check-circle"></i>
+                <span id="nbSuccessText"></span>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+<!-- Crop Image Modal -->
+<div class="modal fade" id="navImageCropModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title"><i class="fas fa-crop-alt me-2"></i>Crop Image</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-3">
+        <div style="max-height: 450px; background: #000; display: flex; justify-content: center; align-items: center; border-radius: 8px; overflow: hidden;">
+          <img id="navCropImageTarget" src="" alt="Crop Target" style="max-width: 100%; max-height: 450px; display: block;">
+        </div>
+        <!-- Crop Controls -->
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary" id="cropRotateLeft" title="Rotate Left"><i class="fas fa-undo"></i></button>
+            <button type="button" class="btn btn-outline-secondary" id="cropRotateRight" title="Rotate Right"><i class="fas fa-redo"></i></button>
+            <button type="button" class="btn btn-outline-secondary" id="cropZoomIn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+            <button type="button" class="btn btn-outline-secondary" id="cropZoomOut" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            <button type="button" class="btn btn-outline-secondary" id="cropReset" title="Reset Crop"><i class="fas fa-sync"></i></button>
+          </div>
+          <div class="btn-group btn-group-sm" id="cropAspectGroup">
+            <button type="button" class="btn btn-outline-primary active" id="cropAspectSquare">1:1 Square</button>
+            <button type="button" class="btn btn-outline-primary" id="cropAspectWide">16:5 Header</button>
+            <button type="button" class="btn btn-outline-primary" id="cropAspectFree">Free</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary fw-bold" id="applyCropBtn"><i class="fas fa-check me-1"></i> Apply Crop</button>
+      </div>
+    </div>
+  </div>
+</div>
       <div class="settings-section" id="section-security">
 
         <!-- Change Password Card -->
@@ -529,6 +671,7 @@
   </div><!-- end layout -->
 </div>
 
+<script src="/static/cropper.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   
@@ -582,77 +725,346 @@ document.addEventListener('DOMContentLoaded', function () {
   eyeToggle('toggleConfirmPw', 'cp-confirm-password');
 
   /* ── Session info ── */
-  document.getElementById('sessionTime').textContent =
-    new Date().toLocaleString('en-IN', { hour12: false });
+  const sTime = document.getElementById('sessionTime');
+  if (sTime) sTime.textContent = new Date().toLocaleString('en-IN', { hour12: false });
   const ua = navigator.userAgent;
   const browser = /Chrome/.test(ua) && !/Edge/.test(ua) ? 'Chrome'
     : /Firefox/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari'
     : /Edge/.test(ua) ? 'Edge' : 'Browser';
-  document.getElementById('sessionBrowser').textContent =
-    browser + ' / ' + (/Mobi/.test(ua) ? 'Mobile' : 'Desktop');
+  const sBrowser = document.getElementById('sessionBrowser');
+  if (sBrowser) sBrowser.textContent = browser + ' / ' + (/Mobi/.test(ua) ? 'Mobile' : 'Desktop');
 
   /* ── Change Password ── */
-  document.getElementById('changePwBtn').addEventListener('click', async function () {
-    clearFeedback();
-    const army   = document.getElementById('cp-army-number').value.trim();
-    const newPw  = document.getElementById('cp-new-password').value;
-    const confPw = document.getElementById('cp-confirm-password').value;
+  const changePwBtn = document.getElementById('changePwBtn');
+  if (changePwBtn) {
+    changePwBtn.addEventListener('click', async function () {
+      clearFeedback();
+      const army   = document.getElementById('cp-army-number').value.trim();
+      const newPw  = document.getElementById('cp-new-password').value;
+      const confPw = document.getElementById('cp-confirm-password').value;
 
-    if (!army || !newPw || !confPw) return showError('Please fill in all fields.');
-    if (newPw !== confPw)           return showError('Passwords do not match.');
-    if (newPw.length < 3)          return showError('Password must be at least 3 characters.');
+      if (!army || !newPw || !confPw) return showError('Please fill in all fields.');
+      if (newPw !== confPw)           return showError('Passwords do not match.');
+      if (newPw.length < 3)          return showError('Password must be at least 3 characters.');
 
-    setLoading(true);
-    try {
-      const res  = await fetch('/change_password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ army_number: army, new_password: newPw })
-      });
-      const data = await res.json();
-      if (data.success) {
-        showSuccess('Password updated successfully!');
-        document.getElementById('cp-army-number').value     = '';
-        document.getElementById('cp-new-password').value    = '';
-        document.getElementById('cp-confirm-password').value = '';
-        resetStrength();
-      } else {
-        showError(data.error || 'Failed to update password.');
-      }
-    } catch { showError('Network error. Please try again.'); }
-    finally  { setLoading(false); }
-  });
+      setLoading(true);
+      try {
+        const res  = await fetch('/change_password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ army_number: army, new_password: newPw })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showSuccess('Password updated successfully!');
+          document.getElementById('cp-army-number').value     = '';
+          document.getElementById('cp-new-password').value    = '';
+          document.getElementById('cp-confirm-password').value = '';
+          resetStrength();
+        } else {
+          showError(data.error || 'Failed to update password.');
+        }
+      } catch { showError('Network error. Please try again.'); }
+      finally  { setLoading(false); }
+    });
+  }
 
   function clearFeedback() {
-    document.getElementById('cpError').className   = 'sfeedback';
-    document.getElementById('cpSuccess').className = 'sfeedback';
+    const err = document.getElementById('cpError');
+    const succ = document.getElementById('cpSuccess');
+    if (err) err.className   = 'sfeedback';
+    if (succ) succ.className = 'sfeedback';
   }
   function showError(msg) {
-    document.getElementById('cpErrorText').textContent = msg;
-    document.getElementById('cpError').className = 'sfeedback error';
+    const errText = document.getElementById('cpErrorText');
+    const err = document.getElementById('cpError');
+    if (errText) errText.textContent = msg;
+    if (err) err.className = 'sfeedback error';
   }
   function showSuccess(msg) {
-    document.getElementById('cpSuccessText').textContent = msg;
-    document.getElementById('cpSuccess').className = 'sfeedback success';
+    const succText = document.getElementById('cpSuccessText');
+    const succ = document.getElementById('cpSuccess');
+    if (succText) succText.textContent = msg;
+    if (succ) succ.className = 'sfeedback success';
   }
   function setLoading(on) {
     const btn = document.getElementById('changePwBtn');
+    if (!btn) return;
     btn.disabled = on;
-    document.getElementById('btnSpinner').style.display = on ? 'block' : 'none';
-    document.getElementById('btnIcon').style.display    = on ? 'none'  : 'inline';
-    document.getElementById('btnText').textContent      = on ? 'Saving…' : 'Save New Password';
+    const spin = document.getElementById('btnSpinner');
+    const icon = document.getElementById('btnIcon');
+    const text = document.getElementById('btnText');
+    if (spin) spin.style.display = on ? 'block' : 'none';
+    if (icon) icon.style.display = on ? 'none'  : 'inline';
+    if (text) text.textContent   = on ? 'Saving…' : 'Save New Password';
   }
-  function resetStrength() {
-    document.getElementById('strengthFill').style.width = '0%';
-    document.getElementById('strengthLabel').textContent = '—';
-    document.getElementById('strengthLabel').style.color = '';
+
+  /* ── Navbar Customization & Cropper Logic ── */
+  const bgTypeGrad = document.getElementById('bg_type_gradient');
+  const bgTypeImg  = document.getElementById('bg_type_image');
+  const gradContainer = document.getElementById('gradientOptionsContainer');
+  const imgContainer  = document.getElementById('imageOptionsContainer');
+
+  if (bgTypeGrad && bgTypeImg) {
+    bgTypeGrad.addEventListener('change', () => {
+      if (gradContainer) gradContainer.style.display = 'block';
+      if (imgContainer) imgContainer.style.display  = 'none';
+    });
+    bgTypeImg.addEventListener('change', () => {
+      if (gradContainer) gradContainer.style.display = 'none';
+      if (imgContainer) imgContainer.style.display  = 'block';
+    });
+  }
+
+  document.getElementById('show_left_logo')?.addEventListener('change', function() {
+    const statusText = document.getElementById('left-logo-status-text');
+    if (statusText) statusText.textContent = this.checked ? 'Enabled (Visible)' : 'Disabled (Hidden)';
+  });
+
+  document.getElementById('show_right_logo')?.addEventListener('change', function() {
+    const statusText = document.getElementById('right-logo-status-text');
+    if (statusText) statusText.textContent = this.checked ? 'Enabled (Visible)' : 'Disabled (Hidden)';
+  });
+
+
+  /* ── Cropper Modal & Controls ── */
+  let currentCropInput = null;
+  let currentCropPreview = null;
+  let cropperInstance = null;
+  let initialAspect = 1;
+
+  const cropModalEl = document.getElementById('navImageCropModal');
+  const cropModal = cropModalEl ? new bootstrap.Modal(cropModalEl) : null;
+  const cropTargetImg = document.getElementById('navCropImageTarget');
+
+  function openCropper(fileOrUrl, inputEl, previewEl, aspectMode) {
+    if (!cropModal || !cropTargetImg) return;
+    currentCropInput = inputEl;
+    currentCropPreview = previewEl;
+    
+    if (aspectMode === '1') {
+      initialAspect = 1;
+    } else if (aspectMode === '16/5') {
+      initialAspect = 16 / 5;
+    } else {
+      initialAspect = NaN;
+    }
+
+    cropTargetImg.src = fileOrUrl;
+    cropModal.show();
+  }
+
+  if (cropModalEl) {
+    cropModalEl.addEventListener('shown.bs.modal', function () {
+      if (cropperInstance) cropperInstance.destroy();
+      cropperInstance = new Cropper(cropTargetImg, {
+        aspectRatio: initialAspect,
+        viewMode: 1,
+        background: true,
+        autoCropArea: 0.95
+      });
+
+      document.querySelectorAll('#cropAspectGroup button').forEach(b => b.classList.remove('active'));
+      if (initialAspect === 1) document.getElementById('cropAspectSquare')?.classList.add('active');
+      else if (initialAspect > 2) document.getElementById('cropAspectWide')?.classList.add('active');
+      else document.getElementById('cropAspectFree')?.classList.add('active');
+    });
+
+    cropModalEl.addEventListener('hidden.bs.modal', function () {
+      if (cropperInstance) {
+        cropperInstance.destroy();
+        cropperInstance = null;
+      }
+    });
+  }
+
+  document.getElementById('cropAspectSquare')?.addEventListener('click', function() {
+    if (cropperInstance) cropperInstance.setAspectRatio(1);
+    document.querySelectorAll('#cropAspectGroup button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+  document.getElementById('cropAspectWide')?.addEventListener('click', function() {
+    if (cropperInstance) cropperInstance.setAspectRatio(16 / 5);
+    document.querySelectorAll('#cropAspectGroup button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+  document.getElementById('cropAspectFree')?.addEventListener('click', function() {
+    if (cropperInstance) cropperInstance.setAspectRatio(NaN);
+    document.querySelectorAll('#cropAspectGroup button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+  });
+
+  document.getElementById('cropRotateLeft')?.addEventListener('click', () => cropperInstance?.rotate(-90));
+  document.getElementById('cropRotateRight')?.addEventListener('click', () => cropperInstance?.rotate(90));
+  document.getElementById('cropZoomIn')?.addEventListener('click', () => cropperInstance?.zoom(0.1));
+  document.getElementById('cropZoomOut')?.addEventListener('click', () => cropperInstance?.zoom(-0.1));
+  document.getElementById('cropReset')?.addEventListener('click', () => cropperInstance?.reset());
+
+  // Intercept file selection for Left Logo, Right Logo, and Background Image
+  function setupFileInputCropper(inputId, previewId, defaultAspect) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    if (!input) return;
+
+    input.addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          openCropper(e.target.result, input, preview, defaultAspect);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  setupFileInputCropper('left_logo_file', 'preview-left-logo', '1');
+  setupFileInputCropper('right_logo_file', 'preview-right-logo', '1');
+  setupFileInputCropper('bg_image_file', 'preview-bg-image', 'free');
+
+  // Crop button click handlers
+  document.querySelectorAll('.crop-trigger-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const input = document.getElementById(this.dataset.input);
+      const preview = document.getElementById(this.dataset.preview);
+      const aspect = this.dataset.aspect;
+      if (input && input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => openCropper(e.target.result, input, preview, aspect);
+        reader.readAsDataURL(input.files[0]);
+      } else if (preview && preview.src && !preview.src.endsWith('/')) {
+        openCropper(preview.src, input, preview, aspect);
+      }
+    });
+  });
+
+  // Apply Crop
+  document.getElementById('applyCropBtn')?.addEventListener('click', function() {
+    if (!cropperInstance) return;
+    const canvas = cropperInstance.getCroppedCanvas({
+      maxWidth: 1920,
+      maxHeight: 1080
+    });
+
+    if (canvas) {
+      const croppedDataUrl = canvas.toDataURL('image/png');
+      if (currentCropPreview) {
+        currentCropPreview.src = croppedDataUrl;
+        currentCropPreview.style.display = 'block';
+      }
+
+      canvas.toBlob(blob => {
+        if (blob && currentCropInput) {
+          const file = new File([blob], 'cropped_image.png', { type: 'image/png' });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          currentCropInput.files = dataTransfer.files;
+        }
+      }, 'image/png');
+
+      if (cropModal) cropModal.hide();
+    }
+  });
+
+  // Form Submit
+  const navbarForm = document.getElementById('navbarSettingsForm');
+  if (navbarForm) {
+    navbarForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const errBox = document.getElementById('nbError');
+      const succBox = document.getElementById('nbSuccess');
+      if (errBox) errBox.style.display = 'none';
+      if (succBox) succBox.style.display = 'none';
+
+      const saveBtn = document.getElementById('saveNavbarBtn');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+      }
+
+      const formData = new FormData(this);
+
+      try {
+        const res = await fetch('/api/settings/navbar', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          if (succBox) {
+            document.getElementById('nbSuccessText').textContent = data.message || 'Navbar settings saved!';
+            succBox.style.display = 'flex';
+            succBox.className = 'sfeedback success';
+          }
+          
+          if (data.config) {
+            const hText = document.getElementById('nav-header-text');
+            if (hText) hText.textContent = data.config.header_text;
+            const lContainer = document.getElementById('nav-left-logo-container');
+            if (lContainer) lContainer.style.display = data.config.show_left_logo !== false ? 'inline-block' : 'none';
+            const rContainer = document.getElementById('nav-right-logo-container');
+            if (rContainer) rContainer.style.display = data.config.show_right_logo !== false ? 'inline-block' : 'none';
+
+            const lImg = document.getElementById('nav-left-logo-img');
+            if (lImg && data.config.left_logo) lImg.src = data.config.left_logo;
+            const rImg = document.getElementById('nav-right-logo-img');
+            if (rImg && data.config.right_logo) rImg.src = data.config.right_logo;
+            
+            const navBarDiv = document.querySelector('.page-title');
+            if (navBarDiv) {
+              if (data.config.bg_type === 'image' && data.config.bg_image) {
+                navBarDiv.style.cssText = `background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url('${data.config.bg_image}') center/cover no-repeat !important;`;
+              } else if (data.config.bg_gradient) {
+                navBarDiv.style.cssText = `background: ${data.config.bg_gradient} !important;`;
+              }
+            }
+          }
+        } else {
+          if (errBox) {
+            document.getElementById('nbErrorText').textContent = data.message || 'Error saving navbar settings';
+            errBox.style.display = 'flex';
+            errBox.className = 'sfeedback error';
+          }
+        }
+      } catch (err) {
+        if (errBox) {
+          document.getElementById('nbErrorText').textContent = 'Network error while saving navbar settings.';
+          errBox.style.display = 'flex';
+          errBox.className = 'sfeedback error';
+        }
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fas fa-save me-1"></i> Save Changes';
+        }
+      }
+    });
+  }
+
+  // Reset to default
+  const resetBtn = document.getElementById('resetNavbarBtn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', async function() {
+      if (!confirm('Are you sure you want to reset navbar settings to default?')) return;
+      const formData = new FormData();
+      formData.append('action', 'reset');
+      try {
+        const res = await fetch('/api/settings/navbar', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.status === 'success') {
+          window.location.reload();
+        }
+      } catch (e) {
+        alert('Failed to reset navbar settings.');
+      }
+    });
   }
 });
 
 function evalStrength(val) {
   const fill  = document.getElementById('strengthFill');
   const label = document.getElementById('strengthLabel');
-  if (!val) { fill.style.width = '0%'; label.textContent = '—'; label.style.color = ''; return; }
+  if (!val || !fill || !label) return;
   let s = 0;
   if (val.length >= 6)           s++;
   if (val.length >= 10)          s++;

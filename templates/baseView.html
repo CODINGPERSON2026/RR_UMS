@@ -1206,14 +1206,12 @@
 
     <!-- Footer Nav (Settings + Logout) -->
     <div class="sidebar-footer">
-      {% if role in ['CO', '2IC'] %}
       <a class="nav-link {% if '/settings' in request.path %}active{% endif %}" href="/settings"
         data-tiptext="Settings">
         <span class="nav-icon"><i class="fas fa-cog"></i></span>
         <span class="nav-label-text">Settings</span>
         <span class="nav-tooltip">Settings</span>
       </a>
-      {% endif %}
 
       <a class="nav-link nav-link-danger" href="/logout" id="logoutLink" data-tiptext="Logout">
         <span class="nav-icon"><i class="fas fa-sign-out-alt"></i></span>

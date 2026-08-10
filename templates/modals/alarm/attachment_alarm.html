@@ -1,3 +1,29 @@
+<style>
+  #attachmentAlarmModalScope .alarm-alert-count-box {
+    background: rgba(220, 53, 69, 0.1) !important;
+    border: 1px solid rgba(220, 53, 69, 0.25) !important;
+  }
+
+  [data-theme="dark"] #attachmentAlarmModalScope .alarm-alert-count-box {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: rgba(239, 68, 68, 0.4) !important;
+  }
+
+  #attachmentAlarmModalScope .alarm-alert-count-label {
+    color: #dc3545 !important;
+    font-weight: 700 !important;
+  }
+
+  [data-theme="dark"] #attachmentAlarmModalScope .alarm-alert-count-label {
+    color: #f87171 !important;
+  }
+
+  #attachAlarmTotalCount {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+  }
+</style>
+
 <!-- Attachment Alarm Badge -->
 <span id="attachmentAlarmAlert" class="alert-gradient d-none" style="cursor:pointer;">
     🔔 You have Attachment alarms!
@@ -22,8 +48,8 @@
           </select>
 
           <!-- TOTAL COUNT BADGE -->
-          <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-3" style="background: #fff0f0; border: 1px solid #ffd6d6;">
-            <span class="fw-semibold small" style="color:#a83131;">Alert Count</span>
+          <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-3 alarm-alert-count-box">
+            <span class="fw-semibold small alarm-alert-count-label">Alert Count</span>
             <span id="attachAlarmTotalCount" class="badge rounded-pill bg-danger">0</span>
           </div>
         </div>

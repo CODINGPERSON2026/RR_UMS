@@ -1,0 +1,10 @@
+{
+  "header_text": "15 CORPS ENGINEERING SIGNAL REGIMENT",
+  "show_left_logo": true,
+  "show_right_logo": true,
+  "left_logo": "/static/image_for_login_page/rt.jpg",
+  "right_logo": "/static/image_for_login_page/chinar.jpg",
+  "bg_type": "gradient",
+  "bg_gradient": "linear-gradient(135deg, #3c425c 0%, #764ba2 100%)",
+  "bg_image": ""
+}

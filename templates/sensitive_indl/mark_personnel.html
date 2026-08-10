@@ -3,250 +3,320 @@
 <link rel="stylesheet" href="/static/fontawesome-free-7.1.0-web/css/all.min.css">
 
 <style>
-    body { background: #f0f2f7; font-family: 'Segoe UI', sans-serif; }
-    .container-main { max-width: 1400px; padding-top: 2rem; padding-bottom: 3rem; }
+    body { font-family: 'DM Sans', 'Segoe UI', sans-serif; }
+    .container-main { max-width: 1400px; padding-top: 1.5rem; padding-bottom: 3rem; }
 
     /* ── Page Header ── */
-    .page-header {
-        background: linear-gradient(135deg, #1e2430 0%, #2d3a52 100%);
-        border-radius: 14px; padding: 1.5rem 2rem;
-        color: white; margin-bottom: 1.75rem;
-        display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-        box-shadow: 0 4px 20px rgba(30,36,48,0.15);
+    .sp-page-header {
+        background: var(--modal-header-bg, linear-gradient(135deg, #1e293b 0%, #0f172a 100%));
+        border-radius: 16px;
+        padding: 1.5rem 2rem;
+        color: white;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1.25rem;
+        box-shadow: 0 4px 24px var(--shadow, rgba(0,0,0,0.15));
     }
-    .page-header-left { display: flex; align-items: center; gap: 1rem; }
-    .page-header-icon {
-        width: 48px; height: 48px; border-radius: 12px;
+    .sp-header-title { display: flex; align-items: center; gap: 1rem; }
+    .sp-header-icon {
+        width: 50px; height: 50px; border-radius: 14px;
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; color: #ffffff;
+    }
+    .sp-header-title h4 { margin: 0; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.01em; }
+    .sp-header-title p  { margin: 0; font-size: 0.85rem; opacity: 0.8; margin-top: 2px; }
+
+    .sp-header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-mark-trigger {
+        background: var(--primary-color, #3b82f6);
+        border: none;
+        color: white;
+        border-radius: 10px;
+        padding: 0.6rem 1.25rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .btn-mark-trigger:hover {
+        background: var(--secondary-color, #2563eb);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.45);
+        color: white;
+    }
+    .btn-back-link {
         background: rgba(255,255,255,0.12);
-        display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        color: white;
+        border-radius: 10px;
+        padding: 0.6rem 1.1rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: background 0.15s;
     }
-    .page-header h4 { margin: 0; font-weight: 700; font-size: 1.2rem; }
-    .page-header p  { margin: 0; font-size: 0.82rem; opacity: 0.7; margin-top: 2px; }
-    .btn-back {
-        background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-        color: white; border-radius: 9px; padding: 0.45rem 1.1rem;
-        font-size: 0.85rem; font-weight: 600; display: flex; align-items: center;
-        gap: 7px; cursor: pointer; transition: background 0.15s; text-decoration: none;
+    .btn-back-link:hover { background: rgba(255,255,255,0.22); color: white; }
+
+    /* ── Metrics Cards ── */
+    .sp-metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
-    .btn-back:hover { background: rgba(255,255,255,0.22); color: white; }
-
-    /* ── Cards ── */
-    .card { border: none; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); overflow: hidden; margin-bottom: 1.5rem; }
-    .card-header-custom { background: #1e2430; color: white; font-weight: 600; padding: 0.9rem 1.4rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; }
-
-    /* ── Add Panel ── */
-    .add-panel-wrap { background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(0,0,0,0.07); margin-bottom: 1.5rem; overflow: hidden; }
-    .add-panel-toggle {
-        background: #1e2430; color: white; padding: 0.9rem 1.4rem;
-        display: flex; align-items: center; justify-content: space-between; cursor: pointer;
-        border: none; width: 100%; text-align: left; font-size: 0.95rem; font-weight: 600;
+    .sp-metric-card {
+        background: var(--card-bg-solid, var(--card-background, #ffffff));
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 14px;
+        padding: 1.1rem 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 12px var(--shadow, rgba(0,0,0,0.04));
     }
-    .add-panel-toggle:hover { background: #252e40; }
-    .add-panel-toggle .toggle-left { display: flex; align-items: center; gap: 0.6rem; }
-    .add-panel-body { display: none; padding: 1.5rem; animation: slideDown 0.2s ease; }
-    .add-panel-body.open { display: block; }
-    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
-
-    .search-result-item {
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 0.6rem 0.85rem; border: 1px solid #eaecf3; border-radius: 8px;
-        margin-bottom: 0.4rem; cursor: pointer; transition: all 0.12s;
+    .sp-metric-icon {
+        width: 44px; height: 44px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.15rem; flex-shrink: 0;
     }
-    .search-result-item:hover { background: #eef1fd; border-color: #4361ee; }
-    .search-result-item.selected { background: #eef1fd; border-color: #4361ee; }
-    .sri-name { font-size: 0.85rem; font-weight: 600; color: #1e2430; }
-    .sri-meta { font-size: 0.75rem; color: #9ea8c0; }
-    .sri-check { color: #4361ee; display: none; }
-    .search-result-item.selected .sri-check { display: block; }
+    .sp-metric-icon.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .sp-metric-icon.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+    .sp-metric-icon.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .sp-metric-val { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .sp-metric-lbl { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
 
-    .selected-badge {
-        background: #eef1fd; border: 1px solid #4361ee; border-radius: 8px;
-        padding: 0.5rem 0.85rem; display: flex; align-items: center; gap: 10px;
-        margin-bottom: 0.75rem; font-size: 0.85rem;
+    /* ── Main List Card ── */
+    .card {
+        border: 1px solid var(--border-color, #e2e8f0);
+        background: var(--card-bg-solid, var(--card-background, #ffffff));
+        color: var(--text-primary);
+        border-radius: 16px;
+        box-shadow: 0 2px 18px var(--shadow, rgba(0,0,0,0.06));
+        overflow: hidden;
+        margin-bottom: 1.5rem;
     }
-    .selected-badge .clear-sel { background: none; border: none; color: #9ea8c0; cursor: pointer; margin-left: auto; }
-    .selected-badge .clear-sel:hover { color: #e63946; }
-
-    /* ── Table ── */
-    .table { font-size: 0.9rem; }
-    .table thead th { background: #f1f3f8; color: #5a6177; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; border: none; padding: 0.8rem 1rem; }
-    .table tbody td { vertical-align: middle; padding: 0.7rem 1rem; border-color: #f0f2f7; }
-    .table tbody tr:hover { background: #f7f8fc; }
-
-    .action-btn { padding: 0.32rem 0.7rem; font-size: 0.8rem; border-radius: 6px; margin: 0 2px; border: none; cursor: pointer; transition: all 0.15s; }
-    .btn-view   { background: #eef1fd; color: #4361ee; }
-    .btn-view:hover   { background: #4361ee; color: white; }
-    .btn-remark { background: #fff8e6; color: #d4900a; }
-    .btn-remark:hover { background: #f7b538; color: #212529; }
-    .btn-remove { background: #fdedf0; color: #e63946; }
-    .btn-remove:hover { background: #e63946; color: white; }
+    .card-header-custom {
+        background: var(--modal-header-bg, linear-gradient(135deg, #1e293b 0%, #0f172a 100%));
+        color: white;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
     /* ── Toolbar ── */
     .list-toolbar {
-        padding: 0.85rem 1.25rem; background: #f8f9fc;
-        border-bottom: 1px solid #eaecf3;
-        display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;
+        padding: 1rem 1.5rem;
+        background: var(--nav-link-hover-bg, #f8f9fc);
+        border-bottom: 1px solid var(--border-color, #eaecf3);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
     }
-    .list-toolbar .search-wrap { flex: 1; min-width: 180px; position: relative; }
-    .list-toolbar .search-wrap input { padding-left: 2.1rem; border-radius: 8px; font-size: 0.85rem; border: 1px solid #dde0ea; }
-    .list-toolbar .search-wrap .si { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: #9ea8c0; font-size: 0.78rem; }
-    .filter-select { font-size: 0.82rem; border-radius: 7px; border: 1px solid #dde0ea; padding: 0.38rem 0.65rem; background: white; color: #5a6177; }
+    .list-toolbar .search-wrap { flex: 1; min-width: 220px; position: relative; }
+    .list-toolbar .search-wrap input {
+        padding-left: 2.3rem; border-radius: 10px; font-size: 0.88rem;
+        border: 1px solid var(--border-color, #dde0ea);
+        background: var(--card-bg-solid, #ffffff);
+        color: var(--text-primary);
+        padding-top: 0.55rem; padding-bottom: 0.55rem;
+    }
+    .list-toolbar .search-wrap .si { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary, #9ea8c0); font-size: 0.85rem; }
+    .filter-select {
+        font-size: 0.85rem; border-radius: 9px;
+        border: 1px solid var(--border-color, #dde0ea);
+        padding: 0.52rem 0.8rem;
+        background: var(--card-bg-solid, #ffffff);
+        color: var(--text-primary);
+    }
 
-    /* ── Char bar ── */
-    .char-bar { height: 3px; background: #eef; border-radius: 2px; margin-top: 5px; overflow: hidden; }
-    .char-bar-fill { height: 100%; background: #dc3545; border-radius: 2px; transition: width 0.2s, background 0.2s; }
+    /* ── Table ── */
+    .table { font-size: 0.9rem; color: var(--text-primary); }
+    .table thead th {
+        background: var(--nav-link-hover-bg, #f1f3f8);
+        color: var(--text-secondary, #5a6177);
+        font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; border: none; padding: 0.9rem 1.25rem;
+    }
+    .table tbody td { vertical-align: middle; padding: 0.85rem 1.25rem; border-color: var(--border-color, #f0f2f7); color: var(--text-primary); }
+    .table tbody tr:hover { background: var(--nav-link-hover-bg, #f7f8fc); }
+
+    .action-btn { padding: 0.4rem 0.75rem; font-size: 0.82rem; border-radius: 8px; margin: 0 3px; border: none; cursor: pointer; transition: all 0.15s; }
+    .btn-view   { background: var(--nav-link-active-bg, rgba(59,130,246,0.12)); color: var(--primary-color, #3b82f6); }
+    .btn-view:hover   { background: var(--primary-color, #3b82f6); color: white; }
+    .btn-remark { background: rgba(245, 158, 11, 0.12); color: #d4900a; }
+    .btn-remark:hover { background: #f7b538; color: #212529; }
+    .btn-remove { background: rgba(239, 68, 68, 0.12); color: var(--danger-color, #ef4444); }
+    .btn-remove:hover { background: var(--danger-color, #ef4444); color: white; }
+
+    /* ── Search Dropdown in Modal ── */
+    .search-result-item {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.65rem 0.9rem;
+        background: var(--card-bg-solid, #ffffff);
+        border: 1px solid var(--border-color, #eaecf3);
+        color: var(--text-primary);
+        border-radius: 10px;
+        margin-bottom: 0.45rem; cursor: pointer; transition: all 0.15s;
+    }
+    .search-result-item:hover, .search-result-item.selected {
+        background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.12));
+        border-color: var(--primary-color, #3b82f6);
+    }
+    .sri-name { font-size: 0.88rem; font-weight: 600; color: var(--text-primary, #1e2430); }
+    .sri-meta { font-size: 0.78rem; color: var(--text-secondary, #9ea8c0); }
+    .sri-check { color: var(--primary-color, #3b82f6); display: none; }
+    .search-result-item.selected .sri-check { display: block; }
+
+    .selected-badge {
+        background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.12));
+        border: 1px solid var(--primary-color, #3b82f6);
+        color: var(--text-primary);
+        border-radius: 10px;
+        padding: 0.65rem 1rem; display: flex; align-items: center; gap: 12px;
+        margin-bottom: 1rem; font-size: 0.88rem;
+    }
+    .selected-badge .clear-sel { background: none; border: none; color: var(--text-secondary, #9ea8c0); cursor: pointer; margin-left: auto; }
+    .selected-badge .clear-sel:hover { color: var(--danger-color, #e63946); }
+
+    /* ── Char progress bar ── */
+    .char-bar { height: 4px; background: var(--border-color, #eef); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .char-bar-fill { height: 100%; background: var(--danger-color, #dc3545); border-radius: 2px; transition: width 0.2s, background 0.2s; }
 
     /* ── Reason Thread ── */
-    .reason-thread { display: flex; flex-direction: column; gap: 0.6rem; max-height: 320px; overflow-y: auto; padding-right: 3px; }
-    .reason-thread::-webkit-scrollbar { width: 4px; }
-    .reason-thread::-webkit-scrollbar-thumb { background: #c8cde0; border-radius: 4px; }
-
-    .reason-block { background: #fff; border: 1px solid #eaecf3; border-left: 3px solid #4361ee; border-radius: 0 10px 10px 0; padding: 0.75rem 1rem; }
+    .reason-thread { display: flex; flex-direction: column; gap: 0.7rem; max-height: 350px; overflow-y: auto; padding-right: 4px; }
+    .reason-block {
+        background: var(--card-bg-solid, #ffffff);
+        border: 1px solid var(--border-color, #eaecf3);
+        border-left: 4px solid var(--primary-color, #3b82f6);
+        border-radius: 0 12px 12px 0; padding: 0.85rem 1.1rem;
+        color: var(--text-primary);
+    }
     .reason-block:nth-child(2n) { border-left-color: #f7b538; }
-    .reason-block:nth-child(3n) { border-left-color: #28a745; }
-    .reason-block:nth-child(4n) { border-left-color: #e63946; }
-    .reason-block:nth-child(5n) { border-left-color: #6f42c1; }
+    .reason-block:nth-child(3n) { border-left-color: #10b981; }
+    .reason-block:nth-child(4n) { border-left-color: var(--danger-color, #ef4444); }
+    .reason-block:nth-child(5n) { border-left-color: #8b5cf6; }
 
     .rb-header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
-    .rb-avatar { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #fff; flex-shrink: 0; }
-    .rb-name  { font-size: 0.8rem; font-weight: 700; color: #1e2430; }
-    .rb-role  { font-size: 0.7rem; color: #7a82a0; background: #f0f2f7; padding: 1px 7px; border-radius: 20px; }
-    .rb-first { font-size: 0.66rem; color: #fff; background: #e63946; padding: 1px 7px; border-radius: 20px; }
-    .rb-text  { font-size: 0.88rem; color: #2d3352; line-height: 1.6; }
-    .rb-time  { font-size: 0.72rem; color: #9ea8c0; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-    .no-reason { background: #fffbf0; border: 1px dashed #ffc107; padding: 1rem; border-radius: 10px; color: #9a7a00; font-size: 0.85rem; text-align: center; }
+    .rb-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .rb-name  { font-size: 0.82rem; font-weight: 700; color: var(--text-primary, #1e2430); }
+    .rb-role  { font-size: 0.72rem; color: var(--text-secondary, #7a82a0); background: var(--nav-link-hover-bg, #f0f2f7); padding: 2px 8px; border-radius: 20px; }
+    .rb-first { font-size: 0.68rem; color: #fff; background: var(--danger-color, #e63946); padding: 2px 8px; border-radius: 20px; }
+    .rb-text  { font-size: 0.9rem; color: var(--text-primary, #2d3352); line-height: 1.6; }
+    .rb-time  { font-size: 0.75rem; color: var(--text-secondary, #9ea8c0); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .no-reason { background: rgba(245, 158, 11, 0.1); border: 1px dashed #ffc107; padding: 1.25rem; border-radius: 12px; color: var(--text-primary); font-size: 0.88rem; text-align: center; }
 
-    /* ── View Modal ── */
-    .modal-content { border: none; border-radius: 16px; overflow: hidden; }
+    /* ── Modals ── */
+    .modal-content {
+        background: var(--card-bg-solid, #ffffff);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 18px; overflow: hidden;
+    }
     .modal-hero-detail {
-        background: linear-gradient(135deg, #1e2430 0%, #2d3a52 100%);
+        background: var(--modal-header-bg, linear-gradient(135deg, #1e293b 0%, #0f172a 100%));
         padding: 1.75rem 1.5rem 1.5rem; color: white; position: relative;
     }
     .modal-hero-detail .close-btn {
         position: absolute; top: 1rem; right: 1rem;
         background: rgba(255,255,255,0.15); border: none; color: white;
-        width: 30px; height: 30px; border-radius: 50%;
+        width: 32px; height: 32px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center; cursor: pointer;
     }
     .modal-hero-detail .close-btn:hover { background: rgba(255,255,255,0.3); }
     .modal-identity { display: flex; align-items: center; gap: 1.1rem; }
-    .modal-avatar-big { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: #fff; flex-shrink: 0; }
-    .modal-name      { font-size: 1.1rem; font-weight: 700; margin: 0; }
-    .modal-rank-text { font-size: 0.84rem; opacity: 0.75; margin: 2px 0 0; }
+    .modal-avatar-big { width: 58px; height: 58px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .modal-name      { font-size: 1.15rem; font-weight: 700; margin: 0; }
+    .modal-rank-text { font-size: 0.85rem; opacity: 0.85; margin: 2px 0 0; }
     .modal-meta-strip { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
-    .meta-pill { background: rgba(255,255,255,0.12); border-radius: 8px; padding: 0.35rem 0.8rem; font-size: 0.78rem; display: flex; align-items: center; gap: 5px; }
-    .modal-section { padding: 1.1rem 1.5rem; }
-    .modal-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9ea8c0; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 6px; }
-    .remarks-count { background: #eef1fd; color: #4361ee; font-size: 0.7rem; padding: 1px 7px; border-radius: 20px; font-weight: 700; }
-    .modal-footer-custom { padding: 0.85rem 1.5rem; border-top: 1px solid #f0f2f7; display: flex; justify-content: flex-end; }
+    .meta-pill { background: rgba(255,255,255,0.15); border-radius: 8px; padding: 0.38rem 0.85rem; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+    .modal-section { padding: 1.25rem 1.5rem; }
+    .modal-section-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary, #9ea8c0); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .remarks-count { background: var(--nav-link-active-bg, #eef1fd); color: var(--primary-color, #3b82f6); font-size: 0.72rem; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
+    .modal-footer-custom { padding: 1rem 1.5rem; border-top: 1px solid var(--border-color, #f0f2f7); display: flex; justify-content: flex-end; gap: 0.5rem; }
 
-    /* ── Remark Modal ── */
-    .edit-hero { background: linear-gradient(135deg, #d4900a, #f7b538); padding: 1.1rem 1.5rem; color: white; position: relative; display: flex; align-items: center; gap: 10px; }
-    .edit-hero h5 { margin: 0; font-weight: 700; font-size: 0.95rem; }
-    .edit-hero .close-btn { position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    /* ── Dark Mode Overrides ── */
+    [data-theme="dark"] .table { color: #ffffff !important; }
+    [data-theme="dark"] .table thead th { background: #1e293b !important; color: #cbd5e1 !important; }
+    [data-theme="dark"] .table tbody td { border-color: #334155 !important; color: #ffffff !important; }
+    [data-theme="dark"] .table tbody tr:hover { background: #273449 !important; }
+    [data-theme="dark"] .list-toolbar { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .list-toolbar input, [data-theme="dark"] .filter-select { background: #0f172a !important; color: #ffffff !important; border-color: #334155 !important; }
+    [data-theme="dark"] .search-result-item { background: #0f172a !important; border-color: #334155 !important; }
+    [data-theme="dark"] .search-result-item:hover, [data-theme="dark"] .search-result-item.selected { background: #1e3a5f !important; border-color: #60a5fa !important; }
+    [data-theme="dark"] .sri-name, [data-theme="dark"] .rb-name, [data-theme="dark"] .rb-text { color: #ffffff !important; }
+    [data-theme="dark"] .reason-block { background: #1e293b !important; border-color: #334155 !important; }
+    [data-theme="dark"] .modal-footer-custom { border-color: #334155 !important; background: #1e293b !important; }
+    [data-theme="dark"] .sp-metric-card { background: #1e293b !important; border-color: #334155 !important; }
 
-    /* ── Empty / Loading ── */
-    .empty-state { text-align: center; padding: 2.5rem 1rem; color: #9ea8c0; }
-    .empty-state i { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.3; display: block; }
-
-    /* ── Toast ── */
-    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
-
-    @media (max-width: 992px) { .container-main { padding: 1rem; } .content-wrapper { padding-left: 0; } }
-    @media (max-width: 576px) { .page-header { padding: 1.2rem; } .modal-meta-strip { gap: 0.5rem; } }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-secondary, #9ea8c0); }
+    .empty-state i { font-size: 2.8rem; margin-bottom: 0.85rem; opacity: 0.35; display: block; }
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; }
 </style>
 </head>
 <body>
 <div class="content-wrapper">
     {% set header = "Sensitive Personnel Management" %}
-    {% set subscript = 'Search → Select → Mark → View Remarks' %}
+    {% set subscript = 'Security Classification & Personnel Monitoring' %}
     {% include 'navbar/navbar.html' %}
 
     <div class="container-fluid container-main">
 
         <!-- ── Page Header ── -->
-        
-
-        <!-- ── Add New Personnel Panel ── -->
-        <div class="add-panel-wrap">
-            <button class="add-panel-toggle" id="toggleAddPanel">
-                <span class="toggle-left">
-                    <i class="fa-solid fa-user-plus"></i>
-                    Mark New Personnel as Sensitive
-                </span>
-                <i class="fa-solid fa-chevron-down" id="toggleChevron"></i>
-            </button>
-            <div class="add-panel-body" id="addPanelBody">
-                <div class="row g-4">
-
-                    <!-- Step 1 -->
-                    <div class="col-md-5">
-                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#5a6177;">
-                            <span class="badge bg-primary me-2" style="font-size:0.72rem;">Step 1</span>
-                            Search &amp; Select Personnel
-                        </p>
-                        <input type="text" id="addSearchInput" class="form-control form-control-sm mb-2"
-                               placeholder="Type name or army number...">
-                        <div id="addSearchStatus" style="display:none;">
-                            <small class="text-muted"><span class="spinner-border spinner-border-sm me-1"></span>Searching...</small>
-                        </div>
-                        <div id="addSearchResults" style="max-height:200px; overflow-y:auto;"></div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="col-md-7">
-                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#5a6177;">
-                            <span class="badge bg-primary me-2" style="font-size:0.72rem;">Step 2</span>
-                            Write Classification Reason
-                        </p>
-
-                        <div id="selectedPersonBadge" class="selected-badge" style="display:none;">
-                            <i class="fa-solid fa-user-shield text-primary"></i>
-                            <div>
-                                <strong id="selectedPersonName">-</strong>
-                                <div style="font-size:0.75rem; color:#9ea8c0;" id="selectedPersonMeta">-</div>
-                            </div>
-                            <button class="clear-sel" id="clearSelection" title="Clear">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-
-                        <input type="hidden" id="add_army_number">
-                        <textarea class="form-control form-control-sm" id="addReason" rows="4"
-                            placeholder="Provide detailed classification reason (minimum 30 characters)..."></textarea>
-                        <div class="char-bar"><div class="char-bar-fill" id="addCharFill" style="width:0%"></div></div>
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <small id="addCharCount" style="color:#dc3545;">0 / 30 minimum</small>
-                            <button class="btn btn-success btn-sm fw-semibold px-3" id="submitMarkBtn">
-                                <i class="fa-solid fa-shield-halved me-1"></i>Mark as Sensitive
-                            </button>
-                        </div>
-                    </div>
-
+        <div class="sp-page-header">
+            <div class="sp-header-title">
+                <div class="sp-header-icon">
+                    <i class="fa-solid fa-user-shield"></i>
                 </div>
+                <div>
+                    <h4>Sensitive Personnel Register</h4>
+                    <p>Security Classification, Reason Log &amp; Monitoring System</p>
+                </div>
+            </div>
+            <div class="sp-header-actions">
+                <button type="button" class="btn-mark-trigger" data-bs-toggle="modal" data-bs-target="#addSensitiveModal" id="toggleAddPanel">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Mark New Personnel as Sensitive</span>
+                </button>
+                <a href="javascript:history.back()" class="btn-back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Go Back</span>
+                </a>
             </div>
         </div>
 
-        <!-- ── Classified List ── -->
+        <!-- ── Classified Personnel List ── -->
         <div class="card">
             <div class="card-header-custom">
-                <a href="javascript:history.back()" class="btn-back">
-                    <i class="fa-solid fa-arrow-left"></i> Go Back
-                </a>
-                <i class="fa-solid fa-shield-virus"></i>
-                Classified Personnel List
-                
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-shield-virus text-warning"></i>
+                    <span>Classified Personnel Roster</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold d-md-none" data-bs-toggle="modal" data-bs-target="#addSensitiveModal">
+                    <i class="fa-solid fa-plus me-1"></i> Mark
+                </button>
             </div>
-            <a href="javascript:history.back()" class="btn-back">
-            <i class="fa-solid fa-arrow-left"></i> Go Back
-        </a>
 
             <!-- Toolbar -->
             <div class="list-toolbar">
                 <div class="search-wrap">
                     <i class="fa-solid fa-magnifying-glass si"></i>
                     <input type="text" id="mainSearchInput" class="form-control form-control-sm"
-                           placeholder="Search classified personnel...">
+                           placeholder="Search by name, rank, army number, or company...">
                 </div>
                 <select id="filterCount" class="filter-select">
                     <option value="5">Show 5</option>
@@ -274,11 +344,12 @@
                     </table>
                     <div id="emptyState" class="empty-state" style="display:none;">
                         <i class="fa-solid fa-shield-slash"></i>
-                        <p class="mb-0" style="font-size:0.9rem;">No sensitive personnel records found.</p>
+                        <p class="mb-0 fw-semibold">No sensitive personnel records found.</p>
+                        <small class="text-muted">Use the "Mark New Personnel as Sensitive" button above to add entries.</small>
                     </div>
                     <div id="loadingState" class="empty-state">
-                        <span class="spinner-border spinner-border-sm text-muted me-2"></span>
-                        <span style="font-size:0.88rem; color:#9ea8c0;">Loading...</span>
+                        <span class="spinner-border spinner-border-sm text-primary me-2"></span>
+                        <span style="font-size:0.9rem;">Loading sensitive personnel register...</span>
                     </div>
                 </div>
             </div>
@@ -289,13 +360,92 @@
 
 
 <!-- ════════════════════════════════
+     MARK NEW PERSONNEL MODAL
+════════════════════════════════ -->
+<div class="modal fade" id="addSensitiveModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-hero-detail">
+                <button class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modal-avatar-big" style="background: rgba(255,255,255,0.2);">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-name">Mark Personnel as Sensitive</h5>
+                        <p class="modal-rank-text">Search personnel records and log mandatory security classification remarks.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="row g-4">
+
+                    <!-- Step 1 -->
+                    <div class="col-md-5">
+                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color: var(--text-secondary);">
+                            <span class="badge bg-primary me-2" style="font-size:0.72rem;">Step 1</span>
+                            Search &amp; Select Personnel
+                        </p>
+                        <div class="position-relative">
+                            <input type="text" id="addSearchInput" class="form-control form-control-sm mb-2"
+                                   placeholder="Type name or army number..." autocomplete="off">
+                        </div>
+                        <div id="addSearchStatus" style="display:none;" class="py-1">
+                            <small class="text-muted"><span class="spinner-border spinner-border-sm me-1"></span>Searching personnel...</small>
+                        </div>
+                        <div id="addSearchResults" style="max-height:220px; overflow-y:auto;"></div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="col-md-7">
+                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color: var(--text-secondary);">
+                            <span class="badge bg-primary me-2" style="font-size:0.72rem;">Step 2</span>
+                            Write Classification Reason
+                        </p>
+
+                        <div id="selectedPersonBadge" class="selected-badge" style="display:none;">
+                            <i class="fa-solid fa-user-shield text-primary fa-lg"></i>
+                            <div>
+                                <strong id="selectedPersonName" class="d-block">-</strong>
+                                <div style="font-size:0.78rem; opacity:0.8;" id="selectedPersonMeta">-</div>
+                            </div>
+                            <button type="button" class="clear-sel" id="clearSelection" title="Clear selection">
+                                <i class="fa-solid fa-xmark fa-lg"></i>
+                            </button>
+                        </div>
+
+                        <input type="hidden" id="add_army_number">
+                        <textarea class="form-control form-control-sm" id="addReason" rows="5"
+                            placeholder="Provide detailed classification reason (minimum 30 characters)..."></textarea>
+                        <div class="char-bar"><div class="char-bar-fill" id="addCharFill" style="width:0%"></div></div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <small id="addCharCount" style="color:#dc3545; font-weight:600;">0 / 30 minimum</small>
+                            <button type="button" class="btn btn-primary btn-sm fw-semibold px-4" id="submitMarkBtn">
+                                <i class="fa-solid fa-shield-halved me-1"></i>Mark as Sensitive
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer-custom">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════
      VIEW DETAIL MODAL
 ════════════════════════════════ -->
 <div class="modal fade" id="viewModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-hero-detail">
-                <button class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fa-sm"></i></button>
+                <button class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
                 <div class="modal-identity">
                     <div class="modal-avatar-big" id="viewAvatarBig">AB</div>
                     <div>
@@ -311,8 +461,8 @@
             </div>
             <div class="modal-section">
                 <div class="modal-section-title">
-                    <i class="fa-solid fa-comments"></i>
-                    Classification Remarks
+                    <i class="fa-solid fa-comments text-primary"></i>
+                    Classification Remarks Log Thread
                     <span class="remarks-count" id="reasonCount">0</span>
                 </div>
                 <div class="reason-thread" id="viewReasonThread">
@@ -335,26 +485,26 @@
         <div class="modal-content">
             <div class="edit-hero">
                 <i class="fa-solid fa-pen-to-square fa-lg"></i>
-                <h5>Add Remark</h5>
-                <button class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark fa-sm"></i></button>
+                <h5>Add Classification Remark</h5>
+                <button class="close-btn" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-section" style="padding-bottom:0;">
                 <input type="hidden" id="editArmyNumber">
-                <div class="alert alert-light border d-flex align-items-start gap-2 py-2 px-3 mb-3"
-                     style="font-size:0.82rem; border-radius:8px;">
-                    <i class="fa-solid fa-circle-info text-primary mt-1" style="flex-shrink:0;"></i>
-                    <span>Your remark will be saved as a <strong>new entry</strong> under your name. Previous remarks are preserved.</span>
+                <div class="alert alert-warning border d-flex align-items-start gap-2 py-2 px-3 mb-3"
+                     style="font-size:0.83rem; border-radius:10px; background: rgba(245, 158, 11, 0.1);">
+                    <i class="fa-solid fa-circle-info text-warning mt-1" style="flex-shrink:0;"></i>
+                    <span>Your remark will be appended as a <strong>new entry</strong> in the log thread under your account name.</span>
                 </div>
                 <label class="form-label fw-semibold" style="font-size:0.85rem;">
-                    Your Remark <span class="text-danger">*</span>
+                    New Classification Remark <span class="text-danger">*</span>
                 </label>
-                <textarea class="form-control" id="editReason" rows="6" minlength="30"
-                    placeholder="Add your classification remark (minimum 30 characters)..."></textarea>
+                <textarea class="form-control" id="editReason" rows="5" minlength="30"
+                    placeholder="Add detailed classification remark (minimum 30 characters)..."></textarea>
                 <div class="char-bar mt-2"><div class="char-bar-fill" id="editCharFill" style="width:0%"></div></div>
-                <small id="editCharCount" style="color:#dc3545;">0 / 30 minimum</small>
+                <small id="editCharCount" style="color:#dc3545; font-weight:600;">0 / 30 minimum</small>
             </div>
             <div class="modal-footer-custom mt-3">
-                <button type="button" class="btn btn-light me-2 px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-light me-1 px-4" data-bs-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-warning fw-semibold px-4" id="saveEditBtn">
                     <i class="fa-solid fa-plus me-1"></i>Add Remark
                 </button>
@@ -376,20 +526,20 @@
 
 
 <script>
-// ── Toast ──────────────────────────────────────────────────────────────────
+// ── Toast Notification ─────────────────────────────────────────────────────
 function showToast(msg, type = 'success') {
     const el = document.getElementById('actionToast');
-    const colors = { success:'#28a745', danger:'#dc3545', warning:'#e6a817', info:'#4361ee' };
+    const colors = { success:'#10b981', danger:'#ef4444', warning:'#f59e0b', info:'#3b82f6' };
     el.style.background = colors[type] || colors.success;
     document.getElementById('toastMessage').textContent = msg;
     new bootstrap.Toast(el, { delay: 3000 }).show();
 }
 
-// ── Avatar helpers ─────────────────────────────────────────────────────────
-const PALETTE = ['#4361ee','#f7b538','#28a745','#e63946','#6f42c1','#20c997','#fd7e14','#0dcaf0','#d63384'];
+// ── Avatar & Color Helpers ─────────────────────────────────────────────────
+const PALETTE = ['#3b82f6','#f59e0b','#10b981','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899'];
 function nameToColor(n) {
     let h = 0;
-    for (let i = 0; i < n.length; i++) h = n.charCodeAt(i) + ((h << 5) - h);
+    for (let i = 0; i < (n||'').length; i++) h = n.charCodeAt(i) + ((h << 5) - h);
     return PALETTE[Math.abs(h) % PALETTE.length];
 }
 function getInitials(n) { return (n||'?').split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase(); }
@@ -399,15 +549,15 @@ function escapeHtml(s) {
     return d.innerHTML;
 }
 
-// ── Char counter ───────────────────────────────────────────────────────────
+// ── Character Counter Progress ─────────────────────────────────────────────
 function updateCharCounter(text, countEl, fillEl, min = 30) {
     const len = text.trim().length;
     const pct = Math.min((len / min) * 100, 100);
     const ok  = len >= min;
     countEl.textContent   = ok ? `✓ ${len} characters` : `${len} / ${min} minimum`;
-    countEl.style.color   = ok ? '#28a745' : '#dc3545';
+    countEl.style.color   = ok ? '#10b981' : '#ef4444';
     fillEl.style.width    = pct + '%';
-    fillEl.style.background = ok ? '#28a745' : (pct > 50 ? '#f7b538' : '#dc3545');
+    fillEl.style.background = ok ? '#10b981' : (pct > 50 ? '#f59e0b' : '#ef4444');
 }
 document.getElementById('addReason').addEventListener('input', function () {
     updateCharCounter(this.value, document.getElementById('addCharCount'), document.getElementById('addCharFill'));
@@ -416,16 +566,7 @@ document.getElementById('editReason').addEventListener('input', function () {
     updateCharCounter(this.value, document.getElementById('editCharCount'), document.getElementById('editCharFill'));
 });
 
-// ── Add Panel toggle ───────────────────────────────────────────────────────
-const addPanelBody  = document.getElementById('addPanelBody');
-const toggleChevron = document.getElementById('toggleChevron');
-
-document.getElementById('toggleAddPanel').addEventListener('click', function () {
-    const open = addPanelBody.classList.toggle('open');
-    toggleChevron.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
-});
-
-// ── Personnel search ───────────────────────────────────────────────────────
+// ── Personnel Search in Add Modal ──────────────────────────────────────────
 let addSearchTimeout;
 let selectedArmyNumber = null;
 
@@ -453,7 +594,7 @@ document.getElementById('addSearchInput').addEventListener('input', function () 
             container.innerHTML = '';
 
             if (!data.length) {
-                container.innerHTML = `<small class="text-muted"><i class="fa-solid fa-circle-xmark me-1"></i>No personnel found</small>`;
+                container.innerHTML = `<small class="text-muted p-2 d-block"><i class="fa-solid fa-circle-xmark me-1"></i>No matching personnel found</small>`;
                 return;
             }
             data.forEach(p => {
@@ -500,7 +641,7 @@ document.getElementById('clearSelection').addEventListener('click', function () 
     updateCharCounter('', document.getElementById('addCharCount'), document.getElementById('addCharFill'));
 });
 
-// ── Submit mark ────────────────────────────────────────────────────────────
+// ── Submit Mark as Sensitive ───────────────────────────────────────────────
 document.getElementById('submitMarkBtn').addEventListener('click', function () {
     const armyNumber = document.getElementById('add_army_number').value;
     const reason     = document.getElementById('addReason').value.trim();
@@ -521,7 +662,7 @@ document.getElementById('submitMarkBtn').addEventListener('click', function () {
         .then(data => {
             if (data.success) {
                 showToast(data.message || 'Marked as sensitive successfully!');
-                // Reset
+                // Reset Form
                 document.getElementById('addReason').value = '';
                 document.getElementById('addSearchInput').value = '';
                 document.getElementById('addSearchResults').innerHTML = '';
@@ -529,9 +670,12 @@ document.getElementById('submitMarkBtn').addEventListener('click', function () {
                 selectedArmyNumber = null;
                 document.getElementById('add_army_number').value = '';
                 updateCharCounter('', document.getElementById('addCharCount'), document.getElementById('addCharFill'));
-                // Collapse panel
-                addPanelBody.classList.remove('open');
-                toggleChevron.style.transform = 'rotate(0deg)';
+
+                // Hide Add Modal
+                const addModalEl = document.getElementById('addSensitiveModal');
+                const bsModal = bootstrap.Modal.getInstance(addModalEl);
+                if (bsModal) bsModal.hide();
+
                 refreshSensitiveList();
             } else {
                 showToast(data.error || 'Failed to mark', 'danger');
@@ -544,7 +688,7 @@ document.getElementById('submitMarkBtn').addEventListener('click', function () {
         });
 });
 
-// ── Render reason thread ───────────────────────────────────────────────────
+// ── Render Reason Log Thread ───────────────────────────────────────────────
 function renderReasonThread(logs) {
     const container = document.getElementById('viewReasonThread');
     document.getElementById('reasonCount').textContent = logs.length;
@@ -561,7 +705,7 @@ function renderReasonThread(logs) {
                 <div class="rb-avatar" style="background:${color};">${initials}</div>
                 <span class="rb-name">${escapeHtml(log.added_by)}</span>
                 <span class="rb-role">${escapeHtml(log.added_by_role)}</span>
-                ${i === 0 ? '<span class="rb-first"><i class="fa-solid fa-star fa-xs me-1"></i>First Entry</span>' : ''}
+                ${i === 0 ? '<span class="rb-first"><i class="fa-solid fa-star fa-xs me-1"></i>Initial Entry</span>' : ''}
             </div>
             <div class="rb-text">${escapeHtml(log.reason)}</div>
             <div class="rb-time"><i class="fa-regular fa-clock"></i>${escapeHtml(log.added_on)}</div>
@@ -569,7 +713,7 @@ function renderReasonThread(logs) {
     }).join('');
 }
 
-// ── Load list ──────────────────────────────────────────────────────────────
+// ── Load & Render List ─────────────────────────────────────────────────────
 function refreshSensitiveList() {
     document.getElementById('loadingState').style.display = 'block';
     document.getElementById('emptyState').style.display   = 'none';
@@ -581,7 +725,7 @@ function refreshSensitiveList() {
             document.getElementById('loadingState').style.display = 'none';
             const tbody = document.getElementById('sensitiveListBody');
 
-            if (!res.success || res.data.length === 0) {
+            if (!res.success || !res.data || res.data.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
                 return;
             }
@@ -591,30 +735,34 @@ function refreshSensitiveList() {
                 row.className = 'sensitive-row';
                 const safeLogsJson = JSON.stringify(s.reason_logs || []).replace(/'/g, '&#39;');
                 const logsCount    = (s.reason_logs || []).length;
+                const initials     = getInitials(s.name || '?');
+                const avatarBg     = nameToColor(s.name || '');
 
                 row.innerHTML = `
-                    <td><code class="text-primary fw-semibold" style="font-size:0.82rem;">${s.army_number}</code></td>
-                    <td><span class="badge rounded-pill" style="background:#eef1fd;color:#4361ee;font-size:0.75rem;font-weight:600;">${s.rank}</span></td>
-                    <td style="text-align: left; text-transform: uppercase;"><strong style="font-size:0.88rem;">${(s.name || '').toUpperCase()}</strong></td>
-                    <td><span class="text-muted" style="font-size:0.85rem;">${s.company || 'N/A'}</span></td>
+                    <td><code class="text-primary fw-semibold px-2 py-1 bg-light border rounded" style="font-size:0.83rem;">${escapeHtml(s.army_number)}</code></td>
+                    <td><span class="badge rounded-pill" style="background:var(--nav-link-active-bg, rgba(59,130,246,0.12));color:var(--primary-color, #3b82f6);font-size:0.75rem;font-weight:700;">${escapeHtml(s.rank)}</span></td>
+                    <td style="text-align: left;">
+                        <strong style="font-size:0.88rem; font-weight:700;">${(escapeHtml(s.name) || '').toUpperCase()}</strong>
+                    </td>
+                    <td><span class="badge bg-light text-dark border" style="font-size:0.78rem;">${escapeHtml(s.company || 'N/A')}</span></td>
                     <td>
                         ${logsCount > 0
-                            ? `<span class="badge rounded-pill bg-primary" style="font-size:0.72rem;">${logsCount} remark${logsCount > 1 ? 's' : ''}</span>`
+                            ? `<span class="badge rounded-pill bg-primary" style="font-size:0.75rem;"><i class="fa-solid fa-comments me-1"></i>${logsCount} remark${logsCount > 1 ? 's' : ''}</span>`
                             : `<span class="badge rounded-pill bg-light text-muted border" style="font-size:0.72rem;">None</span>`}
                     </td>
                     <td class="text-center">
-                        <button class="btn action-btn btn-view" title="View Details"
-                            data-army="${s.army_number}" data-rank="${s.rank}"
-                            data-name="${s.name}" data-company="${s.company || 'N/A'}"
-                            data-marked="${s.marked_on}" data-logs='${safeLogsJson}'>
+                        <button class="btn action-btn btn-view" title="View Thread & Details"
+                            data-army="${escapeHtml(s.army_number)}" data-rank="${escapeHtml(s.rank)}"
+                            data-name="${escapeHtml(s.name)}" data-company="${escapeHtml(s.company || 'N/A')}"
+                            data-marked="${escapeHtml(s.marked_on)}" data-logs='${safeLogsJson}'>
                             <i class="fa-solid fa-eye"></i>
                         </button>
                         <button class="btn action-btn btn-remark" title="Add Remark"
-                            data-army="${s.army_number}">
+                            data-army="${escapeHtml(s.army_number)}">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button class="btn action-btn btn-remove" title="Remove"
-                            data-army="${s.army_number}" data-name="${s.name}">
+                        <button class="btn action-btn btn-remove" title="Remove Record"
+                            data-army="${escapeHtml(s.army_number)}" data-name="${escapeHtml(s.name)}">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </td>`;
@@ -626,11 +774,11 @@ function refreshSensitiveList() {
         })
         .catch(() => {
             document.getElementById('loadingState').style.display = 'none';
-            showToast('Failed to load list', 'danger');
+            showToast('Failed to load sensitive personnel list', 'danger');
         });
 }
 
-// ── Table button listeners ─────────────────────────────────────────────────
+// ── Attach Action Button Listeners ─────────────────────────────────────────
 function attachListeners() {
     document.querySelectorAll('.btn-view').forEach(btn => {
         btn.addEventListener('click', function () {
@@ -650,7 +798,7 @@ function attachListeners() {
     });
 }
 
-// ── View modal ─────────────────────────────────────────────────────────────
+// ── Open View Modal ────────────────────────────────────────────────────────
 function openViewModal(armyNumber, name, rank, company, markedOn, logs) {
     const avatarEl = document.getElementById('viewAvatarBig');
     avatarEl.textContent  = getInitials(name);
@@ -664,16 +812,17 @@ function openViewModal(armyNumber, name, rank, company, markedOn, logs) {
     new bootstrap.Modal(document.getElementById('viewModal')).show();
 }
 
-// ── Remark modal ───────────────────────────────────────────────────────────
+// ── Open Add Remark Modal ──────────────────────────────────────────────────
 function openRemarkModal(armyNumber) {
     document.getElementById('editArmyNumber').value       = armyNumber;
     document.getElementById('editReason').value           = '';
     document.getElementById('editCharCount').textContent  = '0 / 30 minimum';
-    document.getElementById('editCharCount').style.color  = '#dc3545';
+    document.getElementById('editCharCount').style.color  = '#ef4444';
     document.getElementById('editCharFill').style.width   = '0%';
     new bootstrap.Modal(document.getElementById('editModal')).show();
 }
 
+// ── Submit New Remark ──────────────────────────────────────────────────────
 document.getElementById('saveEditBtn').addEventListener('click', function () {
     const armyNumber = document.getElementById('editArmyNumber').value;
     const reason     = document.getElementById('editReason').value.trim();
@@ -692,21 +841,21 @@ document.getElementById('saveEditBtn').addEventListener('click', function () {
                 bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
                 refreshSensitiveList();
             } else {
-                showToast(data.error || 'Failed', 'danger');
+                showToast(data.error || 'Failed to add remark', 'danger');
             }
         });
 });
 
-// ── Remove ─────────────────────────────────────────────────────────────────
+// ── Remove Personnel from Sensitive List ───────────────────────────────────
 function removePersonnel(armyNumber, name) {
-    if (!confirm(`Remove ${name} from the sensitive list?\nAll remarks will also be permanently deleted.`)) return;
+    if (!confirm(`Remove ${name} from the sensitive list?\nAll logged remarks will be permanently deleted.`)) return;
     const fd = new FormData();
     fd.append('army_number', armyNumber);
     fetch('/sensitive/remove_sensitive', { method: 'POST', body: fd })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                showToast(data.message || 'Removed successfully');
+                showToast(data.message || 'Personnel removed successfully');
                 refreshSensitiveList();
             } else {
                 showToast(data.error || 'Remove failed', 'danger');
@@ -714,7 +863,7 @@ function removePersonnel(armyNumber, name) {
         });
 }
 
-// ── Search + Filter ────────────────────────────────────────────────────────
+// ── Search & Filter Roster ─────────────────────────────────────────────────
 function applySearch() {
     const q = document.getElementById('mainSearchInput').value.toLowerCase().trim();
     document.querySelectorAll('.sensitive-row').forEach(row => {
@@ -739,7 +888,7 @@ document.getElementById('filterCount').addEventListener('change', () => {
     applySearch();
 });
 
-// ── Init ───────────────────────────────────────────────────────────────────
+// ── Init on Load ───────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => { refreshSensitiveList(); });
 </script>
 </body>
