@@ -713,8 +713,7 @@ def unfit_graph():
 
 COMPANIES = [
     "All",
-    "1 Company",
-    "2 Company",
+    "COMN Company",
     "3 Company",
     "HQ company"
 ]

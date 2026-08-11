@@ -90,8 +90,7 @@
                 class="form-select"
                 style="min-width:260px;">
           <option value="">All Companies</option>
-          <option value="1 Company">1 Company</option>
-          <option value="2 Company">2 Company</option>
+          <option value="COMN Company">COMN Company</option>
           <option value="3 Company">3 Company</option>
           <option value="HQ Company">HQ Company</option>
         </select>
@@ -210,8 +209,7 @@ function getCompanyClass(company) {
 
 let c = (company || '').trim().toLowerCase();
 
-if (c === "1 company")  return "company-1";
-if (c === "2 company")  return "company-2";
+if (c === "comn" || c === "1 company" || c === "2 company")  return "company-1";
 if (c === "3 company")  return "company-3";
 if (c === "hq company") return "company-hq";
 

@@ -235,8 +235,7 @@ STRICT RULES:
 4. Return ONLY the SQL query, nothing else.
 5. ALWAYS replace placeholders with actual values from the question.
 6. Company names are case sensitive:
-   - '1 Company'
-   - '2 Company'
+   - 'COMN Company'
    - '3 Company'
    - 'HQ Company'
 7. CRITICAL: `rank` is a reserved MySQL word — ALWAYS wrap in backticks: `rank`

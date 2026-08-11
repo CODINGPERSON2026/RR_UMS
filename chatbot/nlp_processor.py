@@ -25,13 +25,15 @@ TYPE_GENERAL = "general"                         # Fallback
 
 # Synonyms and normalizations
 COMPANY_PATTERNS = [
-    (r"\b1\s*company\b", "1 Company"),
-    (r"\b2\s*company\b", "2 Company"),
+    (r"\bcomn\s*company\b", "COMN Company"),
+    (r"\bcomn\b", "COMN Company"),
+    (r"\b1\s*company\b", "COMN Company"),
+    (r"\b2\s*company\b", "COMN Company"),
     (r"\b3\s*company\b", "3 Company"),
     (r"\bhq\s*company\b", "HQ company"),
     (r"\bheadquarters\b", "HQ company"),
-    (r"\bcompany\s*1\b", "1 Company"),
-    (r"\bcompany\s*2\b", "2 Company"),
+    (r"\bcompany\s*1\b", "COMN Company"),
+    (r"\bcompany\s*2\b", "COMN Company"),
     (r"\bcompany\s*3\b", "3 Company"),
 ]
 RANK_PATTERNS = [

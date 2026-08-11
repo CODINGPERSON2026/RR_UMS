@@ -60,8 +60,7 @@ async function loadCompanies() {
       const normalizeCompany = (comp) => {
           if (!comp) return null;
           const lower = comp.toLowerCase().trim();
-          if (lower.includes('1') && (lower.includes('company') || lower.includes('coy'))) return '1 Company';
-          if (lower.includes('2') && (lower.includes('company') || lower.includes('coy'))) return '2 Company';
+          if (lower === 'comn' || lower.includes('comn') || (lower.includes('1') && (lower.includes('company') || lower.includes('coy'))) || (lower.includes('2') && (lower.includes('company') || lower.includes('coy')))) return 'COMN Company';
           if (lower.includes('3') && (lower.includes('company') || lower.includes('coy'))) return '3 Company';
           if (lower.includes('hq') && (lower.includes('company') || lower.includes('coy'))) return 'HQ company';
           return comp;
@@ -71,8 +70,7 @@ async function loadCompanies() {
       const mapUsernameToCompany = (uname) => {
           if (!uname) return null;
           const lower = uname.toLowerCase().trim();
-          if (lower === 'oc1' || lower.includes('oc1')) return '1 Company';
-          if (lower === 'oc2' || lower.includes('oc2')) return '2 Company';
+          if (lower === 'oc1' || lower.includes('oc1') || lower === 'oc2' || lower.includes('oc2') || lower.includes('occomn')) return 'COMN Company';
           if (lower === 'oc3' || lower.includes('oc3')) return '3 Company';
           if (lower === 'ochq' || lower.includes('ochq') || lower === 'oc hq') return 'HQ company';
           return null;
@@ -85,15 +83,15 @@ async function loadCompanies() {
           normalizedUserCompany = mapUsernameToCompany(username);
       }
       
-      // If user is OC (oc1, oc2, oc3, ochq), show only their company
+      // If user is OC, show only their company
       // Otherwise show all companies
       let companiesToShow = [];
-      if (normalizedUserCompany && (normalizedUserCompany === '1 Company' || normalizedUserCompany === '2 Company' || normalizedUserCompany === '3 Company' || normalizedUserCompany === 'HQ company')) {
+      if (normalizedUserCompany && (normalizedUserCompany === 'COMN Company' || normalizedUserCompany === '3 Company' || normalizedUserCompany === 'HQ company')) {
           // Show only the user's company
           companiesToShow = [normalizedUserCompany];
       } else {
           // Show all companies (for Admin, CO, etc.)
-          companiesToShow = ['1 Company', '2 Company', '3 Company', 'HQ company'];
+          companiesToShow = ['COMN Company', '3 Company', 'HQ company'];
       }
       
       companiesToShow.forEach(companyName => {

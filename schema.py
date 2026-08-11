@@ -32,8 +32,7 @@ Other Roles           : admin, clerk, TRG, QM, HEAD CLK, PA, ACCOUNT OFFICER, PR
 
 COMPANY VALUES:
     pass
-- '1 Company'
-- '2 Company'
+- 'COMN Company'
 - '3 Company'
 - 'HQ Company'
 
@@ -49,8 +48,8 @@ EXAMPLE QUERIES:
 Q: who is co
 SQL: SELECT username, role, company FROM users WHERE role = 'CO'
 
-Q: who is oc of 1 coy
-SQL: SELECT username, role, company FROM users WHERE role = 'OC' AND company = '1 Company'
+Q: who is oc of comn coy
+SQL: SELECT username, role, company FROM users WHERE role = 'OC' AND company = 'COMN Company'
 
 Q: how many nco are there
 SQL: SELECT COUNT(*) FROM users WHERE role LIKE 'NCO%'
@@ -61,14 +60,14 @@ SQL: SELECT username, role, company FROM users WHERE role LIKE 'NCO%'
 Q: who is jco
 SQL: SELECT username, role, company FROM users WHERE role LIKE 'JCO%'
 
-Q: how many jco in 2 coy
-SQL: SELECT COUNT(*) FROM users WHERE role LIKE 'JCO%' AND company = '2 Company'
+Q: how many jco in comn coy
+SQL: SELECT COUNT(*) FROM users WHERE role LIKE 'JCO%' AND company = 'COMN Company'
 
 Q: how many users are there
 SQL: SELECT COUNT(*) FROM users
 
-Q: list all jco in 2 coy
-SQL: SELECT username, role, company FROM users WHERE role LIKE 'JCO%' AND company = '2 Company'
+Q: list all jco in comn coy
+SQL: SELECT username, role, company FROM users WHERE role LIKE 'JCO%' AND company = 'COMN Company'
 
 Q: how many officers are there
 SQL: SELECT COUNT(*) FROM users WHERE role IN ('CO', 'OC', '2IC', 'ADJUTANT')
@@ -76,8 +75,8 @@ SQL: SELECT COUNT(*) FROM users WHERE role IN ('CO', 'OC', '2IC', 'ADJUTANT')
 Q: who is nco mccs
 SQL: SELECT username, role, company FROM users WHERE role = 'NCO MCCS'
 
-Q: who is nco it of 1 coy
-SQL: SELECT username, role, company FROM users WHERE role = 'NCO IT' AND company = '1 Company'
+Q: who is nco it of comn coy
+SQL: SELECT username, role, company FROM users WHERE role = 'NCO IT' AND company = 'COMN Company'
 """
 
 # ==========================================================
@@ -130,8 +129,7 @@ RANK SHORT FORMS (user may type these):
 
 COMPANY VALUES:
     pass
-- '1 Company'
-- '2 Company'
+- 'COMN Company'
 - '3 Company'
 - 'HQ Company'
 
@@ -144,8 +142,8 @@ SQL: SELECT COUNT(*) FROM personnel
 Q: what is unit strength
 SQL: SELECT COUNT(*) FROM personnel
 
-Q: strength of 1 coy
-SQL: SELECT COUNT(*) FROM personnel WHERE company = '1 Company'
+Q: strength of comn coy
+SQL: SELECT COUNT(*) FROM personnel WHERE company = 'COMN Company'
 
 Q: list all agniveer
 SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Agniveer'
@@ -153,8 +151,8 @@ SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Ag
 Q: how many agniveer
 SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'Agniveer'
 
-Q: how many nk in 2 coy
-SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'NK' AND company = '2 Company'
+Q: how many nk in comn coy
+SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'NK' AND company = 'COMN Company'
 
 Q: who is on leave
 SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE onleave_status = 1
@@ -168,8 +166,8 @@ SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Ag
 Q: agniveer on detachment
 SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Agniveer' AND detachment_status = 1
 
-Q: agniveer on det in 1 coy
-SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Agniveer' AND detachment_status = 1 AND company = '1 Company'
+Q: agniveer on det in comn coy
+SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Agniveer' AND detachment_status = 1 AND company = 'COMN Company'
 
 Q: how many hav in hq coy
 SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'HAV' AND company = 'HQ Company'
@@ -177,8 +175,8 @@ SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'HAV' AND company = 'HQ Compa
 Q: list all sub maj
 SQL: SELECT army_number, name, `rank`, company FROM personnel WHERE `rank` = 'Subedar Major'
 
-Q: how many nb sub in 1 coy
-SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'Naib Subedar' AND company = '1 Company'
+Q: how many nb sub in comn coy
+SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'Naib Subedar' AND company = 'COMN Company'
 """
 
 # ==========================================================
