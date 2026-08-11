@@ -18,24 +18,25 @@
   .ml-page-header h4 { margin: 0; font-size: 1.5rem; font-weight: 700; }
   .ml-page-header p  { margin: 4px 0 0; font-size: 0.9rem; opacity: 0.85; }
 
-  /* ─── Card container ────────────────────────────────────────── */
+  /* ─── Card container & Collapsible Body ─────────────────────── */
   .ml-card {
     background: var(--card-background);
     border-radius: 16px;
     box-shadow: 0 4px 20px var(--shadow);
     border: 1px solid var(--border-color);
     overflow: hidden;
+    transition: all 0.3s ease;
   }
 
   .ml-card-header {
-    padding: 18px 24px;
+    padding: 16px 24px;
     background: var(--card-background);
     border-bottom: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
   }
 
   .ml-card-header h5 {
@@ -44,51 +45,115 @@
     display: flex; align-items: center; gap: 8px;
   }
 
+  .ml-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .ml-search-wrapper {
+    position: relative;
+  }
+
+  .ml-search-input {
+    border-radius: 20px;
+    padding: 5px 14px 5px 32px;
+    font-size: 0.82rem;
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    color: var(--text-primary);
+    width: 220px;
+    transition: all 0.25s ease;
+  }
+  .ml-search-input:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.15);
+    outline: none;
+  }
+
+  .ml-card-body-wrapper {
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.3s ease;
+    overflow: hidden;
+    max-height: 2000px;
+    opacity: 1;
+  }
+
+  .ml-card-body-wrapper.collapsed {
+    max-height: 0 !important;
+    opacity: 0;
+  }
+
+  .btn-minimize {
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    background: var(--card-background);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+  }
+  .btn-minimize:hover {
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+  }
+
   /* ─── Table ─────────────────────────────────────────────────── */
-  .table-responsive { overflow-x: auto; }
+  .table-responsive {
+    overflow-x: auto;
+    max-height: 520px;
+    overflow-y: auto;
+  }
 
   #leaveTable thead th {
-    background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%);
-    color: white; font-weight: 600; font-size: 0.82rem;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%);
+    color: white; font-weight: 600; font-size: 0.8rem;
     text-transform: uppercase; letter-spacing: 0.5px;
-    border: none; white-space: nowrap; padding: 14px 12px;
+    border: none; white-space: nowrap; padding: 10px 12px;
   }
 
   #leaveTable tbody td {
-    vertical-align: middle; font-size: 0.88rem;
-    color: var(--text-primary); border-color: var(--border-color); padding: 12px;
+    vertical-align: middle; font-size: 0.83rem;
+    color: var(--text-primary); border-color: var(--border-color);
+    padding: 8px 12px; white-space: nowrap;
   }
 
   #leaveTable tbody tr { transition: background 0.2s ease; }
-  #leaveTable tbody tr:hover { background: var(--border-color); }
+  #leaveTable tbody tr:hover { background: var(--nav-link-hover-bg, var(--border-color)); }
 
   /* ─── Badges ────────────────────────────────────────────────── */
   .leave-type-badge {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white; padding: 4px 10px; border-radius: 20px;
-    font-size: 0.75rem; font-weight: 600;
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%);
+    color: white; padding: 3px 9px; border-radius: 20px;
+    font-size: 0.72rem; font-weight: 600; display: inline-block;
   }
 
   .days-badge {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white; padding: 4px 10px; border-radius: 20px;
-    font-size: 0.78rem; font-weight: 700;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white; padding: 3px 9px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 700; display: inline-block;
   }
 
   /* ─── Action buttons ────────────────────────────────────────── */
   .btn-remove {
-    background: linear-gradient(135deg, #f5576c 0%, #c0392b 100%);
-    color: white; border: none; padding: 5px 12px; border-radius: 8px;
-    font-size: 0.78rem; font-weight: 600; transition: all 0.25s ease; white-space: nowrap;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white; border: none; padding: 4px 10px; border-radius: 6px;
+    font-size: 0.75rem; font-weight: 600; transition: all 0.25s ease; white-space: nowrap;
   }
-  .btn-remove:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245,87,108,0.45); color: white; }
+  .btn-remove:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.45); color: white; }
 
   .btn-extend {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    color: #4a2f00; border: none; padding: 5px 12px; border-radius: 8px;
-    font-size: 0.78rem; font-weight: 600; transition: all 0.25s ease; white-space: nowrap;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white; border: none; padding: 4px 10px; border-radius: 6px;
+    font-size: 0.75rem; font-weight: 600; transition: all 0.25s ease; white-space: nowrap;
   }
-  .btn-extend:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(253,160,133,0.45); color: #4a2f00; }
+  .btn-extend:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45); color: white; }
 
   /* ─── Alert Toast ────────────────────────────────────────────── */
   #alertBox {
@@ -114,11 +179,11 @@
     font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
     box-shadow: 0 2px 8px var(--shadow);
   }
-  .ml-stat-pill i { color: #764ba2; }
+  .ml-stat-pill i { color: var(--primary-color, #3b82f6); }
 
   /* ─── Leave History Modal ────────────────────────────────────── */
   #leaveHistoryModal .modal-header {
-    background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%);
     color: white;
   }
   #leaveHistoryModal .modal-title { color: white; font-weight: 700; }
@@ -136,26 +201,26 @@
     border-radius: 14px;
     padding: 16px 12px;
     text-align: center;
-    border: 1px solid rgba(0,0,0,0.07);
+    border: 1px solid var(--border-color);
     transition: transform 0.2s;
     position: relative;
     overflow: hidden;
   }
   .hist-stat-card:hover { transform: translateY(-2px); }
 
-  .hist-stat-card.al  { background: linear-gradient(135deg, #e0f0ff, #b3d4ff); }
-  .hist-stat-card.cl  { background: linear-gradient(135deg, #fff0e0, #ffd4a0); }
-  .hist-stat-card.aal { background: linear-gradient(135deg, #e0ffe8, #a8f0c0); }
-  .hist-stat-card.pl  { background: linear-gradient(135deg, #fce0ff, #e8a0ff); }
+  .hist-stat-card.al  { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.15)); }
+  .hist-stat-card.cl  { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.15)); }
+  .hist-stat-card.aal { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.15)); }
+  .hist-stat-card.pl  { background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(147, 51, 234, 0.15)); }
 
   .hist-stat-card .stat-val {
     font-size: 2rem; font-weight: 800; line-height: 1;
     margin-bottom: 4px;
   }
-  .hist-stat-card.al  .stat-val { color: #1a6fc4; }
-  .hist-stat-card.cl  .stat-val { color: #c47a1a; }
-  .hist-stat-card.aal .stat-val { color: #1a9e50; }
-  .hist-stat-card.pl  .stat-val { color: #8e1ac4; }
+  .hist-stat-card.al  .stat-val { color: var(--primary-color, #3b82f6); }
+  .hist-stat-card.cl  .stat-val { color: #d97706; }
+  .hist-stat-card.aal .stat-val { color: #059669; }
+  .hist-stat-card.pl  .stat-val { color: #9333ea; }
 
   .hist-stat-card .stat-label {
     font-size: 0.72rem; font-weight: 700;
@@ -169,7 +234,7 @@
 
   /* History table */
   .hist-table th {
-    background: linear-gradient(135deg, #3c425c, #764ba2);
+    background: linear-gradient(135deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%);
     color: white; font-size: 0.75rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.4px; border: none;
     padding: 10px 8px;
@@ -234,14 +299,7 @@
 
 <div class="p-3">
 
-  <!-- Page Header -->
-  <div class="ml-page-header">
-    <i class="fas fa-calendar-times"></i>
-    <div>
-      <h4>Manage Leave</h4>
-      <p>View, remove, or extend leave for personnel currently on leave in your company.</p>
-    </div>
-  </div>
+
 
   <!-- Stats Bar -->
   <div class="ml-stats">
@@ -258,39 +316,60 @@
   <!-- Main Card -->
   <div class="ml-card">
     <div class="ml-card-header">
-      <h5><i class="fas fa-list-alt"></i> On-Leave Personnel</h5>
-      <button class="btn btn-sm btn-outline-primary" onclick="loadLeaveData()">
-        <i class="fas fa-sync-alt me-1"></i> Refresh
-      </button>
+      <h5>
+        <i class="fas fa-list-alt text-primary"></i> On-Leave Personnel
+        <span class="badge rounded-pill bg-primary-subtle text-primary border ms-2" id="headerCountBadge" style="font-size: 0.75rem;">—</span>
+      </h5>
+
+      <div class="ml-card-actions">
+        <!-- Search Filter -->
+        <div class="ml-search-wrapper d-none d-sm-block">
+          <i class="fas fa-search position-absolute text-muted" style="left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.8rem;"></i>
+          <input type="text" class="ml-search-input" id="tableSearchInput" placeholder="Search Army No, Name..." onkeyup="filterLeaveTable()">
+        </div>
+
+        <!-- Refresh Button -->
+        <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="loadLeaveData()" title="Refresh Data">
+          <i class="fas fa-sync-alt me-1"></i> Refresh
+        </button>
+
+        <!-- Minimize / Expand Toggle Button -->
+        <button class="btn-minimize" id="toggleCardBtn" onclick="toggleCardBody()" title="Minimize / Expand Table">
+          <i class="fas fa-minus me-1" id="toggleIcon"></i> <span id="toggleText">Minimize</span>
+        </button>
+      </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table table-hover mb-0" id="leaveTable">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Army Number</th>
-            <th>Name</th>
-            <th>Rank</th>
-            <th>Company</th>
-            <th>Leave Type</th>
-            <th>From Date</th>
-            <th>To Date</th>
-            <th>Leave Days</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="leaveTableBody">
-          <tr id="loadingRow">
-            <td colspan="10">
-              <div class="ml-spinner">
-                <div class="spinner-border text-primary mb-2" role="status"></div>
-                <p>Loading leave records…</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Collapsible Card Body Wrapper -->
+    <div class="ml-card-body-wrapper" id="cardBodyWrapper">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="leaveTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Army Number</th>
+              <th>Name</th>
+              <th>Rank</th>
+              <th>Company</th>
+              <th>Leave Type</th>
+              <th>From Date</th>
+              <th>To Date</th>
+              <th>Leave Days</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="leaveTableBody">
+            <tr id="loadingRow">
+              <td colspan="10">
+                <div class="ml-spinner">
+                  <div class="spinner-border text-primary mb-2" role="status"></div>
+                  <p>Loading leave records…</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -485,6 +564,46 @@
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 
+  // ─── MINIMIZE / EXPAND TOGGLE ───────────────────────────────
+  function toggleCardBody() {
+    const wrapper = document.getElementById('cardBodyWrapper');
+    const icon = document.getElementById('toggleIcon');
+    const text = document.getElementById('toggleText');
+
+    if (!wrapper) return;
+
+    if (wrapper.classList.contains('collapsed')) {
+      wrapper.classList.remove('collapsed');
+      if (icon) icon.className = 'fas fa-minus me-1';
+      if (text) text.textContent = 'Minimize';
+    } else {
+      wrapper.classList.add('collapsed');
+      if (icon) icon.className = 'fas fa-chevron-down me-1';
+      if (text) text.textContent = 'Expand';
+    }
+  }
+
+  // ─── QUICK SEARCH FILTER ────────────────────────────────────
+  function filterLeaveTable() {
+    const query = (document.getElementById('tableSearchInput')?.value || '').toLowerCase().trim();
+    const rows = document.querySelectorAll('#leaveTableBody tr');
+    let visibleCount = 0;
+
+    rows.forEach(tr => {
+      if (tr.id === 'loadingRow' || tr.querySelector('.ml-empty')) return;
+      const text = tr.textContent.toLowerCase();
+      if (!query || text.includes(query)) {
+        tr.style.display = '';
+        visibleCount++;
+      } else {
+        tr.style.display = 'none';
+      }
+    });
+
+    const headerBadge = document.getElementById('headerCountBadge');
+    if (headerBadge) headerBadge.textContent = visibleCount;
+  }
+
   // ─── LOAD MAIN LEAVE DATA ────────────────────────────────────
   async function loadLeaveData() {
     const tbody = document.getElementById('leaveTableBody');
@@ -507,6 +626,8 @@
 
       const data = json.data;
       document.getElementById('totalOnLeave').textContent = data.length;
+      const headerBadge = document.getElementById('headerCountBadge');
+      if (headerBadge) headerBadge.textContent = data.length;
 
       if (data.length === 0) {
         tbody.innerHTML = `
@@ -531,10 +652,10 @@
           <td>${formatDate(row.from_date)}</td>
           <td id="toDate-${row.army_number}">${formatDate(row.to_date)}</td>
           <td><span class="days-badge" id="days-${row.army_number}">${row.leave_days} days</span></td>
-          <td>
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn-remove" onclick="removeLeave('${row.leave_id}','${row.army_number}', '${row.name}')">
-                <i class="fas fa-user-minus me-1"></i>Remove
+          <td style="white-space: nowrap;">
+            <div class="d-flex gap-1 align-items-center flex-nowrap" style="white-space: nowrap;">
+              <button class="btn-remove px-2.5" onclick="removeLeave('${row.leave_id}','${row.army_number}', '${row.name}')" title="Remove Leave">
+                <i class="fas fa-trash-alt"></i>
               </button>
               <button class="btn-extend" onclick="openHistoryModal('${row.army_number}', '${row.name}', '${row.to_date}')">
                 <i class="fas fa-calendar-plus me-1"></i>Extend Leave
@@ -543,6 +664,8 @@
           </td>`;
         tbody.appendChild(tr);
       });
+
+      filterLeaveTable();
 
     } catch (err) {
       tbody.innerHTML = `<tr><td colspan="10"><div class="ml-empty"><i class="fas fa-exclamation-triangle text-warning"></i><p>Error: ${err.message}</p></div></td></tr>`;

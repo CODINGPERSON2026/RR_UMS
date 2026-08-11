@@ -1231,6 +1231,74 @@
     {% block content %}{% endblock %}
   </div>
 
+  <!-- ==================== SYSTEM MERGE NOTIFICATION TOAST ==================== -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1090;">
+    <div id="companyMergeToast" class="toast border-0 position-relative overflow-hidden" role="alert" aria-live="assertive" aria-atomic="true" style="background: var(--card-bg-solid, #ffffff) !important; border: 1px solid var(--border-color, #e2e8f0) !important; border-radius: 16px; min-width: 340px; max-width: 420px; display: none; box-shadow: 0 15px 35px var(--shadow, rgba(0, 0, 0, 0.25)) !important;">
+      <!-- Glowing Top Accent Line / 15s Progress Bar Track -->
+      <div style="height: 4px; background: rgba(0, 0, 0, 0.06); width: 100%; overflow: hidden; position: relative;">
+        <div id="toastProgressBar" style="height: 100%; background: linear-gradient(90deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%); width: 100%; transition: width 15s linear;"></div>
+      </div>
+      
+      <div class="p-3">
+        <!-- Toast Header -->
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.15)); border: 1px solid var(--border-color, #e2e8f0);">
+              <span style="font-size: 1rem;">📢</span>
+            </div>
+            <div>
+              <h6 class="mb-0 fw-bold" style="font-size: 0.88rem; letter-spacing: 0.3px; color: var(--text-primary);">Unit Information</h6>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Toast Body -->
+        <p class="mb-1" style="font-size: 0.84rem; line-height: 1.5; color: var(--text-primary) !important;">
+          <strong>1 Company</strong> and <strong>2 Company</strong> have been successfully <strong style="color: var(--primary-color, #3b82f6);">amalgamated and reorganised as COMN Company</strong> across all system records.
+        </p>
+        <div class="fw-bold text-end" style="font-size: 0.82rem; color: var(--primary-color, #3b82f6); letter-spacing: 0.3px;">
+          Jai Hind
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function checkCompanyMergeToast() {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!localStorage.getItem('comnMergeNoticeDismissed_v2')) {
+          const toastEl = document.getElementById('companyMergeToast');
+          const progressBar = document.getElementById('toastProgressBar');
+          if (toastEl) {
+            toastEl.style.display = 'block';
+            toastEl.classList.add('show');
+
+            // Trigger smooth 15s countdown progress bar animation
+            if (progressBar) {
+              setTimeout(function() {
+                progressBar.style.width = '0%';
+              }, 50);
+            }
+
+            // Auto dismiss after 15 seconds
+            setTimeout(function() {
+              dismissMergeToast();
+            }, 15000);
+          }
+        }
+      });
+    })();
+
+    function dismissMergeToast() {
+      const toastEl = document.getElementById('companyMergeToast');
+      if (toastEl) {
+        toastEl.classList.remove('show');
+        toastEl.style.display = 'none';
+      }
+      localStorage.setItem('comnMergeNoticeDismissed_v2', 'true');
+    }
+  </script>
+
   <!-- Logout Modal -->
   <div class="modal fade" id="logoutModal" tabindex="-1">
     <div class="modal-dialog">
