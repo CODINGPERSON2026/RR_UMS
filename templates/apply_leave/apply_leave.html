@@ -2018,8 +2018,15 @@
                 <div class="lhp-entry-item" data-year="${entryYear}" style="display: ${isVisible ? 'block' : 'none'}; padding:10px 12px; margin-bottom:8px; background:#f8fafc; border-radius:8px; border: 1px solid #e2e8f0; border-left:4px solid ${isManual ? '#64748b' : '#2563eb'};">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                       <div style="font-weight:700; color:#334155; font-size: 0.9rem;">${dateStr}</div>
-                      <div style="background: ${isManual ? '#f1f5f9' : '#e0f2fe'}; color: ${isManual ? '#475569' : '#0369a1'}; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">
-                          ${leave.days_taken} Days
+                      <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="background: ${isManual ? '#f1f5f9' : '#e0f2fe'}; color: ${isManual ? '#475569' : '#0369a1'}; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.75rem;">
+                            ${leave.days_taken} Days
+                        </div>
+                        ${(!isManual && leave.id) ? `
+                          <button onclick="downloadCertificate('${leave.id}')" class="btn btn-sm btn-outline-success" style="font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; line-height: 1.2;" title="Download Certificate">
+                            📄 Certificate ↓
+                          </button>
+                        ` : ''}
                       </div>
                     </div>
                     <div style="margin-top:5px; font-size:0.8rem; color:#64748b; font-style: ${isManual ? 'normal' : 'italic'};">

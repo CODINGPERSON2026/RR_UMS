@@ -46,9 +46,6 @@
     </div>
   </div>
 
-  <!-- FOOTER DOTS -->
-  <div class="hb-footer-dots" id="dots"></div>
-
 </div>
 
 <!-- =========================================================
@@ -74,7 +71,6 @@
 
   .hb-card:hover {
     box-shadow: 0 16px 36px -6px var(--shadow, rgba(0, 0, 0, 0.12));
-    border-color: var(--primary-color, #f59e0b);
   }
 
   /* HEADER */
@@ -264,54 +260,81 @@
   }
 
   /* PERSONNEL HERO CARD */
+  /* PERSONNEL HERO CARD REDESIGN */
   .hb-hero-box {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: 14px;
-    background: var(--nav-link-hover-bg, rgba(248, 250, 252, 0.8));
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0.01) 100%), var(--nav-link-hover-bg, #f8fafc);
     border: 1px solid var(--border-color, rgba(226, 232, 240, 0.8));
     margin-bottom: 12px;
-    gap: 12px;
+    gap: 16px;
     position: relative;
-    overflow: hidden;
+    overflow: visible !important;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+  }
+
+  .hb-hero-watermark {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 54px;
+    opacity: 0.06;
+    color: var(--primary-color, #2563eb);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .hb-hero-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     min-width: 0;
     flex: 1;
+    overflow: visible !important;
+    position: relative;
+    z-index: 1;
   }
 
-  /* AVATAR RING */
+  /* SQUARE AVATAR RING */
   .hb-avatar-ring {
     position: relative;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
+    width: 72px;
+    height: 72px;
+    border-radius: 14px;
     padding: 2px;
-    background: linear-gradient(135deg, var(--primary-color, #f59e0b), var(--secondary-color, #3b82f6));
-    box-shadow: 0 4px 12px var(--shadow, rgba(245, 158, 11, 0.25));
+    background: linear-gradient(135deg, var(--primary-color, #2563eb), #6366f1);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     flex-shrink: 0;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .hb-avatar-ring:hover {
+    transform: scale(2.6) translate(15px, 12px);
+    z-index: 9999;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
   }
 
   .hb-avatar-ring::after {
     content: '';
     position: absolute;
-    inset: -3px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color, rgba(245, 158, 11, 0.4)), transparent);
+    inset: -1px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, var(--primary-color, rgba(37, 99, 235, 0.3)), transparent);
     z-index: -1;
-    filter: blur(4px);
+    filter: blur(2px);
   }
 
   .hb-avatar-inner {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: 12px;
     overflow: hidden;
     background: var(--card-bg-solid, #ffffff);
     display: flex;
@@ -331,7 +354,7 @@
     background: linear-gradient(135deg, var(--primary-color, #3b82f6), var(--secondary-color, #1d4ed8));
     color: #ffffff;
     font-weight: 800;
-    font-size: 15px;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -342,53 +365,57 @@
   .hb-person-info {
     min-width: 0;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
   }
 
   .hb-person-name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 800;
     color: var(--text-primary, #0f172a);
     line-height: 1.25;
-    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
   .hb-rank-pill {
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 800;
-    padding: 1px 6px;
+    padding: 2px 8px;
     border-radius: 6px;
-    background: var(--primary-color, #f59e0b);
+    background: linear-gradient(135deg, var(--primary-color, #2563eb), #3b82f6);
     color: #ffffff;
     letter-spacing: 0.3px;
     display: inline-block;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px var(--shadow, rgba(0,0,0,0.15));
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.25);
   }
 
   .hb-tags-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
   .hb-tag {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 10px;
     border-radius: 6px;
-    background: var(--card-bg-solid, rgba(0,0,0,0.04));
+    background: var(--card-background, #ffffff);
     border: 1px solid var(--border-color, rgba(0,0,0,0.08));
     color: var(--text-secondary, #475569);
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
   }
 
   .hb-category-badge {
@@ -466,20 +493,21 @@
     border-radius: 12px;
     border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
     border-left: 4px solid var(--primary-color, #f59e0b);
-    padding: 12px 14px 10px 14px;
+    padding: 14px 16px;
     margin-bottom: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start;
     box-shadow: 0 2px 8px var(--shadow, rgba(0, 0, 0, 0.02));
     overflow: hidden;
+    min-height: 130px;
   }
 
   .hb-quote-watermark {
     position: absolute;
     top: -10px;
     right: 10px;
-    font-size: 70px;
+    font-size: 80px;
     font-family: Georgia, serif;
     color: var(--primary-color, #f59e0b);
     opacity: 0.12;
@@ -491,13 +519,14 @@
   .hb-citation-text {
     position: relative;
     z-index: 1;
-    font-size: 12.5px;
-    line-height: 1.55;
+    font-size: 13.5px;
+    line-height: 1.6;
     font-weight: 500;
     color: var(--text-primary, #1e293b);
-    max-height: 100px;
+    max-height: 160px;
     overflow-y: auto;
     padding-right: 4px;
+    flex: 1;
   }
 
   /* CUSTOM SCROLLBAR FOR CITATION TEXT */
@@ -509,43 +538,38 @@
     border-radius: 3px;
   }
 
-  /* CITATION FOOTER */
-  .hb-citation-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 8px;
-    padding-top: 6px;
-    border-top: 1px dashed var(--border-color, rgba(0,0,0,0.08));
-  }
-
-  .hb-citation-stamp {
-    font-size: 9.5px;
-    font-weight: 800;
-    color: var(--primary-color, #d97706);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .hb-citation-date {
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--text-secondary, #64748b);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
   /* FOOTER DOTS */
   .hb-footer-dots {
-    padding: 8px 0 10px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    display: none !important;
+  }
+
+  /* SUBTLE DELETE BUTTON IN BOTTOM RIGHT CORNER */
+  .hb-delete-btn {
+    position: absolute !important;
+    bottom: 8px !important;
+    right: 10px !important;
+    opacity: 0.25 !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-secondary, #94a3b8) !important;
+    font-size: 13px !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: opacity 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.25s ease !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    z-index: 20 !important;
+  }
+
+  .hb-delete-btn:hover {
+    opacity: 0.9 !important;
+    color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.12) !important;
+    transform: scale(1.1) !important;
   }
 
   .hb-dot {
@@ -835,7 +859,7 @@
         const userRole = "{{ role if role else '' }}".toLowerCase();
         const canManageHonours = ['jco it', 'jcoit', 'nco it', 'onco', 'co', '2ic'].includes(userRole);
         const deleteBtnHTML = (canManageHonours && item.id) ? `
-          <button type="button" class="btn btn-sm btn-outline-danger px-2 py-1 ms-auto hb-delete-btn" data-id="${item.id}" data-name="${item.name || 'this personnel'}" style="font-size:0.85rem; width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid rgba(239, 68, 68, 0.4); color:#ef4444; background:rgba(239,68,68,0.08);" title="Delete Entry">
+          <button type="button" class="hb-delete-btn" data-id="${item.id}" data-name="${item.name || 'this personnel'}" title="Delete Entry">
             <i class="fas fa-trash-alt"></i>
           </button>
         ` : '';
@@ -845,6 +869,7 @@
 
             <!-- HERO PERSONNEL BANNER -->
             <div class="hb-hero-box">
+              <i class="fa-solid fa-award hb-hero-watermark"></i>
               <div class="hb-hero-left">
                 <div class="hb-avatar-ring">
                   <div class="hb-avatar-inner">
@@ -859,16 +884,8 @@
                   <div class="hb-tags-row">
                     ${item.company ? `<span class="hb-tag"><i class="fa-solid fa-building-user"></i> ${item.company}</span>` : ''}
                     ${item.army_number ? `<span class="hb-tag"><i class="fa-solid fa-id-badge"></i> ${item.army_number}</span>` : ''}
-                    <span class="hb-category-badge ${catClass}">
-                      <i class="fa-solid ${catIcon}"></i> ${item.appreciation_type || "Commendation"}
-                    </span>
                   </div>
                 </div>
-              </div>
-
-              <!-- MEDAL BOX -->
-              <div class="hb-medal-box" title="${item.appreciation_type || 'Honour'}">
-                <i class="${medalIcon}"></i>
               </div>
             </div>
 
@@ -878,16 +895,10 @@
               <div class="hb-citation-text">
                 ${item.commendation || "No commendation text provided."}
               </div>
-              <div class="hb-citation-footer">
-                <div class="hb-citation-stamp">
-                  <i class="fa-solid fa-ribbon"></i> Commander's Citation
-                </div>
-                <div class="hb-citation-date">
-                  <i class="far fa-calendar-alt"></i> ${displayDate}
-                </div>
-                ${deleteBtnHTML}
-              </div>
             </div>
+
+            <!-- DELETE BUTTON IN BOTTOM RIGHT CORNER -->
+            ${deleteBtnHTML ? deleteBtnHTML : ''}
 
           </div>
         `;

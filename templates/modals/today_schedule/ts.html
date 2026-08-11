@@ -21,13 +21,19 @@
         transform: translateX(3px);
     }
     
+    .schedule-item.active-now-event {
+        border-color: #22c55e;
+        background: rgba(34, 197, 94, 0.08);
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
+    }
+
     .schedule-item.active-event {
-        border-color: var(--primary-color);
-        background: rgba(13,110,253,0.06);
+        border-color: var(--primary-color, #2563eb);
+        background: rgba(37, 99, 235, 0.06);
     }
     
     .schedule-item.done-event {
-        opacity: 0.45;
+        opacity: 0.55;
     }
     
     .schedule-title {
@@ -60,13 +66,19 @@
         text-transform: uppercase;
         letter-spacing: 0.4px;
     }
+
+    .status-active {
+        color: #16a34a;
+        font-weight: 700;
+    }
     
     .status-done {
-        color: #16a34a;
+        color: #64748b;
     }
     
     .status-next {
-        color: var(--primary-color);
+        color: var(--primary-color, #2563eb);
+        font-weight: 700;
     }
     
     .status-pending {
@@ -213,53 +225,48 @@
     // =========================================================
     
     function loadNextEvent() {
-    
         const now = new Date();
-    
-        const currentMinutes =
-            now.getHours() * 60 +
-            now.getMinutes();
-    
-        const next = schedules.find(event =>
-            getEventMinutes(event.start_time)
-            > currentMinutes
-        );
-    
-        // =============================================
-        // TITLE
-        // =============================================
-    
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        // 1. Check for Active Now (ongoing event: currentMinutes between start & end)
+        const activeEvent = schedules.find(event => {
+            const startMin = getEventMinutes(event.start_time);
+            const endMin = event.end_time ? getEventMinutes(event.end_time) : (startMin + 60);
+            return currentMinutes >= startMin && currentMinutes <= endMin;
+        });
+
+        // 2. Find Next Upcoming Event (start_time > currentMinutes)
+        const nextEvent = schedules.find(event => {
+            const startMin = getEventMinutes(event.start_time);
+            return startMin > currentMinutes;
+        });
+
+        const targetEvent = activeEvent || nextEvent;
+
         const nextEventTitle = document.getElementById("nextEventTitle");
+        if (nextEventTitle) {
+            nextEventTitle.innerText = targetEvent
+                ? targetEvent.title
+                : "All Tasks Completed";
+        }
 
-if (nextEventTitle) {
-    nextEventTitle.innerText = next
-        ? next.title
-        : "All Tasks Completed";
-}
-    
-        // =============================================
-        // TIME
-        // =============================================
-    
         const nextEventTime = document.getElementById("nextEventTime");
+        if (nextEventTime) {
+            if (activeEvent) {
+                nextEventTime.innerHTML = `<span style="color:#16a34a; font-weight:700;">🟢 Active Now</span>`;
+            } else if (nextEvent) {
+                nextEventTime.innerText = formatTime24to12(nextEvent.start_time);
+            } else {
+                nextEventTime.innerText = "--";
+            }
+        }
 
-if (nextEventTime) {
-    nextEventTime.innerText = next
-        ? formatTime24to12(next.start_time)
-        : "--";
-}
-    
-        // =============================================
-        // LOCATION
-        // =============================================
-    
         const nextEventDesc = document.getElementById("nextEventDesc");
-
-if (nextEventDesc) {
-    nextEventDesc.innerText = next
-        ? next.location
-        : "No more schedules today";
-}
+        if (nextEventDesc) {
+            nextEventDesc.innerText = targetEvent
+                ? (targetEvent.location || "Location not specified")
+                : "No more schedules today";
+        }
     }
     
     
@@ -268,145 +275,77 @@ if (nextEventDesc) {
     // =========================================================
     
     function renderSchedule() {
-    
         const now = new Date();
-    
-        const currentMinutes =
-            now.getHours() * 60 +
-            now.getMinutes();
-    
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
         let nextFound = false;
-    
-        const container =
-            document.getElementById(
-                "scheduleList"
-            );
-    
+
+        const container = document.getElementById("scheduleList");
+        if (!container) return;
+
         container.innerHTML = "";
-    
-        // =====================================================
-        // EMPTY
-        // =====================================================
-    
+
         if (!schedules.length) {
-    
             container.innerHTML = `
-    
                 <div class="schedule-empty">
-    
                     <i class="fa fa-calendar-times-o"></i>
-    
-                    <div>
-                        No schedules for today
-                    </div>
-    
+                    <div>No schedules for today</div>
                 </div>
-    
             `;
-    
             return;
         }
-    
-        // =====================================================
-        // LOOP EVENTS
-        // =====================================================
-    
+
         schedules.forEach(event => {
-    
-            const evMin =
-                getEventMinutes(
-                    event.start_time
-                );
-    
+            const startMin = getEventMinutes(event.start_time);
+            const endMin = event.end_time ? getEventMinutes(event.end_time) : (startMin + 60);
+
             let cls = "";
-    
-            let statusCls =
-                "status-pending";
-    
-            let statusLabel =
-                "Scheduled";
-    
-            // =============================================
-            // DONE
-            // =============================================
-    
-            if (evMin < currentMinutes) {
-    
+            let statusCls = "status-pending";
+            let statusLabel = "Scheduled";
+
+            // 🟢 1. Active Now (Ongoing)
+            if (currentMinutes >= startMin && currentMinutes <= endMin) {
+                cls = "active-now-event";
+                statusCls = "status-active";
+                statusLabel = "🟢 Active Now";
+            }
+            // 🔵 2. Next / Upcoming
+            else if (currentMinutes < startMin) {
+                if (!nextFound) {
+                    cls = "active-event";
+                    statusCls = "status-next";
+                    statusLabel = "🔵 Next";
+                    nextFound = true;
+                } else {
+                    cls = "scheduled-event";
+                    statusCls = "status-pending";
+                    statusLabel = "Scheduled";
+                }
+            }
+            // 3. Completed (Past Event)
+            else {
                 cls = "done-event";
-    
                 statusCls = "status-done";
-    
-                statusLabel = "Done";
+                statusLabel = "Completed";
             }
-    
-            // =============================================
-            // NEXT
-            // =============================================
-    
-            else if (!nextFound) {
-    
-                cls = "active-event";
-    
-                statusCls = "status-next";
-    
-                statusLabel = "Next";
-    
-                nextFound = true;
-            }
-    
-            // =============================================
-            // APPEND
-            // =============================================
-    
+
             container.innerHTML += `
-    
                 <div class="schedule-item ${cls}">
-    
                     <div>
-    
-                        <div class="schedule-title">
-    
-                            ${event.title}
-    
-                        </div>
-    
+                        <div class="schedule-title">${event.title}</div>
                         <div class="schedule-sub">
-    
-                            <i class="fa fa-map-marker"
-                               style="
-                                    font-size:11px;
-                                    margin-right:4px
-                               "></i>
-    
+                            <i class="fa fa-map-marker" style="font-size:11px; margin-right:4px"></i>
                             ${event.location || "N/A"}
-    
                         </div>
-    
                     </div>
-    
                     <div class="schedule-right">
-    
                         <div class="schedule-time">
-    
-                            ${formatTime24to12(
-                                event.start_time
-                            )}
-    
+                            ${formatTime24to12(event.start_time)} ${event.end_time ? '- ' + formatTime24to12(event.end_time) : ''}
                         </div>
-    
-                        <div class="
-                            schedule-status
-                            ${statusCls}
-                        ">
-    
+                        <div class="schedule-status ${statusCls}">
                             ${statusLabel}
-    
                         </div>
-    
                     </div>
-    
                 </div>
-    
             `;
         });
     }

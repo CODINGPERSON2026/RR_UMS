@@ -1918,7 +1918,7 @@ def download_leave_certificate(leave_id):
             LEFT JOIN leave_transport lt ON lt.leave_request_id = l.id
             LEFT JOIN leave_address la ON la.leave_request_id = l.id
             WHERE l.id = %s
-              AND l.request_sent_to = 'Approved'
+              AND (l.request_sent_to = 'Approved' OR l.request_status IN ('Approved', 'Leave Closed'))
             ORDER BY l.created_at DESC
             LIMIT 1
         """, (leave_id,))
@@ -2320,6 +2320,7 @@ def full_leave_history(army_number):
         # 2. Fetch Detailed History (With dates and reasons)
         cursor.execute("""
             SELECT
+                id,
                 YEAR(from_date) AS year,
                 leave_type,
                 from_date,

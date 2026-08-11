@@ -1112,19 +1112,56 @@ STATUS COLORS
     margin-left: auto;
     overflow: hidden;
   }
-  .schedule-actionbar-label {
-    font-size: 10px;
-    font-weight: 800;
-    color: var(--primary-color);
-    white-space: nowrap;
-    text-transform: uppercase;
+  .schedule-actionbar-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: color-mix(in srgb, var(--primary-color, #0d6efd) 6%, var(--card-background, #ffffff));
+    border: 1px solid color-mix(in srgb, var(--primary-color, #0d6efd) 25%, var(--border-color, #e2e8f0));
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--primary-color, #0d6efd) 8%, transparent);
+    border-radius: 8px;
+    padding: 4px 10px;
+    height: 36px;
+    flex: 1;
+    max-width: 60%;
+    min-width: 320px;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
   }
+
+  .schedule-actionbar-container:hover {
+    border-color: color-mix(in srgb, var(--primary-color, #0d6efd) 45%, var(--border-color, #e2e8f0));
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--primary-color, #0d6efd) 15%, transparent);
+  }
+
+  .schedule-actionbar-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--primary-color, #0d6efd);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    background: color-mix(in srgb, var(--primary-color, #0d6efd) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary-color, #0d6efd) 22%, transparent);
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+
   .schedule-actionbar-strip {
+    position: relative;
     flex: 1;
     height: 100%;
-    position: relative;
     overflow: hidden;
+    width: 100%;
     min-width: 200px;
+  }
+  .schedule-actionbar-strip::-webkit-scrollbar {
+    display: none;
   }
   .schedule-actionbar-slide {
     position: absolute;
@@ -1134,15 +1171,24 @@ STATUS COLORS
     gap: 8px;
     opacity: 0;
     transform: translateY(100%);
-    transition: all 0.5s ease-in-out;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-right: 8px;
+  }
+  .schedule-actionbar-slide::-webkit-scrollbar {
+    display: none;
   }
   .schedule-actionbar-slide.active {
     opacity: 1;
     transform: translateY(0);
+    z-index: 2;
   }
   .schedule-actionbar-slide.exit {
     opacity: 0;
     transform: translateY(-100%);
+    z-index: 1;
   }
   .s-badge {
     font-size: 9px;
@@ -1150,68 +1196,16 @@ STATUS COLORS
     padding: 1px 6px;
     border-radius: 4px;
     text-transform: uppercase;
+    flex-shrink: 0;
   }
   .status-upcoming { background: rgba(13, 110, 253, 0.1); color: var(--primary-color); }
   .status-ongoing { background: rgba(22, 163, 74, 0.1); color: #16a34a; }
-  .s-time { font-size: 10.5px; font-weight: 700; color: var(--text-primary); }
+  .status-active { background: rgba(34, 197, 94, 0.15); color: #16a34a; font-weight: 800; }
+  .status-next { background: rgba(37, 99, 235, 0.15); color: #2563eb; font-weight: 800; }
+  .status-done { background: rgba(100, 116, 139, 0.15); color: #64748b; }
+  .s-time { font-size: 10.5px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
   .s-title { font-size: 10.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
-
-  /* =========================================================
-     ACTION BAR SCHEDULE STRIP & GRAPHS/HONOURS LAYOUT
-  ========================================================= */
-  .schedule-actionbar-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--nav-link-hover-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 4px 10px;
-    height: 36px;
-    max-width: 50%;
-    min-width: 250px;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  .schedule-actionbar-label {
-    font-size: 9px;
-    font-weight: 800;
-    color: var(--primary-color);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .schedule-actionbar-strip {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    width: 100%;
-  }
-  .schedule-actionbar-strip::-webkit-scrollbar {
-    display: none;
-  }
-  .schedule-actionbar-slide {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-    padding: 2px 6px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-  }
-  .schedule-actionbar-slide.active {
-    background: rgba(37, 99, 235, 0.08);
-    border-left: 2px solid var(--primary-color);
-  }
+  .s-loc { font-size: 10px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; opacity: 0.85; flex-shrink: 0; }
   .schedule-actionbar-slide .s-badge {
     font-size: 8px;
     font-weight: 800;
@@ -1658,42 +1652,82 @@ STATUS COLORS
 
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      let activeIndex = 0;
+      let activeIndex = -1;
+      let nextIndex = -1;
 
       data.forEach((item, index) => {
-        const parts = item.start_time.split(":");
-        const startMinutes = parseInt(parts[0]) * 60 + parseInt(parts[1]);
-        if (startMinutes >= currentMinutes && activeIndex === 0) {
+        const pStart = item.start_time.split(":");
+        const startMinutes = parseInt(pStart[0]) * 60 + parseInt(pStart[1]);
+        let endMinutes = startMinutes + 60;
+        if (item.end_time) {
+          const pEnd = item.end_time.split(":");
+          endMinutes = parseInt(pEnd[0]) * 60 + parseInt(pEnd[1]);
+        }
+
+        if (currentMinutes >= startMinutes && currentMinutes <= endMinutes && activeIndex === -1) {
           activeIndex = index;
+        } else if (startMinutes > currentMinutes && nextIndex === -1) {
+          nextIndex = index;
         }
       });
 
+      // Target specific focus: Prioritize Active Now & Next
+      let tickerIndices = [];
+      if (activeIndex !== -1) tickerIndices.push(activeIndex);
+      if (nextIndex !== -1 && nextIndex !== activeIndex) tickerIndices.push(nextIndex);
+
+      const featuredIndex = tickerIndices.length > 0 ? tickerIndices[0] : 0;
+
       slider.innerHTML = data.map((item, index) => {
-        let badge = "Upcoming";
-        if (item.status === "ongoing") badge = "Ongoing";
-        else if (item.status === "completed") badge = "Done";
-        else if (index === activeIndex) badge = "Next";
+        const pStart = item.start_time.split(":");
+        const startMinutes = parseInt(pStart[0]) * 60 + parseInt(pStart[1]);
+        let endMinutes = startMinutes + 60;
+        if (item.end_time) {
+          const pEnd = item.end_time.split(":");
+          endMinutes = parseInt(pEnd[0]) * 60 + parseInt(pEnd[1]);
+        }
+
+        let badge = "Scheduled";
+        let statusCls = "upcoming";
+
+        if (currentMinutes >= startMinutes && currentMinutes <= endMinutes) {
+          badge = "🟢 Active Now";
+          statusCls = "active";
+        } else if (index === nextIndex) {
+          badge = "🔵 Next";
+          statusCls = "next";
+        } else if (currentMinutes > endMinutes || item.status === "completed") {
+          badge = "Completed";
+          statusCls = "done";
+        }
         
         return `
-          <div class="schedule-actionbar-slide ${index === activeIndex ? 'active' : ''}">
-            <span class="s-badge status-${item.status}">${badge}</span>
+          <div class="schedule-actionbar-slide ${index === featuredIndex ? 'active' : ''}">
+            <span class="s-badge status-${statusCls}">${badge}</span>
             <span class="s-time">${formatScheduleTime(item.start_time)}</span>
             <span class="s-title">${item.title}</span>
           </div>
         `;
       }).join("");
 
-      // Start internal rotation if multiple events
+      // Rotate ticker between Active Now & Next
       const slides = slider.querySelectorAll(".schedule-actionbar-slide");
-      if (slides.length > 1) {
-        let currentSlide = activeIndex;
+      if (tickerIndices.length > 1) {
+        let tickerPos = 0;
         setInterval(() => {
-          slides[currentSlide].classList.remove("active");
-          slides[currentSlide].classList.add("exit");
-          setTimeout((prev) => { prev.classList.remove("exit"); }, 500, slides[currentSlide]);
-          currentSlide = (currentSlide + 1) % slides.length;
-          slides[currentSlide].classList.add("active");
-        }, 5000);
+          const prevIdx = tickerIndices[tickerPos];
+          if (slides[prevIdx]) {
+            slides[prevIdx].classList.remove("active");
+            slides[prevIdx].classList.add("exit");
+            setTimeout((el) => { if (el) el.classList.remove("exit"); }, 500, slides[prevIdx]);
+          }
+          
+          tickerPos = (tickerPos + 1) % tickerIndices.length;
+          const nextIdx = tickerIndices[tickerPos];
+          if (slides[nextIdx]) {
+            slides[nextIdx].classList.add("active");
+          }
+        }, 10000);
       }
     } catch (error) {
       console.error("Schedule fetch error:", error);
@@ -1914,134 +1948,6 @@ STATUS COLORS
     var ampm = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
     return h + ":" + minute + " " + ampm;
-  }
-
-  function initializeScheduleSlider() {
-
-    const slider = document.getElementById("scheduleSlider");
-
-    if (!slider) return;
-
-    fetch("/api/today/schedules")
-
-      .then(response => response.json())
-
-      .then(data => {
-
-        /* =========================================
-           NO DATA
-        ========================================= */
-
-        if (!data.length) {
-          slider.innerHTML = `
-            <div class="schedule-actionbar-slide active">
-              <span class="s-badge status-upcoming">Free</span>
-              <span class="s-title">No events today</span>
-            </div>
-          `;
-          return;
-        }
-
-        /* =========================================
-           SORT BY TIME
-        ========================================= */
-
-        data.sort((a, b) => {
-
-          return a.start_time.localeCompare(b.start_time);
-
-        });
-
-
-        /* =========================================
-           FIND CURRENT / NEXT EVENT
-        ========================================= */
-
-        const now = new Date();
-
-        const currentMinutes =
-          now.getHours() * 60 + now.getMinutes();
-
-        let activeIndex = 0;
-
-        data.forEach((item, index) => {
-
-          const parts = item.start_time.split(":");
-
-          const startMinutes =
-            parseInt(parts[0]) * 60 +
-            parseInt(parts[1]);
-
-          if (startMinutes >= currentMinutes
-            && activeIndex === 0) {
-
-            activeIndex = index;
-          }
-
-        });
-
-
-        /* =========================================
-           RENDER
-        ========================================= */
-
-        slider.innerHTML = data.map((item, index) => {
-          let badge = "Upcoming";
-          if (item.status === "ongoing") {
-            badge = "Ongoing";
-          } else if (item.status === "completed") {
-            badge = "Done";
-          } else if (index === activeIndex) {
-            badge = "Next";
-          }
-          return `
-            <div class="schedule-actionbar-slide ${index === activeIndex ? 'active' : ''}">
-              <span class="s-badge status-${item.status}">${badge}</span>
-              <span class="s-time">${formatScheduleTime(item.start_time)}</span>
-              <span class="s-title">${item.title}</span>
-              <span class="s-loc"><i class="fa fa-map-marker-alt"></i> ${item.location || 'N/A'}</span>
-            </div>
-          `;
-        }).join("");
-
-
-        /* =========================================
-           AUTO SLIDE (DISABLED BY USER REQUEST)
-        ========================================= */
-
-        /*
-        let currentSlide = activeIndex;
-
-        const slides =
-          slider.querySelectorAll(".schedule-slide");
-
-        if (slides.length <= 1) return;
-
-        setInterval(() => {
-
-          slides[currentSlide]
-            .classList.remove("active");
-
-          currentSlide =
-            (currentSlide + 1) % slides.length;
-
-          slides[currentSlide]
-            .classList.add("active");
-
-        }, 5000);
-        */
-
-      })
-
-      .catch(error => {
-
-        console.error(
-          "Schedule fetch error:",
-          error
-        );
-
-      });
-
   }
 
 

@@ -423,29 +423,29 @@ def get_total_medical_category_count():
             connection.close()
 
 RANK_SENIORITY_ORDER = {
-    'subedar major': 1, 'sb maj': 1, 'sub major': 1,
-    'subedar': 2, 'sb': 2,
-    'naib subedar': 3, 'nb sub': 3, 'nb sb': 3,
-    'company quartermaster havildar': 4, 'cqmh': 4,
-    'company havildar major': 5, 'chm': 5,
-    'havildar': 6, 'hav': 6,
-    'local havildar': 7, 'loc hav': 7,
-    'lance havildar': 8, 'l hav': 8, 'l/hav': 8,
-    'naik': 9, 'nk': 9,
-    'local naik': 10, 'loc nk': 10,
-    'lance naik': 11, 'l nk': 11, 'l/nk': 11,
-    'craftsman': 12, 'cfn': 12,
-    'signalman': 13, 'sgl mn': 13, 'sglman': 13,
-    'agniveer': 14, 'agnl': 14, 'agni': 14,
-    'regimental havildar major': 99, 'rhm': 99
+    'agniveer': 1, 'agnl': 1, 'agni': 1,
+    'signalman': 2, 'signal man': 2, 'sgl mn': 2, 'sglman': 2,
+    'craftsman': 3, 'cfn': 3,
+    'lance naik': 4, 'l naik': 4, 'l nk': 4, 'l/nk': 4,
+    'local naik': 5, 'loc naik': 5, 'loc nk': 5,
+    'naik': 6, 'nk': 6,
+    'local havildar': 7, 'loc havildar': 7, 'loc hav': 7, 'lance havildar': 7, 'l havildar': 7, 'l hav': 7, 'l/hav': 7,
+    'havildar': 8, 'hav': 8,
+    'company quartermaster havildar': 9, 'cqmh': 9,
+    'company havildar major': 10, 'chm': 10,
+    'regimental havildar major': 11, 'rhm': 11,
+    'naib subedar': 12, 'nb sub': 12, 'nb sb': 12,
+    'subedar': 13, 'sb': 13,
+    'subedar major': 14, 'sb maj': 14, 'sub major': 14
 }
 
 RANK_SHORT_MAP = {
     'subedar major': 'Sb Maj', 'sb maj': 'Sb Maj', 'sub major': 'Sb Maj',
     'subedar': 'Sb', 'sb': 'Sb',
     'naib subedar': 'Nb Sub', 'nb sub': 'Nb Sub', 'nb sb': 'Nb Sub',
-    'company quartermaster havildar': 'CQMH', 'cqmh': 'CQMH',
+    'regimental havildar major': 'RHM', 'rhm': 'RHM',
     'company havildar major': 'CHM', 'chm': 'CHM',
+    'company quartermaster havildar': 'CQMH', 'cqmh': 'CQMH',
     'havildar': 'Hav', 'hav': 'Hav',
     'local havildar': 'Loc Hav', 'loc hav': 'Loc Hav',
     'lance havildar': 'L Hav', 'l hav': 'L Hav', 'l/hav': 'L Hav',
@@ -453,9 +453,8 @@ RANK_SHORT_MAP = {
     'local naik': 'Loc NK', 'loc nk': 'Loc NK',
     'lance naik': 'L NK', 'l nk': 'L NK', 'l/nk': 'L NK',
     'craftsman': 'CFN', 'cfn': 'CFN',
-    'signalman': 'Sgl Mn', 'sgl mn': 'Sgl Mn', 'sglman': 'Sgl Mn',
-    'agniveer': 'Agnl', 'agnl': 'Agnl', 'agni': 'Agnl',
-    'regimental havildar major': 'RHM', 'rhm': 'RHM'
+    'signalman': 'Sgl Mn', 'sgl mn': 'Sgl Mn', 'sglman': 'Sgl Mn', 'signal man': 'Sgl Mn',
+    'agniveer': 'Agnl', 'agnl': 'Agnl', 'agni': 'Agnl'
 }
 
 def get_rank_seniority(rank_str):
@@ -497,7 +496,7 @@ def rank_graph():
 
         rank_distribution = cursor.fetchall()
 
-        # Sort by Army Rank Seniority (Subedar Major first down to Agniveer)
+        # Sort by Rank Order (Ascending: Agniveer first up to Subedar Major)
         rank_distribution.sort(key=lambda r: get_rank_seniority(r.get('rank')))
 
         # Format rank names to standard UI Short Forms
