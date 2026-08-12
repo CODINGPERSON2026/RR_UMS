@@ -1,3 +1,4 @@
+<script src="{{ url_for('static', filename='chart.umd.min.js') }}"></script>
 <style>
     * {
         box-sizing: border-box;
@@ -793,27 +794,33 @@
 
     .loading-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.9);
-        display: none;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 2000;
+        z-index: 2050;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
     }
 
     .loading-overlay.active {
-        display: flex;
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
     }
 
     .loading-content {
         text-align: center;
-        padding: 40px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 24px 36px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(226, 232, 240, 0.8);
     }
 
     .loading {
@@ -850,212 +857,127 @@
         margin-left: 8px;
         vertical-align: middle;
     }
-
     @media print {
         @page {
-            size: landscape;
-            margin: 1cm;
-        }
-        
-        /* Force text inside the print content area to be visible and solid black */
-        body.printing-parade-state #fullPageView, 
-        body.printing-parade-state #fullPageView * {
-            color: black !important;
-            text-shadow: none !important;
-            box-shadow: none !important;
-            opacity: 1 !important;
-            visibility: visible !important;
+            size: A4 landscape;
+            margin: 6mm;
         }
 
-        /* High-priority color overrides for print area headers & totals */
-        body.printing-parade-state #fullPageView .full-page-table th,
-        body.printing-parade-state #fullPageView .full-page-table th *,
-        body.printing-parade-state #fullPageView .full-page-table .grand-total-row td,
-        body.printing-parade-state #fullPageView .full-page-table .grand-total-row td *,
-        body.printing-parade-state #fullPageView .full-page-table .grand-total-row .category-label {
-            color: white !important;
-        }
-
-        body.printing-parade-state {
-            background: white !important;
-            color: black !important;
-        }
-
-        /* Neutralize parent Bootstrap modals, fixed wrappers, and container limits */
-        body.printing-parade-state,
-        body.printing-parade-state #pageWrapper, 
-        body.printing-parade-state .page-wrapper, 
-        body.printing-parade-state .db-wrap, 
-        body.printing-parade-state #paradeStateModal, 
-        body.printing-parade-state #paradeStateModal .modal-dialog, 
-        body.printing-parade-state #paradeStateModal .modal-content, 
-        body.printing-parade-state #paradeStateModal .modal-body {
-            display: block !important;
-            position: static !important;
-            overflow: visible !important;
-            height: auto !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            border: none !important;
-            background: white !important;
-            box-shadow: none !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        /* Hide all other page/dashboard structures, sidebars, and other modals */
-        body.printing-parade-state .sidebar, 
-        body.printing-parade-state .bottom-nav, 
-        body.printing-parade-state .theme-switcher, 
-        body.printing-parade-state #sidebar-tooltip, 
-        body.printing-parade-state .modal-backdrop, 
-        body.printing-parade-state #pageLoader, 
-        body.printing-parade-state #actionBar, 
-        body.printing-parade-state .db-main-layout, 
-        body.printing-parade-state .scard, 
-        body.printing-parade-state .cards-top-bar, 
-        body.printing-parade-state .cards-slider-viewport, 
-        body.printing-parade-state .top-chart-bar, 
-        body.printing-parade-state .charts-column, 
-        body.printing-parade-state .modal-header, 
-        body.printing-parade-state .modal-footer, 
-        body.printing-parade-state #paradeStateModal .container, 
-        body.printing-parade-state .full-page-header, 
-        body.printing-parade-state .search-section-full, 
-        body.printing-parade-state .no-print, 
-        body.printing-parade-state #fullPageStatusMessage, 
-        body.printing-parade-state .modal:not(#paradeStateModal) { /* Force hide all other modals */
+        /* Hide EVERYTHING on the entire page except our dedicated print container */
+        body.printing-parade-state > *:not(#paradeStatePrintArea) {
             display: none !important;
         }
 
-        /* Force display of the detailed view and its content */
-        body.printing-parade-state .full-page-view {
-            display: block !important;
-            position: static !important;
+        body.printing-parade-state {
+            background: #ffffff !important;
+            color: #000000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
             width: 100% !important;
             height: auto !important;
             overflow: visible !important;
-            padding: 0 !important;
-            background: white !important;
-            visibility: visible !important;
-            opacity: 1 !important;
         }
 
-        body.printing-parade-state .full-page-content {
-            padding: 0 !important;
+        /* Show ONLY #paradeStatePrintArea */
+        body.printing-parade-state #paradeStatePrintArea {
             display: block !important;
-            overflow: visible !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        body.printing-parade-state .print-only-header {
-            display: block !important;
-            margin-bottom: 20px !important;
-            text-align: center !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-
-        body.printing-parade-state .print-only-header * {
-            color: #2c3e50 !important;
-        }
-
-        body.printing-parade-state .table-wrapper {
-            border: none !important;
-            overflow: visible !important;
-            max-height: none !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
             width: 100% !important;
-            display: block !important;
+            height: auto !important;
+            background: #ffffff !important;
+            color: #000000 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
 
-        body.printing-parade-state .full-page-table {
+        body.printing-parade-state #paradeStatePrintArea * {
+            color: #000000 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        body.printing-parade-state #paradeStatePrintArea h1,
+        body.printing-parade-state #paradeStatePrintArea h2 {
+            color: #1a252f !important;
+        }
+
+        body.printing-parade-state #paradeStatePrintArea table {
+            width: 100% !important;
             min-width: 100% !important;
-            width: 100% !important;
-            font-size: 9.5px !important;
             border-collapse: collapse !important;
             border: 1px solid #1a252f !important;
-            display: table !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+            font-size: 8.5pt !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
         }
 
-        body.printing-parade-state .full-page-table th {
+        body.printing-parade-state #paradeStatePrintArea th {
             background-color: #2c3e50 !important;
+            color: #ffffff !important;
             border: 1px solid #1a252f !important;
-            padding: 8px 4px !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        body.printing-parade-state .full-page-table td {
             padding: 5px 3px !important;
-            border: 1px solid #c0c0c0 !important;
-            color: black !important;
-        }
-
-        body.printing-parade-state .full-page-table .category-label {
-            background-color: #ecf0f1 !important;
-            color: black !important;
-            font-weight: bold !important;
-            position: static !important;
+            font-size: 8.5pt !important;
+            text-align: center !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        body.printing-parade-state .full-page-table .total-row td {
+        body.printing-parade-state #paradeStatePrintArea td {
+            padding: 4px 2px !important;
+            border: 1px solid #c0c0c0 !important;
+            color: #000000 !important;
+            text-align: center !important;
+            font-size: 8.5pt !important;
+        }
+
+        body.printing-parade-state #paradeStatePrintArea .category-label {
+            background-color: #ecf0f1 !important;
+            color: #000000 !important;
+            font-weight: bold !important;
+            text-align: left !important;
+            padding-left: 8px !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body.printing-parade-state #paradeStatePrintArea .total-row td {
             background-color: #d5e8f7 !important;
             font-weight: bold !important;
-            color: black !important;
+            color: #000000 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        body.printing-parade-state .full-page-table .grand-total-row td {
+        body.printing-parade-state #paradeStatePrintArea .grand-total-row td {
             background-color: #2c3e50 !important;
+            color: #ffffff !important;
             font-weight: bold !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        body.printing-parade-state .full-page-table .grand-total-row .category-label {
+        body.printing-parade-state #paradeStatePrintArea .grand-total-row .category-label {
             background-color: #2c3e50 !important;
+            color: #ffffff !important;
         }
 
-        body.printing-parade-state .full-page-table .calculated-cell {
+        body.printing-parade-state #paradeStatePrintArea .calculated-cell {
             background-color: #fff3cd !important;
             color: #856404 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        body.printing-parade-state .full-page-table .read-only-cell {
+        body.printing-parade-state #paradeStatePrintArea .read-only-cell {
             background-color: #e9ecef !important;
-            color: black !important;
+            color: #000000 !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
-        }
-
-        /* Style editable input boxes as clean plain text on print */
-        body.printing-parade-state .full-page-table input[type="number"] {
-            border: none !important;
-            background: transparent !important;
-            padding: 0 !important;
-            min-height: 0 !important;
-            text-align: center !important;
-            color: black !important;
-            font-weight: bold !important;
-            -moz-appearance: textfield;
-            width: 100% !important;
-        }
-
-        body.printing-parade-state .full-page-table input[type="number"]::-webkit-outer-spin-button,
-        body.printing-parade-state .full-page-table input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
     }
 </style>
@@ -1100,7 +1022,7 @@
                 <table class="full-page-table" id="fullPageTable">
                     <thead>
                         <tr>
-                            <th rowspan="2">CATEGORY</th>
+                            <th>CATEGORY</th>
                             <th>AUTH</th>
                             <th>H/S</th>
                             <th>POSTED/STR</th>
@@ -1294,6 +1216,8 @@
         let coLeaveChartInstance = null;
         let coManpowerChartInstance = null;
         const TODAY = DEFAULT_DATE;
+        const DASHBOARD_ROLES = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'ADMIN', 'SUBEDAR MAJOR'];
+        function isDashboardRole(r) { return DASHBOARD_ROLES.includes((r || '').toUpperCase()); }
 
         const categories = [
             { name: 'OFFR', key: 'offr', isTotal: false, isFirstSection: true },
@@ -1345,8 +1269,19 @@
             }
         }
 
+        let loadingTimer = null;
         function showLoading(show) {
-            document.getElementById('loadingOverlay').classList.toggle('active', show);
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay) return;
+            if (show) {
+                clearTimeout(loadingTimer);
+                loadingTimer = setTimeout(() => {
+                    overlay.classList.add('active');
+                }, 60);
+            } else {
+                clearTimeout(loadingTimer);
+                overlay.classList.remove('active');
+            }
         }
 
         function showStatus(message, type = 'info') {
@@ -1586,7 +1521,7 @@
                 document.getElementById('fullPageTableContainer').style.display = 'none';
                 initData();
 
-                if (['CO', '2IC', 'ADJUTANT', 'OC'].includes(userRole)) {
+                if (isDashboardRole(userRole)) {
                     const response = await fetch(`${API_BASE_URL}/api/co-dashboard/parade-table/${date}`);
                     const result = await response.json();
 
@@ -1705,7 +1640,7 @@
         };
 
         async function loadCODashboardData(selectedDate) {
-            if (!['CO', '2IC', 'ADJUTANT', 'OC'].includes(userRole)) return;
+            if (!isDashboardRole(userRole)) return;
 
             try {
                 const response = await fetch(`${API_BASE_URL}/api/co-dashboard/all-data/${selectedDate}`);
@@ -1983,7 +1918,7 @@
                 if (response.success) {
                     userCompany = response.company || '';
                     userRole = response.role || '';
-                    if (['CO', '2IC', 'ADJUTANT', 'OC'].includes(userRole)) {
+                    if (isDashboardRole(userRole)) {
                         document.getElementById('coDashboard').classList.add('active');
                     }
                 }
@@ -1998,7 +1933,7 @@
                 const dateObj = new Date(date);
                 const formattedDate = dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
 
-                if (['CO', '2IC', 'ADJUTANT', 'OC'].includes(userRole)) {
+                if (isDashboardRole(userRole)) {
                     const response = await fetch(`${API_BASE_URL}/api/co-dashboard/all-data/${date}`);
                     const result = await response.json();
                     
@@ -2090,10 +2025,7 @@
         }
 
         function printParadeState() {
-            // Apply parade state print styles to body dynamically
-            document.body.classList.add('printing-parade-state');
-            
-            var rawDate = document.getElementById('fullPageDate').value;
+            var rawDate = document.getElementById('fullPageDate').value || document.getElementById('searchDate').value;
             var formattedDate = "";
             if (rawDate) {
                 var dateObj = new Date(rawDate);
@@ -2101,19 +2033,59 @@
             } else {
                 formattedDate = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             }
-            
-            var printDateEl = document.getElementById('printDatePlaceholder');
-            if (printDateEl) {
-                printDateEl.textContent = formattedDate;
+
+            // Remove any existing print area
+            var oldPrintArea = document.getElementById('paradeStatePrintArea');
+            if (oldPrintArea) oldPrintArea.remove();
+
+            // Create dedicated print container attached directly to <body>
+            var printArea = document.createElement('div');
+            printArea.id = 'paradeStatePrintArea';
+
+            // Clone full page table
+            var tableSource = document.getElementById('fullPageTable');
+            if (!tableSource) {
+                console.error("Full page table not found for printing.");
+                return;
             }
-            
-            // Trigger browser print
+            var tableClone = tableSource.cloneNode(true);
+
+            // Strip any stray rowspan attributes from headers
+            tableClone.querySelectorAll('th').forEach(function(th) {
+                th.removeAttribute('rowspan');
+            });
+
+            // Replace input fields with clean text
+            tableClone.querySelectorAll('input[type="number"]').forEach(function(input) {
+                var val = input.value !== "" ? input.value : "0";
+                var span = document.createElement('span');
+                span.textContent = val;
+                span.style.fontWeight = "bold";
+                input.parentNode.replaceChild(span, input);
+            });
+
+            printArea.innerHTML = `
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <h1 style="margin: 0; font-size: 18px; font-weight: bold; color: #1a252f; text-transform: uppercase;">15 CORPS ENGINEERING SIGNAL REGIMENT</h1>
+                    <h2 style="margin: 4px 0 0 0; font-size: 14px; font-weight: 600; color: #2c3e50; text-transform: uppercase;">DAILY PARADE STATE - ${formattedDate}</h2>
+                </div>
+                <div class="print-table-wrapper">
+                    ${tableClone.outerHTML}
+                </div>
+            `;
+
+            document.body.appendChild(printArea);
+            document.body.classList.add('printing-parade-state');
+
+            // Trigger print dialog
             window.print();
         }
 
-        // Remove print class if the user closes print preview
+        // Remove print class and clean up print container when print dialog finishes
         window.addEventListener('afterprint', function() {
             document.body.classList.remove('printing-parade-state');
+            var printArea = document.getElementById('paradeStatePrintArea');
+            if (printArea) printArea.remove();
         });
 
         // ── Init ──────────────────────────────────────────────────────────────────
@@ -2130,7 +2102,18 @@
             await loadDataForDate(today);
 
             searchInput.addEventListener('change', searchByDate);
-            searchInput.addEventListener('input', function () { if (this.value) searchByDate(); });
+
+            const paradeModalEl = document.getElementById('paradeStateModal');
+            if (paradeModalEl) {
+                paradeModalEl.addEventListener('shown.bs.modal', async () => {
+                    if (coLeaveChartInstance) coLeaveChartInstance.resize();
+                    if (coManpowerChartInstance) coManpowerChartInstance.resize();
+                    const activeDate = searchInput ? (searchInput.value || currentDate) : currentDate;
+                    if (!coLeaveChartInstance || currentDate !== activeDate) {
+                        await loadDataForDate(activeDate);
+                    }
+                });
+            }
 
             window.addEventListener('beforeunload', (e) => {
                 if (isDataModified && userRole !== 'CO') {

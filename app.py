@@ -2458,7 +2458,8 @@ def get_co_all_dashboard_data(date_str):
     user = require_login()
     
     role = user.get('role', '')
-    if role not in ['CO', '2IC', 'ADJUTANT', 'OC']:
+    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'Admin', 'Subedar Major']
+    if role not in allowed_roles:
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
     
     conn = get_db_connection()
@@ -2592,7 +2593,8 @@ def get_co_aggregated_parade_table(date_str):
     """Get aggregated parade state data from all companies for CO view"""
     user = require_login()
     role = user.get('role', '')
-    if role not in ['CO', '2IC', 'OC']:
+    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'Admin', 'Subedar Major']
+    if role not in allowed_roles:
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
     
     conn = get_db_connection()
