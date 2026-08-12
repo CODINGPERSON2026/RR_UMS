@@ -5551,14 +5551,22 @@ def delete_gallery(id):
         conn.close()
 
 RANK_SHORT_MAP = {
-    'subedar major':            'Sb Maj',
-    'sb maj':                   'Sb Maj',
-    'sub major':                'Sb Maj',
-    'subedar':                  'Sb',
-    'sb':                       'Sb',
+    'subedar major':            'Sub Maj',
+    'sb maj':                   'Sub Maj',
+    'sub major':                'Sub Maj',
+    'sub maj':                  'Sub Maj',
+    'sb/maj':                   'Sub Maj',
+    'sub/maj':                  'Sub Maj',
+    'subedar_major':            'Sub Maj',
+    'subedar':                  'Sub',
+    'sb':                       'Sub',
+    'sub':                      'Sub',
     'naib subedar':             'Nb Sub',
     'nb sub':                   'Nb Sub',
     'nb sb':                    'Nb Sub',
+    'nbsub':                    'Nb Sub',
+    'naib sub':                 'Nb Sub',
+    'nb/sub':                   'Nb Sub',
     'regimental havildar major':'RHM',
     'rhm':                      'RHM',
     'company havildar major':   'CHM',
@@ -5570,27 +5578,41 @@ RANK_SHORT_MAP = {
     'local havildar':           'Loc Hav',
     'loc havildar':             'Loc Hav',
     'loc hav':                  'Loc Hav',
+    'loc-hav':                  'Loc Hav',
     'lance havildar':           'L Hav',
     'l havildar':               'L Hav',
     'l hav':                    'L Hav',
+    'l/hav':                    'L Hav',
+    'lhav':                     'L Hav',
+    'l-hav':                    'L Hav',
     'naik':                     'NK',
     'nk':                       'NK',
     'local naik':               'Loc NK',
     'loc naik':                 'Loc NK',
     'loc nk':                   'Loc NK',
+    'loc-nk':                   'Loc NK',
     'lance naik':               'L NK',
     'l naik':                   'L NK',
     'l nk':                     'L NK',
     'l/nk':                     'L NK',
+    'lnk':                      'L NK',
+    'l-nk':                     'L NK',
     'craftsman':                'CFN',
     'cfn':                      'CFN',
-    'signal man':               'Sgl Mn',
-    'signalman':                'Sgl Mn',
-    'sgl mn':                   'Sgl Mn',
-    'sglman':                   'Sgl Mn',
-    'agniveer':                 'Agnl',
-    'agnl':                     'Agnl',
-    'agni':                     'Agnl',
+    'signal man':               'Sigmn',
+    'signalman':                'Sigmn',
+    'sgl mn':                   'Sigmn',
+    'sglman':                   'Sigmn',
+    'sigmn':                    'Sigmn',
+    'sgl':                      'Sigmn',
+    'sig':                      'Sigmn',
+    'sigman':                   'Sigmn',
+    'sig mn':                   'Sigmn',
+    'agniveer':                 'Agv',
+    'agnl':                     'Agv',
+    'agni':                     'Agv',
+    'agv':                      'Agv',
+    'agn':                      'Agv'
 }
 
 # Seniority order: rank ordering (used to sort bar chart)
@@ -5598,28 +5620,41 @@ RANK_SENIORITY_ORDER = {
     'agniveer':                         1,
     'agnl':                             1,
     'agni':                             1,
+    'agv':                              1,
+    'agn':                              1,
     'signal man':                       2,
     'signalman':                        2,
     'sgl mn':                           2,
     'sglman':                           2,
+    'sigmn':                            2,
+    'sgl':                              2,
+    'sig':                              2,
+    'sigman':                           2,
+    'sig mn':                           2,
     'craftsman':                        3,
     'cfn':                              3,
     'lance naik':                       4,
     'l naik':                           4,
     'l nk':                             4,
     'l/nk':                             4,
+    'lnk':                              4,
+    'l-nk':                             4,
     'local naik':                       5,
     'loc naik':                         5,
     'loc nk':                           5,
+    'loc-nk':                           5,
     'naik':                             6,
     'nk':                               6,
     'local havildar':                   7,
     'loc havildar':                     7,
     'loc hav':                          7,
-    'lance havildar':                   7,
-    'l havildar':                       7,
-    'l hav':                            7,
-    'l/hav':                            7,
+    'loc-hav':                          7,
+    'lance havildar':                   7.5,
+    'l havildar':                       7.5,
+    'l hav':                            7.5,
+    'l/hav':                            7.5,
+    'lhav':                             7.5,
+    'l-hav':                            7.5,
     'havildar':                         8,
     'hav':                              8,
     'company quartermaster havildar':   9,
@@ -5631,11 +5666,19 @@ RANK_SENIORITY_ORDER = {
     'naib subedar':                     12,
     'nb sub':                           12,
     'nb sb':                            12,
+    'nbsub':                            12,
+    'naib sub':                         12,
+    'nb/sub':                           12,
     'subedar':                          13,
     'sb':                               13,
+    'sub':                              13,
     'subedar major':                    14,
     'sb maj':                           14,
     'sub major':                        14,
+    'sub maj':                          14,
+    'sb/maj':                           14,
+    'sub/maj':                          14,
+    'subedar_major':                    14,
 }
 @app.route('/get_posted_strength', methods=['GET'])
 def get_posted_strength():
@@ -5666,23 +5709,34 @@ def get_posted_strength():
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
-        for r in rows:
-            full_rank = r['rank'].strip().lower()
-            r['_seniority'] = RANK_SENIORITY_ORDER.get(full_rank, 99)
-            r['rank'] = RANK_SHORT_MAP.get(full_rank, r['rank'])
 
-        # Sort by rank order ascending: Agniveer first up to Subedar Major
-        rows.sort(key=lambda r: r['_seniority'])
-        # Remove the internal helper key before returning
+        aggregated = {}
+        seniority_map = {}
         for r in rows:
-            r.pop('_seniority', None)
+            raw_rank = (r.get('rank') or '').strip()
+            full_rank = raw_rank.lower()
+            short_name = RANK_SHORT_MAP.get(full_rank, raw_rank)
+            seniority = RANK_SENIORITY_ORDER.get(full_rank, 99)
+            count = r.get('count', 0)
 
-        total = sum(r['count'] for r in rows)
+            if short_name in aggregated:
+                aggregated[short_name] += count
+                if seniority < seniority_map[short_name]:
+                    seniority_map[short_name] = seniority
+            else:
+                aggregated[short_name] = count
+                seniority_map[short_name] = seniority
+
+        # Format and sort by rank order ascending: Agniveer first up to Subedar Major
+        final_rows = [{'rank': k, 'count': v} for k, v in aggregated.items()]
+        final_rows.sort(key=lambda item: (seniority_map.get(item['rank'], 99), item['rank']))
+
+        total = sum(r['count'] for r in final_rows)
 
         return jsonify({
             "status": "success",
             "total": total,
-            "data": rows
+            "data": final_rows
         })
 
     except Exception as e:

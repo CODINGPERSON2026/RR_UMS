@@ -916,7 +916,7 @@ def recommend_leave():
                         cl += days
                     elif lt == 'AAL':
                         aal += days
-                    elif lt == 'PTL':
+                    elif lt == 'PL':
                         ptl += days
                     elif lt == 'ANNUAL LEAVE':
                         Annual_Leave = days
@@ -956,7 +956,7 @@ def recommend_leave():
                 new_al = (existing['AL'] or 0) + al
                 new_cl = (existing['CL'] or 0) + cl
                 new_aal = (existing['AAL'] or 0) + aal
-                new_ptl = (existing['PTL'] or 0) + ptl
+                new_ptl = (existing['PL'] or 0) + ptl
                 new_Annual_leave = (existing['Annual Leave'] or 0) + Annual_Leave
 
                     

@@ -423,38 +423,86 @@ def get_total_medical_category_count():
             connection.close()
 
 RANK_SENIORITY_ORDER = {
-    'agniveer': 1, 'agnl': 1, 'agni': 1,
-    'signalman': 2, 'signal man': 2, 'sgl mn': 2, 'sglman': 2,
+    'agniveer': 1, 'agnl': 1, 'agni': 1, 'agv': 1, 'agn': 1,
+    'signalman': 2, 'signal man': 2, 'sgl mn': 2, 'sglman': 2, 'sigmn': 2, 'sgl': 2, 'sig': 2, 'sigman': 2, 'sig mn': 2,
     'craftsman': 3, 'cfn': 3,
-    'lance naik': 4, 'l naik': 4, 'l nk': 4, 'l/nk': 4,
-    'local naik': 5, 'loc naik': 5, 'loc nk': 5,
+    'lance naik': 4, 'l naik': 4, 'l nk': 4, 'l/nk': 4, 'lnk': 4, 'l-nk': 4,
+    'local naik': 5, 'loc naik': 5, 'loc nk': 5, 'loc-nk': 5,
     'naik': 6, 'nk': 6,
-    'local havildar': 7, 'loc havildar': 7, 'loc hav': 7, 'lance havildar': 7, 'l havildar': 7, 'l hav': 7, 'l/hav': 7,
+    'local havildar': 7, 'loc havildar': 7, 'loc hav': 7, 'loc-hav': 7,
+    'lance havildar': 7.5, 'l havildar': 7.5, 'l hav': 7.5, 'l/hav': 7.5, 'lhav': 7.5, 'l-hav': 7.5,
     'havildar': 8, 'hav': 8,
     'company quartermaster havildar': 9, 'cqmh': 9,
     'company havildar major': 10, 'chm': 10,
     'regimental havildar major': 11, 'rhm': 11,
-    'naib subedar': 12, 'nb sub': 12, 'nb sb': 12,
-    'subedar': 13, 'sb': 13,
-    'subedar major': 14, 'sb maj': 14, 'sub major': 14
+    'naib subedar': 12, 'nb sub': 12, 'nb sb': 12, 'nbsub': 12, 'naib sub': 12, 'nb/sub': 12,
+    'subedar': 13, 'sb': 13, 'sub': 13,
+    'subedar major': 14, 'sb maj': 14, 'sub major': 14, 'sub maj': 14, 'sb/maj': 14, 'sub/maj': 14, 'subedar_major': 14
 }
 
 RANK_SHORT_MAP = {
-    'subedar major': 'Sb Maj', 'sb maj': 'Sb Maj', 'sub major': 'Sb Maj',
-    'subedar': 'Sb', 'sb': 'Sb',
-    'naib subedar': 'Nb Sub', 'nb sub': 'Nb Sub', 'nb sb': 'Nb Sub',
-    'regimental havildar major': 'RHM', 'rhm': 'RHM',
-    'company havildar major': 'CHM', 'chm': 'CHM',
-    'company quartermaster havildar': 'CQMH', 'cqmh': 'CQMH',
-    'havildar': 'Hav', 'hav': 'Hav',
-    'local havildar': 'Loc Hav', 'loc hav': 'Loc Hav',
-    'lance havildar': 'L Hav', 'l hav': 'L Hav', 'l/hav': 'L Hav',
-    'naik': 'NK', 'nk': 'NK',
-    'local naik': 'Loc NK', 'loc nk': 'Loc NK',
-    'lance naik': 'L NK', 'l nk': 'L NK', 'l/nk': 'L NK',
-    'craftsman': 'CFN', 'cfn': 'CFN',
-    'signalman': 'Sgl Mn', 'sgl mn': 'Sgl Mn', 'sglman': 'Sgl Mn', 'signal man': 'Sgl Mn',
-    'agniveer': 'Agnl', 'agnl': 'Agnl', 'agni': 'Agnl'
+    'subedar major':            'Sub Maj',
+    'sb maj':                   'Sub Maj',
+    'sub major':                'Sub Maj',
+    'sub maj':                  'Sub Maj',
+    'sb/maj':                   'Sub Maj',
+    'sub/maj':                  'Sub Maj',
+    'subedar_major':            'Sub Maj',
+    'subedar':                  'Sub',
+    'sb':                       'Sub',
+    'sub':                      'Sub',
+    'naib subedar':             'Nb Sub',
+    'nb sub':                   'Nb Sub',
+    'nb sb':                    'Nb Sub',
+    'nbsub':                    'Nb Sub',
+    'naib sub':                 'Nb Sub',
+    'nb/sub':                   'Nb Sub',
+    'regimental havildar major':'RHM',
+    'rhm':                      'RHM',
+    'company havildar major':   'CHM',
+    'chm':                      'CHM',
+    'company quartermaster havildar': 'CQMH',
+    'cqmh':                     'CQMH',
+    'havildar':                 'Hav',
+    'hav':                      'Hav',
+    'local havildar':           'Loc Hav',
+    'loc havildar':             'Loc Hav',
+    'loc hav':                  'Loc Hav',
+    'loc-hav':                  'Loc Hav',
+    'lance havildar':           'L Hav',
+    'l havildar':               'L Hav',
+    'l hav':                    'L Hav',
+    'l/hav':                    'L Hav',
+    'lhav':                     'L Hav',
+    'l-hav':                    'L Hav',
+    'naik':                     'NK',
+    'nk':                       'NK',
+    'local naik':               'Loc NK',
+    'loc naik':                 'Loc NK',
+    'loc nk':                   'Loc NK',
+    'loc-nk':                   'Loc NK',
+    'lance naik':               'L NK',
+    'l naik':                   'L NK',
+    'l nk':                     'L NK',
+    'l/nk':                     'L NK',
+    'lnk':                      'L NK',
+    'l-nk':                     'L NK',
+    'craftsman':                'CFN',
+    'cfn':                      'CFN',
+    'signal man':               'Sigmn',
+    'signalman':                'Sigmn',
+    'sgl mn':                   'Sigmn',
+    'sglman':                   'Sigmn',
+    'sigmn':                    'Sigmn',
+    'sgl':                      'Sigmn',
+    'sig':                      'Sigmn',
+    'sigman':                   'Sigmn',
+    'sig mn':                   'Sigmn',
+    'agniveer':                 'Agv',
+    'agnl':                     'Agv',
+    'agni':                     'Agv',
+    'agv':                      'Agv',
+    'agn':                      'Agv'
 }
 
 def get_rank_seniority(rank_str):
@@ -496,14 +544,28 @@ def rank_graph():
 
         rank_distribution = cursor.fetchall()
 
-        # Sort by Rank Order (Ascending: Agniveer first up to Subedar Major)
-        rank_distribution.sort(key=lambda r: get_rank_seniority(r.get('rank')))
-
-        # Format rank names to standard UI Short Forms
+        # Aggregate counts by mapped short rank name
+        aggregated = {}
+        seniority_map = {}
         for r in rank_distribution:
-            r['rank'] = get_rank_short_name(r.get('rank'))
+            raw_rank = r.get('rank')
+            short_name = get_rank_short_name(raw_rank)
+            seniority = get_rank_seniority(raw_rank)
+            count = r.get('count', 0)
 
-        return jsonify({'rank_distribution': rank_distribution}), 200
+            if short_name in aggregated:
+                aggregated[short_name] += count
+                if seniority < seniority_map[short_name]:
+                    seniority_map[short_name] = seniority
+            else:
+                aggregated[short_name] = count
+                seniority_map[short_name] = seniority
+
+        # Format and sort by rank order (Ascending: Agniveer first up to Subedar Major)
+        result_list = [{'rank': k, 'count': v} for k, v in aggregated.items()]
+        result_list.sort(key=lambda item: (seniority_map.get(item['rank'], 999), item['rank']))
+
+        return jsonify({'rank_distribution': result_list}), 200
 
     except Exception as e:
         return jsonify({'message': "internal server error"}), 500

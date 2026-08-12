@@ -208,7 +208,7 @@
 
   .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--grid-gap);
     margin-bottom: 2rem;
   }
@@ -399,7 +399,7 @@
     opacity: 0.9;
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: 992px) {
     .charts-grid {
       grid-template-columns: 1fr;
     }
@@ -450,8 +450,8 @@
   {% include 'navbar/navbar.html' %}
 </br>
 
-{% if role in ['NCO PWR','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO OP','NCO PWR','NCO MW','NCO MCCS','NCO
-CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM'] %}
+{% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO
+CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM'] %}
 <div class="page-header">
 
     <div class="header-right ">
@@ -527,7 +527,7 @@ CHQ','SEC JCO','JCO LINE','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO
           <i class="fas fa-expand"></i> Fullscreen
         </button>
       </div>
-      <div class="chart-container"><canvas id="stateChart"></canvas></div>
+      <div class="chart-container" style="height: 300px;"><canvas id="stateChart"></canvas></div>
     </div>
     <div class="chart-card">
       <div class="chart-header">

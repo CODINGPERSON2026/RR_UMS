@@ -146,7 +146,7 @@ async function fetchBarGraphData() {
               data: [110, 42]
           },
           safeCategory: {
-              labels: ['shape', 'Category'],
+              labels: ['Shape I', 'LMC'],
               data: [34, 118]
           },
           jcoOrFit: {
@@ -154,7 +154,7 @@ async function fetchBarGraphData() {
               data: [50, 60]
           },
           jcoSafeOrCategory: {
-              labels: ['JCO Shape I', 'OR Category'],
+              labels: ['JCO Shape I', 'OR LMC'],
               data: [34, 118]
           }
       });
@@ -233,7 +233,7 @@ function drawBarGraphs(data) {
     window.safeCategoryChartInstance = new Chart(safeCategoryCtx, {
       type: 'bar',
       data: {
-        labels: ['shape I', 'Category'],
+        labels: ['Shape I', 'LMC'],
         datasets: [{
           label: 'shape I',
           data: data.safeCategory?.data || [34, 118],
@@ -1473,9 +1473,9 @@ function renderPersonDetails(data, statusClass) {
       }
     }
   } else if (statusClass === 'category') {
-    reasonTitle = 'Why is this person in CATEGORY?';
+    reasonTitle = 'Why is this person in LMC?';
     const catTypeLabel = categoryType ? String(categoryType).charAt(0).toUpperCase() + String(categoryType).slice(1) : 'Unknown';
-    reasonText = `This person is classified as CATEGORY (${catTypeLabel}), which means they have medical restrictions or limitations. `;
+    reasonText = `This person is classified as LMC (${catTypeLabel}), which means they have medical restrictions or limitations. `;
     if (restrictions) {
       reasonText += `Restrictions: ${restrictions}. `;
     }

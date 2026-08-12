@@ -678,7 +678,7 @@ def api_bar_graph_data():
                 "data": [fit_count, unfit_count]
             },
             "safeCategory": {
-                "labels": ["Shape 1", "Category"],
+                "labels": ["Shape I", "LMC"],
                 "data": [total_safe_count, total_category_count]
             },
             "jcoOrFit": {

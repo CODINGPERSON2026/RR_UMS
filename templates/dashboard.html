@@ -448,7 +448,7 @@
       </button>
       {%endif%}
 
-      {% if role in ['NCO PWR','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO OP','NCO PWR','NCO MW','NCO MCCS','NCO CHQ','SEC JCO','JCO LINE','S/JCO','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','NCO LRW','JCO LRW','JCO QM','O CENTRAL NCO','JCO MW','PST CLK'] %}
+      {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','NCO LRW','JCO LRW','JCO QM','O CENTRAL NCO','JCO MW','PST CLK'] %}
       <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#personnelModal">
         ASSIGN PERSONNEL
       </button>
@@ -460,7 +460,7 @@
       </button>
       {%endif%}
 
-      {% if role in ['NCO PWR','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO OP','NCO PWR','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO LINE','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] %}
+      {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO FAULT REPAIR','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] %}
       <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
         ROLL CALL POINTS
       </button>
@@ -486,7 +486,7 @@
       </button>
       {% endif %}
 
-      {% if role|trim in ['JCO RPNA','NCO PWR','NCO QRT','NCO CHQ','NCO IT','NCO OP','JCO MW','NCO MW','NCO LRW','NCO MCCS','NCO LINE','NCO RHQ','NCO TM','NCO IT','NCO RHQ','NCO MT','NCO RPNA','NCO QM','NCO SYSTEM','JCO SYSTEM','SEC JCO','JCO LINE','JCO LRW','JCO CHQ','JCO IT','JCO MT','JCO RHQ','JCO MCCS','JCO QM','S/JCO','ONCO','OC','2IC','JCO QRT','JCO TM','JCO PWR','JCO OP','JCO SYS','JCO DET','NCO DET','NCO SYS','Subedar Major','PA'] %}
+      {% if role|trim in ['JCO RPNA','NCO COMN','NCO QRT','NCO CHQ','NCO IT','NCO SIGCEN','JCO MW','NCO MW','NCO LRW','NCO MCCS','NCO FAULT REPAIR','NCO RHQ','NCO TM','NCO IT','NCO RHQ','NCO MT','NCO RPNA','NCO QM','NCO SYSTEM','JCO SYSTEM','SEC JCO','JCO FAULT REPAIR','JCO LRW','JCO CHQ','JCO IT','JCO MT','JCO RHQ','JCO MCCS','JCO QM','S/JCO','ONCO','OC','2IC','JCO QRT','JCO TM','JCO COMN','JCO SIGCEN','JCO SYS','JCO DET','NCO DET','NCO SYS','Subedar Major','PA'] %}
       <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn">
         LEAVE REQUESTS
         <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
@@ -620,7 +620,7 @@
       </div>
       {% endif %}
 
-      {%if role in ["ONCO","Subedar Major","S/JCO","NCO PWR","NCO CHQ","NCO IT","NCO MW","NCO LINE","NCO OP","NCO MCCS","NCO RHQ","NCO LRW","NCO QM","NCO MT","NCO TM","NCO RP","JCO PWR","JCO CHQ","JCO IT","JCO MW","JCO LINE","JCO OP","JCO MCCS","JCO RHQ","JCO TM","JCO MT","JCO LRW","JCO QM","JCO CHQ","PA"]%}
+      {%if role in ["ONCO","Subedar Major","S/JCO","NCO COMN","NCO CHQ","NCO IT","NCO MW","NCO FAULT REPAIR","NCO SIGCEN","NCO MCCS","NCO RHQ","NCO LRW","NCO QM","NCO MT","NCO TM","NCO RP","JCO COMN","JCO CHQ","JCO IT","JCO MW","JCO FAULT REPAIR","JCO SIGCEN","JCO MCCS","JCO RHQ","JCO TM","JCO MT","JCO LRW","JCO QM","JCO CHQ","PA"]%}
       <div class="sc" onclick="openLeaveModal()">
         <span class="sc-label">Check Leaves</span>
         <div class="sc-right">

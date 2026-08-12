@@ -26,8 +26,8 @@ Columns:
 VALID ROLE VALUES:
     pass
 Commissioned Officers  : CO, OC, 2IC, ADJUTANT
-JCO Roles             : JCO, S/JCO, JCO PWR, JCO CHQ, JCO IT, JCO MW, JCO LINE, JCO OP, JCO MCCS, JCO RHQ, JCO TM, JCO MT, JCO LRW, JA JCO, ACCOUNT JCO, PROJECT JCO
-NCO Roles             : NCO, ONCO, NCO PWR, NCO CHQ, NCO IT, NCO MW, NCO LINE, NCO OP, NCO MCCS, NCO RHQ, NCO LRW, NCO QM, NCO MT, NCO TM, NCO RP
+JCO Roles             : JCO, S/JCO, JCO COMN, JCO CHQ, JCO IT, JCO MW, JCO FAULT REPAIR, JCO SIGCEN, JCO MCCS, JCO RHQ, JCO TM, JCO MT, JCO LRW, JA JCO, ACCOUNT JCO, PROJECT JCO
+NCO Roles             : NCO, ONCO, NCO COMN, NCO CHQ, NCO IT, NCO MW, NCO FAULT REPAIR, NCO SIGCEN, NCO MCCS, NCO RHQ, NCO LRW, NCO QM, NCO MT, NCO TM, NCO RP
 Other Roles           : admin, clerk, TRG, QM, HEAD CLK, PA, ACCOUNT OFFICER, PROJECT OFFICER, CENTRE
 
 COMPANY VALUES:
@@ -186,10 +186,10 @@ SQL: SELECT COUNT(*) FROM personnel WHERE `rank` = 'Naib Subedar' AND company = 
 USERS_TABLE_KEYWORDS = [
     "co", "oc", "adjutant", "jco", "2ic", "centre", "nco", "onco", "trg",
     "account officer", "project officer", "project jco",
-    "account jco", "s/jco", "nco pwr", "nco chq", "nco it", "nco mw",
-    "nco line", "nco op", "nco mccs", "nco rhq", "nco lrw", "nco qm",
-    "nco mt", "nco tm", "nco rp", "jco pwr", "jco chq", "jco it",
-    "jco mw", "jco line", "jco op", "jco mccs", "jco rhq", "jco tm",
+    "account jco", "s/jco", "NCO COMN", "nco chq", "nco it", "nco mw",
+    "NCO FAULT REPAIR", "NCO SIGCEN", "nco mccs", "nco rhq", "nco lrw", "nco qm",
+    "nco mt", "nco tm", "nco rp", "JCO COMN", "jco chq", "jco it",
+    "jco mw", "JCO FAULT REPAIR", "JCO SIGCEN", "jco mccs", "jco rhq", "jco tm",
     "jco mt", "jco lrw", "ja jco", "qm", "head clk", "pa",
     "user", "users", "admin", "clerk"
 ]

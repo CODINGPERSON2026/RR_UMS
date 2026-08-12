@@ -1198,10 +1198,10 @@
             <div class="card-content">
                 <div>
                     <h2 id="category-count">—</h2>
-                    <p>Low Medical Category</p>
+                    <p>LMC</p>
                 </div>
                 <div class="actions">
-                    <button id="load-category-btn" class="btn-category">Category</button>
+                    <button id="load-category-btn" class="btn-category">LMC</button>
                 </div>
                 <div class="info-tooltip">
                     <span class="info-icon">i</span>
@@ -1251,7 +1251,7 @@
             </div>
             <div class="chart-column">
                 <div class="chart-box">
-                    <h3>Shape vs Category Analysis</h3>
+                    <h3>Shape vs LMC Analysis</h3>
                     <div class="bar-chart-wrapper" style="height: 300px;">
                         <canvas id="safeCategoryChart"></canvas>
                     </div>
@@ -1263,7 +1263,7 @@
                             <label for="jco-safe-or-filter" style="margin: 0; white-space: nowrap;">Filter:</label>
                             <select id="jco-safe-or-filter" class="chart-select">
                                 <option value="shape">SHAPE I</option>
-                                <option value="category">CATEGORY</option>
+                                <option value="category">LMC</option>
                             </select>
                         </div>
                     </div>
@@ -1541,9 +1541,9 @@ async function fetchBarGraphData() {
         console.error("Error fetching bar graph data:", err);
         drawBarGraphs({
             fitUnfit: { labels: ["Fit", "Unfit"], data: [110, 42] },
-            safeCategory: { labels: ["Shape I", "Category"], data: [34, 118] },
+            safeCategory: { labels: ["Shape I", "LMC"], data: [34, 118] },
             jcoOrFit: { labels: ["JCO Fit", "OR Fit"], data: [50, 60] },
-            jcoSafeOrCategory: { labels: ["JCO Shape I", "OR Category"], data: [34, 118] }
+            jcoSafeOrCategory: { labels: ["JCO Shape I", "OR LMC"], data: [34, 118] }
         });
     }
 }
@@ -1698,7 +1698,7 @@ function drawBarGraphs(data) {
         window.safeCategoryChartInstance = new Chart(safeCategoryCanvas.getContext("2d"), {
             type: "bar",
             data: {
-                labels: ["Shape I", "Category"],
+                labels: ["Shape I", "LMC"],
                 datasets: [{
                     data: data.safeCategory?.data || [0, 0],
                     backgroundColor: ["#3182ce", "#d69e2e"],
@@ -2347,8 +2347,8 @@ function renderPersonDetails(data, statusClass) {
         }
     } else if (statusClass === "category") {
         const catLabel = categoryType ? String(categoryType).charAt(0).toUpperCase() + String(categoryType).slice(1) : "Unknown";
-        reasonTitle = "Why is this person in CATEGORY?";
-        reasonText = `This person is classified as CATEGORY (${catLabel}) with medical restrictions. `;
+        reasonTitle = "Why is this person in LMC?";
+        reasonText = `This person is classified as LMC (${catLabel}) with medical restrictions. `;
         if (restrictions) reasonText += `Restrictions: ${restrictions}. `;
         reasonText += `Fitness status: ${status}. `;
         if (status === "UnFit") {
