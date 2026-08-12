@@ -2263,7 +2263,7 @@ def download_leave_certificate(leave_id):
             c.setFont("Helvetica-Bold", 56)
             
             lines = [
-                "15CESR",
+            "15 COPRS UMS",
                 f"{client_ip}"
             ]
             
