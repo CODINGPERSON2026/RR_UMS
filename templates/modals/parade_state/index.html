@@ -848,136 +848,69 @@
         padding: 6px 12px;
         border-radius: 20px;
         font-weight: 600;
-    }
+}
 
     .role-badge {
         font-size: 0.7rem;
         padding: 3px 8px;
-        border-radius: 10px;
-        margin-left: 8px;
+        border-radius: 10px;        margin-left: 8px;
         vertical-align: middle;
     }
+
+    /* Keep watermark strictly hidden on normal screens */
+    .print-device-watermark,
+    .parade-single-watermark,
+    .watermark-overlay,
+    .print-only-header {
+        display: none !important;
+    }
+
     @media print {
         @page {
-            size: A4 landscape;
-            margin: 6mm;
-        }
-
-        /* Hide EVERYTHING on the entire page except our dedicated print container */
-        body.printing-parade-state > *:not(#paradeStatePrintArea) {
-            display: none !important;
+            size: landscape;
+            margin: 10mm;
         }
 
         body.printing-parade-state {
-            background: #ffffff !important;
-            color: #000000 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
+            margin: 0;
+            padding: 0;
+            background: white !important;
         }
 
-        /* Show ONLY #paradeStatePrintArea */
-        body.printing-parade-state #paradeStatePrintArea {
-            display: block !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            background: #ffffff !important;
-            color: #000000 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+        /* Hide everything except the print-specific container */
+        body.printing-parade-state > *:not(#fullPageView) {
+            display: none !important;
         }
 
-        body.printing-parade-state #paradeStatePrintArea * {
-            color: #000000 !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+        #fullPageView {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
         }
 
-        body.printing-parade-state #paradeStatePrintArea h1,
-        body.printing-parade-state #paradeStatePrintArea h2 {
-            color: #1a252f !important;
+        .full-page-header, .search-section-full, .back-btn {
+            display: none !important;
         }
 
-        body.printing-parade-state #paradeStatePrintArea table {
-            width: 100% !important;
-            min-width: 100% !important;
+        .table-wrapper {
+            border: none !important;
+        }
+
+        .full-page-table {
+            width: 100%;
             border-collapse: collapse !important;
-            border: 1px solid #1a252f !important;
-            font-size: 8.5pt !important;
-            page-break-after: avoid !important;
-            page-break-inside: avoid !important;
+            font-size: 8px !important;
         }
 
-        body.printing-parade-state #paradeStatePrintArea th {
-            background-color: #2c3e50 !important;
-            color: #ffffff !important;
-            border: 1px solid #1a252f !important;
-            padding: 5px 3px !important;
-            font-size: 8.5pt !important;
-            text-align: center !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .full-page-table th, .full-page-table td {
+            border: 1px solid #000 !important;
+            padding: 4px !important;
         }
 
-        body.printing-parade-state #paradeStatePrintArea td {
-            padding: 4px 2px !important;
-            border: 1px solid #c0c0c0 !important;
-            color: #000000 !important;
-            text-align: center !important;
-            font-size: 8.5pt !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .category-label {
-            background-color: #ecf0f1 !important;
-            color: #000000 !important;
-            font-weight: bold !important;
-            text-align: left !important;
-            padding-left: 8px !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .total-row td {
-            background-color: #d5e8f7 !important;
-            font-weight: bold !important;
-            color: #000000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .grand-total-row td {
-            background-color: #2c3e50 !important;
-            color: #ffffff !important;
-            font-weight: bold !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .grand-total-row .category-label {
-            background-color: #2c3e50 !important;
-            color: #ffffff !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .calculated-cell {
-            background-color: #fff3cd !important;
-            color: #856404 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-        }
-
-        body.printing-parade-state #paradeStatePrintArea .read-only-cell {
-            background-color: #e9ecef !important;
-            color: #000000 !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
+        .full-page-table input {
+            border: none !important;
+            background: none !important;
         }
     }
 </style>
@@ -1008,12 +941,6 @@
                 <button class="btn btn-primary" onclick="printParadeState()" id="fullPagePrintBtn">
                     🖨️ Print Parade State
                 </button>
-            </div>
-
-            <!-- Print-only Header (only shown during active printing) -->
-            <div class="print-only-header" style="display: none;">
-                <h1 style="margin: 0; font-size: 20px; font-weight: bold; color: #1a252f; text-align: center;">15 CORPS ENGINEERING SIGNAL REGIMENT</h1>
-                <h2 style="margin: 5px 0 15px 0; font-size: 16px; font-weight: 600; color: #2c3e50; text-align: center;">DAILY PARADE STATE - <span id="printDatePlaceholder"></span></h2>
             </div>
 
             <div id="fullPageStatusMessage" style="display: none;"></div>
@@ -2025,7 +1952,7 @@
         }
 
         function printParadeState() {
-            var rawDate = document.getElementById('fullPageDate').value || document.getElementById('searchDate').value;
+            var rawDate = document.getElementById('fullPageDate').value;
             var formattedDate = "";
             if (rawDate) {
                 var dateObj = new Date(rawDate);
@@ -2034,59 +1961,191 @@
                 formattedDate = new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }).toUpperCase();
             }
 
-            // Remove any existing print area
-            var oldPrintArea = document.getElementById('paradeStatePrintArea');
-            if (oldPrintArea) oldPrintArea.remove();
+            var clientIp = window.CLIENT_IP || "{{ client_ip or '127.0.0.1' }}";
+            var now = new Date();
+            var printTimeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-            // Create dedicated print container attached directly to <body>
-            var printArea = document.createElement('div');
-            printArea.id = 'paradeStatePrintArea';
+            // Subtle, elegant diagonal watermark matching reference image
+            var watermarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280"><g transform="rotate(-35 230 140)"><text x="230" y="95" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="rgba(80,100,160,0.12)" text-anchor="middle" letter-spacing="3">15 CORPS ENGG SIG REGT</text><text x="230" y="122" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="rgba(40,60,120,0.14)" text-anchor="middle" letter-spacing="2">IP ${clientIp}</text><text x="230" y="146" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="rgba(80,100,160,0.11)" text-anchor="middle" letter-spacing="1">${printTimeStr}</text></g></svg>`;
+            var bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(watermarkSvg);
 
-            // Clone full page table
-            var tableSource = document.getElementById('fullPageTable');
-            if (!tableSource) {
-                console.error("Full page table not found for printing.");
+            // Clone table and convert any input values to text for clean printing
+            var tableEl = document.getElementById('fullPageTable');
+            if (!tableEl) {
+                console.error('Table element fullPageTable not found');
                 return;
             }
-            var tableClone = tableSource.cloneNode(true);
-
-            // Strip any stray rowspan attributes from headers
-            tableClone.querySelectorAll('th').forEach(function(th) {
-                th.removeAttribute('rowspan');
-            });
-
-            // Replace input fields with clean text
-            tableClone.querySelectorAll('input[type="number"]').forEach(function(input) {
-                var val = input.value !== "" ? input.value : "0";
+            var tableClone = tableEl.cloneNode(true);
+            tableClone.querySelectorAll('input').forEach(function(input) {
+                var val = input.value || '0';
                 var span = document.createElement('span');
                 span.textContent = val;
-                span.style.fontWeight = "bold";
                 input.parentNode.replaceChild(span, input);
             });
 
-            printArea.innerHTML = `
-                <div style="text-align: center; margin-bottom: 12px;">
-                    <h1 style="margin: 0; font-size: 18px; font-weight: bold; color: #1a252f; text-transform: uppercase;">15 CORPS ENGINEERING SIGNAL REGIMENT</h1>
-                    <h2 style="margin: 4px 0 0 0; font-size: 14px; font-weight: 600; color: #2c3e50; text-transform: uppercase;">DAILY PARADE STATE - ${formattedDate}</h2>
-                </div>
-                <div class="print-table-wrapper">
-                    ${tableClone.outerHTML}
-                </div>
-            `;
+            // Remove any previous print iframe
+            var oldIframe = document.getElementById('paradePrintIframe');
+            if (oldIframe) {
+                oldIframe.parentNode.removeChild(oldIframe);
+            }
 
-            document.body.appendChild(printArea);
-            document.body.classList.add('printing-parade-state');
+            // Create hidden iframe
+            var iframe = document.createElement('iframe');
+            iframe.id = 'paradePrintIframe';
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = 'none';
+            document.body.appendChild(iframe);
 
-            // Trigger print dialog
-            window.print();
+            var doc = iframe.contentWindow.document;
+            doc.open();
+            doc.write(`<!DOCTYPE html>
+<html>
+<head>
+    <title>Parade State - ${formattedDate}</title>
+    <style>
+        @page {
+            size: landscape;
+            margin: 4mm 6mm;
         }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            background: #fff;
+            color: #000;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 4mm 6mm;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .watermark-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("${bgUrl}");
+            background-repeat: repeat;
+            pointer-events: none;
+            z-index: 999999;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .header-section {
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .header-section h1 {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1a252f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header-section h2 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 2px 0 4px 0;
+        }
+        .meta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            color: #444;
+            border-bottom: 1px dashed #777;
+            padding-bottom: 3px;
+            margin-bottom: 6px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        th, td {
+            border: 1px solid #777;
+            text-align: center;
+            vertical-align: middle;
+            padding: 2.5px 1.5px;
+        }
+        th {
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            font-size: 7.5px;
+            letter-spacing: 0.3px;
+        }
+        .category-label {
+            background-color: #ecf0f1 !important;
+            font-weight: bold;
+            text-align: left !important;
+            padding-left: 4px !important;
+            color: #000 !important;
+        }
+        .total-row td {
+            background-color: #d5e8f7 !important;
+            font-weight: bold;
+            color: #000 !important;
+        }
+        .grand-total-row td {
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+        .grand-total-row .category-label {
+            background-color: #2c3e50 !important;
+            color: #ffffff !important;
+        }
+        .calculated-cell {
+            background-color: #fff8e1 !important;
+            font-weight: 600;
+        }
+        .read-only-cell {
+            background-color: #f8f9fa !important;
+        }
+        th.bg-warning { background-color: #e67e22 !important; color: #fff !important; }
+        th.bg-info { background-color: #2980b9 !important; color: #fff !important; }
+        th.bg-success { background-color: #27ae60 !important; color: #fff !important; }
+    </style>
+</head>
+<body>
+    <div class="watermark-overlay"></div>
+    <div class="header-section">
+        <h1>15 CORPS ENGINEERING SIGNAL REGIMENT</h1>
+        <h2>DAILY PARADE STATE - ${formattedDate}</h2>
+    </div>
+    <div class="meta-bar">
+        <span><strong>PRINTED FROM DEVICE IP:</strong> ${clientIp}</span>
+        <span><strong>PRINTED ON:</strong> ${printTimeStr}</span>
+    </div>
+    ${tableClone.outerHTML}
+</body>
+</html>`);
+            doc.close();
 
-        // Remove print class and clean up print container when print dialog finishes
-        window.addEventListener('afterprint', function() {
-            document.body.classList.remove('printing-parade-state');
-            var printArea = document.getElementById('paradeStatePrintArea');
-            if (printArea) printArea.remove();
-        });
+            setTimeout(function() {
+                try {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                } catch(e) {
+                    console.error('Print error:', e);
+                }
+            }, 250);
+        }
 
         // ── Init ──────────────────────────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', async () => {

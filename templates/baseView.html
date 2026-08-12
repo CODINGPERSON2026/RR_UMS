@@ -1074,12 +1074,41 @@
         right: 10px;
       }
     }
+
+    /* ==================== GLOBAL PRINT WATERMARK ==================== */
+    .print-device-watermark {
+      display: none !important;
+    }
+
+    @media print {
+      .print-device-watermark {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999999 !important;
+        pointer-events: none !important;
+        background-repeat: repeat !important;
+        background-position: center !important;
+        opacity: 1 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        visibility: visible !important;
+      }
+    }
   </style>
 
   {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+
+  <!-- Global Print Watermark (Visible on Print) -->
+  <div class="print-device-watermark" id="globalPrintWatermark"></div>
 
   <!-- ==================== SIDEBAR ==================== -->
   <div class="sidebar" id="sidebar">
@@ -1443,6 +1472,50 @@
         // Hide tooltip if mouse enters the tooltip itself (edge case)
         tip.addEventListener('mouseenter', hideTip);
       });
+    })();
+  </script>
+
+  <!-- ==================== GLOBAL PRINT WATERMARK SCRIPT ==================== -->
+  <script>
+    (function () {
+      window.CLIENT_IP = "{{ client_ip or '127.0.0.1' }}";
+      window.CURRENT_USER = "{{ current_user_name or '' }}";
+
+      function generateWatermarkSvg(ip, user, dateStr, timeStr) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280">
+          <g transform="rotate(-35 230 140)">
+            <text x="230" y="95" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="700" fill="rgba(80,100,160,0.12)" text-anchor="middle" letter-spacing="3">15 CORPS ENGG SIG REGT</text>
+            <text x="230" y="122" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="900" fill="rgba(40,60,120,0.14)" text-anchor="middle" letter-spacing="2">IP ${ip}</text>
+            <text x="230" y="146" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="600" fill="rgba(80,100,160,0.11)" text-anchor="middle" letter-spacing="1">${user ? user + ' • ' : ''}${dateStr} ${timeStr}</text>
+          </g>
+        </svg>`;
+      }
+
+      function updateAllPrintWatermarks() {
+        const clientIp = window.CLIENT_IP || "{{ client_ip or '127.0.0.1' }}";
+        const user = window.CURRENT_USER || "{{ current_user_name or '' }}";
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const svg = generateWatermarkSvg(clientIp, user, dateStr, timeStr);
+        const bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+
+        document.querySelectorAll('.print-device-watermark').forEach(function (el) {
+          el.style.backgroundImage = 'url("' + bgUrl + '")';
+        });
+
+        document.querySelectorAll('.client-ip-text').forEach(function (el) {
+          el.textContent = clientIp;
+        });
+
+        document.querySelectorAll('.print-timestamp-text').forEach(function (el) {
+          el.textContent = dateStr + ' ' + timeStr;
+        });
+      }
+
+      window.updateAllPrintWatermarks = updateAllPrintWatermarks;
+      window.addEventListener('beforeprint', updateAllPrintWatermarks);
+      document.addEventListener('DOMContentLoaded', updateAllPrintWatermarks);
     })();
   </script>
 

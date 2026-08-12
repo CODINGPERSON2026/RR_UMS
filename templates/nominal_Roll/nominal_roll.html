@@ -744,6 +744,11 @@
     const printWin = window.open('', '_blank');
     let title = viewMode === 'nominal' ? 'Nominal Roll' : 'Leave History';
     let headers, rows;
+    const clientIp = window.CLIENT_IP || "{{ client_ip or '127.0.0.1' }}";
+    const now = new Date();
+    const printTimeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const watermarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280"><g transform="rotate(-35 230 140)"><text x="230" y="95" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="rgba(80,100,160,0.12)" text-anchor="middle" letter-spacing="3">15 CORPS ENGG SIG REGT</text><text x="230" y="122" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="rgba(40,60,120,0.14)" text-anchor="middle" letter-spacing="2">IP ${clientIp}</text><text x="230" y="146" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="rgba(80,100,160,0.11)" text-anchor="middle" letter-spacing="1">${printTimeStr}</text></g></svg>`;
+    const bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(watermarkSvg);
 
     if (viewMode === 'nominal') {
         headers = `<th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Trade</th><th>Company</th><th>Section</th><th>Status</th>`;
@@ -779,8 +784,28 @@
     printWin.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; color: #000; padding: 20px; }
-      h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; font-size: 14px; }
+      body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; color: #000; padding: 20px; position: relative; }
+      .watermark-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        width: 100vw; height: 100vh;
+        background-image: url("${bgUrl}");
+        background-repeat: repeat;
+        pointer-events: none;
+        z-index: 999999;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      h2 { text-align: center; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; }
+      .meta-bar {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #444;
+        border-bottom: 1px dashed #888;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+      }
       table { width: 100%; border-collapse: collapse; }
       thead th {
         font-family: Arial, Helvetica, sans-serif;
@@ -797,7 +822,12 @@
         color: #000; background: #fff;
       }
     </style></head><body>
+    <div class="watermark-overlay"></div>
     <h2>15 CORPS ENGINEERING SIGNAL REGIMENT - ${title.toUpperCase()}</h2>
+    <div class="meta-bar">
+      <span><strong>Printed from IP:</strong> ${clientIp}</span>
+      <span><strong>Date:</strong> ${printTimeStr}</span>
+    </div>
     <table>
       <thead>
         <tr>${headers}</tr>

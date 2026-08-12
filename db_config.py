@@ -5,6 +5,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': 'qaz123QAZ!@#',
+    
     'database': 'hrms',
     'port': 3306
 }

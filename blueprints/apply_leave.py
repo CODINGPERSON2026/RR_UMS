@@ -2213,6 +2213,11 @@ def download_leave_certificate(leave_id):
         elif not os.path.exists(chinar_logo_path):
             chinar_rounded_path = chinar_logo_path
 
+        # Get client IP address and timestamp for backend watermark
+        raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+        client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
+        now_str = datetime.now().strftime('%d/%m/%Y %I:%M %p')
+
         # Render template with logo paths
         html = render_template(
             "certificate.html", 
@@ -2222,7 +2227,7 @@ def download_leave_certificate(leave_id):
             rt_logo_path=rt_logo_path       
         )
         
-        # Generate PDF
+        # Generate base PDF from HTML
         pdf_buffer = BytesIO()
         pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
         
@@ -2230,8 +2235,74 @@ def download_leave_certificate(leave_id):
             return "Error generating PDF", 500
         
         pdf_buffer.seek(0)
+
+        # Overlay diagonal watermark on PDF using ReportLab + pypdf
+        try:
+            from reportlab.pdfgen import canvas
+            from reportlab.lib import colors
+            try:
+                from pypdf import PdfReader, PdfWriter
+            except ImportError:
+                from PyPDF2 import PdfReader, PdfWriter
+
+            # Create 1-page watermark PDF in memory
+            wm_buffer = BytesIO()
+            c = canvas.Canvas(wm_buffer, pagesize=(595.27, 841.89))  # A4 size in points
+            
+            # Position origin slightly towards the top of the page and rotate 45 degrees
+            cx, cy = 595.27 / 2.0, (841.89 / 2.0) + 60.0
+            c.translate(cx, cy)
+            c.rotate(45)
+            
+            # Set soft grey color and increased opacity by 15% (0.35 alpha)
+            c.setFillColor(colors.Color(0.72, 0.72, 0.72))
+            try:
+                c.setFillAlpha(0.35)
+            except Exception:
+                pass
+            c.setFont("Helvetica-Bold", 56)
+            
+            lines = [
+                "15CESR",
+                f"{client_ip}"
+            ]
+            
+            line_height = 68
+            total_h = (len(lines) - 1) * line_height
+            start_y = total_h / 2.0
+            
+            for idx, line in enumerate(lines):
+                y = start_y - (idx * line_height)
+                c.drawCentredString(0, y, line)
+                
+            c.showPage()
+            c.save()
+            wm_buffer.seek(0)
+
+            # Merge watermark page onto each page of base PDF
+            base_reader = PdfReader(pdf_buffer)
+            wm_reader = PdfReader(wm_buffer)
+            wm_page = wm_reader.pages[0]
+
+            writer = PdfWriter()
+            for page in base_reader.pages:
+                page.merge_page(wm_page)
+                writer.add_page(page)
+
+            final_pdf_buffer = BytesIO()
+            writer.write(final_pdf_buffer)
+            final_pdf_buffer.seek(0)
+            download_buffer = final_pdf_buffer
+
+        except Exception as wm_err:
+            import traceback
+            print("Watermark merge error, falling back to base PDF:", wm_err)
+            traceback.print_exc()
+            pdf_buffer.seek(0)
+            download_buffer = pdf_buffer
+
         return send_file(
-            pdf_buffer,
+            download_buffer,
             as_attachment=True,
             download_name=f"Leave_Certificate_{army_number}_{data['leave_id']}.pdf",
             mimetype='application/pdf'

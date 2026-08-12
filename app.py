@@ -100,17 +100,38 @@ def logout():
 import os
 from flask import url_for
 
+def get_client_ip():
+    """Retrieve the client IP address from request headers or remote_addr."""
+    try:
+        x_forwarded_for = request.headers.get('X-Forwarded-For')
+        if x_forwarded_for:
+            return x_forwarded_for.split(',')[0].strip()
+        x_real_ip = request.headers.get('X-Real-IP')
+        if x_real_ip:
+            return x_real_ip.strip()
+        return request.remote_addr or '127.0.0.1'
+    except Exception:
+        return '127.0.0.1'
+
 @app.context_processor
 def inject_user():
     user = require_login()
+    client_ip = get_client_ip()
 
     return {
         "current_user": user,
         "current_user_name": user['username'] if user else None,
         "role": user['role'] if user else None,
         "company": user['company'] if user else None,
-        "dated_url_for": dated_url_for
+        "dated_url_for": dated_url_for,
+        "client_ip": client_ip,
+        "current_datetime": datetime.now()
     }
+
+@app.route('/api/get-client-ip', methods=['GET'])
+def api_get_client_ip():
+    return jsonify({"client_ip": get_client_ip()})
+
 
 
 def dated_url_for(endpoint, **values):
@@ -3348,6 +3369,7 @@ def export_parade_csv(date_str, company):
             writer.writerow(['AGGREGATED PARADE STATE - ALL COMPANIES'])
             writer.writerow([f'Date: {date_str}'])
             writer.writerow([f'Exported by: {user.get("username")} ({user_role})'])
+            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}'])
             writer.writerow([])
             writer.writerow(headers)
             
@@ -3409,6 +3431,7 @@ def export_parade_csv(date_str, company):
             writer.writerow([f'PARADE STATE - {company}'])
             writer.writerow([f'Date: {date_str}'])
             writer.writerow([f'Exported by: {user.get("username")} ({user_role})'])
+            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}'])
             writer.writerow([])
             writer.writerow(headers)
             
