@@ -457,6 +457,29 @@
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    gap: 3px;
+  }
+
+  .sc-badge, .card-corner-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--primary-color, #2563eb);
+    background: var(--nav-link-hover-bg, rgba(37, 99, 235, 0.08));
+    border: 1px solid var(--border-color, rgba(37, 99, 235, 0.25));
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+  }
+
+  .sc:hover .sc-badge, .chart-row-card:hover .card-corner-badge {
+    background: var(--primary-color, #2563eb);
+    color: #ffffff;
+    border-color: var(--primary-color, #2563eb);
   }
 
   .sc-val {
@@ -1378,67 +1401,86 @@ STATUS COLORS
       <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
         <span class="sc-label">PARADE STATE</span>
         <div class="sc-right">
+          <span class="sc-badge">OCENNCO</span>
           <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="openCourses">
         <span class="sc-label">On Course</span>
         <div class="sc-right">
+          <span class="sc-badge">TRGJCO</span>
           <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
-        <span class="sc-label">Roll Call</span>
+        <span class="sc-label">Roll Call Points</span>
         <div class="sc-right">
+          <span class="sc-badge">SM</span>
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope">
         <span class="sc-label">TD / Attachment</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="viewDetailsBtn">
         <span class="sc-label">Detachment</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal" id="card-agniveer" style="cursor: pointer">
         <span class="sc-label">Agniveer Str</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      {% if role in ['YAWAR'] %}
       <div class="sc" id="agniveer_on_leave" style="cursor: pointer">
         <span class="sc-label">Agniveer Leave</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="onleave_leave"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-
-      <!-- <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal">
-        <span class="sc-label">Active Loans</span>
+      {% endif %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
+        <span class="sc-label">Domain Spl</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
+          <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal">
+        <span class="sc-label">Loans</span>
+        <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
-      </div> -->
+      </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#projDash_modal">
-        <span class="sc-label">Total Projects</span>
+        <span class="sc-label">Projects</span>
         <div class="sc-right">
+          <span class="sc-badge">PROJCO</span>
           <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
         <span class="sc-label">Dues In</span>
         <div class="sc-right">
+          <span class="sc-badge">POSTING CLK</span>
           <span class="sc-val" id="dues_in_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesOutListModal">
         <span class="sc-label">Dues Out</span>
         <div class="sc-right">
+          <span class="sc-badge">POSTING CLK</span>
           <span class="sc-val" id="dues_out_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
@@ -1446,16 +1488,20 @@ STATUS COLORS
       <div class="sc" style="cursor: pointer" id="openSensitive">
         <span class="sc-label">Sensitive Indl</span>
         <div class="sc-right">
+          <span class="sc-badge">OC</span>
           <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
+      {% if role in ['YAWAR'] %}
       <div class="sc" id="interview-card" style="cursor: pointer">
         <span class="sc-label">Kunba Intrv</span>
         <div class="sc-right">
+          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="interview-Count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      {% endif %}
     </div>
 
     <!-- SECTION 2: GRAPHS & APPRECIATION WALL -->
@@ -1466,10 +1512,10 @@ STATUS COLORS
         <div class="top-chart-bar">
           <div class="graph-strip" id="graphStrip">
             <button class="graph-tab active" data-index="0">Posted Strength</button>
-            <button class="graph-tab" data-index="1">Bharosa App</button>
-            <button class="graph-tab" data-index="2">Detachment Stats</button>
-            <button class="graph-tab" data-index="3">Trend Analysis</button>
-            <button class="graph-tab" data-index="4">Fit vs UnFit (Weight Based)</button>
+            <!-- <button class="graph-tab" data-index="1">Bharosa App</button> -->
+            <button class="graph-tab" data-index="1">Detachment Stats</button>
+            <button class="graph-tab" data-index="2">Fitness Trend Analysis</button>
+            <button class="graph-tab" data-index="3">Fit vs UnFit (Weight Based)</button>
           </div>
           <div class="chart-filter-wrap">
             <select id="companyFilter" class="form-select form-select-sm">
@@ -1489,22 +1535,29 @@ STATUS COLORS
               <div class="card h-100">
                 <div class="card-body">
                   <div class="chart-header">
-                    <h6>Posted Strength</h6>
-                    <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                    <h6 style="margin-bottom:0;">Posted Strength</h6>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="card-corner-badge">ONCO</span>
+                      <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                    </div>
                   </div>
                   <div class="chart-canvas-wrap"><canvas id="rankChart"></canvas></div>
                 </div>
               </div>
             </div>
 
+            <!--
             <div class="chart-row-card" id="chartCard1">
               <div class="card h-100">
                 <div class="card-body">
                   <div class="chart-header">
-                    <h6>Bharosa App Sentiment</h6>
-                    <div style="display:flex;gap:12px;font-size:12px;font-weight:700">
-                      <span style="color:var(--primary-color, #2563eb)">Happy: <span id="bharosaHappyCount">95%</span></span>
-                      <span style="color:var(--danger-color, #dc2626)">Unhappy: <span id="bharosaUnhappyCount">5%</span></span>
+                    <h6 style="margin-bottom:0;">Bharosa App Sentiment</h6>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="card-corner-badge">ONCO</span>
+                      <div style="display:flex;gap:12px;font-size:12px;font-weight:700">
+                        <span style="color:var(--primary-color, #2563eb)">Happy: <span id="bharosaHappyCount">95%</span></span>
+                        <span style="color:var(--danger-color, #dc2626)">Unhappy: <span id="bharosaUnhappyCount">5%</span></span>
+                      </div>
                     </div>
                   </div>
                   <div class="bharosa-card-content">
@@ -1515,13 +1568,17 @@ STATUS COLORS
                 </div>
               </div>
             </div>
+            -->
 
             <div class="chart-row-card" id="chartCard2">
               <div class="card h-100">
                 <div class="card-body">
                   <div class="chart-header">
-                    <h6>Detachment Stats</h6>
-                    <span id="detachmentTotal" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                    <h6 style="margin-bottom:0;">Detachment Stats</h6>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="card-corner-badge">ONCO</span>
+                      <span id="detachmentTotal" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                    </div>
                   </div>
                   <div class="chart-canvas-wrap"><canvas id="detachmentChart"></canvas></div>
                 </div>
@@ -1532,8 +1589,11 @@ STATUS COLORS
               <div class="card h-100">
                 <div class="card-body">
                   <div class="chart-header">
-                    <h6>Monthly UnFit Comparison</h6>
-                    <span style="font-weight:600;color:#dc2626;font-size:12px">Trend Analysis</span>
+                    <h6 style="margin-bottom:0;">Monthly UnFit Comparison</h6>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="card-corner-badge">ONCO</span>
+                      <span style="font-weight:600;color:#dc2626;font-size:12px">Fitness Trend Analysis</span>
+                    </div>
                   </div>
                   <div class="chart-canvas-wrap"><canvas id="unfitTrendChart"></canvas></div>
                 </div>
@@ -1544,10 +1604,13 @@ STATUS COLORS
               <div class="card h-100">
                 <div class="card-body">
                   <div class="chart-header">
-                    <h6>Fit vs UnFit</h6>
-                    <div style="display:flex;gap:12px;font-size:12px;font-weight:700">
-                      <span style="color:#2563eb">Fit: <span id="fitCount">--</span></span>
-                      <span style="color:#dc2626">UnFit: <span id="unfitCount">--</span></span>
+                    <h6 style="margin-bottom:0;">Fit vs UnFit</h6>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                      <span class="card-corner-badge">ONCO</span>
+                      <div style="display:flex;gap:12px;font-size:12px;font-weight:700">
+                        <span style="color:#2563eb">Fit: <span id="fitCount">--</span></span>
+                        <span style="color:#dc2626">UnFit: <span id="unfitCount">--</span></span>
+                      </div>
                     </div>
                   </div>
                   <div class="chart-canvas-wrap"><canvas id="fitUnfitChart"></canvas></div>
@@ -2354,6 +2417,7 @@ STATUS COLORS
 
 
   async function loadBharosaChart(company) {
+    if (!document.getElementById("bharosaChart")) return;
     company = company || "ALL";
     try {
       var happy = 100;

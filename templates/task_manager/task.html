@@ -121,6 +121,64 @@
     color: #6c757d;
     font-style: italic;
   }
+
+  /* Dashboard Card Design */
+  .stats-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eef2f6;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .stats-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .stats-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
+  
+  .stats-card.total::before { background: linear-gradient(180deg, #4f46e5, #818cf8); }
+  .stats-card.pending::before { background: linear-gradient(180deg, #ef4444, #f87171); }
+  .stats-card.in-progress::before { background: linear-gradient(180deg, #f59e0b, #fbbf24); }
+  .stats-card.completed::before { background: linear-gradient(180deg, #10b981, #34d399); }
+  
+  .stats-icon {
+    font-size: 2rem;
+    opacity: 0.8;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-card.total .stats-icon { color: #4f46e5; }
+  .stats-card.pending .stats-icon { color: #ef4444; }
+  .stats-card.in-progress .stats-icon { color: #f59e0b; }
+  .stats-card.completed .stats-icon { color: #10b981; }
+
+  .stats-number {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stats-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 </style>
 
   {% set header = "Task Management" %}
@@ -128,20 +186,97 @@
   {% include 'navbar/navbar.html' %}
 
   <!-- Buttons Row -->
-  <div class="container mt-4">
+  <div class="container-fluid mt-4">
     <div class="card shadow-sm p-3">
       <div class="row g-2 align-items-center">
+        <div class="col-auto">
+          <button id="btnOverview" class="btn btn-primary btn-md active-btn">Overview</button>
+        </div>
         <div class="col-auto">
           <button id="btnCreateTask" class="btn btn-primary btn-md">Create Task</button>
         </div>
         <div class="col-auto">
           <button id="btnViewTask" class="btn btn-primary btn-md">View Tasks</button>
         </div>
-        <!-- <div class="col-md-4 ms-auto">
-          <form method="GET">
-            <input type="text" name="query" class="form-control" placeholder="Search for a task...">
-          </form>
-        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Dashboard Section -->
+  <div class="container-fluid mt-4" id="statsDashboardSection">
+    <!-- Stats Row -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3">
+        <div class="stats-card total">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="stats-number" id="statTotal">-</div>
+              <div class="stats-label">Total Tasks</div>
+            </div>
+            <div class="stats-icon"><i class="fa-solid fa-layer-group"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card pending">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="stats-number" id="statPending">-</div>
+              <div class="stats-label">Pending</div>
+            </div>
+            <div class="stats-icon"><i class="fa-solid fa-clock"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card in-progress">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="stats-number" id="statInProgress">-</div>
+              <div class="stats-label">In Progress</div>
+            </div>
+            <div class="stats-icon"><i class="fa-solid fa-spinner"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stats-card completed">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="stats-number" id="statCompleted">-</div>
+              <div class="stats-label">Completed</div>
+            </div>
+            <div class="stats-icon"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Tasks List Card -->
+    <div class="card shadow-sm p-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="m-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recently Added Tasks</h4>
+        <button id="viewAllRecentBtn" class="btn btn-sm btn-outline-primary">View All Tasks</button>
+      </div>
+      <hr class="mt-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="recentTasksTable">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 80px;">Id</th>
+              <th>Task Name</th>
+              <th>Assigned To</th>
+              <th>Priority</th>
+              <th>Due Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentTasksBody">
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">Loading stats & recent tasks...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -225,29 +360,119 @@
 
 <script>
   let tasksData = []; 
+  const btnOverview = document.getElementById("btnOverview");
   const btnCreate = document.getElementById("btnCreateTask");
   const btnView = document.getElementById("btnViewTask");
   const formDiv = document.getElementById("createTaskForm");
   const viewSection = document.getElementById("viewTaskSection");
+  const statsDashboardSection = document.getElementById("statsDashboardSection");
+  const viewAllRecentBtn = document.getElementById("viewAllRecentBtn");
   const taskTableBody = document.querySelector("#taskTable tbody");
   const filterBtns = document.querySelectorAll(".filter-btn");
   const taskForm = document.getElementById("taskForm");
 
-  // Toggle Create / View
+  // Fetch and Load Stats and Recent Tasks
+  async function loadDashboardStats() {
+    try {
+      const res = await fetch("/task_manager/api/stats");
+      const result = await res.json();
+      if (result.status === "success") {
+        document.getElementById("statTotal").textContent = result.stats.total || 0;
+        document.getElementById("statPending").textContent = result.stats.pending || 0;
+        document.getElementById("statInProgress").textContent = result.stats.in_progress || 0;
+        document.getElementById("statCompleted").textContent = result.stats.completed || 0;
+
+        const recentBody = document.getElementById("recentTasksBody");
+        recentBody.innerHTML = "";
+        if (result.recent_tasks.length === 0) {
+          recentBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-4">No tasks found</td></tr>`;
+          return;
+        }
+
+        result.recent_tasks.forEach(task => {
+          const badgeClass = task.task_status === "Pending" ? "bg-danger" :
+                             task.task_status === "In Progress" ? "bg-warning text-dark" :
+                             task.task_status === "Completed" ? "bg-success" : "bg-secondary";
+          const priorityBadgeClass = task.priority === "High" ? "bg-danger" :
+                                     task.priority === "Medium" ? "bg-warning text-dark" : "bg-info";
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${task.id}</td>
+            <td><strong>${escapeHtml(task.task_name)}</strong></td>
+            <td>${escapeHtml(task.assigned_name || "Unassigned")}</td>
+            <td><span class="badge ${priorityBadgeClass}">${task.priority || "Low"}</span></td>
+            <td>${task.due_date || "-"}</td>
+            <td><span class="badge ${badgeClass}">${task.task_status || "Pending"}</span></td>
+          `;
+          recentBody.appendChild(row);
+        });
+      }
+    } catch (e) {
+      console.error("Failed to load dashboard stats:", e);
+    }
+  }
+
+  function escapeHtml(t) {
+    if (!t) return "";
+    const d = document.createElement("div");
+    d.textContent = t;
+    return d.innerHTML;
+  }
+
+  // Toggle Overview / Create / View
+  btnOverview.addEventListener("click", () => {
+    formDiv.classList.remove("show");
+    viewSection.style.display = "none";
+    statsDashboardSection.style.display = "block";
+    
+    btnOverview.classList.add("active-btn");
+    btnCreate.classList.remove("active-btn");
+    btnView.classList.remove("active-btn");
+    
+    loadDashboardStats();
+  });
+
   btnCreate.addEventListener("click", () => {
     const isVisible = formDiv.classList.contains("show");
-    formDiv.classList.toggle("show", !isVisible);
-    btnCreate.classList.toggle("active-btn", !isVisible);
-    btnView.classList.remove("active-btn");
-    viewSection.style.display = "none";
+    if (isVisible) {
+      btnOverview.click();
+    } else {
+      formDiv.classList.add("show");
+      viewSection.style.display = "none";
+      statsDashboardSection.style.display = "none";
+      
+      btnOverview.classList.remove("active-btn");
+      btnCreate.classList.add("active-btn");
+      btnView.classList.remove("active-btn");
+    }
   });
 
   btnView.addEventListener("click", () => {
     formDiv.classList.remove("show");
+    viewSection.style.display = "block";
+    statsDashboardSection.style.display = "none";
+    
+    btnOverview.classList.remove("active-btn");
     btnCreate.classList.remove("active-btn");
     btnView.classList.add("active-btn");
-    viewSection.style.display = "block";
+    
     loadTasks("all");
+  });
+
+  viewAllRecentBtn.addEventListener("click", () => {
+    btnView.click();
+  });
+
+  // Initialize view based on URL hash
+  document.addEventListener("DOMContentLoaded", () => {
+    if (window.location.hash === "#create") {
+      btnCreate.click();
+    } else if (window.location.hash === "#view") {
+      btnView.click();
+    } else {
+      btnOverview.click();
+    }
   });
 
   // Create Task
@@ -419,22 +644,21 @@
   });
 
 function deleteTask(taskId){
-   let taskToDelete =  taskId
+   let taskToDelete =  taskId;
    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-   deleteModal.show()
-
+   deleteModal.show();
+ 
    const confirmDeleteBtn = document.getElementById('confirmDelete');
-confirmDeleteBtn.addEventListener('click', function () {
-    if (taskToDelete !== null) {
-        deleteBck(taskToDelete);
-        taskToDelete = null; // reset
-        // Hide the modal
-        const deleteModalEl = document.getElementById('deleteModal');
-        const modalInstance = bootstrap.Modal.getInstance(deleteModalEl);
-        modalInstance.hide();
-    }
-});
-
+   confirmDeleteBtn.onclick = function () {
+       if (taskToDelete !== null) {
+           deleteBck(taskToDelete);
+           taskToDelete = null; // reset
+           // Hide the modal
+           const deleteModalEl = document.getElementById('deleteModal');
+           const modalInstance = bootstrap.Modal.getInstance(deleteModalEl) || new bootstrap.Modal(deleteModalEl);
+           modalInstance.hide();
+       }
+   };
 }
 
 
@@ -461,7 +685,7 @@ confirmDeleteBtn.addEventListener('click', function () {
         }
         return res.json()
       })
-      .then((data) => )
+      .then((data) => {})
       .finally(() => {
         showStatusModal("Task Deleted", "Red", 2000);
 

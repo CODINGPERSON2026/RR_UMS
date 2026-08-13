@@ -303,6 +303,62 @@
       color: #ffffff !important;
     }
 
+    /* ── Universal Modal Count Badge / Pill (High Contrast for All Themes) ── */
+    .modal-header .modal-count-pill,
+    .modal-header .alarm-alert-count-box,
+    .modal-header .duesCountWrap,
+    .modal-header div[style*="background: #eef4ff"],
+    .modal-header div[style*="background:#eef4ff"],
+    .modal-header div[style*="background: rgba(255, 255, 255"] {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding: 3px 10px !important;
+      border-radius: 99px !important;
+      background: rgba(255, 255, 255, 0.22) !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      backdrop-filter: blur(8px) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .modal-header .modal-count-pill span:not(.badge):not(.count-number),
+    .modal-header .alarm-alert-count-box > span:not(.badge):not(.count-number),
+    .modal-header .duesCountWrap > span:not(.badge):not(.count-number),
+    .modal-header div[style*="background"] > span:not(.badge):not(.count-number),
+    .modal-header .alarm-alert-count-label,
+    .modal-header .duesCountLabel {
+      font-size: 0.78rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.3px !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+      white-space: nowrap !important;
+    }
+
+    .modal-header .modal-count-pill .badge,
+    .modal-header .modal-count-pill .count-number,
+    .modal-header .alarm-alert-count-box > span.badge,
+    .modal-header .duesCountWrap > span.badge,
+    .modal-header div[style*="background"] > span.badge,
+    .modal-header .attachmentCountBadgeUnique,
+    .modal-header .detCountBadgeUnique,
+    .modal-header .agniLeaveCountBadgeUnique,
+    .modal-header .duesCountBadge {
+      font-size: 0.8rem !important;
+      font-weight: 800 !important;
+      padding: 3px 10px !important;
+      border-radius: 99px !important;
+      background: #ffffff !important;
+      color: #0d6efd !important;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .modal-header .alarm-alert-count-box > span.badge,
+    .modal-header .badge.bg-danger {
+      background: #ffffff !important;
+      color: #dc2626 !important;
+    }
+
     .modal-header .btn-close, .modal-header .leave-app-close, .modal-header .lh-close {
       filter: invert(1) grayscale(100%) brightness(200%) !important;
       opacity: 0.95 !important;
@@ -1148,14 +1204,14 @@
       </a>
       {% endif %}
 
-      <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
       <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"
          data-tiptext="Tasks">
         <span class="nav-icon"><i class="fas fa-tasks"></i></span>
         <span class="nav-label-text">Task Management</span>
         <span class="nav-tooltip">Tasks</span>
       </a>
-      {% endif %} -->
+      {% endif %}
 
       <!-- Finance Section -->
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT',

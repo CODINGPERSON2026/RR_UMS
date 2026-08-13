@@ -6,7 +6,7 @@ DB_CONFIG = {
     'user': 'root',
     'password': 'yawar@123',
     
-    'database': 'hrms',
+    'database': 'hrmsnew',
     'port': 3306
 }
 

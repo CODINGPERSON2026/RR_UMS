@@ -1388,9 +1388,10 @@ def assigned_alarm():
             DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
         FROM assigned_det ad
         LEFT JOIN dets d ON ad.det_id = d.det_id
-        LEFT JOIN personnel p ON ad.army_number = p.army_number
+        JOIN personnel p ON ad.army_number = p.army_number
         WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
           AND ad.det_status = 1
+          AND p.detachment_status = 1
         '''
 
         params = []
@@ -2059,9 +2060,10 @@ WHERE company = %s
                 DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
-            LEFT JOIN personnel p ON ad.army_number = p.army_number
+            JOIN personnel p ON ad.army_number = p.army_number
             WHERE DATEDIFF(NOW(), ad.assigned_on) > 5
               AND ad.det_status = 1
+              AND p.detachment_status = 1
               ''' + (f" AND p.company = %s" if company != "Admin" else "") +
             '''
             ORDER BY ad.assigned_on ASC;
@@ -4348,9 +4350,10 @@ def get_assigned_alarm():
                 DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
-            LEFT JOIN personnel p ON ad.army_number = p.army_number
+            JOIN personnel p ON ad.army_number = p.army_number
             WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
-              
+              AND p.detachment_status = 1
+              AND ad.det_status = 1
         '''
         params = []
         if company != "Admin":

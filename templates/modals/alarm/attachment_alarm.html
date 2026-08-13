@@ -1,21 +1,21 @@
 <style>
   #attachmentAlarmModalScope .alarm-alert-count-box {
-    background: rgba(220, 53, 69, 0.1) !important;
-    border: 1px solid rgba(220, 53, 69, 0.25) !important;
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
   }
 
   [data-theme="dark"] #attachmentAlarmModalScope .alarm-alert-count-box {
-    background: rgba(239, 68, 68, 0.2) !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
   }
 
   #attachmentAlarmModalScope .alarm-alert-count-label {
-    color: #dc3545 !important;
+    color: #ffffff !important;
     font-weight: 700 !important;
   }
 
   [data-theme="dark"] #attachmentAlarmModalScope .alarm-alert-count-label {
-    color: #f87171 !important;
+    color: #ffffff !important;
   }
 
   #attachAlarmTotalCount {
@@ -29,7 +29,7 @@
     🔔 You have Attachment alarms!
 </span>
 
-<!-- ================= ATTACHMENT ALARM OVER 90 DAYS MODAL ================= -->
+<!-- ================= ATTACHMENT ALARM OVER 180 DAYS MODAL ================= -->
 <div class="modal fade" id="attachmentAlarmModalScope" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl custom-size">
     <div class="modal-content">
@@ -38,7 +38,7 @@
         <div class="d-flex align-items-center gap-3 flex-wrap w-100">
           <div class="d-flex align-items-center gap-2">
             <h5 class="modal-title mb-0">
-              ⚠️ Attachment Alarm — Over 90 Days
+              ⚠️ Attachment Alarm — Over 180 Days
             </h5>
           </div>
 
@@ -48,9 +48,9 @@
           </select>
 
           <!-- TOTAL COUNT BADGE -->
-          <div class="d-flex align-items-center gap-2 px-3 py-1 rounded-3 alarm-alert-count-box">
-            <span class="fw-semibold small alarm-alert-count-label">Alert Count</span>
-            <span id="attachAlarmTotalCount" class="badge rounded-pill bg-danger">0</span>
+          <div class="modal-count-pill alarm-alert-count-box">
+            <span class="count-label alarm-alert-count-label">Alert Count</span>
+            <span id="attachAlarmTotalCount" class="badge rounded-pill bg-danger count-number">0</span>
           </div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -127,7 +127,7 @@ function renderAttachAlarmTable() {
     if (countBadge) countBadge.textContent = filtered.length;
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No attachment alarms over 90 days found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No attachment alarms over 180 days found.</td></tr>`;
         return;
     }
 

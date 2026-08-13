@@ -464,27 +464,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Pie Chart - Expenditure Distribution (Dangerous Red Tones)
+    // Pie Chart - Expenditure Distribution (Rich Vibrant Synced Palette)
+    const expenditureColors = [
+      "#3b82f6", // Royal Blue
+      "#10b981", // Emerald Green
+      "#f59e0b", // Amber Gold
+      "#8b5cf6", // Purple Violet
+      "#ec4899", // Vivid Pink
+      "#06b6d4", // Bright Cyan
+      "#f97316", // Coral Orange
+      "#6366f1", // Deep Indigo
+      "#14b8a6", // Sea Teal
+      "#ef4444"  // Rose Red
+    ];
+
     pieChart = new Chart(document.getElementById("pieChart"), {
       type: "pie",
       data: {
         labels: n,
         datasets: [{ 
           data: e, 
-          backgroundColor: [
-            '#ef4444',   // Red
-            '#f87171',   // Light Red
-            '#b91c1c',   // Dark Red
-            '#dc2626',   // Strong Red
-            '#991b1b'    // Deep Red
-          ]
+          backgroundColor: n.map((_, i) => expenditureColors[i % expenditureColors.length]),
+          borderColor: "#ffffff",
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       plugins: [pieDatalabelsPlugin],
       options: { 
         ...chartOptions, 
         plugins: { 
-          legend: { position: 'right' } 
+          legend: { 
+            position: 'right',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 12,
+              font: { weight: '600', size: 12 }
+            }
+          } 
         }
       }
     });
@@ -509,20 +527,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Doughnut Chart - Overall Utilization
+    // Doughnut Chart - Overall Utilization (Red = Utilized, Green = Remaining)
     doughnutChart = new Chart(document.getElementById("doughnutChart"), {
       type: "doughnut",
       data: {
         labels: ["Utilized", "Remaining"],
         datasets: [{
-          data: [o, 100 - o],
-          backgroundColor: ["#10b981", "#e5e7eb"]
+          data: [o, Math.max(0, 100 - o)],
+          backgroundColor: ["#ef4444", "#10b981"],
+          borderColor: "#ffffff",
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       plugins: [doughnutDatalabelsPlugin],
       options: {
         ...chartOptions,
-        cutout: "65%"
+        cutout: "65%",
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 14,
+              font: { weight: '600', size: 12 }
+            }
+          }
+        }
       }
     });
   }
