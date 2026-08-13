@@ -1,0 +1,43 @@
+{% extends "baseView.html" %}
+
+{% block title %}HRMS AI Chatbot - UMS 15CESR{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+      <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between py-3">
+          <h4 class="mb-0 fs-5 d-flex align-items-center gap-2">
+            <i class="fas fa-robot"></i> HRMS AI Assistant
+          </h4>
+          <span class="badge bg-light text-primary fw-semibold">Live DB Assistant</span>
+        </div>
+        <div class="card-body p-4">
+          <p class="text-secondary mb-4">
+            Ask any question about unit personnel, company strength, leave requests, loans, tasks, parade state, agniveers, or database schema. Use the floating chat assistant at the bottom right corner or click below to start chatting.
+          </p>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('hrms-chatbot-toggle').click()">
+              <i class="fas fa-comments me-1"></i> Open Floating Chat Widget
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Automatically open floating chat widget when navigating to /chat_bot
+    setTimeout(function() {
+      const toggle = document.getElementById('hrms-chatbot-toggle');
+      const panel = document.getElementById('hrms-chatbot-panel');
+      if (toggle && panel && !panel.classList.contains('hrms-chat-panel--open')) {
+        toggle.click();
+      }
+    }, 300);
+  });
+</script>
+{% endblock %}

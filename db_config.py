@@ -1,12 +1,13 @@
-from imports import *
+import mysql.connector
+from mysql.connector import Error
 
 # Database configuration
 DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'qaz123QAZ!@#',
+    'password': 'Reynolds@88',
     
-    'database': 'hrms',
+    'database': 'ums',
     'port': 3306
 }
 
