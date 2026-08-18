@@ -1,0 +1,794 @@
+<!-- COMPANY INTERVIEW MODAL -->
+
+<style>
+  :root {
+    --ci-900: #0c2340;
+    --ci-800: #123361;
+    --ci-700: #1a4882;
+    --ci-600: #2260a8;
+    --ci-500: #2b79d0;
+    --ci-400: #5597e0;
+    --ci-300: #93bdf0;
+    --ci-200: #c8ddf8;
+    --ci-100: #e8f2fe;
+    --ci-50 : #f5f9ff;
+    --ci-ink    : #0f1e35;
+    --ci-ink2   : #2d4260;
+    --ci-muted  : #6b85a6;
+    --ci-border : #cddaee;
+    --ci-surface: #ffffff;
+    --ci-bg     : #f3f7fd;
+    --ci-shadow : rgba(18,51,97,0.14);
+  }
+
+  #companyInterviewModal .modal-dialog {
+    max-width: 1050px;
+    margin: 1.5rem auto 1rem auto;
+  }
+
+  #companyInterviewModal .modal-content {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px var(--ci-border), 0 32px 80px rgba(12,35,64,0.22);
+  }
+
+  /* ── HEADER ── */
+  #companyInterviewModal .modal-header {
+    background: linear-gradient(135deg, var(--ci-900) 0%, var(--ci-700) 100%);
+    border: none;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #companyInterviewModal .modal-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 0% 100%, rgba(43,121,208,.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 0%,  rgba(85,151,224,.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .ci-hdr {
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+  .ci-hdr-icon {
+    width: 50px; height: 50px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .ci-hdr-text { flex: 1; min-width: 0; }
+  .ci-hdr-title {
+    font-size: 1.2rem; font-weight: 700; color: #fff;
+    letter-spacing: -.3px; line-height: 1.2; margin: 0 0 3px;
+  }
+  .ci-hdr-sub {
+    font-size: 0.76rem; color: var(--ci-300);
+    letter-spacing: .6px; text-transform: uppercase; font-weight: 500;
+  }
+  .ci-hdr-badge {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 6px 14px;
+    display: flex; align-items: center; gap: 7px;
+    color: #fff; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;
+  }
+  .ci-hdr-badge .ci-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #facc15;
+    animation: ci-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes ci-pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%     { opacity:.4; transform:scale(.65); }
+  }
+  .ci-btn-close {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer; font-size: 14px; flex-shrink: 0;
+    transition: background .15s; position: relative; z-index: 1;
+  }
+  .ci-btn-close:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── SEARCH ── */
+  .ci-search-strip {
+    padding: 12px 20px;
+    background: var(--ci-bg);
+    border-bottom: 1px solid var(--ci-border);
+  }
+  .ci-search-rel { position: relative; }
+  .ci-search-icon-pos {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--ci-muted); font-size: 12px; pointer-events: none;
+  }
+  .ci-search-input {
+    width: 100%; border: 1px solid var(--ci-border); border-radius: 10px;
+    padding: 8px 13px 8px 34px; font-size: 0.86rem;
+    background: #ffffff; color: var(--ci-ink); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .ci-search-input:focus {
+    border-color: var(--ci-500);
+    box-shadow: 0 0 0 3px rgba(43,121,208,.11);
+  }
+
+  /* ── BODY ── */
+  #companyInterviewModal .modal-body {
+    padding: 0; background: var(--ci-bg);
+    max-height: 58vh; overflow-y: auto;
+  }
+
+  .ci-state-block {
+    padding: 52px 24px; text-align: center; color: var(--ci-muted);
+  }
+  .ci-ld { display:inline-flex; gap:6px; margin-bottom:12px; }
+  .ci-ld span {
+    width:9px; height:9px; border-radius:50%;
+    background: var(--ci-500);
+    animation: ci-bounce 1.2s ease-in-out infinite;
+  }
+  .ci-ld span:nth-child(2) { animation-delay:.2s; }
+  .ci-ld span:nth-child(3) { animation-delay:.4s; }
+  @keyframes ci-bounce {
+    0%,80%,100% { transform:scale(.6); opacity:.4; }
+    40%          { transform:scale(1.2); opacity:1; }
+  }
+
+  /* ── TABLE ── */
+  .ci-tbl-wrap { padding: 14px 18px 18px; }
+  .ci-tbl {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+  }
+  .ci-tbl thead th {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: .7px;
+    text-transform: uppercase; color: var(--ci-muted);
+    padding: 7px 14px; border-bottom: none;
+  }
+  .ci-tbl tbody tr {
+    background: #ffffff;
+    border-radius: 11px;
+    box-shadow: 0 1px 4px rgba(18,51,97,.06);
+    transition: box-shadow .15s, transform .15s;
+  }
+  .ci-tbl tbody tr:hover {
+    box-shadow: 0 4px 16px rgba(18,51,97,.12);
+    transform: translateY(-1px);
+  }
+  .ci-tbl tbody td {
+    padding: 12px 14px; font-size: .88rem;
+    color: var(--ci-ink); vertical-align: middle; border: none;
+  }
+  .ci-tbl tbody td:first-child { border-radius: 11px 0 0 11px; }
+  .ci-tbl tbody td:last-child  { border-radius: 0 11px 11px 0; }
+
+  .ci-sno { font-size:.76rem; font-weight:700; color:var(--ci-muted); width:30px; text-align:center; }
+  .ci-army {
+    display: inline-block;
+    background: var(--ci-100); color: var(--ci-800);
+    border-radius: 20px; padding: 3px 11px;
+    font-size: .79rem; font-weight: 700;
+    letter-spacing: .4px; font-family: 'Courier New', monospace;
+  }
+  .ci-rank {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(43,121,208,.1); color: var(--ci-700);
+    border-radius: 6px; padding: 3px 9px;
+    font-size: .77rem; font-weight: 700;
+  }
+  .ci-name { font-weight: 600; }
+
+  .ci-done-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 15px; border-radius: 8px;
+    font-size: .79rem; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(22,163,74,.22);
+    transition: transform .15s, box-shadow .15s;
+    white-space: nowrap;
+  }
+  .ci-done-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,.33); }
+  .ci-done-btn:active { transform: scale(.97); }
+  .ci-done-btn:disabled { opacity:.55; cursor:not-allowed; transform:none!important; }
+
+  /* ── FOOTER ── */
+  #companyInterviewModal .modal-footer {
+    padding: 12px 22px;
+    background: var(--ci-bg);
+    border-top: 1px solid var(--ci-border);
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+  .ci-foot-info { font-size: .79rem; color: var(--ci-muted); font-weight: 500; }
+  .ci-foot-info strong { color: var(--ci-ink2); }
+  .ci-foot-close {
+    padding: 7px 18px; border-radius: 9px;
+    border: 1px solid var(--ci-border);
+    background: #ffffff; color: var(--ci-ink2);
+    font-size: .84rem; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+  }
+  .ci-foot-close:hover { background: var(--ci-100); }
+
+  /* ── REMARKS OVERLAY ── */
+  .ci-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 1060;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 22px;
+  }
+  .ci-overlay.ci-show { display: flex; }
+
+  .ci-overlay-card {
+    background: #ffffff !important;
+    border-radius: 20px;
+    padding: 30px;
+    width: min(480px, 92vw);
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    box-shadow: 0 25px 65px rgba(15, 23, 42, 0.35);
+    animation: ci-popIn .25s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes ci-popIn {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .ci-ov-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .ci-ov-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #dcfce7;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .ci-ov-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .ci-ov-sub {
+    font-size: 0.84rem;
+    color: #64748b;
+  }
+  .ci-ov-sub strong {
+    color: #15803d;
+    font-weight: 600;
+  }
+
+  .ci-ov-ta {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .ci-ov-ta:focus {
+    border-color: #22c55e;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+  }
+
+  .ci-ov-acts {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+  .ci-ov-cancel {
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .ci-ov-cancel:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+  }
+  .ci-ov-confirm {
+    padding: 9px 22px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .ci-ov-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+  }
+  .ci-ov-confirm:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  /* ── TOAST ── */
+  .ci-toast {
+    position: fixed; bottom: 26px; right: 26px; z-index: 208000;
+    background: #16a34a; color: #fff; border-radius: 12px;
+    padding: 11px 20px; font-size: .87rem; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(22,163,74,.35);
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; transform: translateY(14px);
+    transition: opacity .3s, transform .3s; pointer-events: none;
+  }
+  .ci-toast.ci-toast-on { opacity:1; transform:translateY(0); }
+</style>
+
+
+<!-- ══════ MODAL ══════ -->
+<div class="modal fade" id="companyInterviewModal" tabindex="-1"
+     aria-labelledby="ciModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="position: relative;">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="ci-hdr">
+          <div class="ci-hdr-icon">🎖️</div>
+          <div class="ci-hdr-text">
+            <h5 class="ci-hdr-title" id="ciModalLabel">Company Interview</h5>
+            <p class="ci-hdr-sub">Pending Interview Register</p>
+          </div>
+          <div class="ci-hdr-badge">
+            <span class="ci-dot"></span>
+            <span id="ci-badge-count">—</span>&nbsp;Pending
+          </div>
+          <button class="ci-btn-close" data-bs-dismiss="modal" title="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="ci-search-strip">
+        <div class="ci-search-rel">
+          <i class="fas fa-search ci-search-icon-pos"></i>
+          <input id="ciSearchBox" class="ci-search-input"
+                 type="text" placeholder="Search by name, army number or rank…"
+                 oninput="ciFilterRows()">
+        </div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="ci-tabs-strip d-flex align-items-center justify-content-center py-2 px-3" style="background:#f1f5f9; border-bottom:1px solid #e2e8f0; gap:10px;">
+        <button id="ciTabPendingBtn" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="ciSwitchTab('pending')">
+          <i class="fas fa-clock me-1"></i> Interview Pending <span class="badge bg-white text-primary rounded-pill ms-1" id="ciBadgePending">0</span>
+        </button>
+        <button id="ciTabDoneBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold" onclick="ciSwitchTab('done')">
+          <i class="fas fa-check-circle me-1"></i> Interview Done <span class="badge bg-secondary rounded-pill ms-1" id="ciBadgeDone">0</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" id="ciBody">
+        <div class="ci-state-block" id="ciLoader">
+          <div class="ci-ld"><span></span><span></span><span></span></div>
+          <div style="font-size:.9rem;font-weight:600;">Loading interview records…</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap" style="gap:10px;">
+        <span class="ci-foot-info" style="font-size:0.85rem; color:#475569;">
+          Showing <strong id="ciPageStart">0</strong>–<strong id="ciPageEnd">0</strong> of
+          <strong id="ci-tot">0</strong> <span id="ciFootLabel">pending interviews</span>
+        </span>
+
+        <div class="d-flex align-items-center gap-2" id="ciPaginationControls">
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="ciPrevBtn" onclick="ciChangePage(-1)" disabled>
+            <i class="fas fa-chevron-left me-1"></i> Prev
+          </button>
+          <span style="font-size:0.82rem; font-weight:600; color:#334155;">
+            Page <span id="ciCurrentPageNum">1</span> of <span id="ciTotalPagesNum">1</span>
+          </span>
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="ciNextBtn" onclick="ciChangePage(1)" disabled>
+            Next <i class="fas fa-chevron-right ms-1"></i>
+          </button>
+        </div>
+
+        <button class="ci-foot-close" data-bs-dismiss="modal">Close</button>
+      </div>
+
+      <!-- ══════ REMARKS OVERLAY (INSIDE MODAL CONTENT) ══════ -->
+      <div class="ci-overlay" id="ciOverlay" onclick="if(event.target===this) ciCancelOverlay()">
+        <div class="ci-overlay-card">
+          <div class="ci-ov-header">
+            <div class="ci-ov-icon">✓</div>
+            <div>
+              <div class="ci-ov-title">Mark Interview Done</div>
+              <div class="ci-ov-sub" id="ciOverlaySub">Adding remarks for soldier</div>
+            </div>
+          </div>
+          <textarea id="ciOverlayTA" class="ci-ov-ta"
+                    placeholder="Enter remarks (optional)…"></textarea>
+          <div class="ci-ov-acts">
+            <button class="ci-ov-cancel" onclick="ciCancelOverlay()">Cancel</button>
+            <button class="ci-ov-confirm" id="ciOverlayConfirm" onclick="ciSubmitDone()">
+              ✓&nbsp;Confirm Interview Done
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TOAST ══════ -->
+<div class="ci-toast" id="ciToast">
+  <span>✓</span><span id="ciToastTxt">Interview marked as done!</span>
+</div>
+
+
+<script>
+(function () {
+  'use strict';
+
+  var ciPendingRows   = [];
+  var ciCompletedRows = [];
+  var ciFiltered      = [];
+  var ciCurrentTab    = 'pending';
+  var ciIsAdmin       = false;
+  var ciPageSize      = 20;
+  var ciCurrentPage   = 1;
+  var ciActiveCiId    = null;
+  var ciActiveRow     = null;
+
+  /* ── Open modal → load data ── */
+  var ciModal = document.getElementById('companyInterviewModal');
+  if (ciModal) {
+    ciModal.addEventListener('show.bs.modal', ciLoad);
+  }
+
+  /* ── Keypress ESC to close overlay ── */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var ov = document.getElementById('ciOverlay');
+      if (ov && ov.classList.contains('ci-show')) {
+        ciCancelOverlay();
+      }
+    }
+  });
+
+  /* ── Fetch list ── */
+  async function ciLoad() {
+    var body = document.getElementById('ciBody');
+    body.innerHTML = '<div class="ci-state-block"><div class="ci-ld"><span></span><span></span><span></span></div><div style="font-size:.9rem;font-weight:600;margin-top:4px">Loading interview records…</div></div>';
+
+    try {
+      var res  = await fetch('/interview_update/company_interview_pending');
+      var data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || 'Server error');
+
+      ciPendingRows   = data.pending || [];
+      ciCompletedRows = data.completed || [];
+      ciIsAdmin       = !!data.is_admin;
+
+      var bPending = document.getElementById('ciBadgePending');
+      var bDone    = document.getElementById('ciBadgeDone');
+      if (bPending) bPending.textContent = ciPendingRows.length;
+      if (bDone)    bDone.textContent    = ciCompletedRows.length;
+
+      ciSwitchTab('pending');
+
+    } catch (e) {
+      body.innerHTML = '<div class="ci-state-block"><div style="font-size:2rem;margin-bottom:8px">⚠️</div><div style="font-weight:600">Could not load data</div><div style="font-size:.8rem;margin-top:4px">' + e.message + '</div></div>';
+    }
+  }
+
+  /* ── Switch Tab ── */
+  window.ciSwitchTab = function (tab) {
+    ciCurrentTab  = tab;
+    ciCurrentPage = 1;
+
+    var pBtn = document.getElementById('ciTabPendingBtn');
+    var dBtn = document.getElementById('ciTabDoneBtn');
+
+    if (tab === 'pending') {
+      if (pBtn) pBtn.className = 'btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm';
+      if (dBtn) dBtn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold';
+      var bP = document.getElementById('ciBadgePending');
+      var bD = document.getElementById('ciBadgeDone');
+      if (bP) bP.className = 'badge bg-white text-primary rounded-pill ms-1';
+      if (bD) bD.className = 'badge bg-secondary rounded-pill ms-1';
+    } else {
+      if (pBtn) pBtn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold';
+      if (dBtn) dBtn.className = 'btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm';
+      var bP = document.getElementById('ciBadgePending');
+      var bD = document.getElementById('ciBadgeDone');
+      if (bP) bP.className = 'badge bg-secondary rounded-pill ms-1';
+      if (bD) bD.className = 'badge bg-white text-success rounded-pill ms-1';
+    }
+
+    ciFilterAndPaginate();
+  };
+
+  /* ── Filter & Paginate ── */
+  window.ciFilterAndPaginate = function () {
+    var q      = (document.getElementById('ciSearchBox').value || '').toLowerCase().trim();
+    var source = ciCurrentTab === 'pending' ? ciPendingRows : ciCompletedRows;
+
+    if (!q) {
+      ciFiltered = source;
+    } else {
+      ciFiltered = source.filter(function (r) {
+        var str = (r.army_number + ' ' + r.rank + ' ' + r.name + ' ' + (r.company || '') + ' ' + (r.remarks || '')).toLowerCase();
+        return str.includes(q);
+      });
+    }
+
+    var totalPages = Math.ceil(ciFiltered.length / ciPageSize) || 1;
+    if (ciCurrentPage < 1) ciCurrentPage = 1;
+    if (ciCurrentPage > totalPages) ciCurrentPage = totalPages;
+
+    var start = (ciCurrentPage - 1) * ciPageSize;
+    var end   = start + ciPageSize;
+    var pageSlice = ciFiltered.slice(start, end);
+
+    ciRenderTable(pageSlice, start, ciFiltered.length, totalPages);
+  };
+
+  /* ── Change Page ── */
+  window.ciChangePage = function (delta) {
+    ciCurrentPage += delta;
+    ciFilterAndPaginate();
+  };
+
+  /* ── Filter rows on search input ── */
+  window.ciFilterRows = function () {
+    ciCurrentPage = 1;
+    ciFilterAndPaginate();
+  };
+
+  /* ── Render table slice ── */
+  function ciRenderTable(pageRows, startIndex, totalFilteredCount, totalPages) {
+    var body      = document.getElementById('ciBody');
+    var badge     = document.getElementById('ci-badge-count');
+    var tot       = document.getElementById('ci-tot');
+    var startEl   = document.getElementById('ciPageStart');
+    var endEl     = document.getElementById('ciPageEnd');
+    var pageNum   = document.getElementById('ciCurrentPageNum');
+    var totalPagesEl = document.getElementById('ciTotalPagesNum');
+    var prevBtn   = document.getElementById('ciPrevBtn');
+    var nextBtn   = document.getElementById('ciNextBtn');
+    var footLabel = document.getElementById('ciFootLabel');
+
+    var dataset = ciCurrentTab === 'pending' ? ciPendingRows : ciCompletedRows;
+    if (badge) badge.textContent = dataset.length;
+    if (tot)   tot.textContent   = totalFilteredCount;
+    if (footLabel) footLabel.textContent = ciCurrentTab === 'pending' ? 'pending interviews' : 'completed interviews';
+
+    if (totalFilteredCount === 0) {
+      if (startEl) startEl.textContent = 0;
+      if (endEl)   endEl.textContent   = 0;
+    } else {
+      if (startEl) startEl.textContent = startIndex + 1;
+      if (endEl)   endEl.textContent   = Math.min(startIndex + pageRows.length, totalFilteredCount);
+    }
+
+    if (pageNum) pageNum.textContent = totalPages === 0 ? 0 : ciCurrentPage;
+    if (totalPagesEl) totalPagesEl.textContent = totalPages;
+
+    if (prevBtn) prevBtn.disabled = ciCurrentPage <= 1;
+    if (nextBtn) nextBtn.disabled = ciCurrentPage >= totalPages;
+
+    /* Update dashboard card count too */
+    var cardEl = document.getElementById('company-interview-count');
+    if (cardEl && ciCurrentTab === 'pending') cardEl.textContent = dataset.length;
+
+    if (totalFilteredCount === 0) {
+      body.innerHTML = ciCurrentTab === 'pending'
+        ? '<div class="ci-state-block"><div style="font-size:2.5rem;margin-bottom:10px">🎉</div><div style="font-weight:700;font-size:1rem;margin-bottom:5px">All interviews complete!</div><div style="font-size:.84rem">No pending interviews found.</div></div>'
+        : '<div class="ci-state-block"><div style="font-size:2.5rem;margin-bottom:10px">📋</div><div style="font-weight:700;font-size:1rem;margin-bottom:5px">No completed interviews yet!</div><div style="font-size:.84rem">Completed interview records will appear here.</div></div>';
+      return;
+    }
+
+    var html = pageRows.map(function (r, i) {
+      var rowNum = startIndex + i + 1;
+      if (ciCurrentTab === 'pending') {
+        var actionCell = ciIsAdmin
+          ? '<td><span class="badge bg-warning text-dark border px-2 py-1" style="font-size:0.75rem;font-weight:600;">Pending</span></td>'
+          : '<td><button class="ci-done-btn" data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '" data-name="' + esc(r.name) + '" onclick="ciOpenOverlay(this)">✓ Interview Done</button></td>';
+
+        return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
+          '<td class="ci-sno">' + rowNum + '</td>' +
+          '<td><span class="ci-army">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="ci-rank">⭐ ' + esc(r.rank) + '</span></td>' +
+          '<td class="ci-name">' + esc(r.name) + '</td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
+          actionCell +
+        '</tr>';
+      } else {
+        return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
+          '<td class="ci-sno">' + rowNum + '</td>' +
+          '<td><span class="ci-army">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="ci-rank">⭐ ' + esc(r.rank) + '</span></td>' +
+          '<td class="ci-name">' + esc(r.name) + '</td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
+          '<td><span class="badge bg-success-subtle text-success border px-2 py-1" style="font-size:0.78rem;font-weight:600;"><i class="fas fa-calendar-check me-1"></i>' + esc(r.interview_done_on || 'Done') + '</span></td>' +
+          '<td class="text-start" style="max-width:220px;word-break:break-word;"><span style="font-style:italic;color:#334155;font-size:0.86rem;">' + (esc(r.remarks) || '<span style="color:#94a3b8">—</span>') + '</span></td>' +
+        '</tr>';
+      }
+    }).join('');
+
+    var headers = ciCurrentTab === 'pending'
+      ? '<thead><tr><th class="ci-sno">#</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Company</th><th>' + (ciIsAdmin ? 'Status' : 'Action') + '</th></tr></thead>'
+      : '<thead><tr><th class="ci-sno">#</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Company</th><th>Interview Done On</th><th style="text-align:left;">Remarks</th></tr></thead>';
+
+    body.innerHTML =
+      '<div class="ci-tbl-wrap">' +
+        '<table class="ci-tbl" id="ciTable">' +
+          headers +
+          '<tbody id="ciTbody">' + html + '</tbody>' +
+        '</table>' +
+      '</div>';
+  }
+
+  /* ── Filter rows ── */
+  window.ciFilterRows = function () {
+    var q     = (document.getElementById('ciSearchBox').value || '').toLowerCase().trim();
+    var tbody = document.getElementById('ciTbody');
+    var vis   = document.getElementById('ci-vis');
+    if (!tbody) return;
+    var count = 0;
+    tbody.querySelectorAll('tr').forEach(function (tr) {
+      var show = !q || tr.dataset.search.toLowerCase().includes(q);
+      tr.style.display = show ? '' : 'none';
+      if (show) count++;
+    });
+    if (vis) vis.textContent = count;
+  };
+
+  var ciActiveArmyNumber = null;
+
+  /* ── Open overlay ── */
+  window.ciOpenOverlay = function (btn) {
+    ciActiveCiId         = btn.dataset.ciId || null;
+    ciActiveArmyNumber   = btn.dataset.armyNumber || null;
+    ciActiveRow          = btn.closest('tr');
+    var name             = btn.dataset.name || 'this individual';
+    var sub              = document.getElementById('ciOverlaySub');
+    if (sub) sub.innerHTML = 'Adding remarks for <strong>' + name + '</strong>';
+    var ta = document.getElementById('ciOverlayTA');
+    if (ta) ta.value = '';
+    document.getElementById('ciOverlay').classList.add('ci-show');
+    setTimeout(function() { if (ta) ta.focus(); }, 100);
+  };
+
+  /* ── Cancel overlay ── */
+  window.ciCancelOverlay = function () {
+    document.getElementById('ciOverlay').classList.remove('ci-show');
+    ciActiveCiId         = null;
+    ciActiveArmyNumber   = null;
+    ciActiveRow          = null;
+  };
+
+  /* ── Submit done ── */
+  window.ciSubmitDone = async function () {
+    if (!ciActiveCiId && !ciActiveArmyNumber) return;
+    var remarks  = (document.getElementById('ciOverlayTA').value || '').trim();
+    var confirm  = document.getElementById('ciOverlayConfirm');
+    if (confirm) { confirm.disabled = true; confirm.textContent = 'Saving…'; }
+
+    try {
+      var payload = { remarks: remarks };
+      if (ciActiveCiId) payload.ci_id = parseInt(ciActiveCiId);
+      if (ciActiveArmyNumber) payload.army_number = ciActiveArmyNumber;
+
+      var res  = await fetch('/interview_update/company_interview_done', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(payload)
+      });
+      var data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || 'Server error');
+
+      ciCancelOverlay();
+      ciFireToast('Interview marked as done!');
+      await ciLoad();
+
+    } catch (e) {
+      ciFireToast('Error: ' + e.message, true);
+    } finally {
+      if (confirm) { confirm.disabled = false; confirm.textContent = '✓ Confirm Interview Done'; }
+    }
+  };
+
+  /* ── Helpers ── */
+  function ciRenumber() {
+    document.querySelectorAll('#ciTbody tr:not([style*="display: none"])').forEach(function (tr, i) {
+      var s = tr.querySelector('.ci-sno');
+      if (s) s.textContent = i + 1;
+    });
+  }
+
+  function ciUpdateCounts() {
+    var all   = document.querySelectorAll('#ciTbody tr').length;
+    var badge = document.getElementById('ci-badge-count');
+    var tot   = document.getElementById('ci-tot');
+    var vis   = document.getElementById('ci-vis');
+    if (badge) badge.textContent = all;
+    if (tot)   tot.textContent   = all;
+    if (vis)   vis.textContent   = all;
+
+    /* Dashboard card */
+    var cardEl = document.getElementById('company-interview-count');
+    if (cardEl) {
+      var cur = parseInt(cardEl.textContent) || 0;
+      if (cur > 0) cardEl.textContent = cur - 1;
+    }
+
+    if (all === 0) {
+      var wrap = document.querySelector('.ci-tbl-wrap');
+      if (wrap) wrap.innerHTML = '<div class="ci-state-block"><div style="font-size:2.5rem;margin-bottom:10px">🎉</div><div style="font-weight:700;font-size:1rem;margin-bottom:5px">All interviews complete!</div><div style="font-size:.84rem">No pending interviews for your company.</div></div>';
+    }
+  }
+
+  function ciFireToast(msg, isError) {
+    var t = document.getElementById('ciToast');
+    var m = document.getElementById('ciToastTxt');
+    if (!t) return;
+    t.style.background = isError ? '#dc2626' : '#16a34a';
+    if (m) m.textContent = msg;
+    t.classList.add('ci-toast-on');
+    setTimeout(function () { t.classList.remove('ci-toast-on'); }, 3500);
+  }
+
+  function esc(str) {
+    if (str == null) return '—';
+    var d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+})();
+</script>

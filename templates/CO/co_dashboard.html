@@ -1401,42 +1401,36 @@ STATUS COLORS
       <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
         <span class="sc-label">PARADE STATE</span>
         <div class="sc-right">
-          <span class="sc-badge">OCENNCO</span>
           <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="openCourses">
         <span class="sc-label">On Course</span>
         <div class="sc-right">
-          <span class="sc-badge">TRGJCO</span>
           <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
         <span class="sc-label">Roll Call Points</span>
         <div class="sc-right">
-          <span class="sc-badge">SM</span>
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope">
         <span class="sc-label">TD / Attachment</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="viewDetailsBtn">
         <span class="sc-label">Detachment</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal" id="card-agniveer" style="cursor: pointer">
         <span class="sc-label">Agniveer Str</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
@@ -1444,7 +1438,6 @@ STATUS COLORS
       <div class="sc" id="agniveer_on_leave" style="cursor: pointer">
         <span class="sc-label">Agniveer Leave</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="onleave_leave"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
@@ -1452,35 +1445,30 @@ STATUS COLORS
       <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
         <span class="sc-label">Domain Spl</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal">
         <span class="sc-label">Loans</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#projDash_modal">
         <span class="sc-label">Projects</span>
         <div class="sc-right">
-          <span class="sc-badge">PROJCO</span>
           <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
         <span class="sc-label">Dues In</span>
         <div class="sc-right">
-          <span class="sc-badge">POSTING CLK</span>
           <span class="sc-val" id="dues_in_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesOutListModal">
         <span class="sc-label">Dues Out</span>
         <div class="sc-right">
-          <span class="sc-badge">POSTING CLK</span>
           <span class="sc-val" id="dues_out_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
@@ -1488,16 +1476,24 @@ STATUS COLORS
       <div class="sc" style="cursor: pointer" id="openSensitive">
         <span class="sc-label">Sensitive Indl</span>
         <div class="sc-right">
-          <span class="sc-badge">OC</span>
           <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal" id="card-company-interview" style="cursor: pointer">
+        <span class="sc-label">OC Interview</span>
+        <div class="sc-right">
+          <span class="sc-val">
+            <span id="co-company-interview-pending"><span class="val-dots"><span></span><span></span><span></span></span></span>
+            /
+            <span id="co-company-interview-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          </span>
+        </div>
+      </div>
       {% if role in ['YAWAR'] %}
       <div class="sc" id="interview-card" style="cursor: pointer">
         <span class="sc-label">Kunba Intrv</span>
         <div class="sc-right">
-          <span class="sc-badge">ONCO</span>
           <span class="sc-val" id="interview-Count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
@@ -1657,15 +1653,20 @@ STATUS COLORS
     {% include 'modals/ADD-DUES-IN/modal.html' %}
     {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
     {% include 'modals/ADD-DUES-OUT/modal.html' %}
-    {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
     {% include 'modals/today_schedule/ts.html' %}
+    {% include 'modals/company_interview/modal.html' %}
 
     <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content overflow-hidden">
           <div class="modal-header">
             <h5 class="modal-title">Man Power</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+            <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+              <i class="fa fa-user-shield me-1"></i> UPDATED BY C O NCO
+            </span>
           </div>
           <div class="modal-body">
             {% include 'modals/parade_state/index.html' %}
@@ -1904,6 +1905,19 @@ STATUS COLORS
     } catch (e) { }
   }
 
+  /* ── load company interview count ── */
+  async function loadCompanyInterviewCount() {
+    try {
+      var r = await fetch("/interview_update/company_interview_count");
+      var d = await r.json();
+      safeSet("co-company-interview-pending", d.pending != null ? d.pending : (d.count != null ? d.count : 0));
+      safeSet("co-company-interview-total", d.total != null ? d.total : 0);
+    } catch (e) {
+      safeSet("co-company-interview-pending", "0");
+      safeSet("co-company-interview-total", "0");
+    }
+  }
+
   /* ── main dashboard data ── */
   async function loadDashboard() {
     try {
@@ -1927,7 +1941,7 @@ STATUS COLORS
       safeSet("onleave_leave", data.agniveer_on_leave);
       safeSet("dues_in_count", data.dues_in);
       safeSet("dues_out_count", data.dues_out);
-      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents()]);
+      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents(), loadCompanyInterviewCount()]);
       hidePageLoader();
       showActionBar();
       showStatsGrid();

@@ -243,6 +243,108 @@
 </div>
 
 
+<!-- ================= EDIT PROJECT MODAL ================= -->
+<div class="modal fade prj-detail-modal" id="prjEditModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header border-0 p-0">
+                <div class="prj-detail-header w-100 bg-warning text-dark" style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 1.5rem 2rem;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <h3 class="prj-detail-title text-white">Edit Project</h3>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body prj-detail-body-content">
+                <input type="hidden" id="editPrjId">
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Project Title *</label>
+                    <input type="text" id="editPrjTitle" class="form-control" required>
+                    <div class="invalid-feedback">Project title is required</div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Project Head *</label>
+                    <select id="editPrjHead" class="form-select" required>
+                        <option value="">-- Select Head --</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a project head</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Company</label>
+                        <input type="text" id="editPrjCompany" class="form-control" placeholder="e.g. COMN Company">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Stage</label>
+                        <select id="editPrjStage" class="form-select">
+                            <option>PPP</option>
+                            <option>AON</option>
+                            <option>FBU</option>
+                            <option>TOB & TEC</option>
+                            <option>B BD</option>
+                            <option>OCB RA</option>
+                            <option>Placement Of SO</option>
+                            <option>Store / Items Delivery</option>
+                            <option>ATP</option>
+                            <option>PRAC & CRAC</option>
+                            <option>Payment</option>
+                            <option>Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Cost *</label>
+                        <input type="text" id="editPrjCost" class="form-control">
+                        <div class="invalid-feedback"></div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Quantity</label>
+                        <input type="number" id="editPrjQuantity" class="form-control" min="0">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Items</label>
+                    <input type="text" id="editPrjItems" class="form-control">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Deadline</label>
+                        <input type="date" id="editPrjDeadline" class="form-control">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select id="editPrjStatus" class="form-select">
+                            <option value="Active">Active</option>
+                            <option value="On Hold">On Hold</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea id="editPrjDescription" class="form-control" rows="3"></textarea>
+                </div>
+
+                <button class="prj-update-button" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="saveProjectEdit()">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <!-- Floating Add Button -->
 <button class="floating-add-btn" onclick="openCreateProjectModal()">+</button>
 
@@ -253,7 +355,7 @@ let allProjects = [];
 let currentProjectId = null;
 let currentTab = "active";
 
-// ── LOAD HEADS (used for both filter dropdown AND create modal dropdown) ──
+// ── LOAD HEADS (used for filter, create modal, and edit modal dropdowns) ──
 async function loadHeads() {
     const res = await fetch('/get_project_heads');
     const heads = await res.json();
@@ -271,6 +373,15 @@ async function loadHeads() {
     heads.forEach(h => {
         modalDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
     });
+
+    // Edit modal dropdown
+    const editDropdown = document.getElementById("editPrjHead");
+    if (editDropdown) {
+        editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+        heads.forEach(h => {
+            editDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
+        });
+    }
 }
 
 // ── LOAD PROJECTS ──
@@ -316,14 +427,17 @@ function renderTable() {
             <td>${p.project_name}</td>
             <td>${p.head}</td>
             <td>${p.company || '-'}</td>
-            <td>${p.current_stage}</td>
+            <td><span class="badge bg-info text-dark">${p.current_stage}</span></td>
             <td>₹${p.project_cost}</td>
-            <td>${p.project_items}</td>
-            <td>${p.quantity}</td>
+            <td>${p.project_items || '-'}</td>
+            <td>${p.quantity || 0}</td>
             <td>${p.deadline || '-'}</td>
             <td>
-                <button class="btn btn-sm btn-primary" onclick='viewProject(${JSON.stringify(p)})'>
+                <button class="btn btn-sm btn-primary me-1" onclick='viewProject(${JSON.stringify(p)})'>
                     View
+                </button>
+                <button class="btn btn-sm btn-warning text-dark" onclick='editProject(${JSON.stringify(p)})'>
+                    Edit
                 </button>
             </td>
         </tr>`;
@@ -335,13 +449,72 @@ function viewProject(p) {
     currentProjectId = p.project_id;
     document.getElementById("modalTitle").innerText = p.project_name;
     document.getElementById("mHead").innerText = p.head;
-    document.getElementById("mCompany").innerText = p.company;
+    document.getElementById("mCompany").innerText = p.company || 'N/A';
     document.getElementById("mCost").innerText = p.project_cost;
-    document.getElementById("mItems").innerText = p.project_items;
-    document.getElementById("mQty").innerText = p.quantity;
+    document.getElementById("mItems").innerText = p.project_items || 'N/A';
+    document.getElementById("mQty").innerText = p.quantity || 0;
     document.getElementById("mDesc").innerText = p.project_description || "N/A";
     document.getElementById("modalStage").value = p.current_stage;
     new bootstrap.Modal(document.getElementById("viewModal")).show();
+}
+
+// ── EDIT PROJECT ──
+function editProject(p) {
+    loadHeads().then(() => {
+        document.getElementById("editPrjId").value = p.project_id;
+        document.getElementById("editPrjTitle").value = p.project_name;
+        document.getElementById("editPrjHead").value = p.head;
+        document.getElementById("editPrjCompany").value = p.company || '';
+        document.getElementById("editPrjStage").value = p.current_stage || 'PPP';
+        document.getElementById("editPrjCost").value = p.project_cost || 0;
+        document.getElementById("editPrjItems").value = p.project_items || '';
+        document.getElementById("editPrjQuantity").value = p.quantity || 0;
+        document.getElementById("editPrjDeadline").value = p.deadline || '';
+        document.getElementById("editPrjStatus").value = p.status || 'Active';
+        document.getElementById("editPrjDescription").value = p.project_description || '';
+        new bootstrap.Modal(document.getElementById("prjEditModal")).show();
+    });
+}
+
+// ── SAVE PROJECT EDIT ──
+async function saveProjectEdit() {
+    const project_id = document.getElementById("editPrjId").value;
+    const project_name = document.getElementById("editPrjTitle").value.trim();
+    const head = document.getElementById("editPrjHead").value.trim();
+    const company = document.getElementById("editPrjCompany").value.trim();
+    const current_stage = document.getElementById("editPrjStage").value;
+    const project_cost = document.getElementById("editPrjCost").value.trim();
+    const project_items = document.getElementById("editPrjItems").value.trim();
+    const quantity = document.getElementById("editPrjQuantity").value.trim();
+    const deadline = document.getElementById("editPrjDeadline").value;
+    const status = document.getElementById("editPrjStatus").value;
+    const project_description = document.getElementById("editPrjDescription").value.trim();
+
+    if (!project_name || !head || !project_cost) {
+        alert("Project Title, Head, and Cost are required.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/update_project', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                project_id, project_name, head, company, current_stage,
+                project_cost, project_items, quantity, deadline, status, project_description
+            })
+        });
+        const res = await response.json();
+        if (res.status === 'success') {
+            bootstrap.Modal.getInstance(document.getElementById('prjEditModal')).hide();
+            await loadProjects();
+        } else {
+            alert(res.message || "Failed to update project.");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Server error while updating project.");
+    }
 }
 
 // ── UPDATE STAGE ──

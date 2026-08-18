@@ -3,48 +3,150 @@
 
     <style>
 
-        body{
-            background:#f4f6f5;
-            font-family:system-ui;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background: #f0f4f2;
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
-        .history-container{
-            
-            margin:50px auto;
-            background:white;
-            padding:40px;
-            border-radius:18px;
-            box-shadow:0 10px 35px rgba(0,0,0,0.08);
+        .history-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            background: white;
+            padding: 50px 60px;
+            border-radius: 18px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.09);
         }
 
-        .history-title{
-            font-size:2.3rem;
-            font-weight:700;
-            color:#2d6b42;
-            margin-bottom:25px;
+        .history-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #1e5631;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
-        .back-btn{
-            margin-top:35px;
+        .history-subtitle {
+            font-size: 0.95rem;
+            color: #6b8f71;
+            font-weight: 500;
+            margin-bottom: 38px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #2d6b42, #5aaf6f);
+            border-radius: 2px;
+            margin-bottom: 38px;
+        }
+
+        .history-section {
+            margin-bottom: 36px;
+        }
+
+        .section-heading {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e5631;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-heading::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 18px;
+            background: linear-gradient(180deg, #2d6b42, #5aaf6f);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .history-section p {
+            font-size: 1rem;
+            line-height: 1.85;
+            color: #3d4f45;
+            text-align: justify;
+            margin: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #eaf5ee, #f4faf6);
+            border-left: 4px solid #2d6b42;
+            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 28px 0;
+            font-size: 1rem;
+            color: #1e5631;
+            font-weight: 500;
+            font-style: italic;
+            line-height: 1.75;
+        }
+
+        .back-btn {
+            margin-top: 40px;
         }
 
     </style>
 </head>
 <body>
-    {% set header = "History of 15 COR" %}
-{% set subscript = "Command History → Military Operations → Heritage → Structure" %}
-{% include 'navbar/navbar.html' %}
+    {% set header = "History of 15 CORPS" %}
+    {% set subscript = "Command History → Military Operations → Heritage → Structure" %}
+    {% include 'navbar/navbar.html' %}
+
     <div class="history-container">
 
-        <h1 class="history-title">
-            Revisit of 15 CORPS
-        </h1>
+        <h1 class="history-title">15 Corps — Chinar Corps Headquarters</h1>
+        <p class="history-subtitle">Command History &nbsp;·&nbsp; Military Operations &nbsp;·&nbsp; Heritage &nbsp;·&nbsp; Structure</p>
+        <div class="divider"></div>
 
-        <p>
-        history of 15 CORPS here...
-        </p>
+        <!-- Formation & Background -->
+        <div class="history-section">
+            <h2 class="section-heading">Formation &amp; Historical Background</h2>
+            <p>
+                The <strong>15 Corps</strong>, popularly known as the <strong>Chinar Corps</strong>, is one of the most strategically significant formations of the Indian Army. Headquartered in <strong>Badami Bagh Cantonment, Srinagar, Jammu &amp; Kashmir</strong>, the corps was raised to address the unique and complex security environment of the Kashmir Valley. The name "Chinar" draws from the iconic Chinar tree — a symbol of grandeur, resilience, and deep-rooted identity in Kashmiri culture — aptly reflecting the corps' enduring presence and strength in the region.
+            </p>
+            <p style="margin-top: 14px;">
+                Since its inception, the 15 Corps has been at the forefront of safeguarding India's territorial integrity along the Line of Control (LoC) and maintaining internal security across one of the most challenging operational theatres in the subcontinent.
+            </p>
+        </div>
 
-        
+        <!-- Command & Structure -->
+        <div class="history-section">
+            <h2 class="section-heading">Command Structure &amp; Organisation</h2>
+            <p>
+                Commanded by a Lieutenant General, the Chinar Corps encompasses multiple infantry divisions, artillery brigades, armoured regiments, engineer formations, signal units, and supporting arms — all integrated under a unified command structure. The corps exercises operational control over forces deployed across the Kashmir Valley, the Kargil sector, and the Siachen area, making it one of the most extensive and operationally active corps in the Indian Army's order of battle.
+            </p>
+            <p style="margin-top: 14px;">
+                The corps headquarters at Badami Bagh Cantonment serves as the nerve centre for all operational planning, intelligence collation, logistics coordination, and joint civil-military engagements across the theatre.
+            </p>
+        </div>
+
+        <div class="highlight-box">
+            "The Chinar Corps stands as the sentinel of the Valley — unwavering in its resolve, unmatched in its commitment, and unyielding in the face of every challenge."
+        </div>
+
+        <!-- Military Operations & Legacy -->
+        <div class="history-section">
+            <h2 class="section-heading">Military Operations &amp; Legacy</h2>
+            <p>
+                The 15 Corps has participated in every major conflict and internal security operation since the post-independence era. It played a decisive role during the <strong>1947–48 Kashmir War</strong>, the <strong>1965 War</strong>, the <strong>1971 Indo-Pakistani War</strong>, and the landmark <strong>Kargil Conflict of 1999</strong> — Operation Vijay — where forces under the corps recaptured strategic heights from Pakistani intruders, writing a celebrated chapter in Indian military history. In the domain of counter-insurgency, the corps has sustained decades of sustained operations, significantly degrading terrorist infrastructure while maintaining civilian outreach and law enforcement coordination.
+            </p>
+        </div>
+
+        <!-- Achievements -->
+        <div class="history-section">
+            <h2 class="section-heading">Key Achievements &amp; Honours</h2>
+            <p>
+                The Chinar Corps has been decorated with numerous battle honours, unit citations, and individual gallantry awards including Param Vir Chakras, Vir Chakras, and Sena Medals earned by its brave soldiers across generations of service. The corps has also distinguished itself through its humanitarian initiatives — conducting relief operations during floods, avalanches, and natural calamities in the Valley, reinforcing its role as a protector not only from external threats but also as a pillar of support to the people of Jammu &amp; Kashmir. Under its command, fostering peace, enabling development, and building trust with local communities remains as integral a mission as tactical operations.
+            </p>
+        </div>
 
     </div>
 

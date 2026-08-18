@@ -277,6 +277,8 @@
       width: 100%;
     }
 
+  #duesOutListModal .modal-dialog {
+    margin-top: 1.5rem !important;
   }
 </style>
 
@@ -288,58 +290,38 @@
 
   <div class="modal-dialog modal-xl custom-size">
 
-    <div class="modal-content">
+    <div class="modal-content overflow-hidden">
 
       <!-- ================= HEADER ================= -->
 
-      <div class="modal-header">
-
-        <div class="d-flex align-items-center gap-3 flex-wrap w-100">
-
-          <!-- TITLE -->
-
-          <div class="d-flex align-items-center gap-2">
-
-            <h5 class="modal-title mb-0">
-              Dues Out Details
-            </h5>
-
-          </div>
-
-          <!-- SEARCH -->
-
-          <div class="duesSearchWrap">
-
-            <svg class="duesSearchIcon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-
-              <circle cx="6.5" cy="6.5" r="4.5" />
-              <path d="M10.5 10.5l3 3" />
-
-            </svg>
-
-            <input type="text" id="duesOutSearch" placeholder="Search army no or name">
-
-          </div>
-
-          <!-- COUNT -->
-
-          <div class="modal-count-pill duesCountWrap">
-            <span class="count-label duesCountLabel">Total Count</span>
-            <span id="duesOutCount" class="badge rounded-pill duesCountBadge count-number">0</span>
-          </div>
-
+      <div class="modal-header bg-primary text-white py-3 px-4 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <h5 class="modal-title mb-0 text-white fw-bold" style="font-size:16px">Dues Out Details</h5>
+          <span id="duesOutCount" class="badge rounded-pill shadow-sm" style="color: #1d4ed8 !important; background-color: #ffffff !important; font-size: 12px; font-weight: 700; padding: 4px 14px;">0 records</span>
         </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
 
-        <!-- CLOSE -->
-
-        <button class="btn-close" data-bs-dismiss="modal">
-        </button>
-
+      <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-user-shield me-1"></i> UPDATED BY POSTING CLK
+        </span>
       </div>
 
       <!-- ================= BODY ================= -->
 
       <div class="modal-body">
+
+        <!-- Search box -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div class="search-wrap" style="position:relative; width:260px;">
+            <svg style="position:absolute; left:10px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:#64748b;" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="6.5" cy="6.5" r="4.5" />
+              <path d="M10.5 10.5l3 3" />
+            </svg>
+            <input type="text" id="duesOutSearch" class="form-control form-control-sm ps-4" placeholder="Search army no or name…">
+          </div>
+        </div>
 
         <!-- ================= LOADER ================= -->
 
@@ -385,6 +367,28 @@
 
       </div>
 
+      <!-- Footer Pagination -->
+      <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap px-4 py-3" style="gap:10px; background:#f8fafc; border-top:1px solid #e2e8f0;">
+        <span class="text-muted" style="font-size:0.85rem;">
+          Showing <strong id="duesOutPageStart">0</strong>–<strong id="duesOutPageEnd">0</strong> of
+          <strong id="duesOutTotalFiltered">0</strong> records
+        </span>
+
+        <div class="d-flex align-items-center gap-2" id="duesOutPaginationControls">
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="duesOutPrevBtn" onclick="duesOutChangePage(-1)" disabled>
+            <i class="fas fa-chevron-left me-1"></i> Prev
+          </button>
+          <span style="font-size:0.82rem; font-weight:600; color:#334155;">
+            Page <span id="duesOutCurrentPageNum">1</span> of <span id="duesOutTotalPagesNum">1</span>
+          </span>
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="duesOutNextBtn" onclick="duesOutChangePage(1)" disabled>
+            Next <i class="fas fa-chevron-right ms-1"></i>
+          </button>
+        </div>
+
+        <button class="btn btn-sm btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+      </div>
+
     </div>
 
   </div>
@@ -394,345 +398,180 @@
 
 <script>
   let duesOutData = [];
+  let duesOutFilteredData = [];
+  let duesOutPageSize = 20;
+  let duesOutCurrentPage = 1;
 
-  /* =====================================================
-     DATE FORMAT
-  ===================================================== */
   function formatDuesOutDate(date) {
-
     if (!date) return "—";
-
-    return new Date(date).toLocaleDateString(
-      "en-GB",
-      {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      }
-    );
-
+    return new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   }
 
-  /* =====================================================
-     OPEN MODAL
-  ===================================================== */
-  document
-    .getElementById("duesOutListModal")
-    .addEventListener(
-      "show.bs.modal",
-      async function () {
+  document.getElementById("duesOutListModal")?.addEventListener("show.bs.modal", async function () {
+    duesOutCurrentPage = 1;
+    await loadDuesOutData();
+  });
 
-        await loadDuesOutData();
-
-      }
-    );
-
-  /* =====================================================
-     LOAD DATA
-  ===================================================== */
   async function loadDuesOutData() {
-
-    const loader =
-      document.getElementById("duesOutLoader");
-
-    const table =
-      document.getElementById("duesOutTable");
-
-    const tbody =
-      document.getElementById("duesOutTableBody");
+    const loader = document.getElementById("duesOutLoader");
+    const table  = document.getElementById("duesOutTable");
+    const tbody  = document.getElementById("duesOutTableBody");
 
     loader.classList.remove("d-none");
-
     table.classList.add("d-none");
-
     tbody.innerHTML = "";
 
     try {
-
-      const response =
-        await fetch("/dues/dues-out/list");
-
-      const result =
-        await response.json();
-
-      if (!result.success) {
-        throw new Error("Failed");
-      }
+      const response = await fetch("/dues/dues-out/list");
+      const result   = await response.json();
+      if (!result.success) throw new Error("Failed");
 
       duesOutData = result.data || [];
+      duesOutFilterAndPaginate();
 
-      renderDuesOutTable(duesOutData);
-
-    }
-    catch (error) {
-
+    } catch (error) {
       console.error(error);
-
-      loader.innerHTML = `
-        <p class="text-danger fw-bold mt-3">
-          Failed to load data
-        </p>
-      `;
-
+      loader.innerHTML = `<p class="text-danger fw-bold mt-3">Failed to load data</p>`;
     }
-
   }
 
-  /* =====================================================
-     RENDER TABLE
-  ===================================================== */
-  function renderDuesOutTable(data) {
+  function duesOutFilterAndPaginate() {
+    const v = (document.getElementById("duesOutSearch")?.value || "").toLowerCase().trim();
+    duesOutFilteredData = v ? duesOutData.filter(r =>
+      (r.army_number || "").toLowerCase().includes(v) ||
+      (r.name || "").toLowerCase().includes(v) ||
+      (r.rank || "").toLowerCase().includes(v) ||
+      (r.posted_to || "").toLowerCase().includes(v) ||
+      (r.trade || "").toLowerCase().includes(v)
+    ) : duesOutData;
 
-    const tbody =
-      document.getElementById("duesOutTableBody");
+    const countEl = document.getElementById("duesOutCount");
+    if (countEl) countEl.textContent = duesOutData.length + " records";
 
-    const loader =
-      document.getElementById("duesOutLoader");
+    const totalPages = Math.ceil(duesOutFilteredData.length / duesOutPageSize) || 1;
+    if (duesOutCurrentPage < 1) duesOutCurrentPage = 1;
+    if (duesOutCurrentPage > totalPages) duesOutCurrentPage = totalPages;
 
-    const table =
-      document.getElementById("duesOutTable");
+    const start = (duesOutCurrentPage - 1) * duesOutPageSize;
+    const end   = start + duesOutPageSize;
+    const pageSlice = duesOutFilteredData.slice(start, end);
 
-    const count =
-      document.getElementById("duesOutCount");
+    renderDuesOutTableSlice(pageSlice, start, duesOutFilteredData.length, totalPages);
+  }
+
+  function duesOutChangePage(delta) {
+    duesOutCurrentPage += delta;
+    duesOutFilterAndPaginate();
+  }
+
+  function renderDuesOutTableSlice(dataSlice, startIndex, totalFilteredCount, totalPages) {
+    const tbody        = document.getElementById("duesOutTableBody");
+    const loader       = document.getElementById("duesOutLoader");
+    const table        = document.getElementById("duesOutTable");
+    const startEl      = document.getElementById("duesOutPageStart");
+    const endEl        = document.getElementById("duesOutPageEnd");
+    const totalEl      = document.getElementById("duesOutTotalFiltered");
+    const pageNum      = document.getElementById("duesOutCurrentPageNum");
+    const totalPagesEl = document.getElementById("duesOutTotalPagesNum");
+    const prevBtn      = document.getElementById("duesOutPrevBtn");
+    const nextBtn      = document.getElementById("duesOutNextBtn");
 
     tbody.innerHTML = "";
 
-    count.textContent = data.length;
-
-    if (data.length === 0) {
-
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="9" class="empty-cell">
-            No records found
-          </td>
-        </tr>
-      `;
-
+    if (totalEl) totalEl.textContent = totalFilteredCount;
+    if (totalFilteredCount === 0) {
+      if (startEl) startEl.textContent = 0;
+      if (endEl)   endEl.textContent   = 0;
+    } else {
+      if (startEl) startEl.textContent = startIndex + 1;
+      if (endEl)   endEl.textContent   = Math.min(startIndex + dataSlice.length, totalFilteredCount);
     }
-    else {
 
-      data.forEach(row => {
+    if (pageNum) pageNum.textContent = totalPages === 0 ? 0 : duesOutCurrentPage;
+    if (totalPagesEl) totalPagesEl.textContent = totalPages;
 
+    if (prevBtn) prevBtn.disabled = duesOutCurrentPage <= 1;
+    if (nextBtn) nextBtn.disabled = duesOutCurrentPage >= totalPages;
+
+    if (dataSlice.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" class="empty-cell text-center py-4 text-muted">No records found</td></tr>`;
+    } else {
+      dataSlice.forEach(row => {
         tbody.insertAdjacentHTML(
           "beforeend",
           `
-  
           <tr id="dues-row-${row.id}">
-  
             <td>
-  
-              <button
-                class="del-btn duesDeleteBtn"
-                data-id="${row.id}">
-  
-                <i class="fas fa-trash"></i>
-  
-                Remove
-  
+              <button class="del-btn duesDeleteBtn" data-id="${row.id}">
+                <i class="fas fa-trash"></i> Remove
               </button>
-  
             </td>
-  
             <td>
-  
               <div class="duesCellScroll">
-  
-                <span class="army-chip">
-                  ${row.army_number || ""}
-                </span>
-  
+                <span class="army-chip">${row.army_number || ""}</span>
               </div>
-  
             </td>
-  
             <td>
-  
               <div class="duesCellScroll">
-  
-                <span class="rank-pill">
-                  ${row.rank || ""}
-                </span>
-  
+                <span class="rank-pill">${row.rank || ""}</span>
               </div>
-  
             </td>
-  
             <td class="name-cell">
-              ${(row.name || "")
-            .toLowerCase()
-            .replace(/\b\w/g, c => c.toUpperCase())}
+              ${(row.name || "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
             </td>
-  
             <td>
-  
-              <div class="duesCellScroll">
-                ${row.trade || "—"}
-              </div>
-  
+              <div class="duesCellScroll">${row.trade || "—"}</div>
             </td>
-  
             <td>
-  
               <div class="duesCellScroll">
-                ${(row.posted_to || "")
-            .toLowerCase()
-            .replace(/\b\w/g, c => c.toUpperCase())}
+                ${(row.posted_to || "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase())}
               </div>
-  
             </td>
-  
             <td>
-  
-              <div class="duesCellScroll">
-                ${formatDuesOutDate(row.date_of_move)}
-              </div>
-  
+              <div class="duesCellScroll">${formatDuesOutDate(row.date_of_move)}</div>
             </td>
-  
             <td>
-  
-              <div class="duesCellScroll">
-                ${row.posting_order_no || "—"}
-              </div>
-  
+              <div class="duesCellScroll">${row.posting_order_no || "—"}</div>
             </td>
-  
             <td class="remarks-text">
-  
-              <div class="duesCellScroll">
-                ${row.remarks || "—"}
-              </div>
-  
+              <div class="duesCellScroll">${row.remarks || "—"}</div>
             </td>
-  
           </tr>
-  
           `
         );
-
       });
-
     }
 
     loader.classList.add("d-none");
-
     table.classList.remove("d-none");
 
-    /* ================= DELETE ================= */
-
-    document
-      .querySelectorAll(".duesDeleteBtn")
-      .forEach(btn => {
-
-        btn.addEventListener(
-          "click",
-          async function () {
-
-            const id =
-              this.dataset.id;
-
-            if (
-              !confirm(
-                "Are you sure you want to remove this record?"
-              )
-            ) {
-              return;
+    /* Delete Event Binding */
+    document.querySelectorAll(".duesDeleteBtn").forEach(btn => {
+      btn.onclick = async function () {
+        const id = this.dataset.id;
+        if (!confirm("Are you sure you want to remove this record?")) return;
+        try {
+          const response = await fetch(`/dues/dues-out/delete/${id}`, { method: "DELETE" });
+          const result = await response.json();
+          if (result.success) {
+            duesOutData = duesOutData.filter(r => String(r.id) !== String(id));
+            duesOutFilterAndPaginate();
+            if (typeof showStatusModal === 'function') {
+              showStatusModal("Removed successfully", "Red", 2500);
             }
-
-            try {
-
-              const response =
-                await fetch(
-                  `/dues/dues-out/delete/${id}`,
-                  {
-                    method: "DELETE"
-                  }
-                );
-
-              const result =
-                await response.json();
-
-              if (result.success) {
-
-                duesOutData =
-                  duesOutData.filter(
-                    r => String(r.id) !== String(id)
-                  );
-
-                renderDuesOutTable(duesOutData);
-
-                showStatusModal(
-                  "Removed successfully",
-                  "Red",
-                  2500
-                );
-
-              }
-              else {
-
-                alert(
-                  result.message ||
-                  "Delete failed"
-                );
-
-              }
-
-            }
-            catch (error) {
-
-              console.error(error);
-
-              alert(
-                "Something went wrong"
-              );
-
-            }
-
+          } else {
+            alert(result.message || "Delete failed");
           }
-        );
-
-      });
-
+        } catch (error) {
+          console.error(error);
+          alert("Something went wrong");
+        }
+      };
+    });
   }
 
-  /* =====================================================
-     SEARCH
-  ===================================================== */
-  document
-    .getElementById("duesOutSearch")
-    .addEventListener(
-      "keyup",
-      function () {
-
-        const value =
-          this.value.toLowerCase();
-
-        if (!value) {
-
-          renderDuesOutTable(duesOutData);
-
-          return;
-
-        }
-
-        const filtered =
-          duesOutData.filter(row =>
-
-            (row.army_number || "")
-              .toLowerCase()
-              .includes(value)
-
-            ||
-
-            (row.name || "")
-              .toLowerCase()
-              .includes(value)
-
-          );
-
-        renderDuesOutTable(filtered);
-
-      }
-    );
+  document.getElementById("duesOutSearch")?.addEventListener("input", function () {
+    duesOutCurrentPage = 1;
+    duesOutFilterAndPaginate();
+  });
 </script>

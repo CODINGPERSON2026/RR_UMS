@@ -94,7 +94,7 @@
     border-radius: 20px;
   }
   #attachmentModalUniqueScope .modal-dialog {
-    margin-top: 5px;
+    margin-top: 1.5rem !important;
   }
   #attachmentModalUniqueScope .custom-size {
     max-width: 99% !important;
@@ -112,58 +112,35 @@
 
   <div class="modal-dialog modal-xl custom-size modal-dialog-scrollable">
 
-    <div class="modal-content">
+    <div class="modal-content overflow-hidden">
 
       <!-- ================= HEADER ================= -->
 
       <div class="modal-header">
+        <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+          <!-- TITLE -->
+          <h5 class="modal-title mb-0">Attachment Details</h5>
 
-        <div class="d-flex align-items-center gap-3 flex-wrap">
-
-          <!-- TITLE + COUNT -->
-
-          <div class="d-flex align-items-center gap-2">
-
-            <h5 class="modal-title mb-0">
-
-              Attachment Details
-
-            </h5>
-
-          </div>
-
-          <!-- COMPANY FILTER -->
-
-          <select
-            id="attachmentCompanyFilterUniqueScope"
-            class="form-select form-select-sm"
-            style="width: 190px;">
-
-            <option value="ALL">
-
-              All Companies
-
-            </option>
-
-          </select>
-          <div class="d-flex align-items-center gap-2">
-
+          <!-- FILTERS & COUNT -->
+          <div class="d-flex align-items-center gap-3">
+            <select id="attachmentCompanyFilterUniqueScope" class="form-select form-select-sm" style="width: 190px;">
+              <option value="ALL">All Companies</option>
+            </select>
             <div class="modal-count-pill">
               <span class="count-label">Total Count</span>
               <span id="attachmentCountUniqueScope" class="badge rounded-pill attachmentCountBadgeUnique count-number">0</span>
             </div>
-          
           </div>
+
+          <!-- CLOSE BUTTON -->
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+      </div>
 
-
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close">
-        </button>
-
+      <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-user-shield me-1"></i> UPDATED BY ONCO
+        </span>
       </div>
 
       <!-- ================= BODY ================= -->
@@ -244,13 +221,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let filteredAttachmentDataUniqueScope =
       attachmentFetchedDataUniqueScope;
 
-    if (selectedCompany !== "ALL") {
-
+    if (selectedCompany && selectedCompany.trim().toUpperCase() !== "ALL") {
+      const selectedCompanyUpper = selectedCompany.trim().toUpperCase();
       filteredAttachmentDataUniqueScope =
         attachmentFetchedDataUniqueScope.filter(
-          item => item.company === selectedCompany
+          item => (item.company || "").trim().toUpperCase() === selectedCompanyUpper
         );
-
     }
 
     /* ================= COUNT ================= */
@@ -460,7 +436,7 @@ attachmentCountBadgeUniqueScope.textContent =
         const distinctCompaniesUniqueScope = [
           ...new Set(
             attachmentFetchedDataUniqueScope
-              .map(item => item.company.toLowerCase())
+              .map(item => (item.company || "").trim())
               .filter(Boolean)
           )
         ];
@@ -473,7 +449,7 @@ attachmentCountBadgeUniqueScope.textContent =
               `
                 <option value="${company}">
 
-                  ${company.replace(/\b\w/g, c => c.toUpperCase() )}
+                  ${company}
 
                 </option>
               `

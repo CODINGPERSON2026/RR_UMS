@@ -3,29 +3,94 @@
 
     <style>
 
-        body{
-            background:#f4f6f5;
-            font-family:system-ui;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background: #f0f4f2;
+            font-family: 'Inter', system-ui, sans-serif;
         }
 
-        .history-container{
-            max-width:1100px;
-            margin:50px auto;
-            background:white;
-            padding:40px;
-            border-radius:18px;
-            box-shadow:0 10px 35px rgba(0,0,0,0.08);
+        .history-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            background: white;
+            padding: 50px 60px;
+            border-radius: 18px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.09);
         }
 
-        .history-title{
-            font-size:2.3rem;
-            font-weight:700;
-            color:#2d6b42;
-            margin-bottom:25px;
+        .history-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #1e5631;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
-        .back-btn{
-            margin-top:35px;
+        .history-subtitle {
+            font-size: 0.95rem;
+            color: #6b8f71;
+            font-weight: 500;
+            margin-bottom: 38px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .divider {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #2d6b42, #5aaf6f);
+            border-radius: 2px;
+            margin-bottom: 38px;
+        }
+
+        .history-section {
+            margin-bottom: 36px;
+        }
+
+        .section-heading {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e5631;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-heading::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 18px;
+            background: linear-gradient(180deg, #2d6b42, #5aaf6f);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .history-section p {
+            font-size: 1rem;
+            line-height: 1.85;
+            color: #3d4f45;
+            text-align: justify;
+            margin: 0;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #eaf5ee, #f4faf6);
+            border-left: 4px solid #2d6b42;
+            border-radius: 0 10px 10px 0;
+            padding: 20px 24px;
+            margin: 28px 0;
+            font-size: 1rem;
+            color: #1e5631;
+            font-weight: 500;
+            font-style: italic;
+            line-height: 1.75;
+        }
+
+        .back-btn {
+            margin-top: 40px;
         }
 
     </style>
@@ -34,17 +99,51 @@
     {% set header = "History of 15 CESR" %}
     {% set subscript = "Formation → Operations → Legacy → Achievements" %}
     {% include 'navbar/navbar.html' %}
+
     <div class="history-container">
 
-        <h1 class="history-title">
-            Revisit  15 CESR
-        </h1>
+        <h1 class="history-title">15 Corps Engineer Signal Regiment</h1>
+        <p class="history-subtitle">Formation &nbsp;·&nbsp; Operations &nbsp;·&nbsp; Legacy &nbsp;·&nbsp; Achievements</p>
+        <div class="divider"></div>
 
-        <p>
-             content of 15 CESR here...
-        </p>
+        <!-- Formation & Background -->
+        <div class="history-section">
+            <h2 class="section-heading">Formation &amp; Background</h2>
+            <p>
+                The 15 Corps Engineer Signal Regiment (15 CESR) was raised as a specialised signals formation to provide dedicated communication, electronic warfare, and technical support to the 15 Corps — famously known as the <strong>Chinar Corps</strong> — of the Indian Army. Headquartered in <strong>Srinagar, Jammu &amp; Kashmir</strong>, the regiment operates at the strategic heart of one of the most operationally demanding theatres in the country, managing secure, uninterrupted connectivity across the rugged terrain of the Kashmir Valley and along the Line of Control (LoC).
+            </p>
+        </div>
 
-       
+        <!-- Operational Role -->
+        <div class="history-section">
+            <h2 class="section-heading">Operational Role &amp; Responsibilities</h2>
+            <p>
+                The regiment is entrusted with establishing and sustaining robust tactical communication networks that underpin all operational activities of the Chinar Corps. Its core responsibilities encompass the deployment and maintenance of encrypted voice and data communication systems, field signal infrastructure, electronic support measures, and real-time situational awareness grids. Operating in sub-zero winters, high-altitude zones, and dense forested belts, the regiment's engineers and signal specialists ensure that command-and-control chains remain functional under the most adverse battlefield conditions.
+            </p>
+            <p style="margin-top: 14px;">
+                The regiment plays a decisive role in counter-insurgency operations, coordinating seamless communication between infantry columns, aviation assets, intelligence agencies, and higher headquarters — a function that has repeatedly proven critical to operational success in the Valley.
+            </p>
+        </div>
+
+        <div class="highlight-box">
+            "In the theatre of Kashmir, where every ridge-line is contested and every second counts, the signal soldier's wire and wavelength are as vital as the infantryman's rifle."
+        </div>
+
+        <!-- Legacy -->
+        <div class="history-section">
+            <h2 class="section-heading">Legacy &amp; Distinguished Service</h2>
+            <p>
+                Over decades of continuous service, 15 CESR has built an enduring legacy rooted in technical excellence, operational reliability, and selfless dedication. Personnel of the regiment have served with distinction in multiple counter-insurgency and counter-terrorism operations, earning gallantry awards and unit citations for maintaining communications under direct enemy fire and in the face of severe logistical challenges. The regiment's institutional knowledge of the Kashmir terrain and its signal infrastructure has been invaluable to successive corps commanders in planning and executing complex operations.
+            </p>
+        </div>
+
+        <!-- Achievements -->
+        <div class="history-section">
+            <h2 class="section-heading">Key Achievements</h2>
+            <p>
+                The regiment has successfully modernised its signal architecture in line with the Indian Army's broader digitalisation roadmap, transitioning from legacy analogue systems to advanced digital and satellite-based communication platforms. It has achieved rapid deployment capability for tactical communication nodes, enabling brigade-level formations to establish operational networks within hours of deployment. Its contribution to joint operations with the Indian Air Force and paramilitary forces has further demonstrated its capacity for inter-service coordination and joint communication planning.
+            </p>
+        </div>
 
     </div>
 
