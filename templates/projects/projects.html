@@ -1,78 +1,295 @@
 {% extends "baseView.html" %}
 {% block content %}
-<!-- UPTADES FILE -->
 <style>
+/* ==================== MODERN PROJECT MANAGEMENT DASHBOARD STYLES ==================== */
 .dashboard-container {
-    padding: 2rem;
-}
-.table-container {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-.nav-tabs .nav-link.active {
-    background-color: #0d6efd;
-    color: white;
+    padding: 1.75rem 2rem 3rem;
+    background-color: var(--background, #f8fafc);
+    min-height: calc(100vh - 70px);
 }
 
-/* ── Floating Add Button ── */
+/* Header KPI Cards */
+.prj-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 1.75rem;
+}
+
+.prj-kpi-card {
+    background: var(--card-bg-solid, #ffffff);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prj-kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.prj-kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.prj-kpi-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--text-primary, #0f172a);
+}
+
+.prj-kpi-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary, #64748b);
+}
+
+/* Toolbar & Filters */
+.prj-toolbar {
+    background: var(--card-bg-solid, #ffffff);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.prj-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+}
+
+.prj-search-input {
+    width: 100%;
+    padding: 8px 14px 8px 38px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color, #cbd5e1);
+    font-size: 0.88rem;
+    background: var(--card-bg-solid, #ffffff);
+    color: var(--text-primary, #1e293b);
+    transition: all 0.2s ease;
+}
+
+.prj-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.prj-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.prj-filter-select {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color, #cbd5e1);
+    font-size: 0.86rem;
+    font-weight: 600;
+    background: var(--card-bg-solid, #ffffff);
+    color: var(--text-primary, #1e293b);
+    cursor: pointer;
+}
+
+/* Tabs */
+.prj-nav-tabs {
+    display: flex;
+    background: var(--background, #f1f5f9);
+    padding: 4px;
+    border-radius: 12px;
+    gap: 4px;
+}
+
+.prj-nav-tab {
+    border: none;
+    background: transparent;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary, #64748b);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.prj-nav-tab.active {
+    background: var(--card-bg-solid, #ffffff);
+    color: #2563eb;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Table Container */
+.prj-table-card {
+    background: var(--card-bg-solid, #ffffff);
+    border-radius: 18px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.prj-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.prj-table thead th {
+    background: var(--card-bg-solid, #f8fafc);
+    color: var(--text-secondary, #475569);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    text-align: left;
+}
+
+.prj-table tbody td {
+    padding: 14px 18px;
+    font-size: 0.88rem;
+    color: var(--text-primary, #1e293b);
+    border-bottom: 1px solid var(--border-color, #f1f5f9);
+    vertical-align: middle;
+    text-align: left;
+}
+
+.prj-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.prj-table tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.04);
+}
+
+.prj-title-cell {
+    font-weight: 700;
+    color: var(--text-primary, #0f172a);
+}
+
+.prj-badge-stage {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+}
+
+/* Action Buttons */
+
+
+.btn-action-edit {
+    border: 1px solid #f59e0b;
+    background: #fffbeb;
+    color: #d97706;
+    font-weight: 700;
+    font-size: 0.78rem;
+    border-radius: 8px;
+    padding: 4px 12px;
+    transition: all 0.2s ease;
+}
+
+.btn-action-edit:hover {
+    background: #d97706;
+    color: white;
+    border-color: #d97706;
+}
+
+/* Floating Create Button */
 .floating-add-btn {
     position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    width: 56px;
-    height: 56px;
+    bottom: 2.2rem;
+    right: 2.2rem;
+    width: 58px;
+    height: 58px;
     border-radius: 50%;
-    background: #0d6efd;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
     border: none;
-    font-size: 1.4rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 1.6rem;
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
     z-index: 1050;
     cursor: pointer;
-    transition: transform 0.2s, background 0.2s;
-}
-.floating-add-btn:hover {
-    transform: scale(1.1);
-    background: #2563eb;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* ── Create Project Modal ── */
+.floating-add-btn:hover {
+    transform: scale(1.1) rotate(90deg);
+}
+
+/* Modern Modals */
 .prj-detail-modal .modal-content {
-    border-radius: 16px;
+    border-radius: 20px;
     overflow: hidden;
     border: none;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
 }
+
 .prj-detail-header {
-    background: linear-gradient(135deg, #0d6efd, #0056b3);
-    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    padding: 1.25rem 2rem;
     color: white;
 }
+
 .prj-detail-title {
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 800;
     margin: 0;
     color: white;
 }
+
 .prj-detail-body-content {
     padding: 2rem;
     background: #f8fafc;
 }
+
 .prj-update-button {
-    background: linear-gradient(135deg, #0d6efd, #0056b3);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     color: white;
     border: none;
     padding: 0.75rem 2rem;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 12px;
+    font-weight: 700;
     width: 100%;
     cursor: pointer;
-    transition: opacity 0.2s;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
 }
-.prj-update-button:hover { opacity: 0.9; }
-.prj-update-button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.prj-update-button:hover {
+    opacity: 0.95;
+    transform: translateY(-1px);
+}
 </style>
 
 <div class="wrapper">
@@ -80,128 +297,137 @@
     {% set subscript = "Create tasks → View tasks → Update tasks → Assign tasks" %}
     {% include 'navbar/navbar.html' %}
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <h3 class="mb-3">Project Management</h3>
+        <!-- KPI Summary Cards Header (Font Awesome Icons Only) -->
+        <div class="prj-kpi-grid">
+            <div class="prj-kpi-card">
+                <div>
+                    <div class="prj-kpi-val" id="kpiTotalProjects">0</div>
+                    <div class="prj-kpi-label">Total Projects</div>
+                </div>
+                <div class="prj-kpi-icon" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+            </div>
 
-    <!-- FILTERS -->
-    <div class="d-flex gap-3 mb-3 flex-wrap">
-        <select id="headFilter" class="form-select w-auto">
-            <option value="all">All Heads</option>
-        </select>
+            <div class="prj-kpi-card">
+                <div>
+                    <div class="prj-kpi-val text-warning" id="kpiActiveProjects">0</div>
+                    <div class="prj-kpi-label">Active Projects</div>
+                </div>
+                <div class="prj-kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: #d97706;">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+            </div>
 
-        <select id="stageFilter" class="form-select w-auto">
-            <option value="all">All Stages</option>
-            <option>PPP</option>
-            <option>AON</option>
-            <option>EAS</option>
-            <option>TOB & TEC</option>
-            <option>B BD</option>
-            <option>OCB RA</option>
-            <option>Placement Of SO</option>
-            <option>Store / Items Delivery</option>
-            <option>ATP</option>
-            <option>PRAC & CRAC</option>
-            <option>Payment</option>
-            <option>Completed</option>
-        </select>
+            <div class="prj-kpi-card">
+                <div>
+                    <div class="prj-kpi-val text-success" id="kpiCompletedProjects">0</div>
+                    <div class="prj-kpi-label">Completed</div>
+                </div>
+                <div class="prj-kpi-icon" style="background: rgba(22, 163, 74, 0.1); color: #16a34a;">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+
+            <div class="prj-kpi-card">
+                <div>
+                    <div class="prj-kpi-val text-primary" id="kpiTotalCost">₹ 0</div>
+                    <div class="prj-kpi-label">Total Portfolio Cost</div>
+                </div>
+                <div class="prj-kpi-icon" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar Bar -->
+        <div class="prj-toolbar">
+            <!-- Left: Search Box -->
+            <div class="prj-search-box">
+                <i class="fas fa-search prj-search-icon"></i>
+                <input type="text" id="prjSearchInput" class="prj-search-input" placeholder="Search by name, items, or head..." onkeyup="renderTable()">
+            </div>
+
+            <!-- Middle: Head & Stage Filters -->
+            <div class="d-flex align-items-center gap-2">
+                <select id="headFilter" class="prj-filter-select">
+                    <option value="all">All Heads</option>
+                </select>
+
+                <select id="stageFilter" class="prj-filter-select">
+                    <option value="all">All Stages</option>
+                    <option>PPP</option>
+                    <option>AON</option>
+                    <option>FBU</option>
+                    <option>TOB & TEC</option>
+                    <option>B BD</option>
+                    <option>OCB RA</option>
+                    <option>Placement Of SO</option>
+                    <option>Store / Items Delivery</option>
+                    <option>ATP</option>
+                    <option>PRAC & CRAC</option>
+                    <option>Payment</option>
+                    <option>Completed</option>
+                </select>
+            </div>
+
+            <!-- Right: Tab Pills & Create Button -->
+            <div class="d-flex align-items-center gap-3">
+                <div class="prj-nav-tabs">
+                    <button class="prj-nav-tab active" onclick="switchTab('active', this)">Active</button>
+                    <button class="prj-nav-tab" onclick="switchTab('completed', this)">Completed</button>
+                </div>
+
+                <button class="btn btn-primary rounded-pill px-3 py-1 fw-bold shadow-sm" style="font-size: 0.85rem;" onclick="openCreateProjectModal()">
+                    <i class="fas fa-plus me-1"></i> New Project
+                </button>
+            </div>
+        </div>
+
+        <!-- Projects Table (Company Column Removed) -->
+        <div class="prj-table-card">
+            <div class="table-responsive">
+                <table class="prj-table">
+                    <thead>
+                        <tr>
+                            <th>Project Title</th>
+                            <th>Head</th>
+                            <th>Stage</th>
+                            <th>Cost</th>
+                            <th>Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="projectTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-
-    <!-- TABS -->
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item">
-            <button class="nav-link active" onclick="switchTab('active')">Active</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" onclick="switchTab('completed')">Completed</button>
-        </li>
-    </ul>
-
-    <!-- TABLE -->
-    <div class="table-container">
-        <table class="table table-bordered table-hover">
-            <thead class="table-light">
-                <tr>
-                    <th>Name</th>
-                    <th>Head</th>
-                    <th>Company</th>
-                    <th>Stage</th>
-                    <th>Cost</th>
-                    <th>Items</th>
-                    <th>Qty</th>
-                    <th>Deadline</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="projectTableBody"></tbody>
-        </table>
-    </div>
-
 </div>
 
-
-<!-- ================= VIEW / STAGE MODAL ================= -->
-<div class="modal fade" id="viewModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header bg-info text-white">
-        <h5 id="modalTitle"></h5>
-        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-
-        <p><b>Head:</b> <span id="mHead"></span></p>
-        <p><b>Company:</b> <span id="mCompany"></span></p>
-        <p><b>Cost:</b> ₹<span id="mCost"></span></p>
-        <p><b>Items:</b> <span id="mItems"></span></p>
-        <p><b>Quantity:</b> <span id="mQty"></span></p>
-        <p><b>Description:</b> <span id="mDesc"></span></p>
-
-        <label class="fw-bold mt-2">Update Stage</label>
-        <select id="modalStage" class="form-select" onchange="updateStage(this.value)">
-            <option>PPP</option>
-            <option>AON</option>
-            <option>FBU</option>
-            <option>TOB & TEC</option>
-            <option>B BD</option>
-            <option>OCB RA</option>
-            <option>Placement Of SO</option>
-            <option>Store / Items Delivery</option>
-            <option>ATP</option>
-            <option>PRAC & CRAC</option>
-            <option>Payment</option>
-            <option>Completed</option>
-        </select>
-
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- ================= CREATE PROJECT MODAL ================= -->
 <div class="modal fade prj-detail-modal" id="prjCreateModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header border-0 p-0">
-                <div class="prj-detail-header w-100">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h3 class="prj-detail-title">Create New Project</h3>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
+                <div class="prj-detail-header w-100 d-flex justify-content-between align-items-center">
+                    <h3 class="prj-detail-title">Create New Project</h3>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
             </div>
 
             <div class="modal-body prj-detail-body-content">
-
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Project Title *</label>
-                    <input type="text" id="newPrjTitle" class="form-control" required>
+                    <input type="text" id="newPrjTitle" class="form-control" placeholder="Enter project name..." required>
                     <div class="invalid-feedback">Project title is required</div>
                 </div>
 
-                <!-- Head comes from DB via /get_project_heads -->
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Project Head *</label>
                     <select id="newPrjOwner" class="form-select" required>
@@ -211,14 +437,14 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Cost *</label>
-                    <input type="text" id="newPrjCost" class="form-control" placeholder="e.g. 15000 or 15000.50">
+                    <label class="form-label fw-semibold">Cost (₹) *</label>
+                    <input type="text" id="newPrjCost" class="form-control" placeholder="e.g. 1500000">
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Items</label>
-                    <input type="text" id="newPrjItems" class="form-control" placeholder="e.g. Steel Pipes, Cement Bags">
+                    <input type="text" id="newPrjItems" class="form-control" placeholder="e.g. Hardware Equipment">
                     <div class="invalid-feedback"></div>
                 </div>
 
@@ -230,30 +456,25 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Description</label>
-                    <textarea id="newPrjDescription" class="form-control" rows="3"></textarea>
+                    <textarea id="newPrjDescription" class="form-control" rows="3" placeholder="Enter details..."></textarea>
                 </div>
 
                 <button class="prj-update-button" onclick="createNewProjectData()">
                     <i class="fas fa-save me-2"></i>Create Project
                 </button>
-
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- ================= EDIT PROJECT MODAL ================= -->
 <div class="modal fade prj-detail-modal" id="prjEditModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-
             <div class="modal-header border-0 p-0">
-                <div class="prj-detail-header w-100 bg-warning text-dark" style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 1.5rem 2rem;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <h3 class="prj-detail-title text-white">Edit Project</h3>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                    </div>
+                <div class="prj-detail-header w-100 d-flex justify-content-between align-items-center">
+                    <h3 class="prj-detail-title">Edit Project</h3>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
             </div>
 
@@ -300,7 +521,7 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Cost *</label>
+                        <label class="form-label fw-semibold">Cost (₹) *</label>
                         <input type="text" id="editPrjCost" class="form-control">
                         <div class="invalid-feedback"></div>
                     </div>
@@ -315,19 +536,13 @@
                     <input type="text" id="editPrjItems" class="form-control">
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Deadline</label>
-                        <input type="date" id="editPrjDeadline" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Status</label>
-                        <select id="editPrjStatus" class="form-select">
-                            <option value="Active">Active</option>
-                            <option value="On Hold">On Hold</option>
-                            <option value="Completed">Completed</option>
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select id="editPrjStatus" class="form-select">
+                        <option value="Active">Active</option>
+                        <option value="On Hold">On Hold</option>
+                        <option value="Completed">Completed</option>
+                    </select>
                 </div>
 
                 <div class="mb-3">
@@ -335,19 +550,16 @@
                     <textarea id="editPrjDescription" class="form-control" rows="3"></textarea>
                 </div>
 
-                <button class="prj-update-button" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="saveProjectEdit()">
+                <button class="prj-update-button" onclick="saveProjectEdit()">
                     <i class="fas fa-save me-2"></i>Save Changes
                 </button>
-
             </div>
         </div>
     </div>
 </div>
 
-
 <!-- Floating Add Button -->
-<button class="floating-add-btn" onclick="openCreateProjectModal()">+</button>
-
+<button class="floating-add-btn" onclick="openCreateProjectModal()" title="Create New Project">+</button>
 
 <!-- ================= SCRIPTS ================= -->
 <script>
@@ -355,47 +567,93 @@ let allProjects = [];
 let currentProjectId = null;
 let currentTab = "active";
 
-// ── LOAD HEADS (used for filter, create modal, and edit modal dropdowns) ──
-async function loadHeads() {
-    const res = await fetch('/get_project_heads');
-    const heads = await res.json();
+// Color mapping for stages
+const STAGE_BADGE_MAP = {
+    'ppp': { bg: '#e0f2fe', color: '#0369a1', label: 'PPP' },
+    'aon': { bg: '#f3e8ff', color: '#7e22ce', label: 'AON' },
+    'fbu': { bg: '#e0f2fe', color: '#0284c7', label: 'FBU' },
+    'tob & tec': { bg: '#dcfce7', color: '#15803d', label: 'TOB & TEC' },
+    'b bd': { bg: '#fef3c7', color: '#b45309', label: 'B BD' },
+    'ocb ra': { bg: '#e0e7ff', color: '#4338ca', label: 'OCB RA' },
+    'placement of so': { bg: '#fef9c3', color: '#a16207', label: 'SO Placement' },
+    'store / items delivery': { bg: '#cff4fc', color: '#0891b2', label: 'Store Delivery' },
+    'store/items delivery': { bg: '#cff4fc', color: '#0891b2', label: 'Store Delivery' },
+    'atp': { bg: '#e0f2fe', color: '#0369a1', label: 'ATP' },
+    'prac & crac': { bg: '#f3e8ff', color: '#9333ea', label: 'PRAC & CRAC' },
+    'payment': { bg: '#fef3c7', color: '#b45309', label: 'Payment' },
+    'completed': { bg: '#dcfce7', color: '#16a34a', label: 'Completed' }
+};
 
-    // Filter dropdown
-    const filterDropdown = document.getElementById("headFilter");
-    filterDropdown.innerHTML = '<option value="all">All Heads</option>';
-    heads.forEach(h => {
-        filterDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
-    });
-
-    // Create modal dropdown
-    const modalDropdown = document.getElementById("newPrjOwner");
-    modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
-    heads.forEach(h => {
-        modalDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
-    });
-
-    // Edit modal dropdown
-    const editDropdown = document.getElementById("editPrjHead");
-    if (editDropdown) {
-        editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
-        heads.forEach(h => {
-            editDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
-        });
+function formatCurrency(val) {
+    if (val == null || val === '' || isNaN(val)) return '₹ 0';
+    const num = Number(val);
+    if (num >= 10000000) {
+        return '₹ ' + (num / 10000000).toFixed(2) + ' Cr';
+    } else if (num >= 100000) {
+        return '₹ ' + (num / 100000).toFixed(2) + ' Lakh';
     }
+    return '₹ ' + num.toLocaleString('en-IN');
+}
+
+// ── LOAD HEADS ──
+async function loadHeads() {
+    try {
+        const res = await fetch('/get_project_heads');
+        const heads = await res.json();
+
+        // Filter dropdown
+        const filterDropdown = document.getElementById("headFilter");
+        filterDropdown.innerHTML = '<option value="all">All Heads</option>';
+        heads.forEach(h => {
+            filterDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
+        });
+
+        // Create modal dropdown
+        const modalDropdown = document.getElementById("newPrjOwner");
+        modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+        heads.forEach(h => {
+            modalDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
+        });
+
+        // Edit modal dropdown
+        const editDropdown = document.getElementById("editPrjHead");
+        if (editDropdown) {
+            editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+            heads.forEach(h => {
+                editDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
+            });
+        }
+    } catch(e) { console.error('Error loading heads:', e); }
 }
 
 // ── LOAD PROJECTS ──
 async function loadProjects() {
-    const res = await fetch('/api/get_projects');
-    allProjects = await res.json();
-    renderTable();
+    try {
+        const res = await fetch('/api/get_projects');
+        allProjects = await res.json();
+        updateKpis();
+        renderTable();
+    } catch(e) { console.error('Error loading projects:', e); }
+}
+
+// ── UPDATE KPI SUMMARY CARDS ──
+function updateKpis() {
+    const total = allProjects.length;
+    const completed = allProjects.filter(p => (p.current_stage || '').toLowerCase() === 'completed').length;
+    const active = total - completed;
+    const totalCostSum = allProjects.reduce((sum, p) => sum + (Number(p.project_cost) || 0), 0);
+
+    document.getElementById("kpiTotalProjects").textContent = total;
+    document.getElementById("kpiActiveProjects").textContent = active;
+    document.getElementById("kpiCompletedProjects").textContent = completed;
+    document.getElementById("kpiTotalCost").textContent = formatCurrency(totalCostSum);
 }
 
 // ── SWITCH TAB ──
-function switchTab(tab) {
+function switchTab(tab, btnEl) {
     currentTab = tab;
-    document.querySelectorAll(".nav-link").forEach(btn => btn.classList.remove("active"));
-    event.target.classList.add("active");
+    document.querySelectorAll(".prj-nav-tab").forEach(btn => btn.classList.remove("active"));
+    if (btnEl) btnEl.classList.add("active");
     renderTable();
 }
 
@@ -404,59 +662,57 @@ function renderTable() {
     const tbody = document.getElementById("projectTableBody");
     const head = document.getElementById("headFilter").value;
     const stage = document.getElementById("stageFilter").value;
+    const search = document.getElementById("prjSearchInput").value.toLowerCase().trim();
 
     tbody.innerHTML = "";
 
     let filtered = allProjects.filter(p => {
         let matchTab = currentTab === "active"
-            ? p.current_stage !== "Completed"
-            : p.current_stage === "Completed";
+            ? (p.current_stage || '').toLowerCase() !== "completed"
+            : (p.current_stage || '').toLowerCase() === "completed";
         let matchHead = head === "all" || p.head === head;
-        let matchStage = stage === "all" || p.current_stage === stage;
-        return matchTab && matchHead && matchStage;
+        let matchStage = stage === "all" || (p.current_stage || '').toLowerCase() === stage.toLowerCase();
+        let matchSearch = !search || 
+            (p.project_name || '').toLowerCase().includes(search) ||
+            (p.head || '').toLowerCase().includes(search) ||
+            (p.project_items || '').toLowerCase().includes(search);
+
+        return matchTab && matchHead && matchStage && matchSearch;
     });
 
     if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center">No data</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-muted py-5 fw-semibold"><i class="fas fa-folder-minus fs-2 d-block mb-2"></i>No matching projects found</td></tr>`;
         return;
     }
 
     filtered.forEach(p => {
+        const rawStage = (p.current_stage || 'PPP').toLowerCase();
+        const stageConfig = STAGE_BADGE_MAP[rawStage] || { bg: '#e2e8f0', color: '#475569', label: p.current_stage || 'PPP' };
+
         tbody.innerHTML += `
         <tr>
-            <td>${p.project_name}</td>
-            <td>${p.head}</td>
-            <td>${p.company || '-'}</td>
-            <td><span class="badge bg-info text-dark">${p.current_stage}</span></td>
-            <td>₹${p.project_cost}</td>
-            <td>${p.project_items || '-'}</td>
-            <td>${p.quantity || 0}</td>
-            <td>${p.deadline || '-'}</td>
+            <td class="prj-title-cell">
+                <div>${p.project_name}</div>
+                <span style="font-size:0.68rem;color:#94a3b8;letter-spacing:0.5px;">PRJ-${String(p.project_id).padStart(3, '0')}</span>
+            </td>
+            <td class="fw-semibold">${p.head || 'Unassigned'}</td>
             <td>
-                <button class="btn btn-sm btn-primary me-1" onclick='viewProject(${JSON.stringify(p)})'>
-                    View
-                </button>
-                <button class="btn btn-sm btn-warning text-dark" onclick='editProject(${JSON.stringify(p)})'>
-                    Edit
-                </button>
+                <span class="prj-badge-stage" style="background:${stageConfig.bg}; color:${stageConfig.color};">
+                    ${stageConfig.label}
+                </span>
+            </td>
+            <td class="fw-bold text-success">${formatCurrency(p.project_cost)}</td>
+            <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.project_items || '-'}</td>
+            <td>
+                    <button class="btn btn-action-edit" onclick='editProject(${JSON.stringify(p)})'>
+                        <i class="fas fa-pencil-alt me-1"></i>Edit
+                    </button>
             </td>
         </tr>`;
     });
 }
 
-// ── VIEW PROJECT ──
-function viewProject(p) {
-    currentProjectId = p.project_id;
-    document.getElementById("modalTitle").innerText = p.project_name;
-    document.getElementById("mHead").innerText = p.head;
-    document.getElementById("mCompany").innerText = p.company || 'N/A';
-    document.getElementById("mCost").innerText = p.project_cost;
-    document.getElementById("mItems").innerText = p.project_items || 'N/A';
-    document.getElementById("mQty").innerText = p.quantity || 0;
-    document.getElementById("mDesc").innerText = p.project_description || "N/A";
-    document.getElementById("modalStage").value = p.current_stage;
-    new bootstrap.Modal(document.getElementById("viewModal")).show();
-}
+
 
 // ── EDIT PROJECT ──
 function editProject(p) {
@@ -528,15 +784,18 @@ async function updateStage(stage) {
     const data = await res.json();
     if (data.status === "success") {
         let project = allProjects.find(p => p.project_id == currentProjectId);
-        project.current_stage = stage;
-        if (stage === "Completed") project.status = "Completed";
+        if (project) {
+            project.current_stage = stage;
+            if (stage === "Completed") project.status = "Completed";
+        }
+        updateKpis();
         renderTable();
     }
 }
 
-// ── OPEN CREATE MODAL (refresh heads every time it opens) ──
+// ── OPEN CREATE MODAL ──
 function openCreateProjectModal() {
-    loadHeads(); // re-fetch so modal always has latest heads
+    loadHeads();
     const createModal = new bootstrap.Modal(document.getElementById('prjCreateModal'));
     createModal.show();
 }
@@ -557,77 +816,31 @@ async function createNewProjectData() {
     const quantity            = quantityEl.value.trim();
     const project_description = descEl.value.trim();
 
-    // ── Reset all validation states ──
     [titleEl, ownerEl, costEl, itemsEl, quantityEl].forEach(el => {
         el.classList.remove("is-invalid", "is-valid");
     });
 
     let isValid = true;
 
-    // 1. Project Title — required, min 3 chars, letters/numbers/spaces/hyphens only
-    if (!project_name) {
+    if (!project_name || project_name.length < 3) {
         titleEl.classList.add("is-invalid");
-        titleEl.nextElementSibling.textContent = "Project title is required.";
         isValid = false;
-    } else if (project_name.length < 3) {
-        titleEl.classList.add("is-invalid");
-        titleEl.nextElementSibling.textContent = "Title must be at least 3 characters.";
-        isValid = false;
-    
-    } 
-    //else if (!/^[a-zA-Z0-9\s\-\/\(\)\.]+$/.test(project_name)) {
-       // titleEl.classList.add("is-invalid");
-       // titleEl.nextElementSibling.textContent = "Title can only contain letters, numbers, spaces, hyphens, slashes and brackets.";
-        //isValid = false;
-    //} 
-    else {
+    } else {
         titleEl.classList.add("is-valid");
     }
 
-    // 2. Project Head — required, must select from dropdown
     if (!head) {
         ownerEl.classList.add("is-invalid");
-        ownerEl.nextElementSibling.textContent = "Please select a project head.";
         isValid = false;
     } else {
         ownerEl.classList.add("is-valid");
     }
 
-    // 3. Cost — required, must be a valid positive float (e.g. 1500, 1500.50)
-    if (!project_cost) {
+    if (!project_cost || isNaN(project_cost) || parseFloat(project_cost) <= 0) {
         costEl.classList.add("is-invalid");
-        costEl.nextElementSibling.textContent = "Project cost is required.";
-        isValid = false;
-    } else if (!/^\d+(\.\d{1,2})?$/.test(project_cost)) {
-        costEl.classList.add("is-invalid");
-        costEl.nextElementSibling.textContent = "Cost must be a valid number (e.g. 1500 or 1500.50).";
-        isValid = false;
-    } else if (parseFloat(project_cost) <= 0) {
-        costEl.classList.add("is-invalid");
-        costEl.nextElementSibling.textContent = "Cost must be greater than zero.";
         isValid = false;
     } else {
         costEl.classList.add("is-valid");
-    }
-
-    // 4. Items — optional, but if filled must be text (not just numbers)
-    if (project_items && /^\d+$/.test(project_items)) {
-        itemsEl.classList.add("is-invalid");
-        itemsEl.nextElementSibling.textContent = "Items should be a name/description, not just a number.";
-        isValid = false;
-    } else if (project_items) {
-        itemsEl.classList.add("is-valid");
-    }
-
-    // 5. Quantity — optional, but if filled must be a positive whole number
-    if (quantity) {
-        if (!/^\d+$/.test(quantity) || parseInt(quantity) <= 0) {
-            quantityEl.classList.add("is-invalid");
-            quantityEl.nextElementSibling.textContent = "Quantity must be a positive whole number.";
-            isValid = false;
-        } else {
-            quantityEl.classList.add("is-valid");
-        }
     }
 
     if (!isValid) return;
@@ -651,7 +864,6 @@ async function createNewProjectData() {
             setTimeout(() => {
                 bootstrap.Modal.getInstance(document.getElementById('prjCreateModal')).hide();
 
-                // Reset form fields and validation states
                 [titleEl, costEl, itemsEl, quantityEl, descEl].forEach(el => {
                     el.value = '';
                     el.classList.remove('is-valid', 'is-invalid');
@@ -659,7 +871,6 @@ async function createNewProjectData() {
                 ownerEl.value = '';
                 ownerEl.classList.remove('is-valid', 'is-invalid');
 
-                // Refresh table
                 Promise.all([loadHeads(), loadProjects()]);
 
                 btn.innerHTML = `<i class="fas fa-save me-2"></i>Create Project`;
@@ -704,4 +915,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </div> <!-- end wrapper -->
 
-{%endblock%}
+{% endblock %}

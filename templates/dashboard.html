@@ -420,9 +420,10 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
+      {% if role in ['OC'] %}
       {% include 'modals/alarm/alarm.html' %}
       {% include 'modals/alarm/attachment_alarm.html' %}
-
+      {% endif %}
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
@@ -523,6 +524,12 @@
         <span class="ahb-text">
           Add Honour Entry
         </span>
+      </button>
+      {% endif %}
+
+      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#projDash_modal">
+        PROJECTS
       </button>
       {% endif %}
 
@@ -641,14 +648,7 @@
       </div>
       {% endif %}
 
-      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
-      <div class="sc" id="openProjects">
-        <span class="sc-label">Total Projects</span>
-        <div class="sc-right">
-          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-        </div>
-      </div>
-      {% endif %}
+
 
       {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
@@ -1459,5 +1459,7 @@
     reloadDashboardCharts();
   });
 </script>
+
+{% include 'modals/Projects/modal.html' %}
 
 {% endblock %}
