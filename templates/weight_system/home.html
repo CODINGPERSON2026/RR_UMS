@@ -190,6 +190,10 @@
         transform: translateY(-10px);
     }
 
+    .card-success, .card-unauth, .card-safe, .card-category {
+        cursor: pointer;
+    }
+
     .card {
         background: var(--card-background);
         border-radius: 14px;   /* slightly smaller */
@@ -1275,58 +1279,7 @@
         </div>
     </div>
 
-    <!-- Table Wrapper -->
-    <div class="table-wrapper" id="table-wrapper" style="position: relative;">
-        <div class="table-spinner" id="table-spinner" style="display: none;">
-            <div class="spinner"></div>
-        </div>
-        <div class="chart-box" id="unfit-deviation-chart-box" style="display: none; margin-bottom: 20px;">
-            <h3>Unfit Deviation Analysis (Click a bar to view persons)</h3>
-            <div class="bar-chart-wrapper" style="height: 320px;">
-                <canvas id="unfitDeviationLineChart"></canvas>
-            </div>
-        </div>
-        <div class="table-controls">
-            <button id="close-table-btn" class="close-btn">Close Details</button>
-            <div class="company-filter">
-                <label for="deviation-filter">Filter by Deviation:</label>
-                <select id="deviation-filter" class="deviation-filter">
-                    <option value="all">All Deviations</option>
-                    <!-- <option value="0-10">0% to 10%</option> -->
-                    <option value="10-20">10% to 20%</option>
-                    <option value="more-than-20">More than 20%</option>
-                </select>
-            </div>
-            <div class="company-filter">
-                <label for="rank-filter">Filter by Rank:</label>
-                <select id="rank-filter" class="rank-filter">
-                    <option value="all">All Ranks</option>
-                    <option value="JCO">JCO</option>
-                    <option value="other">Other than JCO</option>
-                </select>
-            </div>
-        </div>
-        <table class="modern-table">
-            <thead>
-                <tr>
-                    <th>Army No.</th>
-                    <th>Name</th>
-                    <th>Rank</th>
-                    <th>Company</th>
-                    <th>Age</th>
-                    <th>Height (cm)</th>
-                    <th>Authorized Range (kg)</th>
-                    <th>Actual (kg)</th>
-                    <th>Deviation (kg)</th>
-                    <th>Deviation (%)</th>
-                    <th>Status</th>
-                    <th>Status Type</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <!-- Table Wrapper Removed (replaced with interactive modals) -->
 </div>
 
 <!-- Person Details Modal -->
@@ -1375,6 +1328,7 @@
 </script>
 
 {% include 'weight_system/modals/modal.html'%}
+{% include 'weight_system/modals/weight_graph_modal.html' %}
 <script>
     // Toggle cards visibility
     document.getElementById('toggle-cards-btn').addEventListener('click', function () {
@@ -1614,7 +1568,7 @@ const donutDatalabelsPlugin = {
     }
 };
 
-function makeBarOptions() {
+function makeBarOptions(graphType = "") {
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -1629,11 +1583,25 @@ function makeBarOptions() {
             y: { beginAtZero: true, ticks: { color: "#4a5568" }, grid: { color: "rgba(0,0,0,0.05)" } },
             x: { ticks: { color: "#4a5568" }, grid: { display: false } }
         },
-        animation: { duration: 800, easing: "easeOutQuart" }
+        animation: { duration: 800, easing: "easeOutQuart" },
+        onHover: (evt, elements) => {
+            if (evt.native && evt.native.target) {
+                evt.native.target.style.cursor = elements && elements.length ? 'pointer' : 'default';
+            }
+        },
+        onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+                const index = elements[0].index;
+                const label = chart.data.labels[index];
+                if (window.openWeightGraphModal && graphType) {
+                    window.openWeightGraphModal(graphType, label);
+                }
+            }
+        }
     };
 }
 
-function makeDonutOptions(legendPosition = "bottom") {
+function makeDonutOptions(legendPosition = "bottom", graphType = "") {
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -1646,7 +1614,21 @@ function makeDonutOptions(legendPosition = "bottom") {
                 callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` }
             }
         },
-        animation: { duration: 1000, easing: "easeOutQuart" }
+        animation: { duration: 1000, easing: "easeOutQuart" },
+        onHover: (evt, elements) => {
+            if (evt.native && evt.native.target) {
+                evt.native.target.style.cursor = elements && elements.length ? 'pointer' : 'default';
+            }
+        },
+        onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+                const index = elements[0].index;
+                const label = chart.data.labels[index];
+                if (window.openWeightGraphModal && graphType) {
+                    window.openWeightGraphModal(graphType, label);
+                }
+            }
+        }
     };
 }
 
@@ -1687,7 +1669,21 @@ function drawBarGraphs(data) {
                         callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed}` }
                     }
                 },
-                animation: { duration: 800, easing: "easeOutQuart" }
+                animation: { duration: 800, easing: "easeOutQuart" },
+                onHover: (evt, elements) => {
+                    if (evt.native && evt.native.target) {
+                        evt.native.target.style.cursor = elements && elements.length ? 'pointer' : 'default';
+                    }
+                },
+                onClick: (evt, elements, chart) => {
+                    if (elements && elements.length > 0) {
+                        const index = elements[0].index;
+                        const label = chart.data.labels[index];
+                        if (window.openWeightGraphModal) {
+                            window.openWeightGraphModal('fit_unfit', label);
+                        }
+                    }
+                }
             }
         });
     }
@@ -1709,7 +1705,7 @@ function drawBarGraphs(data) {
                 }]
             },
             plugins: [barDatalabelsPlugin],
-            options: makeBarOptions()
+            options: makeBarOptions("shape_category")
         });
     }
 
@@ -1728,7 +1724,7 @@ function drawBarGraphs(data) {
                 }]
             },
             plugins: [donutDatalabelsPlugin],
-            options: makeDonutOptions("bottom")
+            options: makeDonutOptions("bottom", "jco_or_fit")
         });
     }
 
@@ -1747,7 +1743,7 @@ function drawBarGraphs(data) {
                 }]
             },
             plugins: [donutDatalabelsPlugin],
-            options: makeDonutOptions("top")
+            options: makeDonutOptions("top", "jco_or_shape")
         });
     }
 }
@@ -1784,7 +1780,7 @@ function updateDoughnutCharts() {
                         }]
                     },
                     plugins: [donutDatalabelsPlugin],
-                    options: makeDonutOptions("bottom")
+                    options: makeDonutOptions("bottom", "jco_or_fit")
                 });
             }
 
@@ -1802,7 +1798,7 @@ function updateDoughnutCharts() {
                         }]
                     },
                     plugins: [donutDatalabelsPlugin],
-                    options: makeDonutOptions("top")
+                    options: makeDonutOptions("top", "jco_or_shape")
                 });
             }
         })
@@ -2615,67 +2611,49 @@ async function handleUpdateUserSubmit(event) {
 // ============================================================
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Filters
-    document.getElementById("deviation-filter").innerHTML = `
-        <option value="all">All Deviations</option>
-        <option value="0-10">0% to 10%</option>
-        <option value="10-20">10% to 20%</option>
-        <option value="more-than-20">More than 20%</option>
-    `;
-    document.getElementById("rank-filter").innerHTML = `
-        <option value="all">All Ranks</option>
-        <option value="JCO">JCO</option>
-        <option value="other">Other than JCO</option>
-    `;
+    // Filters (if present)
+    const devFlt = document.getElementById("deviation-filter");
+    if (devFlt) {
+        devFlt.innerHTML = `
+            <option value="all">All Deviations</option>
+            <option value="0-10">0% to 10%</option>
+            <option value="10-20">10% to 20%</option>
+            <option value="more-than-20">More than 20%</option>
+        `;
+    }
+    const rkFlt = document.getElementById("rank-filter");
+    if (rkFlt) {
+        rkFlt.innerHTML = `
+            <option value="all">All Ranks</option>
+            <option value="JCO">JCO</option>
+            <option value="other">Other than JCO</option>
+        `;
+    }
 
-    // Summary card buttons
-    document.getElementById("load-unauth-btn").addEventListener("click", fetchAndShowUnfitWithGraph);
-    document.getElementById("load-auth-btn").addEventListener("click", () => fetchAndShow("/weight_system/api/authorized", "auth"));
-    document.getElementById("load-safe-btn").addEventListener("click", () => fetchStatusData("shape"));
-    document.getElementById("load-category-btn").addEventListener("click", () => fetchStatusData("category"));
-    document.getElementById("close-table-btn").addEventListener("click", closeTable);
-    document.getElementById("table-wrapper").addEventListener("scroll", handleScroll);
+    // Summary card buttons & cards -> Open graph details modal
+    const openFitModal = (e) => { if (e) e.stopPropagation(); if (window.openWeightGraphModal) window.openWeightGraphModal("fit_unfit", "Fit"); };
+    const openUnfitModal = (e) => { if (e) e.stopPropagation(); if (window.openWeightGraphModal) window.openWeightGraphModal("fit_unfit", "Unfit"); };
+    const openSafeModal = (e) => { if (e) e.stopPropagation(); if (window.openWeightGraphModal) window.openWeightGraphModal("shape_category", "Shape I"); };
+    const openCategoryModal = (e) => { if (e) e.stopPropagation(); if (window.openWeightGraphModal) window.openWeightGraphModal("shape_category", "LMC"); };
+
+    document.getElementById("load-auth-btn")?.addEventListener("click", openFitModal);
+    document.getElementById("load-unauth-btn")?.addEventListener("click", openUnfitModal);
+    document.getElementById("load-safe-btn")?.addEventListener("click", openSafeModal);
+    document.getElementById("load-category-btn")?.addEventListener("click", openCategoryModal);
+
+    document.querySelector(".card-success")?.addEventListener("click", openFitModal);
+    document.querySelector(".card-unauth")?.addEventListener("click", openUnfitModal);
+    document.querySelector(".card-safe")?.addEventListener("click", openSafeModal);
+    document.querySelector(".card-category")?.addEventListener("click", openCategoryModal);
 
     // Company dropdown
-    document.getElementById("company-select").addEventListener("change", e => {
+    document.getElementById("company-select")?.addEventListener("change", e => {
         fetchSummary(e.target.value);
-        closeTable();
-    });
-
-    // Table filters
-    document.getElementById("deviation-filter").addEventListener("change", e => {
-        if (currentStatusClass !== "unauth") return;
-        showLoader("table-spinner", true);
-        setTimeout(() => {
-            const wrapper = document.getElementById("table-wrapper");
-            const tableEl = wrapper.querySelector(".modern-table");
-            const controlsEl = wrapper.querySelector(".table-controls");
-            if (tableEl) tableEl.style.display = "table";
-            if (controlsEl) controlsEl.style.display = "flex";
-            const rows = applyUnfitFilters(tableData.slice(0, currentPage * ROWS_PER_PAGE));
-            displayedData = rows;
-            renderTableRows(rows, currentStatusClass);
-            hasMoreData = tableData.length > currentPage * ROWS_PER_PAGE;
-            showLoader("table-spinner", false);
-        }, 300);
-    });
-
-    document.getElementById("rank-filter").addEventListener("change", e => {
-        showLoader("table-spinner", true);
-        setTimeout(() => {
-            let rows = tableData.slice(0, currentPage * ROWS_PER_PAGE);
-            if (currentStatusClass === "unauth") rows = applyUnfitFilters(rows);
-            else rows = filterTableByRank(rows, e.target.value);
-            displayedData = rows;
-            renderTableRows(rows, currentStatusClass);
-            hasMoreData = tableData.length > currentPage * ROWS_PER_PAGE;
-            showLoader("table-spinner", false);
-        }, 300);
     });
 
     // Chart filters
-    document.getElementById("jco-or-filter").addEventListener("change", updateDoughnutCharts);
-    document.getElementById("jco-safe-or-filter").addEventListener("change", updateDoughnutCharts);
+    document.getElementById("jco-or-filter")?.addEventListener("change", updateDoughnutCharts);
+    document.getElementById("jco-safe-or-filter")?.addEventListener("change", updateDoughnutCharts);
 
    
 

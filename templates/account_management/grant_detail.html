@@ -18,12 +18,6 @@
   {% if role != 'CO' %}
   <!-- ACTION BUTTONS -->
   <div class="mb-4">
-    {#
-    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addSoModal">
-      + Add Sanction Order
-    </button>
-    #}
-
     <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#addExpModal">
       + Add Expenditure
     </button>
@@ -35,10 +29,13 @@
   {% endif %}
 
   <!-- TITLE -->
-  <div class="d-flex align-items-center mb-4 gap-2">
+  <div class="d-flex align-items-center mb-4 gap-2 flex-wrap">
     <h4 class="mb-0">
       {{ grant.name }} ({{ grant.code_head }})
     </h4>
+    <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+      <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY ACCJCO
+    </span>
     {% if role != 'CO' %}
     <button class="btn btn-sm btn-warning text-dark ms-2" data-bs-toggle="modal" data-bs-target="#editGrantDetailModal">
       ✏️ Edit Grant

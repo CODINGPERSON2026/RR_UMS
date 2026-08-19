@@ -90,13 +90,22 @@
 <script>
 let attachAlarmFetchedData = [];
 
+const userCompanyStrAttach = "{{ user_company | default('') }}".trim();
+const isNonAdminCoyAttach = userCompanyStrAttach && !["ADMIN", "ALL", "CENTER"].includes(userCompanyStrAttach.toUpperCase());
+
 async function showAssignedAttachmentAlarms() {
     try {
         const res = await fetch('/stats/assigned_attachment_alarm');
         if (!res.ok) throw new Error("Network error");
 
         const result = await res.json();
-        attachAlarmFetchedData = result.rows || [];
+        let rows = result.rows || [];
+
+        if (isNonAdminCoyAttach) {
+            rows = rows.filter(item => item.company && item.company.toLowerCase().trim() === userCompanyStrAttach.toLowerCase().trim());
+        }
+
+        attachAlarmFetchedData = rows;
         const alarmAlert = document.getElementById("attachmentAlarmAlert");
 
         if (attachAlarmFetchedData.length > 0) {
@@ -120,8 +129,10 @@ function renderAttachAlarmTable() {
     if (!tbody) return;
 
     let filtered = attachAlarmFetchedData;
-    if (companyVal) {
-        filtered = filtered.filter(item => (item.company || '').toUpperCase() === companyVal.toUpperCase());
+    if (isNonAdminCoyAttach) {
+        filtered = filtered.filter(item => item.company && item.company.toLowerCase().trim() === userCompanyStrAttach.toLowerCase().trim());
+    } else if (companyVal) {
+        filtered = filtered.filter(item => (item.company || '').toLowerCase().trim() === companyVal.toLowerCase().trim());
     }
 
     if (countBadge) countBadge.textContent = filtered.length;
@@ -152,9 +163,17 @@ function renderAttachAlarmTable() {
 function populateAttachCompanyFilter() {
     const select = document.getElementById("attachAlarmCompanyFilter");
     if (!select) return;
-    const companies = Array.from(new Set(attachAlarmFetchedData.map(i => i.company).filter(Boolean)));
-    select.innerHTML = '<option value="">All Companies</option>' + 
-        companies.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    if (isNonAdminCoyAttach) {
+        select.innerHTML = `<option value="${userCompanyStrAttach}">${userCompanyStrAttach}</option>`;
+        select.value = userCompanyStrAttach;
+        select.disabled = true;
+    } else {
+        select.disabled = false;
+        const companies = Array.from(new Set(attachAlarmFetchedData.map(i => i.company).filter(Boolean)));
+        select.innerHTML = '<option value="">All Companies</option>' + 
+            companies.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
 }
 
 async function deleteAttachmentAlarm(armyNumber) {

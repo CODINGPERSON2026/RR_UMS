@@ -22,7 +22,8 @@
   }
 
   #companyInterviewModal .modal-dialog {
-    max-width: 1050px;
+    max-width: 1400px;
+    width: 94vw;
     margin: 1.5rem auto 1rem auto;
   }
 
@@ -53,40 +54,40 @@
   }
 
   .ci-hdr {
-    padding: 22px 28px;
+    padding: 12px 22px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     width: 100%;
     position: relative;
     z-index: 1;
   }
   .ci-hdr-icon {
-    width: 50px; height: 50px;
-    border-radius: 14px;
+    width: 38px; height: 38px;
+    border-radius: 10px;
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.18);
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
+    font-size: 17px; flex-shrink: 0;
   }
   .ci-hdr-text { flex: 1; min-width: 0; }
   .ci-hdr-title {
-    font-size: 1.2rem; font-weight: 700; color: #fff;
-    letter-spacing: -.3px; line-height: 1.2; margin: 0 0 3px;
+    font-size: 1.05rem; font-weight: 700; color: #fff;
+    letter-spacing: -.2px; line-height: 1.2; margin: 0 0 1px;
   }
   .ci-hdr-sub {
-    font-size: 0.76rem; color: var(--ci-300);
-    letter-spacing: .6px; text-transform: uppercase; font-weight: 500;
+    font-size: 0.7rem; color: var(--ci-300);
+    letter-spacing: .5px; text-transform: uppercase; font-weight: 500; margin: 0;
   }
   .ci-hdr-badge {
     background: rgba(255,255,255,0.13);
     border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px; padding: 6px 14px;
-    display: flex; align-items: center; gap: 7px;
-    color: #fff; font-size: 0.82rem; font-weight: 600; flex-shrink: 0;
+    border-radius: 20px; padding: 4px 12px;
+    display: flex; align-items: center; gap: 6px;
+    color: #fff; font-size: 0.78rem; font-weight: 600; flex-shrink: 0;
   }
   .ci-hdr-badge .ci-dot {
-    width: 8px; height: 8px; border-radius: 50%;
+    width: 7px; height: 7px; border-radius: 50%;
     background: #facc15;
     animation: ci-pulse 1.8s ease-in-out infinite;
   }
@@ -96,9 +97,9 @@
   }
   .ci-btn-close {
     background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-    width: 34px; height: 34px; border-radius: 10px;
+    width: 30px; height: 30px; border-radius: 8px;
     display: flex; align-items: center; justify-content: center;
-    color: #fff; cursor: pointer; font-size: 14px; flex-shrink: 0;
+    color: #fff; cursor: pointer; font-size: 13px; flex-shrink: 0;
     transition: background .15s; position: relative; z-index: 1;
   }
   .ci-btn-close:hover { background: rgba(255,255,255,0.22); }
@@ -158,6 +159,7 @@
     font-size: 0.7rem; font-weight: 700; letter-spacing: .7px;
     text-transform: uppercase; color: var(--ci-muted);
     padding: 7px 14px; border-bottom: none;
+    text-align: left !important;
   }
   .ci-tbl tbody tr {
     background: #ffffff;
@@ -172,11 +174,12 @@
   .ci-tbl tbody td {
     padding: 12px 14px; font-size: .88rem;
     color: var(--ci-ink); vertical-align: middle; border: none;
+    text-align: left !important;
   }
   .ci-tbl tbody td:first-child { border-radius: 11px 0 0 11px; }
   .ci-tbl tbody td:last-child  { border-radius: 0 11px 11px 0; }
 
-  .ci-sno { font-size:.76rem; font-weight:700; color:var(--ci-muted); width:30px; text-align:center; }
+  .ci-sno { font-size:.76rem; font-weight:700; color:var(--ci-muted); width:30px; text-align: left !important; }
   .ci-army {
     display: inline-block;
     background: var(--ci-100); color: var(--ci-800);
@@ -190,7 +193,7 @@
     border-radius: 6px; padding: 3px 9px;
     font-size: .77rem; font-weight: 700;
   }
-  .ci-name { font-weight: 600; }
+  .ci-name { font-weight: 600; text-align: left !important; }
 
   .ci-done-btn {
     display: inline-flex; align-items: center; gap: 6px;
@@ -207,6 +210,37 @@
   .ci-done-btn:active { transform: scale(.97); }
   .ci-done-btn:disabled { opacity:.55; cursor:not-allowed; transform:none!important; }
 
+  /* ── REMARKS HORIZONTAL SCROLL ── */
+  .ci-remarks-scroll {
+    max-width: 520px;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: #334155;
+    font-style: italic;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+  }
+  .ci-remarks-scroll::-webkit-scrollbar {
+    height: 5px;
+  }
+  .ci-remarks-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+  }
+  .ci-remarks-scroll::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 4px;
+  }
+  .ci-remarks-scroll::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+  }
+
   /* ── FOOTER ── */
   #companyInterviewModal .modal-footer {
     padding: 12px 22px;
@@ -214,6 +248,64 @@
     border-top: 1px solid var(--ci-border);
     display: flex; align-items: center;
     justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  /* ── COMPANY BREAKDOWN PILLS (ADMIN) ── */
+  .ci-coy-breakdown-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 18px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--ci-border);
+  }
+
+  .ci-coy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    user-select: none;
+  }
+
+  .ci-coy-pill:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  }
+
+  .ci-coy-pill.active {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff !important;
+    border-color: #1e3a8a;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+  }
+
+  .ci-coy-pill .ci-coy-count {
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    border-radius: 12px;
+    padding: 1px 8px;
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .ci-coy-pill.active .ci-coy-count {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
   }
   .ci-foot-info { font-size: .79rem; color: var(--ci-muted); font-weight: 500; }
   .ci-foot-info strong { color: var(--ci-ink2); }
@@ -368,7 +460,7 @@
 <!-- ══════ MODAL ══════ -->
 <div class="modal fade" id="companyInterviewModal" tabindex="-1"
      aria-labelledby="ciModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content" style="position: relative;">
 
       <!-- Header -->
@@ -376,7 +468,12 @@
         <div class="ci-hdr">
           <div class="ci-hdr-icon">🎖️</div>
           <div class="ci-hdr-text">
-            <h5 class="ci-hdr-title" id="ciModalLabel">Company Interview</h5>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h5 class="ci-hdr-title" id="ciModalLabel">Company Interview</h5>
+              <span id="ci-updated-by-badge" class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px; display: none;">
+                <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY OC
+              </span>
+            </div>
             <p class="ci-hdr-sub">Pending Interview Register</p>
           </div>
           <div class="ci-hdr-badge">
@@ -387,25 +484,41 @@
         </div>
       </div>
 
-      <!-- Search -->
-      <div class="ci-search-strip">
-        <div class="ci-search-rel">
+      <!-- Combined Toolbar Strip: Search, Tabs & Company Filter -->
+      <div class="ci-search-strip d-flex align-items-center justify-content-between gap-3 flex-wrap py-2 px-3" style="background:#f8fafc; border-bottom:1px solid var(--ci-border);">
+        <!-- Search Box (Compact Width) -->
+        <div class="ci-search-rel" style="width: 280px; max-width: 100%; flex-shrink: 0;">
           <i class="fas fa-search ci-search-icon-pos"></i>
           <input id="ciSearchBox" class="ci-search-input"
-                 type="text" placeholder="Search by name, army number or rank…"
+                 type="text" placeholder="Search name, army no, rank…"
                  oninput="ciFilterRows()">
+        </div>
+
+        <!-- Center Tabs -->
+        <div class="d-flex align-items-center gap-2">
+          <button id="ciTabPendingBtn" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="ciSwitchTab('pending')">
+            <i class="fas fa-clock me-1"></i> Interview Pending <span class="badge bg-white text-primary rounded-pill ms-1" id="ciBadgePending">0</span>
+          </button>
+          <button id="ciTabDoneBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold" onclick="ciSwitchTab('done')">
+            <i class="fas fa-check-circle me-1"></i> Interview Done <span class="badge bg-secondary rounded-pill ms-1" id="ciBadgeDone">0</span>
+          </button>
+        </div>
+
+        <!-- Right Company Filter -->
+        <div class="d-flex align-items-center gap-2">
+          <label for="ciCompanyFilter" class="mb-0 fw-bold text-secondary" style="font-size:0.8rem; white-space:nowrap;">
+            <i class="fas fa-building me-1"></i>Company:
+          </label>
+          <select id="ciCompanyFilter" class="form-select form-select-sm shadow-sm"
+                  style="border-radius: 10px; font-size: 0.85rem; border-color: var(--ci-border); min-width: 150px;"
+                  onchange="ciFilterRows()">
+            <option value="">All Companies</option>
+          </select>
         </div>
       </div>
 
-      <!-- Tabs Navigation -->
-      <div class="ci-tabs-strip d-flex align-items-center justify-content-center py-2 px-3" style="background:#f1f5f9; border-bottom:1px solid #e2e8f0; gap:10px;">
-        <button id="ciTabPendingBtn" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="ciSwitchTab('pending')">
-          <i class="fas fa-clock me-1"></i> Interview Pending <span class="badge bg-white text-primary rounded-pill ms-1" id="ciBadgePending">0</span>
-        </button>
-        <button id="ciTabDoneBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold" onclick="ciSwitchTab('done')">
-          <i class="fas fa-check-circle me-1"></i> Interview Done <span class="badge bg-secondary rounded-pill ms-1" id="ciBadgeDone">0</span>
-        </button>
-      </div>
+      <!-- Company Pending Breakdown Bar (Visible for Admin in Pending Tab) -->
+      <div id="ciCompanyBreakdownStrip" class="ci-coy-breakdown-strip" style="display: none;"></div>
 
       <!-- Body -->
       <div class="modal-body" id="ciBody">
@@ -448,10 +561,16 @@
             </div>
           </div>
           <textarea id="ciOverlayTA" class="ci-ov-ta"
-                    placeholder="Enter remarks (optional)…"></textarea>
+                    placeholder="Enter detailed interview remarks (minimum 30 words required)…"
+                    oninput="ciUpdateWordCount()"></textarea>
+          <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+            <small id="ciWordCountMsg" class="fw-bold text-danger" style="font-size:0.8rem;">
+              <i class="fas fa-exclamation-circle me-1"></i>Minimum 30 words required (<span id="ciWordCount">0</span>/30 words)
+            </small>
+          </div>
           <div class="ci-ov-acts">
             <button class="ci-ov-cancel" onclick="ciCancelOverlay()">Cancel</button>
-            <button class="ci-ov-confirm" id="ciOverlayConfirm" onclick="ciSubmitDone()">
+            <button class="ci-ov-confirm" id="ciOverlayConfirm" onclick="ciSubmitDone()" disabled>
               ✓&nbsp;Confirm Interview Done
             </button>
           </div>
@@ -513,6 +632,13 @@
       ciCompletedRows = data.completed || [];
       ciIsAdmin       = !!data.is_admin;
 
+      var ocBadge = document.getElementById('ci-updated-by-badge');
+      if (ocBadge) {
+        ocBadge.style.display = ciIsAdmin ? 'inline-block' : 'none';
+      }
+
+      ciPopulateCompanyDropdown();
+
       var bPending = document.getElementById('ciBadgePending');
       var bDone    = document.getElementById('ciBadgeDone');
       if (bPending) bPending.textContent = ciPendingRows.length;
@@ -522,6 +648,48 @@
 
     } catch (e) {
       body.innerHTML = '<div class="ci-state-block"><div style="font-size:2rem;margin-bottom:8px">⚠️</div><div style="font-weight:600">Could not load data</div><div style="font-size:.8rem;margin-top:4px">' + e.message + '</div></div>';
+    }
+  }
+
+  /* ── Populate Company Dropdown (Case-Insensitive & Deduplicated) ── */
+  function ciPopulateCompanyDropdown() {
+    var select = document.getElementById('ciCompanyFilter');
+    if (!select) return;
+
+    var currentVal = (select.value || '').toLowerCase().trim();
+    var companiesMap = new Map();
+
+    ciPendingRows.concat(ciCompletedRows).forEach(function(r) {
+      if (r.company && String(r.company).trim()) {
+        var raw = String(r.company).trim();
+        var key = raw.toLowerCase();
+
+        var display = raw.split(/\s+/).map(function(word) {
+          if (word === word.toLowerCase()) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          return word;
+        }).join(' ');
+
+        if (!companiesMap.has(key)) {
+          companiesMap.set(key, display);
+        } else if (raw !== raw.toLowerCase()) {
+          companiesMap.set(key, display);
+        }
+      }
+    });
+
+    var sortedKeys = Array.from(companiesMap.keys()).sort();
+
+    select.innerHTML = '<option value="">All Companies</option>' +
+      sortedKeys.map(function(k) {
+        return '<option value="' + esc(k) + '">' + esc(companiesMap.get(k)) + '</option>';
+      }).join('');
+
+    if (currentVal && companiesMap.has(currentVal)) {
+      select.value = currentVal;
+    } else {
+      select.value = '';
     }
   }
 
@@ -554,17 +722,22 @@
 
   /* ── Filter & Paginate ── */
   window.ciFilterAndPaginate = function () {
-    var q      = (document.getElementById('ciSearchBox').value || '').toLowerCase().trim();
-    var source = ciCurrentTab === 'pending' ? ciPendingRows : ciCompletedRows;
+    var q        = (document.getElementById('ciSearchBox').value || '').toLowerCase().trim();
+    var coySelect = document.getElementById('ciCompanyFilter');
+    var coyVal   = (coySelect ? coySelect.value : '').toLowerCase().trim();
+    var source   = ciCurrentTab === 'pending' ? ciPendingRows : ciCompletedRows;
 
-    if (!q) {
-      ciFiltered = source;
-    } else {
-      ciFiltered = source.filter(function (r) {
-        var str = (r.army_number + ' ' + r.rank + ' ' + r.name + ' ' + (r.company || '') + ' ' + (r.remarks || '')).toLowerCase();
-        return str.includes(q);
-      });
-    }
+    ciFiltered = source.filter(function (r) {
+      var rCoy = (r.company || '').toLowerCase().trim();
+      var matchesCoy = !coyVal || rCoy === coyVal;
+
+      if (!matchesCoy) return false;
+
+      if (!q) return true;
+
+      var str = (r.army_number + ' ' + r.rank + ' ' + r.name + ' ' + (r.company || '') + ' ' + (r.remarks || '')).toLowerCase();
+      return str.includes(q);
+    });
 
     var totalPages = Math.ceil(ciFiltered.length / ciPageSize) || 1;
     if (ciCurrentPage < 1) ciCurrentPage = 1;
@@ -575,6 +748,71 @@
     var pageSlice = ciFiltered.slice(start, end);
 
     ciRenderTable(pageSlice, start, ciFiltered.length, totalPages);
+    ciRenderCompanyBreakdown();
+  };
+
+  /* ── Render Company Breakdown Pills for Admin (Pending Tab) ── */
+  function ciRenderCompanyBreakdown() {
+    var strip = document.getElementById('ciCompanyBreakdownStrip');
+    if (!strip) return;
+
+    if (!ciIsAdmin || ciCurrentTab !== 'pending') {
+      strip.style.display = 'none';
+      return;
+    }
+
+    strip.style.display = 'flex';
+
+    var coyMap = new Map();
+    var totalPending = ciPendingRows.length;
+
+    ciPendingRows.forEach(function(r) {
+      if (r.company && String(r.company).trim()) {
+        var raw = String(r.company).trim();
+        var key = raw.toLowerCase();
+
+        var display = raw.split(/\s+/).map(function(w) {
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+
+        if (!coyMap.has(key)) {
+          coyMap.set(key, { display: display, count: 1 });
+        } else {
+          coyMap.get(key).count++;
+        }
+      }
+    });
+
+    var select = document.getElementById('ciCompanyFilter');
+    var activeVal = (select ? select.value : '').toLowerCase().trim();
+
+    var html = '<button type="button" class="ci-coy-pill ' + (!activeVal ? 'active' : '') + '" onclick="ciSelectCompanyPill(\'\')">' +
+      '<span>All Companies</span>' +
+      '<span class="ci-coy-count">' + totalPending + '</span>' +
+      '</button>';
+
+    var sortedKeys = Array.from(coyMap.keys()).sort();
+    sortedKeys.forEach(function(k) {
+      var item = coyMap.get(k);
+      var isActive = (activeVal === k);
+      html += '<button type="button" class="ci-coy-pill ' + (isActive ? 'active' : '') + '" onclick="ciSelectCompanyPill(\'' + esc(k) + '\')">' +
+        '<span>🏢 ' + esc(item.display) + '</span>' +
+        '<span class="ci-coy-count">' + item.count + '</span>' +
+        '</button>';
+    });
+
+    strip.innerHTML = html;
+  }
+
+  window.ciSelectCompanyPill = function(coyKey) {
+    var select = document.getElementById('ciCompanyFilter');
+    if (select) {
+      var foundOpt = Array.from(select.options).find(function(opt) {
+        return opt.value.toLowerCase().trim() === coyKey.toLowerCase().trim();
+      });
+      select.value = foundOpt ? foundOpt.value : coyKey;
+    }
+    ciFilterRows();
   };
 
   /* ── Change Page ── */
@@ -583,7 +821,7 @@
     ciFilterAndPaginate();
   };
 
-  /* ── Filter rows on search input ── */
+  /* ── Filter rows on search input or company change ── */
   window.ciFilterRows = function () {
     ciCurrentPage = 1;
     ciFilterAndPaginate();
@@ -642,8 +880,8 @@
         return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
           '<td class="ci-sno">' + rowNum + '</td>' +
           '<td><span class="ci-army">' + esc(r.army_number) + '</span></td>' +
-          '<td><span class="ci-rank">⭐ ' + esc(r.rank) + '</span></td>' +
-          '<td class="ci-name">' + esc(r.name) + '</td>' +
+          '<td><span class="ci-rank">' + esc(r.rank) + '</span></td>' +
+          '<td class="ci-name text-start text-uppercase" style="text-align:left !important;">' + esc(String(r.name || '').toUpperCase()) + '</td>' +
           '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
           actionCell +
         '</tr>';
@@ -651,18 +889,22 @@
         return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
           '<td class="ci-sno">' + rowNum + '</td>' +
           '<td><span class="ci-army">' + esc(r.army_number) + '</span></td>' +
-          '<td><span class="ci-rank">⭐ ' + esc(r.rank) + '</span></td>' +
-          '<td class="ci-name">' + esc(r.name) + '</td>' +
+          '<td><span class="ci-rank">' + esc(r.rank) + '</span></td>' +
+          '<td class="ci-name text-start text-uppercase" style="text-align:left !important;">' + esc(String(r.name || '').toUpperCase()) + '</td>' +
           '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
           '<td><span class="badge bg-success-subtle text-success border px-2 py-1" style="font-size:0.78rem;font-weight:600;"><i class="fas fa-calendar-check me-1"></i>' + esc(r.interview_done_on || 'Done') + '</span></td>' +
-          '<td class="text-start" style="max-width:220px;word-break:break-word;"><span style="font-style:italic;color:#334155;font-size:0.86rem;">' + (esc(r.remarks) || '<span style="color:#94a3b8">—</span>') + '</span></td>' +
+          '<td class="text-start" style="max-width:520px;">' +
+            (r.remarks
+              ? '<div class="ci-remarks-scroll" title="' + esc(r.remarks) + '"><i class="fas fa-quote-left text-muted me-1" style="font-size:0.7rem;"></i>' + esc(r.remarks) + '</div>'
+              : '<span style="color:#94a3b8">—</span>') +
+          '</td>' +
         '</tr>';
       }
     }).join('');
 
     var headers = ciCurrentTab === 'pending'
-      ? '<thead><tr><th class="ci-sno">#</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Company</th><th>' + (ciIsAdmin ? 'Status' : 'Action') + '</th></tr></thead>'
-      : '<thead><tr><th class="ci-sno">#</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Company</th><th>Interview Done On</th><th style="text-align:left;">Remarks</th></tr></thead>';
+      ? '<thead><tr><th class="ci-sno" style="text-align:left !important;">#</th><th style="text-align:left !important;">Army Number</th><th style="text-align:left !important;">Rank</th><th style="text-align:left !important;">Name</th><th style="text-align:left !important;">Company</th><th style="text-align:left !important;">' + (ciIsAdmin ? 'Status' : 'Action') + '</th></tr></thead>'
+      : '<thead><tr><th class="ci-sno" style="text-align:left !important;">#</th><th style="text-align:left !important;">Army Number</th><th style="text-align:left !important;">Rank</th><th style="text-align:left !important;">Name</th><th style="text-align:left !important;">Company</th><th style="text-align:left !important;">Interview Done On</th><th style="text-align:left !important;">Remarks</th></tr></thead>';
 
     body.innerHTML =
       '<div class="ci-tbl-wrap">' +
@@ -673,22 +915,39 @@
       '</div>';
   }
 
-  /* ── Filter rows ── */
-  window.ciFilterRows = function () {
-    var q     = (document.getElementById('ciSearchBox').value || '').toLowerCase().trim();
-    var tbody = document.getElementById('ciTbody');
-    var vis   = document.getElementById('ci-vis');
-    if (!tbody) return;
-    var count = 0;
-    tbody.querySelectorAll('tr').forEach(function (tr) {
-      var show = !q || tr.dataset.search.toLowerCase().includes(q);
-      tr.style.display = show ? '' : 'none';
-      if (show) count++;
-    });
-    if (vis) vis.textContent = count;
-  };
+
 
   var ciActiveArmyNumber = null;
+
+  /* ── Live Word Counter ── */
+  window.ciUpdateWordCount = function () {
+    var ta    = document.getElementById('ciOverlayTA');
+    var cntEl = document.getElementById('ciWordCount');
+    var msgEl = document.getElementById('ciWordCountMsg');
+    var btn   = document.getElementById('ciOverlayConfirm');
+    if (!ta) return;
+
+    var text  = (ta.value || '').trim();
+    var words = text ? text.split(/\s+/).filter(Boolean) : [];
+    var count = words.length;
+
+    if (cntEl) cntEl.textContent = count;
+
+    if (count >= 30) {
+      if (msgEl) {
+        msgEl.className = 'fw-bold text-success';
+        msgEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Minimum 30 words requirement met (' + count + ' words)';
+      }
+      if (btn) btn.disabled = false;
+    } else {
+      var remaining = 30 - count;
+      if (msgEl) {
+        msgEl.className = 'fw-bold text-danger';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Minimum 30 words required (' + count + '/30 words — need ' + remaining + ' more)';
+      }
+      if (btn) btn.disabled = true;
+    }
+  };
 
   /* ── Open overlay ── */
   window.ciOpenOverlay = function (btn) {
@@ -700,6 +959,7 @@
     if (sub) sub.innerHTML = 'Adding remarks for <strong>' + name + '</strong>';
     var ta = document.getElementById('ciOverlayTA');
     if (ta) ta.value = '';
+    ciUpdateWordCount();
     document.getElementById('ciOverlay').classList.add('ci-show');
     setTimeout(function() { if (ta) ta.focus(); }, 100);
   };
@@ -716,6 +976,14 @@
   window.ciSubmitDone = async function () {
     if (!ciActiveCiId && !ciActiveArmyNumber) return;
     var remarks  = (document.getElementById('ciOverlayTA').value || '').trim();
+    var words    = remarks ? remarks.split(/\s+/).filter(Boolean) : [];
+
+    if (words.length < 30) {
+      ciFireToast('Remarks must be at least 30 words minimum! Current count: ' + words.length + ' words.', true);
+      ciUpdateWordCount();
+      return;
+    }
+
     var confirm  = document.getElementById('ciOverlayConfirm');
     if (confirm) { confirm.disabled = true; confirm.textContent = 'Saving…'; }
 

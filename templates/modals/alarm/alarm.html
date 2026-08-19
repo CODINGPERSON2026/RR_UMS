@@ -343,6 +343,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let alarmFetchedData = [];
 
+  const userCompanyStr = "{{ user_company | default('') }}".trim();
+  const isNonAdminCoy = userCompanyStr && !["ADMIN", "ALL", "CENTER"].includes(userCompanyStr.toUpperCase());
+
   /* ================= CHECK ALARM COUNT ================= */
 
   async function showAssignedAlarms() {
@@ -352,11 +355,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const result = await res.json();
       const alarmAlert = document.getElementById("alarmAlert");
+      let rows = result.rows || [];
 
-      if (result.rows && result.rows.length > 0) {
+      if (isNonAdminCoy) {
+        rows = rows.filter(item => item.company && item.company.toLowerCase().trim() === userCompanyStr.toLowerCase().trim());
+      }
+
+      if (rows && rows.length > 0) {
         alarmAlert.classList.remove("d-none");
         alarmAlert.classList.add("alert-pulse");
-        alarmAlert.innerText = `🔔 You have ${result.rows.length} Detachment alarm(s)!`;
+        alarmAlert.innerText = `🔔 You have ${rows.length} Detachment alarm(s)!`;
       } else {
         alarmAlert.classList.add("d-none");
         alarmAlert.classList.remove("alert-pulse");
@@ -465,26 +473,36 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error("Failed");
       }
 
-      alarmFetchedData = result.data;
+      alarmFetchedData = result.data || [];
+
+      if (isNonAdminCoy) {
+        alarmFetchedData = alarmFetchedData.filter(item =>
+          item.company && item.company.toLowerCase().trim() === userCompanyStr.toLowerCase().trim()
+        );
+      }
 
       /* ================= COMPANY FILTER ================= */
 
-      alarmCompanyFilter.innerHTML = `
-        <option value="">All Companies</option>
-      `;
+      if (isNonAdminCoy) {
+        alarmCompanyFilter.innerHTML = `<option value="${userCompanyStr}">${userCompanyStr}</option>`;
+        alarmCompanyFilter.value = userCompanyStr;
+        alarmCompanyFilter.disabled = true;
+      } else {
+        alarmCompanyFilter.disabled = false;
+        alarmCompanyFilter.innerHTML = `
+          <option value="">All Companies</option>
+        `;
 
-      const uniqueCompanies = [
-        ...new Set(
-          alarmFetchedData
-            .map(item => item.company)
-            .filter(Boolean)
-        )
-      ];
+        const uniqueCompanies = [
+          ...new Set(
+            alarmFetchedData
+              .map(item => item.company)
+              .filter(Boolean)
+          )
+        ];
 
-      uniqueCompanies.forEach(company => {
-
-        alarmCompanyFilter
-          .insertAdjacentHTML(
+        uniqueCompanies.forEach(company => {
+          alarmCompanyFilter.insertAdjacentHTML(
             "beforeend",
             `
               <option value="${company}">
@@ -492,8 +510,8 @@ document.addEventListener("DOMContentLoaded", function () {
               </option>
             `
           );
-
-      });
+        });
+      }
 
       renderAlarmTable();
 
@@ -546,8 +564,7 @@ document.addEventListener("DOMContentLoaded", function () {
       filteredData =
         filteredData.filter(
           item =>
-            item.company ===
-            selectedCompany
+            item.company && item.company.toLowerCase().trim() === selectedCompany.toLowerCase().trim()
         );
 
     }

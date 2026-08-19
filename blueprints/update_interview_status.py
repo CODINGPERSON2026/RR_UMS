@@ -615,6 +615,10 @@ def mark_company_interview_done():
     if not army_number and not ci_id:
         return jsonify({"status": "error", "message": "army_number or ci_id is required"}), 400
 
+    word_count = len(remarks.split()) if remarks else 0
+    if word_count < 30:
+        return jsonify({"status": "error", "message": f"Remarks must be at least 30 words minimum (currently {word_count} words)"}), 400
+
     conn   = get_db_connection()
     cursor = conn.cursor()
 

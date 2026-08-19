@@ -15,6 +15,8 @@ app.secret_key = os.urandom(24)
 app.register_blueprint(personnel_info)
 app.register_blueprint(nominal_bp)
 app.register_blueprint(weight_ms)
+app.register_blueprint(weight_graph_bp)
+app.register_blueprint(personnel_graph_bp) # Registered Personnel Info Graph Blueprint
 app.register_blueprint(leave_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(task_bp)

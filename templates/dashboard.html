@@ -420,6 +420,9 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
+      {% include 'modals/alarm/alarm.html' %}
+      {% include 'modals/alarm/attachment_alarm.html' %}
+
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
@@ -867,7 +870,7 @@
         <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-              <h6 style="margin:0;font-weight:600;">Fit vs UnFit (Weight)</h6>
+              <h6 style="margin:0;font-weight:600;">Fit vs UnFit</h6>
               <div style="display:flex;gap:12px;font-size:12px;font-weight:700;">
                 <span style="color:#2563eb;font-weight:900;">Fit: <span id="fitCount">--</span></span>
                 <span style="color:#dc2626;font-weight:900;">UnFit: <span id="unfitCount">--</span></span>

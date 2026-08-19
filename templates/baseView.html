@@ -1188,7 +1188,7 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ'] %}
       <a class="nav-link {% if '/weight_system' in request.path %}active{% endif %}" href="/weight_system"
-        data-tiptext="Weight">
+        data-tiptext="Weight Management">
         <span class="nav-icon"><i class="fas fa-weight"></i></span>
         <span class="nav-label-text">Weight Management</span>
         <span class="nav-tooltip">Weight</span>
@@ -1197,7 +1197,7 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
       <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}"
-        href="/personnel_information" data-tiptext="Personnel">
+        href="/personnel_information" data-tiptext="Personnel Management">
         <span class="nav-icon"><i class="fas fa-users"></i></span>
         <span class="nav-label-text">Personnel Management</span>
         <span class="nav-tooltip">Personnel</span>
@@ -1206,7 +1206,7 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
       <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"
-         data-tiptext="Tasks">
+         data-tiptext="Task Management">
         <span class="nav-icon"><i class="fas fa-tasks"></i></span>
         <span class="nav-label-text">Task Management</span>
         <span class="nav-tooltip">Tasks</span>
@@ -1221,7 +1221,7 @@
 
       {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
       <a class="nav-link {% if '/projects' in request.path %}active{% endif %}"
-        href="{{ url_for('projects_dashboard') }}" data-tiptext="Projects">
+        href="{{ url_for('projects_dashboard') }}" data-tiptext="Project Management">
         <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>
         <span class="nav-label-text">Project Management</span>
         <span class="nav-tooltip">Projects</span>
@@ -1229,7 +1229,7 @@
       {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] %}
-      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Accounts">
+      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Account Management">
         <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
         <span class="nav-label-text">Account Management</span>
         <span class="nav-tooltip">Accounts</span>
