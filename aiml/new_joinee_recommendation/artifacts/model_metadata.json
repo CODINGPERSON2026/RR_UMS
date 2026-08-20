@@ -1,0 +1,130 @@
+{
+  "version": "1.0.0",
+  "last_trained_at": "2026-08-20T14:06:14.186557",
+  "total_eligible_records": 474,
+  "selected_model": "Random Forest",
+  "canonical_classes": [
+    "3 Coy",
+    "Comn Coy",
+    "HQ Coy"
+  ],
+  "feature_count": 450,
+  "smote_distribution": {
+    "before": {
+      "3 Coy": 71,
+      "Comn Coy": 138,
+      "HQ Coy": 170
+    },
+    "after": {
+      "3 Coy": 170,
+      "Comn Coy": 170,
+      "HQ Coy": 170
+    }
+  },
+  "metrics": {
+    "model_name": "Random Forest",
+    "accuracy": 0.5263,
+    "precision": 0.4475,
+    "recall": 0.445,
+    "f1": 0.4346,
+    "macro_f1": 0.4346,
+    "weighted_f1": 0.5005,
+    "top_1_accuracy": 0.5263,
+    "top_2_accuracy": 0.7895,
+    "roc_auc": 0.6737,
+    "confusion_matrix": [
+      [
+        2,
+        4,
+        12
+      ],
+      [
+        5,
+        17,
+        13
+      ],
+      [
+        2,
+        9,
+        31
+      ]
+    ],
+    "class_names": [
+      "3 Coy",
+      "Comn Coy",
+      "HQ Coy"
+    ],
+    "per_class": {
+      "3 Coy": {
+        "precision": 0.2222222222222222,
+        "recall": 0.1111111111111111,
+        "f1": 0.14814814814814814,
+        "support": 18
+      },
+      "Comn Coy": {
+        "precision": 0.5666666666666667,
+        "recall": 0.4857142857142857,
+        "f1": 0.5230769230769231,
+        "support": 35
+      },
+      "HQ Coy": {
+        "precision": 0.5535714285714286,
+        "recall": 0.7380952380952381,
+        "f1": 0.6326530612244898,
+        "support": 42
+      }
+    },
+    "cv_mean_accuracy": 0.6196,
+    "cv_std_accuracy": 0.0722,
+    "cv_mean_f1": 0.6184,
+    "cv_std_f1": 0.0757,
+    "feature_importance": {
+      "cat__trade_TTC": 0.07076705152243525,
+      "num__age_years": 0.05442734792936223,
+      "num__service_years": 0.045842265748059045,
+      "cat__trade_DMV": 0.039815336112023945,
+      "num__avg_posting_duration_days": 0.03527041569589568,
+      "num__total_service_duration_days": 0.03198699388451742,
+      "num__duty_count": 0.029032420854934043,
+      "cat__rank_NK": 0.01943797692882721,
+      "cat__previous_unit_2_4 CSR": 0.01827909835066883,
+      "num__previous_unit_count": 0.01774530800873825,
+      "cat__previous_unit_3_WCSR": 0.01740460369684922,
+      "cat__trade_TTC -LL": 0.017161313004106872,
+      "cat__rank_L HAV": 0.017100446209861345,
+      "cat__most_recent_duty_NO_DUTY": 0.016099568108617127,
+      "cat__prior_station_NO": 0.015455371285565024
+    }
+  },
+  "dataset_profile": {
+    "total_personnel": 474,
+    "total_eligible": 474,
+    "records_with_trade": 474,
+    "personnel_with_unit_history": 156,
+    "personnel_without_unit_history": 318,
+    "total_unit_records": 538,
+    "company_distribution": {
+      "HQ Coy": 212,
+      "Comn Coy": 173,
+      "3 Coy": 89
+    },
+    "top_trades": {
+      "TTC": 163,
+      "LMN": 62,
+      "EFS": 49,
+      "DMV": 46,
+      "OCC": 38,
+      "DVR MT": 15,
+      "CC": 10,
+      "CLK SD": 8,
+      "JENE": 8,
+      "ATBV": 4
+    },
+    "canonical_classes": [
+      "HQ Coy",
+      "Comn Coy",
+      "3 Coy"
+    ]
+  },
+  "training_duration_seconds": 27.78
+}

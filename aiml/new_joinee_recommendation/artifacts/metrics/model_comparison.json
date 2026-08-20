@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-08-20T14:06:14.182804",
+  "selected_model": "Random Forest",
+  "dataset_summary": {
+    "total_records": 474,
+    "train_records": 379,
+    "test_records": 95,
+    "feature_count": 450,
+    "class_distribution_before_smote": {
+      "3 Coy": 71,
+      "Comn Coy": 138,
+      "HQ Coy": 170
+    },
+    "class_distribution_after_smote": {
+      "3 Coy": 170,
+      "Comn Coy": 170,
+      "HQ Coy": 170
+    }
+  },
+  "models": {
+    "Random Forest": {
+      "model_name": "Random Forest",
+      "accuracy": 0.5263,
+      "precision": 0.4475,
+      "recall": 0.445,
+      "f1": 0.4346,
+      "macro_f1": 0.4346,
+      "weighted_f1": 0.5005,
+      "top_1_accuracy": 0.5263,
+      "top_2_accuracy": 0.7895,
+      "roc_auc": 0.6737,
+      "confusion_matrix": [
+        [
+          2,
+          4,
+          12
+        ],
+        [
+          5,
+          17,
+          13
+        ],
+        [
+          2,
+          9,
+          31
+        ]
+      ],
+      "class_names": [
+        "3 Coy",
+        "Comn Coy",
+        "HQ Coy"
+      ],
+      "per_class": {
+        "3 Coy": {
+          "precision": 0.2222222222222222,
+          "recall": 0.1111111111111111,
+          "f1": 0.14814814814814814,
+          "support": 18
+        },
+        "Comn Coy": {
+          "precision": 0.5666666666666667,
+          "recall": 0.4857142857142857,
+          "f1": 0.5230769230769231,
+          "support": 35
+        },
+        "HQ Coy": {
+          "precision": 0.5535714285714286,
+          "recall": 0.7380952380952381,
+          "f1": 0.6326530612244898,
+          "support": 42
+        }
+      },
+      "cv_mean_accuracy": 0.6196,
+      "cv_std_accuracy": 0.0722,
+      "cv_mean_f1": 0.6184,
+      "cv_std_f1": 0.0757,
+      "feature_importance": {
+        "cat__trade_TTC": 0.07076705152243525,
+        "num__age_years": 0.05442734792936223,
+        "num__service_years": 0.045842265748059045,
+        "cat__trade_DMV": 0.039815336112023945,
+        "num__avg_posting_duration_days": 0.03527041569589568,
+        "num__total_service_duration_days": 0.03198699388451742,
+        "num__duty_count": 0.029032420854934043,
+        "cat__rank_NK": 0.01943797692882721,
+        "cat__previous_unit_2_4 CSR": 0.01827909835066883,
+        "num__previous_unit_count": 0.01774530800873825,
+        "cat__previous_unit_3_WCSR": 0.01740460369684922,
+        "cat__trade_TTC -LL": 0.017161313004106872,
+        "cat__rank_L HAV": 0.017100446209861345,
+        "cat__most_recent_duty_NO_DUTY": 0.016099568108617127,
+        "cat__prior_station_NO": 0.015455371285565024
+      }
+    },
+    "XGBoost": {
+      "model_name": "XGBoost",
+      "accuracy": 0.4737,
+      "precision": 0.4063,
+      "recall": 0.4101,
+      "f1": 0.4077,
+      "macro_f1": 0.4077,
+      "weighted_f1": 0.4715,
+      "top_1_accuracy": 0.4737,
+      "top_2_accuracy": 0.7684,
+      "roc_auc": 0.593,
+      "confusion_matrix": [
+        [
+          2,
+          6,
+          10
+        ],
+        [
+          8,
+          20,
+          7
+        ],
+        [
+          7,
+          12,
+          23
+        ]
+      ],
+      "class_names": [
+        "3 Coy",
+        "Comn Coy",
+        "HQ Coy"
+      ],
+      "per_class": {
+        "3 Coy": {
+          "precision": 0.11764705882352941,
+          "recall": 0.1111111111111111,
+          "f1": 0.11428571428571428,
+          "support": 18
+        },
+        "Comn Coy": {
+          "precision": 0.5263157894736842,
+          "recall": 0.5714285714285714,
+          "f1": 0.547945205479452,
+          "support": 35
+        },
+        "HQ Coy": {
+          "precision": 0.575,
+          "recall": 0.5476190476190477,
+          "f1": 0.5609756097560976,
+          "support": 42
+        }
+      },
+      "cv_mean_accuracy": 0.6824,
+      "cv_std_accuracy": 0.0437,
+      "cv_mean_f1": 0.6821,
+      "cv_std_f1": 0.0443,
+      "feature_importance": {
+        "cat__trade_TTC": 0.02770427241921425,
+        "cat__trade_TTC -LL": 0.02703038603067398,
+        "cat__previous_unit_1_1CSR": 0.026467500254511833,
+        "cat__previous_unit_1_4 AFSR": 0.025980269536376,
+        "cat__most_frequent_duty_DUTY DVR MTNCO": 0.025619614869356155,
+        "cat__previous_unit_1_ESG NSG": 0.022779669612646103,
+        "cat__previous_unit_3_WCSR": 0.02246810495853424,
+        "cat__most_recent_duty_DUTY EFS": 0.0221597570925951,
+        "cat__previous_unit_2_2 MDSR": 0.021296793594956398,
+        "cat__previous_unit_2_16 RSR": 0.020465724170207977,
+        "cat__previous_unit_1_31ADSR": 0.020111266523599625,
+        "cat__most_recent_duty_EXCHANGE": 0.019902588799595833,
+        "cat__trade_DMV": 0.018851405009627342,
+        "cat__most_recent_duty_NO_DUTY": 0.01684599556028843,
+        "cat__previous_unit_2_4 CSR": 0.016242876648902893
+      }
+    }
+  }
+}

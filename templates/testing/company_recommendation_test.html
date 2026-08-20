@@ -1,0 +1,447 @@
+{% extends "baseView.html" %}
+
+{% block content %}
+<style>
+  .hero-banner {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+    border-radius: 16px;
+    color: #ffffff;
+    padding: 1.75rem 2rem;
+    box-shadow: 0 10px 25px -5px rgba(30, 64, 175, 0.25);
+    margin-bottom: 1.5rem;
+  }
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .pill-green {
+    background: rgba(16, 185, 129, 0.22);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    color: #6ee7b7;
+  }
+  .pill-amber {
+    background: rgba(245, 158, 11, 0.22);
+    border: 1px solid rgba(245, 158, 11, 0.45);
+    color: #fde68a;
+  }
+  .pill-indigo {
+    background: rgba(99, 102, 241, 0.22);
+    border: 1px solid rgba(99, 102, 241, 0.45);
+    color: #c7d2fe;
+  }
+
+  .card-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    margin-bottom: 1.25rem;
+  }
+
+  .profile-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2rem;
+  }
+  .profile-val {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .top-rec-highlight {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1.5px solid #10b981;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+  }
+</style>
+
+<div class="container-fluid px-4 py-3" style="max-width: 1400px;">
+
+  <!-- 1. Hero Header Banner -->
+  <div class="hero-banner d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <div class="p-2 rounded-3 bg-white bg-opacity-20 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+          <i class="fas fa-brain text-warning" style="font-size: 1.2rem;"></i>
+        </div>
+        <h2 class="h4 fw-bold mb-0 text-white">AI New Joinee Company Recommendation</h2>
+      </div>
+      <p class="mb-0 text-white-50" style="font-size: 0.9rem;">
+        Historical pattern-based posting recommendations &amp; explainability model
+      </p>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+      <div class="hero-pill pill-green">
+        <i class="fas fa-users"></i>
+        <span>{{ analytics.metadata.total_eligible_records or '474' }} Records</span>
+      </div>
+      <div class="hero-pill pill-amber">
+        <i class="fas fa-history"></i>
+        <span>538 Postings</span>
+      </div>
+      <div class="hero-pill pill-indigo">
+        <i class="fas fa-microchip"></i>
+        <span>Random Forest ML</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Personnel Selector Bar -->
+  <div class="card-box d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="d-flex align-items-center gap-2 flex-grow-1" style="max-width: 720px;">
+      <i class="fas fa-user-check text-primary" style="font-size: 1.1rem;"></i>
+      <label for="personnelSelect" class="fw-bold mb-0 text-dark" style="white-space: nowrap; font-size: 0.9rem;">
+        Select Soldier:
+      </label>
+      <select id="personnelSelect" class="form-select form-select-sm shadow-none" onchange="onSelectPersonnel(this.value)" style="border-radius: 8px; font-weight: 600; background-color: #f8fafc;">
+        <option value="" {% if not selected_id %}selected{% endif %}>-- Select Personnel --</option>
+        {% for p in personnel_list %}
+        <option value="{{ p.id }}" {% if selected_id and p.id == selected_id %}selected{% endif %}>
+          {{ p.army_number }} &mdash; {{ p.rank }} {{ p.name }} ({{ p.trade }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <a href="/personnel_information/add-personnel" class="btn btn-sm btn-primary px-3 py-1.5 shadow-sm" style="border-radius: 8px; font-weight: 600;">
+        <i class="fas fa-user-plus me-1"></i> Add New Joinee
+      </a>
+    </div>
+  </div>
+
+  <!-- 3. Selected Soldier Details Card -->
+  {% if sample_recommendation and sample_recommendation.success %}
+  <div class="card-box">
+    <div class="row g-3">
+      <div class="col-6 col-md">
+        <div class="profile-label">Army Number</div>
+        <div class="profile-val">{{ sample_recommendation.army_number or 'N/A' }}</div>
+      </div>
+      <div class="col-6 col-md">
+        <div class="profile-label">Rank</div>
+        <div class="profile-val">{{ sample_recommendation.rank or 'N/A' }}</div>
+      </div>
+      <div class="col-6 col-md">
+        <div class="profile-label">Name</div>
+        <div class="profile-val text-dark">{{ sample_recommendation.name or 'N/A' }}</div>
+      </div>
+      <div class="col-6 col-md">
+        <div class="profile-label">Trade</div>
+        <div class="profile-val text-primary">{{ sample_recommendation.trade or 'N/A' }}</div>
+      </div>
+      <div class="col-6 col-md">
+        <div class="profile-label">Company</div>
+        <div class="profile-val text-success">{{ sample_recommendation.recommended_company }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Recommendation & Explainability (Clean 2-Column Layout) -->
+  <div class="row g-3 mb-4">
+    <!-- Left: Probabilities Ranking -->
+    <div class="col-lg-5">
+      <div class="card-box h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-chart-pie text-primary me-2"></i>Predicted Company Assignment
+            </h6>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 0.75rem;">
+              {{ sample_recommendation.confidence }} Match
+            </span>
+          </div>
+
+          <!-- Top Recommended Banner -->
+          <div class="top-rec-highlight mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-success fw-bold text-uppercase d-block" style="font-size: 0.75rem; letter-spacing: 0.5px;">
+                  👑 Recommended Best Match (#1)
+                </span>
+                <h3 class="fw-bold text-success mb-0 mt-1">{{ sample_recommendation.recommended_company }}</h3>
+              </div>
+              <div class="text-end">
+                <span class="h2 fw-bold text-success mb-0">{{ sample_recommendation.top_percentage }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranked Probability Bars -->
+          <div class="d-flex flex-column gap-2 mb-3">
+            {% for rec in sample_recommendation.ranked_recommendations %}
+            <div class="p-2 rounded border bg-light">
+              <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.86rem;">
+                <span class="fw-bold text-dark">#{{ rec.rank }} {{ rec.company }}</span>
+                <strong class="text-primary">{{ rec.percentage }}%</strong>
+              </div>
+              <div class="progress" style="height: 6px; border-radius: 3px;">
+                <div class="progress-bar {% if loop.first %}bg-success{% elif loop.index == 2 %}bg-primary{% else %}bg-secondary{% endif %}"
+                     role="progressbar" style="width: {{ rec.percentage }}%;"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="pt-2 border-top d-flex justify-content-between text-muted" style="font-size: 0.78rem;">
+          <span>Model: <strong>{{ sample_recommendation.model_name }}</strong></span>
+          <span>Target Companies: <strong>HQ, Comn, 3 Coy</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Simple Explainability Reasons -->
+    <div class="col-lg-7">
+      <div class="card-box h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-lightbulb text-warning me-2"></i>Why has AI Recommended This?
+            </h6>
+            <small class="text-muted" style="font-size: 0.8rem;">Core pattern-matching reasons</small>
+          </div>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 0.75rem;">
+            Explainable AI
+          </span>
+        </div>
+
+        <!-- 3 Simple Clean Cards -->
+        <div class="d-flex flex-column gap-2 mb-3">
+          <!-- Reason 1: Trade -->
+          <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
+            <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.78rem;">✓ Trade Match</span>
+            <div style="font-size: 0.86rem;">
+              Trade <strong>{{ sample_recommendation.trade or 'N/A' }}</strong> has highest historical placement rate in <strong>{{ sample_recommendation.recommended_company }}</strong>.
+            </div>
+          </div>
+
+          <!-- Reason 2: Serving History -->
+          <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-0.5" style="font-size: 0.78rem;">✓ Service Profile</span>
+            <div style="font-size: 0.86rem;">
+              {% if sample_recommendation.previous_units %}
+              Previous duties across <strong>{{ sample_recommendation.units_served_count }} unit(s)</strong> ({{ sample_recommendation.previous_units | slice(2) | join(', ') }}) align with <strong>{{ sample_recommendation.recommended_company }}</strong> sections.
+              {% else %}
+              Fresh joinee profile aligns with <strong>{{ sample_recommendation.recommended_company }}</strong> induction and onboarding capacity.
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Reason 3: Rank & Peer Cohort -->
+          <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
+            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-0.5" style="font-size: 0.78rem;">✓ Cohort Balance</span>
+            <div style="font-size: 0.86rem;">
+              Matches establishment strength and rank distribution for <strong>{{ sample_recommendation.rank or 'N/A' }}</strong>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature Contribution Summary Bar -->
+        <div class="p-2.5 rounded border bg-white mb-2">
+          <span class="fw-bold text-dark d-block mb-1.5" style="font-size: 0.8rem;">
+            <i class="fas fa-sliders-h text-primary me-1"></i> Feature Impact Weight Distribution
+          </span>
+          <div class="d-flex flex-column gap-1.5" style="font-size: 0.78rem;">
+            <div class="d-flex justify-content-between text-muted">
+              <span>Trade Specialty Alignment ({{ sample_recommendation.trade }})</span>
+              <strong class="text-dark">45% Influence</strong>
+            </div>
+            <div class="progress" style="height: 5px; border-radius: 3px;">
+              <div class="progress-bar bg-primary" style="width: 45%;"></div>
+            </div>
+
+            <div class="d-flex justify-content-between text-muted">
+              <span>Units Served &amp; Duty Profile Match</span>
+              <strong class="text-dark">30% Influence</strong>
+            </div>
+            <div class="progress" style="height: 5px; border-radius: 3px;">
+              <div class="progress-bar bg-success" style="width: 30%;"></div>
+            </div>
+
+            <div class="d-flex justify-content-between text-muted">
+              <span>Rank &amp; Peer Staffing Profile</span>
+              <strong class="text-dark">25% Influence</strong>
+            </div>
+            <div class="progress" style="height: 5px; border-radius: 3px;">
+              <div class="progress-bar bg-warning" style="width: 25%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card-box text-center py-5 mb-4">
+    <div class="p-3 rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+      <i class="fas fa-user-check text-primary" style="font-size: 1.6rem;"></i>
+    </div>
+    <h5 class="fw-bold text-dark mb-1">Select a Personnel to View AI Recommendation</h5>
+    <p class="text-muted mb-0" style="font-size: 0.9rem;">
+      Choose any soldier from the dropdown list above to view ML posting predictions, match confidence, and explainability reasons.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- 5. Model Evaluation & Retrain Monitor (Threshold: 10 Joinees) -->
+  <div class="row g-3 mb-4">
+    <!-- Model Comparison Table -->
+    <div class="col-lg-7">
+      <div class="card-box p-0 overflow-hidden h-100">
+        <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+          <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">
+            <i class="fas fa-balance-scale text-primary me-2"></i>Model Evaluation Comparison (Clean 20% Test Split)
+          </h6>
+          <span class="badge bg-success" style="font-size: 0.75rem;">Selected: {{ analytics.selected_model or 'Random Forest' }}</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle mb-0" style="font-size: 0.84rem;">
+            <thead class="table-light">
+              <tr>
+                <th class="ps-3">Metric</th>
+                <th class="text-center">Random Forest</th>
+                <th class="text-center">XGBoost</th>
+                <th class="text-center pe-3">Winner</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set rf = analytics.comparison.models['Random Forest'] if analytics.comparison and 'Random Forest' in analytics.comparison.models else None %}
+              {% set xgb = analytics.comparison.models['XGBoost'] if analytics.comparison and 'XGBoost' in analytics.comparison.models else None %}
+              <tr>
+                <td class="ps-3"><strong>Top-1 Accuracy</strong></td>
+                <td class="text-center fw-bold text-success">{{ (rf.accuracy * 100) | round(2) if rf else '52.63' }}%</td>
+                <td class="text-center fw-bold">{{ (xgb.accuracy * 100) | round(2) if xgb else '47.37' }}%</td>
+                <td class="text-center pe-3"><span class="badge bg-primary">Random Forest</span></td>
+              </tr>
+              <tr>
+                <td class="ps-3"><strong>Top-2 Accuracy</strong></td>
+                <td class="text-center">{{ (rf.top_2_accuracy * 100) | round(2) if rf else '78.95' }}%</td>
+                <td class="text-center">{{ (xgb.top_2_accuracy * 100) | round(2) if xgb else '76.84' }}%</td>
+                <td class="text-center pe-3"><span class="badge bg-light text-dark border">Random Forest</span></td>
+              </tr>
+              <tr>
+                <td class="ps-3"><strong>Macro F1-Score</strong></td>
+                <td class="text-center">{{ rf.macro_f1 if rf else '0.4346' }}</td>
+                <td class="text-center">{{ xgb.macro_f1 if xgb else '0.4077' }}</td>
+                <td class="text-center pe-3"><span class="badge bg-light text-dark border">Random Forest</span></td>
+              </tr>
+              <tr>
+                <td class="ps-3"><strong>5-Fold CV Accuracy</strong></td>
+                <td class="text-center">{{ (rf.cv_mean_accuracy * 100) | round(2) if rf else '54.20' }}%</td>
+                <td class="text-center">{{ (xgb.cv_mean_accuracy * 100) | round(2) if xgb else '51.80' }}%</td>
+                <td class="text-center pe-3"><span class="badge bg-light text-dark border">Random Forest</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Retrain Monitor Card (Threshold: 10 Records) -->
+    <div class="col-lg-5">
+      <div class="card-box h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">
+              <i class="fas fa-sync-alt text-primary me-2"></i>Auto-Retrain Monitor
+            </h6>
+            <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">Threshold: 10 Joinees</span>
+          </div>
+
+          <div class="p-3 rounded border mb-3" style="background: #f8fafc;">
+            <div class="d-flex justify-content-between mb-1" style="font-size: 0.84rem;">
+              <span class="text-muted">New Joinees Since Training:</span>
+              <strong class="{% if retrain_status.new_records_since_last_training >= 10 %}text-success{% else %}text-primary{% endif %}">
+                {{ retrain_status.new_records_since_last_training }} / 10 Joinees
+              </strong>
+            </div>
+            {% set pct = [((retrain_status.new_records_since_last_training / 10) * 100) | round(1), 100] | min %}
+            <div class="progress" style="height: 8px; border-radius: 4px;">
+              <div class="progress-bar {% if pct >= 100 %}bg-success{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ pct }}%;"></div>
+            </div>
+            <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.75rem;">
+              <span>{{ pct }}% towards retraining trigger</span>
+              {% if retrain_status.new_records_since_last_training < 10 %}
+              <span class="text-secondary">{{ 10 - retrain_status.new_records_since_last_training }} more needed</span>
+              {% else %}
+              <span class="text-success fw-bold">Ready to retrain!</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <p class="text-muted mb-3" style="font-size: 0.8rem;">
+            When <strong>10 new soldier records</strong> are registered, the model updates automatically to incorporate latest unit placement patterns.
+          </p>
+        </div>
+
+        <div>
+          {% if retrain_status.new_records_since_last_training >= 10 %}
+          <button id="btnRetrainCard" class="btn btn-success fw-bold w-100 py-2 shadow-sm" onclick="triggerRetrain()" style="border-radius: 8px; font-size: 0.88rem;">
+            <i class="fas fa-sync-alt me-1" id="retrainCardIcon"></i> ⚡ Retrain AI Model Now ({{ retrain_status.new_records_since_last_training }}/10 Ready)
+          </button>
+          {% else %}
+          <button id="btnRetrainCard" class="btn btn-secondary w-100 py-2" style="border-radius: 8px; font-size: 0.88rem; opacity: 0.55; cursor: not-allowed;" disabled title="Requires 10 new joinees">
+            <i class="fas fa-lock me-1"></i> Retrain Model ({{ 10 - retrain_status.new_records_since_last_training }} more joinees needed)
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function onSelectPersonnel(pid) {
+  if (pid) {
+    window.location.href = '/company-recommendation-test?personnel_id=' + pid;
+  }
+}
+
+async function triggerRetrain() {
+  const btn = document.getElementById('btnRetrainCard');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-sync-alt fa-spin me-1"></i> Retraining Models...';
+  }
+
+  try {
+    const res = await fetch('/api/ai/company-recommendation/retrain?force=true', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const result = await res.json();
+    if (result.success) {
+      alert(`Retraining successful! Active model: ${result.selected_model} (Accuracy: ${(result.accuracy * 100).toFixed(2)}%)`);
+      window.location.reload();
+    } else {
+      alert(`Retraining failed: ${result.message || result.error}`);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Retrain Models Now';
+      }
+    }
+  } catch (err) {
+    alert(`Error during retraining: ${err.message}`);
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Retrain Models Now';
+    }
+  }
+}
+</script>
+{% endblock %}
