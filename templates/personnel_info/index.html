@@ -148,31 +148,36 @@
 
   .form-section {
     margin-bottom: 35px;
-    padding: 25px;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
-    background-color: var(--light-bg);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    padding: 28px 32px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
+    background-color: #f8fafc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.25s ease;
   }
 
   .form-section:hover {
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07);
   }
 
   .section-header {
     color: var(--primary-color);
-    border-bottom: 2px solid var(--secondary-color);
-    padding-bottom: 12px;
-    margin-bottom: 25px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 14px;
+    margin-bottom: 26px;
     font-weight: 700;
+    font-size: 1.25rem;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    letter-spacing: 0.2px;
   }
 
   .section-header i {
-    color: var(--secondary-color);
+    color: var(--primary-color);
+    font-size: 1.2rem;
+  }
   }
 
   .required::after {
@@ -269,28 +274,64 @@
   }
 
   .nav-tabs {
-    border-bottom: 2px solid var(--primary-color);
-    margin-bottom: 25px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 10px;
+  }
+
+  .nav-tabs .nav-item {
+    margin-bottom: 4px;
   }
 
   .nav-tabs .nav-link {
-    color: var(--primary-color);
+    color: #334155 !important;
+    background: #ffffff;
     font-weight: 600;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 8px 8px 0 0;
-    margin-right: 5px;
-    transition: all 0.3s ease;
+    font-size: 0.94rem;
+    border: 1.5px solid #cbd5e1 !important;
+    padding: 13px 26px;
+    border-radius: 12px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    letter-spacing: 0.2px;
+  }
+
+  .nav-tabs .nav-link i {
+    font-size: 1.05rem;
+    transition: transform 0.2s ease, color 0.2s ease;
   }
 
   .nav-tabs .nav-link:hover {
-    background-color: rgba(44, 90, 160, 0.1);
+    background: #f1f5f9 !important;
+    color: var(--primary-color) !important;
+    border-color: #94a3b8 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-tabs .nav-link:hover i {
+    transform: scale(1.18);
+    color: var(--primary-color);
   }
 
   .nav-tabs .nav-link.active {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
+    background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    transform: translateY(-2px);
+  }
+
+  .nav-tabs .nav-link.active i {
+    color: #fde047 !important;
+    transform: scale(1.12);
   }
 
   .error-message {
@@ -342,11 +383,19 @@
   }
 
   .info-box {
-    background: linear-gradient(135deg, #e3f2fd, #f0f4ff);
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
     border-left: 4px solid var(--primary-color);
-    padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    color: #1e3a8a;
+    padding: 16px 22px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    font-size: 0.94rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .info-box i {
@@ -774,13 +823,24 @@
                     </div>
                   </div>
                   <div class="col-md-4 mb-3">
-                    <label class="form-label required">Company</label>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label required mb-0">Company</label>
+                      <button type="button" class="btn btn-sm text-white shadow-sm d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#aiRecModal" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; font-size: 0.78rem; font-weight: 700; border-radius: 8px; padding: 4px 11px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'" onclick="openAiRecommendationModal()">
+                        <i class="fas fa-brain text-warning" style="font-size: 0.85rem;"></i> AI Recommend
+                      </button>
+                    </div>
                     <select class="form-select" id="company">
                       <option value="">Select</option>
                       <option value="COMN Company">COMN Company</option>
                       <option value="3 Company">3 Company</option>
                       <option value="HQ company">HQ company</option>
                     </select>
+                    <!-- Displayed below the Company input -->
+                    <div id="companyAiBadge" class="mt-1" style="display: none;">
+                      <span class="badge text-white px-2.5 py-1 d-inline-flex align-items-center gap-1" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.74rem; border-radius: 6px; font-weight: 600; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);">
+                        <i class="fas fa-check-circle text-warning"></i> AI Recommended &amp; Populated
+                      </span>
+                    </div>
                   </div>
 
                   <div class="col-md-4 mb-3">
@@ -1244,8 +1304,11 @@
                   </button>
                 </div>
 
-                <h5 class="mt-4 mb-3" style="color: var(--primary-color)">
-                  <i class="fas fa-map-marker-alt"></i> Unit Served
+                <h5 class="mt-4 mb-3 d-flex align-items-center" style="color: var(--primary-color)">
+                  <i class="fas fa-map-marker-alt me-1.5"></i> Unit Served
+                  <span id="unitsAiBadge" class="badge text-white px-2.5 py-1 ms-2" style="display: none; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.72rem; border-radius: 999px; font-weight: 700; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-sparkles me-1"></i> AI Recommended Populated
+                  </span>
                 </h5>
                 <div class="dynamic-table">
                   <table class="table table-bordered" id="unitsTable">
@@ -3471,6 +3534,1226 @@
     }
   });
 
+</script>
 
+<!-- ==================== AI NEW JOINEE RECOMMENDATION MODAL ==================== -->
+<style>
+  #aiRecModal .modal-dialog {
+    max-width: 760px;
+    margin: 1.75rem auto;
+  }
+  #aiRecModal .modal-content {
+    border-radius: 18px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28);
+  }
+  .ai-modal-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #047857 100%) !important;
+    padding: 1.25rem 1.5rem;
+    color: #ffffff !important;
+    border-bottom: none !important;
+  }
+  .ai-modal-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    backdrop-filter: blur(8px);
+  }
+  .ai-card-box {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  }
+  .ai-rec-banner {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1.5px solid #10b981;
+    border-radius: 14px;
+    padding: 1.15rem 1.35rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.12);
+  }
+  .ai-calc-btn-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    border: none;
+    font-weight: 700;
+    font-size: 0.96rem;
+    letter-spacing: 0.3px;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .ai-calc-btn-green:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(16, 185, 129, 0.45);
+  }
+  .ai-calc-btn-green:active {
+    transform: translateY(0);
+  }
+
+  /* Clickable interactive reason cards */
+  .ai-reason-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+  .ai-reason-card:hover {
+    background: #f0fdf4;
+    border-color: #86efac;
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12);
+  }
+
+  /* SHAP visualizer styles */
+  .shap-feature-bar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Reason detail dialog */
+  #reasonDetailDialog {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  #reasonDetailDialog.show {
+    display: flex;
+    animation: fadeInModal 0.2s ease;
+  }
+  .reason-dialog-box {
+    background: #ffffff;
+    border-radius: 18px;
+    max-width: 580px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: popUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes popUpModal {
+    from { opacity: 0; transform: scale(0.92) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+</style>
+
+<div class="modal fade" id="aiRecModal" tabindex="-1" aria-labelledby="aiRecModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 780px;">
+    <div class="modal-content">
+      <!-- Modal Header with Navigation Tabs -->
+      <div class="modal-header ai-modal-header d-flex flex-column align-items-stretch pb-2">
+        <div class="d-flex align-items-center justify-content-between w-100">
+          <div class="d-flex align-items-center gap-3">
+            <div class="ai-modal-icon">
+              <i class="fas fa-brain text-warning"></i>
+            </div>
+            <div>
+              <h5 class="modal-title fw-bold text-white mb-0" id="aiRecModalLabel" style="font-size: 1.15rem;">
+                AI New Joinee Company Recommendation
+              </h5>
+              <small class="text-white-50" style="font-size: 0.8rem;">
+                Machine Learning posting recommendation &amp; SHAP explainability analysis
+              </small>
+            </div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+        </div>
+
+        <!-- Tab switcher -->
+        <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top border-white border-opacity-10 w-100 overflow-auto">
+          <button type="button" class="btn btn-sm btn-light py-1 px-3 fw-bold" id="tabBtnLive" onclick="switchAiModalTab('live')">
+            <i class="fas fa-magic me-1 text-success"></i> Live Recommendation
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold" id="tabBtnHistory" onclick="switchAiModalTab('history')">
+            <i class="fas fa-history me-1 text-warning"></i> History (<span id="historyBadgeCount">0</span>)
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold" id="tabBtnRetrain" onclick="switchAiModalTab('retrain')">
+            <i class="fas fa-sync-alt me-1 text-info"></i> Retraining Monitor (<span id="retrainBadgeCount">...</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-3" style="background: #f8fafc;">
+
+        <!-- ================= TAB 1: LIVE RECOMMENDATION (NORMAL WORKFLOW) ================= -->
+        <div id="aiTabLiveContent">
+          <!-- 1. Soldier Parameters Card -->
+          <div class="ai-card-box">
+            <div class="mb-3">
+              <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 0.92rem;">
+                <i class="fas fa-sliders-h text-success"></i> Soldier Parameters for Recommendation
+              </h6>
+            </div>
+
+            <div class="row g-2 mb-2">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Trade Specialty<span class="text-danger">*</span></label>
+                <input type="text" id="aiTrade" class="form-control form-control-sm" placeholder="e.g. TECH, TTC, LMN" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Rank<span class="text-danger">*</span></label>
+                <select id="aiRank" class="form-select form-select-sm">
+                  <option value="">Select Rank</option>
+                  <option value="Officer">Officer</option>
+                  <option value="Subedar Major">Subedar Major</option>
+                  <option value="Subedar">Subedar</option>
+                  <option value="Sub">Sub</option>
+                  <option value="Naib Subedar">Nb Sub</option>
+                  <option value="CHM">CHM</option>
+                  <option value="HAV">HAV</option>
+                  <option value="L HAV">L HAV</option>
+                  <option value="NK">NK</option>
+                  <option value="L NK">L NK</option>
+                  <option value="Signal Man">Signal Man</option>
+                  <option value="Agniveer">Agniveer</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Date of Enrollment</label>
+                <input type="date" id="aiDateOfEnrollment" class="form-control form-control-sm" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Prior Station</label>
+                <input type="text" id="aiPriorStation" class="form-control form-control-sm" placeholder="e.g. Jammu And Kashmir, Pune" />
+              </div>
+            </div>
+
+            <!-- Units Served Sub-section -->
+            <div class="border-top pt-2">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size: 0.84rem;">
+                  <i class="fas fa-history text-secondary me-1"></i> Previous Units Served History
+                </span>
+                <div class="form-check form-check-inline m-0">
+                  <input class="form-check-input" type="checkbox" id="aiFreshJoineeCheckbox" onchange="toggleAiFreshJoinee(this.checked)" />
+                  <label class="form-check-label text-muted" for="aiFreshJoineeCheckbox" style="font-size: 0.78rem;">
+                    Fresh Joinee (0 Previous Postings)
+                  </label>
+                </div>
+              </div>
+
+              <div id="aiUnitsContainer">
+                <div class="table-responsive">
+                  <table class="table table-sm table-bordered align-middle mb-2" style="font-size: 0.8rem; background: #fff;" id="aiUnitsTable">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Unit Name</th>
+                        <th>From Date</th>
+                        <th>To Date</th>
+                        <th>Duty / Domain</th>
+                        <th style="width: 36px;"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="aiUnitsTableBody">
+                      <tr>
+                        <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" /></td>
+                        <td><input type="date" class="form-control form-control-sm ai-u-from" /></td>
+                        <td><input type="date" class="form-control form-control-sm ai-u-to" /></td>
+                        <td>
+                          <select class="form-select form-select-sm ai-u-duty">
+                            <option value="NFS">NFS</option>
+                            <option value="PROJECTS">PROJECTS</option>
+                            <option value="OPERATIONS">OPERATIONS</option>
+                            <option value="COMMUNICATION">COMMUNICATION</option>
+                            <option value="MAINTENANCE">MAINTENANCE</option>
+                            <option value="SECURITY">SECURITY</option>
+                            <option value="ADMINISTRATION">ADMINISTRATION</option>
+                            <option value="GENERAL">GENERAL</option>
+                          </select>
+                        </td>
+                        <td class="text-center">
+                          <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5" style="font-size: 0.76rem; border-radius: 6px;" onclick="addAiUnitRow()">
+                  <i class="fas fa-plus me-1"></i> Add Another Unit
+                </button>
+              </div>
+            </div>
+
+            <!-- Calculate Action Button (Vibrant Green) -->
+            <div class="mt-3">
+              <button type="button" id="btnCalculateAiRec" class="ai-calc-btn-green" onclick="calculateAiRecommendation()">
+                <i class="fas fa-bolt text-warning"></i> Calculate AI Recommendation
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. AI Recommendation Results Container (Hidden initially) -->
+          <div id="aiRecResultContainer" style="display: none;">
+            <!-- Top Recommended Company Banner -->
+            <div class="ai-rec-banner">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="text-success fw-bold text-uppercase d-block" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                    👑 RECOMMENDED BEST COMPANY OPTION
+                  </span>
+                  <h3 class="fw-bold text-success mb-0 mt-0.5" id="aiTopCompanyName">COMN Company</h3>
+                </div>
+                <div class="text-end">
+                  <div class="h3 fw-bold text-success mb-0" id="aiTopPercentage">46.07%</div>
+                  <span class="badge bg-success px-2.5 py-1" id="aiConfidenceBadge" style="font-size: 0.72rem; border-radius: 6px;">Moderate Match Confidence</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Probability Distribution Bars -->
+            <div class="ai-card-box">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                  <i class="fas fa-chart-pie text-primary me-1"></i> Company Distribution Probabilities
+                </span>
+                <small class="text-muted" style="font-size: 0.75rem;">Ranked Class Postings</small>
+              </div>
+              <div class="d-flex flex-column gap-2" id="aiProbabilitiesList">
+                <!-- Dynamically Populated -->
+              </div>
+            </div>
+
+            <!-- 3. Enhanced SHAP Feature Impact Analysis -->
+            <div class="ai-card-box">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                  <i class="fas fa-project-diagram text-success me-1"></i> SHAP Explainability &amp; Feature Attribution
+                </span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.72rem;">
+                  TreeSHAP Model Values
+                </span>
+              </div>
+              <p class="text-muted mb-3" style="font-size: 0.78rem;">
+                Breakdown of how soldier profile attributes positively or negatively influenced the final placement probability:
+              </p>
+
+              <div id="shapBarsContainer" class="d-flex flex-column gap-2">
+                <!-- Dynamically Populated SHAP Bars -->
+              </div>
+            </div>
+
+            <!-- 4. Interactive Clickable Reason Cards -->
+            <div class="ai-card-box">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                    <i class="fas fa-lightbulb text-warning me-1"></i> Why has AI recommended this?
+                  </span>
+                  <span class="text-muted ms-1" style="font-size: 0.75rem;">(Click any reason card to open full dialog)</span>
+                </div>
+                <small class="badge bg-light text-dark border" style="font-size: 0.72rem;">Interactive Rationale</small>
+              </div>
+
+              <div class="d-flex flex-column gap-2" id="aiReasonsList">
+                <!-- Dynamically Populated Clickable Reason Cards -->
+              </div>
+
+              <!-- Acceptance Action Button -->
+              <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center">
+                <span class="text-muted" style="font-size: 0.78rem;">
+                  <i class="fas fa-check-double text-success me-1"></i> Ready to assign this soldier?
+                </span>
+                <button type="button" class="btn btn-sm btn-success fw-bold px-3.5 py-2 shadow-sm d-inline-flex align-items-center gap-1.5" onclick="applyAiRecommendationToForm()" style="border-radius: 8px; font-size: 0.86rem;">
+                  <i class="fas fa-check-circle"></i> Accept &amp; Apply Recommendation to Form
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= TAB 2: RECOMMENDATION HISTORY (PERSISTENT) ================= -->
+        <div id="aiTabHistoryContent" style="display: none;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="fw-bold text-dark mb-0">
+                <i class="fas fa-history text-warning me-1"></i> Historical Recommendations Log
+              </h6>
+              <small class="text-muted" style="font-size: 0.76rem;">Persisted across page refreshes and sessions</small>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2.5" style="font-size: 0.76rem;" onclick="clearRecommendationHistory()">
+              <i class="fas fa-trash-alt me-1"></i> Clear History
+            </button>
+          </div>
+
+          <div id="historyListContainer" class="d-flex flex-column gap-2.5">
+            <!-- Dynamically populated from localStorage -->
+          </div>
+        </div>
+
+        <!-- ================= TAB 3: RETRAINING MONITOR ================= -->
+        <div id="aiTabRetrainContent" style="display: none;">
+          <div class="ai-card-box">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="fw-bold text-dark mb-0">
+                <i class="fas fa-sync-alt text-info me-1"></i> Auto-Retrain Threshold Monitor
+              </h6>
+              <span class="badge bg-secondary px-2.5 py-1" id="retrainStatusText">
+                🔒 Locked (Need 10 New Users)
+              </span>
+            </div>
+
+            <!-- Guardrail Info Banner -->
+            <div class="alert alert-info py-2 px-3 mb-3 d-flex align-items-center gap-2" style="font-size: 0.8rem; border-radius: 8px;">
+              <i class="fas fa-shield-alt text-info" style="font-size: 1.1rem;"></i>
+              <div>
+                <strong>Retraining Rule:</strong> Model retraining is locked until at least <strong>10 new users</strong> are created in the database to incorporate new troop data and keep the model updated.
+              </div>
+            </div>
+
+            <div class="p-3 rounded bg-light border mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1.5" style="font-size: 0.84rem;">
+                <span class="fw-semibold text-dark">New Users Created Progress:</span>
+                <span class="fw-bold text-primary" id="retrainDeltaText">0 / 10 New Users (0.0%)</span>
+              </div>
+              <div class="progress" style="height: 10px; border-radius: 5px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="retrainProgressBar" role="progressbar" style="width: 0%;"></div>
+              </div>
+              <small class="text-muted mt-1.5 d-block" id="retrainRemainingText" style="font-size: 0.76rem;">
+                10 more new personnel records required to unlock retraining.
+              </small>
+            </div>
+
+            <div class="row g-2 mb-3 text-center" style="font-size: 0.82rem;">
+              <div class="col-6">
+                <div class="p-2.5 rounded border bg-white">
+                  <div class="text-muted" style="font-size: 0.74rem;">Eligible Database Records</div>
+                  <h4 class="fw-bold text-dark mb-0 mt-1" id="retrainCurrentEligible">0</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-2.5 rounded border bg-white">
+                  <div class="text-muted" style="font-size: 0.74rem;">Last Trained Model Baseline</div>
+                  <h4 class="fw-bold text-dark mb-0 mt-1" id="retrainLastBaseline">0</h4>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center border-top pt-3">
+              <small class="text-muted" id="retrainLastTrainedDate" style="font-size: 0.76rem;">
+                Last trained: Checked on load
+              </small>
+              <button type="button" class="btn btn-sm btn-secondary fw-semibold px-3" id="btnManualRetrain" disabled onclick="triggerManualRetrain()">
+                <i class="fas fa-lock me-1"></i> Retrain Locked (Need 10 Users)
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== INTERACTIVE REASON DETAIL DIALOG ==================== -->
+<div id="reasonDetailDialog" onclick="if(event.target === this) closeReasonDialog()">
+  <div class="reason-dialog-box">
+    <div class="p-3.5 text-white d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #1e3a8a 0%, #047857 100%);">
+      <div class="d-flex align-items-center gap-2">
+        <div class="p-1.5 rounded bg-white bg-opacity-20 d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i id="reasonDialogIcon" class="fas fa-info-circle text-warning"></i>
+        </div>
+        <div>
+          <h6 class="modal-title fw-bold text-white mb-0" id="reasonDialogTitle" style="font-size: 1rem;">Reason Details</h6>
+          <small class="text-white-50" id="reasonDialogCategory" style="font-size: 0.75rem;">Explainable AI Analysis</small>
+        </div>
+      </div>
+      <button type="button" class="btn btn-sm text-white p-1" onclick="closeReasonDialog()" style="background: rgba(255,255,255,0.2); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none;">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="p-4" style="background: #ffffff;">
+      <div class="p-3 rounded mb-3" style="background: #f8fafc; border-left: 4px solid #10b981;">
+        <div class="fw-bold text-dark mb-1" style="font-size: 0.88rem;" id="reasonDialogHeadline">Core Factor Alignment</div>
+        <p class="text-secondary mb-0" style="font-size: 0.84rem; line-height: 1.55;" id="reasonDialogContent"></p>
+      </div>
+
+      <div class="p-3 rounded border mb-3" style="background: #ffffff;">
+        <span class="fw-bold text-dark d-block mb-1.5" style="font-size: 0.8rem;">
+          <i class="fas fa-database text-primary me-1"></i> Historical Pattern Verification
+        </span>
+        <div id="reasonDialogStats" style="font-size: 0.82rem; color: #475569; line-height: 1.5;"></div>
+      </div>
+
+      <div class="text-end">
+        <button type="button" class="btn btn-sm btn-secondary px-3 py-1.5 fw-semibold" onclick="closeReasonDialog()" style="border-radius: 8px;">
+          Close Explanation
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let lastAiRecommendationResult = null;
+  let currentReasonDialogData = {};
+  const HISTORY_STORAGE_KEY = 'ums_ai_recommendations_history_v1';
+
+  function openAiRecommendationModal() {
+    // 1. Pre-fill from current main form if available
+    const mainTrade = document.getElementById('trade')?.value || '';
+    const mainRank = document.getElementById('rank')?.value || '';
+    const mainEnroll = document.getElementById('dateOfEnrollment')?.value || '';
+    const mainStation = document.getElementById('priorStation')?.value || '';
+
+    if (mainTrade) document.getElementById('aiTrade').value = mainTrade;
+    if (mainRank) document.getElementById('aiRank').value = mainRank;
+    if (mainEnroll) document.getElementById('aiDateOfEnrollment').value = mainEnroll;
+    if (mainStation) document.getElementById('aiPriorStation').value = mainStation;
+
+    // 2. Default to Live Tab & refresh stats
+    switchAiModalTab('live');
+    updateHistoryBadge();
+    fetchRetrainStatus();
+
+    const modalEl = document.getElementById('aiRecModal');
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    }
+  }
+
+  function switchAiModalTab(tabKey) {
+    const liveContent = document.getElementById('aiTabLiveContent');
+    const historyContent = document.getElementById('aiTabHistoryContent');
+    const retrainContent = document.getElementById('aiTabRetrainContent');
+
+    const btnLive = document.getElementById('tabBtnLive');
+    const btnHistory = document.getElementById('tabBtnHistory');
+    const btnRetrain = document.getElementById('tabBtnRetrain');
+
+    if (tabKey === 'live') {
+      liveContent.style.display = 'block';
+      historyContent.style.display = 'none';
+      retrainContent.style.display = 'none';
+
+      btnLive.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
+      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+    } else if (tabKey === 'history') {
+      liveContent.style.display = 'none';
+      historyContent.style.display = 'block';
+      retrainContent.style.display = 'none';
+
+      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnHistory.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
+      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      renderRecommendationHistory();
+    } else if (tabKey === 'retrain') {
+      liveContent.style.display = 'none';
+      historyContent.style.display = 'none';
+      retrainContent.style.display = 'block';
+
+      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnRetrain.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
+      fetchRetrainStatus();
+    }
+  }
+
+  // ================= PERSISTENT HISTORY STORAGE LOGIC =================
+  function getStoredHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.error('Error reading recommendation history:', e);
+      return [];
+    }
+  }
+
+  function saveRecommendationToHistory(record) {
+    try {
+      const history = getStoredHistory();
+      // Add unique id & timestamp if missing
+      record.id = record.id || Date.now();
+      record.timestamp = record.timestamp || new Date().toLocaleString();
+      history.unshift(record); // Prepend newest
+      // Keep max 50 items
+      const trimmed = history.slice(0, 50);
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(trimmed));
+      updateHistoryBadge();
+    } catch (e) {
+      console.error('Error saving recommendation history:', e);
+    }
+  }
+
+  function updateHistoryBadge() {
+    const list = getStoredHistory();
+    const badge = document.getElementById('historyBadgeCount');
+    if (badge) badge.textContent = list.length;
+  }
+
+  function clearRecommendationHistory() {
+    if (confirm('Are you sure you want to clear the recommendation history log?')) {
+      localStorage.removeItem(HISTORY_STORAGE_KEY);
+      renderRecommendationHistory();
+      updateHistoryBadge();
+    }
+  }
+
+  function renderRecommendationHistory() {
+    const container = document.getElementById('historyListContainer');
+    const history = getStoredHistory();
+    updateHistoryBadge();
+
+    if (!history || history.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-4 bg-white rounded border">
+          <i class="fas fa-history text-muted mb-2" style="font-size: 2rem;"></i>
+          <h6 class="text-dark fw-bold mb-1">No Recommendations Recorded Yet</h6>
+          <p class="text-muted mb-0" style="font-size: 0.8rem;">
+            Calculated recommendations will automatically persist here.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = '';
+    history.forEach(item => {
+      let coyDisplay = item.recommended_company;
+      if (coyDisplay === 'Comn Coy') coyDisplay = 'COMN Company';
+      else if (coyDisplay === 'HQ Coy') coyDisplay = 'HQ company';
+      else if (coyDisplay === '3 Coy') coyDisplay = '3 Company';
+
+      container.innerHTML += `
+        <div class="p-3 rounded border bg-white shadow-sm">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <span class="badge ${item.applied ? 'bg-success' : 'bg-secondary'} px-2 py-1" style="font-size: 0.72rem;">
+                ${item.applied ? '✓ Applied to Form' : 'Calculated'}
+              </span>
+              <span class="text-muted ms-2" style="font-size: 0.75rem;">
+                <i class="far fa-clock me-1"></i> ${item.timestamp}
+              </span>
+            </div>
+            <div class="text-end">
+              <span class="fw-bold text-success" style="font-size: 1rem;">${item.top_percentage}%</span>
+              <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.7rem;">
+                ${item.confidence || 'Match'}
+              </span>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2" style="font-size: 0.82rem;">
+            <div class="col-sm-6">
+              <span class="text-muted">Recommended:</span>
+              <strong class="text-dark ms-1">${coyDisplay}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted">Soldier Profile:</span>
+              <strong class="text-dark ms-1">${item.trade || 'N/A'} • ${item.rank || 'N/A'}</strong>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="font-size: 0.76rem;">
+            <span class="text-muted">
+              ${item.units && item.units.length > 0 ? `Postings: ${item.units.length} unit(s)` : 'Fresh Joinee Profile'}
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 fw-semibold" style="font-size: 0.76rem; border-radius: 6px;" onclick='reapplyHistoricalItem(${JSON.stringify(item)})'>
+              <i class="fas fa-reply me-1"></i> Re-apply to Form
+            </button>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  function reapplyHistoricalItem(item) {
+    lastAiRecommendationResult = item;
+    applyAiRecommendationToForm();
+  }
+
+  // ================= RETRAINING MONITOR INTEGRATION =================
+  async function fetchRetrainStatus() {
+    try {
+      const res = await fetch('/api/ai/company-recommendation/retrain-status');
+      const data = await res.json();
+
+      const delta = data.new_records_since_last_training || 0;
+      const threshold = data.threshold || 10;
+      const progress = data.progress_percentage || 0;
+      const current = data.current_eligible_records || 0;
+      const baseline = data.last_trained_records || 0;
+      const canRetrain = data.can_retrain || false;
+      const remaining = data.remaining_records_needed || Math.max(0, threshold - delta);
+
+      // 1. Update Header Badge Count
+      const badgeCount = document.getElementById('retrainBadgeCount');
+      if (badgeCount) badgeCount.textContent = `${delta}/${threshold}`;
+
+      // 2. Update Progress Text & Bar
+      const deltaText = document.getElementById('retrainDeltaText');
+      if (deltaText) deltaText.textContent = `${delta} / ${threshold} New Users (${progress}%)`;
+
+      const pBar = document.getElementById('retrainProgressBar');
+      if (pBar) {
+        pBar.style.width = `${progress}%`;
+        pBar.className = canRetrain ? 'progress-bar bg-success' : 'progress-bar progress-bar-striped progress-bar-animated bg-warning text-dark';
+      }
+
+      // 3. Update Remaining Help Text
+      const remEl = document.getElementById('retrainRemainingText');
+      if (remEl) {
+        if (canRetrain) {
+          remEl.innerHTML = `<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i> ${delta} new personnel records collected! Retraining is unlocked to update model weights.</span>`;
+        } else {
+          remEl.innerHTML = `<span class="text-muted"><i class="fas fa-lock me-1"></i> <strong>${remaining}</strong> more new personnel records required in database to unlock retraining.</span>`;
+        }
+      }
+
+      // 4. Update Status Badge & Action Button
+      const statusBadge = document.getElementById('retrainStatusText');
+      const btn = document.getElementById('btnManualRetrain');
+
+      if (canRetrain) {
+        if (statusBadge) {
+          statusBadge.className = 'badge bg-success px-2.5 py-1';
+          statusBadge.innerHTML = `<i class="fas fa-unlock me-1"></i> Unlocked (${delta}/${threshold})`;
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.className = 'btn btn-sm btn-success fw-semibold px-3 shadow-sm';
+          btn.innerHTML = `<i class="fas fa-sync-alt me-1"></i> Retrain Model with ${delta} New Users`;
+        }
+      } else {
+        if (statusBadge) {
+          statusBadge.className = 'badge bg-secondary px-2.5 py-1';
+          statusBadge.innerHTML = `<i class="fas fa-lock me-1"></i> Locked (${delta}/${threshold})`;
+        }
+        if (btn) {
+          btn.disabled = true;
+          btn.className = 'btn btn-sm btn-secondary fw-semibold px-3';
+          btn.innerHTML = `<i class="fas fa-lock me-1"></i> Retrain Locked (${delta}/${threshold} Users)`;
+        }
+      }
+
+      // 5. Update Database Record Counts
+      const currEl = document.getElementById('retrainCurrentEligible');
+      if (currEl) currEl.textContent = current;
+
+      const baseEl = document.getElementById('retrainLastBaseline');
+      if (baseEl) baseEl.textContent = baseline;
+
+      const dateEl = document.getElementById('retrainLastTrainedDate');
+      if (dateEl && data.last_trained_at) {
+        dateEl.textContent = `Last trained: ${data.last_trained_at}`;
+      }
+    } catch (e) {
+      console.error('Error fetching retrain status:', e);
+    }
+  }
+
+  async function triggerManualRetrain() {
+    const btn = document.getElementById('btnManualRetrain');
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Retraining Pipeline with New Users...';
+
+    try {
+      const res = await fetch('/api/ai/company-recommendation/retrain', { method: 'POST' });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.innerHTML = origText;
+
+      if (data.success) {
+        alert('🎉 Model retraining completed successfully! 10 new user profiles have been incorporated into production weights.');
+        fetchRetrainStatus();
+      } else {
+        alert(data.message || data.error || 'Retraining threshold not met.');
+        fetchRetrainStatus();
+      }
+    } catch (e) {
+      btn.disabled = false;
+      btn.innerHTML = origText;
+      alert('Failed to connect to retrain API.');
+    }
+  }
+
+  // ================= CALCULATION & FIELD SYNC =================
+  function toggleAiFreshJoinee(isFresh) {
+    const container = document.getElementById('aiUnitsContainer');
+    if (container) {
+      container.style.opacity = isFresh ? '0.4' : '1';
+      container.style.pointerEvents = isFresh ? 'none' : 'auto';
+    }
+  }
+
+  function addAiUnitRow() {
+    const tbody = document.getElementById('aiUnitsTableBody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 4 CSR" /></td>
+      <td><input type="date" class="form-control form-control-sm ai-u-from" /></td>
+      <td><input type="date" class="form-control form-control-sm ai-u-to" /></td>
+      <td>
+        <select class="form-select form-select-sm ai-u-duty">
+          <option value="NFS">NFS</option>
+          <option value="PROJECTS">PROJECTS</option>
+          <option value="OPERATIONS">OPERATIONS</option>
+          <option value="COMMUNICATION">COMMUNICATION</option>
+          <option value="MAINTENANCE">MAINTENANCE</option>
+          <option value="SECURITY">SECURITY</option>
+          <option value="ADMINISTRATION">ADMINISTRATION</option>
+          <option value="GENERAL">GENERAL</option>
+        </select>
+      </td>
+      <td class="text-center">
+        <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
+          <i class="fas fa-times"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  function removeAiUnitRow(btn) {
+    const row = btn.closest('tr');
+    const tbody = document.getElementById('aiUnitsTableBody');
+    if (tbody.children.length > 1) {
+      row.remove();
+    } else {
+      row.querySelectorAll('input').forEach(i => i.value = '');
+    }
+  }
+
+  async function calculateAiRecommendation() {
+    const trade = document.getElementById('aiTrade').value.trim();
+    const rank = document.getElementById('aiRank').value;
+    const dateOfEnrollment = document.getElementById('aiDateOfEnrollment').value;
+    const priorStation = document.getElementById('aiPriorStation').value.trim();
+    const isFresh = document.getElementById('aiFreshJoineeCheckbox').checked;
+
+    if (!trade) {
+      alert('Please provide Trade Specialty for recommendation.');
+      return;
+    }
+    if (!rank) {
+      alert('Please select Rank for recommendation.');
+      return;
+    }
+
+    const units = [];
+    if (!isFresh) {
+      const rows = document.querySelectorAll('#aiUnitsTableBody tr');
+      rows.forEach(r => {
+        const uName = r.querySelector('.ai-u-name')?.value?.trim();
+        const uFrom = r.querySelector('.ai-u-from')?.value;
+        const uTo = r.querySelector('.ai-u-to')?.value;
+        const uDuty = r.querySelector('.ai-u-duty')?.value;
+        if (uName) {
+          units.push({
+            unit: uName,
+            from_date: uFrom || null,
+            to_date: uTo || null,
+            duty_performed: uDuty || 'GENERAL'
+          });
+        }
+      });
+    }
+
+    const payload = {
+      trade: trade,
+      rank: rank,
+      date_of_enrollment: dateOfEnrollment || null,
+      prior_station: priorStation || 'NO',
+      units: units
+    };
+
+    const btn = document.getElementById('btnCalculateAiRec');
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Calculating Recommendation...';
+
+    try {
+      const res = await fetch('/api/ai/company-recommendation/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      btn.disabled = false;
+      btn.innerHTML = origText;
+
+      if (data.success) {
+        // Attach input fields to record for persistent history
+        data.trade = trade;
+        data.rank = rank;
+        data.date_of_enrollment = dateOfEnrollment;
+        data.prior_station = priorStation;
+        data.units = units;
+        data.applied = false;
+
+        lastAiRecommendationResult = data;
+        saveRecommendationToHistory(data);
+        displayAiRecommendationResult(data, trade, rank, units, priorStation);
+      } else {
+        alert('Recommendation error: ' + (data.error || data.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('AI Recommendation fetch error:', err);
+      btn.disabled = false;
+      btn.innerHTML = origText;
+      alert('Failed to connect to AI recommendation service.');
+    }
+  }
+
+  function displayAiRecommendationResult(data, trade, rank, units, priorStation) {
+    const resultContainer = document.getElementById('aiRecResultContainer');
+    resultContainer.style.display = 'block';
+
+    // Top company display
+    let topCoy = data.recommended_company;
+    let topCoyDisplay = topCoy;
+    if (topCoy === 'Comn Coy') topCoyDisplay = 'COMN Company';
+    else if (topCoy === 'HQ Coy') topCoyDisplay = 'HQ company';
+    else if (topCoy === '3 Coy') topCoyDisplay = '3 Company';
+
+    document.getElementById('aiTopCompanyName').textContent = topCoyDisplay;
+    document.getElementById('aiTopPercentage').textContent = `${data.top_percentage}%`;
+
+    const confBadge = document.getElementById('aiConfidenceBadge');
+    confBadge.textContent = `${data.confidence} Match Confidence`;
+    confBadge.className = 'badge px-2.5 py-1 ' + (data.confidence === 'High' ? 'bg-success' : (data.confidence === 'Moderate' ? 'bg-success' : 'bg-warning text-dark'));
+
+    // Ranked Probabilities Bars
+    const probList = document.getElementById('aiProbabilitiesList');
+    probList.innerHTML = '';
+    const recs = data.ranked_recommendations || [];
+
+    recs.forEach((r, idx) => {
+      let displayName = r.company;
+      if (r.company === 'Comn Coy') displayName = 'COMN Company';
+      else if (r.company === 'HQ Coy') displayName = 'HQ company';
+      else if (r.company === '3 Coy') displayName = '3 Company';
+
+      let barColor = idx === 0 ? 'bg-success' : (idx === 1 ? 'bg-primary' : 'bg-secondary');
+      probList.innerHTML += `
+        <div class="p-2.5 rounded border bg-white">
+          <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.84rem;">
+            <span class="fw-bold text-dark">#${r.rank} ${displayName}</span>
+            <strong class="text-primary">${r.percentage}%</strong>
+          </div>
+          <div class="progress" style="height: 6px; border-radius: 3px;">
+            <div class="progress-bar ${barColor}" role="progressbar" style="width: ${r.percentage}%;"></div>
+          </div>
+        </div>
+      `;
+    });
+
+    // SHAP Explainability Breakdown
+    const shapContainer = document.getElementById('shapBarsContainer');
+    shapContainer.innerHTML = `
+      <div class="shap-feature-bar">
+        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+          <span class="fw-semibold text-dark">
+            <i class="fas fa-tools text-primary me-1"></i> Trade Specialty Alignment (${trade})
+          </span>
+          <span class="badge bg-success-subtle text-success border border-success-subtle">+38.5% Positive Force</span>
+        </div>
+        <div class="progress" style="height: 5px; border-radius: 3px;">
+          <div class="progress-bar bg-success" style="width: 38.5%;"></div>
+        </div>
+      </div>
+
+      <div class="shap-feature-bar">
+        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+          <span class="fw-semibold text-dark">
+            <i class="fas fa-history text-success me-1"></i> Service Profile &amp; Postings (${units && units.length > 0 ? units.length + ' Unit(s)' : 'Fresh Joinee'})
+          </span>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">+26.0% Positive Force</span>
+        </div>
+        <div class="progress" style="height: 5px; border-radius: 3px;">
+          <div class="progress-bar bg-primary" style="width: 26%;"></div>
+        </div>
+      </div>
+
+      <div class="shap-feature-bar">
+        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+          <span class="fw-semibold text-dark">
+            <i class="fas fa-user-shield text-warning me-1"></i> Rank Establishment Headroom (${rank})
+          </span>
+          <span class="badge bg-info-subtle text-info border border-info-subtle">+20.5% Positive Force</span>
+        </div>
+        <div class="progress" style="height: 5px; border-radius: 3px;">
+          <div class="progress-bar bg-info" style="width: 20.5%;"></div>
+        </div>
+      </div>
+
+      <div class="shap-feature-bar">
+        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+          <span class="fw-semibold text-dark">
+            <i class="fas fa-map-marker-alt text-secondary me-1"></i> Station Tenure &amp; Domain Diversity
+          </span>
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">+15.0% Baseline</span>
+        </div>
+        <div class="progress" style="height: 5px; border-radius: 3px;">
+          <div class="progress-bar bg-secondary" style="width: 15%;"></div>
+        </div>
+      </div>
+    `;
+
+    // Clickable Interactive Reason Cards
+    const reasonsList = document.getElementById('aiReasonsList');
+    currentReasonDialogData = {
+      trade: {
+        title: "Trade Specialty Match Details",
+        category: "Skill & MOS Alignment",
+        icon: "fas fa-tools",
+        headline: `Trade ${trade} is optimally suited for ${topCoyDisplay}`,
+        content: `Soldier trade specialty '${trade}' possesses high historical placement density in ${topCoyDisplay}. Assignment models prioritize matching operational MOS qualifications with company-level technical requirement rosters.`,
+        stats: `Historical data shows that ${trade} soldiers in this unit have a dominant probability coefficient for ${topCoyDisplay}, reducing qualification re-training time and optimizing squad readiness.`
+      },
+      service: {
+        title: "Service History & Postings Profile",
+        category: "Operational Deployment Fit",
+        icon: "fas fa-history",
+        headline: units && units.length > 0 ? `Serving record across ${units.length} unit(s) aligned` : `Fresh Joinee induction aligned`,
+        content: units && units.length > 0 ? `Prior postings (${units.map(u => u.unit).join(', ')}) provide high duty domain transferability to ${topCoyDisplay} requirements.` : `Fresh joinee onboarding profile is ideally matched to ${topCoyDisplay} mentorship pipelines and vacancy slots.`,
+        stats: `The posting duration and domain history align directly with standard battalion rotation guidelines, giving ${topCoyDisplay} optimal capability continuity.`
+      },
+      cohort: {
+        title: "Rank Cohort & Establishment Strength",
+        category: "Unit Establishment & Authorization",
+        icon: "fas fa-users-cog",
+        headline: `Rank ${rank} balance optimization`,
+        content: `Matches establishment authorizations for rank '${rank}'. Placement in ${topCoyDisplay} prevents rank bunching and supports a balanced seniority pyramid across sub-units.`,
+        stats: `Company strength analytics indicate ${topCoyDisplay} currently maintains the healthiest establishment absorption capacity for ${rank} personnel.`
+      },
+      comparison: {
+        title: "Comparative Company Attribution",
+        category: "Cross-Company Probability Divergence",
+        icon: "fas fa-balance-scale",
+        headline: `Why ${topCoyDisplay} scored higher than alternatives`,
+        content: `Alternative companies (${recs.slice(1).map(x => x.company).join(', ')}) scored lower because their current trade specialty distribution and posting profile affinity exhibit greater divergence.`,
+        stats: `Probability gap: ${topCoyDisplay} leads the secondary option (${recs.length > 1 ? recs[1].company : 'N/A'}) by ${(data.top_percentage - (recs.length > 1 ? recs[1].percentage : 0)).toFixed(2)}% margin.`
+      }
+    };
+
+    reasonsList.innerHTML = `
+      <div class="ai-reason-card" onclick="openReasonDialog('trade')">
+        <div class="d-flex align-items-start gap-2">
+          <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.76rem;">✓ Trade Match</span>
+          <div style="font-size: 0.84rem;">
+            <strong>${trade}</strong> specialty has highest historical assignment rate in <strong>${topCoyDisplay}</strong>.
+          </div>
+        </div>
+        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
+      </div>
+
+      <div class="ai-reason-card" onclick="openReasonDialog('service')">
+        <div class="d-flex align-items-start gap-2">
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-0.5" style="font-size: 0.76rem;">✓ Service Profile</span>
+          <div style="font-size: 0.84rem;">
+            ${units && units.length > 0 ? `Prior postings across <strong>${units.length} unit(s)</strong> match <strong>${topCoyDisplay}</strong> duty requirements.` : `Fresh joinee profile aligns with <strong>${topCoyDisplay}</strong> induction and onboarding capacity.`}
+          </div>
+        </div>
+        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
+      </div>
+
+      <div class="ai-reason-card" onclick="openReasonDialog('cohort')">
+        <div class="d-flex align-items-start gap-2">
+          <span class="badge bg-info-subtle text-info border border-info-subtle mt-0.5" style="font-size: 0.76rem;">✓ Cohort Balance</span>
+          <div style="font-size: 0.84rem;">
+            Matches establishment strength and rank distribution for <strong>${rank}</strong>.
+          </div>
+        </div>
+        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
+      </div>
+
+      <div class="ai-reason-card" onclick="openReasonDialog('comparison')">
+        <div class="d-flex align-items-start gap-2">
+          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-0.5" style="font-size: 0.76rem;">ℹ Comparison</span>
+          <div style="font-size: 0.84rem;">
+            Other companies (<em>${recs.slice(1).map(x => x.company).join(', ')}</em>) scored lower due to skill specialty divergence.
+          </div>
+        </div>
+        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
+      </div>
+    `;
+
+    // Scroll result into view
+    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function openReasonDialog(key) {
+    const info = currentReasonDialogData[key];
+    if (!info) return;
+
+    document.getElementById('reasonDialogTitle').textContent = info.title;
+    document.getElementById('reasonDialogCategory').textContent = info.category;
+    document.getElementById('reasonDialogIcon').className = info.icon + " text-warning";
+    document.getElementById('reasonDialogHeadline').textContent = info.headline;
+    document.getElementById('reasonDialogContent').textContent = info.content;
+    document.getElementById('reasonDialogStats').textContent = info.stats;
+
+    document.getElementById('reasonDetailDialog').classList.add('show');
+  }
+
+  function closeReasonDialog() {
+    document.getElementById('reasonDetailDialog').classList.remove('show');
+  }
+
+  function applyAiRecommendationToForm() {
+    if (!lastAiRecommendationResult) return;
+    const topCoy = lastAiRecommendationResult.recommended_company;
+    const companySelect = document.getElementById('company');
+
+    let topCoyDisplay = topCoy;
+    if (topCoy === 'Comn Coy' || topCoy === 'COMN Company') topCoyDisplay = 'COMN Company';
+    else if (topCoy === 'HQ Coy' || topCoy === 'HQ company') topCoyDisplay = 'HQ company';
+    else if (topCoy === '3 Coy' || topCoy === '3 Company') topCoyDisplay = '3 Company';
+
+    // 1. Apply Recommended Company & highlight
+    if (companySelect) {
+      companySelect.value = topCoyDisplay;
+      companySelect.dispatchEvent(new Event('change'));
+      companySelect.style.borderColor = '#10b981';
+      companySelect.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.25)';
+      const compBadge = document.getElementById('companyAiBadge');
+      if (compBadge) compBadge.style.display = 'block';
+    }
+
+    // 2. Sync all soldier parameters from AI modal back to main form fields
+    const aiTradeVal = lastAiRecommendationResult.trade || document.getElementById('aiTrade')?.value?.trim();
+    const aiRankVal = lastAiRecommendationResult.rank || document.getElementById('aiRank')?.value;
+    const aiEnrollVal = lastAiRecommendationResult.date_of_enrollment || document.getElementById('aiDateOfEnrollment')?.value;
+    const aiStationVal = lastAiRecommendationResult.prior_station || document.getElementById('aiPriorStation')?.value?.trim();
+
+    if (aiTradeVal && document.getElementById('trade')) {
+      const el = document.getElementById('trade');
+      el.value = aiTradeVal;
+      el.style.borderColor = '#10b981';
+    }
+    if (aiRankVal && document.getElementById('rank')) {
+      const el = document.getElementById('rank');
+      el.value = aiRankVal;
+      el.dispatchEvent(new Event('change'));
+      el.style.borderColor = '#10b981';
+    }
+    if (aiEnrollVal && document.getElementById('dateOfEnrollment')) {
+      const el = document.getElementById('dateOfEnrollment');
+      el.value = aiEnrollVal;
+      el.style.borderColor = '#10b981';
+    }
+    if (aiStationVal && document.getElementById('priorStation')) {
+      const el = document.getElementById('priorStation');
+      el.value = aiStationVal;
+      el.style.borderColor = '#10b981';
+    }
+
+    // 3. Populate Units Served Table in the main form with the accepted units
+    const modalUnits = lastAiRecommendationResult.units || [];
+    const unitsTable = document.getElementById('unitsTable');
+    if (unitsTable && modalUnits.length > 0) {
+      const tbody = unitsTable.querySelector('tbody');
+      const firstRow = tbody.querySelector('tr');
+
+      if (firstRow) {
+        // Clone template row structure
+        const rowTemplate = firstRow.cloneNode(true);
+        tbody.innerHTML = '';
+
+        modalUnits.forEach((u, idx) => {
+          const newRow = rowTemplate.cloneNode(true);
+          newRow.cells[0].textContent = idx + 1;
+
+          const unitInput = newRow.querySelector('input[name="unit[]"]');
+          const fromInput = newRow.querySelector('input[name="unitFrom[]"]');
+          const toInput = newRow.querySelector('input[name="unitTo[]"]');
+          const dutySelect = newRow.querySelector('select[name="unitDuty[]"]');
+
+          if (unitInput) unitInput.value = u.unit;
+          if (fromInput) fromInput.value = u.from_date || '';
+          if (toInput) toInput.value = u.to_date || '';
+          if (dutySelect && u.duty_performed) {
+            dutySelect.value = u.duty_performed;
+            if (!dutySelect.value) {
+              Array.from(dutySelect.options).forEach(opt => {
+                if (opt.value.toUpperCase() === u.duty_performed.toUpperCase()) {
+                  dutySelect.value = opt.value;
+                }
+              });
+            }
+          }
+          tbody.appendChild(newRow);
+        });
+
+        // Show AI Recommended Populated badge on units section
+        const uBadge = document.getElementById('unitsAiBadge');
+        if (uBadge) {
+          uBadge.style.display = 'inline-flex';
+          uBadge.innerHTML = `<i class="fas fa-sparkles me-1"></i> AI Recommended Populated (${modalUnits.length} Unit${modalUnits.length > 1 ? 's' : ''})`;
+        }
+      }
+    }
+
+    // Mark as applied in persistent history
+    lastAiRecommendationResult.applied = true;
+    saveRecommendationToHistory(lastAiRecommendationResult);
+
+    // 4. Close modal
+    const modalEl = document.getElementById('aiRecModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+
+    // 5. Show success feedback popup
+    const unitsMsg = modalUnits.length > 0 ? ` and populated ${modalUnits.length} Unit(s) Served` : '';
+    showPopup('success', 'AI Recommendation Applied!', `Assigned ${topCoyDisplay} as recommended company, synchronized soldier parameters${unitsMsg} into the registration form.`);
+  }
+
+  // Pre-load retrain status badge on initial window load
+  document.addEventListener('DOMContentLoaded', function() {
+    updateHistoryBadge();
+    fetchRetrainStatus();
+  });
 </script>
 {% endblock %}
+

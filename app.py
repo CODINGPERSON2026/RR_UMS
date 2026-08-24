@@ -32,6 +32,8 @@ app.register_blueprint(onco_leave_bp)
 app.register_blueprint(dues_bp)
 app.register_blueprint(sensitive_bp)
 app.register_blueprint(chatbot_bp)
+app.register_blueprint(company_rec_bp)
+
 
 @app.route("/history/15cesr")
 def history_15cesr():

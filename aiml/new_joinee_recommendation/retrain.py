@@ -27,7 +27,7 @@ def get_current_eligible_count() -> int:
 
 def check_retrain_status() -> Dict[str, Any]:
     """
-    Checks if new database records have met or exceeded the 50-record retraining threshold.
+    Checks if new database records have met or exceeded the 10-record retraining threshold.
     """
     current_count = get_current_eligible_count()
     last_count = 0
@@ -43,13 +43,16 @@ def check_retrain_status() -> Dict[str, Any]:
             logger.warning(f"Could not read metadata file: {e}")
 
     delta_records = max(0, current_count - last_count)
-    should_retrain = delta_records >= AUTO_RETRAIN_THRESHOLD_RECORDS and current_count > 0
+    remaining_records = max(0, AUTO_RETRAIN_THRESHOLD_RECORDS - delta_records)
+    can_retrain = delta_records >= AUTO_RETRAIN_THRESHOLD_RECORDS and current_count > 0
 
     return {
-        "should_retrain": should_retrain,
+        "should_retrain": can_retrain,
+        "can_retrain": can_retrain,
         "current_eligible_records": current_count,
         "last_trained_records": last_count,
         "new_records_since_last_training": delta_records,
+        "remaining_records_needed": remaining_records,
         "threshold": AUTO_RETRAIN_THRESHOLD_RECORDS,
         "progress_percentage": min(100.0, round((delta_records / AUTO_RETRAIN_THRESHOLD_RECORDS) * 100, 1)),
         "last_trained_at": last_trained_at
@@ -69,10 +72,10 @@ def execute_retraining(force: bool = False) -> Dict[str, Any]:
 
     try:
         status = check_retrain_status()
-        if not force and not status["should_retrain"]:
+        if not force and not status["can_retrain"]:
             return {
                 "success": False,
-                "message": f"Retraining threshold not reached ({status['new_records_since_last_training']}/{AUTO_RETRAIN_THRESHOLD_RECORDS} new records).",
+                "message": f"Retraining locked: Only {status['new_records_since_last_training']} out of 10 new personnel records created in database. Need {status['remaining_records_needed']} more records to enable retraining.",
                 "status": "threshold_not_met",
                 "details": status
             }

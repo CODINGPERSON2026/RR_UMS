@@ -142,7 +142,7 @@ def api_trigger_retrain():
         return jsonify({"success": False, "error": "Unauthorized"}), 401
 
     try:
-        force = request.args.get("force", "true").lower() == "true"
+        force = request.args.get("force", "false").lower() == "true"
         res = execute_retraining(force=force)
         if res.get("success"):
             rec_service.reload_model()
