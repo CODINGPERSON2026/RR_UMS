@@ -50,9 +50,14 @@
   <!-- HEADER -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-      <h4 style="font-weight:600;background:#e3e0dc;padding:6px 12px;border-radius:10px;">
-        DETAILS OF GRANTS – FY <span id="fyLabel"></span>
-      </h4>
+      <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+        <h4 class="mb-0" style="font-weight:600;background:#e3e0dc;padding:6px 12px;border-radius:10px;">
+          DETAILS OF GRANTS – FY <span id="fyLabel"></span>
+        </h4>
+        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY ACCJCO
+        </span>
+      </div>
       <small class="text-muted">Admin Financial Control Panel</small>
     </div>
 
@@ -120,8 +125,33 @@
         <form id="grantForm">
           <input class="form-control mb-2" id="grant_name" placeholder="Grant Name" required>
           <input class="form-control mb-2" id="code_head" placeholder="Code Head" required>
-          <input class="form-control mb-3" id="allotment" type="number" placeholder="Initial Allotment (₹)" required>
+          <input class="form-control mb-3" id="allotment" type="number" step="0.01" placeholder="Initial Allotment (₹)" required>
           <button type="submit" class="btn btn-success w-100">Save Grant</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT GRANT MODAL -->
+  <div class="modal fade" id="editGrantModal">
+    <div class="modal-dialog">
+      <div class="modal-content p-3">
+        <h5 class="modal-title mb-3">Edit Grant Details</h5>
+        <form id="editGrantForm" onsubmit="submitEditGrant(event)">
+          <input type="hidden" id="editGrantId">
+          <div class="mb-2">
+            <label class="form-label fw-semibold">Grant Name</label>
+            <input class="form-control" id="editGrantName" placeholder="Grant Name" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label fw-semibold">Code Head</label>
+            <input class="form-control" id="editCodeHead" placeholder="Code Head" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Allotment (₹)</label>
+            <input class="form-control" id="editAllotment" type="number" step="0.01" placeholder="Allotment Amount" required>
+          </div>
+          <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Update Grant</button>
         </form>
       </div>
     </div>
@@ -189,7 +219,7 @@
               <th>Grant Name</th>
               <th>Code Head</th>
               <th>Allotment</th>
-              <th>SOs</th>
+              <!-- <th>SOs</th> -->
               <th>Expenditure</th>
               <th>Balance</th>
               <th>Utilization</th>
@@ -305,11 +335,14 @@ document.addEventListener("DOMContentLoaded", () => {
               <td class="text-start">${g.name}</td>
               <td>${g.code_head}</td>
               <td class="text-end">${format(a)}</td>
-              <td>${g.no_of_sos}</td>
+              <!-- <td>${g.no_of_sos}</td> -->
               <td class="text-danger text-end">${format(e)}</td>
               <td class="text-end">${format(g.balance)}</td>
               <td>${p.toFixed(2)}%</td>
-              <td><a href="/account/grants/${g.id}?fy=${fyFilter.value}" class="btn btn-sm btn-outline-primary">View</a></td>
+              <td>
+                <a href="/account/grants/${g.id}?fy=${fyFilter.value}" class="btn btn-sm btn-outline-primary me-1">View</a>
+                <button class="btn btn-sm btn-outline-warning text-dark" onclick='openEditGrantModal(${JSON.stringify(g)})'>Edit</button>
+              </td>
             </tr>`;
         });
 
@@ -464,27 +497,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Pie Chart - Expenditure Distribution (Dangerous Red Tones)
+    // Pie Chart - Expenditure Distribution (Rich Vibrant Synced Palette)
+    const expenditureColors = [
+      "#3b82f6", // Royal Blue
+      "#10b981", // Emerald Green
+      "#f59e0b", // Amber Gold
+      "#8b5cf6", // Purple Violet
+      "#ec4899", // Vivid Pink
+      "#06b6d4", // Bright Cyan
+      "#f97316", // Coral Orange
+      "#6366f1", // Deep Indigo
+      "#14b8a6", // Sea Teal
+      "#ef4444"  // Rose Red
+    ];
+
     pieChart = new Chart(document.getElementById("pieChart"), {
       type: "pie",
       data: {
         labels: n,
         datasets: [{ 
           data: e, 
-          backgroundColor: [
-            '#ef4444',   // Red
-            '#f87171',   // Light Red
-            '#b91c1c',   // Dark Red
-            '#dc2626',   // Strong Red
-            '#991b1b'    // Deep Red
-          ]
+          backgroundColor: n.map((_, i) => expenditureColors[i % expenditureColors.length]),
+          borderColor: "#ffffff",
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       plugins: [pieDatalabelsPlugin],
       options: { 
         ...chartOptions, 
         plugins: { 
-          legend: { position: 'right' } 
+          legend: { 
+            position: 'right',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 12,
+              font: { weight: '600', size: 12 }
+            }
+          } 
         }
       }
     });
@@ -509,20 +560,34 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    // Doughnut Chart - Overall Utilization
+    // Doughnut Chart - Overall Utilization (Red = Utilized, Green = Remaining)
     doughnutChart = new Chart(document.getElementById("doughnutChart"), {
       type: "doughnut",
       data: {
         labels: ["Utilized", "Remaining"],
         datasets: [{
-          data: [o, 100 - o],
-          backgroundColor: ["#10b981", "#e5e7eb"]
+          data: [o, Math.max(0, 100 - o)],
+          backgroundColor: ["#ef4444", "#10b981"],
+          borderColor: "#ffffff",
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       plugins: [doughnutDatalabelsPlugin],
       options: {
         ...chartOptions,
-        cutout: "65%"
+        cutout: "65%",
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 14,
+              font: { weight: '600', size: 12 }
+            }
+          }
+        }
       }
     });
   }
@@ -556,13 +621,54 @@ document.getElementById("grantForm").addEventListener("submit", function(e) {
   .then(r => r.json())
   .then(res => {
     if (res.success) {
-      bootstrap.Modal.getInstance(grantModal).hide();
-      grantForm.reset();
-      window.reloadGrants();
+      bootstrap.Modal.getInstance(document.getElementById("grantModal")).hide();
+      document.getElementById("grantForm").reset();
+      if (typeof window.reloadGrants === 'function') window.reloadGrants();
+    } else {
+      alert(res.message || "Failed to add grant");
     }
   })
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error(err);
+    alert("Server error while adding grant");
+  });
 });
+
+// ====================== EDIT GRANT FORM ======================
+function openEditGrantModal(g) {
+  document.getElementById("editGrantId").value = g.id;
+  document.getElementById("editGrantName").value = g.name;
+  document.getElementById("editCodeHead").value = g.code_head;
+  document.getElementById("editAllotment").value = g.total_allotment || g.allotment || 0;
+  new bootstrap.Modal(document.getElementById("editGrantModal")).show();
+}
+
+function submitEditGrant(e) {
+  e.preventDefault();
+  const id = document.getElementById("editGrantId").value;
+  const name = document.getElementById("editGrantName").value.trim();
+  const code_head = document.getElementById("editCodeHead").value.trim();
+  const allotment = parseFloat(document.getElementById("editAllotment").value);
+
+  fetch(`/account/grants/${id}/edit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, code_head, allotment })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      bootstrap.Modal.getInstance(document.getElementById("editGrantModal")).hide();
+      window.reloadGrants();
+    } else {
+      alert(res.message || "Failed to update grant");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Server error while updating grant");
+  });
+}
 </script>
 
 {% endblock %}

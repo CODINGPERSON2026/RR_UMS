@@ -242,6 +242,10 @@ def delete_related_records(cursor, personnel_id, army_number):
             pass
 
     cursor.execute("DELETE FROM weight_info WHERE army_number = %s", (army_number,))
+    try:
+        cursor.execute("DELETE FROM company_interview WHERE army_number = %s", (army_number,))
+    except Exception:
+        pass
 @personnel_info.route('/get_total_personnel_count_and_courses')
 def total_army_personnel__and_courses():
     user = require_login()

@@ -15,6 +15,8 @@ app.secret_key = os.urandom(24)
 app.register_blueprint(personnel_info)
 app.register_blueprint(nominal_bp)
 app.register_blueprint(weight_ms)
+app.register_blueprint(weight_graph_bp)
+app.register_blueprint(personnel_graph_bp) # Registered Personnel Info Graph Blueprint
 app.register_blueprint(leave_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(task_bp)
@@ -133,6 +135,38 @@ def inject_user():
 def api_get_client_ip():
     return jsonify({"client_ip": get_client_ip()})
 
+
+# ── Auto-create company_interview table on first boot ──
+_company_interview_table_ready = False
+
+@app.before_request
+def ensure_company_interview_table():
+    global _company_interview_table_ready
+    if _company_interview_table_ready:
+        return
+    try:
+        conn   = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS company_interview (
+                id                INT AUTO_INCREMENT PRIMARY KEY,
+                army_number       VARCHAR(100) NOT NULL,
+                interview_status  TINYINT      NOT NULL DEFAULT 0,
+                interview_done_on DATE         DEFAULT NULL,
+                remarks           TEXT         DEFAULT NULL,
+                created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_ci_army
+                    FOREIGN KEY (army_number)
+                    REFERENCES personnel(army_number)
+                    ON DELETE CASCADE ON UPDATE CASCADE
+            )
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        _company_interview_table_ready = True
+    except Exception:
+        pass  # Fail silently — table may already exist
 
 
 def dated_url_for(endpoint, **values):
@@ -695,12 +729,17 @@ def assign_personnel():
                 """, (pid, remarks))
 
                 cursor.execute("""
-                    DELETE FROM personnel
+                    DELETE FROM company_interview
                     WHERE army_number = %s
                 """, (pid,))
 
                 cursor.execute("""
                     DELETE FROM weight_info
+                    WHERE army_number = %s
+                """, (pid,))
+
+                cursor.execute("""
+                    DELETE FROM personnel
                     WHERE army_number = %s
                 """, (pid,))
 
@@ -1389,9 +1428,10 @@ def assigned_alarm():
             DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
         FROM assigned_det ad
         LEFT JOIN dets d ON ad.det_id = d.det_id
-        LEFT JOIN personnel p ON ad.army_number = p.army_number
+        JOIN personnel p ON ad.army_number = p.army_number
         WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
           AND ad.det_status = 1
+          AND p.detachment_status = 1
         '''
 
         params = []
@@ -2060,9 +2100,10 @@ WHERE company = %s
                 DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
-            LEFT JOIN personnel p ON ad.army_number = p.army_number
+            JOIN personnel p ON ad.army_number = p.army_number
             WHERE DATEDIFF(NOW(), ad.assigned_on) > 5
               AND ad.det_status = 1
+              AND p.detachment_status = 1
               ''' + (f" AND p.company = %s" if company != "Admin" else "") +
             '''
             ORDER BY ad.assigned_on ASC;
@@ -3500,17 +3541,29 @@ def api_get_projects():
     try:
         query = """
             SELECT project_id, head, project_name, current_stage, 
-                   project_cost, project_items, quantity, project_description
+                   project_cost, project_items, quantity, project_description,
+                   company, deadline, status
             FROM projects
         """
         params = []
 
-        if company != "Admin" and role != 'PROJECT JCO' and  role != 'PROJECT OFFICER':
+        if company != "Admin" and role != 'PROJECT JCO' and role != 'PROJECT OFFICER':
             query += " WHERE company = %s"
             params.append(company)
 
+        query += " ORDER BY project_id DESC"
+
         cursor.execute(query, params)
         projects = cursor.fetchall()
+
+        # Format deadline as YYYY-MM-DD string if present
+        for p in projects:
+            if p.get('deadline') and hasattr(p['deadline'], 'strftime'):
+                p['deadline'] = p['deadline'].strftime('%Y-%m-%d')
+            elif p.get('deadline'):
+                p['deadline'] = str(p['deadline'])
+            else:
+                p['deadline'] = ''
 
         return jsonify(projects)  
 
@@ -3519,6 +3572,69 @@ def api_get_projects():
     finally:
         cursor.close()
         conn.close()
+
+
+@app.route('/update_project', methods=['POST'])
+@app.route('/projects/update', methods=['POST'])
+def update_project_full():
+    data = request.get_json() or {}
+    project_id = data.get('project_id')
+    project_name = (data.get('project_name') or '').strip()
+    head = (data.get('head') or '').strip()
+    company = (data.get('company') or '').strip()
+    current_stage = (data.get('current_stage') or '').strip()
+    project_cost = data.get('project_cost')
+    project_items = (data.get('project_items') or '').strip()
+    quantity = data.get('quantity')
+    project_description = (data.get('project_description') or '').strip()
+    deadline = data.get('deadline') or None
+    status = (data.get('status') or 'Active').strip()
+
+    if not project_id or not project_name or not head:
+        return jsonify({"status": "error", "message": "Project ID, Title, and Head are required"}), 400
+
+    try:
+        cost_val = float(project_cost) if project_cost is not None and str(project_cost).strip() != '' else 0.0
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid cost value"}), 400
+
+    try:
+        qty_val = int(quantity) if quantity is not None and str(quantity).strip() != '' else 0
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Invalid quantity value"}), 400
+
+    if deadline == '':
+        deadline = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE projects
+            SET project_name = %s,
+                head = %s,
+                company = %s,
+                current_stage = %s,
+                project_cost = %s,
+                project_items = %s,
+                quantity = %s,
+                project_description = %s,
+                deadline = %s,
+                status = %s,
+                updated_date = NOW()
+            WHERE project_id = %s
+        """, (
+            project_name, head, company if company else None,
+            current_stage if current_stage else 'PPP',
+            cost_val, project_items, qty_val,
+            project_description, deadline, status,
+            project_id
+        ))
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "message": "Project updated successfully"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
     
@@ -4349,9 +4465,10 @@ def get_assigned_alarm():
                 DATEDIFF(NOW(), ad.assigned_on) AS days_on_det
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
-            LEFT JOIN personnel p ON ad.army_number = p.army_number
+            JOIN personnel p ON ad.army_number = p.army_number
             WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
-              
+              AND p.detachment_status = 1
+              AND ad.det_status = 1
         '''
         params = []
         if company != "Admin":
@@ -6295,4 +6412,4 @@ def create_schedule():
         if conn:
             conn.close()
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=4000,debug=True)
+    app.run(port=4000,debug=True)

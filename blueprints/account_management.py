@@ -244,6 +244,15 @@ def grant_detail(grant_id):
     """, (grant_id, fy))
     expenditures = cursor.fetchall()
 
+    # ALLOTMENTS / ALLOCATIONS
+    cursor.execute("""
+        SELECT id, amount, allocation_type, remarks, created_at
+        FROM grant_allocations
+        WHERE grant_id = %s AND financial_year = %s
+        ORDER BY created_at DESC
+    """, (grant_id, fy))
+    allocations = cursor.fetchall()
+
     balance = total_allotment - total_exp
     exp_percent = (
         round((total_exp / total_allotment) * 100, 2)
@@ -260,6 +269,7 @@ def grant_detail(grant_id):
         total_exp=total_exp,
         sos=sos,
         expenditures=expenditures,
+        allocations=allocations,
         balance=balance,
         exp_percent=exp_percent,
         current_fy=fy
@@ -344,3 +354,231 @@ def add_expenditure(grant_id):
     conn.close()
 
     return jsonify({"success": True})
+
+
+# ==========================================
+# EDIT GRANT DETAILS
+# ==========================================
+@accounts_bp.route("/grants/<int:grant_id>/edit", methods=["POST"])
+def edit_grant(grant_id):
+    data = request.get_json() or {}
+    name = (data.get("name") or "").strip()
+    code_head = (data.get("code_head") or "").strip()
+    allotment = float(data.get("allotment") or 0)
+
+    if not name or not code_head:
+        return jsonify({"success": False, "message": "Name and Code Head are required"})
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Update grant row
+        cursor.execute("""
+            UPDATE grants
+            SET name = %s, code_head = %s, allotment = %s
+            WHERE id = %s
+        """, (name, code_head, allotment, grant_id))
+
+        # Update the 'Original' allotment entry in grant_allocations if it exists
+        cursor.execute("""
+            UPDATE grant_allocations
+            SET amount = %s
+            WHERE grant_id = %s AND allocation_type = 'Original'
+        """, (allotment, grant_id))
+
+        conn.commit()
+        return jsonify({"success": True, "message": "Grant updated successfully"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# ==========================================
+# ADD SANCTION ORDER
+# ==========================================
+@accounts_bp.route("/grants/<int:grant_id>/add-so", methods=["POST"])
+def add_so(grant_id):
+    data = request.get_json() or {}
+    so_number = (data.get("so_number") or "").strip()
+    so_amount = float(data.get("so_amount") or 0)
+    fy = request.args.get("fy") or get_financial_year()
+
+    if not so_number or so_amount <= 0:
+        return jsonify({"success": False, "message": "Valid SO Number and Amount required"})
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO sanction_orders (grant_id, so_number, so_amount, financial_year, created_at)
+            VALUES (%s, %s, %s, %s, NOW())
+        """, (grant_id, so_number, so_amount, fy))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# ==========================================
+# EDIT / DELETE SANCTION ORDER
+# ==========================================
+@accounts_bp.route("/so/<int:so_id>/edit", methods=["POST"])
+def edit_so(so_id):
+    data = request.get_json() or {}
+    so_number = (data.get("so_number") or "").strip()
+    so_amount = float(data.get("so_amount") or 0)
+
+    if not so_number or so_amount <= 0:
+        return jsonify({"success": False, "message": "Valid SO Number and Amount required"})
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE sanction_orders
+            SET so_number = %s, so_amount = %s
+            WHERE id = %s
+        """, (so_number, so_amount, so_id))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@accounts_bp.route("/so/<int:so_id>/delete", methods=["POST", "DELETE"])
+def delete_so(so_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM sanction_orders WHERE id = %s", (so_id,))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# ==========================================
+# EDIT / DELETE EXPENDITURE
+# ==========================================
+@accounts_bp.route("/exp/<int:exp_id>/edit", methods=["POST"])
+def edit_expenditure(exp_id):
+    data = request.get_json() or {}
+    amount = float(data.get("amount") or 0)
+    remarks = (data.get("remarks") or "").strip()
+
+    if amount <= 0:
+        return jsonify({"success": False, "message": "Amount must be greater than zero"})
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE expenditures
+            SET amount = %s, remarks = %s
+            WHERE id = %s
+        """, (amount, remarks, exp_id))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@accounts_bp.route("/exp/<int:exp_id>/delete", methods=["POST", "DELETE"])
+def delete_expenditure(exp_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM expenditures WHERE id = %s", (exp_id,))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        cursor.close()
+        conn.close()
+
+
+# ==========================================
+# EDIT / DELETE ALLOCATION (ALLOTMENT)
+# ==========================================
+@accounts_bp.route("/allocation/<int:alloc_id>/edit", methods=["POST"])
+def edit_allocation(alloc_id):
+    data = request.get_json() or {}
+    amount = float(data.get("amount") or 0)
+    remarks = (data.get("remarks") or "").strip()
+
+    if amount <= 0:
+        return jsonify({"success": False, "message": "Amount must be greater than zero"})
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT grant_id, allocation_type FROM grant_allocations WHERE id = %s", (alloc_id,))
+        alloc = cursor.fetchone()
+        if not alloc:
+            return jsonify({"success": False, "message": "Allocation record not found"}), 404
+
+        cursor.execute("""
+            UPDATE grant_allocations
+            SET amount = %s, remarks = %s
+            WHERE id = %s
+        """, (amount, remarks, alloc_id))
+
+        if alloc['allocation_type'] == 'Original':
+            cursor.execute("""
+                UPDATE grants
+                SET allotment = %s
+                WHERE id = %s
+            """, (amount, alloc['grant_id']))
+
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@accounts_bp.route("/allocation/<int:alloc_id>/delete", methods=["POST", "DELETE"])
+def delete_allocation(alloc_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("DELETE FROM grant_allocations WHERE id = %s", (alloc_id,))
+        conn.commit()
+        return jsonify({"success": True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+

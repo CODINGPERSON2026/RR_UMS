@@ -1,337 +1,365 @@
-
+<style>
+  #taskDetailModal .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden;
+  }
+  #taskDetailModal .modal-header {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    border: none;
+    padding: 1.5rem;
+  }
+  #taskDetailModal .modal-title {
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+  }
+  #taskDetailModal .modal-body {
+    padding: 2rem;
+    background-color: #f8fafc;
+  }
+  .assignment-banner {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+  .glass-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01);
+  }
+  .glass-card .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+  .glass-card .value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .desc-box {
+    background: #fdfdfd;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 12px;
+    border-top: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .remark-bubble {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+    transition: all 0.2s ease;
+  }
+  .remark-bubble:hover {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    transform: translateX(2px);
+  }
+  .remarks-timeline-container {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  .remarks-timeline-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  .remarks-timeline-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
+  .remarks-timeline-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+  #taskDetailModal .progress {
+    background-color: #e2e8f0;
+    border-radius: 999px;
+  }
   
-  <style>
-    .readonly-slider {
-      pointer-events: none;
-      height: 8px;
-    }
+  #taskDetailModal .priority-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
 
-    .modal-content {
-      border: none;
-      border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    }
+  #taskDetailModal .priority-high {
+    background: #fee2e2;
+    color: #ef4444;
+  }
 
-    .modal-header {
-      /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-      border-radius: 16px 16px 0 0;
-      padding: 1.0rem;
-      border: none;
-    }
-    
+  #taskDetailModal .priority-medium {
+    background: #fef3c7;
+    color: #d97706;
+  }
 
-    .modal-title {
-      font-weight: 600;
-      font-size: 1.5rem;
-    }
+  #taskDetailModal .priority-low {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
 
-    .modal-body {
-      padding: 2rem;
-    }
+  #taskDetailModal .btn-close-custom {
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #475569;
+    transition: all 0.2s;
+  }
 
-    .info-card {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 0.25rem;
-      margin-bottom: 1rem;
-      border-left: 4px solid #667eea;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+  #taskDetailModal .btn-close-custom:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    color: #1e293b;
+    transform: translateY(-1px);
+  }
 
-    
+  #taskDetailModal .description-scroll {
+    max-height: 120px;
+    overflow-y: auto;
+    font-weight: 500;
+    line-height: 1.5;
+    color: #334155;
+    white-space: pre-line;
+  }
 
-    .info-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.75rem;
-    }
+  #taskDetailModal .description-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
 
-    .info-row:last-child {
-      margin-bottom: 0;
-    }
+  #taskDetailModal .description-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+  }
 
-    
-
-    .info-content {
-      flex: 1;
-    }
-
-    .info-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      color: #6c757d;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.25rem;
-    }
-
-    .info-value {
-      font-size: 1rem;
-      color: #212529;
-      font-weight: 500;
-    }
-
-    .description-scroll {
-      max-height: 80px;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-
-    .description-scroll::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    .description-scroll::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    .description-scroll::-webkit-scrollbar-thumb {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 10px;
-    }
-
-    .description-scroll::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    }
-
-    .priority-badge {
-      display: inline-block;
-      padding: 0.35rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .priority-high {
-      background: #fee;
-      color: #dc3545;
-    }
-
-    .priority-medium {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .priority-low {
-      background: #d1ecf1;
-      color: #0c5460;
-    }
-
-    .progress-section {
-      background: white;
-      border: 2px solid #e9ecef;
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-    }
-
-    .progress-label {
-      font-weight: 600;
-      color: #495057;
-      font-size: 1rem;
-    }
-
-    .progress-badge {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .form-range {
-      background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
-      border-radius: 10px;
-    }
-
-    .form-range::-webkit-slider-thumb {
-      background: #667eea;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-    }
-
-    .form-range::-moz-range-thumb {
-      background: #667eea;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-    }
-
-    .modal-footer {
-      border: none;
-      padding: 1.5rem 2rem;
-      background: #f8f9fa;
-      border-radius: 0 0 16px 16px;
-    }
-   
-    
-   
-
-    .btn-close-custom {
-      background: white;
-      border: none;
-      padding: 0.5rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 600;
-      color: #495057;
-      transition: all 0.3s;
-    }
-
-    .btn-close-custom:hover {
-      background: #e9ecef;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .custom-size {
-      max-width: 800px;
-      width: 85%;
-    }
-    .custom-position{
-        position: absolute;
-        top:0px;    
-        left: 250px;
-    
-    }
-    .modal-dialog{
-        margin-top: 2px;
-    }
-
-    
-  </style>
-</head>
-<body>
+  #taskDetailModal .description-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+</style>
 
 <!-- Task Details Modal -->
 <div class="modal fade" id="taskDetailModal" tabindex="-1">
-  <div class="modal-dialog custom-size custom-position">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content">
       
       <div class="modal-header text-white">
-        <h5 class="modal-title" id="taskModalTitle">Task Details</h5>
+        <h5 class="modal-title d-flex align-items-center" id="taskModalTitleHeader">
+          <i class="bi bi-info-circle-fill me-2"></i>Task Information
+        </h5>
         <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="modal-body">
+        <div class="row g-4">
+          <!-- Left Column (Core Info & Progress) -->
+          <div class="col-md-6 d-flex flex-column justify-content-between">
+            <div>
+              <!-- Task Title -->
+              <h3 class="fw-extrabold text-slate-900 mb-3" id="taskModalTitle" style="font-weight: 800; color: #0f172a;">Task Title</h3>
 
-        <!-- Description -->
-        <div class="info-card">
-          <div class="info-row">
-            <div class="info-content">
-              <div class="info-label">Description</div>
-              <div class="info-value description-scroll" id="taskDescription"></div>
+              <!-- Was Assigned To Banner -->
+              <div class="assignment-banner mb-3 py-2 px-3">
+                <div class="text-muted small fw-bold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem;">Was Assigned To</div>
+                <h5 class="fw-bold text-dark m-0 mt-1" style="font-size: 1rem;" id="taskModalAssignedToUser">Rank Name (Company)</h5>
+              </div>
+
+              <!-- Progress Tracking -->
+              <div class="glass-card mb-3 py-2 px-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="label m-0" style="font-size: 0.7rem;"><i class="bi bi-speedometer2 me-1"></i>Progress</span>
+                  <span id="sliderValue" class="badge bg-primary progress-badge" style="font-size: 0.75rem; padding: 3px 6px;">0%</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar" id="taskProgressBar" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description Box -->
+            <div class="desc-box p-3 flex-grow-1" style="min-height: 100px;">
+              <div class="label" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b;"><i class="bi bi-justify-left me-1"></i>Task Description</div>
+              <div class="description-scroll mt-1 text-secondary" id="taskDescription" style="font-size: 0.9rem; max-height: 100px;">Description here...</div>
             </div>
           </div>
-        </div>
 
-        <!-- Assigned To | Priority | Due Date -->
-        <div class="row g-3">
-          <div class="col-md-4">
-            <div class="info-card">
-              <div class="info-row">
-                <div class="info-content">
-                  <div class="info-label">Assigned To</div>
-                  <div class="info-value" id="taskAssignedTo"></div>
+          <!-- Right Column (Status Details & Remarks Timeline) -->
+          <div class="col-md-6 d-flex flex-column justify-content-between">
+            <!-- Metadata Row -->
+            <div class="row g-2 mb-3">
+              <div class="col-4">
+                <div class="glass-card p-2 text-center h-100 d-flex flex-column justify-content-center">
+                  <span class="label" style="font-size: 0.65rem;"><i class="bi bi-shield-check me-1"></i>Status</span>
+                  <div class="mt-1"><span id="taskStatusBadge" class="badge rounded-pill fw-bold" style="font-size: 0.75rem; padding: 4px 8px;">Pending</span></div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="glass-card p-2 text-center h-100 d-flex flex-column justify-content-center">
+                  <span class="label" style="font-size: 0.65rem;"><i class="bi bi-flag-fill me-1"></i>Priority</span>
+                  <div class="mt-1"><span id="taskPriority" class="priority-badge" style="font-size: 0.75rem; padding: 4px 8px;">Low</span></div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="glass-card p-2 text-center h-100 d-flex flex-column justify-content-center">
+                  <span class="label" style="font-size: 0.65rem;"><i class="bi bi-calendar-check-fill me-1"></i>Due Date</span>
+                  <div class="mt-1 text-primary fw-bold" id="taskDueDate" style="font-size: 0.75rem;">2026-08-30</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Remarks History Timeline -->
+            <div class="glass-card p-3 flex-grow-1 d-flex flex-column justify-content-between" style="min-height: 160px;">
+              <div>
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-1 mb-2">
+                  <span class="label m-0" style="font-size: 0.7rem;"><i class="bi bi-chat-quote-fill me-1 text-primary"></i>Remarks History</span>
+                  <span class="text-muted" style="font-size: 0.65rem;">
+                    Last Updated: <span id="taskRemarkTimestamp" class="fw-bold">N/A</span>
+                  </span>
+                </div>
+                <div id="remarksTimeline" class="remarks-timeline-container" style="max-height: 120px; overflow-y: auto;">
+                  <!-- Timeline items -->
                 </div>
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="info-card">
-              <div class="info-row">
-                <div class="info-content">
-                  <div class="info-label">Priority</div>
-                  <div class="info-value"><span id="taskPriority" class="priority-badge"></span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="info-card">
-              <div class="info-row">
-                <div class="info-content">
-                  <div class="info-label">Due Date & Time</div>
-                  <div class="info-value" id="taskDueDate"></div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-
-        <!-- Progress Slider -->
-        <div class="progress-section">
-          <div class="progress-header">
-            <span class="progress-label"><i class="fas fa-tasks me-2"></i>Task Progress</span>
-            <span id="sliderValue" class="progress-badge">0%</span>
-          </div>
-          <input id="taskProgress" type="range" min="0" max="100" value="0" class="form-range readonly-slider">
-        </div>
-
-        <!-- Remarks -->
-        <h5 class="mt-4 mb-3" style="color: #495057; font-weight: 600;"><i class="fas fa-sticky-note me-2"></i>Latest Remarks</h5>
-        <div class="info-card mt-3">
-          <div class="info-row">
-            <div class="info-content">
-              <div class="info-label">Remarks</div>
-              <div class="info-value" id="taskRemarks"></div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-close-custom" data-bs-dismiss="modal"><i class="fas fa-times me-2"></i>Close</button>
-      </div>
+
 
     </div>
   </div>
 </div>
 
-
 <script>
-   async function  viewModal(taskid){
-
-       
-    
-  
-    const taskId = taskid
-  
+  async function viewModal(taskid){
+    const taskId = taskid;
     const res = await fetch(`/task_manager/get_task/${taskId}`);
     const task = await res.json();
   
-    document.getElementById("taskModalTitle").innerText = task.task_name;
-    document.getElementById("taskDescription").innerText = task.description;
+    document.getElementById("taskModalTitle").innerText = task.task_name || 'No Name';
+    document.getElementById("taskDescription").innerText = task.description || 'No Description';
+    
+    // Assigned to mapping
+    const assignedRank = task.assigned_rank || '';
+    const assignedName = task.assigned_name || 'Unknown';
+    const assignedCompany = task.assigned_company || 'No Company';
+    document.getElementById("taskModalAssignedToUser").innerText = `${assignedRank} ${assignedName} (${assignedCompany})`;
     
     const priorityElement = document.getElementById("taskPriority");
-    priorityElement.innerText = task.priority;
-    priorityElement.className = `priority-badge priority-${task.priority.toLowerCase()}`;
-    
-    document.getElementById("taskAssignedTo").innerText = task.assigned_to;
+    priorityElement.innerText = task.priority || 'Low';
+    priorityElement.className = `priority-badge priority-${(task.priority || 'Low').toLowerCase()}`;
     
     // Format date and time
     const dueDate = task.due_date;
-const dateOnly = new Date(dueDate).toISOString().split('T')[0];
-
- 
+    const dateOnly = dueDate ? new Date(dueDate).toISOString().split('T')[0] : 'N/A';
     document.getElementById("taskDueDate").innerText = dateOnly;
     
-    document.getElementById("taskRemarks").innerText = task.remarks || "No Remarks";
+    // Render Remarks Timeline
+    const remarksContainer = document.getElementById("remarksTimeline");
+    remarksContainer.innerHTML = "";
+    
+    const remarksStr = task.remarks || "";
+    if (!remarksStr.trim() || remarksStr === "No Remarks") {
+      remarksContainer.innerHTML = `<div class="text-muted text-center py-3">No remarks have been logged yet.</div>`;
+    } else {
+      const remarkLines = remarksStr.split("\n");
+      remarkLines.reverse();
+      remarkLines.forEach(line => {
+        if (!line.trim()) return;
+        
+        // Parse line format: [timestamp]: message
+        const match = line.match(/^\[(.*?)\]:\s*(.*)$/);
+        if (match) {
+          const headerInfo = match[1];
+          const message = match[2];
+          
+          let timestamp = headerInfo;
+          // Strip out legacy user prefix if present
+          if (headerInfo.includes('|')) {
+            const parts = headerInfo.split('|');
+            timestamp = parts[0].trim();
+          }
+          
+          const bubble = document.createElement("div");
+          bubble.className = "remark-bubble mb-3 p-3";
+          bubble.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="text-muted small fw-bold"><i class="bi bi-clock-history me-1"></i>${escapeHtml(timestamp)}</span>
+            </div>
+            <div class="text-dark" style="font-size: 0.9rem; line-height: 1.4; white-space: pre-line;">${escapeHtml(message)}</div>
+          `;
+          remarksContainer.appendChild(bubble);
+        } else {
+          const bubble = document.createElement("div");
+          bubble.className = "remark-bubble mb-3 p-3";
+          bubble.innerHTML = `
+            <div class="text-dark" style="font-size: 0.9rem; line-height: 1.4; white-space: pre-line;">${escapeHtml(line)}</div>
+          `;
+          remarksContainer.appendChild(bubble);
+        }
+      });
+    }
   
-    const slider = document.getElementById("taskProgress");
-    slider.value = task.range_status || 0;
+    // Format and display remark update time
+    const remarkTime = task.remark_updated_at;
+    let remarkTimeStr = 'N/A';
+    if (remarkTime) {
+      const date = new Date(remarkTime);
+      remarkTimeStr = date.toLocaleString();
+    }
+    document.getElementById("taskRemarkTimestamp").innerText = remarkTimeStr;
   
-    document.getElementById("sliderValue").innerText = `${slider.value}%`;
+    // Update progress bar
+    const progress = parseInt(task.range_status || 0);
+    const bar = document.getElementById("taskProgressBar");
+    bar.style.width = progress + '%';
+    bar.className = 'progress-bar'; // reset class
+    
+    if (progress < 35) {
+      bar.classList.add('bg-danger');
+    } else if (progress < 70) {
+      bar.classList.add('bg-warning');
+    } else {
+      bar.classList.add('bg-success');
+    }
+    
+    document.getElementById("sliderValue").innerText = `${progress}%`;
+
+    // Update status badge
+    const status = task.task_status || 'Pending';
+    const statusBadge = document.getElementById("taskStatusBadge");
+    statusBadge.innerText = status;
+    statusBadge.className = 'badge px-3 py-2 rounded-pill fw-bold';
+    
+    if (status === 'Completed') {
+      statusBadge.classList.add('bg-success');
+    } else if (status === 'In Progress') {
+      statusBadge.classList.add('bg-warning', 'text-dark');
+    } else {
+      statusBadge.classList.add('bg-danger');
+    }
   
     new bootstrap.Modal(document.getElementById("taskDetailModal")).show();
-  };
+  }
 
-    
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 </script>
-

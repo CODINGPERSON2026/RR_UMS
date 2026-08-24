@@ -420,6 +420,10 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
+      {% if role in ['OC'] %}
+      {% include 'modals/alarm/alarm.html' %}
+      {% include 'modals/alarm/attachment_alarm.html' %}
+      {% endif %}
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
@@ -520,6 +524,12 @@
         <span class="ahb-text">
           Add Honour Entry
         </span>
+      </button>
+      {% endif %}
+
+      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#projDash_modal">
+        PROJECTS
       </button>
       {% endif %}
 
@@ -638,14 +648,7 @@
       </div>
       {% endif %}
 
-      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
-      <div class="sc" id="openProjects">
-        <span class="sc-label">Total Projects</span>
-        <div class="sc-right">
-          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-        </div>
-      </div>
-      {% endif %}
+
 
       {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
@@ -695,10 +698,16 @@
       </div>
       {% endif %}
 
-
-
-
-      
+      {# ── COMPANY INTERVIEW CARD ── #}
+      {% if role in ['CO','2IC','ADJUTANT','OC','Subedar Major','S/JCO','NCO COMN','NCO CHQ','NCO IT','NCO MW','NCO SIGCEN','NCO MCCS','NCO RHQ','NCO LRW','NCO QM','NCO MT','NCO TM','NCO RPNA','JCO COMN','JCO CHQ','JCO IT','JCO MW','JCO SIGCEN','JCO MCCS','JCO RHQ','JCO TM','JCO MT','JCO LRW','JCO QM','ONCO'] %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
+        <span class="sc-label">Interview</span>
+        <div class="sc-right">
+          <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-sub">Pending</span>
+        </div>
+      </div>
+      {% endif %}
 
     </div>
     <!-- /statsGrid -->
@@ -749,6 +758,7 @@
     {% include 'modals/oncourses/modal.html' %}
     {% include 'modals/messenger/modal.html' %}
     {% include 'modals/Sanctioned_leaves/sanction_leave_modal.html' %}
+    {% include 'modals/company_interview/modal.html' %}
 
     {% if role in ['O CENTRE NCO'] %}
     <div class="modal fade" id="tradeModal" tabindex="-1">
@@ -860,7 +870,7 @@
         <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
-              <h6 style="margin:0;font-weight:600;">Fit vs UnFit (Weight)</h6>
+              <h6 style="margin:0;font-weight:600;">Fit vs UnFit</h6>
               <div style="display:flex;gap:12px;font-size:12px;font-weight:700;">
                 <span style="color:#2563eb;font-weight:900;">Fit: <span id="fitCount">--</span></span>
                 <span style="color:#dc2626;font-weight:900;">UnFit: <span id="unfitCount">--</span></span>
@@ -1081,17 +1091,18 @@
   /* ---- Load all cards ---- */
   async function loadAllDashboardCards() {
     var simpleCards = [
-      { id: "locationCount",      endpoint: "/api/dashboard/detachments", key: "count" },
-      { id: "attachment-count",   endpoint: "/api/dashboard/attachments",  key: "count" },
-      { id: "agniveer_count",     endpoint: "/api/dashboard/agniveers",    key: "count" },
-      { id: "get_projects_count", endpoint: "/api/dashboard/projects",     key: "count" },
-      { id: "sensitive-count",    endpoint: "/api/dashboard/sensitive",    key: "count" },
-      { id: "active-loan-count",  endpoint: "/api/dashboard/loans",        key: "count" },
-      { id: "totalCoursesDone",   endpoint: "/api/dashboard/courses",      key: "count" },
-      { id: "center-roll-points", endpoint: "/api/dashboard/rollcall",     key: "points" },
-      { id: "count-dues-in",      endpoint: "/dues/count-dues-in",         key: "count_dues_in" },
-      { id: "count-dues-out",     endpoint: "/dues/count-dues-out",        key: "count_dues_out" },
-      { id: "board-count",        endpoint: "/api/dashboard/boards",       key: "count" },
+      { id: "locationCount",           endpoint: "/api/dashboard/detachments",              key: "count" },
+      { id: "attachment-count",        endpoint: "/api/dashboard/attachments",               key: "count" },
+      { id: "agniveer_count",          endpoint: "/api/dashboard/agniveers",                key: "count" },
+      { id: "get_projects_count",      endpoint: "/api/dashboard/projects",                 key: "count" },
+      { id: "sensitive-count",         endpoint: "/api/dashboard/sensitive",                key: "count" },
+      { id: "active-loan-count",       endpoint: "/api/dashboard/loans",                   key: "count" },
+      { id: "totalCoursesDone",        endpoint: "/api/dashboard/courses",                  key: "count" },
+      { id: "center-roll-points",      endpoint: "/api/dashboard/rollcall",                 key: "points" },
+      { id: "count-dues-in",           endpoint: "/dues/count-dues-in",                     key: "count_dues_in" },
+      { id: "count-dues-out",          endpoint: "/dues/count-dues-out",                    key: "count_dues_out" },
+      { id: "board-count",             endpoint: "/api/dashboard/boards",                   key: "count" },
+      { id: "company-interview-count", endpoint: "/interview_update/company_interview_count", key: "count" },
     ];
 
     var promises = [];
@@ -1448,5 +1459,7 @@
     reloadDashboardCharts();
   });
 </script>
+
+{% include 'modals/Projects/modal.html' %}
 
 {% endblock %}

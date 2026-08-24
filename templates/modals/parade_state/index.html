@@ -190,11 +190,61 @@
         font-size: 13px;
         font-weight: 600;
         margin-bottom: 8px;
-        text-align: center;
         color: #111827;
         padding-bottom: 8px;
         border-bottom: 1px solid #f3f4f6;
         letter-spacing: -0.2px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .co-card-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4.5px;
+        font-size: 8.5px;
+        font-weight: 800;
+        letter-spacing: 0.7px;
+        text-transform: uppercase;
+        color: var(--primary-color, #1e3c72);
+        background: rgba(30, 60, 114, 0.08);
+        border: 1px solid rgba(30, 60, 114, 0.28);
+        padding: 2px 7px;
+        border-radius: 5px;
+        line-height: 1.1;
+        white-space: nowrap;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .co-card-badge::before {
+        content: '';
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: var(--primary-color, #1e3c72);
+        box-shadow: 0 0 6px var(--primary-color, #1e3c72);
+        animation: coBadgeDotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes coBadgeDotPulse {
+        0%, 100% { transform: scale(1); opacity: 0.85; }
+        50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 9px var(--primary-color, #1e3c72); }
+    }
+
+    .co-card:hover .co-card-badge, .co-card-badge:hover {
+        background: #1e3c72;
+        color: #ffffff;
+        border-color: #1e3c72;
+        transform: translateY(-1px) scale(1.08);
+        box-shadow: 0 4px 12px rgba(30, 60, 114, 0.35);
+    }
+
+    .co-card:hover .co-card-badge::before, .co-card-badge:hover::before {
+        background-color: #ffffff;
+        box-shadow: 0 0 6px #ffffff;
     }
 
     .co-table-container {
@@ -1019,7 +1069,9 @@
 
             <!-- Leave Percentage Card (OR only) -->
             <div class="co-card card-compact">
-                <div class="co-card-title">📊 Leave % (All Companies (OR only))</div>
+                <div class="co-card-title">
+                    <span>📊 Leave % (All Companies (OR only))</span>
+                </div>
                 <div class="chart-container" style="position: relative; height: 220px; width: 100%;">
                     <canvas id="coLeaveChart"></canvas>
                 </div>
@@ -1046,7 +1098,9 @@
 
             <!-- Company Wise Man Power Card -->
             <div class="co-card card-wide">
-                <div class="co-card-title">👥 Company Wise Man Power</div>
+                <div class="co-card-title">
+                    <span>👥 Company Wise Man Power</span>
+                </div>
                 <div class="chart-container" style="position: relative; height: 220px; width: 100%;">
                     <canvas id="coManpowerChart"></canvas>
                 </div>
@@ -1079,7 +1133,9 @@
 
             <!-- Officers Leave Card -->
             <div class="co-card">
-                <div class="co-card-title">🎖️ Officers Leave % (All Companies)</div>
+                <div class="co-card-title">
+                    <span>🎖️ Officers Leave % (All Companies)</span>
+                </div>
                 <div class="co-table-container">
                     <table class="co-table" id="coOfficerLeaveTable">
                         <thead>
@@ -1105,7 +1161,9 @@
 
             <!-- JCO Leave Card -->
             <div class="co-card">
-                <div class="co-card-title">⭐ JCO Leave % (All Companies)</div>
+                <div class="co-card-title">
+                    <span>⭐ JCO Leave % (All Companies)</span>
+                </div>
                 <div class="co-table-container">
                     <table class="co-table" id="coJcoLeaveTable">
                         <thead>

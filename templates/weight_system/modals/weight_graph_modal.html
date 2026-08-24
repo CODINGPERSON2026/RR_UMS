@@ -1,0 +1,576 @@
+<!-- GRAPH DETAILS MODAL -->
+<style>
+  #wgModalScope .modal-dialog {
+    max-width: 1250px;
+    width: 95vw;
+    margin: 25px auto !important;
+  }
+
+  #wgModalScope .modal-content {
+    border: none;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--card-background, #ffffff);
+    color: var(--text-primary, #1e293b);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  #wgModalScope .modal-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: #ffffff;
+    padding: 16px 24px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  #wgModalScope .wg-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #wgModalScope .wg-badge-coy {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #ffffff !important;
+  }
+
+  #wgModalScope .wg-badge-count {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 0.78rem;
+    font-weight: 800 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+  }
+
+  #wgModalScope .wg-toolbar {
+    padding: 12px 24px;
+    background: var(--bg-surface, #f8fafc);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  #wgModalScope .wg-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+  }
+
+  #wgModalScope .wg-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 13px;
+    pointer-events: none;
+  }
+
+  #wgModalScope .wg-search-input {
+    width: 100%;
+    padding: 7px 12px 7px 34px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color, #cbd5e1);
+    background: var(--card-background, #ffffff);
+    color: var(--text-primary, #0f172a);
+    font-size: 0.86rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  #wgModalScope .wg-search-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  #wgModalScope .wg-tbl-wrap {
+    padding: 0 24px 16px 24px;
+    max-height: 65vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  #wgModalScope .wg-tbl {
+    width: 100%;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin: 0 !important;
+  }
+
+  #wgModalScope .wg-tbl thead {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  #wgModalScope .wg-tbl thead th {
+    font-size: 0.74rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+    padding: 10px 12px !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+    white-space: nowrap !important;
+    vertical-align: middle !important;
+  }
+
+  #wgModalScope .wg-tbl tbody tr {
+    background: var(--card-background, #ffffff);
+    transition: background 0.15s;
+    box-shadow: none;
+  }
+
+  #wgModalScope .wg-tbl tbody tr:hover {
+    background: var(--bg-hover, #f1f5f9);
+  }
+
+  #wgModalScope .wg-tbl tbody td {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    color: var(--text-primary, #1e293b);
+  }
+
+  #wgModalScope .wg-badge-fit {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.76rem;
+  }
+
+  #wgModalScope .wg-badge-unfit {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.76rem;
+  }
+
+  #wgModalScope .wg-btn-view {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  #wgModalScope .wg-btn-view:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  }
+</style>
+
+<div class="modal fade" id="wgModalScope" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-3">
+          <span style="font-size: 1.5rem;">📊</span>
+          <div>
+            <h5 class="wg-modal-title" id="wgModalTitle">Graph Details</h5>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span class="wg-badge-coy" id="wgModalCoyBadge">All Companies</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="wg-toolbar">
+        <div class="wg-search-wrap">
+          <i class="fas fa-search wg-search-icon"></i>
+          <input type="text" id="wgSearchBox" class="wg-search-input"
+                 placeholder="Search by name, army number, rank or company…"
+                 oninput="wgFilterRows()">
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <label for="wgCoySelect" class="form-label mb-0 fw-bold text-secondary small text-nowrap"><i class="fas fa-building me-1"></i>Company:</label>
+          <select id="wgCoySelect" class="form-select form-select-sm rounded-pill px-3 fw-bold border-primary-subtle shadow-sm" style="width: auto; min-width: 160px; font-size: 0.82rem;" onchange="wgFilterRows()">
+            <option value="All">All Companies</option>
+          </select>
+        </div>
+        <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold" onclick="wgExportCSV()">
+          <i class="fas fa-download me-1"></i> Export CSV
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="wg-tbl-wrap">
+        <!-- Spinner -->
+        <div id="wgLoader" class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <div class="mt-2 text-muted fw-semibold">Loading graph details…</div>
+        </div>
+
+        <!-- Table -->
+        <table class="wg-tbl d-none" id="wgTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Army Number</th>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Company</th>
+              <th>Height (cm)</th>
+              <th>Actual Wt (kg)</th>
+              <th>Ideal Wt (kg)</th>
+              <th>Deviation</th>
+              <th>Fitness Status</th>
+            </tr>
+          </thead>
+          <tbody id="wgTableBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer py-2 px-4 d-flex justify-content-between align-items-center" style="background: var(--bg-surface, #f8fafc); border-top: 1px solid var(--border-color, #e2e8f0);">
+        <small class="text-muted fw-semibold">Showing <span id="wgVisCount">0</span> of <span id="wgTotCount">0</span> personnel</small>
+        <button type="button" class="btn btn-sm btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var wgRowsData = [];
+  var wgDisplayedRows = [];
+  var currentGraphType = '';
+
+  window.openWeightGraphModal = async function(graphType, sliceLabel) {
+    var modalEl = document.getElementById('wgModalScope');
+    if (!modalEl) return;
+
+    currentGraphType = graphType || '';
+
+    var bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    bsModal.show();
+
+    var titleEl  = document.getElementById('wgModalTitle');
+    var coyEl    = document.getElementById('wgModalCoyBadge');
+    var cntEl    = document.getElementById('wgModalCountBadge');
+    var loader   = document.getElementById('wgLoader');
+    var table    = document.getElementById('wgTable');
+    var search   = document.getElementById('wgSearchBox');
+    if (search) search.value = '';
+
+    if (loader) loader.classList.remove('d-none');
+    if (table)  table.classList.add('d-none');
+
+    var company = window.currentCompany || 'All';
+    var jcoOrFilter = (document.getElementById('jco-or-filter') ? document.getElementById('jco-or-filter').value : 'Fit');
+    var jcoSafeOrFilter = (document.getElementById('jco-safe-or-filter') ? document.getElementById('jco-safe-or-filter').value : 'shape');
+
+    if (titleEl) titleEl.textContent = 'Graph Details — ' + sliceLabel;
+    if (coyEl)   coyEl.textContent   = company === 'All' ? 'All Companies' : company;
+
+    try {
+      var params = new URLSearchParams({
+        graph_type: graphType,
+        slice_label: sliceLabel,
+        company: company,
+        fitUnfitFilter: jcoOrFilter,
+        safeCategoryFilter: jcoSafeOrFilter
+      });
+
+      var res  = await fetch('/weight_graph/api/graph-personnel?' + params.toString());
+      var contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        var text = await res.text();
+        throw new Error('Please refresh server or re-login. Response error (' + res.status + ')');
+      }
+      var data = await res.json();
+
+      if (data.status !== 'success') throw new Error(data.message || 'Error fetching details');
+
+      wgRowsData = data.rows || [];
+      wgDisplayedRows = wgRowsData;
+      if (cntEl) cntEl.textContent = wgRowsData.length + ' Personnel';
+
+      // Populate company dropdown
+      populateCompanyDropdown();
+
+      if (loader) loader.classList.add('d-none');
+      if (table)  table.classList.remove('d-none');
+
+      wgFilterRows();
+
+    } catch (e) {
+      console.error(e);
+      if (loader) loader.innerHTML = '<div class="text-danger fw-bold py-4">⚠️ ' + e.message + '</div>';
+    }
+  };
+
+  function populateCompanyDropdown() {
+    var coySelect = document.getElementById('wgCoySelect');
+    if (!coySelect) return;
+
+    var coyMap = {};
+    wgRowsData.forEach(function(r) {
+      if (r.company) {
+        var norm = String(r.company).trim();
+        var key = norm.toLowerCase();
+        if (!coyMap[key]) coyMap[key] = norm;
+      }
+    });
+
+    var uniqueCoys = Object.values(coyMap).sort(function(a, b) { return a.localeCompare(b); });
+    var optHtml = '<option value="All">All Companies</option>';
+    uniqueCoys.forEach(function(c) {
+      optHtml += '<option value="' + esc(c) + '">' + esc(c) + '</option>';
+    });
+    coySelect.innerHTML = optHtml;
+
+    var isNonAdminCoy = (window.userCompanyFromTemplate && window.userCompanyFromTemplate !== 'Admin');
+    if (isNonAdminCoy) {
+      var foundCoy = uniqueCoys.find(function(c) { return c.toLowerCase() === String(window.userCompanyFromTemplate).toLowerCase(); });
+      coySelect.value = foundCoy || window.userCompanyFromTemplate;
+      coySelect.disabled = true;
+    } else {
+      coySelect.disabled = false;
+      var curCoy = window.currentCompany || 'All';
+      if (curCoy && curCoy !== 'All') {
+        var foundSel = uniqueCoys.find(function(c) { return c.toLowerCase() === curCoy.toLowerCase(); });
+        coySelect.value = foundSel || 'All';
+      } else {
+        coySelect.value = 'All';
+      }
+    }
+  }
+
+  function wgRenderRows(rows) {
+    var thead = document.querySelector('#wgTable thead');
+    var tbody = document.getElementById('wgTableBody');
+    var visEl = document.getElementById('wgVisCount');
+    var totEl = document.getElementById('wgTotCount');
+
+    if (!tbody || !thead) return;
+    if (totEl) totEl.textContent = wgRowsData.length;
+    if (visEl) visEl.textContent = rows.length;
+
+    var isCategoryMode = (currentGraphType === 'shape_category' || currentGraphType === 'jco_or_shape');
+
+    if (isCategoryMode) {
+      thead.innerHTML = '<tr>' +
+        '<th>#</th>' +
+        '<th>Army Number</th>' +
+        '<th>Rank</th>' +
+        '<th>Name</th>' +
+        '<th>Company</th>' +
+        '<th>Age</th>' +
+        '<th>Medical Status</th>' +
+        '<th>Category Type</th>' +
+        '<th>Restrictions</th>' +
+      '</tr>';
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">No personnel records found for this section.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(function(r, i) {
+        var isShape1 = r.status_type === 'shape';
+        var statusBadge = isShape1
+          ? '<span class="badge bg-success-subtle text-success border px-2 py-1 fw-bold"><i class="fas fa-check-circle me-1"></i>Shape-1</span>'
+          : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-bold"><i class="fas fa-exclamation-triangle me-1"></i>LMC</span>';
+
+        var catTypeBadge = r.category_type && r.category_type !== 'N/A'
+          ? '<span class="badge ' + (isShape1 ? 'bg-info-subtle text-dark border' : 'bg-danger text-white') + ' px-2 py-1 text-uppercase fw-bold">' + esc(String(r.category_type).toUpperCase()) + '</span>'
+          : '—';
+
+        var restrText = r.restrictions && r.restrictions !== 'N/A' ? esc(r.restrictions) : 'None';
+
+        return '<tr>' +
+          '<td><strong>' + (i + 1) + '</strong></td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1 fw-bold">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="badge bg-primary-subtle text-primary border px-2 py-1 fw-bold">' + esc(r.rank) + '</span></td>' +
+          '<td><strong>' + esc(r.name) + '</strong></td>' +
+          '<td><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">' + esc(r.company) + '</span></td>' +
+          '<td>' + (r.age != null ? r.age : '—') + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td>' + catTypeBadge + '</td>' +
+          '<td><span class="text-muted fw-medium">' + restrText + '</span></td>' +
+        '</tr>';
+      }).join('');
+
+    } else {
+      thead.innerHTML = '<tr>' +
+        '<th>#</th>' +
+        '<th>Army Number</th>' +
+        '<th>Rank</th>' +
+        '<th>Name</th>' +
+        '<th>Company</th>' +
+        '<th>Height (cm)</th>' +
+        '<th>Actual Wt (kg)</th>' +
+        '<th>Ideal Wt (kg)</th>' +
+        '<th>Deviation</th>' +
+        '<th>Fitness Status</th>' +
+      '</tr>';
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">No personnel records found for this section.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(function(r, i) {
+        var statusBadge = r.status === 'Fit'
+          ? '<span class="wg-badge-fit"><i class="fas fa-check-circle me-1"></i>Fit</span>'
+          : '<span class="wg-badge-unfit"><i class="fas fa-exclamation-triangle me-1"></i>UnFit</span>';
+
+        var devText = (r.weight_deviation_percent != null && r.weight_deviation_percent !== 0)
+          ? (r.weight_deviation_percent > 0 ? '+' : '') + r.weight_deviation_percent + '%'
+          : '0%';
+
+        return '<tr>' +
+          '<td><strong>' + (i + 1) + '</strong></td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1 fw-bold">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="badge bg-primary-subtle text-primary border px-2 py-1 fw-bold">' + esc(r.rank) + '</span></td>' +
+          '<td><strong>' + esc(r.name) + '</strong></td>' +
+          '<td><span class="badge bg-secondary-subtle text-secondary border px-2 py-1">' + esc(r.company) + '</span></td>' +
+          '<td>' + (r.height_cm != null ? r.height_cm : '—') + '</td>' +
+          '<td><strong>' + (r.actual_weight != null ? r.actual_weight : '—') + '</strong></td>' +
+          '<td>' + (r.ideal_weight != null ? r.ideal_weight : '—') + '</td>' +
+          '<td><span class="fw-bold ' + (r.weight_deviation_percent > 0 ? 'text-danger' : 'text-success') + '">' + devText + '</span></td>' +
+          '<td>' + statusBadge + '</td>' +
+        '</tr>';
+      }).join('');
+    }
+  }
+
+  window.wgFilterRows = function() {
+    var q = (document.getElementById('wgSearchBox').value || '').toLowerCase().trim();
+    var coySel = document.getElementById('wgCoySelect');
+    var coyVal = (coySel ? coySel.value : 'All').toLowerCase().trim();
+
+    wgDisplayedRows = wgRowsData.filter(function(r) {
+      var rowCoy = (r.company || '').toLowerCase().trim();
+      var matchesCoy = (coyVal === 'all') || (rowCoy === coyVal);
+
+      if (!matchesCoy) return false;
+      if (!q) return true;
+
+      var str = (
+        (r.army_number || '') + ' ' +
+        (r.name || '') + ' ' +
+        (r.rank || '') + ' ' +
+        (r.company || '') + ' ' +
+        (r.status || '') + ' ' +
+        (r.status_type || '') + ' ' +
+        (r.category_type || '') + ' ' +
+        (r.restrictions || '')
+      ).toLowerCase();
+
+      return str.includes(q);
+    });
+
+    var coyBadge = document.getElementById('wgModalCoyBadge');
+    if (coyBadge) {
+      var displayCoy = coySel ? coySel.value : 'All';
+      coyBadge.textContent = (displayCoy.toLowerCase() === 'all') ? 'All Companies' : displayCoy;
+    }
+
+    wgRenderRows(wgDisplayedRows);
+  };
+
+  window.wgViewDetails = function(armyNo) {
+    var modalEl = document.getElementById('wgModalScope');
+    if (modalEl) {
+      var bsModal = bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+    }
+    if (typeof window.viewPersonDetails === 'function') {
+      window.viewPersonDetails(armyNo);
+    }
+  };
+
+  window.wgExportCSV = function() {
+    if (!wgDisplayedRows.length) {
+      alert("No data available to export.");
+      return;
+    }
+
+    var isCategoryMode = (currentGraphType === 'shape_category' || currentGraphType === 'jco_or_shape');
+    var headers = isCategoryMode
+      ? ["Army Number", "Rank", "Name", "Company", "Age", "Medical Status", "Category Type", "Restrictions"]
+      : ["Army Number", "Rank", "Name", "Company", "Age", "Height (cm)", "Actual Weight", "Ideal Weight", "Status"];
+
+    var csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+    wgDisplayedRows.forEach(function(r) {
+      var row = isCategoryMode ? [
+        '"' + (r.army_number || '') + '"',
+        '"' + (r.rank || '') + '"',
+        '"' + (r.name || '') + '"',
+        '"' + (r.company || '') + '"',
+        r.age || '',
+        '"' + (r.status_type === 'shape' ? 'Shape-1' : 'LMC') + '"',
+        '"' + (r.category_type || '') + '"',
+        '"' + (r.restrictions || 'None') + '"'
+      ] : [
+        '"' + (r.army_number || '') + '"',
+        '"' + (r.rank || '') + '"',
+        '"' + (r.name || '') + '"',
+        '"' + (r.company || '') + '"',
+        r.age || '',
+        r.height_cm || '',
+        r.actual_weight || '',
+        r.ideal_weight || '',
+        '"' + (r.status || '') + '"'
+      ];
+      csvContent += row.join(",") + "\n";
+    });
+
+    var encodedUri = encodeURI(csvContent);
+    var link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "Graph_Personnel.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  function esc(str) {
+    if (str == null) return '';
+    var d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+})();
+</script>

@@ -255,7 +255,7 @@ function fetchPersonnel(query, company) {
               <tr>
                 <td>${p.army_number}</td>
                 <td>${p.rank}</td>
-                <td class="name-cell">${p.name}</td>
+                <td class="name-cell text-uppercase">${(p.name || '').toUpperCase()}</td>
                 <td>${p.home_state}</td>
                 <td>
                   <span class="company-badge ${companyClass}">

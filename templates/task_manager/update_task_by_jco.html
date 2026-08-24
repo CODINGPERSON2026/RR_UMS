@@ -31,15 +31,77 @@
     </div>
   </div>
   
+  <!-- Custom Styling for Premium Modal Aesthetics -->
+  <style>
+    #editTaskModal .modal-content {
+      border-radius: 16px;
+      border: none;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+    }
+    #editTaskModal .form-label {
+      color: #475569;
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+    #editTaskModal .form-select, #editTaskModal .form-control {
+      border-radius: 10px;
+      border: 1.5px solid #e2e8f0;
+      padding: 10px 14px;
+      transition: all 0.2s ease-in-out;
+    }
+    #editTaskModal .form-select:focus, #editTaskModal .form-control:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+      background-color: #f8fafc;
+    }
+    #editTaskModal .form-range {
+      height: 6px;
+      border-radius: 999px;
+    }
+    #editTaskModal .form-range::-webkit-slider-thumb {
+      background: #3b82f6;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+      width: 18px;
+      height: 18px;
+      transition: transform 0.1s ease;
+      cursor: pointer;
+    }
+    #editTaskModal .form-range::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+    #editTaskModal .btn {
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    #editTaskModal .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+    }
+    #editTaskModal .btn-success:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-1px);
+    }
+    #editTaskModal .progress {
+      border-radius: 999px;
+      background-color: #f1f5f9;
+      overflow: hidden;
+    }
+  </style>
+
   <!-- Edit Task Modal -->
   <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content shadow">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title fw-bold" id="editTaskModalLabel">Update Task</h5>
+        <div class="modal-header bg-gradient-primary text-white border-0 py-3" style="background: linear-gradient(135deg, #0d6efd, #0a58ca);">
+          <h5 class="modal-title fw-bold d-flex align-items-center" id="editTaskModalLabel">
+            <i class="bi bi-pencil-square me-2"></i>Update Task Progress
+          </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
+        <div class="modal-body p-4">
           <form>
             <div class="mb-3">
               <label class="form-label fw-semibold">Task Status</label>
@@ -52,20 +114,25 @@
   
             <div class="mb-3">
               <label class="form-label fw-semibold">Remarks</label>
-              <textarea class="form-control" id="editRemarks" rows="3" placeholder="Add your remarks..."></textarea>
+              <textarea class="form-control" id="editRemarks" rows="3" placeholder="Type new remark here to append..."></textarea>
             </div>
   
             <div class="mb-4">
-              <label class="form-label fw-semibold d-block">Range Status: <span id="rangeValue">0</span>%</label>
-              <input type="range" class="form-range" min="0" max="100" value="0" id="editRangeStatus">
+              <div class="d-flex justify-content-between align-items-center">
+                <label class="form-label fw-semibold">Range Status</label>
+                <span class="badge bg-light text-primary fw-bold fs-6 border" id="rangeValue">0%</span>
+              </div>
+              <input type="range" class="form-range mt-2" min="0" max="100" value="0" id="editRangeStatus">
               <div class="progress mt-2" style="height: 8px;">
-                <div class="progress-bar bg-success" id="rangeProgressBar" style="width: 0%;"></div>
+                <div class="progress-bar" id="rangeProgressBar" style="width: 0%;"></div>
               </div>
             </div>
   
-            <div class="text-end">
-              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-success" id="saveTaskBtn">Save Changes</button>
+            <div class="text-end pt-2 border-top">
+              <button type="button" class="btn btn-light border me-2" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-success d-inline-flex align-items-center" id="saveTaskBtn">
+                Save Changes
+              </button>
             </div>
           </form>
         </div>
@@ -78,70 +145,94 @@
     let taskModalInstance = null; // To control the main modal
   
     const taskCard = document.getElementById('task-assigned');
-  if(taskCard) {
-    taskCard.addEventListener('click', () => {
-      fetch('/task_manager/get_my_tasks')
-        .then(res => {
-          if (!res.ok) throw new Error('Network error');
-          return res.json();
-        })
-        .then(data => {
-          const tbody = document.getElementById('taskModalBody');
-          const noTasksMsg = document.getElementById('noTasksMessage');
-          tbody.innerHTML = '';
-  
-          if (data.tasks.length === 0) {
-            noTasksMsg.style.display = 'block';
-          } else {
-            noTasksMsg.style.display = 'none';
-          }
-  
-          data.tasks.forEach(task => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td class="fw-medium">${escapeHtml(task.task_name)}</td>
-              <td class="text-muted small">${escapeHtml(task.description || '-')}</td>
-              <td>
-                <span class="badge bg-${task.priority === 'High' ? 'danger' : task.priority === 'Medium' ? 'warning' : 'info'}">
-                  ${task.priority || 'Low'}
-                </span>
-              </td>
-              <td class="text-nowrap">${task.due_date || '-'}</td>
-              <td class="text-center">
-                <button class="btn btn-sm btn-primary shadow-sm" 
-                        onclick="openEditModal(${task.id}, '${task.task_status || 'Pending'}', '${escapeHtmlForAttr(task.remarks || '')}', ${task.range_status || 0})">
-                  <i class="bi bi-pencil-square me-1"></i> Update
-                </button>
-              </td>
-            `;
-            tbody.appendChild(row);
+    if(taskCard) {
+      taskCard.addEventListener('click', () => {
+        fetch('/task_manager/get_my_tasks')
+          .then(res => {
+            if (!res.ok) throw new Error('Network error');
+            return res.json();
+          })
+          .then(data => {
+            const tbody = document.getElementById('taskModalBody');
+            const noTasksMsg = document.getElementById('noTasksMessage');
+            tbody.innerHTML = '';
+    
+            if (data.tasks.length === 0) {
+              noTasksMsg.style.display = 'block';
+            } else {
+              noTasksMsg.style.display = 'none';
+            }
+    
+            data.tasks.forEach(task => {
+              const row = document.createElement('tr');
+              
+              const updateBtn = document.createElement('button');
+              updateBtn.className = 'btn btn-sm btn-primary shadow-sm';
+              updateBtn.innerHTML = '<i class="bi bi-pencil-square me-1"></i> Update';
+              updateBtn.addEventListener('click', () => {
+                openEditModal(task.id, task.task_status || 'Pending', task.remarks || '', task.range_status || 0);
+              });
+              
+              row.innerHTML = `
+                <td class="fw-medium">${escapeHtml(task.task_name)}</td>
+                <td class="text-muted small">${escapeHtml(task.description || '-')}</td>
+                <td>
+                  <span class="badge bg-${task.priority === 'High' ? 'danger' : task.priority === 'Medium' ? 'warning' : 'info'}">
+                    ${task.priority || 'Low'}
+                  </span>
+                </td>
+                <td class="text-nowrap">${task.due_date || '-'}</td>
+                <td class="text-center action-td"></td>
+              `;
+              
+              row.querySelector('.action-td').appendChild(updateBtn);
+              tbody.appendChild(row);
+            });
+    
+            // Show main modal and store instance
+            const modalElement = document.getElementById('taskModal');
+            taskModalInstance = new bootstrap.Modal(modalElement);
+            taskModalInstance.show();
+          })
+          .catch(err => {
+            alert('Failed to load tasks: ' + err.message);
           });
-  
-          // Show main modal and store instance
-          const modalElement = document.getElementById('taskModal');
-          taskModalInstance = new bootstrap.Modal(modalElement);
-          taskModalInstance.show();
-        })
-        .catch(err => {
-          alert('Failed to load tasks: ' + err.message);
-        });
-    });
-  }
+      });
+    }
+
+    function updateProgressBar(val) {
+      const bar = document.getElementById('rangeProgressBar');
+      if (!bar) return;
+      bar.style.width = val + '%';
+      
+      // Dynamic color coding based on progress percentage
+      bar.className = 'progress-bar'; // reset class names
+      const valNum = parseInt(val);
+      if (valNum < 35) {
+        bar.classList.add('bg-danger');
+      } else if (valNum < 70) {
+        bar.classList.add('bg-warning');
+      } else {
+        bar.classList.add('bg-success');
+      }
+    }
+
     function openEditModal(taskId, status, remarks, rangeValue) {
       currentTaskId = taskId;
   
       // Populate form
       document.getElementById('editTaskStatus').value = status;
-      document.getElementById('editRemarks').value = remarks;
+      document.getElementById('editRemarks').value = ""; // Always clear new remark box
       document.getElementById('editRangeStatus').value = rangeValue;
-      document.getElementById('rangeValue').textContent = rangeValue;
-      document.getElementById('rangeProgressBar').style.width = rangeValue + '%';
+      document.getElementById('rangeValue').textContent = rangeValue + '%';
+      
+      updateProgressBar(rangeValue);
   
       // Live slider update
       const slider = document.getElementById('editRangeStatus');
       slider.oninput = function() {
-        document.getElementById('rangeValue').textContent = this.value;
-        document.getElementById('rangeProgressBar').style.width = this.value + '%';
+        document.getElementById('rangeValue').textContent = this.value + '%';
+        updateProgressBar(this.value);
       };
   
       // IMPORTANT: Hide the main modal before showing edit modal
@@ -155,37 +246,67 @@
     }
   
     // Save changes
-    document.getElementById('saveTaskBtn').addEventListener('click', () => {
+    document.getElementById('saveTaskBtn').addEventListener('click', async () => {
       if (!currentTaskId) return;
   
       const status = document.getElementById('editTaskStatus').value;
-      const remarks = document.getElementById('editRemarks').value;
+      const newRemark = document.getElementById('editRemarks').value.trim();
       const range = document.getElementById('editRangeStatus').value;
   
-      updateTask(currentTaskId, 'task_status', status);
-      updateTask(currentTaskId, 'remarks', remarks);
-      updateTask(currentTaskId, 'range_status', range);
-  
       const btn = document.getElementById('saveTaskBtn');
-      btn.innerHTML = '<i class="bi bi-check2-all"></i> Saved!';
+      const originalText = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
       btn.disabled = true;
-  
-      setTimeout(() => {
-        btn.innerHTML = 'Save Changes';
+
+      try {
+        const success = await updateTask(currentTaskId, status, newRemark, range);
+        if (success) {
+          btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Saved!';
+          btn.classList.replace('btn-success', 'btn-info');
+          
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.replace('btn-info', 'btn-success');
+            btn.disabled = false;
+            
+            // Hide Edit Modal
+            const editModalEl = document.getElementById('editTaskModal');
+            const editModalInst = bootstrap.Modal.getInstance(editModalEl) || new bootstrap.Modal(editModalEl);
+            editModalInst.hide();
+            
+            // Refresh parent task list modal
+            if (taskCard) taskCard.click();
+          }, 1000);
+        } else {
+          alert('Failed to update task.');
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('An error occurred while saving.');
+        btn.innerHTML = originalText;
         btn.disabled = false;
-        bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
-        
-        // Optional: Refresh task list after save
-        // taskCard.click(); // Uncomment if you want auto-refresh
-      }, 1500);
+      }
     });
   
-    function updateTask(taskId, field, value) {
-      fetch('/task_manager/update_task', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: taskId, field: field, value: value })
-      }).catch(err => console.error('Update failed:', err));
+    async function updateTask(taskId, status, newRemark, range) {
+      try {
+        const res = await fetch('/task_manager/update_task', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            id: taskId, 
+            task_status: status, 
+            new_remark: newRemark, 
+            range_status: range 
+          })
+        });
+        const data = await res.json();
+        return data.success;
+      } catch (err) {
+        console.error('Update failed:', err);
+        return false;
+      }
     }
   
     function escapeHtml(text) {

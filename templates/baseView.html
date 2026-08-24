@@ -306,6 +306,62 @@
       color: #ffffff !important;
     }
 
+    /* ── Universal Modal Count Badge / Pill (High Contrast for All Themes) ── */
+    .modal-header .modal-count-pill,
+    .modal-header .alarm-alert-count-box,
+    .modal-header .duesCountWrap,
+    .modal-header div[style*="background: #eef4ff"],
+    .modal-header div[style*="background:#eef4ff"],
+    .modal-header div[style*="background: rgba(255, 255, 255"] {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 8px !important;
+      padding: 3px 10px !important;
+      border-radius: 99px !important;
+      background: rgba(255, 255, 255, 0.22) !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      backdrop-filter: blur(8px) !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .modal-header .modal-count-pill span:not(.badge):not(.count-number),
+    .modal-header .alarm-alert-count-box > span:not(.badge):not(.count-number),
+    .modal-header .duesCountWrap > span:not(.badge):not(.count-number),
+    .modal-header div[style*="background"] > span:not(.badge):not(.count-number),
+    .modal-header .alarm-alert-count-label,
+    .modal-header .duesCountLabel {
+      font-size: 0.78rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.3px !important;
+      color: #ffffff !important;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+      white-space: nowrap !important;
+    }
+
+    .modal-header .modal-count-pill .badge,
+    .modal-header .modal-count-pill .count-number,
+    .modal-header .alarm-alert-count-box > span.badge,
+    .modal-header .duesCountWrap > span.badge,
+    .modal-header div[style*="background"] > span.badge,
+    .modal-header .attachmentCountBadgeUnique,
+    .modal-header .detCountBadgeUnique,
+    .modal-header .agniLeaveCountBadgeUnique,
+    .modal-header .duesCountBadge {
+      font-size: 0.8rem !important;
+      font-weight: 800 !important;
+      padding: 3px 10px !important;
+      border-radius: 99px !important;
+      background: #ffffff !important;
+      color: #0d6efd !important;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .modal-header .alarm-alert-count-box > span.badge,
+    .modal-header .badge.bg-danger {
+      background: #ffffff !important;
+      color: #dc2626 !important;
+    }
+
     .modal-header .btn-close, .modal-header .leave-app-close, .modal-header .lh-close {
       filter: invert(1) grayscale(100%) brightness(200%) !important;
       opacity: 0.95 !important;
@@ -1135,7 +1191,7 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ'] %}
       <a class="nav-link {% if '/weight_system' in request.path %}active{% endif %}" href="/weight_system"
-        data-tiptext="Weight">
+        data-tiptext="Weight Management">
         <span class="nav-icon"><i class="fas fa-weight"></i></span>
         <span class="nav-label-text">Weight Management</span>
         <span class="nav-tooltip">Weight</span>
@@ -1144,21 +1200,21 @@
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
       <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}"
-        href="/personnel_information" data-tiptext="Personnel">
+        href="/personnel_information" data-tiptext="Personnel Management">
         <span class="nav-icon"><i class="fas fa-users"></i></span>
         <span class="nav-label-text">Personnel Management</span>
         <span class="nav-tooltip">Personnel</span>
       </a>
       {% endif %}
 
-      <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
       <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"
-         data-tiptext="Tasks">
+         data-tiptext="Task Management">
         <span class="nav-icon"><i class="fas fa-tasks"></i></span>
         <span class="nav-label-text">Task Management</span>
         <span class="nav-tooltip">Tasks</span>
       </a>
-      {% endif %} -->
+      {% endif %}
 
       <!-- Finance Section -->
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT',
@@ -1168,7 +1224,7 @@
 
       {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
       <a class="nav-link {% if '/projects' in request.path %}active{% endif %}"
-        href="{{ url_for('projects_dashboard') }}" data-tiptext="Projects">
+        href="{{ url_for('projects_dashboard') }}" data-tiptext="Project Management">
         <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>
         <span class="nav-label-text">Project Management</span>
         <span class="nav-tooltip">Projects</span>
@@ -1176,7 +1232,7 @@
       {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] %}
-      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Accounts">
+      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Account Management">
         <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
         <span class="nav-label-text">Account Management</span>
         <span class="nav-tooltip">Accounts</span>
@@ -1260,44 +1316,73 @@
   </div>
 
   <!-- ==================== SYSTEM MERGE NOTIFICATION TOAST ==================== -->
-  <div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 1090;">
-    <div id="companyMergeToast" class="toast border-0 position-relative overflow-hidden" role="alert" aria-live="assertive" aria-atomic="true" style="background: var(--card-bg-solid, #ffffff) !important; border: 1px solid var(--border-color, #e2e8f0) !important; border-radius: 16px; min-width: 340px; max-width: 420px; display: none; box-shadow: 0 15px 35px var(--shadow, rgba(0, 0, 0, 0.25)) !important;">
-      <!-- Glowing Top Accent Line -->
-      <div style="height: 4px; background: linear-gradient(90deg, var(--primary-color, #3b82f6) 0%, var(--secondary-color, #2563eb) 100%); width: 100%;"></div>
+  <div id="companyMergeToast" style="position: fixed; top: 24px; right: 24px; width: 90%; max-width: 420px; z-index: 100000; opacity: 0; pointer-events: none; transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; visibility: hidden;">
+    <div style="background: linear-gradient(135deg, #e0f2fe 0%, #eff6ff 100%); border: 1px solid rgba(14, 165, 233, 0.25); border-left: 5px solid #0284c7; border-radius: 14px; box-shadow: 0 12px 30px rgba(14, 165, 233, 0.15); overflow: hidden; padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start;">
       
-      <div class="p-3">
-        <!-- Toast Header -->
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <div class="d-flex align-items-center gap-2">
-            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 32px; height: 32px; background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.15)); border: 1px solid var(--border-color, #e2e8f0);">
-              <span style="font-size: 1rem;">📢</span>
-            </div>
-            <div>
-              <h6 class="mb-0 fw-bold" style="font-size: 0.88rem; letter-spacing: 0.3px; color: var(--text-primary);">Unit Information</h6>
-            </div>
+      <!-- System Icon Badge -->
+      <div style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 8px; flex-shrink: 0; color: #0284c7;">
+        <span style="font-size: 1.25rem; display: inline-block; animation: rotateSystemGear 8s infinite linear;">⚙️</span>
+      </div>
+      
+      <!-- Content Area -->
+      <div style="flex-grow: 1;">
+        <!-- Header -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; gap: 10px;">
+          <div>
+            <span style="font-weight: 800; font-size: 0.85rem; color: #0369a1; text-transform: uppercase; letter-spacing: 0.8px; display: inline-flex; align-items: center; gap: 4px;">
+              <span style="width: 6px; height: 6px; background: #0284c7; border-radius: 50%; display: inline-block;"></span>
+              System Updated
+            </span>
           </div>
-          <button type="button" onclick="dismissMergeToast()" class="btn btn-sm text-white border-0 fw-bold shadow-sm" style="background: #ef4444; font-size: 0.75rem; padding: 3px 10px; border-radius: 6px; cursor: pointer;">Hide</button>
+          
+          <!-- Dismiss/Hide Button -->
+          <button type="button" onclick="dismissMergeToast()" 
+                  style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 4px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center;"
+                  onmouseover="this.style.background='#ef4444'; this.style.color='#ffffff'; this.style.borderColor='#ef4444'; this.style.boxShadow='0 2px 6px rgba(239, 68, 68, 0.3)';"
+                  onmouseout="this.style.background='rgba(239, 68, 68, 0.08)'; this.style.color='#ef4444'; this.style.borderColor='rgba(239, 68, 68, 0.2)'; this.style.boxShadow='none';"
+                  onmousedown="this.style.transform='scale(0.95)';"
+                  onmouseup="this.style.transform='scale(1)';">
+            Dismiss
+          </button>
         </div>
         
         <!-- Toast Body -->
-        <p class="mb-1" style="font-size: 0.84rem; line-height: 1.5; color: var(--text-primary) !important;">
-          <strong>1 Company</strong> and <strong>2 Company</strong> have been successfully <strong style="color: var(--primary-color, #3b82f6);">amalgamated and reorganised as COMN Company</strong> across all system records.
+        <p style="margin: 0 0 10px 0; font-size: 0.82rem; line-height: 1.5; color: #0f172a;">
+          <strong>1 Company</strong> and <strong>2 Company</strong> have been successfully 
+          <span style="color: #0284c7; font-weight: 700;">amalgamated and reorganised as COMN Company</span> 
+          across all system records.
         </p>
-        <div class="fw-bold text-end" style="font-size: 0.82rem; color: var(--primary-color, #3b82f6); letter-spacing: 0.3px;">
-          Jai Hind
+        
+        <!-- Footer / Motto -->
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 0.72rem; color: #475569; font-style: italic;">Records synchronised</span>
+          <span style="font-weight: 800; font-size: 0.78rem; color: #0284c7; letter-spacing: 0.5px;">
+            Jai Hind 🇮🇳
+          </span>
         </div>
       </div>
     </div>
   </div>
 
+  <style>
+    @keyframes rotateSystemGear {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
   <script>
     (function checkCompanyMergeToast() {
       document.addEventListener('DOMContentLoaded', function() {
-        if (!localStorage.getItem('comnMergeNoticeDismissed_v2')) {
+        if (!localStorage.getItem('comnMergeNoticeDismissed_v6')) {
           const toastEl = document.getElementById('companyMergeToast');
           if (toastEl) {
-            toastEl.style.display = 'block';
-            toastEl.classList.add('show');
+            requestAnimationFrame(() => {
+              toastEl.style.visibility = 'visible';
+              toastEl.style.opacity = '1';
+              toastEl.style.pointerEvents = 'auto';
+              toastEl.style.transform = 'translateX(0)';
+            });
           }
         }
       });
@@ -1306,10 +1391,14 @@
     function dismissMergeToast() {
       const toastEl = document.getElementById('companyMergeToast');
       if (toastEl) {
-        toastEl.classList.remove('show');
-        toastEl.style.display = 'none';
+        toastEl.style.opacity = '0';
+        toastEl.style.pointerEvents = 'none';
+        toastEl.style.transform = 'translateX(120%)';
+        setTimeout(() => {
+          toastEl.style.visibility = 'hidden';
+        }, 500);
       }
-      localStorage.setItem('comnMergeNoticeDismissed_v2', 'true');
+      localStorage.setItem('comnMergeNoticeDismissed_v6', 'true');
     }
   </script>
 

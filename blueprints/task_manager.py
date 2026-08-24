@@ -6,6 +6,57 @@ task_bp = Blueprint('task',__name__,url_prefix='/task_manager')
 def home():
     return render_template('/task_manager/task.html')
 
+@task_bp.route('/api/stats')
+def get_task_stats():
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Get task stats
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total,
+                COALESCE(SUM(LOWER(task_status) = 'pending' OR task_status IS NULL), 0) as pending,
+                COALESCE(SUM(LOWER(task_status) = 'in progress'), 0) as in_progress,
+                COALESCE(SUM(LOWER(task_status) = 'completed'), 0) as completed
+            FROM tasks
+        """)
+        stats = cursor.fetchone()
+        
+        # Get 5 most recent tasks
+        cursor.execute("""
+            SELECT 
+                t.id,
+                t.task_name,
+                t.task_status,
+                t.priority,
+                t.due_date,
+                p.name AS assigned_name
+            FROM tasks t
+            LEFT JOIN personnel p ON t.assigned_to = p.army_number
+            ORDER BY t.id DESC
+            LIMIT 5
+        """)
+        recent_tasks = cursor.fetchall()
+        for task in recent_tasks:
+            if task['due_date']:
+                task['due_date'] = task['due_date'].strftime('%Y-%m-%d')
+                
+        return jsonify({
+            "status": "success",
+            "stats": stats,
+            "recent_tasks": recent_tasks
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 @task_bp.route('/create-task', methods=['POST'])
 def update_task():
     data = request.get_json()
@@ -74,23 +125,50 @@ def view_task():
 def get_task_details(id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM tasks WHERE id=%s", (id,))
+    cursor.execute("""
+        SELECT 
+            t.id,
+            t.task_name,
+            t.description,
+            t.priority,
+            t.assigned_to,
+            t.assigned_by,
+            t.due_date,
+            t.task_status,
+            t.remarks,
+            t.range_status,
+            t.remark_updated_at,
+            p.name AS assigned_name,
+            p.company AS assigned_company,
+            p.rank AS assigned_rank
+        FROM tasks t
+        LEFT JOIN personnel p ON t.assigned_to = p.army_number
+        WHERE t.id = %s
+    """, (id,))
     task = cursor.fetchone()
     cursor.close()
     conn.close()
 
     return jsonify(task)
 
-@task_bp.route('delete_task/<int:id>',methods = ['DELETE'])
+@task_bp.route('/delete_task/<int:id>', methods=['DELETE'])
 def delete_task(id):
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     try:
-        query = 'DELETE FROM tasks where id = %s'
-        cursor.execute(query,(id,))
+        query = 'DELETE FROM tasks WHERE id = %s'
+        cursor.execute(query, (id,))
+        conn.commit()
+        status = 200
+        response = {'status': 'success', 'message': f'Task {id} deleted'}
     except Exception as e:
-        pass
-    return jsonify({'message': f'{id} deleted'}),200
+        conn.rollback()
+        status = 500
+        response = {'status': 'error', 'message': str(e)}
+    finally:
+        cursor.close()
+        conn.close()
+    return jsonify(response), status
 
 
 
@@ -171,40 +249,108 @@ def get_my_tasks():
 
 @task_bp.route('/update_task', methods=['POST'])
 def jco_update_task():
+    conn = None
     try:
+        user = require_login()
+        user_name = user.get('name', 'User')
+
         data = request.get_json()
         task_id = data.get('id')
+        if not task_id:
+            return jsonify({'error': 'Missing task id'}), 400
+            
+        task_status = data.get('task_status')
+        new_remark = data.get('new_remark')
+        range_status = data.get('range_status')
+
+        conn = get_db_connection()
+        # Create cursor with dictionary capability to easily fetch current remarks
+        cursor = conn.cursor(dictionary=True)
+
+        updates = []
+        params = []
+        
+        if task_status is not None:
+            updates.append("task_status = %s")
+            params.append(task_status)
+            
+        if new_remark:
+            # Fetch existing remarks
+            cursor.execute("SELECT remarks FROM tasks WHERE id = %s", (task_id,))
+            row = cursor.fetchone()
+            current_remarks = row['remarks'] if row and row['remarks'] else ""
+            
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            formatted_new_remark = f"[{timestamp}]: {new_remark}"
+            
+            if current_remarks:
+                updated_remarks = f"{current_remarks}\n{formatted_new_remark}"
+            else:
+                updated_remarks = formatted_new_remark
+                
+            updates.append("remarks = %s")
+            params.append(updated_remarks)
+            updates.append("remark_updated_at = NOW()")
+            
+        if range_status is not None:
+            updates.append("range_status = %s")
+            params.append(int(range_status))
+            
+        # Support old single-field update format as fallback
         field = data.get('field')
         value = data.get('value')
-
-        if not task_id or not field:
-            return jsonify({'error': 'Missing id or field'}), 400
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Map field to column name (add more if needed)
-        allowed_fields = {
-            'task_status': 'task_status',
-            'remarks': 'remarks',
-            'range_status': 'range_status'
-        }
-
-        if field not in allowed_fields:
-            return jsonify({'error': 'Invalid field'}), 400
-
-        column = allowed_fields[field]
-
-        # Handle range_status as integer
-        if field == 'range_status':
-            value = int(value)
-
-        query = f"UPDATE tasks SET {column} = %s WHERE id = %s"
-        cursor.execute(query, (value, task_id))
+        if field and value is not None:
+            allowed_fields = {
+                'task_status': 'task_status',
+                'remarks': 'remarks',
+                'range_status': 'range_status'
+            }
+            if field in allowed_fields:
+                column = allowed_fields[field]
+                if field == 'remarks':
+                    # Fallback single field remarks append
+                    cursor.execute("SELECT remarks FROM tasks WHERE id = %s", (task_id,))
+                    row = cursor.fetchone()
+                    current_remarks = row['remarks'] if row and row['remarks'] else ""
+                    
+                    import datetime
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                    formatted_new_remark = f"[{timestamp}]: {value}"
+                    
+                    if current_remarks:
+                        value = f"{current_remarks}\n{formatted_new_remark}"
+                    else:
+                        value = formatted_new_remark
+                    updates.append("remark_updated_at = NOW()")
+                updates.append(f"{column} = %s")
+                params.append(int(value) if field == 'range_status' else value)
+            
+        if not updates:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': True, 'message': 'No changes to update'})
+            
+        query = f"UPDATE tasks SET {', '.join(updates)} WHERE id = %s"
+        params.append(task_id)
+        
+        # Convert cursor back to normal or just execute (dictionary cursor execute works fine)
+        cursor.execute(query, tuple(params))
+        conn.commit()
         
         cursor.close()
+        conn.close()
 
         return jsonify({'success': True, 'message': 'Task updated successfully'})
 
     except Exception as e:
-        mysql.connection.rollback()
+        if conn:
+            try:
+                conn.rollback()
+            except:
+                pass
+            try:
+                conn.close()
+            except:
+                pass
         return jsonify({'error': str(e)}), 500

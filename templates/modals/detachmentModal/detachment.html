@@ -109,7 +109,7 @@
 
   /* ================= COUNT BADGE ================= */
   #detModalUniqueScope .modal-dialog {
-    margin-top: 1px;
+    margin-top: 1.5rem !important;
   }
   #detModalUniqueScope .detCountBadgeUnique {
     font-size: 0.78rem;
@@ -136,95 +136,39 @@
 
   <div class="modal-dialog modal-xl custom-size">
 
-    <div class="modal-content">
+    <div class="modal-content overflow-hidden">
 
       <!-- ================= HEADER ================= -->
 
-      <!-- ================= HEADER ================= -->
+      <div class="modal-header">
+        <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-2">
+          <!-- TITLE -->
+          <h5 class="modal-title mb-0">Detachment Details</h5>
 
-<div class="modal-header">
+          <!-- FILTERS & COUNT -->
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <select id="detCompanyFilterUniqueScope" class="form-select form-select-sm" style="width: 180px;">
+              <option value="">All Companies</option>
+            </select>
+            <select id="detachmentFilterUniqueScope" class="form-select form-select-sm" style="width: 190px;">
+              <option value="">All Detachments</option>
+            </select>
+            <div class="modal-count-pill">
+              <span class="count-label">Total Count</span>
+              <span id="detTotalCountUniqueScope" class="badge rounded-pill detCountBadgeUnique count-number">0</span>
+            </div>
+          </div>
 
-  <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+          <!-- CLOSE BUTTON -->
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
 
-    <!-- ================= TITLE ================= -->
-
-    
-      
-
-      
-        
-    <div class="d-flex align-items-center gap-2">
-
-      <h5 class="modal-title mb-0">
-
-        Detachment Details
-
-      </h5>
-
-    </div>
-      
-
-    
-
-    <!-- ================= COMPANY FILTER ================= -->
-
-    <select
-      id="detCompanyFilterUniqueScope"
-      class="form-select form-select-sm"
-      style="width: 200px;">
-
-      <option value="">All Companies</option>
-
-    </select>
-
-    <!-- ================= DETACHMENT FILTER ================= -->
-
-    <select
-      id="detachmentFilterUniqueScope"
-      class="form-select form-select-sm"
-      style="width: 220px;">
-
-      <option value="">All Detachments</option>
-
-    </select>
-
-    <!-- ================= TOTAL COUNT ================= -->
-
-    <div
-      class="d-flex align-items-center gap-2 px-3 py-1 rounded-3"
-      style="
-        background: #eef4ff;
-        border: 1px solid #d6e4ff;
-      ">
-
-      <span
-        class="fw-semibold small"
-        style="color:#315ca8;">
-
-        Total Count
-
-      </span>
-
-      <span
-        id="detTotalCountUniqueScope"
-        class="badge rounded-pill bg-primary detCountBadgeUnique">
-
-        0
-
-      </span>
-
-    </div>
-
-  </div>
-
-  <!-- ================= CLOSE BUTTON ================= -->
-
-  <button
-    class="btn-close"
-    data-bs-dismiss="modal">
-  </button>
-
-</div>
+      <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-user-shield me-1"></i> UPDATED BY ONCO
+        </span>
+      </div>
 
       <!-- ================= BODY ================= -->
 
@@ -506,14 +450,11 @@ document.addEventListener("DOMContentLoaded", function () {
     /* ================= COMPANY FILTER ================= */
 
     if (selectedCompanyUniqueScope) {
-
+      const selectedCoyUpper = selectedCompanyUniqueScope.trim().toUpperCase();
       filteredDataUniqueScope =
         filteredDataUniqueScope.filter(
-          item =>
-            item.company ===
-            selectedCompanyUniqueScope
+          item => (item.company || "").trim().toUpperCase() === selectedCoyUpper
         );
-
     }
 
     /* ================= COUNT ================= */

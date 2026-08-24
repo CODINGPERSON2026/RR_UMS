@@ -223,7 +223,7 @@ def assigned_attachment_alarm():
                 COALESCE(t.remarks, '') AS remarks
             FROM td_table t
             LEFT JOIN personnel p ON p.army_number = t.army_number
-            WHERE t.td_date <= NOW() - INTERVAL 90 DAY
+            WHERE t.td_date <= NOW() - INTERVAL 180 DAY
             ORDER BY t.td_date ASC
         """)
 

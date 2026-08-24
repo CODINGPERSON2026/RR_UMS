@@ -278,6 +278,25 @@
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   }
 
+  .graph-btn.nominal-roll-btn {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 9px 18px !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .graph-btn.nominal-roll-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+    transform: translateY(-2px) scale(1.03) !important;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.5) !important;
+  }
+
   .chart-title {
     font-size: 1rem;
     font-weight: 700;
@@ -479,9 +498,9 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
 
 
   <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; background: var(--card-bg); padding: 14px 20px; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
-    <!-- TOTAL PERSONNEL BUTTON -->
-    <button class="graph-btn" onclick="openPersonnelModal()" style="background: var(--primary-color); color: #ffffff; border-color: var(--primary-color);">
-      <i class="fas fa-users"></i> TOTAL PERSONNEL (<span id="totalPersonnelCount">Loading...</span>)
+    <!-- NOMINAL ROLL BUTTON -->
+    <button class="graph-btn nominal-roll-btn" onclick="openPersonnelModal()">
+      <i class="fas fa-id-card me-1"></i> NOMINAL ROLL (<span id="totalPersonnelCount">Loading...</span>)
     </button>
 
     <button class="graph-btn" onclick="openChartModal('ageDonutChart', 'AGE DISTRIBUTION')">
@@ -741,6 +760,18 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+              const index = elements[0].index;
+              const label = chart.data.labels[index];
+              if (label && window.openPersonnelGraphModal) {
+                window.openPersonnelGraphModal('age', label);
+              }
+            }
+          },
+          onHover: (evt, elements) => {
+            evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+          },
           plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 11 }, boxWidth: 50 } } }
         }
       });
@@ -762,6 +793,18 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
           responsive: true,
           maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
+          onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+              const index = elements[0].index;
+              const label = chart.data.labels[index];
+              if (label && window.openPersonnelGraphModal) {
+                window.openPersonnelGraphModal('rank', label);
+              }
+            }
+          },
+          onHover: (evt, elements) => {
+            evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+          },
           plugins: { legend: { display: false } },
           scales: {
             x: {
@@ -801,6 +844,18 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+              const index = elements[0].index;
+              const label = chart.data.labels[index];
+              if (label && window.openPersonnelGraphModal) {
+                window.openPersonnelGraphModal('state', label);
+              }
+            }
+          },
+          onHover: (evt, elements) => {
+            evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+          },
           plugins: {
             legend: {
               position: 'right',
@@ -809,20 +864,6 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
           }
         }
       });
-
-      /*employmentChart = new Chart(document.getElementById('employmentChart'), {
-        type: 'pie',
-        data: {
-          labels: employmentData.employment_distribution?.map(i => i.type) || [],
-          datasets: [{ data: employmentData.employment_distribution?.map(i => i.count) || [], backgroundColor: [chartColors[0], chartColors[1]], borderColor: [borderColors[0], borderColors[1]], borderWidth: 2 }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { color: textColor, font: { size: 11 } } } }
-        }
-      });
-      */
 
       serviceChart = new Chart(document.getElementById('serviceChart'), {
         type: 'bar',
@@ -841,6 +882,18 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
           responsive: true,
           maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
+          onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+              const index = elements[0].index;
+              const label = chart.data.labels[index];
+              if (label && window.openPersonnelGraphModal) {
+                window.openPersonnelGraphModal('service', label);
+              }
+            }
+          },
+          onHover: (evt, elements) => {
+            evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+          },
           plugins: { legend: { display: false } },
           scales: {
             x: {
@@ -931,6 +984,18 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
           responsive: true,
           maintainAspectRatio: false,
           layout: { padding: { top: 15 } },
+          onClick: (evt, elements, chart) => {
+            if (elements && elements.length > 0) {
+              const index = elements[0].index;
+              const label = chart.data.labels[index];
+              if (label && window.openPersonnelGraphModal) {
+                window.openPersonnelGraphModal('sports', label);
+              }
+            }
+          },
+          onHover: (evt, elements) => {
+            evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+          },
           plugins: { legend: { display: false } },
           scales: {
             x: {
@@ -995,6 +1060,41 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
     }
   });
 
+  const fullscreenAgeDatalabelsPlugin = {
+    id: 'fullscreenAgeDatalabels',
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      chart.data.datasets.forEach((ds, i) => {
+        const meta = chart.getDatasetMeta(i);
+        meta.data.forEach((arc, j) => {
+          const val = ds.data[j];
+          const label = chart.data.labels[j] || '';
+          if (val == null || val === 0) return;
+          const angle = arc.endAngle - arc.startAngle;
+          if (angle < 0.08) return;
+          ctx.save();
+          const midAngle = arc.startAngle + angle / 2;
+          const midRadius = arc.innerRadius + (arc.outerRadius - arc.innerRadius) / 2;
+          const x = arc.x + Math.cos(midAngle) * midRadius;
+          const y = arc.y + Math.sin(midAngle) * midRadius;
+
+          ctx.font = 'bold 13px sans-serif';
+          ctx.fillStyle = '#ffffff';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+          ctx.shadowBlur = 4;
+
+          ctx.fillText(`${label}`, x, y - 9);
+          ctx.font = 'bold 14px sans-serif';
+          ctx.fillText(`(${val})`, x, y + 9);
+
+          ctx.restore();
+        });
+      });
+    }
+  };
+
   let fullscreenChartInstance = null;
   function openChartModal(chartCanvasId, titleText) {
     const modalEl = document.getElementById('chartFullscreenModal');
@@ -1018,10 +1118,16 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const textColor = isDark ? '#f8fafc' : '#1e293b';
 
+      let fsPlugins = sourceChart.config.plugins ? [...sourceChart.config.plugins] : [];
+      if (chartCanvasId === 'ageDonutChart') {
+        fsPlugins = fsPlugins.filter(p => p && p.id !== 'donutDatalabels');
+        fsPlugins.push(fullscreenAgeDatalabelsPlugin);
+      }
+
       fullscreenChartInstance = new Chart(fsCanvas.getContext('2d'), {
         type: sourceChart.config.type,
         data: JSON.parse(JSON.stringify(sourceChart.config.data)),
-        plugins: sourceChart.config.plugins || [],
+        plugins: fsPlugins,
         options: {
           ...sourceChart.config.options,
           responsive: true,
@@ -1062,5 +1168,6 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO R
 
 {% include 'modals/detachmentModal/detachment.html' %}
 {% include 'modals/view_all_personnel/modal.html' %}
+{% include 'personnel_info/modals/personnel_graph_modal.html' %}
 
 {% endblock %}

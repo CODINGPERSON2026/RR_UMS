@@ -18,10 +18,6 @@
   {% if role != 'CO' %}
   <!-- ACTION BUTTONS -->
   <div class="mb-4">
-    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#addSoModal">
-      + Add Sanction Order
-    </button>
-
     <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#addExpModal">
       + Add Expenditure
     </button>
@@ -33,9 +29,19 @@
   {% endif %}
 
   <!-- TITLE -->
-  <h4 class="mb-4">
-    {{ grant.name }} ({{ grant.code_head }})
-  </h4>
+  <div class="d-flex align-items-center mb-4 gap-2 flex-wrap">
+    <h4 class="mb-0">
+      {{ grant.name }} ({{ grant.code_head }})
+    </h4>
+    <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+      <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY ACCJCO
+    </span>
+    {% if role != 'CO' %}
+    <button class="btn btn-sm btn-warning text-dark ms-2" data-bs-toggle="modal" data-bs-target="#editGrantDetailModal">
+      ✏️ Edit Grant
+    </button>
+    {% endif %}
+  </div>
 
   <!-- SUMMARY CARDS -->
   <div class="row mb-4 g-3">
@@ -72,19 +78,21 @@
 
   </div>
 
+  {#
   <!-- SANCTION ORDERS -->
   <div class="card mb-4">
     <div class="card-header bg-dark text-white">
       Sanction Orders
     </div>
     <div class="card-body p-0">
-      <table class="table table-bordered mb-0 text-center">
+      <table class="table table-bordered mb-0 text-center align-middle">
         <thead>
           <tr>
             <th>#</th>
             <th>SO Number</th>
             <th>Amount (₹)</th>
             <th>Date</th>
+            {% if role != 'CO' %}<th>Action</th>{% endif %}
           </tr>
         </thead>
         <tbody>
@@ -94,11 +102,67 @@
             <td>{{ so.so_number }}</td>
             <td>{{ "{:,.2f}".format(so.so_amount or 0) }}</td>
             <td>{{ so.created_at.strftime("%d-%m-%Y") }}</td>
+            {% if role != 'CO' %}
+            <td>
+              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditSoModal({{ so.id }}, "{{ so.so_number }}", {{ so.so_amount or 0 }})'>Edit</button>
+              <button class="btn btn-sm btn-danger" onclick='deleteSo({{ so.id }})'>Delete</button>
+            </td>
+            {% endif %}
           </tr>
           {% endfor %}
           {% if sos|length == 0 %}
           <tr>
-            <td colspan="4">No Sanction Orders Added</td>
+            <td colspan="{{ 5 if role != 'CO' else 4 }}">No Sanction Orders Added</td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  #}
+
+  <!-- ALLOTMENTS / ALLOCATIONS -->
+  <div class="card mb-4">
+    <div class="card-header bg-dark text-white">
+      Allotments &amp; Allocations
+    </div>
+    <div class="card-body p-0">
+      <table class="table table-bordered mb-0 text-center align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Amount (₹)</th>
+            <th>Remarks</th>
+            <th>Date</th>
+            {% if role != 'CO' %}<th>Action</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in allocations %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+              <span class="badge {{ 'bg-primary' if a.allocation_type == 'Original' else 'bg-info text-dark' }}">
+                {{ a.allocation_type or 'Additional' }}
+              </span>
+            </td>
+            <td class="text-success fw-bold">
+              {{ "{:,.2f}".format(a.amount or 0) }}
+            </td>
+            <td>{{ a.remarks or '-' }}</td>
+            <td>{{ a.created_at.strftime("%d-%m-%Y") if a.created_at else '-' }}</td>
+            {% if role != 'CO' %}
+            <td>
+              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditAllocModal({{ a.id }}, {{ a.amount or 0 }}, "{{ a.remarks or '' }}")'>Edit</button>
+              <button class="btn btn-sm btn-danger" onclick='deleteAlloc({{ a.id }})'>Delete</button>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+          {% if allocations|length == 0 %}
+          <tr>
+            <td colspan="{{ 6 if role != 'CO' else 5 }}">No Allotments / Allocations Added</td>
           </tr>
           {% endif %}
         </tbody>
@@ -112,13 +176,14 @@
       Expenditures
     </div>
     <div class="card-body p-0">
-      <table class="table table-bordered mb-0 text-center">
+      <table class="table table-bordered mb-0 text-center align-middle">
         <thead>
           <tr>
             <th>#</th>
             <th>Amount (₹)</th>
             <th>Remarks</th>
             <th>Date</th>
+            {% if role != 'CO' %}<th>Action</th>{% endif %}
           </tr>
         </thead>
         <tbody>
@@ -130,11 +195,17 @@
             </td>
             <td>{{ e.remarks or '-' }}</td>
             <td>{{ e.created_at.strftime("%d-%m-%Y") }}</td>
+            {% if role != 'CO' %}
+            <td>
+              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditExpModal({{ e.id }}, {{ e.amount or 0 }}, "{{ e.remarks or '' }}")'>Edit</button>
+              <button class="btn btn-sm btn-danger" onclick='deleteExp({{ e.id }})'>Delete</button>
+            </td>
+            {% endif %}
           </tr>
           {% endfor %}
           {% if expenditures|length == 0 %}
           <tr>
-            <td colspan="4">No Expenditures Added</td>
+            <td colspan="{{ 5 if role != 'CO' else 4 }}">No Expenditures Added</td>
           </tr>
           {% endif %}
         </tbody>
@@ -146,6 +217,7 @@
 
 <!-- ================= MODALS ================= -->
 
+{#
 <!-- ADD SO -->
 <div class="modal fade" id="addSoModal">
   <div class="modal-dialog">
@@ -165,6 +237,7 @@
     </div>
   </div>
 </div>
+#}
 
 <!-- ADD EXPENDITURE -->
 <div class="modal fade" id="addExpModal">
@@ -210,6 +283,95 @@
   </div>
 </div>
 
+<!-- EDIT GRANT DETAIL MODAL -->
+<div class="modal fade" id="editGrantDetailModal">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5>Edit Grant Details</h5>
+      <form id="editGrantDetailForm" onsubmit="submitEditGrantDetail(event)">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Grant Name</label>
+          <input type="text" class="form-control" id="editGrantDetailName" value="{{ grant.name }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Code Head</label>
+          <input type="text" class="form-control" id="editGrantDetailCodeHead" value="{{ grant.code_head }}" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Allotment (₹)</label>
+          <input type="number" step="0.01" class="form-control" id="editGrantDetailAllotment" value="{{ grant.allotment or 0 }}" required>
+        </div>
+        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{#
+<!-- EDIT SO MODAL -->
+<div class="modal fade" id="editSoModal">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5>Edit Sanction Order</h5>
+      <form id="editSoForm" onsubmit="submitEditSo(event)">
+        <input type="hidden" id="editSoId">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">SO Number</label>
+          <input type="text" class="form-control" id="editSoNumber" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">SO Amount (₹)</label>
+          <input type="number" step="0.01" class="form-control" id="editSoAmount" required>
+        </div>
+        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Update SO</button>
+      </form>
+    </div>
+  </div>
+</div>
+#}
+
+<!-- EDIT EXPENDITURE MODAL -->
+<div class="modal fade" id="editExpModal">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5>Edit Expenditure</h5>
+      <form id="editExpForm" onsubmit="submitEditExp(event)">
+        <input type="hidden" id="editExpId">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Amount (₹)</label>
+          <input type="number" step="0.01" class="form-control" id="editExpAmount" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Remarks</label>
+          <input type="text" class="form-control" id="editExpRemarks">
+        </div>
+        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Update Expenditure</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT ALLOCATION MODAL -->
+<div class="modal fade" id="editAllocModal">
+  <div class="modal-dialog">
+    <div class="modal-content p-3">
+      <h5>Edit Allotment / Allocation</h5>
+      <form id="editAllocForm" onsubmit="submitEditAlloc(event)">
+        <input type="hidden" id="editAllocId">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Amount (₹)</label>
+          <input type="number" step="0.01" class="form-control" id="editAllocAmount" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Remarks</label>
+          <input type="text" class="form-control" id="editAllocRemarks">
+        </div>
+        <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Update Allotment</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 // Count-up Animation Function
 function animateValue(id, start, end, duration, prefix = "", suffix = "", isPercent = false) {
@@ -218,7 +380,6 @@ function animateValue(id, start, end, duration, prefix = "", suffix = "", isPerc
 
   const range = end - start;
   let startTimestamp = null;
-  let lastValue = start;
 
   const step = (timestamp) => {
     if (!startTimestamp) startTimestamp = timestamp;
@@ -235,7 +396,6 @@ function animateValue(id, start, end, duration, prefix = "", suffix = "", isPerc
     if (progress < 1) {
       window.requestAnimationFrame(step);
     } else {
-      // Final precise value
       if (isPercent) {
         obj.textContent = end.toFixed(2) + suffix;
       } else {
@@ -257,42 +417,82 @@ document.addEventListener("DOMContentLoaded", () => {
   const balanceVal = {{ balance or 0 }};
   const utilPercent = {{ exp_percent or 0 }};
 
-  // Animate Allotment
   animateValue("totalAllotment", 0, allotment, 1400, "₹ ", "");
-
-  // Animate Expenditure
   animateValue("totalExpenditure", 0, expenditure, 1600, "₹ ", "");
-
-  // Animate Balance
   animateValue("balanceAmount", 0, balanceVal, 1200, "₹ ", "");
-
-  // Animate Utilization
   animateValue("utilizationPercent", 0, utilPercent, 1000, "", "%", true);
 });
 
-/* ADD SO */
-document.getElementById("addSoForm")
-.addEventListener("submit", function(e){
+/* EDIT GRANT DETAIL */
+function submitEditGrantDetail(e) {
   e.preventDefault();
+  const name = document.getElementById("editGrantDetailName").value.trim();
+  const code_head = document.getElementById("editGrantDetailCodeHead").value.trim();
+  const allotment = parseFloat(document.getElementById("editGrantDetailAllotment").value);
 
-  fetch(`/account/grants/${grantId}/add-so?fy=${fy}`, {
+  fetch(`/account/grants/${grantId}/edit`, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      so_number: document.getElementById("soNumber").value.trim(),
-      so_amount: Number(document.getElementById("soAmount").value)
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, code_head, allotment })
   })
   .then(res => res.json())
   .then(data => {
-    if(data.success){
-      alert("Sanction Order Added");
-      window.location.href = `/account/grants/${grantId}?fy=${fy}`;
+    if (data.success) {
+      window.location.reload();
     } else {
-      alert(data.message);
+      alert(data.message || "Failed to update grant");
     }
   });
-});
+}
+
+/* EDIT & DELETE ALLOCATION / ALLOTMENT */
+function openEditAllocModal(id, amount, remarks) {
+  document.getElementById("editAllocId").value = id;
+  document.getElementById("editAllocAmount").value = amount;
+  document.getElementById("editAllocRemarks").value = remarks;
+  new bootstrap.Modal(document.getElementById("editAllocModal")).show();
+}
+
+function submitEditAlloc(e) {
+  e.preventDefault();
+  const id = document.getElementById("editAllocId").value;
+  const amount = parseFloat(document.getElementById("editAllocAmount").value);
+  const remarks = document.getElementById("editAllocRemarks").value.trim();
+
+  fetch(`/account/allocation/${id}/edit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, remarks })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) window.location.reload();
+    else alert(res.message || "Failed to update allocation");
+  });
+}
+
+function deleteAlloc(id) {
+  if (!confirm("Are you sure you want to delete this Allotment / Allocation entry?")) return;
+  fetch(`/account/allocation/${id}/delete`, { method: "POST" })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) window.location.reload();
+    else alert(res.message || "Failed to delete allocation");
+  });
+}
+
+/* 
+ * SANCTION ORDERS (DISABLED / COMMENTED OUT)
+ *
+ * ADD SO
+ * document.getElementById("addSoForm")
+ * .addEventListener("submit", function(e){ ... });
+ * 
+ * EDIT & DELETE SO
+ * function openEditSoModal(id, number, amount) { ... }
+ * function submitEditSo(e) { ... }
+ * function deleteSo(id) { ... }
+ */
 
 /* ADD EXPENDITURE */
 document.getElementById("addExpForm")
@@ -310,13 +510,48 @@ document.getElementById("addExpForm")
   .then(res => res.json())
   .then(data => {
     if(data.success){
-      alert("Expenditure Added");
       window.location.href = `/account/grants/${grantId}?fy=${fy}`;
     } else {
       alert(data.message);
     }
   });
 });
+
+/* EDIT & DELETE EXPENDITURE */
+function openEditExpModal(id, amount, remarks) {
+  document.getElementById("editExpId").value = id;
+  document.getElementById("editExpAmount").value = amount;
+  document.getElementById("editExpRemarks").value = remarks;
+  new bootstrap.Modal(document.getElementById("editExpModal")).show();
+}
+
+function submitEditExp(e) {
+  e.preventDefault();
+  const id = document.getElementById("editExpId").value;
+  const amount = parseFloat(document.getElementById("editExpAmount").value);
+  const remarks = document.getElementById("editExpRemarks").value.trim();
+
+  fetch(`/account/exp/${id}/edit`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, remarks })
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) window.location.reload();
+    else alert(res.message || "Failed to update expenditure");
+  });
+}
+
+function deleteExp(id) {
+  if (!confirm("Are you sure you want to delete this Expenditure?")) return;
+  fetch(`/account/exp/${id}/delete`, { method: "POST" })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) window.location.reload();
+    else alert(res.message || "Failed to delete expenditure");
+  });
+}
 
 /* ADD ALLOCATION */
 function openAllocationModal() {
@@ -343,7 +578,6 @@ function submitAllocation(grantId) {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      alert("Allocation Added Successfully");
       window.location.href = `/account/grants/${grantId}?fy=${fy}`;
     } else {
       alert(data.message);

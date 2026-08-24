@@ -1,24 +1,31 @@
 <style>
-  /* ==================== UNIQUE PROJECT DASHBOARD STYLES ==================== */
-  .projdash-dashboard-container {
-    padding: 0;
+  /* ==================== PREMIUM PROJECT DASHBOARD STYLES ==================== */
+  #projDash_modal .modal-dialog {
+    max-width: 1550px !important;
+    width: 95vw !important;
+  }
+
+  #projDash_modal .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25) !important;
+    overflow: hidden;
+    background: var(--card-bg-solid, #fff);
   }
 
   .projdash-header-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 24px;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 10px 22px;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
     color: white;
-    margin: -1rem -1rem 0 -1rem;
-    border-radius: 8px 8px 0 0;
   }
 
   .projdash-header-wrapper h5 {
     margin: 0;
-    font-size: 1.45rem;
-    font-weight: 700;
+    font-size: 1.5rem;
+    font-weight: 800;
   }
 
   /* Main Header Stats */
@@ -34,23 +41,25 @@
   }
 
   .projdash-main-stat-number {
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1;
+    font-size: 1.45rem;
+    font-weight: 800;
+    line-height: 1.1;
   }
 
   .projdash-main-stat-label {
-    font-size: 0.78rem;
-    opacity: 0.9;
+    font-size: 0.72rem;
+    opacity: 0.85;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: 700;
   }
 
   .projdash-filters-bar {
     display: flex;
     gap: 12px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.02);
+    padding: 8px 22px;
+    background: var(--card-bg-solid, #f8fafc);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
     flex-wrap: wrap;
     align-items: center;
   }
@@ -62,13 +71,21 @@
   }
 
   .projdash-filter-dropdown {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border: 1px solid var(--border-color, #cbd5e1);
     border-radius: 8px;
-    font-size: 0.9rem;
-    background: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--card-bg-solid, white);
+    color: var(--text-primary, #1f2937);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+  }
+
+  .projdash-filter-dropdown:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
   }
 
   .projdash-search-wrapper {
@@ -80,10 +97,19 @@
   .projdash-search-field {
     width: 100%;
     padding: 8px 12px 8px 36px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #cbd5e1);
     border-radius: 8px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
+    font-size: 0.88rem;
+    transition: all 0.2s ease;
+    height: 38px;
+    background: var(--card-bg-solid, white);
+    color: var(--text-primary, #1f2937);
+  }
+
+  .projdash-search-field:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
   }
 
   .projdash-search-icon {
@@ -91,40 +117,193 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--text-secondary, #64748b);
   }
 
   .projdash-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    padding: 20px;
-    max-height: 58vh;
-    overflow-y: auto;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 16px !important;
+    padding: 1.25rem 2rem !important;
+    max-height: 54vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background-color: var(--background, #f8fafc) !important;
+    scrollbar-width: thin !important;
   }
-   
+
   .projdash-single-card {
-    background: var(--card-background);
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: var(--card-bg-solid, white) !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--border-color, #e2e8f0) !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.05) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
+
+  @media (max-width: 1400px) {
+    .projdash-cards-grid {
+      grid-template-columns: repeat(3, 1fr) !important;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .projdash-cards-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
   }
 
   .projdash-single-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-    border-color: var(--primary-color);
+    transform: translateY(-4px) !important;
+    box-shadow: 0 12px 28px rgba(59,130,246,0.15) !important;
+  }
+
+  .projdash-card-accent {
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    flex-shrink: 0;
+  }
+
+  .projdash-card-body {
+    padding: 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 8px;
   }
 
   .projdash-card-heading {
-    font-size: 1.25rem;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 16px 0;
+    color: var(--text-primary, #0f172a);
+    margin: 0;
     line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .projdash-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #64748b);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .projdash-card-footer {
+    padding: 0.65rem 1.15rem 0.85rem;
+    border-top: 1px solid var(--border-color, #f1f5f9);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #fafafa;
+  }
+
+  .projdash-owner-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(59,130,246,0.35);
+  }
+
+  .text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .glass-card {
+    background: var(--card-bg-solid, white);
+    border-radius: 14px;
+    padding: 1.25rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+  }
+
+  .desc-box {
+    background: #fdfdfd;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 12px;
+    border-top: 1px solid #f1f5f9;
+    border-right: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  /* ── ALL STAGES STATS BAR & CLICKABLE CARDS (SINGLE ROW HORIZONTAL SCROLL) ── */
+  .projdash-stage-stats-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 22px !important;
+    background: var(--card-bg-solid, #ffffff) !important;
+    border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: thin !important;
+    white-space: nowrap !important;
+  }
+
+  .projdash-stage-stat-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 88px !important;
+    padding: 6px 10px !important;
+    border-radius: 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    user-select: none !important;
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  .projdash-stage-stat-box:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .projdash-stage-stat-box.active {
+    font-weight: 800 !important;
+  }
+
+  .projdash-stage-stat-number {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+  }
+
+  .projdash-stage-stat-label {
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+    margin-top: 2px !important;
+    white-space: nowrap !important;
   }
 
   /* ==================== MODERN PROJECT POPUP CARD ==================== */
@@ -132,8 +311,9 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(10, 15, 30, 0.65);
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     z-index: 1060;
     display: none;
     align-items: center;
@@ -141,255 +321,276 @@
   }
 
   .projdash-popup-card {
-    background: white;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 780px;
-    max-height: 90vh;
+    background: var(--card-bg-solid, white);
+    border-radius: 24px;
+    width: 92%;
+    max-width: 860px;
+    max-height: 88vh;
     overflow: hidden;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
-    animation: popupFadeIn 0.4s ease forwards;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+    animation: popupFadeIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    display: flex;
+    flex-direction: column;
   }
 
   @keyframes popupFadeIn {
-    from { opacity: 0; transform: scale(0.92) translateY(40px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+    from { opacity: 0; transform: scale(0.92) translateY(30px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  /* Redesigned Compact & Beautiful Header */
   .projdash-popup-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
-    padding: 24px 32px;
+    padding: 1.25rem 2rem 1.1rem;
     position: relative;
+    flex-shrink: 0;
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .projdash-popup-header-content {
-    flex: 1;
-  }
-
-  .projdash-popup-header h2 {
-    margin: 0 0 6px 0;
-    font-size: 1.65rem;
-    font-weight: 700;
-    line-height: 1.2;
-  }
-
-  .projdash-popup-badge {
-    background: rgba(255,255,255,0.25);
-    color: white;
-    padding: 5px 14px;
-    border-radius: 30px;
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  .projdash-popup-meta {
-    display: flex;
-    gap: 18px;
-    margin-top: 12px;
-    font-size: 0.95rem;
-    opacity: 0.95;
+  .projdash-popup-header h3 {
+    margin: 0;
+    font-size: 1.45rem;
+    font-weight: 900;
+    line-height: 1.25;
+    padding-right: 36px;
+    color: #ffffff;
+    word-break: break-word;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   }
 
   .projdash-popup-close {
     position: absolute;
-    top: 18px;
-    right: 18px;
-    background: rgba(255,255,255,0.25);
+    top: 14px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    font-size: 1.5rem;
-    line-height: 1;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    line-height: 1;
   }
 
   .projdash-popup-close:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.35);
     transform: rotate(90deg);
   }
 
   .projdash-popup-body {
-    padding: 32px;
-    max-height: calc(90vh - 110px);
+    background: var(--background, #f8fafc);
     overflow-y: auto;
+    flex: 1;
   }
 
-  .projdash-popup-section {
-    margin-bottom: 32px;
-  }
-
-  .projdash-popup-section-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 14px;
+  /* Stage Progress Stepper */
+  .projdash-stepper {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 0;
+    overflow-x: auto;
+    padding: 8px 22px;
+    background: var(--card-bg-solid, white);
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    scrollbar-width: thin;
   }
 
-  .projdash-popup-desc {
-    background: #f8f9fa;
-    padding: 24px;
-    border-radius: 16px;
-    line-height: 1.75;
-    font-size: 1.02rem;
-    color: #444;
-    border-left: 5px solid var(--primary-color);
+  .projdash-stepper::-webkit-scrollbar { display: none; }
+
+  .projdash-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
+    position: relative;
+    min-width: 64px;
   }
 
-  .projdash-popup-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+  .projdash-step-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color, #e2e8f0);
+    background: var(--card-bg-solid, white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: var(--text-secondary, #94a3b8);
+    transition: all 0.3s ease;
+    z-index: 1;
+    position: relative;
   }
 
-  .projdash-popup-grid-item {
-    background: #f8f9fa;
-    padding: 18px 20px;
-    border-radius: 14px;
+  .projdash-step.done .projdash-step-dot {
+    background: var(--primary-color, #3b82f6);
+    border-color: var(--primary-color, #3b82f6);
+    color: white;
   }
 
-  .projdash-popup-grid-label {
-    font-size: 0.8rem;
-    color: #666;
+  .projdash-step.active .projdash-step-dot {
+    background: var(--card-bg-solid, white);
+    border-color: var(--primary-color, #3b82f6);
+    color: var(--primary-color, #3b82f6);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+    width: 26px;
+    height: 26px;
+  }
+
+  .projdash-step-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-secondary, #94a3b8);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
+    letter-spacing: 0.3px;
+    text-align: center;
+    white-space: nowrap;
   }
 
-  .projdash-popup-grid-value {
-    font-size: 1.18rem;
-    font-weight: 700;
-    color: var(--text-primary);
+  .projdash-step.done .projdash-step-label,
+  .projdash-step.active .projdash-step-label {
+    color: var(--primary-color, #3b82f6);
   }
 
-  .projdash-stage-badge {
-    display: inline-block;
-    padding: 12px 28px;
-    border-radius: 50px;
-    font-size: 1.05rem;
-    font-weight: 700;
+  .projdash-step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border-color, #e2e8f0);
+    margin-bottom: 20px;
+    min-width: 20px;
+    transition: background 0.3s ease;
+  }
+
+  .projdash-step-line.done {
+    background: var(--primary-color, #3b82f6);
+  }
+
+  /* Info grid inside popup body */
+  .popup-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 1.75rem 2rem;
+  }
+
+  .popup-info-card {
+    background: var(--card-bg-solid, white);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .popup-info-card.wide {
+    grid-column: span 2;
+  }
+
+  .popup-info-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--text-secondary, #94a3b8);
     text-transform: uppercase;
     letter-spacing: 0.6px;
   }
 
+  .popup-info-value {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-primary, #0f172a);
+    line-height: 1.3;
+  }
+
+  .popup-info-value.cost { color: var(--success-color, #16a34a); font-size: 1.35rem; }
+  .popup-info-value.desc { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary, #475569); line-height: 1.6; max-height: 100px; overflow-y: auto; white-space: pre-line; }
+
+  .projdash-stage-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
   /* Stage Colors */
-  .projdash-stage-ppp { background: #e3f2fd; color: #1976d2; }
+  .projdash-stage-ppp { background: #e0f2fe; color: #0284c7; }
   .projdash-stage-aon { background: #f3e5f5; color: #7b1fa2; }
   .projdash-stage-fbu { background: #fff3e0; color: #f57c00; }
   .projdash-stage-tob-tec { background: #e8f5e9; color: #388e3c; }
   .projdash-stage-b-bd { background: #fce4ec; color: #c2185b; }
   .projdash-stage-ocb-ra { background: #e0f2f1; color: #00796b; }
-  .projdash-stage-placement-of-so { background: #fff9c4; color: #f57f17; }
+  .projdash-stage-placement-of-so { background: #fef9c3; color: #a16207; }
   .projdash-stage-store-delivery { background: #ede7f6; color: #5e35b1; }
-  .projdash-stage-atp { background: #e1f5fe; color: #0277bd; }
-  .projdash-stage-prac-crac { background: #f1f8e9; color: #558b2f; }
-  .projdash-stage-payment { background: #fff8e1; color: #ff6f00; }
-  .projdash-stage-completed { background: #e8f5e9; color: #2e7d32; }
+  .projdash-stage-atp { background: #e0f2fe; color: #0369a1; }
+  .projdash-stage-prac-crac { background: #f0fdf4; color: #166534; }
+  .projdash-stage-payment { background: #fffbeb; color: #b45309; }
+  .projdash-stage-completed { background: #dcfce7; color: #15803d; }
 
-  /* Stage Stats Bar */
-  .projdash-stage-stats-bar {
-    display: flex;
-    gap: 12px;
-    padding: 18px 20px 12px 20px;
-    background: white;
-    border-bottom: 1px solid var(--border-color);
-    flex-wrap: wrap;
-  }
 
-  .projdash-stage-stat-box {
-    flex: 1;
-    min-width: 135px;
-    background: white;
-    border-radius: 14px;
-    padding: 14px 16px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.07);
-    border: 1px solid var(--border-color);
-    transition: all 0.3s ease;
-  }
-
-  .projdash-stage-stat-box:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  }
-
-  .projdash-stage-stat-number {
-    font-size: 1.65rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .projdash-stage-stat-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .stat-aon { border-left: 6px solid #7b1fa2; }
-  .stat-tec { border-left: 6px solid #388e3c; }
-  .stat-so  { border-left: 6px solid #f57f17; }
-  .stat-atp { border-left: 6px solid #0277bd; }
-  .stat-payment { border-left: 6px solid #ff6f00; }
 
   /* Responsive */
   @media (max-width: 768px) {
-    .projdash-cards-grid { grid-template-columns: 1fr; gap: 16px; }
+    .projdash-cards-grid { grid-template-columns: 1fr; padding: 1rem; }
     .projdash-main-stats { gap: 16px; }
-    .projdash-popup-card { width: 96%; }
-    .projdash-popup-header { padding: 20px 24px; }
-    .projdash-popup-body { padding: 24px; }
+    .projdash-popup-card { width: 94%; }
   }
 </style>
 
 <!-- Projects Dashboard Modal -->
 <div class="modal fade" id="projDash_modal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
-    <div class="modal-content">
-      <!-- Improved Header with Active & Completed Counts -->
+    <div class="modal-content overflow-hidden">
+      
+      <!-- Minimal & Clean Compact Header -->
       <div class="projdash-header-wrapper">
         <div class="d-flex align-items-center gap-3">
-          <h5 class="mb-0">
-            <i class="fas fa-rocket me-2"></i>Projects Dashboard
-          </h5>
-          <button class="btn btn-light btn-sm fw-semibold ms-2"
-onclick="openStatisticsModal()">
-<i class="fas fa-chart-bar me-1"></i> View Statistics
-</button>
+          <div class="d-flex flex-column">
+            <h6 class="mb-0 text-white fw-bold d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+              <i class="fas fa-tasks"></i> Projects Dashboard
+            </h6>
+            <div style="font-size: 0.68rem; font-weight: 600; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.5px; margin-top: 1px;">
+              <i class="fa fa-user-shield me-1" style="font-size: 0.65rem;"></i> UPDATED BY PROJCO
+            </div>
+          </div>
+          <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 py-1 ms-2 shadow-sm" style="font-size: 0.78rem;" onclick="openStatisticsModal()">
+            <i class="fas fa-chart-bar me-1"></i> View Statistics
+          </button>
         </div>
 
-        <!-- Active + Completed Stats -->
-        <div class="projdash-main-stats">
-          <div class="projdash-main-stat">
-            <div class="projdash-main-stat-number" id="projdashTotalCount">0</div>
-            <div class="projdash-main-stat-label">Total</div>
+        <!-- Compact Header Stats -->
+        <div class="projdash-main-stats d-flex align-items-center gap-3">
+          <div class="projdash-main-stat" style="min-width: 50px;">
+            <div class="projdash-main-stat-number" id="projdashTotalCount" style="font-size: 1.1rem;">0</div>
+            <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Total</div>
           </div>
-          <div class="projdash-main-stat">
-            <div class="projdash-main-stat-number" id="projdashActiveCount">0</div>
-            <div class="projdash-main-stat-label">Active</div>
+          <div class="projdash-main-stat" style="min-width: 50px;">
+            <div class="projdash-main-stat-number text-warning" id="projdashActiveCount" style="font-size: 1.1rem;">0</div>
+            <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Active</div>
           </div>
-          <div class="projdash-main-stat">
-            <div class="projdash-main-stat-number" style="color: #2196f3;" id="projdashCompletedCount">0</div>
-            <div class="projdash-main-stat-label">Completed</div>
+          <div class="projdash-main-stat" style="min-width: 50px;">
+            <div class="projdash-main-stat-number" id="projdashCompletedCount" style="font-size: 1.1rem; color: #4ade80; font-weight: 900;">0</div>
+            <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Completed</div>
           </div>
         </div>
 
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <!-- Filters -->
+      <!-- Clean Filters -->
       <div class="projdash-filters-bar">
         <div class="projdash-filter-group">
-          <label style="font-size: 0.9rem; font-weight: 600;">Stage:</label>
+          <span class="small fw-bold text-secondary text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Stage</span>
           <select class="projdash-filter-dropdown" id="prjStageFilter" onchange="filterProjectsData()">
             <option value="">All Stages</option>
             <option value="PPP">PPP</option>
@@ -408,7 +609,7 @@ onclick="openStatisticsModal()">
         </div>
 
         <div class="projdash-filter-group">
-          <label style="font-size: 0.9rem; font-weight: 600;">Head:</label>
+          <span class="small fw-bold text-secondary text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Head</span>
           <select class="projdash-filter-dropdown" id="prjHeadFilter" onchange="filterProjectsData()">
             <option value="">All Heads</option>
           </select>
@@ -417,14 +618,14 @@ onclick="openStatisticsModal()">
         <div class="projdash-search-wrapper">
           <i class="fas fa-search projdash-search-icon"></i>
           <input type="text" class="projdash-search-field" id="prjSearchInput"
-                 placeholder="Search projects..." onkeyup="filterProjectsData()">
+                 placeholder="Search projects by title, description or owner..." onkeyup="filterProjectsData()">
         </div>
       </div>
 
       <!-- Stage Stats Bar -->
       <div class="projdash-stage-stats-bar" id="projdashStageStatsBar"></div>
 
-      <div class="modal-body projdash-dashboard-container">
+      <div class="modal-body p-0">
         <div class="projdash-cards-grid" id="prjCardsGrid">
           <!-- Cards loaded here -->
         </div>
@@ -433,41 +634,65 @@ onclick="openStatisticsModal()">
   </div>
 </div>
 
-<!-- ==================== MODERN PROJECT POPUP CARD ==================== -->
+<!-- ==================== REDESIGNED PROJECT DETAILS POPUP ==================== -->
 <div class="projdash-popup-overlay" id="projdashPopupOverlay">
   <div class="projdash-popup-card">
-    <div class="projdash-popup-header">
-      <div class="projdash-popup-header-content">
-        <h2 id="popupTitle">Project Title</h2>
-        <span class="projdash-popup-badge" id="popupBadge">PRJ-001</span>
-        <div class="projdash-popup-meta" id="popupMeta"></div>
+
+    <!-- Dynamic Header with Prominently Visible Project Name -->
+    <div class="projdash-popup-header" id="popupHeader">
+      <div class="d-flex align-items-center gap-2">
+        <span id="popupBadge" class="badge text-white"
+              style="background:rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">PRJ-001</span>
       </div>
-      <button class="projdash-popup-close" onclick="closeProjectPopup()">×</button>
+      <h3 id="popupTitle" class="mb-0 text-white fw-bold"></h3>
+      <button class="projdash-popup-close" onclick="closeProjectPopup()" aria-label="Close">×</button>
     </div>
-    
+
+    <!-- Stage Progress Stepper -->
+    <div class="projdash-stepper" id="popupStepper"></div>
+
+    <!-- Info Grid Body -->
     <div class="projdash-popup-body">
-      <!-- Description -->
-      <div class="projdash-popup-section">
-        <div class="projdash-popup-section-title">
-          <i class="fas fa-align-left"></i> Project Description
-        </div>
-        <div class="projdash-popup-desc" id="popupDescription"></div>
-      </div>
+      <div class="popup-info-grid">
 
-      <!-- Project Details -->
-      <div class="projdash-popup-section">
-        <div class="projdash-popup-section-title">
-          <i class="fas fa-info-circle"></i> Project Details
+        <!-- Description (full width) -->
+        <div class="popup-info-card wide">
+          <div class="popup-info-label"><i class="fas fa-align-left me-1"></i>Project Description</div>
+          <div class="popup-info-value desc" id="popupDescription">No description provided.</div>
         </div>
-        <div class="projdash-popup-grid" id="popupDetailsGrid"></div>
-      </div>
 
-      <!-- Current Status -->
-      <div class="projdash-popup-section">
-        <div class="projdash-popup-section-title">
-          <i class="fas fa-tasks"></i> Current Status
+        <!-- Cost -->
+        <div class="popup-info-card">
+          <div class="popup-info-label"><i class="fas fa-wallet me-1"></i>Estimated Cost</div>
+          <div class="popup-info-value cost" id="popupCost">₹ 0</div>
         </div>
-        <div id="popupCurrentStage"></div>
+
+        <!-- Current Stage -->
+        <div class="popup-info-card d-flex flex-row align-items-center justify-content-between">
+          <div>
+            <div class="popup-info-label"><i class="fas fa-flag me-1"></i>Current Status</div>
+          </div>
+          <div id="popupCurrentStage"></div>
+        </div>
+
+        <!-- Owner -->
+        <div class="popup-info-card d-flex flex-row align-items-center justify-content-between">
+          <div class="popup-info-label"><i class="fas fa-user-tag me-1"></i>Project Head</div>
+          <div class="popup-info-value" id="popupOwner" style="font-size:0.95rem;">—</div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="popup-info-card d-flex flex-row align-items-center justify-content-between">
+          <div class="popup-info-label"><i class="fas fa-calendar-alt me-1"></i>Start Date</div>
+          <div class="popup-info-value" id="popupStartDate" style="font-size:0.95rem;color:#3b82f6;">N/A</div>
+        </div>
+
+        <!-- Items -->
+        <div class="popup-info-card wide">
+          <div class="popup-info-label"><i class="fas fa-boxes me-1"></i>Items</div>
+          <div class="popup-info-value" id="popupItems" style="font-size:0.95rem;">—</div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -476,6 +701,8 @@ onclick="openStatisticsModal()">
 <!-- Includes -->
 {%include 'modals/add_new_project/modal.html'%}
 {%include 'modals/projects/view_cost_graph_modal.html'%}
+
+
 
 <script>
   let allProjectsData = [];
@@ -525,62 +752,166 @@ onclick="openStatisticsModal()">
     document.getElementById('projdashCompletedCount').textContent = completed;
   }
 
+  function getProjectProgress(stage) {
+    if (!stage) return 0;
+    const s = stage.toUpperCase().trim();
+    if (s.includes('COMPLETED')) return 100;
+    if (s.includes('PAYMENT')) return 99;
+    if (s.includes('PRAC') || s.includes('CRAC')) return 95;
+    if (s.includes('ATP')) return 90;
+    if (s.includes('STORE') || s.includes('DELIVERY')) return 80;
+    if (s.includes('SO') || s.includes('PLACEMENT')) return 70;
+    if (s.includes('OCB') || s.includes('RA')) return 60;
+    if (s.includes('B BD')) return 50;
+    if (s.includes('TOB') || s.includes('TEC')) return 40;
+    if (s.includes('FBU')) return 30;
+    if (s.includes('AON')) return 20;
+    if (s.includes('PPP')) return 10;
+    return 10;
+  }
+
   function renderProjectsData(projects) {
     const grid = document.getElementById('prjCardsGrid');
     if (!projects.length) {
-      grid.innerHTML = `<div class="projdash-empty-state"><i class="fas fa-search"></i><h4>No Projects Found</h4></div>`;
+      grid.innerHTML = `<div class="w-100 text-center text-muted py-5"><i class="fas fa-search fs-1"></i><h4 class="mt-2">No Projects Found</h4></div>`;
       return;
     }
-    grid.innerHTML = projects.map(p => `
-      <div class="projdash-single-card" onclick="openProjectPopup(${p.id})">
-        <h3 class="projdash-card-heading">${escapeHtmlText(p.title || 'Untitled')}</h3>
-        <div class="d-flex justify-content-between align-items-center">
-          <div style="font-size:0.95rem;font-weight:600;color:var(--text-secondary);">
-            <i class="fas fa-user me-1"></i>${escapeHtmlText(p.owner || 'Unassigned')}
+    
+    grid.innerHTML = projects.map(p => {
+      const progress = getProjectProgress(p.stage);
+      const stageClass = getProjectStageClass(p.stage);
+      const ownerName = p.owner || 'Unassigned';
+      const initials = ownerName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+      // Gradient accent color per stage
+      const stageGradients = {
+        'ppp': 'linear-gradient(90deg,#0284c7,#38bdf8)',
+        'aon': 'linear-gradient(90deg,#7b1fa2,#c084fc)',
+        'fbu': 'linear-gradient(90deg,#f57c00,#fbbf24)',
+        'tob_tec': 'linear-gradient(90deg,#388e3c,#4ade80)',
+        'b_bd': 'linear-gradient(90deg,#c2185b,#f472b6)',
+        'ocb_ra': 'linear-gradient(90deg,#00796b,#34d399)',
+        'placement_of_so': 'linear-gradient(90deg,#a16207,#fbbf24)',
+        'store_items_delivery': 'linear-gradient(90deg,#5e35b1,#a78bfa)',
+        'atp': 'linear-gradient(90deg,#0369a1,#38bdf8)',
+        'prac_crac': 'linear-gradient(90deg,#166534,#4ade80)',
+        'payment': 'linear-gradient(90deg,#b45309,#fcd34d)',
+        'completed': 'linear-gradient(90deg,#15803d,#86efac)'
+      };
+
+      const stageKey = (p.stage||'').toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
+      const accentGrad = stageGradients[stageKey] || 'linear-gradient(90deg,#3b82f6,#8b5cf6)';
+      const progressBarGrad = accentGrad;
+
+      const userRole = "{{ role | default(session.get('role', '')) }}".toUpperCase();
+      const canEditProjects = ['PROJECT OFFICER', 'PROJECT JCO', 'CO', '2IC', 'ADJUTANT', 'ADMIN', 'OC'].includes(userRole);
+
+      return `
+        <div class="projdash-single-card" onclick="openProjectPopup(${p.id})">
+
+          <!-- Colored accent strip that matches stage -->
+          <div class="projdash-card-accent" style="background:${accentGrad};"></div>
+
+          <div class="projdash-card-body">
+            <!-- Top Row: ID badge + Stage pill -->
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bold" style="font-size:0.7rem;color:#94a3b8;letter-spacing:1px;">PRJ-${String(p.id).padStart(3, '0')}</span>
+              <span class="projdash-stage-badge ${stageClass}" style="font-size:0.68rem;padding:3px 10px;border-radius:99px;font-weight:800;">${p.stage || 'Planning'}</span>
+            </div>
+
+            <!-- Title -->
+            <h4 class="projdash-card-heading">${escapeHtmlText(p.project_name || p.title || 'Untitled')}</h4>
+
+            <!-- Description -->
+            <p class="projdash-card-desc m-0">${escapeHtmlText(p.description || 'No description provided.')}</p>
+
+            <!-- Progress bar -->
+            <div style="margin-top:auto;padding-top:8px;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size:0.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;">Progress</span>
+                <span style="font-size:0.68rem;font-weight:800;color:#475569;">${progress}%</span>
+              </div>
+              <div style="background:#f1f5f9;border-radius:99px;height:5px;overflow:hidden;">
+                <div style="width:${progress}%;height:100%;border-radius:99px;background:${progressBarGrad};transition:width 0.8s ease;"></div>
+              </div>
+            </div>
           </div>
-          <div style="font-size:1.15rem;font-weight:700;color:#2e7d32;">${formatProjectCurrency(p.cost)}</div>
+
+          <!-- Footer row -->
+          <div class="projdash-card-footer">
+            <div class="d-flex align-items-center gap-2">
+              <div class="projdash-owner-avatar" style="background:${accentGrad};">${initials}</div>
+              <span style="font-size:0.78rem;font-weight:600;color:#475569;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtmlText(ownerName)}</span>
+            </div>
+            <div style="font-size:1rem;font-weight:800;color:#15803d;">${formatProjectCurrency(p.cost)}</div>
+          </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   function openProjectPopup(id) {
     selectedProjectData = allProjectsData.find(p => p.id === id);
     if (!selectedProjectData) return;
 
-    document.getElementById('popupTitle').textContent = selectedProjectData.title || 'Untitled Project';
-    document.getElementById('popupBadge').textContent = `PRJ-${String(selectedProjectData.id).padStart(3, '0')}`;
+    const p = selectedProjectData;
+    const stageClass = getProjectStageClass(p.stage);
 
-    const metaHTML = `
-      <div><i class="fas fa-user"></i> ${escapeHtmlText(selectedProjectData.owner || 'Unassigned')}</div>
-      ${selectedProjectData.start_date ? `<div><i class="fas fa-calendar-alt"></i> ${formatProjectDate(selectedProjectData.start_date)}</div>` : ''}
-    `;
-    document.getElementById('popupMeta').innerHTML = metaHTML;
+    // Stage gradient map for header
+    const stageGradients = {
+      'ppp': 'linear-gradient(135deg,#0284c7,#38bdf8)',
+      'aon': 'linear-gradient(135deg,#7b1fa2,#c084fc)',
+      'fbu': 'linear-gradient(135deg,#f57c00,#fbbf24)',
+      'tob_tec': 'linear-gradient(135deg,#388e3c,#4ade80)',
+      'b_bd': 'linear-gradient(135deg,#c2185b,#f472b6)',
+      'ocb_ra': 'linear-gradient(135deg,#00796b,#34d399)',
+      'placement_of_so': 'linear-gradient(135deg,#a16207,#fbbf24)',
+      'store_items_delivery': 'linear-gradient(135deg,#5e35b1,#a78bfa)',
+      'atp': 'linear-gradient(135deg,#0369a1,#38bdf8)',
+      'prac_crac': 'linear-gradient(135deg,#166534,#4ade80)',
+      'payment': 'linear-gradient(135deg,#b45309,#fcd34d)',
+      'completed': 'linear-gradient(135deg,#15803d,#86efac)'
+    };
+    const stageKey = (p.stage||'').toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
+    const headerGrad = stageGradients[stageKey] || 'linear-gradient(135deg,#1e3a8a,#3b82f6)';
 
-    document.getElementById('popupDescription').textContent = selectedProjectData.description || 'No description provided.';
+    document.getElementById('popupHeader').style.background = headerGrad;
+    document.getElementById('popupTitle').textContent = p.project_name || p.title || 'Untitled Project';
+    document.getElementById('popupBadge').textContent = `PRJ-${String(p.id).padStart(3, '0')}`;
+    document.getElementById('popupDescription').textContent = p.description || 'No description provided.';
+    document.getElementById('popupCost').textContent = formatProjectCurrency(p.cost);
+    document.getElementById('popupOwner').textContent = p.owner || 'Unassigned';
+    document.getElementById('popupStartDate').textContent = p.start_date ? formatProjectDate(p.start_date) : 'N/A';
+    document.getElementById('popupItems').textContent = p.items || '—';
+    document.getElementById('popupCurrentStage').innerHTML =
+      `<span class="projdash-stage-badge ${stageClass}">${p.stage || 'Planning'}</span>`;
 
-    document.getElementById('popupDetailsGrid').innerHTML = `
-      <div class="projdash-popup-grid-item">
-        <div class="projdash-popup-grid-label">Cost</div>
-        <div class="projdash-popup-grid-value">${formatProjectCurrency(selectedProjectData.cost)}</div>
-      </div>
-      <div class="projdash-popup-grid-item">
-        <div class="projdash-popup-grid-label">Items</div>
-        <div class="projdash-popup-grid-value">${selectedProjectData.items || '-'}</div>
-      </div>
-      <div class="projdash-popup-grid-item">
-        <div class="projdash-popup-grid-label">Quantity</div>
-        <div class="projdash-popup-grid-value">${selectedProjectData.quantity || '0'}</div>
-      </div>
-    `;
-
-    const stageClass = getProjectStageClass(selectedProjectData.stage);
-    document.getElementById('popupCurrentStage').innerHTML = `
-      <span class="projdash-stage-badge ${stageClass}">${selectedProjectData.stage || 'Planning'}</span>
-    `;
+    // Build stage stepper
+    const stages = ['PPP','AON','FBU','TOB & TEC','B BD','OCB RA','Placement Of SO','Store/Items Delivery','ATP','PRAC & CRAC','Payment','Completed'];
+    const currentIdx = stages.findIndex(s => s.toUpperCase() === (p.stage||'').toUpperCase());
+    const stepper = document.getElementById('popupStepper');
+    stepper.innerHTML = stages.map((s, i) => {
+      const isDone = i < currentIdx;
+      const isActive = i === currentIdx;
+      const cls = isDone ? 'done' : isActive ? 'active' : '';
+      const shortLabel = s.replace('Placement Of SO','SO').replace('Store/Items Delivery','Delivery').replace('TOB & TEC','TEC').replace('PRAC & CRAC','CRAC');
+      const dotContent = isDone ? '✓' : (i + 1);
+      const lineHtml = i < stages.length - 1
+        ? `<div class="projdash-step-line ${isDone ? 'done' : ''}"></div>`
+        : '';
+      return `
+        <div class="projdash-step ${cls}">
+          <div class="projdash-step-dot">${dotContent}</div>
+          <div class="projdash-step-label">${shortLabel}</div>
+        </div>
+        ${lineHtml}
+      `;
+    }).join('');
 
     document.getElementById('projdashPopupOverlay').style.display = 'flex';
   }
+
+
 
   function closeProjectPopup() {
     document.getElementById('projdashPopupOverlay').style.display = 'none';
@@ -606,24 +937,79 @@ onclick="openStatisticsModal()">
     renderStageWiseStats();
   }
 
+  const ALL_STAGES_CONFIG = [
+    { key: 'PPP', label: 'PPP', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.08)', border: '#6366f1' },
+    { key: 'AON', label: 'AON', color: '#7b1fa2', bg: 'rgba(123, 31, 162, 0.08)', border: '#7b1fa2' },
+    { key: 'FBU', label: 'FBU', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.08)', border: '#0284c7' },
+    { key: 'TOB & TEC', label: 'TOB & TEC', color: '#388e3c', bg: 'rgba(56, 142, 60, 0.08)', border: '#388e3c' },
+    { key: 'B BD', label: 'B BD', color: '#d97706', bg: 'rgba(217, 119, 6, 0.08)', border: '#d97706' },
+    { key: 'OCB RA', label: 'OCB RA', color: '#4f46e5', bg: 'rgba(79, 70, 229, 0.08)', border: '#4f46e5' },
+    { key: 'Placement Of SO', label: 'SO Placement', color: '#a16207', bg: 'rgba(161, 98, 7, 0.08)', border: '#a16207' },
+    { key: 'Store/Items Delivery', label: 'Store Delivery', color: '#0891b2', bg: 'rgba(8, 145, 178, 0.08)', border: '#0891b2' },
+    { key: 'ATP', label: 'ATP', color: '#0369a1', bg: 'rgba(3, 105, 161, 0.08)', border: '#0369a1' },
+    { key: 'PRAC & CRAC', label: 'PRAC & CRAC', color: '#9333ea', bg: 'rgba(147, 51, 234, 0.08)', border: '#9333ea' },
+    { key: 'Payment', label: 'Payment', color: '#b45309', bg: 'rgba(180, 83, 9, 0.08)', border: '#b45309' },
+    { key: 'Completed', label: 'Completed', color: '#16a34a', bg: 'rgba(22, 163, 74, 0.08)', border: '#16a34a' }
+  ];
+
   function renderStageWiseStats() {
     const bar = document.getElementById('projdashStageStatsBar');
-    const counts = {
-      aon: allProjectsData.filter(p => (p.stage || '').toUpperCase() === 'AON').length,
-      tec: allProjectsData.filter(p => (p.stage || '').toUpperCase() === 'TOB & TEC').length,
-      so:  allProjectsData.filter(p => (p.stage || '').toUpperCase() === 'PLACEMENT OF SO').length,
-      atp: allProjectsData.filter(p => (p.stage || '').toUpperCase() === 'ATP').length,
-      pay: allProjectsData.filter(p => (p.stage || '').toUpperCase() === 'PAYMENT').length
-    };
+    if (!bar) return;
 
-    bar.innerHTML = `
-      <div class="projdash-stage-stat-box stat-aon"><div class="projdash-stage-stat-number" style="color:#7b1fa2">${counts.aon}</div><div class="projdash-stage-stat-label" style="color:#7b1fa2">AON</div></div>
-      <div class="projdash-stage-stat-box stat-tec"><div class="projdash-stage-stat-number" style="color:#388e3c">${counts.tec}</div><div class="projdash-stage-stat-label" style="color:#388e3c">TEC</div></div>
-      <div class="projdash-stage-stat-box stat-so"><div class="projdash-stage-stat-number" style="color:#f57f17">${counts.so}</div><div class="projdash-stage-stat-label" style="color:#f57f17">SO</div></div>
-      <div class="projdash-stage-stat-box stat-atp"><div class="projdash-stage-stat-number" style="color:#0277bd">${counts.atp}</div><div class="projdash-stage-stat-label" style="color:#0277bd">ATP</div></div>
-      <div class="projdash-stage-stat-box stat-payment"><div class="projdash-stage-stat-number" style="color:#ff6f00">${counts.pay}</div><div class="projdash-stage-stat-label" style="color:#ff6f00">Payment</div></div>
-    `;
+    const currentSelectedStage = (document.getElementById('prjStageFilter')?.value || '').toLowerCase().trim();
+
+    let html = '';
+    ALL_STAGES_CONFIG.forEach(stg => {
+      const matchCount = allProjectsData.filter(p => {
+        const pStage = (p.stage || '').toLowerCase().trim();
+        const stgKey = stg.key.toLowerCase().trim();
+        if (stgKey === 'store/items delivery') {
+          return pStage.includes('store') || pStage.includes('delivery');
+        }
+        return pStage === stgKey;
+      }).length;
+
+      const isActive = currentSelectedStage && (
+        currentSelectedStage === stg.key.toLowerCase().trim() ||
+        (stg.key.toLowerCase() === 'store/items delivery' && (currentSelectedStage.includes('store') || currentSelectedStage.includes('delivery')))
+      );
+
+      const activeStyle = isActive
+        ? `border: 2px solid ${stg.color}; box-shadow: 0 0 0 3px ${stg.color}33; transform: scale(1.03); background: #ffffff;`
+        : `border: 1px solid ${stg.border}44; background: ${stg.bg};`;
+
+      html += `
+        <div class="projdash-stage-stat-box ${isActive ? 'active' : ''}" 
+             style="${activeStyle}"
+             title="Click to filter by ${stg.label}"
+             onclick="filterByStageCard('${escapeHtmlText(stg.key)}')">
+          <div class="projdash-stage-stat-number" style="color:${stg.color}">${matchCount}</div>
+          <div class="projdash-stage-stat-label" style="color:${stg.color}">${stg.label}</div>
+        </div>
+      `;
+    });
+
+    bar.innerHTML = html;
   }
+
+  window.filterByStageCard = function(stageKey) {
+    const stageSelect = document.getElementById('prjStageFilter');
+    if (!stageSelect) return;
+
+    const currentVal = (stageSelect.value || '').toLowerCase().trim();
+    const targetKey  = (stageKey || '').toLowerCase().trim();
+
+    if (currentVal === targetKey || (targetKey.includes('store') && currentVal.includes('store'))) {
+      stageSelect.value = '';
+    } else {
+      const foundOpt = Array.from(stageSelect.options).find(opt => {
+        const optVal = opt.value.toLowerCase().trim();
+        return optVal === targetKey || (targetKey.includes('store') && optVal.includes('store'));
+      });
+      stageSelect.value = foundOpt ? foundOpt.value : stageKey;
+    }
+    filterProjectsData();
+  };
 
   function getProjectStageClass(stage) {
     if (!stage) return 'projdash-stage-ppp';
@@ -645,7 +1031,9 @@ onclick="openStatisticsModal()">
     return isNaN(n) ? '₹ 0' : '₹ ' + n.toLocaleString('en-IN', {maximumFractionDigits: 2});
   }
 
+  // Helper function to safely escape text to avoid HTML injection
   function escapeHtmlText(t) {
+    if (!t) return '';
     const d = document.createElement('div'); d.textContent = t; return d.innerHTML;
   }
 
