@@ -1,0 +1,2261 @@
+id,personnel_id,army_number,sr_no,unit,from_date,to_date,duty_performed
+1,,TEST00001,1,Test Training Unit,2011-06-24,2012-09-16,Technical Duty
+2,,TEST00001,2,Test Support Unit,2012-12-14,2014-02-07,General Duty
+3,,TEST00002,1,Test ASC Unit,2015-05-07,2016-10-28,Technical Duty
+4,,TEST00002,2,Test Transport Unit,2017-01-14,2017-09-11,Field Duty
+5,,TEST00003,1,Test Field Unit,2003-01-27,2004-06-20,Technical Duty
+6,,TEST00003,2,Test Infantry Unit A,2004-07-12,2005-05-08,Administrative Duty
+7,,TEST00003,3,Test Support Unit,2005-05-20,2007-06-09,Field Duty
+8,,TEST00004,1,Test Field Unit,2024-04-19,2026-06-08,Field Duty
+9,,TEST00004,2,Test Infantry Unit A,2026-07-29,2027-07-24,Technical Duty
+10,,TEST00005,1,Test Support Unit,2002-05-27,2003-01-22,Store Duty
+11,,TEST00005,2,Test Infantry Unit B,2003-02-25,2005-08-13,Administrative Duty
+12,,TEST00006,1,Test Infantry Unit A,2014-12-30,2017-06-17,Field Duty
+13,,TEST00006,2,Test Training Unit,2017-09-07,2019-11-26,Administrative Duty
+14,,TEST00006,3,Test Support Unit,2019-12-22,2022-06-09,Store Duty
+15,,TEST00007,1,Test Infantry Unit A,2015-10-11,2017-08-01,General Duty
+16,,TEST00007,2,Test Infantry Unit B,2017-08-29,2018-12-22,Technical Duty
+17,,TEST00008,1,Test Training Unit,2019-03-04,2021-03-23,Administrative Duty
+18,,TEST00008,2,Test Field Unit,2021-05-21,2022-10-13,Technical Duty
+19,,TEST00009,1,Test Administrative Unit,2025-08-31,2026-08-26,General Duty
+20,,TEST00009,2,Test HQ Unit,2026-09-23,2028-08-13,General Duty
+21,,TEST00010,1,Test ASC Unit,2014-02-25,2016-01-16,Technical Duty
+22,,TEST00010,2,Test Transport Unit,2016-04-06,2018-02-25,Administrative Duty
+23,,TEST00011,1,Test Training Unit,2022-02-19,2023-12-11,Field Duty
+24,,TEST00011,2,Test Infantry Unit A,2024-03-22,2025-01-16,Communication Duty
+25,,TEST00012,1,Test Support Unit,2005-02-02,2006-01-28,Technical Duty
+26,,TEST00012,2,Test Infantry Unit B,2006-05-28,2007-10-20,Store Duty
+27,,TEST00013,1,Test Store Unit,2008-01-12,2009-05-06,Technical Duty
+28,,TEST00013,2,Test Ordnance Unit,2009-08-29,2012-01-16,Field Duty
+29,,TEST00014,1,Test EME Unit A,2019-08-11,2020-05-07,Technical Duty
+30,,TEST00014,2,Test Workshop Unit,2020-05-24,2021-04-19,General Duty
+31,,TEST00015,1,Test Signal Unit B,2010-02-13,2012-04-03,Field Duty
+32,,TEST00015,2,Test Communication Unit,2012-06-09,2013-12-31,Communication Duty
+33,,TEST00016,1,Test Transport Unit,2020-03-03,2021-12-23,Store Duty
+34,,TEST00016,2,Test ASC Unit,2022-03-29,2023-10-20,Administrative Duty
+35,,TEST00017,1,Test Infantry Unit B,2027-11-15,2029-10-05,General Duty
+36,,TEST00017,2,Test Training Unit,2029-11-01,2031-02-24,Communication Duty
+37,,TEST00017,3,Test Support Unit,2031-04-30,2031-12-26,General Duty
+38,,TEST00018,1,Test Infantry Unit A,2011-07-09,2012-04-04,Technical Duty
+39,,TEST00018,2,Test Training Unit,2012-04-17,2014-01-07,Store Duty
+40,,TEST00019,1,Test Artillery Unit B,2014-01-18,2015-05-13,General Duty
+41,,TEST00019,2,Test Artillery Unit A,2015-07-24,2016-08-17,Communication Duty
+42,,TEST00020,1,Test HQ Unit,2014-09-30,2017-02-16,Administrative Duty
+43,,TEST00020,2,Test Administrative Unit,2017-04-24,2018-03-20,Technical Duty
+44,,TEST00021,1,Test Ordnance Unit,2012-02-13,2014-08-01,General Duty
+45,,TEST00021,2,Test Store Unit,2014-10-09,2015-08-05,Technical Duty
+46,,TEST00022,1,Test Support Unit,2029-06-24,2030-05-20,Technical Duty
+47,,TEST00022,2,Test Training Unit,2030-06-05,2032-03-26,Field Duty
+48,,TEST00023,1,Test HQ Unit,2005-05-21,2006-10-13,Administrative Duty
+49,,TEST00023,2,Test Administrative Unit,2006-12-29,2008-04-22,Communication Duty
+50,,TEST00024,1,Test Store Unit,2023-09-16,2024-08-11,Field Duty
+51,,TEST00024,2,Test Ordnance Unit,2024-09-15,2025-05-13,General Duty
+52,,TEST00025,1,Test Infantry Unit B,2012-04-27,2014-04-17,Field Duty
+53,,TEST00025,2,Test Field Unit,2014-06-11,2016-04-01,Communication Duty
+54,,TEST00025,3,Test Support Unit,2016-07-10,2018-04-01,Store Duty
+55,,TEST00026,1,Test Infantry Unit A,2007-01-26,2009-02-14,General Duty
+56,,TEST00026,2,Test Infantry Unit B,2009-04-07,2010-06-01,Field Duty
+57,,TEST00026,3,Test Training Unit,2010-09-21,2011-11-15,Store Duty
+58,,TEST00027,1,Test Workshop Unit,2023-04-03,2024-12-23,Communication Duty
+59,,TEST00027,2,Test EME Unit A,2025-02-26,2026-02-21,General Duty
+60,,TEST00028,1,Test EME Unit B,2010-01-18,2012-07-06,Communication Duty
+61,,TEST00028,2,Test Engineer Unit,2012-07-18,2013-04-14,General Duty
+62,,TEST00029,1,Test Support Unit,2021-01-29,2022-06-23,Administrative Duty
+63,,TEST00029,2,Test Training Unit,2022-09-21,2024-11-09,General Duty
+64,,TEST00029,3,Test Infantry Unit A,2025-02-23,2025-12-20,General Duty
+65,,TEST00030,1,Test Training Unit,2020-04-02,2022-01-22,General Duty
+66,,TEST00030,2,Test Support Unit,2022-03-05,2022-11-30,General Duty
+67,,TEST00030,3,Test Field Unit,2023-03-15,2025-07-02,Administrative Duty
+68,,TEST00031,1,Test EME Unit A,2006-01-01,2008-02-20,General Duty
+69,,TEST00031,2,Test Workshop Unit,2008-04-10,2009-07-04,Field Duty
+70,,TEST00032,1,Test Field Unit,2009-01-15,2009-10-12,Administrative Duty
+71,,TEST00032,2,Test Infantry Unit B,2010-01-08,2012-03-28,Store Duty
+72,,TEST00033,1,Test Training Unit,2017-04-08,2018-11-29,Store Duty
+73,,TEST00033,2,Test Support Unit,2019-02-14,2021-01-04,Field Duty
+74,,TEST00034,1,Test Transport Unit,2010-05-03,2012-06-21,Communication Duty
+75,,TEST00034,2,Test ASC Unit,2012-09-26,2013-08-22,Communication Duty
+76,,TEST00035,1,Test Infantry Unit A,2016-08-24,2018-04-16,General Duty
+77,,TEST00035,2,Test Support Unit,2018-05-15,2019-07-09,Communication Duty
+78,,TEST00036,1,Test Administrative Unit,2021-04-06,2023-05-26,Administrative Duty
+79,,TEST00036,2,Test HQ Unit,2023-07-06,2024-09-28,Technical Duty
+80,,TEST00037,1,Test Workshop Unit,2025-11-17,2027-01-11,Field Duty
+81,,TEST00037,2,Test EME Unit A,2027-04-19,2029-04-08,Field Duty
+82,,TEST00038,1,Test Artillery Unit A,2020-10-28,2021-06-25,General Duty
+83,,TEST00038,2,Test Artillery Unit B,2021-10-04,2023-01-27,Technical Duty
+84,,TEST00039,1,Test Infantry Unit A,2019-10-05,2021-07-26,General Duty
+85,,TEST00039,2,Test Infantry Unit B,2021-10-09,2023-07-31,Store Duty
+86,,TEST00040,1,Test Ordnance Unit,2005-01-25,2006-10-17,General Duty
+87,,TEST00040,2,Test Store Unit,2007-02-11,2008-03-07,Field Duty
+88,,TEST00041,1,Test Field Unit,2007-01-02,2009-01-21,General Duty
+89,,TEST00041,2,Test Infantry Unit A,2009-03-02,2010-09-23,Field Duty
+90,,TEST00042,1,Test Infantry Unit B,2009-11-11,2011-09-02,General Duty
+91,,TEST00042,2,Test Infantry Unit A,2011-12-14,2014-01-02,Store Duty
+92,,TEST00042,3,Test Support Unit,2014-04-02,2016-05-21,Administrative Duty
+93,,TEST00043,1,Test Infantry Unit A,2009-11-15,2011-03-10,Administrative Duty
+94,,TEST00043,2,Test Support Unit,2011-05-27,2012-05-21,Technical Duty
+95,,TEST00044,1,Test Support Unit,2003-04-24,2005-04-13,Store Duty
+96,,TEST00044,2,Test Field Unit,2005-07-26,2006-10-19,Store Duty
+97,,TEST00045,1,Test Store Unit,2011-07-18,2013-08-06,Technical Duty
+98,,TEST00045,2,Test Ordnance Unit,2013-08-23,2014-04-20,Administrative Duty
+99,,TEST00046,1,Test Support Unit,2006-02-23,2007-08-17,Communication Duty
+100,,TEST00046,2,Test Training Unit,2007-11-20,2008-09-15,Technical Duty
+101,,TEST00047,1,Test Support Unit,2010-08-13,2012-01-05,Store Duty
+102,,TEST00047,2,Test Infantry Unit A,2012-03-06,2012-12-31,Field Duty
+103,,TEST00048,1,Test Infantry Unit B,2013-03-22,2015-08-09,Store Duty
+104,,TEST00048,2,Test Support Unit,2015-09-22,2016-10-16,Store Duty
+105,,TEST00049,1,Test Training Unit,2011-05-17,2013-01-06,Store Duty
+106,,TEST00049,2,Test Infantry Unit B,2013-04-11,2015-03-02,Field Duty
+107,,TEST00049,3,Test Support Unit,2015-06-01,2016-02-26,Administrative Duty
+108,,TEST00050,1,Test Infantry Unit B,2020-12-18,2022-04-12,General Duty
+109,,TEST00050,2,Test Infantry Unit A,2022-08-01,2024-09-19,Communication Duty
+110,,TEST00051,1,Test Store Unit,2020-02-24,2022-01-14,Store Duty
+111,,TEST00051,2,Test Ordnance Unit,2022-04-16,2023-07-10,Technical Duty
+112,,TEST00052,1,Test Training Unit,2015-11-04,2017-04-27,Field Duty
+113,,TEST00052,2,Test Infantry Unit B,2017-06-24,2019-01-15,General Duty
+114,,TEST00053,1,Test Training Unit,2024-12-16,2026-05-10,Field Duty
+115,,TEST00053,2,Test Support Unit,2026-05-25,2028-08-12,Communication Duty
+116,,TEST00053,3,Test Infantry Unit A,2028-11-19,2031-03-09,Administrative Duty
+117,,TEST00054,1,Test Support Unit,2020-04-10,2021-08-03,Store Duty
+118,,TEST00054,2,Test Infantry Unit B,2021-10-06,2022-06-03,Administrative Duty
+119,,TEST00054,3,Test Field Unit,2022-08-09,2024-07-29,Administrative Duty
+120,,TEST00055,1,Test Store Unit,2012-08-08,2013-08-03,Store Duty
+121,,TEST00055,2,Test Ordnance Unit,2013-09-25,2014-08-21,Communication Duty
+122,,TEST00056,1,Test Engineer Unit,2007-03-23,2009-07-10,Communication Duty
+123,,TEST00056,2,Test EME Unit B,2009-08-24,2011-09-13,Store Duty
+124,,TEST00057,1,Test Communication Unit,2013-09-01,2014-12-25,Store Duty
+125,,TEST00057,2,Test Signal Unit A,2015-02-24,2017-03-15,Field Duty
+126,,TEST00058,1,Test Training Unit,2013-10-01,2015-06-23,Technical Duty
+127,,TEST00058,2,Test Infantry Unit A,2015-08-05,2017-03-27,Communication Duty
+128,,TEST00059,1,Test Training Unit,2021-05-14,2022-01-09,Store Duty
+129,,TEST00059,2,Test Infantry Unit A,2022-05-05,2023-03-01,General Duty
+130,,TEST00059,3,Test Infantry Unit B,2023-04-18,2024-02-12,Technical Duty
+131,,TEST00060,1,Test EME Unit B,2003-06-12,2005-10-29,Store Duty
+132,,TEST00060,2,Test Engineer Unit,2006-01-28,2007-02-22,Technical Duty
+133,,TEST00061,1,Test Infantry Unit A,2004-06-07,2006-04-28,Field Duty
+134,,TEST00061,2,Test Infantry Unit B,2006-06-29,2007-02-24,Administrative Duty
+135,,TEST00061,3,Test Training Unit,2007-03-29,2008-06-21,General Duty
+136,,TEST00062,1,Test EME Unit A,2014-02-21,2015-08-15,Field Duty
+137,,TEST00062,2,Test EME Unit B,2015-08-27,2016-09-20,Administrative Duty
+138,,TEST00063,1,Test Workshop Unit,2007-10-09,2009-01-31,General Duty
+139,,TEST00063,2,Test EME Unit A,2009-04-29,2010-03-25,Communication Duty
+140,,TEST00064,1,Test HQ Unit,2006-01-02,2007-04-27,General Duty
+141,,TEST00064,2,Test Administrative Unit,2007-08-15,2009-10-03,Communication Duty
+142,,TEST00065,1,Test Administrative Unit,2024-09-21,2025-07-18,Store Duty
+143,,TEST00065,2,Test HQ Unit,2025-08-13,2028-01-30,Administrative Duty
+144,,TEST00066,1,Test Training Unit,2019-05-19,2021-01-08,Communication Duty
+145,,TEST00066,2,Test Infantry Unit A,2021-05-04,2023-05-24,Technical Duty
+146,,TEST00067,1,Test HQ Unit,2019-08-19,2020-12-11,Communication Duty
+147,,TEST00067,2,Test Administrative Unit,2021-02-25,2022-01-21,Technical Duty
+148,,TEST00068,1,Test Training Unit,2026-02-05,2027-09-28,Field Duty
+149,,TEST00068,2,Test Infantry Unit B,2027-11-25,2029-03-19,Store Duty
+150,,TEST00069,1,Test Training Unit,2023-11-03,2026-04-21,Store Duty
+151,,TEST00069,2,Test Support Unit,2026-07-10,2028-04-30,Administrative Duty
+152,,TEST00070,1,Test Training Unit,2015-11-08,2016-09-03,Administrative Duty
+153,,TEST00070,2,Test Field Unit,2016-10-26,2018-12-15,Administrative Duty
+154,,TEST00070,3,Test Support Unit,2019-02-03,2021-06-22,General Duty
+155,,TEST00071,1,Test Training Unit,2007-11-25,2010-02-12,Field Duty
+156,,TEST00071,2,Test Infantry Unit B,2010-03-17,2010-12-12,Field Duty
+157,,TEST00072,1,Test Field Unit,2021-02-05,2022-09-28,Field Duty
+158,,TEST00072,2,Test Infantry Unit B,2022-10-13,2024-05-05,General Duty
+159,,TEST00072,3,Test Training Unit,2024-05-24,2026-04-14,General Duty
+160,,TEST00073,1,Test Transport Unit,2018-08-04,2019-09-28,Communication Duty
+161,,TEST00073,2,Test ASC Unit,2019-11-17,2021-02-09,Communication Duty
+162,,TEST00074,1,Test EME Unit A,2009-05-31,2010-11-22,Administrative Duty
+163,,TEST00074,2,Test EME Unit B,2011-02-16,2011-11-13,Communication Duty
+164,,TEST00075,1,Test Transport Unit,2009-09-27,2011-12-16,Field Duty
+165,,TEST00075,2,Test ASC Unit,2012-03-18,2014-05-07,Administrative Duty
+166,,TEST00076,1,Test Field Unit,2017-07-13,2018-08-07,General Duty
+167,,TEST00076,2,Test Training Unit,2018-09-23,2020-05-15,Communication Duty
+168,,TEST00077,1,Test Artillery Unit B,2022-03-30,2024-02-18,Communication Duty
+169,,TEST00077,2,Test Artillery Unit A,2024-03-05,2025-08-27,Communication Duty
+170,,TEST00078,1,Test Infantry Unit A,2016-11-18,2018-05-12,Communication Duty
+171,,TEST00078,2,Test Field Unit,2018-09-09,2020-04-01,Communication Duty
+172,,TEST00079,1,Test Field Unit,2018-12-15,2020-10-05,Administrative Duty
+173,,TEST00079,2,Test Infantry Unit A,2021-01-21,2022-07-15,Technical Duty
+174,,TEST00079,3,Test Training Unit,2022-08-18,2024-08-07,Store Duty
+175,,TEST00080,1,Test Infantry Unit B,2017-04-07,2018-07-31,Communication Duty
+176,,TEST00080,2,Test Training Unit,2018-09-27,2019-09-22,Field Duty
+177,,TEST00080,3,Test Support Unit,2019-10-25,2021-07-16,Administrative Duty
+178,,TEST00081,1,Test Infantry Unit A,2010-10-15,2012-06-06,Field Duty
+179,,TEST00081,2,Test Training Unit,2012-07-28,2014-10-16,Store Duty
+180,,TEST00082,1,Test Transport Unit,2009-02-15,2011-08-04,Field Duty
+181,,TEST00082,2,Test ASC Unit,2011-10-07,2012-10-31,Technical Duty
+182,,TEST00083,1,Test Infantry Unit B,2020-07-29,2021-08-23,Communication Duty
+183,,TEST00083,2,Test Field Unit,2021-10-26,2023-09-16,Field Duty
+184,,TEST00084,1,Test Field Unit,2010-02-04,2011-07-29,Store Duty
+185,,TEST00084,2,Test Support Unit,2011-08-16,2013-04-07,General Duty
+186,,TEST00084,3,Test Infantry Unit A,2013-04-30,2014-02-24,Technical Duty
+187,,TEST00085,1,Test Infantry Unit A,2012-12-28,2014-12-18,Administrative Duty
+188,,TEST00085,2,Test Field Unit,2015-03-06,2017-02-23,Field Duty
+189,,TEST00086,1,Test Infantry Unit A,2010-06-24,2011-05-20,Communication Duty
+190,,TEST00086,2,Test Training Unit,2011-08-13,2013-08-02,Communication Duty
+191,,TEST00087,1,Test Training Unit,2013-09-12,2014-07-09,Technical Duty
+192,,TEST00087,2,Test Infantry Unit B,2014-09-30,2016-12-18,Administrative Duty
+193,,TEST00087,3,Test Infantry Unit A,2017-02-22,2017-10-20,Administrative Duty
+194,,TEST00088,1,Test EME Unit B,2023-08-16,2024-09-09,Field Duty
+195,,TEST00088,2,Test EME Unit A,2024-12-31,2026-09-22,General Duty
+196,,TEST00089,1,Test Transport Unit,2004-07-24,2005-09-17,Store Duty
+197,,TEST00089,2,Test ASC Unit,2005-10-29,2007-01-22,Field Duty
+198,,TEST00090,1,Test Field Unit,2021-01-06,2022-07-30,Field Duty
+199,,TEST00090,2,Test Infantry Unit B,2022-10-23,2024-06-14,Store Duty
+200,,TEST00090,3,Test Support Unit,2024-06-30,2026-04-21,Store Duty
+201,,TEST00091,1,Test Artillery Unit B,2015-02-13,2017-02-02,Technical Duty
+202,,TEST00091,2,Test Artillery Unit A,2017-03-23,2018-03-18,General Duty
+203,,TEST00092,1,Test Training Unit,2016-06-19,2017-10-12,Administrative Duty
+204,,TEST00092,2,Test Field Unit,2018-02-01,2019-05-27,General Duty
+205,,TEST00093,1,Test Field Unit,2006-10-04,2008-04-26,Administrative Duty
+206,,TEST00093,2,Test Training Unit,2008-07-28,2010-05-19,Administrative Duty
+207,,TEST00093,3,Test Support Unit,2010-08-31,2011-08-26,Technical Duty
+208,,TEST00094,1,Test Transport Unit,2021-03-01,2022-04-25,Technical Duty
+209,,TEST00094,2,Test ASC Unit,2022-08-04,2024-05-25,Administrative Duty
+210,,TEST00095,1,Test Training Unit,2009-07-28,2011-05-19,Communication Duty
+211,,TEST00095,2,Test Infantry Unit A,2011-09-03,2012-10-27,Technical Duty
+212,,TEST00095,3,Test Infantry Unit B,2013-01-30,2014-06-24,Field Duty
+213,,TEST00096,1,Test Support Unit,2011-01-16,2011-09-13,Technical Duty
+214,,TEST00096,2,Test Infantry Unit B,2012-01-07,2014-01-26,Store Duty
+215,,TEST00097,1,Test HQ Unit,2021-06-25,2023-01-16,Field Duty
+216,,TEST00097,2,Test Administrative Unit,2023-01-27,2025-05-16,Store Duty
+217,,TEST00098,1,Test Workshop Unit,2012-05-13,2013-02-07,Administrative Duty
+218,,TEST00098,2,Test EME Unit A,2013-03-31,2015-09-17,Field Duty
+219,,TEST00099,1,Test EME Unit B,2015-05-22,2016-11-12,Field Duty
+220,,TEST00099,2,Test EME Unit A,2017-01-30,2019-01-20,Technical Duty
+221,,TEST00100,1,Test Field Unit,2004-07-28,2005-12-20,General Duty
+222,,TEST00100,2,Test Infantry Unit B,2006-01-03,2008-06-21,Field Duty
+223,,TEST00101,1,Test Communication Unit,2003-09-12,2006-02-28,Communication Duty
+224,,TEST00101,2,Test Signal Unit A,2006-05-05,2008-03-25,Store Duty
+225,,TEST00102,1,Test EME Unit B,2022-01-21,2023-02-15,Administrative Duty
+226,,TEST00102,2,Test EME Unit A,2023-03-29,2024-07-21,Field Duty
+227,,TEST00103,1,Test Field Unit,2021-01-18,2021-10-15,Store Duty
+228,,TEST00103,2,Test Support Unit,2021-11-20,2023-12-10,Administrative Duty
+229,,TEST00104,1,Test Support Unit,2012-01-07,2013-10-28,Field Duty
+230,,TEST00104,2,Test Infantry Unit B,2014-02-15,2016-03-06,General Duty
+231,,TEST00105,1,Test EME Unit A,2010-10-10,2011-10-05,Store Duty
+232,,TEST00105,2,Test Workshop Unit,2011-12-12,2013-12-01,Store Duty
+233,,TEST00106,1,Test Training Unit,2009-07-04,2011-09-22,Store Duty
+234,,TEST00106,2,Test Support Unit,2011-12-15,2013-09-05,Store Duty
+235,,TEST00107,1,Test Training Unit,2027-12-09,2029-05-02,Administrative Duty
+236,,TEST00107,2,Test Infantry Unit A,2029-07-12,2031-08-31,Field Duty
+237,,TEST00108,1,Test Infantry Unit A,2003-12-16,2006-05-04,Technical Duty
+238,,TEST00108,2,Test Field Unit,2006-06-15,2008-02-05,Technical Duty
+239,,TEST00108,3,Test Infantry Unit B,2008-02-19,2008-12-15,Field Duty
+240,,TEST00109,1,Test Field Unit,2017-06-09,2018-06-04,Technical Duty
+241,,TEST00109,2,Test Infantry Unit B,2018-09-28,2020-10-17,Field Duty
+242,,TEST00109,3,Test Support Unit,2020-11-24,2023-01-13,Communication Duty
+243,,TEST00110,1,Test Transport Unit,2023-11-09,2024-11-03,General Duty
+244,,TEST00110,2,Test ASC Unit,2025-02-03,2027-06-23,Store Duty
+245,,TEST00111,1,Test Support Unit,2011-08-07,2013-09-25,Technical Duty
+246,,TEST00111,2,Test Infantry Unit B,2013-10-27,2015-10-17,Store Duty
+247,,TEST00112,1,Test EME Unit A,2011-12-07,2012-11-01,General Duty
+248,,TEST00112,2,Test EME Unit B,2013-02-23,2014-01-19,General Duty
+249,,TEST00113,1,Test Ordnance Unit,2016-04-19,2016-12-15,General Duty
+250,,TEST00113,2,Test Store Unit,2017-03-23,2019-03-13,Communication Duty
+251,,TEST00114,1,Test Support Unit,2006-11-25,2007-07-23,Store Duty
+252,,TEST00114,2,Test Infantry Unit A,2007-11-17,2010-03-06,Store Duty
+253,,TEST00114,3,Test Training Unit,2010-06-09,2012-06-28,Field Duty
+254,,TEST00115,1,Test Infantry Unit A,2010-04-03,2011-01-28,Administrative Duty
+255,,TEST00115,2,Test Training Unit,2011-03-03,2012-09-23,Communication Duty
+256,,TEST00115,3,Test Field Unit,2013-01-12,2013-11-08,Administrative Duty
+257,,TEST00116,1,Test Training Unit,2019-07-02,2020-12-23,Field Duty
+258,,TEST00116,2,Test Field Unit,2021-02-02,2023-05-23,General Duty
+259,,TEST00117,1,Test EME Unit B,2023-12-25,2025-09-15,Store Duty
+260,,TEST00117,2,Test EME Unit A,2025-12-16,2026-12-11,Technical Duty
+261,,TEST00118,1,Test Engineer Unit,2002-04-26,2004-09-12,General Duty
+262,,TEST00118,2,Test EME Unit B,2004-09-26,2005-05-24,Technical Duty
+263,,TEST00119,1,Test EME Unit B,2017-12-24,2019-01-18,General Duty
+264,,TEST00119,2,Test EME Unit A,2019-03-16,2020-07-08,Administrative Duty
+265,,TEST00120,1,Test Support Unit,2028-10-07,2029-06-04,Field Duty
+266,,TEST00120,2,Test Infantry Unit A,2029-06-19,2031-03-11,Communication Duty
+267,,TEST00120,3,Test Infantry Unit B,2031-06-14,2033-02-03,Communication Duty
+268,,TEST00121,1,Test Transport Unit,2016-07-05,2018-10-23,Communication Duty
+269,,TEST00121,2,Test ASC Unit,2018-12-19,2020-05-12,General Duty
+270,,TEST00122,1,Test Ordnance Unit,2013-03-31,2013-11-26,Communication Duty
+271,,TEST00122,2,Test Store Unit,2014-02-13,2015-08-07,General Duty
+272,,TEST00123,1,Test Communication Unit,2008-03-04,2008-11-29,Store Duty
+273,,TEST00123,2,Test Signal Unit B,2009-02-25,2009-10-23,Administrative Duty
+274,,TEST00124,1,Test Support Unit,2008-01-31,2010-02-19,Technical Duty
+275,,TEST00124,2,Test Training Unit,2010-04-07,2012-04-26,Technical Duty
+276,,TEST00125,1,Test Infantry Unit B,2004-11-07,2006-08-29,General Duty
+277,,TEST00125,2,Test Support Unit,2006-11-14,2008-02-07,Store Duty
+278,,TEST00125,3,Test Field Unit,2008-04-12,2010-05-02,Store Duty
+279,,TEST00126,1,Test Administrative Unit,2006-08-10,2008-10-28,General Duty
+280,,TEST00126,2,Test HQ Unit,2008-12-23,2009-08-20,Administrative Duty
+281,,TEST00127,1,Test Infantry Unit B,2012-09-11,2013-07-08,Store Duty
+282,,TEST00127,2,Test Field Unit,2013-09-14,2015-05-07,General Duty
+283,,TEST00127,3,Test Training Unit,2015-08-13,2017-10-31,Technical Duty
+284,,TEST00128,1,Test Artillery Unit A,2012-08-25,2014-05-17,Field Duty
+285,,TEST00128,2,Test Artillery Unit B,2014-09-01,2016-03-24,Communication Duty
+286,,TEST00129,1,Test Support Unit,2015-08-30,2017-01-21,General Duty
+287,,TEST00129,2,Test Infantry Unit A,2017-04-11,2017-12-07,Store Duty
+288,,TEST00130,1,Test Transport Unit,2024-12-11,2026-07-04,Administrative Duty
+289,,TEST00130,2,Test ASC Unit,2026-09-17,2028-03-10,General Duty
+290,,TEST00131,1,Test Support Unit,2015-02-21,2015-12-18,Field Duty
+291,,TEST00131,2,Test Field Unit,2016-04-01,2017-03-27,Communication Duty
+292,,TEST00131,3,Test Training Unit,2017-05-13,2019-01-03,Store Duty
+293,,TEST00132,1,Test Infantry Unit A,2014-08-14,2015-12-07,General Duty
+294,,TEST00132,2,Test Infantry Unit B,2016-03-03,2018-08-20,Store Duty
+295,,TEST00133,1,Test Support Unit,2016-07-17,2017-08-11,Technical Duty
+296,,TEST00133,2,Test Field Unit,2017-09-08,2019-11-27,Communication Duty
+297,,TEST00134,1,Test Administrative Unit,2023-10-13,2026-03-31,Administrative Duty
+298,,TEST00134,2,Test HQ Unit,2026-07-11,2028-02-01,Administrative Duty
+299,,TEST00135,1,Test Workshop Unit,2016-01-10,2017-08-02,Communication Duty
+300,,TEST00135,2,Test EME Unit A,2017-11-26,2018-08-23,Administrative Duty
+301,,TEST00136,1,Test Infantry Unit A,2010-09-05,2011-08-31,Administrative Duty
+302,,TEST00136,2,Test Infantry Unit B,2011-11-12,2012-07-09,Field Duty
+303,,TEST00137,1,Test Infantry Unit A,2017-01-22,2019-05-12,Communication Duty
+304,,TEST00137,2,Test Training Unit,2019-06-19,2021-12-05,Administrative Duty
+305,,TEST00138,1,Test Infantry Unit A,2020-03-25,2021-04-19,Technical Duty
+306,,TEST00138,2,Test Support Unit,2021-08-12,2022-08-07,Administrative Duty
+307,,TEST00139,1,Test Infantry Unit B,2004-04-28,2006-07-17,Administrative Duty
+308,,TEST00139,2,Test Training Unit,2006-10-27,2008-02-19,General Duty
+309,,TEST00139,3,Test Field Unit,2008-03-07,2009-01-01,Communication Duty
+310,,TEST00140,1,Test Infantry Unit B,2016-12-26,2019-06-14,Communication Duty
+311,,TEST00140,2,Test Field Unit,2019-07-24,2020-05-19,Technical Duty
+312,,TEST00141,1,Test Support Unit,2001-01-21,2001-09-18,Communication Duty
+313,,TEST00141,2,Test Field Unit,2001-10-06,2002-07-03,Administrative Duty
+314,,TEST00142,1,Test Infantry Unit A,1999-12-05,2002-01-23,Administrative Duty
+315,,TEST00142,2,Test Training Unit,2002-02-02,2004-04-22,Technical Duty
+316,,TEST00143,1,Test Infantry Unit A,2009-02-04,2010-03-01,Communication Duty
+317,,TEST00143,2,Test Training Unit,2010-03-21,2010-12-16,Field Duty
+318,,TEST00143,3,Test Infantry Unit B,2011-02-10,2012-05-05,Communication Duty
+319,,TEST00144,1,Test HQ Unit,2016-12-01,2017-08-28,Communication Duty
+320,,TEST00144,2,Test Administrative Unit,2017-09-16,2019-06-08,Store Duty
+321,,TEST00145,1,Test Artillery Unit A,2007-11-16,2009-03-10,Field Duty
+322,,TEST00145,2,Test Artillery Unit B,2009-07-04,2011-10-22,General Duty
+323,,TEST00146,1,Test Administrative Unit,2029-10-08,2031-01-01,Field Duty
+324,,TEST00146,2,Test HQ Unit,2031-01-29,2033-03-19,Store Duty
+325,,TEST00147,1,Test Training Unit,2023-02-01,2024-08-24,Technical Duty
+326,,TEST00147,2,Test Infantry Unit B,2024-11-18,2026-03-13,Administrative Duty
+327,,TEST00147,3,Test Support Unit,2026-05-22,2027-04-17,Communication Duty
+328,,TEST00148,1,Test HQ Unit,2015-02-09,2016-04-04,Administrative Duty
+329,,TEST00148,2,Test Administrative Unit,2016-07-26,2018-08-15,General Duty
+330,,TEST00149,1,Test EME Unit A,2002-10-04,2004-03-27,General Duty
+331,,TEST00149,2,Test EME Unit B,2004-04-25,2005-11-16,Store Duty
+332,,TEST00150,1,Test Signal Unit A,2026-04-04,2028-01-24,Administrative Duty
+333,,TEST00150,2,Test Communication Unit,2028-03-01,2029-09-22,Communication Duty
+334,,TEST00150,3,Test Signal Unit B,2029-11-03,2031-10-24,Technical Duty
+335,,TEST00151,1,Test Support Unit,2003-04-09,2004-11-29,Administrative Duty
+336,,TEST00151,2,Test Infantry Unit A,2005-02-16,2006-11-08,General Duty
+337,,TEST00152,1,Test Support Unit,2007-05-02,2009-05-21,Technical Duty
+338,,TEST00152,2,Test Infantry Unit B,2009-08-30,2010-12-23,Administrative Duty
+339,,TEST00152,3,Test Field Unit,2011-03-12,2013-03-01,Technical Duty
+340,,TEST00153,1,Test Ordnance Unit,2023-09-18,2024-12-11,Communication Duty
+341,,TEST00153,2,Test Store Unit,2025-04-02,2027-07-21,Administrative Duty
+342,,TEST00154,1,Test Transport Unit,2014-09-26,2016-03-19,General Duty
+343,,TEST00154,2,Test ASC Unit,2016-05-25,2018-03-16,Administrative Duty
+344,,TEST00155,1,Test Workshop Unit,2020-03-19,2022-01-08,Store Duty
+345,,TEST00155,2,Test EME Unit A,2022-03-01,2023-09-22,General Duty
+346,,TEST00156,1,Test Infantry Unit B,2004-09-21,2005-10-16,Field Duty
+347,,TEST00156,2,Test Training Unit,2006-02-08,2006-10-06,Store Duty
+348,,TEST00156,3,Test Field Unit,2006-10-20,2008-11-08,Administrative Duty
+349,,TEST00157,1,Test Infantry Unit A,2006-06-20,2008-05-10,Field Duty
+350,,TEST00157,2,Test Training Unit,2008-08-17,2010-01-09,Field Duty
+351,,TEST00158,1,Test EME Unit A,2003-06-13,2004-04-08,General Duty
+352,,TEST00158,2,Test EME Unit B,2004-06-16,2006-06-06,Communication Duty
+353,,TEST00159,1,Test Artillery Unit A,2023-11-06,2025-03-30,Field Duty
+354,,TEST00159,2,Test Artillery Unit B,2025-06-04,2027-10-22,Communication Duty
+355,,TEST00160,1,Test Infantry Unit B,2016-11-04,2018-06-27,Field Duty
+356,,TEST00160,2,Test Infantry Unit A,2018-09-24,2020-04-16,Technical Duty
+357,,TEST00161,1,Test EME Unit B,2007-09-16,2008-05-13,General Duty
+358,,TEST00161,2,Test Engineer Unit,2008-08-16,2009-08-11,Technical Duty
+359,,TEST00162,1,Test Training Unit,2005-12-27,2006-09-23,General Duty
+360,,TEST00162,2,Test Field Unit,2006-10-23,2008-07-14,Field Duty
+361,,TEST00163,1,Test Workshop Unit,2007-03-17,2008-09-07,Technical Duty
+362,,TEST00163,2,Test EME Unit A,2009-01-05,2010-01-30,Administrative Duty
+363,,TEST00164,1,Test Administrative Unit,2017-01-30,2017-10-27,Communication Duty
+364,,TEST00164,2,Test HQ Unit,2017-12-12,2018-09-08,Communication Duty
+365,,TEST00165,1,Test Infantry Unit B,1999-11-21,2002-02-08,Store Duty
+366,,TEST00165,2,Test Training Unit,2002-02-24,2003-09-17,Field Duty
+367,,TEST00165,3,Test Support Unit,2003-12-31,2006-02-18,Field Duty
+368,,TEST00166,1,Test Signal Unit A,2002-07-05,2003-04-01,General Duty
+369,,TEST00166,2,Test Communication Unit,2003-05-31,2004-10-22,Field Duty
+370,,TEST00167,1,Test Administrative Unit,2011-09-27,2012-11-20,Field Duty
+371,,TEST00167,2,Test HQ Unit,2013-02-12,2014-01-08,General Duty
+372,,TEST00168,1,Test Infantry Unit B,2016-08-22,2017-10-16,Communication Duty
+373,,TEST00168,2,Test Infantry Unit A,2017-10-31,2019-10-21,Store Duty
+374,,TEST00169,1,Test Ordnance Unit,2006-07-09,2008-07-28,Administrative Duty
+375,,TEST00169,2,Test Store Unit,2008-10-26,2011-01-14,General Duty
+376,,TEST00170,1,Test Training Unit,2006-05-30,2008-06-18,Administrative Duty
+377,,TEST00170,2,Test Infantry Unit B,2008-08-11,2009-11-04,Administrative Duty
+378,,TEST00171,1,Test Infantry Unit B,2021-08-23,2023-03-16,Communication Duty
+379,,TEST00171,2,Test Infantry Unit A,2023-04-04,2023-12-30,General Duty
+380,,TEST00172,1,Test Training Unit,2013-06-26,2014-02-21,Communication Duty
+381,,TEST00172,2,Test Infantry Unit A,2014-05-15,2016-02-04,Store Duty
+382,,TEST00172,3,Test Field Unit,2016-02-21,2016-12-17,Store Duty
+383,,TEST00173,1,Test Support Unit,2001-04-25,2003-10-12,Technical Duty
+384,,TEST00173,2,Test Field Unit,2003-12-22,2005-12-11,Administrative Duty
+385,,TEST00173,3,Test Infantry Unit A,2006-03-19,2008-08-05,Technical Duty
+386,,TEST00174,1,Test EME Unit A,2015-10-06,2017-02-27,Store Duty
+387,,TEST00174,2,Test EME Unit B,2017-06-06,2018-12-28,Technical Duty
+388,,TEST00175,1,Test Signal Unit B,2008-01-01,2009-10-22,Communication Duty
+389,,TEST00175,2,Test Communication Unit,2010-02-06,2011-03-03,Administrative Duty
+390,,TEST00176,1,Test Infantry Unit B,2017-12-02,2020-03-21,Administrative Duty
+391,,TEST00176,2,Test Training Unit,2020-07-15,2021-03-12,General Duty
+392,,TEST00177,1,Test Signal Unit B,2018-02-18,2019-06-13,Technical Duty
+393,,TEST00177,2,Test Communication Unit,2019-08-12,2020-09-05,Administrative Duty
+394,,TEST00178,1,Test Training Unit,2026-01-19,2028-03-09,General Duty
+395,,TEST00178,2,Test Field Unit,2028-06-07,2029-07-02,Field Duty
+396,,TEST00178,3,Test Infantry Unit A,2029-09-23,2032-03-11,Technical Duty
+397,,TEST00179,1,Test Workshop Unit,1999-06-10,2000-05-05,General Duty
+398,,TEST00179,2,Test EME Unit A,2000-05-16,2001-02-10,Store Duty
+399,,TEST00180,1,Test Infantry Unit A,2009-06-18,2010-02-13,Field Duty
+400,,TEST00180,2,Test Field Unit,2010-05-31,2012-06-19,Store Duty
+401,,TEST00180,3,Test Training Unit,2012-08-20,2014-08-10,Administrative Duty
+402,,TEST00181,1,Test HQ Unit,2011-05-14,2012-03-09,Communication Duty
+403,,TEST00181,2,Test Administrative Unit,2012-05-08,2014-02-27,Technical Duty
+404,,TEST00182,1,Test EME Unit A,2018-07-21,2020-12-07,Administrative Duty
+405,,TEST00182,2,Test EME Unit B,2021-02-13,2022-08-07,Store Duty
+406,,TEST00183,1,Test Field Unit,2013-01-14,2014-02-08,Store Duty
+407,,TEST00183,2,Test Infantry Unit B,2014-05-23,2016-07-11,Communication Duty
+408,,TEST00183,3,Test Infantry Unit A,2016-08-29,2017-09-23,Communication Duty
+409,,TEST00184,1,Test Infantry Unit B,2022-09-24,2025-02-10,Technical Duty
+410,,TEST00184,2,Test Support Unit,2025-06-02,2026-01-28,Field Duty
+411,,TEST00185,1,Test Field Unit,2025-10-26,2026-11-20,General Duty
+412,,TEST00185,2,Test Training Unit,2027-01-01,2028-10-22,Communication Duty
+413,,TEST00185,3,Test Support Unit,2028-11-04,2031-04-23,Store Duty
+414,,TEST00186,1,Test ASC Unit,2005-10-25,2006-08-21,Administrative Duty
+415,,TEST00186,2,Test Transport Unit,2006-12-16,2008-01-10,Technical Duty
+416,,TEST00187,1,Test Infantry Unit B,2009-01-22,2010-10-14,Field Duty
+417,,TEST00187,2,Test Training Unit,2010-11-14,2011-10-10,Field Duty
+418,,TEST00188,1,Test Infantry Unit A,2014-12-06,2016-11-25,General Duty
+419,,TEST00188,2,Test Field Unit,2017-02-09,2019-03-31,Communication Duty
+420,,TEST00189,1,Test Field Unit,2016-04-03,2017-12-24,General Duty
+421,,TEST00189,2,Test Infantry Unit A,2018-04-11,2019-03-07,Store Duty
+422,,TEST00190,1,Test Administrative Unit,2016-05-20,2018-06-09,Store Duty
+423,,TEST00190,2,Test HQ Unit,2018-06-29,2020-08-17,Administrative Duty
+424,,TEST00191,1,Test Support Unit,2016-06-18,2018-12-05,General Duty
+425,,TEST00191,2,Test Infantry Unit B,2019-02-01,2021-02-20,Store Duty
+426,,TEST00191,3,Test Field Unit,2021-03-07,2023-08-24,General Duty
+427,,TEST00192,1,Test Infantry Unit B,2024-01-05,2026-01-24,Field Duty
+428,,TEST00192,2,Test Support Unit,2026-04-21,2027-06-15,General Duty
+429,,TEST00193,1,Test Training Unit,2022-11-22,2025-01-10,Communication Duty
+430,,TEST00193,2,Test Infantry Unit B,2025-02-11,2027-02-01,Administrative Duty
+431,,TEST00193,3,Test Field Unit,2027-03-25,2028-08-16,General Duty
+432,,TEST00194,1,Test Transport Unit,2004-12-01,2006-10-22,Technical Duty
+433,,TEST00194,2,Test ASC Unit,2006-11-01,2007-07-29,Technical Duty
+434,,TEST00195,1,Test ASC Unit,2011-04-23,2013-08-10,Technical Duty
+435,,TEST00195,2,Test Transport Unit,2013-09-06,2016-01-24,Technical Duty
+436,,TEST00196,1,Test EME Unit A,2011-06-27,2012-10-19,Communication Duty
+437,,TEST00196,2,Test Workshop Unit,2012-12-03,2015-03-23,Technical Duty
+438,,TEST00197,1,Test Artillery Unit A,2014-06-17,2016-03-08,Administrative Duty
+439,,TEST00197,2,Test Artillery Unit B,2016-05-30,2018-08-18,Field Duty
+440,,TEST00198,1,Test Infantry Unit B,2023-02-01,2024-01-27,General Duty
+441,,TEST00198,2,Test Infantry Unit A,2024-04-27,2025-06-21,General Duty
+442,,TEST00199,1,Test Infantry Unit B,2021-04-04,2022-03-30,Field Duty
+443,,TEST00199,2,Test Training Unit,2022-06-04,2024-04-24,Administrative Duty
+444,,TEST00200,1,Test HQ Unit,2010-06-05,2011-12-27,Field Duty
+445,,TEST00200,2,Test Administrative Unit,2012-01-30,2012-10-26,Technical Duty
+446,,TEST00201,1,Test Support Unit,2016-01-09,2016-10-05,Communication Duty
+447,,TEST00201,2,Test Field Unit,2016-11-16,2018-07-09,Technical Duty
+448,,TEST00202,1,Test Field Unit,2003-05-08,2005-02-26,Communication Duty
+449,,TEST00202,2,Test Infantry Unit B,2005-05-05,2006-11-26,Communication Duty
+450,,TEST00203,1,Test Training Unit,2007-12-18,2008-12-12,General Duty
+451,,TEST00203,2,Test Infantry Unit B,2009-03-19,2009-11-14,Field Duty
+452,,TEST00204,1,Test Store Unit,2002-07-28,2004-06-17,Administrative Duty
+453,,TEST00204,2,Test Ordnance Unit,2004-08-14,2006-11-02,General Duty
+454,,TEST00205,1,Test Training Unit,2016-01-05,2016-11-30,General Duty
+455,,TEST00205,2,Test Infantry Unit B,2017-01-12,2018-04-07,Field Duty
+456,,TEST00206,1,Test Infantry Unit A,2010-01-24,2011-09-16,Technical Duty
+457,,TEST00206,2,Test Support Unit,2011-10-15,2013-12-03,General Duty
+458,,TEST00207,1,Test Infantry Unit A,2016-11-26,2018-10-17,General Duty
+459,,TEST00207,2,Test Support Unit,2018-12-30,2019-09-26,Administrative Duty
+460,,TEST00208,1,Test Support Unit,2023-03-28,2025-01-16,General Duty
+461,,TEST00208,2,Test Training Unit,2025-03-16,2026-06-09,Field Duty
+462,,TEST00209,1,Test Infantry Unit A,2002-12-09,2004-07-01,Administrative Duty
+463,,TEST00209,2,Test Support Unit,2004-07-18,2005-12-10,Store Duty
+464,,TEST00210,1,Test EME Unit B,2010-12-08,2012-09-28,Communication Duty
+465,,TEST00210,2,Test EME Unit A,2012-11-27,2014-01-21,Field Duty
+466,,TEST00211,1,Test Infantry Unit B,2013-11-27,2015-06-20,General Duty
+467,,TEST00211,2,Test Support Unit,2015-08-07,2017-11-24,Store Duty
+468,,TEST00212,1,Test ASC Unit,2009-03-19,2010-03-14,Technical Duty
+469,,TEST00212,2,Test Transport Unit,2010-05-12,2011-05-07,Communication Duty
+470,,TEST00213,1,Test Infantry Unit A,2017-03-20,2018-03-15,Administrative Duty
+471,,TEST00213,2,Test Field Unit,2018-04-21,2020-01-11,Field Duty
+472,,TEST00214,1,Test EME Unit B,2020-09-24,2023-02-11,Technical Duty
+473,,TEST00214,2,Test EME Unit A,2023-03-05,2025-07-22,Store Duty
+474,,TEST00215,1,Test Workshop Unit,2003-08-24,2005-11-11,Communication Duty
+475,,TEST00215,2,Test EME Unit A,2005-12-09,2008-03-28,Technical Duty
+476,,TEST00216,1,Test Infantry Unit A,2011-07-12,2012-11-03,Technical Duty
+477,,TEST00216,2,Test Support Unit,2012-12-08,2014-12-28,Administrative Duty
+478,,TEST00217,1,Test EME Unit B,2008-09-05,2010-06-27,Technical Duty
+479,,TEST00217,2,Test Engineer Unit,2010-08-22,2013-01-08,General Duty
+480,,TEST00218,1,Test Transport Unit,2024-05-15,2025-09-07,Technical Duty
+481,,TEST00218,2,Test ASC Unit,2025-12-30,2026-09-26,Field Duty
+482,,TEST00219,1,Test Infantry Unit A,2002-05-26,2004-10-12,Store Duty
+483,,TEST00219,2,Test Field Unit,2004-12-24,2006-08-16,General Duty
+484,,TEST00220,1,Test ASC Unit,2020-06-24,2022-02-14,Field Duty
+485,,TEST00220,2,Test Transport Unit,2022-05-07,2024-09-23,Administrative Duty
+486,,TEST00221,1,Test Support Unit,2024-04-05,2026-05-25,Field Duty
+487,,TEST00221,2,Test Training Unit,2026-09-04,2027-12-28,Field Duty
+488,,TEST00222,1,Test Transport Unit,2018-02-19,2019-05-15,Communication Duty
+489,,TEST00222,2,Test ASC Unit,2019-07-11,2021-08-29,Communication Duty
+490,,TEST00223,1,Test Support Unit,2013-12-25,2016-03-14,Store Duty
+491,,TEST00223,2,Test Training Unit,2016-05-11,2017-03-07,Communication Duty
+492,,TEST00224,1,Test Infantry Unit B,2018-08-12,2019-09-06,Administrative Duty
+493,,TEST00224,2,Test Infantry Unit A,2019-10-22,2021-05-14,General Duty
+494,,TEST00225,1,Test Training Unit,2016-11-30,2019-02-18,Administrative Duty
+495,,TEST00225,2,Test Field Unit,2019-05-04,2020-02-28,Administrative Duty
+496,,TEST00226,1,Test Training Unit,2024-07-30,2026-02-20,Store Duty
+497,,TEST00226,2,Test Infantry Unit B,2026-04-19,2027-12-10,Administrative Duty
+498,,TEST00226,3,Test Support Unit,2028-04-06,2030-01-26,Technical Duty
+499,,TEST00227,1,Test EME Unit A,2019-03-20,2020-07-12,Technical Duty
+500,,TEST00227,2,Test Workshop Unit,2020-08-21,2022-03-14,Field Duty
+501,,TEST00228,1,Test Field Unit,2021-05-06,2022-12-27,General Duty
+502,,TEST00228,2,Test Infantry Unit B,2023-04-20,2024-09-11,General Duty
+503,,TEST00229,1,Test Training Unit,2016-03-22,2017-06-15,Technical Duty
+504,,TEST00229,2,Test Infantry Unit B,2017-08-17,2018-07-13,Administrative Duty
+505,,TEST00230,1,Test Engineer Unit,2010-08-19,2013-02-04,General Duty
+506,,TEST00230,2,Test EME Unit B,2013-04-12,2015-06-01,Communication Duty
+507,,TEST00231,1,Test Infantry Unit B,2019-05-09,2020-01-04,General Duty
+508,,TEST00231,2,Test Infantry Unit A,2020-03-22,2022-07-10,Field Duty
+509,,TEST00231,3,Test Field Unit,2022-10-21,2023-09-16,Communication Duty
+510,,TEST00232,1,Test Infantry Unit B,2023-09-09,2024-08-04,General Duty
+511,,TEST00232,2,Test Training Unit,2024-09-30,2026-10-20,Communication Duty
+512,,TEST00233,1,Test Workshop Unit,2013-03-22,2014-05-16,Administrative Duty
+513,,TEST00233,2,Test EME Unit A,2014-09-07,2017-01-24,Administrative Duty
+514,,TEST00234,1,Test Store Unit,2024-12-21,2026-04-15,Administrative Duty
+515,,TEST00234,2,Test Ordnance Unit,2026-08-11,2028-12-28,Field Duty
+516,,TEST00235,1,Test Infantry Unit A,2018-08-21,2019-10-15,Field Duty
+517,,TEST00235,2,Test Training Unit,2019-11-14,2022-03-03,Field Duty
+518,,TEST00235,3,Test Infantry Unit B,2022-03-16,2024-09-01,Store Duty
+519,,TEST00236,1,Test Infantry Unit B,2010-09-30,2012-07-21,Communication Duty
+520,,TEST00236,2,Test Training Unit,2012-09-26,2013-09-21,Store Duty
+521,,TEST00237,1,Test Field Unit,2020-05-30,2021-07-24,Communication Duty
+522,,TEST00237,2,Test Support Unit,2021-08-03,2022-06-29,Administrative Duty
+523,,TEST00237,3,Test Infantry Unit A,2022-07-16,2024-11-02,General Duty
+524,,TEST00238,1,Test EME Unit A,2021-05-05,2023-05-25,General Duty
+525,,TEST00238,2,Test Workshop Unit,2023-06-07,2024-12-28,Administrative Duty
+526,,TEST00239,1,Test EME Unit B,2009-01-01,2009-12-27,Communication Duty
+527,,TEST00239,2,Test Engineer Unit,2010-04-25,2012-09-11,Technical Duty
+528,,TEST00240,1,Test Infantry Unit A,2026-06-24,2027-07-19,Administrative Duty
+529,,TEST00240,2,Test Field Unit,2027-09-26,2030-02-12,Technical Duty
+530,,TEST00241,1,Test Infantry Unit A,2005-07-04,2007-08-23,Field Duty
+531,,TEST00241,2,Test Field Unit,2007-12-12,2008-11-06,Technical Duty
+532,,TEST00241,3,Test Training Unit,2009-02-21,2010-10-14,Store Duty
+533,,TEST00242,1,Test Support Unit,2008-11-22,2009-08-19,Technical Duty
+534,,TEST00242,2,Test Infantry Unit B,2009-09-13,2010-11-07,Communication Duty
+535,,TEST00243,1,Test ASC Unit,2018-11-26,2020-11-15,Communication Duty
+536,,TEST00243,2,Test Transport Unit,2020-12-17,2021-08-14,Store Duty
+537,,TEST00244,1,Test Engineer Unit,2015-11-06,2017-05-29,Technical Duty
+538,,TEST00244,2,Test EME Unit B,2017-09-08,2019-04-01,Store Duty
+539,,TEST00245,1,Test Infantry Unit B,2004-12-19,2006-01-13,Technical Duty
+540,,TEST00245,2,Test Training Unit,2006-04-14,2008-09-30,Communication Duty
+541,,TEST00246,1,Test Training Unit,2028-07-31,2029-03-28,Administrative Duty
+542,,TEST00246,2,Test Infantry Unit B,2029-05-23,2031-04-13,Field Duty
+543,,TEST00247,1,Test Field Unit,2013-05-29,2014-05-24,Technical Duty
+544,,TEST00247,2,Test Infantry Unit B,2014-07-27,2016-04-17,General Duty
+545,,TEST00248,1,Test Ordnance Unit,2001-06-24,2003-02-14,General Duty
+546,,TEST00248,2,Test Store Unit,2003-03-02,2005-03-21,Communication Duty
+547,,TEST00249,1,Test Support Unit,2017-05-02,2018-03-28,Store Duty
+548,,TEST00249,2,Test Training Unit,2018-07-19,2019-08-13,Technical Duty
+549,,TEST00250,1,Test Infantry Unit A,2000-01-23,2001-12-13,General Duty
+550,,TEST00250,2,Test Training Unit,2002-01-11,2003-09-03,General Duty
+551,,TEST00251,1,Test Training Unit,2026-12-30,2029-06-17,General Duty
+552,,TEST00251,2,Test Infantry Unit B,2029-10-14,2031-09-04,Field Duty
+553,,TEST00252,1,Test Field Unit,2008-01-10,2009-11-30,Technical Duty
+554,,TEST00252,2,Test Training Unit,2010-01-20,2011-11-11,Administrative Duty
+555,,TEST00252,3,Test Infantry Unit B,2011-12-07,2012-12-01,Technical Duty
+556,,TEST00253,1,Test EME Unit A,2018-02-27,2020-08-15,Store Duty
+557,,TEST00253,2,Test EME Unit B,2020-08-27,2022-12-15,General Duty
+558,,TEST00254,1,Test Administrative Unit,2025-12-19,2027-07-12,Store Duty
+559,,TEST00254,2,Test HQ Unit,2027-10-15,2029-12-03,Technical Duty
+560,,TEST00255,1,Test Infantry Unit B,2010-05-28,2012-01-18,General Duty
+561,,TEST00255,2,Test Field Unit,2012-03-16,2013-04-10,Store Duty
+562,,TEST00256,1,Test Signal Unit B,2013-09-17,2015-05-10,Technical Duty
+563,,TEST00256,2,Test Signal Unit A,2015-09-03,2017-12-21,Field Duty
+564,,TEST00257,1,Test EME Unit A,2005-02-12,2007-03-04,General Duty
+565,,TEST00257,2,Test EME Unit B,2007-04-17,2008-12-07,Field Duty
+566,,TEST00258,1,Test Signal Unit B,2011-03-17,2011-11-12,Communication Duty
+567,,TEST00258,2,Test Signal Unit A,2012-02-15,2013-08-08,Technical Duty
+568,,TEST00258,3,Test Communication Unit,2013-12-05,2015-12-25,Administrative Duty
+569,,TEST00259,1,Test Training Unit,2024-06-16,2025-06-11,General Duty
+570,,TEST00259,2,Test Field Unit,2025-09-13,2026-07-10,Technical Duty
+571,,TEST00260,1,Test Infantry Unit B,2019-01-26,2019-10-23,Store Duty
+572,,TEST00260,2,Test Support Unit,2020-02-10,2021-07-04,Field Duty
+573,,TEST00260,3,Test Field Unit,2021-09-03,2022-11-27,Store Duty
+574,,TEST00261,1,Test Field Unit,2013-12-23,2015-06-16,Field Duty
+575,,TEST00261,2,Test Support Unit,2015-07-31,2017-06-20,General Duty
+576,,TEST00261,3,Test Infantry Unit A,2017-08-15,2019-02-06,Administrative Duty
+577,,TEST00262,1,Test Signal Unit A,2000-10-11,2002-05-04,General Duty
+578,,TEST00262,2,Test Communication Unit,2002-07-07,2003-10-30,General Duty
+579,,TEST00263,1,Test Field Unit,2009-06-09,2010-10-02,General Duty
+580,,TEST00263,2,Test Support Unit,2010-12-23,2013-05-11,General Duty
+581,,TEST00264,1,Test Training Unit,2012-10-21,2014-04-14,Communication Duty
+582,,TEST00264,2,Test Infantry Unit B,2014-07-03,2016-05-23,Administrative Duty
+583,,TEST00264,3,Test Field Unit,2016-09-13,2017-10-08,General Duty
+584,,TEST00265,1,Test HQ Unit,2009-03-17,2010-07-10,Technical Duty
+585,,TEST00265,2,Test Administrative Unit,2010-09-13,2011-10-08,Field Duty
+586,,TEST00266,1,Test Training Unit,2029-08-07,2030-07-03,Technical Duty
+587,,TEST00266,2,Test Support Unit,2030-10-14,2033-03-02,General Duty
+588,,TEST00267,1,Test EME Unit A,2013-12-29,2016-02-17,Technical Duty
+589,,TEST00267,2,Test EME Unit B,2016-06-02,2018-11-19,Communication Duty
+590,,TEST00268,1,Test Support Unit,2025-01-22,2025-10-19,Store Duty
+591,,TEST00268,2,Test Training Unit,2026-01-03,2027-11-24,Technical Duty
+592,,TEST00268,3,Test Infantry Unit B,2027-12-13,2029-01-06,Communication Duty
+593,,TEST00269,1,Test Infantry Unit B,2003-08-30,2004-09-23,Technical Duty
+594,,TEST00269,2,Test Infantry Unit A,2004-11-28,2007-03-18,Communication Duty
+595,,TEST00269,3,Test Field Unit,2007-06-22,2008-02-17,Communication Duty
+596,,TEST00270,1,Test Training Unit,2005-07-14,2006-10-07,Field Duty
+597,,TEST00270,2,Test Support Unit,2006-11-12,2009-03-01,Field Duty
+598,,TEST00270,3,Test Infantry Unit B,2009-05-23,2011-11-09,Field Duty
+599,,TEST00271,1,Test EME Unit A,2016-11-04,2019-02-22,Communication Duty
+600,,TEST00271,2,Test EME Unit B,2019-04-15,2020-09-06,Technical Duty
+601,,TEST00272,1,Test Infantry Unit B,2027-07-23,2028-06-17,Technical Duty
+602,,TEST00272,2,Test Training Unit,2028-07-02,2029-07-27,General Duty
+603,,TEST00273,1,Test Field Unit,2026-09-03,2028-03-26,Communication Duty
+604,,TEST00273,2,Test Infantry Unit A,2028-07-17,2030-03-09,Administrative Duty
+605,,TEST00274,1,Test Field Unit,2027-10-18,2030-04-05,General Duty
+606,,TEST00274,2,Test Support Unit,2030-04-15,2031-04-10,Communication Duty
+607,,TEST00274,3,Test Infantry Unit A,2031-06-30,2033-04-20,Communication Duty
+608,,TEST00275,1,Test EME Unit B,2027-03-04,2028-10-24,Administrative Duty
+609,,TEST00275,2,Test EME Unit A,2029-01-15,2030-11-06,Store Duty
+610,,TEST00276,1,Test Infantry Unit A,2001-09-30,2002-11-24,Communication Duty
+611,,TEST00276,2,Test Support Unit,2003-01-17,2004-10-08,Field Duty
+612,,TEST00277,1,Test ASC Unit,2004-08-08,2005-04-05,Communication Duty
+613,,TEST00277,2,Test Transport Unit,2005-05-16,2006-12-07,Administrative Duty
+614,,TEST00278,1,Test Support Unit,2020-12-15,2021-09-11,Store Duty
+615,,TEST00278,2,Test Infantry Unit B,2021-12-24,2023-08-16,Administrative Duty
+616,,TEST00279,1,Test Training Unit,2015-03-19,2017-01-07,General Duty
+617,,TEST00279,2,Test Infantry Unit B,2017-01-31,2019-05-21,Store Duty
+618,,TEST00279,3,Test Support Unit,2019-08-22,2021-03-14,Technical Duty
+619,,TEST00280,1,Test Infantry Unit B,2013-08-18,2014-05-15,Field Duty
+620,,TEST00280,2,Test Field Unit,2014-07-11,2016-08-29,Communication Duty
+621,,TEST00280,3,Test Infantry Unit A,2016-12-09,2017-08-06,Technical Duty
+622,,TEST00281,1,Test HQ Unit,2015-07-09,2017-06-28,Technical Duty
+623,,TEST00281,2,Test Administrative Unit,2017-09-05,2019-05-28,Field Duty
+624,,TEST00282,1,Test Signal Unit B,2006-02-02,2007-07-27,Store Duty
+625,,TEST00282,2,Test Signal Unit A,2007-09-12,2009-09-01,Store Duty
+626,,TEST00282,3,Test Communication Unit,2009-12-28,2012-01-17,Store Duty
+627,,TEST00283,1,Test EME Unit B,2005-10-11,2007-03-05,Communication Duty
+628,,TEST00283,2,Test EME Unit A,2007-06-07,2009-02-26,Technical Duty
+629,,TEST00284,1,Test Store Unit,2004-12-28,2006-03-23,Administrative Duty
+630,,TEST00284,2,Test Ordnance Unit,2006-07-01,2007-10-24,General Duty
+631,,TEST00285,1,Test EME Unit A,2005-10-07,2007-11-26,Store Duty
+632,,TEST00285,2,Test EME Unit B,2008-02-19,2009-05-14,Store Duty
+633,,TEST00286,1,Test Field Unit,2027-01-20,2028-06-13,Technical Duty
+634,,TEST00286,2,Test Support Unit,2028-09-04,2029-12-28,Communication Duty
+635,,TEST00287,1,Test EME Unit A,2015-08-24,2016-11-16,General Duty
+636,,TEST00287,2,Test EME Unit B,2017-02-09,2018-08-03,Store Duty
+637,,TEST00288,1,Test Store Unit,2011-12-25,2014-02-12,Field Duty
+638,,TEST00288,2,Test Ordnance Unit,2014-06-06,2016-06-25,Field Duty
+639,,TEST00289,1,Test Infantry Unit A,2015-12-18,2017-01-11,General Duty
+640,,TEST00289,2,Test Infantry Unit B,2017-01-22,2019-03-13,Communication Duty
+641,,TEST00290,1,Test Infantry Unit B,2023-07-23,2025-06-12,General Duty
+642,,TEST00290,2,Test Infantry Unit A,2025-08-22,2027-02-13,Administrative Duty
+643,,TEST00291,1,Test EME Unit B,2027-10-03,2030-01-20,Field Duty
+644,,TEST00291,2,Test Engineer Unit,2030-05-10,2032-01-30,Administrative Duty
+645,,TEST00292,1,Test Training Unit,2004-05-14,2005-02-08,Technical Duty
+646,,TEST00292,2,Test Infantry Unit B,2005-02-19,2005-11-16,Administrative Duty
+647,,TEST00292,3,Test Infantry Unit A,2005-12-31,2008-02-19,Communication Duty
+648,,TEST00293,1,Test Engineer Unit,2022-05-06,2023-05-01,Field Duty
+649,,TEST00293,2,Test EME Unit B,2023-07-28,2024-10-20,Store Duty
+650,,TEST00294,1,Test EME Unit A,2023-05-16,2024-04-10,Technical Duty
+651,,TEST00294,2,Test Workshop Unit,2024-07-28,2025-06-23,Technical Duty
+652,,TEST00295,1,Test Field Unit,2017-07-05,2019-06-25,Field Duty
+653,,TEST00295,2,Test Support Unit,2019-09-19,2021-05-11,Technical Duty
+654,,TEST00295,3,Test Infantry Unit B,2021-07-02,2023-08-21,Administrative Duty
+655,,TEST00296,1,Test Infantry Unit A,2016-03-09,2018-04-28,Store Duty
+656,,TEST00296,2,Test Support Unit,2018-06-04,2019-03-31,Administrative Duty
+657,,TEST00296,3,Test Training Unit,2019-07-09,2021-01-29,Store Duty
+658,,TEST00297,1,Test Field Unit,2012-03-23,2013-11-13,Communication Duty
+659,,TEST00297,2,Test Training Unit,2013-12-21,2014-10-17,General Duty
+660,,TEST00298,1,Test Infantry Unit A,2024-10-23,2026-03-17,Technical Duty
+661,,TEST00298,2,Test Infantry Unit B,2026-04-20,2028-01-10,Technical Duty
+662,,TEST00299,1,Test Ordnance Unit,2012-12-18,2014-02-11,Administrative Duty
+663,,TEST00299,2,Test Store Unit,2014-04-20,2015-09-12,Technical Duty
+664,,TEST00300,1,Test Infantry Unit B,1999-03-18,2000-08-09,Technical Duty
+665,,TEST00300,2,Test Infantry Unit A,2000-11-11,2002-09-02,Field Duty
+666,,TEST00300,3,Test Support Unit,2002-11-25,2004-08-16,Store Duty
+667,,TEST00301,1,Test Training Unit,2011-03-03,2013-03-22,Field Duty
+668,,TEST00301,2,Test Infantry Unit A,2013-05-11,2015-10-28,Field Duty
+669,,TEST00301,3,Test Support Unit,2015-11-25,2018-01-13,Administrative Duty
+670,,TEST00302,1,Test EME Unit B,2018-05-27,2020-09-13,Field Duty
+671,,TEST00302,2,Test Engineer Unit,2020-11-24,2022-09-15,Administrative Duty
+672,,TEST00303,1,Test Field Unit,2005-01-21,2006-06-15,Technical Duty
+673,,TEST00303,2,Test Infantry Unit B,2006-10-10,2008-04-02,General Duty
+674,,TEST00303,3,Test Infantry Unit A,2008-05-01,2009-07-25,Store Duty
+675,,TEST00304,1,Test EME Unit A,2027-04-27,2028-05-21,Store Duty
+676,,TEST00304,2,Test EME Unit B,2028-08-17,2029-12-10,Communication Duty
+677,,TEST00305,1,Test Ordnance Unit,2021-04-07,2022-09-29,Field Duty
+678,,TEST00305,2,Test Store Unit,2023-01-13,2024-02-07,Technical Duty
+679,,TEST00306,1,Test Training Unit,2007-01-25,2009-04-14,Technical Duty
+680,,TEST00306,2,Test Infantry Unit B,2009-04-25,2010-04-20,General Duty
+681,,TEST00307,1,Test Administrative Unit,2004-10-28,2005-12-22,Technical Duty
+682,,TEST00307,2,Test HQ Unit,2006-01-02,2007-03-28,General Duty
+683,,TEST00308,1,Test Artillery Unit B,2000-03-11,2001-12-31,Communication Duty
+684,,TEST00308,2,Test Artillery Unit A,2002-01-18,2004-07-06,General Duty
+685,,TEST00309,1,Test Support Unit,2007-07-04,2009-04-24,Communication Duty
+686,,TEST00309,2,Test Field Unit,2009-05-22,2011-04-12,Store Duty
+687,,TEST00309,3,Test Infantry Unit A,2011-07-09,2013-01-29,Administrative Duty
+688,,TEST00310,1,Test Infantry Unit B,2020-01-23,2022-05-12,Administrative Duty
+689,,TEST00310,2,Test Field Unit,2022-06-17,2023-03-14,General Duty
+690,,TEST00311,1,Test ASC Unit,2023-07-19,2024-08-12,Technical Duty
+691,,TEST00311,2,Test Transport Unit,2024-08-25,2025-10-19,Administrative Duty
+692,,TEST00312,1,Test EME Unit B,2015-07-04,2017-07-23,Administrative Duty
+693,,TEST00312,2,Test Engineer Unit,2017-09-29,2018-07-26,Store Duty
+694,,TEST00313,1,Test EME Unit B,2014-01-20,2016-07-08,Technical Duty
+695,,TEST00313,2,Test Engineer Unit,2016-08-07,2018-12-25,Technical Duty
+696,,TEST00314,1,Test Artillery Unit B,2001-06-30,2003-04-21,Field Duty
+697,,TEST00314,2,Test Artillery Unit A,2003-06-22,2004-10-14,Field Duty
+698,,TEST00315,1,Test Infantry Unit A,2010-08-26,2012-12-13,Field Duty
+699,,TEST00315,2,Test Support Unit,2013-02-24,2014-08-18,Administrative Duty
+700,,TEST00315,3,Test Field Unit,2014-10-19,2015-09-14,Store Duty
+701,,TEST00316,1,Test Field Unit,2012-03-08,2013-10-29,Administrative Duty
+702,,TEST00316,2,Test Infantry Unit A,2014-01-28,2016-02-17,Technical Duty
+703,,TEST00317,1,Test Infantry Unit B,2002-02-16,2003-02-11,Administrative Duty
+704,,TEST00317,2,Test Support Unit,2003-04-26,2004-02-20,Technical Duty
+705,,TEST00317,3,Test Field Unit,2004-03-20,2005-09-11,Store Duty
+706,,TEST00318,1,Test Support Unit,2018-06-20,2020-07-09,Administrative Duty
+707,,TEST00318,2,Test Training Unit,2020-10-18,2022-02-10,Store Duty
+708,,TEST00319,1,Test Infantry Unit B,2028-04-22,2029-07-16,Field Duty
+709,,TEST00319,2,Test Support Unit,2029-08-19,2031-06-10,Store Duty
+710,,TEST00320,1,Test HQ Unit,2023-02-01,2024-01-27,General Duty
+711,,TEST00320,2,Test Administrative Unit,2024-02-17,2024-11-13,General Duty
+712,,TEST00321,1,Test Training Unit,2006-08-02,2009-01-18,Administrative Duty
+713,,TEST00321,2,Test Infantry Unit A,2009-04-26,2011-05-16,Communication Duty
+714,,TEST00321,3,Test Support Unit,2011-09-06,2013-11-24,General Duty
+715,,TEST00322,1,Test Support Unit,2029-08-09,2031-06-30,Administrative Duty
+716,,TEST00322,2,Test Infantry Unit A,2031-10-06,2032-07-02,Field Duty
+717,,TEST00323,1,Test Field Unit,2018-03-01,2020-04-19,Store Duty
+718,,TEST00323,2,Test Infantry Unit A,2020-07-17,2021-11-09,Field Duty
+719,,TEST00324,1,Test Training Unit,2028-12-20,2029-11-15,Communication Duty
+720,,TEST00324,2,Test Field Unit,2029-12-08,2031-01-02,Technical Duty
+721,,TEST00325,1,Test Support Unit,2008-08-27,2009-11-20,Store Duty
+722,,TEST00325,2,Test Field Unit,2010-01-27,2011-02-21,Technical Duty
+723,,TEST00325,3,Test Infantry Unit A,2011-03-05,2012-09-25,Administrative Duty
+724,,TEST00326,1,Test HQ Unit,2021-04-24,2022-05-19,Communication Duty
+725,,TEST00326,2,Test Administrative Unit,2022-08-23,2024-02-14,Field Duty
+726,,TEST00327,1,Test Artillery Unit B,2024-04-22,2025-06-16,Field Duty
+727,,TEST00327,2,Test Artillery Unit A,2025-09-28,2026-05-26,Field Duty
+728,,TEST00328,1,Test Ordnance Unit,2022-05-06,2023-09-28,Administrative Duty
+729,,TEST00328,2,Test Store Unit,2023-12-03,2024-07-30,Administrative Duty
+730,,TEST00329,1,Test Training Unit,2026-06-22,2027-10-15,Communication Duty
+731,,TEST00329,2,Test Field Unit,2027-10-27,2028-11-20,General Duty
+732,,TEST00329,3,Test Infantry Unit A,2029-03-20,2030-10-11,Store Duty
+733,,TEST00330,1,Test Training Unit,2007-09-22,2009-12-10,Administrative Duty
+734,,TEST00330,2,Test Field Unit,2010-01-13,2012-06-01,Communication Duty
+735,,TEST00330,3,Test Infantry Unit A,2012-08-13,2013-12-06,Store Duty
+736,,TEST00331,1,Test Support Unit,2024-03-02,2026-06-20,Field Duty
+737,,TEST00331,2,Test Training Unit,2026-07-26,2027-08-20,Store Duty
+738,,TEST00332,1,Test Support Unit,2014-07-22,2015-11-14,Technical Duty
+739,,TEST00332,2,Test Infantry Unit B,2016-01-20,2017-12-10,Communication Duty
+740,,TEST00333,1,Test Infantry Unit B,2004-10-06,2006-11-25,Technical Duty
+741,,TEST00333,2,Test Field Unit,2006-12-07,2008-08-28,General Duty
+742,,TEST00334,1,Test HQ Unit,2008-09-29,2010-12-18,Technical Duty
+743,,TEST00334,2,Test Administrative Unit,2010-12-31,2013-04-19,Administrative Duty
+744,,TEST00335,1,Test Infantry Unit B,2008-05-15,2009-04-10,General Duty
+745,,TEST00335,2,Test Field Unit,2009-05-31,2011-02-20,Technical Duty
+746,,TEST00336,1,Test Training Unit,2011-01-22,2012-07-15,Field Duty
+747,,TEST00336,2,Test Field Unit,2012-10-22,2014-12-11,Communication Duty
+748,,TEST00337,1,Test Infantry Unit B,2008-07-22,2009-07-17,Field Duty
+749,,TEST00337,2,Test Support Unit,2009-09-17,2010-10-12,Store Duty
+750,,TEST00337,3,Test Field Unit,2011-01-22,2012-06-15,Field Duty
+751,,TEST00338,1,Test EME Unit A,2007-12-07,2009-07-29,General Duty
+752,,TEST00338,2,Test Workshop Unit,2009-09-19,2012-02-06,Administrative Duty
+753,,TEST00339,1,Test EME Unit B,2012-08-31,2013-10-25,Technical Duty
+754,,TEST00339,2,Test EME Unit A,2014-02-04,2014-12-31,Technical Duty
+755,,TEST00340,1,Test EME Unit A,2019-07-11,2021-08-29,Store Duty
+756,,TEST00340,2,Test EME Unit B,2021-12-26,2023-03-21,Field Duty
+757,,TEST00341,1,Test Ordnance Unit,2027-12-25,2029-01-18,Technical Duty
+758,,TEST00341,2,Test Store Unit,2029-02-09,2030-03-06,General Duty
+759,,TEST00342,1,Test Training Unit,2004-09-17,2007-03-06,Administrative Duty
+760,,TEST00342,2,Test Infantry Unit A,2007-05-23,2008-05-17,Communication Duty
+761,,TEST00343,1,Test Training Unit,2013-10-13,2015-03-07,General Duty
+762,,TEST00343,2,Test Support Unit,2015-03-30,2017-05-18,General Duty
+763,,TEST00343,3,Test Infantry Unit B,2017-08-03,2019-01-25,Administrative Duty
+764,,TEST00344,1,Test EME Unit B,2015-05-20,2016-10-11,Technical Duty
+765,,TEST00344,2,Test EME Unit A,2017-02-05,2019-06-25,General Duty
+766,,TEST00345,1,Test Signal Unit A,2016-07-11,2018-10-29,Store Duty
+767,,TEST00345,2,Test Signal Unit B,2019-01-08,2020-04-02,Administrative Duty
+768,,TEST00345,3,Test Communication Unit,2020-06-17,2021-12-09,Field Duty
+769,,TEST00346,1,Test Field Unit,2027-04-26,2028-09-17,Field Duty
+770,,TEST00346,2,Test Support Unit,2028-10-12,2030-12-31,Communication Duty
+771,,TEST00346,3,Test Training Unit,2031-04-12,2032-04-06,Technical Duty
+772,,TEST00347,1,Test HQ Unit,2028-09-25,2031-03-14,Communication Duty
+773,,TEST00347,2,Test Administrative Unit,2031-07-05,2032-06-29,Technical Duty
+774,,TEST00348,1,Test Infantry Unit B,2009-01-02,2010-05-27,Field Duty
+775,,TEST00348,2,Test Infantry Unit A,2010-06-14,2011-03-11,Administrative Duty
+776,,TEST00349,1,Test Communication Unit,2010-12-19,2011-11-14,Administrative Duty
+777,,TEST00349,2,Test Signal Unit A,2012-02-25,2014-01-15,Store Duty
+778,,TEST00350,1,Test Infantry Unit A,2016-02-08,2018-04-28,Communication Duty
+779,,TEST00350,2,Test Support Unit,2018-05-27,2020-02-16,Store Duty
+780,,TEST00351,1,Test Training Unit,2011-02-01,2013-05-21,Technical Duty
+781,,TEST00351,2,Test Infantry Unit A,2013-08-04,2016-01-21,Technical Duty
+782,,TEST00352,1,Test Signal Unit A,2021-07-17,2023-04-08,Communication Duty
+783,,TEST00352,2,Test Communication Unit,2023-06-09,2024-02-04,Field Duty
+784,,TEST00353,1,Test Artillery Unit A,2007-09-21,2008-05-18,Administrative Duty
+785,,TEST00353,2,Test Artillery Unit B,2008-06-22,2009-07-17,Store Duty
+786,,TEST00354,1,Test EME Unit B,2005-08-15,2006-07-11,General Duty
+787,,TEST00354,2,Test EME Unit A,2006-08-31,2008-12-18,General Duty
+788,,TEST00355,1,Test EME Unit B,2010-04-24,2012-04-13,Technical Duty
+789,,TEST00355,2,Test EME Unit A,2012-07-02,2014-12-19,General Duty
+790,,TEST00356,1,Test Support Unit,2010-08-30,2013-01-16,Store Duty
+791,,TEST00356,2,Test Infantry Unit B,2013-05-04,2015-07-23,General Duty
+792,,TEST00357,1,Test Support Unit,2020-03-31,2022-01-20,Communication Duty
+793,,TEST00357,2,Test Training Unit,2022-03-02,2023-05-26,Technical Duty
+794,,TEST00357,3,Test Infantry Unit A,2023-09-21,2025-10-10,Technical Duty
+795,,TEST00358,1,Test Infantry Unit B,2015-01-22,2016-10-13,Field Duty
+796,,TEST00358,2,Test Training Unit,2016-11-02,2018-10-23,Administrative Duty
+797,,TEST00358,3,Test Support Unit,2019-01-22,2019-12-18,Field Duty
+798,,TEST00359,1,Test Infantry Unit B,2025-04-29,2026-03-25,Technical Duty
+799,,TEST00359,2,Test Support Unit,2026-05-29,2028-06-17,Administrative Duty
+800,,TEST00359,3,Test Training Unit,2028-10-04,2029-08-30,General Duty
+801,,TEST00360,1,Test Signal Unit A,2016-11-17,2018-01-11,Technical Duty
+802,,TEST00360,2,Test Communication Unit,2018-04-22,2020-07-10,Technical Duty
+803,,TEST00361,1,Test Field Unit,2010-05-19,2012-03-09,Field Duty
+804,,TEST00361,2,Test Infantry Unit B,2012-06-03,2013-03-30,Store Duty
+805,,TEST00362,1,Test Ordnance Unit,2016-02-22,2018-01-12,Communication Duty
+806,,TEST00362,2,Test Store Unit,2018-03-12,2019-02-05,Field Duty
+807,,TEST00363,1,Test Field Unit,2013-11-01,2016-02-19,Store Duty
+808,,TEST00363,2,Test Infantry Unit B,2016-05-05,2017-03-31,Field Duty
+809,,TEST00363,3,Test Infantry Unit A,2017-07-23,2018-11-15,Technical Duty
+810,,TEST00364,1,Test Training Unit,2025-05-03,2027-02-22,Store Duty
+811,,TEST00364,2,Test Infantry Unit B,2027-04-29,2029-01-18,General Duty
+812,,TEST00365,1,Test ASC Unit,2009-01-31,2011-03-22,Store Duty
+813,,TEST00365,2,Test Transport Unit,2011-06-22,2012-09-14,Store Duty
+814,,TEST00366,1,Test Field Unit,2023-09-11,2024-10-05,Field Duty
+815,,TEST00366,2,Test Support Unit,2025-01-09,2025-09-06,Field Duty
+816,,TEST00367,1,Test Support Unit,2001-10-17,2003-05-10,Field Duty
+817,,TEST00367,2,Test Training Unit,2003-09-02,2005-04-24,Store Duty
+818,,TEST00368,1,Test Store Unit,2024-10-02,2025-09-27,Administrative Duty
+819,,TEST00368,2,Test Ordnance Unit,2025-12-03,2027-01-27,Administrative Duty
+820,,TEST00369,1,Test Field Unit,2025-03-09,2026-06-02,Store Duty
+821,,TEST00369,2,Test Training Unit,2026-07-16,2028-12-02,Communication Duty
+822,,TEST00370,1,Test Artillery Unit B,2013-04-21,2014-04-16,Store Duty
+823,,TEST00370,2,Test Artillery Unit A,2014-08-14,2016-11-01,General Duty
+824,,TEST00371,1,Test EME Unit B,2019-10-08,2021-12-26,Communication Duty
+825,,TEST00371,2,Test EME Unit A,2022-02-28,2024-04-18,Administrative Duty
+826,,TEST00372,1,Test Training Unit,2013-12-11,2014-08-08,Store Duty
+827,,TEST00372,2,Test Support Unit,2014-08-18,2016-09-06,Store Duty
+828,,TEST00372,3,Test Infantry Unit B,2016-11-13,2018-04-07,Field Duty
+829,,TEST00373,1,Test Field Unit,2023-06-18,2025-09-05,Store Duty
+830,,TEST00373,2,Test Training Unit,2025-10-21,2027-06-13,Administrative Duty
+831,,TEST00373,3,Test Support Unit,2027-07-02,2029-06-21,Technical Duty
+832,,TEST00374,1,Test Infantry Unit A,2023-06-24,2025-04-14,Technical Duty
+833,,TEST00374,2,Test Support Unit,2025-05-30,2027-03-21,Store Duty
+834,,TEST00375,1,Test Infantry Unit B,2011-07-01,2013-08-19,Store Duty
+835,,TEST00375,2,Test Support Unit,2013-12-10,2015-12-30,General Duty
+836,,TEST00376,1,Test Training Unit,2019-10-16,2021-02-07,Administrative Duty
+837,,TEST00376,2,Test Infantry Unit A,2021-03-29,2021-11-24,Store Duty
+838,,TEST00377,1,Test Infantry Unit A,2017-01-24,2017-12-20,General Duty
+839,,TEST00377,2,Test Field Unit,2018-01-19,2019-09-11,Technical Duty
+840,,TEST00377,3,Test Training Unit,2019-11-18,2020-08-14,Communication Duty
+841,,TEST00378,1,Test Training Unit,2016-03-24,2016-11-19,Store Duty
+842,,TEST00378,2,Test Infantry Unit A,2016-12-21,2018-04-15,Store Duty
+843,,TEST00379,1,Test Field Unit,2026-11-02,2028-01-26,General Duty
+844,,TEST00379,2,Test Infantry Unit A,2028-04-16,2030-05-06,Store Duty
+845,,TEST00380,1,Test Infantry Unit A,2019-05-27,2021-04-16,Administrative Duty
+846,,TEST00380,2,Test Field Unit,2021-07-20,2023-08-09,Store Duty
+847,,TEST00381,1,Test Field Unit,2005-12-27,2007-07-20,Communication Duty
+848,,TEST00381,2,Test Infantry Unit A,2007-11-17,2009-02-09,General Duty
+849,,TEST00381,3,Test Training Unit,2009-03-10,2010-12-30,Administrative Duty
+850,,TEST00382,1,Test Infantry Unit A,2014-02-15,2014-11-12,Field Duty
+851,,TEST00382,2,Test Infantry Unit B,2015-01-05,2016-08-27,Field Duty
+852,,TEST00383,1,Test Training Unit,2014-11-12,2017-03-01,Technical Duty
+853,,TEST00383,2,Test Field Unit,2017-03-13,2018-10-04,Communication Duty
+854,,TEST00384,1,Test Store Unit,2012-09-13,2014-07-05,Store Duty
+855,,TEST00384,2,Test Ordnance Unit,2014-10-08,2016-03-01,Communication Duty
+856,,TEST00385,1,Test Training Unit,2007-05-24,2008-01-19,Field Duty
+857,,TEST00385,2,Test Support Unit,2008-02-13,2010-02-02,Communication Duty
+858,,TEST00386,1,Test Infantry Unit A,2024-04-15,2026-08-03,Technical Duty
+859,,TEST00386,2,Test Training Unit,2026-10-06,2028-04-28,Field Duty
+860,,TEST00386,3,Test Support Unit,2028-05-23,2029-02-17,Technical Duty
+861,,TEST00387,1,Test Administrative Unit,2018-07-13,2019-07-08,Store Duty
+862,,TEST00387,2,Test HQ Unit,2019-10-02,2020-06-28,Communication Duty
+863,,TEST00388,1,Test Field Unit,2016-06-21,2018-07-11,Communication Duty
+864,,TEST00388,2,Test Support Unit,2018-11-02,2020-05-25,Technical Duty
+865,,TEST00389,1,Test Support Unit,2016-03-14,2017-03-09,General Duty
+866,,TEST00389,2,Test Infantry Unit B,2017-04-29,2018-11-20,Store Duty
+867,,TEST00390,1,Test Support Unit,2011-12-12,2013-09-02,Technical Duty
+868,,TEST00390,2,Test Infantry Unit B,2013-10-05,2014-10-30,General Duty
+869,,TEST00390,3,Test Training Unit,2015-01-25,2015-09-22,Administrative Duty
+870,,TEST00391,1,Test Administrative Unit,2021-04-01,2021-11-27,Administrative Duty
+871,,TEST00391,2,Test HQ Unit,2022-02-08,2023-07-03,Communication Duty
+872,,TEST00392,1,Test Training Unit,2014-04-19,2016-09-05,Administrative Duty
+873,,TEST00392,2,Test Field Unit,2016-11-01,2019-01-20,Technical Duty
+874,,TEST00393,1,Test Field Unit,2010-10-25,2012-01-18,Store Duty
+875,,TEST00393,2,Test Infantry Unit B,2012-02-25,2013-08-18,General Duty
+876,,TEST00393,3,Test Infantry Unit A,2013-10-29,2014-08-25,Technical Duty
+877,,TEST00394,1,Test Field Unit,2000-10-13,2001-09-08,Technical Duty
+878,,TEST00394,2,Test Infantry Unit B,2001-12-16,2004-03-05,General Duty
+879,,TEST00395,1,Test Support Unit,2020-04-27,2022-09-14,Technical Duty
+880,,TEST00395,2,Test Infantry Unit B,2022-10-05,2023-08-01,Field Duty
+881,,TEST00396,1,Test Infantry Unit B,2021-05-27,2023-03-18,Communication Duty
+882,,TEST00396,2,Test Training Unit,2023-04-17,2025-01-06,Administrative Duty
+883,,TEST00396,3,Test Field Unit,2025-03-25,2027-07-13,Store Duty
+884,,TEST00397,1,Test Training Unit,2019-08-10,2021-08-29,Administrative Duty
+885,,TEST00397,2,Test Field Unit,2021-12-08,2024-04-26,Administrative Duty
+886,,TEST00398,1,Test HQ Unit,2005-05-16,2007-07-05,Field Duty
+887,,TEST00398,2,Test Administrative Unit,2007-08-23,2008-09-16,Field Duty
+888,,TEST00399,1,Test Transport Unit,2014-07-31,2015-06-26,Communication Duty
+889,,TEST00399,2,Test ASC Unit,2015-07-20,2017-07-09,Administrative Duty
+890,,TEST00400,1,Test Training Unit,2008-11-09,2010-08-31,General Duty
+891,,TEST00400,2,Test Infantry Unit A,2010-09-17,2012-03-10,General Duty
+892,,TEST00401,1,Test Field Unit,2002-05-16,2004-08-03,General Duty
+893,,TEST00401,2,Test Training Unit,2004-09-15,2006-07-07,Communication Duty
+894,,TEST00402,1,Test Administrative Unit,2022-09-30,2024-04-22,Field Duty
+895,,TEST00402,2,Test HQ Unit,2024-05-29,2025-12-20,Technical Duty
+896,,TEST00403,1,Test Training Unit,2015-12-01,2017-09-21,General Duty
+897,,TEST00403,2,Test Field Unit,2017-11-15,2020-01-04,Administrative Duty
+898,,TEST00403,3,Test Infantry Unit A,2020-04-12,2022-06-01,Communication Duty
+899,,TEST00404,1,Test EME Unit B,2027-05-18,2028-02-12,Administrative Duty
+900,,TEST00404,2,Test EME Unit A,2028-03-22,2030-02-10,Store Duty
+901,,TEST00405,1,Test Infantry Unit B,2025-05-17,2026-04-12,Store Duty
+902,,TEST00405,2,Test Training Unit,2026-05-19,2028-02-08,General Duty
+903,,TEST00406,1,Test Infantry Unit B,2020-06-23,2022-10-11,Store Duty
+904,,TEST00406,2,Test Training Unit,2023-01-05,2024-01-30,Communication Duty
+905,,TEST00407,1,Test Training Unit,2022-02-08,2022-12-05,Administrative Duty
+906,,TEST00407,2,Test Infantry Unit B,2023-03-26,2024-04-19,Communication Duty
+907,,TEST00407,3,Test Field Unit,2024-07-07,2026-05-28,Technical Duty
+908,,TEST00408,1,Test Workshop Unit,2007-09-01,2009-02-22,Field Duty
+909,,TEST00408,2,Test EME Unit A,2009-03-12,2010-09-03,Technical Duty
+910,,TEST00409,1,Test Field Unit,2023-11-13,2026-04-01,Technical Duty
+911,,TEST00409,2,Test Support Unit,2026-05-22,2027-08-15,Communication Duty
+912,,TEST00409,3,Test Infantry Unit B,2027-12-06,2029-11-25,General Duty
+913,,TEST00410,1,Test ASC Unit,2023-05-07,2025-09-23,Communication Duty
+914,,TEST00410,2,Test Transport Unit,2025-10-27,2027-03-21,Administrative Duty
+915,,TEST00411,1,Test Infantry Unit A,2012-09-27,2014-05-20,Technical Duty
+916,,TEST00411,2,Test Support Unit,2014-08-13,2016-04-04,Store Duty
+917,,TEST00411,3,Test Infantry Unit B,2016-04-22,2017-09-14,Technical Duty
+918,,TEST00412,1,Test Infantry Unit B,2009-03-16,2011-07-04,Communication Duty
+919,,TEST00412,2,Test Field Unit,2011-08-16,2013-02-06,General Duty
+920,,TEST00412,3,Test Training Unit,2013-05-05,2015-06-24,Store Duty
+921,,TEST00413,1,Test Infantry Unit A,2017-07-05,2018-04-01,Store Duty
+922,,TEST00413,2,Test Training Unit,2018-06-26,2020-07-15,Administrative Duty
+923,,TEST00414,1,Test Training Unit,2016-07-09,2018-07-29,Technical Duty
+924,,TEST00414,2,Test Infantry Unit A,2018-11-22,2021-04-10,Field Duty
+925,,TEST00415,1,Test Ordnance Unit,2000-07-26,2002-08-15,Store Duty
+926,,TEST00415,2,Test Store Unit,2002-10-16,2005-03-04,Store Duty
+927,,TEST00416,1,Test EME Unit A,2018-01-04,2019-08-27,Administrative Duty
+928,,TEST00416,2,Test EME Unit B,2019-12-09,2021-11-28,Store Duty
+929,,TEST00417,1,Test Training Unit,2020-12-19,2022-01-13,Store Duty
+930,,TEST00417,2,Test Field Unit,2022-03-11,2024-01-30,Administrative Duty
+931,,TEST00417,3,Test Infantry Unit B,2024-04-30,2026-10-17,Store Duty
+932,,TEST00418,1,Test Training Unit,2014-01-19,2016-03-09,General Duty
+933,,TEST00418,2,Test Infantry Unit A,2016-04-10,2017-04-05,General Duty
+934,,TEST00419,1,Test Training Unit,2004-06-02,2005-10-25,Store Duty
+935,,TEST00419,2,Test Infantry Unit A,2006-01-12,2007-03-08,Field Duty
+936,,TEST00419,3,Test Support Unit,2007-06-03,2009-03-24,General Duty
+937,,TEST00420,1,Test Field Unit,2023-07-21,2024-11-12,Administrative Duty
+938,,TEST00420,2,Test Training Unit,2025-03-05,2026-01-29,Administrative Duty
+939,,TEST00421,1,Test Support Unit,2003-12-22,2005-01-15,Store Duty
+940,,TEST00421,2,Test Training Unit,2005-03-16,2007-03-06,General Duty
+941,,TEST00422,1,Test HQ Unit,2007-12-07,2009-01-30,Store Duty
+942,,TEST00422,2,Test Administrative Unit,2009-04-14,2010-10-06,Communication Duty
+943,,TEST00423,1,Test Infantry Unit A,2014-01-23,2016-04-12,Communication Duty
+944,,TEST00423,2,Test Infantry Unit B,2016-08-06,2018-08-26,General Duty
+945,,TEST00424,1,Test Communication Unit,2014-08-06,2015-04-03,Field Duty
+946,,TEST00424,2,Test Signal Unit A,2015-07-23,2017-10-10,Field Duty
+947,,TEST00425,1,Test Infantry Unit A,2018-07-26,2020-05-16,Store Duty
+948,,TEST00425,2,Test Support Unit,2020-06-01,2021-12-23,Administrative Duty
+949,,TEST00426,1,Test Support Unit,2019-05-17,2020-12-07,General Duty
+950,,TEST00426,2,Test Infantry Unit B,2021-03-07,2023-07-25,Administrative Duty
+951,,TEST00426,3,Test Infantry Unit A,2023-11-07,2025-10-27,Store Duty
+952,,TEST00427,1,Test ASC Unit,2011-07-31,2013-12-17,Administrative Duty
+953,,TEST00427,2,Test Transport Unit,2014-01-20,2015-01-15,Field Duty
+954,,TEST00428,1,Test Artillery Unit A,2021-02-26,2023-04-17,Technical Duty
+955,,TEST00428,2,Test Artillery Unit B,2023-08-05,2025-09-23,General Duty
+956,,TEST00429,1,Test EME Unit B,2014-06-29,2015-11-21,Technical Duty
+957,,TEST00429,2,Test Engineer Unit,2016-02-21,2017-08-14,Administrative Duty
+958,,TEST00430,1,Test Engineer Unit,2024-12-10,2027-01-29,General Duty
+959,,TEST00430,2,Test EME Unit B,2027-05-07,2029-04-26,Administrative Duty
+960,,TEST00431,1,Test HQ Unit,2027-07-27,2028-12-18,Administrative Duty
+961,,TEST00431,2,Test Administrative Unit,2029-01-04,2029-12-30,Administrative Duty
+962,,TEST00432,1,Test Infantry Unit B,2011-01-06,2012-06-29,Field Duty
+963,,TEST00432,2,Test Support Unit,2012-10-18,2014-10-08,Communication Duty
+964,,TEST00432,3,Test Infantry Unit A,2014-11-13,2016-07-05,Communication Duty
+965,,TEST00433,1,Test Infantry Unit A,2022-11-03,2024-05-26,Store Duty
+966,,TEST00433,2,Test Infantry Unit B,2024-09-05,2026-11-24,Communication Duty
+967,,TEST00433,3,Test Field Unit,2027-02-14,2028-05-09,Technical Duty
+968,,TEST00434,1,Test EME Unit A,2012-02-22,2014-06-11,Administrative Duty
+969,,TEST00434,2,Test Workshop Unit,2014-08-29,2016-02-20,Communication Duty
+970,,TEST00435,1,Test Artillery Unit B,1999-12-03,2002-04-21,Technical Duty
+971,,TEST00435,2,Test Artillery Unit A,2002-05-12,2004-08-29,Administrative Duty
+972,,TEST00436,1,Test Support Unit,2012-08-18,2014-07-09,Store Duty
+973,,TEST00436,2,Test Infantry Unit B,2014-08-11,2016-03-03,Administrative Duty
+974,,TEST00436,3,Test Field Unit,2016-06-22,2017-05-18,General Duty
+975,,TEST00437,1,Test EME Unit A,2021-08-30,2024-01-17,Store Duty
+976,,TEST00437,2,Test EME Unit B,2024-02-01,2026-06-20,Technical Duty
+977,,TEST00438,1,Test Support Unit,2028-10-14,2029-11-08,Communication Duty
+978,,TEST00438,2,Test Training Unit,2029-11-21,2030-12-16,Store Duty
+979,,TEST00439,1,Test Support Unit,2025-04-13,2026-10-05,Technical Duty
+980,,TEST00439,2,Test Training Unit,2026-11-21,2027-12-16,Store Duty
+981,,TEST00439,3,Test Infantry Unit A,2028-01-05,2029-08-27,Administrative Duty
+982,,TEST00440,1,Test Support Unit,2022-12-27,2023-09-23,General Duty
+983,,TEST00440,2,Test Infantry Unit A,2023-12-21,2026-06-08,Communication Duty
+984,,TEST00441,1,Test Store Unit,2011-09-27,2013-06-18,Administrative Duty
+985,,TEST00441,2,Test Ordnance Unit,2013-07-03,2015-01-24,General Duty
+986,,TEST00442,1,Test HQ Unit,2022-07-21,2024-06-10,Technical Duty
+987,,TEST00442,2,Test Administrative Unit,2024-06-21,2025-10-14,Technical Duty
+988,,TEST00443,1,Test Infantry Unit B,2021-11-21,2023-11-11,General Duty
+989,,TEST00443,2,Test Support Unit,2023-12-24,2026-04-12,Administrative Duty
+990,,TEST00443,3,Test Infantry Unit A,2026-07-17,2027-11-09,Communication Duty
+991,,TEST00444,1,Test Training Unit,1999-11-11,2001-01-04,General Duty
+992,,TEST00444,2,Test Field Unit,2001-03-28,2002-12-18,Store Duty
+993,,TEST00445,1,Test ASC Unit,2027-09-29,2029-05-21,Administrative Duty
+994,,TEST00445,2,Test Transport Unit,2029-08-27,2032-01-14,Store Duty
+995,,TEST00446,1,Test Transport Unit,2006-08-31,2008-08-20,Store Duty
+996,,TEST00446,2,Test ASC Unit,2008-12-05,2010-03-30,Store Duty
+997,,TEST00447,1,Test Field Unit,2017-10-31,2018-09-26,Field Duty
+998,,TEST00447,2,Test Training Unit,2018-11-05,2020-04-28,Store Duty
+999,,TEST00447,3,Test Infantry Unit B,2020-08-11,2022-06-02,Technical Duty
+1000,,TEST00448,1,Test Infantry Unit A,2022-07-31,2023-09-24,General Duty
+1001,,TEST00448,2,Test Support Unit,2023-12-25,2025-09-15,Store Duty
+1002,,TEST00448,3,Test Infantry Unit B,2025-12-05,2026-10-31,General Duty
+1003,,TEST00449,1,Test Field Unit,2022-05-11,2023-10-03,Technical Duty
+1004,,TEST00449,2,Test Infantry Unit A,2023-12-27,2025-12-16,Store Duty
+1005,,TEST00449,3,Test Support Unit,2026-01-03,2027-12-24,Communication Duty
+1006,,TEST00450,1,Test Signal Unit B,2016-09-23,2017-12-17,Technical Duty
+1007,,TEST00450,2,Test Communication Unit,2018-02-16,2019-07-11,Communication Duty
+1008,,TEST00450,3,Test Signal Unit A,2019-09-16,2020-05-13,Administrative Duty
+1009,,TEST00451,1,Test HQ Unit,2020-12-23,2023-03-13,General Duty
+1010,,TEST00451,2,Test Administrative Unit,2023-05-06,2024-06-29,Store Duty
+1011,,TEST00452,1,Test Infantry Unit A,2005-08-20,2006-08-15,Communication Duty
+1012,,TEST00452,2,Test Infantry Unit B,2006-09-11,2008-04-03,Administrative Duty
+1013,,TEST00452,3,Test Field Unit,2008-07-22,2009-08-16,General Duty
+1014,,TEST00453,1,Test Infantry Unit B,2003-12-04,2004-09-29,Store Duty
+1015,,TEST00453,2,Test Training Unit,2004-10-13,2007-01-31,Administrative Duty
+1016,,TEST00454,1,Test Infantry Unit B,2008-12-15,2010-04-09,General Duty
+1017,,TEST00454,2,Test Infantry Unit A,2010-04-21,2011-01-16,Field Duty
+1018,,TEST00454,3,Test Training Unit,2011-04-24,2013-03-14,Field Duty
+1019,,TEST00455,1,Test EME Unit B,2024-12-28,2026-01-22,Administrative Duty
+1020,,TEST00455,2,Test Engineer Unit,2026-03-20,2027-06-13,Store Duty
+1021,,TEST00456,1,Test EME Unit A,2012-10-06,2015-03-25,Store Duty
+1022,,TEST00456,2,Test EME Unit B,2015-05-13,2016-04-07,Field Duty
+1023,,TEST00457,1,Test Artillery Unit B,2010-10-26,2011-06-23,Store Duty
+1024,,TEST00457,2,Test Artillery Unit A,2011-10-04,2013-10-23,Communication Duty
+1025,,TEST00458,1,Test Field Unit,2015-08-26,2016-09-19,Technical Duty
+1026,,TEST00458,2,Test Support Unit,2016-11-15,2017-09-11,Communication Duty
+1027,,TEST00458,3,Test Infantry Unit A,2018-01-06,2019-05-31,Technical Duty
+1028,,TEST00459,1,Test Infantry Unit A,2025-11-02,2028-04-20,Field Duty
+1029,,TEST00459,2,Test Field Unit,2028-07-25,2029-09-18,Technical Duty
+1030,,TEST00460,1,Test Infantry Unit A,2009-07-22,2010-04-18,Technical Duty
+1031,,TEST00460,2,Test Training Unit,2010-06-06,2012-01-27,Store Duty
+1032,,TEST00461,1,Test ASC Unit,2011-07-17,2012-04-12,Communication Duty
+1033,,TEST00461,2,Test Transport Unit,2012-04-23,2013-04-18,Store Duty
+1034,,TEST00462,1,Test Infantry Unit B,2005-07-27,2006-04-23,General Duty
+1035,,TEST00462,2,Test Infantry Unit A,2006-07-18,2008-01-09,Technical Duty
+1036,,TEST00462,3,Test Support Unit,2008-03-09,2009-11-29,Field Duty
+1037,,TEST00463,1,Test Engineer Unit,2019-11-16,2021-08-07,Store Duty
+1038,,TEST00463,2,Test EME Unit B,2021-10-30,2022-06-27,General Duty
+1039,,TEST00464,1,Test Support Unit,2026-05-19,2027-02-13,General Duty
+1040,,TEST00464,2,Test Field Unit,2027-04-27,2028-07-20,Technical Duty
+1041,,TEST00464,3,Test Infantry Unit A,2028-09-10,2030-10-30,General Duty
+1042,,TEST00465,1,Test Infantry Unit B,2006-06-10,2007-08-04,General Duty
+1043,,TEST00465,2,Test Support Unit,2007-11-05,2009-08-26,Technical Duty
+1044,,TEST00465,3,Test Infantry Unit A,2009-09-25,2010-07-22,General Duty
+1045,,TEST00466,1,Test Training Unit,2013-05-26,2015-05-16,Communication Duty
+1046,,TEST00466,2,Test Infantry Unit A,2015-06-04,2017-09-21,Communication Duty
+1047,,TEST00466,3,Test Field Unit,2017-12-03,2018-11-28,Technical Duty
+1048,,TEST00467,1,Test Field Unit,2022-09-24,2025-03-12,Administrative Duty
+1049,,TEST00467,2,Test Training Unit,2025-06-25,2027-03-17,General Duty
+1050,,TEST00468,1,Test Artillery Unit A,2023-01-13,2024-12-03,General Duty
+1051,,TEST00468,2,Test Artillery Unit B,2025-02-09,2026-06-04,Administrative Duty
+1052,,TEST00469,1,Test Infantry Unit A,2022-02-13,2023-07-08,Administrative Duty
+1053,,TEST00469,2,Test Infantry Unit B,2023-11-04,2024-10-29,Technical Duty
+1054,,TEST00469,3,Test Training Unit,2024-12-24,2025-12-19,General Duty
+1055,,TEST00470,1,Test Infantry Unit A,2006-11-27,2007-12-22,Technical Duty
+1056,,TEST00470,2,Test Infantry Unit B,2008-03-16,2009-07-09,General Duty
+1057,,TEST00470,3,Test Support Unit,2009-08-06,2011-12-24,Field Duty
+1058,,TEST00471,1,Test Field Unit,2004-03-31,2006-02-19,Technical Duty
+1059,,TEST00471,2,Test Support Unit,2006-04-18,2008-07-06,General Duty
+1060,,TEST00472,1,Test Support Unit,2009-08-11,2011-02-02,General Duty
+1061,,TEST00472,2,Test Field Unit,2011-03-12,2012-03-06,Communication Duty
+1062,,TEST00473,1,Test Store Unit,2027-03-21,2029-04-09,General Duty
+1063,,TEST00473,2,Test Ordnance Unit,2029-07-14,2030-07-09,Administrative Duty
+1064,,TEST00474,1,Test ASC Unit,2017-07-04,2019-02-24,General Duty
+1065,,TEST00474,2,Test Transport Unit,2019-03-22,2020-02-15,General Duty
+1066,,TEST00475,1,Test Field Unit,2011-04-20,2012-05-14,Communication Duty
+1067,,TEST00475,2,Test Infantry Unit A,2012-08-01,2014-03-24,Field Duty
+1068,,TEST00476,1,Test Field Unit,2013-11-12,2015-08-04,Store Duty
+1069,,TEST00476,2,Test Support Unit,2015-11-08,2017-07-30,Technical Duty
+1070,,TEST00476,3,Test Training Unit,2017-09-05,2019-06-27,Communication Duty
+1071,,TEST00477,1,Test Training Unit,2028-07-17,2029-12-09,Communication Duty
+1072,,TEST00477,2,Test Field Unit,2030-01-21,2030-09-18,Store Duty
+1073,,TEST00478,1,Test Support Unit,2018-10-13,2020-12-01,General Duty
+1074,,TEST00478,2,Test Infantry Unit A,2021-02-22,2021-11-19,Communication Duty
+1075,,TEST00479,1,Test Infantry Unit A,2007-03-15,2008-08-06,General Duty
+1076,,TEST00479,2,Test Support Unit,2008-08-22,2010-04-14,Store Duty
+1077,,TEST00480,1,Test Support Unit,2025-01-23,2026-03-19,Administrative Duty
+1078,,TEST00480,2,Test Infantry Unit B,2026-04-27,2027-08-20,Store Duty
+1079,,TEST00481,1,Test Field Unit,2022-12-23,2024-12-12,Technical Duty
+1080,,TEST00481,2,Test Support Unit,2025-01-06,2026-04-01,Store Duty
+1081,,TEST00481,3,Test Infantry Unit A,2026-06-17,2028-03-08,Administrative Duty
+1082,,TEST00482,1,Test Infantry Unit B,2017-02-13,2017-10-11,Technical Duty
+1083,,TEST00482,2,Test Training Unit,2017-10-29,2018-11-23,Technical Duty
+1084,,TEST00482,3,Test Field Unit,2019-03-08,2021-01-26,Field Duty
+1085,,TEST00483,1,Test Infantry Unit A,2003-08-01,2005-01-22,General Duty
+1086,,TEST00483,2,Test Field Unit,2005-02-27,2006-04-23,General Duty
+1087,,TEST00484,1,Test Ordnance Unit,2023-06-30,2024-09-22,Administrative Duty
+1088,,TEST00484,2,Test Store Unit,2025-01-05,2027-06-24,Communication Duty
+1089,,TEST00485,1,Test Communication Unit,2017-12-30,2020-03-19,General Duty
+1090,,TEST00485,2,Test Signal Unit A,2020-03-29,2022-03-19,Store Duty
+1091,,TEST00486,1,Test Infantry Unit A,2003-02-03,2003-12-30,Communication Duty
+1092,,TEST00486,2,Test Field Unit,2004-04-20,2004-12-16,General Duty
+1093,,TEST00487,1,Test ASC Unit,2018-11-29,2020-02-22,Technical Duty
+1094,,TEST00487,2,Test Transport Unit,2020-05-29,2022-04-19,Technical Duty
+1095,,TEST00488,1,Test Training Unit,2022-08-16,2023-04-13,Store Duty
+1096,,TEST00488,2,Test Infantry Unit A,2023-08-02,2025-01-23,Administrative Duty
+1097,,TEST00488,3,Test Infantry Unit B,2025-04-12,2026-02-06,Store Duty
+1098,,TEST00489,1,Test Field Unit,2012-07-13,2013-04-09,General Duty
+1099,,TEST00489,2,Test Support Unit,2013-04-21,2015-07-10,Store Duty
+1100,,TEST00489,3,Test Infantry Unit A,2015-09-23,2017-01-15,Field Duty
+1101,,TEST00490,1,Test Store Unit,1999-12-31,2000-11-25,Field Duty
+1102,,TEST00490,2,Test Ordnance Unit,2001-03-21,2002-06-14,Communication Duty
+1103,,TEST00491,1,Test Artillery Unit A,2022-09-09,2023-07-06,Field Duty
+1104,,TEST00491,2,Test Artillery Unit B,2023-10-01,2025-10-20,Field Duty
+1105,,TEST00492,1,Test ASC Unit,2012-01-23,2014-03-13,Administrative Duty
+1106,,TEST00492,2,Test Transport Unit,2014-04-11,2014-12-07,Technical Duty
+1107,,TEST00493,1,Test EME Unit A,2012-05-03,2013-11-24,Technical Duty
+1108,,TEST00493,2,Test EME Unit B,2014-01-14,2015-04-09,Administrative Duty
+1109,,TEST00494,1,Test Infantry Unit A,2010-04-30,2011-12-21,Store Duty
+1110,,TEST00494,2,Test Support Unit,2012-03-17,2014-06-05,Administrative Duty
+1111,,TEST00494,3,Test Infantry Unit B,2014-07-21,2016-09-08,Field Duty
+1112,,TEST00495,1,Test Support Unit,2019-05-16,2021-11-01,General Duty
+1113,,TEST00495,2,Test Training Unit,2021-11-23,2022-08-20,Store Duty
+1114,,TEST00495,3,Test Infantry Unit A,2022-09-16,2024-01-09,Field Duty
+1115,,TEST00496,1,Test EME Unit B,2008-10-03,2011-03-22,Store Duty
+1116,,TEST00496,2,Test Engineer Unit,2011-04-20,2012-04-14,Field Duty
+1117,,TEST00497,1,Test Training Unit,2014-11-13,2015-11-08,Communication Duty
+1118,,TEST00497,2,Test Field Unit,2015-12-06,2016-09-01,Store Duty
+1119,,TEST00497,3,Test Infantry Unit A,2016-10-25,2018-10-15,General Duty
+1120,,TEST00498,1,Test ASC Unit,2022-10-12,2024-08-02,Technical Duty
+1121,,TEST00498,2,Test Transport Unit,2024-11-21,2026-06-14,Field Duty
+1122,,TEST00499,1,Test Field Unit,2010-04-29,2011-11-20,Communication Duty
+1123,,TEST00499,2,Test Infantry Unit B,2011-12-02,2012-07-29,Administrative Duty
+1124,,TEST00499,3,Test Infantry Unit A,2012-08-19,2013-09-13,Store Duty
+1125,,TEST00500,1,Test Store Unit,2025-08-10,2027-08-30,General Duty
+1126,,TEST00500,2,Test Ordnance Unit,2027-12-05,2029-08-26,General Duty
+1127,,TEST00501,1,Test Field Unit,2012-07-06,2014-08-25,General Duty
+1128,,TEST00501,2,Test Training Unit,2014-10-10,2017-02-26,Communication Duty
+1129,,TEST00502,1,Test Signal Unit A,2020-06-27,2022-09-15,Technical Duty
+1130,,TEST00502,2,Test Signal Unit B,2022-10-23,2023-07-20,Administrative Duty
+1131,,TEST00503,1,Test Infantry Unit A,2017-02-03,2018-01-29,Store Duty
+1132,,TEST00503,2,Test Training Unit,2018-03-11,2020-02-29,Technical Duty
+1133,,TEST00503,3,Test Support Unit,2020-05-07,2021-03-03,General Duty
+1134,,TEST00504,1,Test Infantry Unit B,2005-11-15,2008-01-04,Field Duty
+1135,,TEST00504,2,Test Training Unit,2008-04-03,2009-12-24,General Duty
+1136,,TEST00505,1,Test HQ Unit,2015-08-01,2017-11-18,Administrative Duty
+1137,,TEST00505,2,Test Administrative Unit,2018-02-04,2020-07-23,Administrative Duty
+1138,,TEST00506,1,Test Support Unit,2018-08-15,2019-11-08,Field Duty
+1139,,TEST00506,2,Test Training Unit,2020-02-22,2021-06-16,Administrative Duty
+1140,,TEST00506,3,Test Infantry Unit B,2021-08-13,2022-05-10,Administrative Duty
+1141,,TEST00507,1,Test Signal Unit A,2028-03-07,2029-11-27,Technical Duty
+1142,,TEST00507,2,Test Signal Unit B,2030-03-26,2032-07-13,Administrative Duty
+1143,,TEST00508,1,Test Infantry Unit A,2007-02-21,2008-08-14,Technical Duty
+1144,,TEST00508,2,Test Training Unit,2008-08-24,2010-03-17,Communication Duty
+1145,,TEST00509,1,Test Store Unit,2023-03-11,2024-03-05,Administrative Duty
+1146,,TEST00509,2,Test Ordnance Unit,2024-04-14,2025-11-05,Store Duty
+1147,,TEST00510,1,Test Store Unit,2014-04-24,2016-05-13,Technical Duty
+1148,,TEST00510,2,Test Ordnance Unit,2016-06-12,2017-12-04,General Duty
+1149,,TEST00511,1,Test Support Unit,2009-07-31,2011-03-23,Communication Duty
+1150,,TEST00511,2,Test Infantry Unit B,2011-04-02,2013-03-22,Communication Duty
+1151,,TEST00512,1,Test Support Unit,2006-11-26,2008-07-18,Technical Duty
+1152,,TEST00512,2,Test Field Unit,2008-11-14,2009-11-09,Administrative Duty
+1153,,TEST00512,3,Test Training Unit,2009-11-28,2012-02-16,Communication Duty
+1154,,TEST00513,1,Test Training Unit,2011-12-23,2013-05-16,Communication Duty
+1155,,TEST00513,2,Test Field Unit,2013-07-24,2014-05-20,Field Duty
+1156,,TEST00513,3,Test Support Unit,2014-06-19,2016-08-07,General Duty
+1157,,TEST00514,1,Test ASC Unit,2026-07-25,2027-04-21,Communication Duty
+1158,,TEST00514,2,Test Transport Unit,2027-05-14,2029-05-03,Administrative Duty
+1159,,TEST00515,1,Test Field Unit,2019-01-15,2020-04-09,Administrative Duty
+1160,,TEST00515,2,Test Infantry Unit B,2020-08-07,2021-11-30,Technical Duty
+1161,,TEST00515,3,Test Infantry Unit A,2022-01-18,2022-10-15,Administrative Duty
+1162,,TEST00516,1,Test Support Unit,2004-09-15,2005-09-10,General Duty
+1163,,TEST00516,2,Test Infantry Unit B,2005-11-02,2008-02-20,Communication Duty
+1164,,TEST00516,3,Test Infantry Unit A,2008-06-16,2009-10-09,Store Duty
+1165,,TEST00517,1,Test Transport Unit,2002-06-02,2003-09-25,Store Duty
+1166,,TEST00517,2,Test ASC Unit,2004-01-13,2005-02-06,General Duty
+1167,,TEST00518,1,Test Field Unit,2024-08-28,2025-07-24,General Duty
+1168,,TEST00518,2,Test Infantry Unit A,2025-10-27,2028-04-14,Store Duty
+1169,,TEST00519,1,Test HQ Unit,2020-09-09,2022-07-01,Technical Duty
+1170,,TEST00519,2,Test Administrative Unit,2022-07-11,2024-11-27,Communication Duty
+1171,,TEST00520,1,Test Infantry Unit B,2014-09-20,2017-02-06,Store Duty
+1172,,TEST00520,2,Test Field Unit,2017-05-27,2018-10-19,Store Duty
+1173,,TEST00521,1,Test Infantry Unit A,2007-05-29,2009-07-17,Communication Duty
+1174,,TEST00521,2,Test Field Unit,2009-10-03,2010-05-31,Communication Duty
+1175,,TEST00522,1,Test Infantry Unit A,2019-09-07,2020-08-02,General Duty
+1176,,TEST00522,2,Test Field Unit,2020-08-17,2021-09-11,General Duty
+1177,,TEST00523,1,Test Field Unit,2021-12-15,2024-05-03,Field Duty
+1178,,TEST00523,2,Test Infantry Unit B,2024-06-17,2025-04-13,Field Duty
+1179,,TEST00524,1,Test Ordnance Unit,2025-11-30,2028-05-18,Communication Duty
+1180,,TEST00524,2,Test Store Unit,2028-06-03,2029-10-26,Store Duty
+1181,,TEST00525,1,Test Infantry Unit A,2003-03-23,2004-03-17,General Duty
+1182,,TEST00525,2,Test Infantry Unit B,2004-06-26,2006-10-14,Store Duty
+1183,,TEST00525,3,Test Support Unit,2006-12-12,2007-09-08,General Duty
+1184,,TEST00526,1,Test Infantry Unit A,2013-08-08,2014-07-04,Store Duty
+1185,,TEST00526,2,Test Infantry Unit B,2014-09-09,2016-09-28,Store Duty
+1186,,TEST00527,1,Test Infantry Unit A,2003-12-11,2005-04-04,General Duty
+1187,,TEST00527,2,Test Training Unit,2005-04-15,2006-06-09,Administrative Duty
+1188,,TEST00528,1,Test Ordnance Unit,2021-07-19,2024-01-05,Communication Duty
+1189,,TEST00528,2,Test Store Unit,2024-04-19,2025-03-15,Store Duty
+1190,,TEST00529,1,Test Training Unit,2026-12-12,2027-11-07,Field Duty
+1191,,TEST00529,2,Test Support Unit,2028-02-21,2029-10-13,Technical Duty
+1192,,TEST00529,3,Test Infantry Unit A,2030-01-28,2031-08-21,Field Duty
+1193,,TEST00530,1,Test Training Unit,2005-02-11,2006-01-07,Store Duty
+1194,,TEST00530,2,Test Field Unit,2006-04-09,2007-09-01,Field Duty
+1195,,TEST00531,1,Test Field Unit,2014-09-28,2017-01-15,General Duty
+1196,,TEST00531,2,Test Infantry Unit A,2017-02-03,2018-03-30,Communication Duty
+1197,,TEST00532,1,Test Signal Unit B,2006-11-25,2009-05-13,General Duty
+1198,,TEST00532,2,Test Signal Unit A,2009-05-25,2011-04-15,Technical Duty
+1199,,TEST00533,1,Test Training Unit,2024-02-14,2025-02-08,Communication Duty
+1200,,TEST00533,2,Test Infantry Unit A,2025-05-05,2026-01-30,Field Duty
+1201,,TEST00533,3,Test Infantry Unit B,2026-03-10,2027-12-30,General Duty
+1202,,TEST00534,1,Test Artillery Unit B,2016-09-15,2018-10-05,Field Duty
+1203,,TEST00534,2,Test Artillery Unit A,2018-12-19,2019-11-14,Store Duty
+1204,,TEST00535,1,Test Infantry Unit B,1999-07-01,2001-11-17,Store Duty
+1205,,TEST00535,2,Test Training Unit,2002-03-04,2004-04-22,Field Duty
+1206,,TEST00536,1,Test Support Unit,2007-01-05,2007-12-01,Store Duty
+1207,,TEST00536,2,Test Training Unit,2008-01-05,2009-11-25,Administrative Duty
+1208,,TEST00537,1,Test Signal Unit A,2001-08-30,2003-05-22,Store Duty
+1209,,TEST00537,2,Test Signal Unit B,2003-09-19,2004-08-14,General Duty
+1210,,TEST00538,1,Test HQ Unit,2023-08-14,2025-03-06,Communication Duty
+1211,,TEST00538,2,Test Administrative Unit,2025-07-04,2027-06-24,General Duty
+1212,,TEST00539,1,Test Workshop Unit,2006-05-24,2007-07-18,Technical Duty
+1213,,TEST00539,2,Test EME Unit A,2007-08-24,2009-04-15,Technical Duty
+1214,,TEST00540,1,Test Support Unit,2004-07-21,2006-03-13,Store Duty
+1215,,TEST00540,2,Test Infantry Unit A,2006-06-16,2008-02-06,Store Duty
+1216,,TEST00541,1,Test Field Unit,2001-12-30,2003-11-20,General Duty
+1217,,TEST00541,2,Test Support Unit,2004-01-18,2005-11-08,Field Duty
+1218,,TEST00541,3,Test Training Unit,2006-02-13,2007-09-06,General Duty
+1219,,TEST00542,1,Test Infantry Unit B,2024-09-12,2027-03-01,Field Duty
+1220,,TEST00542,2,Test Field Unit,2027-03-29,2028-01-23,Administrative Duty
+1221,,TEST00543,1,Test Support Unit,2014-11-18,2015-11-13,Communication Duty
+1222,,TEST00543,2,Test Field Unit,2015-12-02,2016-07-29,Communication Duty
+1223,,TEST00544,1,Test Ordnance Unit,2025-01-15,2025-10-12,Field Duty
+1224,,TEST00544,2,Test Store Unit,2025-12-27,2027-04-21,Technical Duty
+1225,,TEST00545,1,Test Infantry Unit A,2015-06-19,2017-08-07,Technical Duty
+1226,,TEST00545,2,Test Infantry Unit B,2017-09-22,2019-10-12,Administrative Duty
+1227,,TEST00546,1,Test EME Unit B,2016-03-27,2016-11-22,Administrative Duty
+1228,,TEST00546,2,Test Engineer Unit,2016-12-15,2018-09-06,Store Duty
+1229,,TEST00547,1,Test Infantry Unit A,2003-04-24,2004-07-17,General Duty
+1230,,TEST00547,2,Test Field Unit,2004-08-14,2005-07-10,Administrative Duty
+1231,,TEST00548,1,Test Support Unit,2027-03-13,2029-04-01,Communication Duty
+1232,,TEST00548,2,Test Field Unit,2029-07-09,2030-12-01,Communication Duty
+1233,,TEST00548,3,Test Training Unit,2031-03-12,2032-06-04,Technical Duty
+1234,,TEST00549,1,Test Signal Unit A,2027-09-26,2029-10-15,General Duty
+1235,,TEST00549,2,Test Signal Unit B,2029-11-05,2030-07-03,Administrative Duty
+1236,,TEST00550,1,Test Field Unit,2002-06-04,2004-02-24,Administrative Duty
+1237,,TEST00550,2,Test Support Unit,2004-06-11,2005-06-06,Communication Duty
+1238,,TEST00551,1,Test Infantry Unit A,2017-08-05,2018-10-29,Store Duty
+1239,,TEST00551,2,Test Field Unit,2018-12-21,2020-06-13,Field Duty
+1240,,TEST00551,3,Test Infantry Unit B,2020-09-28,2021-08-24,Technical Duty
+1241,,TEST00552,1,Test Store Unit,2015-07-04,2016-12-25,General Duty
+1242,,TEST00552,2,Test Ordnance Unit,2017-01-21,2018-04-16,Store Duty
+1243,,TEST00553,1,Test Training Unit,2026-12-16,2028-07-08,Administrative Duty
+1244,,TEST00553,2,Test Infantry Unit A,2028-08-06,2030-03-29,Field Duty
+1245,,TEST00553,3,Test Infantry Unit B,2030-04-13,2032-08-30,Store Duty
+1246,,TEST00554,1,Test Infantry Unit B,2024-01-01,2024-08-28,Technical Duty
+1247,,TEST00554,2,Test Support Unit,2024-10-14,2026-03-08,Communication Duty
+1248,,TEST00555,1,Test EME Unit B,2009-05-02,2011-02-21,Communication Duty
+1249,,TEST00555,2,Test EME Unit A,2011-03-21,2011-12-16,Administrative Duty
+1250,,TEST00556,1,Test Infantry Unit A,2015-12-13,2017-02-05,General Duty
+1251,,TEST00556,2,Test Training Unit,2017-05-31,2019-05-21,Communication Duty
+1252,,TEST00556,3,Test Infantry Unit B,2019-06-15,2021-01-05,Communication Duty
+1253,,TEST00557,1,Test Administrative Unit,2020-04-22,2022-03-13,Field Duty
+1254,,TEST00557,2,Test HQ Unit,2022-06-23,2023-03-20,Technical Duty
+1255,,TEST00558,1,Test Field Unit,2011-03-13,2013-03-02,General Duty
+1256,,TEST00558,2,Test Training Unit,2013-06-19,2014-07-14,Communication Duty
+1257,,TEST00558,3,Test Infantry Unit A,2014-08-30,2015-06-26,Administrative Duty
+1258,,TEST00559,1,Test Support Unit,2003-10-04,2005-05-26,General Duty
+1259,,TEST00559,2,Test Infantry Unit B,2005-06-25,2007-08-14,Technical Duty
+1260,,TEST00560,1,Test EME Unit B,2009-02-17,2010-02-12,Communication Duty
+1261,,TEST00560,2,Test EME Unit A,2010-03-17,2012-04-05,Store Duty
+1262,,TEST00561,1,Test Signal Unit A,2021-11-04,2023-07-27,Communication Duty
+1263,,TEST00561,2,Test Signal Unit B,2023-09-07,2024-09-01,General Duty
+1264,,TEST00562,1,Test Infantry Unit B,2022-09-26,2023-07-23,Field Duty
+1265,,TEST00562,2,Test Training Unit,2023-08-28,2025-02-18,Technical Duty
+1266,,TEST00562,3,Test Support Unit,2025-06-01,2027-06-21,Communication Duty
+1267,,TEST00563,1,Test Infantry Unit B,2002-11-06,2003-11-01,Technical Duty
+1268,,TEST00563,2,Test Field Unit,2004-01-17,2005-10-08,Field Duty
+1269,,TEST00563,3,Test Support Unit,2005-12-21,2007-11-11,Store Duty
+1270,,TEST00564,1,Test Infantry Unit A,2003-06-17,2005-06-06,Communication Duty
+1271,,TEST00564,2,Test Field Unit,2005-08-30,2008-01-17,Technical Duty
+1272,,TEST00564,3,Test Support Unit,2008-02-18,2008-11-14,Field Duty
+1273,,TEST00565,1,Test Infantry Unit B,2027-11-12,2028-07-09,Administrative Duty
+1274,,TEST00565,2,Test Field Unit,2028-10-27,2029-06-24,Field Duty
+1275,,TEST00566,1,Test Support Unit,2022-01-25,2024-03-15,Communication Duty
+1276,,TEST00566,2,Test Infantry Unit B,2024-06-28,2025-04-24,Administrative Duty
+1277,,TEST00567,1,Test Support Unit,2009-01-07,2010-07-01,Technical Duty
+1278,,TEST00567,2,Test Field Unit,2010-10-06,2013-01-23,Field Duty
+1279,,TEST00567,3,Test Infantry Unit A,2013-03-15,2014-12-05,Communication Duty
+1280,,TEST00568,1,Test Training Unit,2022-02-22,2024-08-10,Administrative Duty
+1281,,TEST00568,2,Test Support Unit,2024-10-03,2026-01-26,Technical Duty
+1282,,TEST00568,3,Test Infantry Unit B,2026-04-01,2027-01-26,Store Duty
+1283,,TEST00569,1,Test HQ Unit,2013-11-11,2014-11-06,Technical Duty
+1284,,TEST00569,2,Test Administrative Unit,2015-01-16,2016-03-11,Communication Duty
+1285,,TEST00570,1,Test Support Unit,2016-02-26,2017-03-22,General Duty
+1286,,TEST00570,2,Test Infantry Unit B,2017-06-30,2018-07-25,Technical Duty
+1287,,TEST00571,1,Test EME Unit B,2018-09-12,2019-08-08,General Duty
+1288,,TEST00571,2,Test EME Unit A,2019-12-02,2021-09-22,Administrative Duty
+1289,,TEST00572,1,Test Support Unit,2014-02-10,2015-01-06,Communication Duty
+1290,,TEST00572,2,Test Infantry Unit A,2015-02-06,2015-11-03,Administrative Duty
+1291,,TEST00572,3,Test Infantry Unit B,2015-12-03,2018-02-20,Store Duty
+1292,,TEST00573,1,Test Field Unit,2020-01-16,2022-02-04,Communication Duty
+1293,,TEST00573,2,Test Training Unit,2022-04-28,2024-05-17,Technical Duty
+1294,,TEST00574,1,Test Infantry Unit B,2002-09-24,2004-06-15,Store Duty
+1295,,TEST00574,2,Test Infantry Unit A,2004-06-26,2005-08-20,Store Duty
+1296,,TEST00575,1,Test Infantry Unit B,2005-01-01,2006-01-26,Field Duty
+1297,,TEST00575,2,Test Infantry Unit A,2006-03-29,2008-05-17,Store Duty
+1298,,TEST00576,1,Test Field Unit,2014-07-05,2016-11-21,Communication Duty
+1299,,TEST00576,2,Test Infantry Unit B,2017-01-04,2018-11-25,General Duty
+1300,,TEST00577,1,Test Training Unit,2004-03-19,2006-01-08,Communication Duty
+1301,,TEST00577,2,Test Infantry Unit A,2006-04-25,2006-12-21,Technical Duty
+1302,,TEST00577,3,Test Support Unit,2007-04-13,2008-02-07,Communication Duty
+1303,,TEST00578,1,Test Infantry Unit A,2009-02-17,2009-10-15,General Duty
+1304,,TEST00578,2,Test Field Unit,2009-12-01,2012-01-20,Technical Duty
+1305,,TEST00578,3,Test Support Unit,2012-02-25,2013-03-21,Communication Duty
+1306,,TEST00579,1,Test Infantry Unit B,1999-09-23,2001-05-15,Store Duty
+1307,,TEST00579,2,Test Field Unit,2001-06-22,2002-05-18,Communication Duty
+1308,,TEST00579,3,Test Training Unit,2002-06-17,2004-08-05,Administrative Duty
+1309,,TEST00580,1,Test Support Unit,2009-01-27,2009-09-24,Store Duty
+1310,,TEST00580,2,Test Infantry Unit B,2009-11-01,2011-12-21,General Duty
+1311,,TEST00580,3,Test Field Unit,2012-04-03,2013-11-24,Administrative Duty
+1312,,TEST00581,1,Test Infantry Unit B,2018-12-26,2021-03-15,Field Duty
+1313,,TEST00581,2,Test Field Unit,2021-06-11,2023-07-01,Administrative Duty
+1314,,TEST00582,1,Test Training Unit,2006-10-01,2007-09-26,Communication Duty
+1315,,TEST00582,2,Test Infantry Unit B,2008-01-03,2009-01-27,Communication Duty
+1316,,TEST00583,1,Test Infantry Unit B,2004-11-25,2006-07-18,Technical Duty
+1317,,TEST00583,2,Test Infantry Unit A,2006-09-10,2008-12-28,General Duty
+1318,,TEST00584,1,Test Infantry Unit A,2013-06-11,2015-11-28,Communication Duty
+1319,,TEST00584,2,Test Infantry Unit B,2016-02-03,2017-09-25,Field Duty
+1320,,TEST00584,3,Test Support Unit,2017-11-16,2018-12-11,Communication Duty
+1321,,TEST00585,1,Test Engineer Unit,2005-03-05,2006-04-29,Store Duty
+1322,,TEST00585,2,Test EME Unit B,2006-07-10,2007-11-02,Store Duty
+1323,,TEST00586,1,Test Infantry Unit A,2006-04-09,2006-12-05,Store Duty
+1324,,TEST00586,2,Test Support Unit,2007-04-03,2009-04-22,Communication Duty
+1325,,TEST00587,1,Test Workshop Unit,2024-03-07,2025-09-28,Communication Duty
+1326,,TEST00587,2,Test EME Unit A,2026-01-24,2026-09-21,Technical Duty
+1327,,TEST00588,1,Test EME Unit A,2014-08-16,2016-11-03,General Duty
+1328,,TEST00588,2,Test EME Unit B,2016-12-04,2017-12-29,General Duty
+1329,,TEST00589,1,Test HQ Unit,2024-11-24,2026-03-19,Administrative Duty
+1330,,TEST00589,2,Test Administrative Unit,2026-06-06,2028-07-25,General Duty
+1331,,TEST00590,1,Test Infantry Unit B,2021-11-29,2023-06-22,Technical Duty
+1332,,TEST00590,2,Test Training Unit,2023-08-02,2024-09-25,Technical Duty
+1333,,TEST00591,1,Test EME Unit A,2004-06-18,2005-04-14,General Duty
+1334,,TEST00591,2,Test Workshop Unit,2005-05-13,2006-12-04,Field Duty
+1335,,TEST00592,1,Test Administrative Unit,2020-10-31,2021-09-26,Store Duty
+1336,,TEST00592,2,Test HQ Unit,2022-01-07,2023-04-02,Administrative Duty
+1337,,TEST00593,1,Test Artillery Unit A,2024-04-14,2025-12-05,Store Duty
+1338,,TEST00593,2,Test Artillery Unit B,2026-02-17,2028-03-08,Store Duty
+1339,,TEST00594,1,Test EME Unit A,2018-02-03,2019-03-30,Technical Duty
+1340,,TEST00594,2,Test Workshop Unit,2019-05-16,2020-08-08,Communication Duty
+1341,,TEST00595,1,Test Infantry Unit B,2017-01-22,2017-09-19,Administrative Duty
+1342,,TEST00595,2,Test Infantry Unit A,2017-12-10,2019-12-30,Field Duty
+1343,,TEST00595,3,Test Field Unit,2020-02-07,2021-01-02,Technical Duty
+1344,,TEST00596,1,Test Signal Unit B,2030-05-30,2031-06-24,Store Duty
+1345,,TEST00596,2,Test Signal Unit A,2031-07-11,2033-05-01,Administrative Duty
+1346,,TEST00597,1,Test Field Unit,2018-07-02,2019-05-28,Technical Duty
+1347,,TEST00597,2,Test Infantry Unit B,2019-07-08,2021-05-28,Communication Duty
+1348,,TEST00597,3,Test Infantry Unit A,2021-07-02,2022-04-28,Communication Duty
+1349,,TEST00598,1,Test Training Unit,2013-10-27,2015-02-19,Technical Duty
+1350,,TEST00598,2,Test Field Unit,2015-03-09,2015-11-04,Communication Duty
+1351,,TEST00599,1,Test Infantry Unit A,2007-04-17,2009-02-05,Administrative Duty
+1352,,TEST00599,2,Test Infantry Unit B,2009-05-05,2010-03-31,Store Duty
+1353,,TEST00600,1,Test Engineer Unit,2006-02-28,2006-12-25,Field Duty
+1354,,TEST00600,2,Test EME Unit B,2007-02-02,2007-12-29,Communication Duty
+1355,,TEST00601,1,Test Support Unit,2016-01-24,2017-10-15,Administrative Duty
+1356,,TEST00601,2,Test Infantry Unit B,2017-12-24,2019-06-17,Technical Duty
+1357,,TEST00602,1,Test Field Unit,2025-09-12,2026-09-07,Field Duty
+1358,,TEST00602,2,Test Support Unit,2026-09-20,2028-12-08,Communication Duty
+1359,,TEST00602,3,Test Infantry Unit A,2029-01-02,2030-10-24,Technical Duty
+1360,,TEST00603,1,Test Training Unit,2018-06-12,2020-10-29,Field Duty
+1361,,TEST00603,2,Test Infantry Unit B,2021-01-15,2022-05-10,Administrative Duty
+1362,,TEST00604,1,Test Infantry Unit A,2019-09-27,2020-10-21,Field Duty
+1363,,TEST00604,2,Test Infantry Unit B,2020-11-13,2021-09-09,Administrative Duty
+1364,,TEST00605,1,Test Store Unit,2020-10-26,2021-06-23,Administrative Duty
+1365,,TEST00605,2,Test Ordnance Unit,2021-07-15,2022-11-07,Technical Duty
+1366,,TEST00606,1,Test EME Unit A,2013-07-08,2014-11-30,Technical Duty
+1367,,TEST00606,2,Test EME Unit B,2015-03-05,2015-11-30,Store Duty
+1368,,TEST00607,1,Test Support Unit,2008-09-23,2009-09-18,Administrative Duty
+1369,,TEST00607,2,Test Training Unit,2009-11-26,2012-02-14,Technical Duty
+1370,,TEST00607,3,Test Field Unit,2012-04-11,2014-09-28,Field Duty
+1371,,TEST00608,1,Test Infantry Unit B,2001-11-21,2003-11-11,Store Duty
+1372,,TEST00608,2,Test Infantry Unit A,2003-12-21,2006-06-08,Administrative Duty
+1373,,TEST00609,1,Test Training Unit,2003-07-13,2005-08-31,Technical Duty
+1374,,TEST00609,2,Test Infantry Unit A,2005-12-13,2006-08-10,Administrative Duty
+1375,,TEST00610,1,Test Support Unit,2026-10-31,2028-09-20,Field Duty
+1376,,TEST00610,2,Test Infantry Unit A,2028-11-17,2031-01-06,Technical Duty
+1377,,TEST00610,3,Test Infantry Unit B,2031-02-11,2032-05-06,Technical Duty
+1378,,TEST00611,1,Test Signal Unit B,2007-08-09,2009-10-27,General Duty
+1379,,TEST00611,2,Test Signal Unit A,2009-11-27,2011-05-21,Communication Duty
+1380,,TEST00611,3,Test Communication Unit,2011-08-30,2013-09-18,Field Duty
+1381,,TEST00612,1,Test Field Unit,2021-08-27,2023-02-18,Field Duty
+1382,,TEST00612,2,Test Infantry Unit A,2023-05-03,2024-11-23,Field Duty
+1383,,TEST00612,3,Test Training Unit,2025-02-08,2027-01-29,Technical Duty
+1384,,TEST00613,1,Test EME Unit B,2019-04-20,2021-10-06,Communication Duty
+1385,,TEST00613,2,Test EME Unit A,2021-11-02,2023-06-25,Technical Duty
+1386,,TEST00614,1,Test Support Unit,2006-04-22,2007-04-17,Field Duty
+1387,,TEST00614,2,Test Training Unit,2007-07-10,2008-08-03,Administrative Duty
+1388,,TEST00615,1,Test ASC Unit,2017-11-11,2018-09-07,Store Duty
+1389,,TEST00615,2,Test Transport Unit,2018-11-06,2019-12-01,Store Duty
+1390,,TEST00616,1,Test EME Unit B,2012-05-09,2013-01-04,General Duty
+1391,,TEST00616,2,Test Engineer Unit,2013-03-23,2014-04-17,Administrative Duty
+1392,,TEST00617,1,Test Infantry Unit B,2030-08-07,2031-09-01,Store Duty
+1393,,TEST00617,2,Test Field Unit,2031-11-02,2032-12-26,Store Duty
+1394,,TEST00617,3,Test Training Unit,2033-04-12,2034-08-05,Technical Duty
+1395,,TEST00618,1,Test Infantry Unit A,2023-11-25,2024-12-19,Technical Duty
+1396,,TEST00618,2,Test Infantry Unit B,2025-02-02,2025-11-29,Administrative Duty
+1397,,TEST00619,1,Test Training Unit,2007-05-16,2008-01-11,Store Duty
+1398,,TEST00619,2,Test Infantry Unit A,2008-04-19,2010-08-07,Communication Duty
+1399,,TEST00620,1,Test Support Unit,2024-12-15,2025-12-10,Communication Duty
+1400,,TEST00620,2,Test Infantry Unit A,2026-02-09,2026-10-07,Administrative Duty
+1401,,TEST00621,1,Test EME Unit A,2014-08-01,2016-04-22,Technical Duty
+1402,,TEST00621,2,Test Workshop Unit,2016-05-25,2017-03-21,Communication Duty
+1403,,TEST00622,1,Test EME Unit A,2013-03-25,2015-09-11,Technical Duty
+1404,,TEST00622,2,Test Workshop Unit,2015-12-08,2016-10-03,General Duty
+1405,,TEST00623,1,Test Training Unit,2004-04-27,2005-07-21,Administrative Duty
+1406,,TEST00623,2,Test Infantry Unit B,2005-11-05,2006-12-30,Store Duty
+1407,,TEST00624,1,Test EME Unit B,2021-09-09,2023-02-01,Communication Duty
+1408,,TEST00624,2,Test Engineer Unit,2023-02-22,2023-12-19,Store Duty
+1409,,TEST00625,1,Test Infantry Unit A,2013-12-23,2014-08-20,Store Duty
+1410,,TEST00625,2,Test Training Unit,2014-09-17,2016-07-08,Communication Duty
+1411,,TEST00625,3,Test Infantry Unit B,2016-10-10,2017-07-07,Administrative Duty
+1412,,TEST00626,1,Test Store Unit,2015-12-31,2018-05-19,Field Duty
+1413,,TEST00626,2,Test Ordnance Unit,2018-07-21,2019-04-17,Communication Duty
+1414,,TEST00627,1,Test EME Unit B,2018-12-15,2020-02-08,Field Duty
+1415,,TEST00627,2,Test EME Unit A,2020-04-25,2022-10-12,Administrative Duty
+1416,,TEST00628,1,Test Artillery Unit B,2013-03-04,2014-12-24,Technical Duty
+1417,,TEST00628,2,Test Artillery Unit A,2015-01-28,2016-05-22,Communication Duty
+1418,,TEST00629,1,Test Support Unit,2025-04-01,2027-08-19,General Duty
+1419,,TEST00629,2,Test Infantry Unit B,2027-09-24,2028-11-17,Communication Duty
+1420,,TEST00629,3,Test Infantry Unit A,2028-12-11,2029-08-08,Field Duty
+1421,,TEST00630,1,Test Field Unit,2007-08-25,2009-05-16,Administrative Duty
+1422,,TEST00630,2,Test Infantry Unit A,2009-06-12,2010-08-06,Field Duty
+1423,,TEST00631,1,Test Field Unit,2001-02-18,2002-01-14,Field Duty
+1424,,TEST00631,2,Test Training Unit,2002-02-18,2003-12-10,Technical Duty
+1425,,TEST00631,3,Test Infantry Unit B,2004-02-17,2006-01-07,Field Duty
+1426,,TEST00632,1,Test Support Unit,2015-05-03,2016-01-28,Communication Duty
+1427,,TEST00632,2,Test Training Unit,2016-05-26,2018-11-12,Technical Duty
+1428,,TEST00633,1,Test ASC Unit,2005-03-27,2007-06-15,General Duty
+1429,,TEST00633,2,Test Transport Unit,2007-10-07,2009-01-29,Communication Duty
+1430,,TEST00634,1,Test Support Unit,2013-11-24,2015-05-18,General Duty
+1431,,TEST00634,2,Test Field Unit,2015-08-01,2017-08-20,Communication Duty
+1432,,TEST00635,1,Test Support Unit,2008-11-29,2009-12-24,Administrative Duty
+1433,,TEST00635,2,Test Infantry Unit B,2010-04-02,2011-04-27,General Duty
+1434,,TEST00636,1,Test Training Unit,2028-03-02,2029-12-22,Administrative Duty
+1435,,TEST00636,2,Test Infantry Unit B,2030-02-04,2031-05-30,General Duty
+1436,,TEST00637,1,Test Infantry Unit B,2010-11-10,2012-06-02,Communication Duty
+1437,,TEST00637,2,Test Training Unit,2012-09-19,2014-03-13,Technical Duty
+1438,,TEST00637,3,Test Support Unit,2014-05-26,2016-01-16,Store Duty
+1439,,TEST00638,1,Test Training Unit,2003-05-16,2004-12-06,Administrative Duty
+1440,,TEST00638,2,Test Infantry Unit A,2005-03-24,2007-04-13,Administrative Duty
+1441,,TEST00638,3,Test Support Unit,2007-07-27,2008-10-19,Communication Duty
+1442,,TEST00639,1,Test Support Unit,2019-04-24,2020-08-16,Field Duty
+1443,,TEST00639,2,Test Infantry Unit A,2020-10-24,2021-11-18,Technical Duty
+1444,,TEST00640,1,Test Communication Unit,2022-05-28,2024-09-14,General Duty
+1445,,TEST00640,2,Test Signal Unit B,2024-09-24,2026-12-13,Administrative Duty
+1446,,TEST00640,3,Test Signal Unit A,2027-01-21,2029-01-10,Administrative Duty
+1447,,TEST00641,1,Test Support Unit,2015-02-06,2016-03-02,General Duty
+1448,,TEST00641,2,Test Field Unit,2016-05-01,2017-08-24,Technical Duty
+1449,,TEST00642,1,Test HQ Unit,2018-08-15,2020-07-05,Store Duty
+1450,,TEST00642,2,Test Administrative Unit,2020-07-24,2021-11-16,Field Duty
+1451,,TEST00643,1,Test Artillery Unit B,2002-07-14,2004-10-31,Field Duty
+1452,,TEST00643,2,Test Artillery Unit A,2005-01-01,2005-11-27,Administrative Duty
+1453,,TEST00644,1,Test Training Unit,2011-08-07,2012-09-30,Communication Duty
+1454,,TEST00644,2,Test Field Unit,2012-10-16,2014-06-08,Field Duty
+1455,,TEST00644,3,Test Infantry Unit B,2014-08-05,2015-06-01,Store Duty
+1456,,TEST00645,1,Test Field Unit,2017-05-09,2019-01-29,Communication Duty
+1457,,TEST00645,2,Test Support Unit,2019-02-24,2021-07-13,Communication Duty
+1458,,TEST00645,3,Test Infantry Unit B,2021-10-27,2023-01-20,Communication Duty
+1459,,TEST00646,1,Test Field Unit,2015-12-24,2018-06-11,General Duty
+1460,,TEST00646,2,Test Training Unit,2018-08-26,2020-03-18,Store Duty
+1461,,TEST00647,1,Test EME Unit A,2024-06-18,2026-04-09,Communication Duty
+1462,,TEST00647,2,Test EME Unit B,2026-07-17,2027-08-11,Store Duty
+1463,,TEST00648,1,Test EME Unit A,2015-12-05,2017-05-28,General Duty
+1464,,TEST00648,2,Test EME Unit B,2017-09-04,2019-06-26,Field Duty
+1465,,TEST00649,1,Test Infantry Unit A,2019-04-28,2020-11-18,Communication Duty
+1466,,TEST00649,2,Test Field Unit,2021-03-04,2022-11-24,General Duty
+1467,,TEST00649,3,Test Training Unit,2023-01-16,2023-10-13,Technical Duty
+1468,,TEST00650,1,Test Support Unit,2022-01-15,2023-10-07,Store Duty
+1469,,TEST00650,2,Test Field Unit,2023-12-21,2025-03-15,Technical Duty
+1470,,TEST00651,1,Test Support Unit,2006-09-17,2007-11-11,General Duty
+1471,,TEST00651,2,Test Training Unit,2008-03-04,2009-10-25,Communication Duty
+1472,,TEST00651,3,Test Field Unit,2010-02-01,2010-12-28,Store Duty
+1473,,TEST00652,1,Test EME Unit B,2014-08-12,2016-05-03,Communication Duty
+1474,,TEST00652,2,Test Engineer Unit,2016-07-25,2018-11-12,Administrative Duty
+1475,,TEST00653,1,Test Training Unit,2022-02-09,2024-01-30,Communication Duty
+1476,,TEST00653,2,Test Infantry Unit A,2024-04-14,2026-08-02,Store Duty
+1477,,TEST00654,1,Test EME Unit A,2023-10-19,2026-03-07,Store Duty
+1478,,TEST00654,2,Test EME Unit B,2026-06-28,2027-03-25,Communication Duty
+1479,,TEST00655,1,Test Store Unit,2018-08-23,2020-01-15,Field Duty
+1480,,TEST00655,2,Test Ordnance Unit,2020-05-08,2021-06-02,Field Duty
+1481,,TEST00656,1,Test Support Unit,2027-04-19,2028-10-10,Field Duty
+1482,,TEST00656,2,Test Infantry Unit A,2028-11-30,2029-07-28,Field Duty
+1483,,TEST00656,3,Test Field Unit,2029-10-27,2031-03-21,Store Duty
+1484,,TEST00657,1,Test HQ Unit,2019-04-08,2020-01-03,Administrative Duty
+1485,,TEST00657,2,Test Administrative Unit,2020-04-04,2022-04-24,Communication Duty
+1486,,TEST00658,1,Test Training Unit,2013-12-22,2016-05-10,Field Duty
+1487,,TEST00658,2,Test Support Unit,2016-07-15,2017-03-12,Communication Duty
+1488,,TEST00659,1,Test Infantry Unit B,2009-12-21,2010-10-17,Communication Duty
+1489,,TEST00659,2,Test Infantry Unit A,2011-02-01,2012-02-26,Store Duty
+1490,,TEST00660,1,Test Support Unit,2022-08-26,2024-10-14,Store Duty
+1491,,TEST00660,2,Test Infantry Unit B,2024-11-15,2026-11-05,Store Duty
+1492,,TEST00661,1,Test Artillery Unit B,2022-03-25,2024-04-13,Technical Duty
+1493,,TEST00661,2,Test Artillery Unit A,2024-06-15,2026-12-02,Administrative Duty
+1494,,TEST00662,1,Test Infantry Unit B,2017-04-29,2018-02-23,Communication Duty
+1495,,TEST00662,2,Test Support Unit,2018-06-07,2019-02-02,Store Duty
+1496,,TEST00663,1,Test Training Unit,2025-10-07,2026-11-01,Communication Duty
+1497,,TEST00663,2,Test Field Unit,2027-01-25,2028-06-18,Technical Duty
+1498,,TEST00664,1,Test Transport Unit,2005-10-04,2008-02-21,Technical Duty
+1499,,TEST00664,2,Test ASC Unit,2008-04-12,2009-09-04,Field Duty
+1500,,TEST00665,1,Test Artillery Unit A,2003-04-27,2004-11-17,Store Duty
+1501,,TEST00665,2,Test Artillery Unit B,2005-02-13,2006-11-05,Communication Duty
+1502,,TEST00666,1,Test Training Unit,2029-07-28,2031-10-16,Administrative Duty
+1503,,TEST00666,2,Test Infantry Unit B,2032-02-07,2034-02-26,Communication Duty
+1504,,TEST00666,3,Test Infantry Unit A,2034-04-01,2034-11-27,Administrative Duty
+1505,,TEST00667,1,Test Field Unit,2015-05-21,2017-06-09,Store Duty
+1506,,TEST00667,2,Test Infantry Unit B,2017-09-22,2019-01-15,Field Duty
+1507,,TEST00668,1,Test EME Unit A,2024-06-14,2026-12-01,Field Duty
+1508,,TEST00668,2,Test EME Unit B,2027-03-26,2028-01-20,Communication Duty
+1509,,TEST00669,1,Test Support Unit,2023-12-31,2025-12-20,General Duty
+1510,,TEST00669,2,Test Training Unit,2026-02-17,2028-06-06,Communication Duty
+1511,,TEST00670,1,Test Infantry Unit B,2030-04-13,2031-10-05,Field Duty
+1512,,TEST00670,2,Test Infantry Unit A,2031-12-21,2034-02-08,General Duty
+1513,,TEST00671,1,Test Field Unit,2020-05-15,2022-05-05,General Duty
+1514,,TEST00671,2,Test Infantry Unit B,2022-06-26,2023-02-21,Technical Duty
+1515,,TEST00671,3,Test Training Unit,2023-04-29,2024-01-24,General Duty
+1516,,TEST00672,1,Test Communication Unit,2012-04-17,2014-01-07,Field Duty
+1517,,TEST00672,2,Test Signal Unit A,2014-02-24,2014-11-21,Communication Duty
+1518,,TEST00673,1,Test Infantry Unit A,2026-04-20,2028-04-09,Field Duty
+1519,,TEST00673,2,Test Training Unit,2028-08-07,2029-06-03,Communication Duty
+1520,,TEST00674,1,Test Infantry Unit B,2019-10-08,2021-06-29,Store Duty
+1521,,TEST00674,2,Test Training Unit,2021-07-31,2023-11-18,Administrative Duty
+1522,,TEST00674,3,Test Field Unit,2024-03-13,2025-08-05,Store Duty
+1523,,TEST00675,1,Test EME Unit B,2013-02-04,2014-01-30,Store Duty
+1524,,TEST00675,2,Test Engineer Unit,2014-04-14,2016-08-31,Store Duty
+1525,,TEST00676,1,Test Store Unit,2014-03-27,2015-01-21,General Duty
+1526,,TEST00676,2,Test Ordnance Unit,2015-03-25,2017-04-13,General Duty
+1527,,TEST00677,1,Test Training Unit,2013-08-03,2014-06-29,Technical Duty
+1528,,TEST00677,2,Test Support Unit,2014-10-19,2016-09-08,Communication Duty
+1529,,TEST00678,1,Test EME Unit A,2024-01-31,2026-01-20,Technical Duty
+1530,,TEST00678,2,Test EME Unit B,2026-05-17,2027-01-12,Technical Duty
+1531,,TEST00679,1,Test Support Unit,2015-03-25,2017-07-12,Technical Duty
+1532,,TEST00679,2,Test Infantry Unit A,2017-09-13,2018-11-07,Field Duty
+1533,,TEST00680,1,Test Artillery Unit B,2012-12-14,2014-06-07,Store Duty
+1534,,TEST00680,2,Test Artillery Unit A,2014-08-04,2016-11-21,Field Duty
+1535,,TEST00681,1,Test Field Unit,2001-03-11,2001-11-06,General Duty
+1536,,TEST00681,2,Test Support Unit,2001-12-08,2002-08-05,Field Duty
+1537,,TEST00682,1,Test Infantry Unit B,2023-11-30,2024-12-24,Field Duty
+1538,,TEST00682,2,Test Field Unit,2025-02-19,2026-04-15,Communication Duty
+1539,,TEST00683,1,Test Training Unit,2023-07-05,2024-06-29,Technical Duty
+1540,,TEST00683,2,Test Infantry Unit A,2024-09-05,2026-03-29,Technical Duty
+1541,,TEST00684,1,Test Training Unit,2002-06-08,2004-07-27,Communication Duty
+1542,,TEST00684,2,Test Field Unit,2004-09-26,2007-03-15,General Duty
+1543,,TEST00685,1,Test Support Unit,2009-08-03,2010-12-26,Technical Duty
+1544,,TEST00685,2,Test Infantry Unit A,2011-02-22,2012-08-15,Technical Duty
+1545,,TEST00685,3,Test Training Unit,2012-12-11,2015-05-30,Administrative Duty
+1546,,TEST00686,1,Test Artillery Unit B,2010-09-08,2013-02-24,Communication Duty
+1547,,TEST00686,2,Test Artillery Unit A,2013-04-07,2015-03-28,General Duty
+1548,,TEST00687,1,Test Field Unit,2015-05-01,2015-12-27,Technical Duty
+1549,,TEST00687,2,Test Training Unit,2016-02-26,2018-08-14,Administrative Duty
+1550,,TEST00687,3,Test Support Unit,2018-12-09,2020-11-28,Store Duty
+1551,,TEST00688,1,Test EME Unit B,2005-07-25,2007-06-15,Technical Duty
+1552,,TEST00688,2,Test EME Unit A,2007-08-30,2009-03-22,Administrative Duty
+1553,,TEST00689,1,Test Support Unit,2006-07-31,2007-07-26,Technical Duty
+1554,,TEST00689,2,Test Infantry Unit B,2007-09-28,2008-06-24,Communication Duty
+1555,,TEST00689,3,Test Infantry Unit A,2008-08-24,2010-06-15,Store Duty
+1556,,TEST00690,1,Test Field Unit,2019-04-25,2020-11-15,Store Duty
+1557,,TEST00690,2,Test Infantry Unit A,2021-01-03,2023-02-22,Communication Duty
+1558,,TEST00690,3,Test Support Unit,2023-06-21,2025-11-07,Technical Duty
+1559,,TEST00691,1,Test Store Unit,2026-02-11,2028-05-01,Store Duty
+1560,,TEST00691,2,Test Ordnance Unit,2028-06-29,2029-07-24,Technical Duty
+1561,,TEST00692,1,Test Infantry Unit A,2026-09-25,2028-06-16,Communication Duty
+1562,,TEST00692,2,Test Support Unit,2028-07-05,2030-04-26,Store Duty
+1563,,TEST00693,1,Test Infantry Unit B,2020-04-29,2021-12-20,Store Duty
+1564,,TEST00693,2,Test Training Unit,2022-03-15,2024-06-02,Field Duty
+1565,,TEST00693,3,Test Support Unit,2024-09-25,2025-09-20,Store Duty
+1566,,TEST00694,1,Test Signal Unit A,2012-05-08,2014-05-28,Field Duty
+1567,,TEST00694,2,Test Signal Unit B,2014-08-07,2016-03-29,Store Duty
+1568,,TEST00695,1,Test Communication Unit,2021-12-22,2024-03-11,Technical Duty
+1569,,TEST00695,2,Test Signal Unit B,2024-05-07,2026-01-27,General Duty
+1570,,TEST00695,3,Test Signal Unit A,2026-03-16,2027-02-09,Technical Duty
+1571,,TEST00696,1,Test Signal Unit A,2020-04-23,2022-07-12,Technical Duty
+1572,,TEST00696,2,Test Signal Unit B,2022-08-03,2024-01-25,Technical Duty
+1573,,TEST00697,1,Test Training Unit,2023-07-23,2024-07-17,Technical Duty
+1574,,TEST00697,2,Test Infantry Unit A,2024-09-16,2025-05-14,General Duty
+1575,,TEST00698,1,Test ASC Unit,2023-06-16,2024-03-12,Field Duty
+1576,,TEST00698,2,Test Transport Unit,2024-06-14,2026-12-01,Communication Duty
+1577,,TEST00699,1,Test Ordnance Unit,2019-09-18,2022-01-05,Field Duty
+1578,,TEST00699,2,Test Store Unit,2022-02-13,2022-11-10,Administrative Duty
+1579,,TEST00700,1,Test Infantry Unit B,2018-06-18,2019-05-14,General Duty
+1580,,TEST00700,2,Test Field Unit,2019-06-19,2021-06-08,Store Duty
+1581,,TEST00701,1,Test HQ Unit,2027-03-10,2028-03-04,General Duty
+1582,,TEST00701,2,Test Administrative Unit,2028-05-28,2030-08-16,Store Duty
+1583,,TEST00702,1,Test Store Unit,2019-07-24,2020-08-17,Field Duty
+1584,,TEST00702,2,Test Ordnance Unit,2020-12-05,2023-04-24,Field Duty
+1585,,TEST00703,1,Test Signal Unit A,2012-04-23,2014-07-12,Field Duty
+1586,,TEST00703,2,Test Signal Unit B,2014-10-13,2015-10-08,General Duty
+1587,,TEST00704,1,Test Infantry Unit B,2014-10-26,2016-01-19,General Duty
+1588,,TEST00704,2,Test Field Unit,2016-04-10,2018-03-01,Communication Duty
+1589,,TEST00705,1,Test Training Unit,2013-09-04,2015-09-24,Store Duty
+1590,,TEST00705,2,Test Field Unit,2015-11-24,2016-11-18,Store Duty
+1591,,TEST00706,1,Test Field Unit,2014-05-26,2016-06-14,Technical Duty
+1592,,TEST00706,2,Test Support Unit,2016-06-24,2017-04-20,Communication Duty
+1593,,TEST00707,1,Test Ordnance Unit,2017-02-23,2018-12-15,Store Duty
+1594,,TEST00707,2,Test Store Unit,2019-02-15,2020-11-06,General Duty
+1595,,TEST00708,1,Test Training Unit,2009-12-15,2010-12-10,Field Duty
+1596,,TEST00708,2,Test Field Unit,2011-03-23,2013-07-10,Administrative Duty
+1597,,TEST00708,3,Test Infantry Unit B,2013-11-05,2014-07-03,Administrative Duty
+1598,,TEST00709,1,Test EME Unit B,2023-12-20,2024-11-14,Field Duty
+1599,,TEST00709,2,Test EME Unit A,2024-12-14,2026-06-07,Technical Duty
+1600,,TEST00710,1,Test ASC Unit,2012-01-16,2013-09-07,General Duty
+1601,,TEST00710,2,Test Transport Unit,2013-09-18,2014-06-15,Communication Duty
+1602,,TEST00711,1,Test Infantry Unit B,2018-09-07,2020-07-28,Administrative Duty
+1603,,TEST00711,2,Test Training Unit,2020-08-14,2021-11-07,Communication Duty
+1604,,TEST00711,3,Test Infantry Unit A,2021-11-28,2024-01-17,Field Duty
+1605,,TEST00712,1,Test EME Unit B,2016-06-23,2018-09-11,Field Duty
+1606,,TEST00712,2,Test Engineer Unit,2019-01-05,2021-02-23,Store Duty
+1607,,TEST00713,1,Test Training Unit,2027-05-21,2029-05-10,Communication Duty
+1608,,TEST00713,2,Test Infantry Unit B,2029-06-13,2030-08-07,Communication Duty
+1609,,TEST00714,1,Test Field Unit,2020-08-10,2022-01-02,Administrative Duty
+1610,,TEST00714,2,Test Infantry Unit B,2022-02-16,2023-12-08,Administrative Duty
+1611,,TEST00715,1,Test Field Unit,2028-02-23,2029-11-14,General Duty
+1612,,TEST00715,2,Test Support Unit,2030-01-19,2032-02-08,Communication Duty
+1613,,TEST00716,1,Test Infantry Unit B,2018-10-16,2019-08-12,General Duty
+1614,,TEST00716,2,Test Field Unit,2019-11-18,2021-10-08,Communication Duty
+1615,,TEST00717,1,Test Communication Unit,2027-01-24,2028-12-14,Field Duty
+1616,,TEST00717,2,Test Signal Unit A,2028-12-28,2031-06-16,Store Duty
+1617,,TEST00718,1,Test EME Unit A,2006-12-20,2009-06-07,Technical Duty
+1618,,TEST00718,2,Test EME Unit B,2009-09-09,2010-10-04,Store Duty
+1619,,TEST00719,1,Test EME Unit A,2012-11-29,2014-06-22,Communication Duty
+1620,,TEST00719,2,Test EME Unit B,2014-07-26,2015-11-18,General Duty
+1621,,TEST00720,1,Test ASC Unit,2024-12-25,2026-07-18,Administrative Duty
+1622,,TEST00720,2,Test Transport Unit,2026-10-05,2027-08-01,Field Duty
+1623,,TEST00721,1,Test Artillery Unit B,2017-01-09,2018-05-04,Administrative Duty
+1624,,TEST00721,2,Test Artillery Unit A,2018-08-13,2020-10-31,Communication Duty
+1625,,TEST00722,1,Test HQ Unit,2004-04-28,2005-12-19,General Duty
+1626,,TEST00722,2,Test Administrative Unit,2006-03-21,2008-02-09,Communication Duty
+1627,,TEST00723,1,Test Field Unit,2021-02-20,2023-04-11,Technical Duty
+1628,,TEST00723,2,Test Infantry Unit A,2023-08-05,2024-04-01,Field Duty
+1629,,TEST00724,1,Test Field Unit,2008-01-17,2010-02-05,Administrative Duty
+1630,,TEST00724,2,Test Infantry Unit A,2010-02-17,2011-05-13,Store Duty
+1631,,TEST00725,1,Test Infantry Unit B,2004-10-29,2006-11-18,General Duty
+1632,,TEST00725,2,Test Infantry Unit A,2007-02-23,2008-04-18,Store Duty
+1633,,TEST00726,1,Test Infantry Unit B,2015-02-19,2017-02-08,Administrative Duty
+1634,,TEST00726,2,Test Infantry Unit A,2017-06-03,2019-06-23,Store Duty
+1635,,TEST00726,3,Test Support Unit,2019-08-23,2022-01-09,Administrative Duty
+1636,,TEST00727,1,Test Communication Unit,2007-07-21,2009-08-09,Store Duty
+1637,,TEST00727,2,Test Signal Unit B,2009-08-20,2010-08-15,Communication Duty
+1638,,TEST00728,1,Test Artillery Unit B,2019-08-03,2021-03-25,Administrative Duty
+1639,,TEST00728,2,Test Artillery Unit A,2021-07-01,2023-03-23,Field Duty
+1640,,TEST00729,1,Test Infantry Unit B,2011-07-25,2013-01-15,Field Duty
+1641,,TEST00729,2,Test Training Unit,2013-03-19,2014-03-14,Technical Duty
+1642,,TEST00730,1,Test Training Unit,2011-06-05,2012-10-27,Administrative Duty
+1643,,TEST00730,2,Test Support Unit,2013-02-22,2013-10-20,Store Duty
+1644,,TEST00731,1,Test Support Unit,2003-06-07,2004-03-03,Store Duty
+1645,,TEST00731,2,Test Training Unit,2004-06-13,2006-09-01,Store Duty
+1646,,TEST00732,1,Test Artillery Unit A,2029-02-20,2031-07-10,Field Duty
+1647,,TEST00732,2,Test Artillery Unit B,2031-08-04,2033-10-22,Field Duty
+1648,,TEST00733,1,Test EME Unit B,2008-08-15,2009-06-11,General Duty
+1649,,TEST00733,2,Test EME Unit A,2009-07-16,2011-12-03,Technical Duty
+1650,,TEST00734,1,Test Support Unit,2013-02-25,2014-08-19,Store Duty
+1651,,TEST00734,2,Test Infantry Unit A,2014-10-03,2016-10-22,Administrative Duty
+1652,,TEST00734,3,Test Training Unit,2017-01-11,2017-10-08,Administrative Duty
+1653,,TEST00735,1,Test Infantry Unit B,2010-12-31,2011-11-26,General Duty
+1654,,TEST00735,2,Test Training Unit,2012-02-20,2014-06-09,Communication Duty
+1655,,TEST00735,3,Test Field Unit,2014-06-23,2015-11-15,Communication Duty
+1656,,TEST00736,1,Test Infantry Unit B,2014-11-26,2016-05-19,Technical Duty
+1657,,TEST00736,2,Test Infantry Unit A,2016-08-13,2018-07-04,Field Duty
+1658,,TEST00737,1,Test Support Unit,2026-01-03,2028-06-21,Administrative Duty
+1659,,TEST00737,2,Test Field Unit,2028-08-07,2030-06-28,Field Duty
+1660,,TEST00737,3,Test Infantry Unit B,2030-10-05,2031-07-02,Store Duty
+1661,,TEST00738,1,Test Infantry Unit B,2008-09-25,2010-07-17,General Duty
+1662,,TEST00738,2,Test Infantry Unit A,2010-09-02,2012-04-24,Field Duty
+1663,,TEST00739,1,Test EME Unit A,2026-09-15,2028-06-06,Communication Duty
+1664,,TEST00739,2,Test EME Unit B,2028-09-26,2030-05-19,Communication Duty
+1665,,TEST00740,1,Test Infantry Unit B,2012-12-18,2015-06-06,Store Duty
+1666,,TEST00740,2,Test Training Unit,2015-08-03,2016-03-30,Administrative Duty
+1667,,TEST00740,3,Test Support Unit,2016-05-08,2017-01-03,Technical Duty
+1668,,TEST00741,1,Test Infantry Unit A,2007-07-11,2008-07-05,Administrative Duty
+1669,,TEST00741,2,Test Field Unit,2008-09-15,2010-10-05,Communication Duty
+1670,,TEST00741,3,Test Training Unit,2010-10-15,2011-12-09,Communication Duty
+1671,,TEST00742,1,Test Infantry Unit A,2024-12-11,2026-08-03,Technical Duty
+1672,,TEST00742,2,Test Field Unit,2026-08-18,2028-04-09,Communication Duty
+1673,,TEST00742,3,Test Training Unit,2028-05-19,2030-02-08,General Duty
+1674,,TEST00743,1,Test Transport Unit,2008-08-14,2010-12-02,Field Duty
+1675,,TEST00743,2,Test ASC Unit,2011-02-04,2012-05-29,General Duty
+1676,,TEST00744,1,Test Ordnance Unit,2012-07-04,2014-08-23,General Duty
+1677,,TEST00744,2,Test Store Unit,2014-11-16,2015-10-12,Technical Duty
+1678,,TEST00745,1,Test Infantry Unit A,2009-09-30,2011-04-23,Technical Duty
+1679,,TEST00745,2,Test Infantry Unit B,2011-05-05,2013-07-23,Administrative Duty
+1680,,TEST00746,1,Test Infantry Unit B,2010-09-11,2012-04-03,Store Duty
+1681,,TEST00746,2,Test Support Unit,2012-06-11,2014-11-28,Store Duty
+1682,,TEST00747,1,Test Signal Unit A,2016-10-28,2018-06-20,General Duty
+1683,,TEST00747,2,Test Communication Unit,2018-07-06,2020-09-23,Field Duty
+1684,,TEST00748,1,Test Infantry Unit A,2013-01-26,2014-08-19,Communication Duty
+1685,,TEST00748,2,Test Infantry Unit B,2014-10-05,2017-02-21,Administrative Duty
+1686,,TEST00748,3,Test Support Unit,2017-04-04,2018-07-28,Field Duty
+1687,,TEST00749,1,Test EME Unit A,2022-03-20,2023-08-12,Field Duty
+1688,,TEST00749,2,Test EME Unit B,2023-11-01,2026-01-19,Administrative Duty
+1689,,TEST00750,1,Test Artillery Unit B,2025-03-31,2027-03-21,General Duty
+1690,,TEST00750,2,Test Artillery Unit A,2027-04-15,2029-05-04,General Duty
+1691,,TEST00751,1,Test Training Unit,2022-03-08,2023-09-29,Field Duty
+1692,,TEST00751,2,Test Support Unit,2023-11-22,2025-11-11,Technical Duty
+1693,,TEST00752,1,Test Artillery Unit B,2002-05-18,2004-01-08,Technical Duty
+1694,,TEST00752,2,Test Artillery Unit A,2004-05-07,2005-06-01,Store Duty
+1695,,TEST00753,1,Test Infantry Unit B,2013-10-04,2015-08-25,Store Duty
+1696,,TEST00753,2,Test Infantry Unit A,2015-11-06,2016-08-02,Administrative Duty
+1697,,TEST00754,1,Test Support Unit,2024-11-19,2026-08-11,General Duty
+1698,,TEST00754,2,Test Infantry Unit A,2026-12-02,2028-08-23,Technical Duty
+1699,,TEST00754,3,Test Training Unit,2028-10-11,2030-10-31,Communication Duty
+1700,,TEST00755,1,Test Infantry Unit A,2010-03-19,2012-07-06,Technical Duty
+1701,,TEST00755,2,Test Field Unit,2012-10-20,2014-07-12,Communication Duty
+1702,,TEST00755,3,Test Infantry Unit B,2014-07-24,2015-07-19,Technical Duty
+1703,,TEST00756,1,Test Store Unit,2011-11-30,2012-07-27,General Duty
+1704,,TEST00756,2,Test Ordnance Unit,2012-09-22,2013-11-16,Field Duty
+1705,,TEST00757,1,Test Workshop Unit,2017-02-22,2019-07-12,Field Duty
+1706,,TEST00757,2,Test EME Unit A,2019-10-11,2020-08-06,Communication Duty
+1707,,TEST00758,1,Test Engineer Unit,2020-04-14,2021-01-09,Administrative Duty
+1708,,TEST00758,2,Test EME Unit B,2021-03-27,2023-01-16,Store Duty
+1709,,TEST00759,1,Test Infantry Unit B,2006-06-11,2007-10-04,Administrative Duty
+1710,,TEST00759,2,Test Training Unit,2007-10-23,2008-12-16,Technical Duty
+1711,,TEST00760,1,Test Field Unit,2018-04-19,2020-06-07,Administrative Duty
+1712,,TEST00760,2,Test Support Unit,2020-06-24,2022-12-11,Communication Duty
+1713,,TEST00761,1,Test EME Unit B,2018-09-06,2021-01-23,Administrative Duty
+1714,,TEST00761,2,Test Engineer Unit,2021-05-01,2023-02-20,Store Duty
+1715,,TEST00762,1,Test ASC Unit,2004-09-28,2006-11-17,Field Duty
+1716,,TEST00762,2,Test Transport Unit,2006-12-07,2009-03-26,Store Duty
+1717,,TEST00763,1,Test Signal Unit B,2021-06-06,2023-07-26,Technical Duty
+1718,,TEST00763,2,Test Communication Unit,2023-09-28,2025-03-21,Communication Duty
+1719,,TEST00763,3,Test Signal Unit A,2025-04-15,2027-05-05,Technical Duty
+1720,,TEST00764,1,Test Training Unit,2005-05-07,2006-08-30,Field Duty
+1721,,TEST00764,2,Test Support Unit,2006-12-03,2008-12-22,Communication Duty
+1722,,TEST00765,1,Test Field Unit,2011-11-11,2012-08-07,Technical Duty
+1723,,TEST00765,2,Test Support Unit,2012-09-17,2015-03-06,Communication Duty
+1724,,TEST00766,1,Test Infantry Unit A,2004-11-10,2005-07-08,Field Duty
+1725,,TEST00766,2,Test Field Unit,2005-07-30,2007-09-18,Technical Duty
+1726,,TEST00766,3,Test Training Unit,2007-10-18,2008-06-14,Store Duty
+1727,,TEST00767,1,Test Support Unit,2002-01-11,2003-03-07,Technical Duty
+1728,,TEST00767,2,Test Infantry Unit B,2003-06-13,2005-11-29,Store Duty
+1729,,TEST00767,3,Test Infantry Unit A,2006-03-08,2008-01-27,Technical Duty
+1730,,TEST00768,1,Test Transport Unit,2008-08-16,2010-01-08,Administrative Duty
+1731,,TEST00768,2,Test ASC Unit,2010-01-23,2011-02-17,Store Duty
+1732,,TEST00769,1,Test Infantry Unit B,2016-03-02,2017-10-23,Communication Duty
+1733,,TEST00769,2,Test Training Unit,2017-12-20,2020-03-09,Store Duty
+1734,,TEST00770,1,Test Field Unit,2015-06-04,2017-03-25,Communication Duty
+1735,,TEST00770,2,Test Infantry Unit B,2017-05-04,2019-07-23,Field Duty
+1736,,TEST00771,1,Test Training Unit,2022-04-08,2024-07-26,Technical Duty
+1737,,TEST00771,2,Test Field Unit,2024-08-10,2025-08-05,Technical Duty
+1738,,TEST00772,1,Test Infantry Unit A,2007-04-05,2008-07-28,Field Duty
+1739,,TEST00772,2,Test Training Unit,2008-08-07,2009-06-03,Communication Duty
+1740,,TEST00773,1,Test EME Unit A,2002-06-28,2004-06-17,Administrative Duty
+1741,,TEST00773,2,Test EME Unit B,2004-08-03,2005-07-29,Technical Duty
+1742,,TEST00774,1,Test Infantry Unit A,2017-04-13,2017-12-09,Field Duty
+1743,,TEST00774,2,Test Infantry Unit B,2018-02-18,2019-08-12,Administrative Duty
+1744,,TEST00774,3,Test Field Unit,2019-12-10,2020-10-05,Administrative Duty
+1745,,TEST00775,1,Test EME Unit B,2013-08-01,2015-03-24,General Duty
+1746,,TEST00775,2,Test EME Unit A,2015-05-29,2016-11-19,Communication Duty
+1747,,TEST00776,1,Test EME Unit A,2015-06-18,2016-05-13,General Duty
+1748,,TEST00776,2,Test EME Unit B,2016-05-23,2018-11-09,Communication Duty
+1749,,TEST00777,1,Test HQ Unit,2020-05-20,2022-10-07,Technical Duty
+1750,,TEST00777,2,Test Administrative Unit,2022-11-09,2024-07-31,Field Duty
+1751,,TEST00778,1,Test Infantry Unit B,2014-03-17,2016-01-06,Communication Duty
+1752,,TEST00778,2,Test Support Unit,2016-03-15,2017-05-09,Technical Duty
+1753,,TEST00779,1,Test Training Unit,2019-01-29,2020-09-20,Administrative Duty
+1754,,TEST00779,2,Test Infantry Unit A,2021-01-01,2022-11-22,General Duty
+1755,,TEST00779,3,Test Infantry Unit B,2023-03-14,2025-01-02,General Duty
+1756,,TEST00780,1,Test Transport Unit,2009-05-27,2011-01-17,General Duty
+1757,,TEST00780,2,Test ASC Unit,2011-03-10,2013-05-28,Administrative Duty
+1758,,TEST00781,1,Test HQ Unit,2012-10-11,2013-08-07,Field Duty
+1759,,TEST00781,2,Test Administrative Unit,2013-11-30,2014-08-27,Field Duty
+1760,,TEST00782,1,Test EME Unit A,2023-12-28,2025-11-17,Administrative Duty
+1761,,TEST00782,2,Test Workshop Unit,2025-11-29,2028-04-17,Field Duty
+1762,,TEST00783,1,Test Field Unit,2015-09-28,2017-07-19,Communication Duty
+1763,,TEST00783,2,Test Infantry Unit B,2017-08-15,2019-03-08,Store Duty
+1764,,TEST00783,3,Test Support Unit,2019-03-18,2020-12-07,Technical Duty
+1765,,TEST00784,1,Test EME Unit B,2013-08-10,2014-10-04,Store Duty
+1766,,TEST00784,2,Test Engineer Unit,2015-01-06,2016-07-29,Field Duty
+1767,,TEST00785,1,Test Field Unit,2021-12-30,2022-10-26,Administrative Duty
+1768,,TEST00785,2,Test Support Unit,2023-01-17,2024-11-07,Administrative Duty
+1769,,TEST00785,3,Test Training Unit,2024-12-27,2027-03-17,Communication Duty
+1770,,TEST00786,1,Test Infantry Unit A,2009-01-28,2011-03-19,Field Duty
+1771,,TEST00786,2,Test Infantry Unit B,2011-07-05,2013-08-23,Field Duty
+1772,,TEST00787,1,Test Training Unit,2018-02-07,2019-06-02,Store Duty
+1773,,TEST00787,2,Test Infantry Unit A,2019-09-10,2021-08-30,Communication Duty
+1774,,TEST00788,1,Test Administrative Unit,2005-01-18,2006-06-12,Store Duty
+1775,,TEST00788,2,Test HQ Unit,2006-09-19,2009-02-05,Technical Duty
+1776,,TEST00789,1,Test Support Unit,2024-08-10,2025-08-05,Technical Duty
+1777,,TEST00789,2,Test Field Unit,2025-11-18,2027-02-11,Store Duty
+1778,,TEST00789,3,Test Infantry Unit A,2027-03-25,2028-11-14,General Duty
+1779,,TEST00790,1,Test Infantry Unit B,2017-02-13,2019-07-03,General Duty
+1780,,TEST00790,2,Test Infantry Unit A,2019-08-24,2021-11-11,Administrative Duty
+1781,,TEST00791,1,Test Infantry Unit B,2003-09-07,2004-05-04,General Duty
+1782,,TEST00791,2,Test Field Unit,2004-08-11,2005-06-07,Technical Duty
+1783,,TEST00792,1,Test Support Unit,2018-05-22,2019-07-16,Store Duty
+1784,,TEST00792,2,Test Infantry Unit B,2019-10-01,2022-03-19,Administrative Duty
+1785,,TEST00792,3,Test Infantry Unit A,2022-05-31,2023-10-23,Technical Duty
+1786,,TEST00793,1,Test Field Unit,2015-07-12,2017-12-28,Communication Duty
+1787,,TEST00793,2,Test Support Unit,2018-04-12,2020-04-01,Field Duty
+1788,,TEST00794,1,Test EME Unit A,2024-12-03,2026-01-27,Communication Duty
+1789,,TEST00794,2,Test EME Unit B,2026-04-14,2028-08-01,Store Duty
+1790,,TEST00795,1,Test Signal Unit A,2019-05-22,2020-03-17,Communication Duty
+1791,,TEST00795,2,Test Signal Unit B,2020-06-01,2021-02-26,Communication Duty
+1792,,TEST00795,3,Test Communication Unit,2021-06-05,2022-04-01,Field Duty
+1793,,TEST00796,1,Test Training Unit,2012-12-09,2014-08-01,Administrative Duty
+1794,,TEST00796,2,Test Field Unit,2014-10-09,2016-11-27,Store Duty
+1795,,TEST00797,1,Test ASC Unit,2009-03-18,2011-08-05,Administrative Duty
+1796,,TEST00797,2,Test Transport Unit,2011-10-19,2013-07-10,Field Duty
+1797,,TEST00798,1,Test Training Unit,2011-11-27,2013-01-20,Field Duty
+1798,,TEST00798,2,Test Support Unit,2013-04-09,2014-07-03,General Duty
+1799,,TEST00799,1,Test Infantry Unit B,2018-11-07,2019-10-03,General Duty
+1800,,TEST00799,2,Test Training Unit,2020-01-28,2022-02-16,General Duty
+1801,,TEST00799,3,Test Support Unit,2022-05-10,2023-05-05,Communication Duty
+1802,,TEST00800,1,Test Support Unit,2025-07-14,2026-06-09,Communication Duty
+1803,,TEST00800,2,Test Infantry Unit B,2026-07-30,2028-02-20,Administrative Duty
+1804,,TEST00800,3,Test Infantry Unit A,2028-06-02,2030-03-24,Field Duty
+1805,,TEST00801,1,Test Field Unit,2009-02-20,2011-07-10,Store Duty
+1806,,TEST00801,2,Test Training Unit,2011-09-09,2013-03-02,Administrative Duty
+1807,,TEST00801,3,Test Infantry Unit B,2013-06-16,2015-01-07,Communication Duty
+1808,,TEST00802,1,Test Artillery Unit A,2015-06-10,2017-04-30,Communication Duty
+1809,,TEST00802,2,Test Artillery Unit B,2017-06-14,2018-02-09,General Duty
+1810,,TEST00803,1,Test Training Unit,2015-07-20,2017-07-09,Communication Duty
+1811,,TEST00803,2,Test Support Unit,2017-10-30,2019-10-20,Technical Duty
+1812,,TEST00803,3,Test Infantry Unit B,2019-12-06,2022-04-24,General Duty
+1813,,TEST00804,1,Test Support Unit,2016-09-25,2018-04-18,Administrative Duty
+1814,,TEST00804,2,Test Training Unit,2018-06-08,2019-05-04,Technical Duty
+1815,,TEST00805,1,Test Field Unit,2018-03-16,2019-01-10,Store Duty
+1816,,TEST00805,2,Test Training Unit,2019-04-05,2021-06-23,Communication Duty
+1817,,TEST00806,1,Test Infantry Unit B,2013-02-06,2014-04-02,Store Duty
+1818,,TEST00806,2,Test Training Unit,2014-06-03,2016-06-22,Communication Duty
+1819,,TEST00807,1,Test Store Unit,2020-12-16,2021-09-12,Field Duty
+1820,,TEST00807,2,Test Ordnance Unit,2021-09-30,2023-07-22,General Duty
+1821,,TEST00808,1,Test Infantry Unit B,2012-11-09,2014-04-03,Administrative Duty
+1822,,TEST00808,2,Test Infantry Unit A,2014-05-02,2015-06-26,Store Duty
+1823,,TEST00808,3,Test Field Unit,2015-09-26,2017-06-17,General Duty
+1824,,TEST00809,1,Test Field Unit,2004-11-08,2006-11-28,Store Duty
+1825,,TEST00809,2,Test Infantry Unit A,2007-03-12,2009-03-31,Technical Duty
+1826,,TEST00810,1,Test Infantry Unit A,2027-08-01,2028-11-23,Field Duty
+1827,,TEST00810,2,Test Infantry Unit B,2029-02-15,2029-10-13,Store Duty
+1828,,TEST00811,1,Test Communication Unit,2020-06-06,2022-08-25,Communication Duty
+1829,,TEST00811,2,Test Signal Unit A,2022-12-21,2025-02-08,Communication Duty
+1830,,TEST00811,3,Test Signal Unit B,2025-03-07,2026-06-30,Administrative Duty
+1831,,TEST00812,1,Test Infantry Unit A,2006-09-13,2008-04-05,Communication Duty
+1832,,TEST00812,2,Test Infantry Unit B,2008-07-02,2009-10-25,Store Duty
+1833,,TEST00813,1,Test Field Unit,2006-07-20,2008-05-10,Technical Duty
+1834,,TEST00813,2,Test Infantry Unit A,2008-07-04,2010-02-24,Field Duty
+1835,,TEST00814,1,Test Training Unit,2008-11-29,2011-01-18,Administrative Duty
+1836,,TEST00814,2,Test Infantry Unit A,2011-04-01,2013-07-19,Field Duty
+1837,,TEST00815,1,Test Infantry Unit A,2021-07-18,2023-09-06,Field Duty
+1838,,TEST00815,2,Test Field Unit,2023-12-22,2026-01-10,General Duty
+1839,,TEST00816,1,Test Infantry Unit A,2003-06-21,2005-09-08,Administrative Duty
+1840,,TEST00816,2,Test Infantry Unit B,2005-10-22,2006-10-17,Field Duty
+1841,,TEST00816,3,Test Field Unit,2007-02-07,2007-11-04,Technical Duty
+1842,,TEST00817,1,Test Training Unit,2005-04-07,2006-09-29,Store Duty
+1843,,TEST00817,2,Test Infantry Unit B,2006-11-13,2009-01-31,General Duty
+1844,,TEST00818,1,Test Artillery Unit B,2007-12-14,2008-09-09,Technical Duty
+1845,,TEST00818,2,Test Artillery Unit A,2008-10-01,2010-11-20,Field Duty
+1846,,TEST00819,1,Test Support Unit,2029-05-04,2031-01-24,Communication Duty
+1847,,TEST00819,2,Test Field Unit,2031-03-21,2033-06-08,Administrative Duty
+1848,,TEST00819,3,Test Training Unit,2033-07-02,2035-11-19,Administrative Duty
+1849,,TEST00820,1,Test Field Unit,2024-01-08,2024-09-04,Store Duty
+1850,,TEST00820,2,Test Infantry Unit B,2024-11-19,2025-11-14,Store Duty
+1851,,TEST00820,3,Test Infantry Unit A,2026-01-03,2028-04-22,Store Duty
+1852,,TEST00821,1,Test EME Unit B,2014-08-25,2015-09-19,Technical Duty
+1853,,TEST00821,2,Test Engineer Unit,2015-12-20,2017-03-14,Technical Duty
+1854,,TEST00822,1,Test EME Unit B,2014-10-20,2017-04-07,Store Duty
+1855,,TEST00822,2,Test EME Unit A,2017-07-22,2018-11-14,Technical Duty
+1856,,TEST00823,1,Test Support Unit,2030-05-14,2031-07-08,General Duty
+1857,,TEST00823,2,Test Field Unit,2031-11-03,2033-08-24,Technical Duty
+1858,,TEST00823,3,Test Training Unit,2033-12-01,2034-07-29,Communication Duty
+1859,,TEST00824,1,Test Transport Unit,2018-12-03,2020-06-25,General Duty
+1860,,TEST00824,2,Test ASC Unit,2020-10-16,2022-10-06,General Duty
+1861,,TEST00825,1,Test Field Unit,2023-03-08,2024-10-28,Administrative Duty
+1862,,TEST00825,2,Test Infantry Unit B,2025-02-20,2026-08-14,Store Duty
+1863,,TEST00826,1,Test Training Unit,2007-06-18,2008-06-12,Technical Duty
+1864,,TEST00826,2,Test Infantry Unit A,2008-07-09,2010-04-30,Field Duty
+1865,,TEST00826,3,Test Infantry Unit B,2010-05-28,2011-08-21,Field Duty
+1866,,TEST00827,1,Test Administrative Unit,2010-08-06,2011-08-01,Technical Duty
+1867,,TEST00827,2,Test HQ Unit,2011-09-09,2013-07-30,Field Duty
+1868,,TEST00828,1,Test Infantry Unit A,2024-02-05,2025-07-29,Administrative Duty
+1869,,TEST00828,2,Test Support Unit,2025-11-18,2028-05-06,Store Duty
+1870,,TEST00829,1,Test Infantry Unit A,2004-09-28,2006-07-20,Store Duty
+1871,,TEST00829,2,Test Field Unit,2006-09-09,2009-02-25,Administrative Duty
+1872,,TEST00829,3,Test Infantry Unit B,2009-03-16,2011-07-04,Communication Duty
+1873,,TEST00830,1,Test Field Unit,2004-11-08,2006-12-28,Store Duty
+1874,,TEST00830,2,Test Training Unit,2007-01-16,2009-02-04,Store Duty
+1875,,TEST00830,3,Test Infantry Unit A,2009-05-04,2011-09-21,General Duty
+1876,,TEST00831,1,Test Infantry Unit B,2020-10-06,2021-08-02,Administrative Duty
+1877,,TEST00831,2,Test Support Unit,2021-10-25,2022-08-21,Administrative Duty
+1878,,TEST00831,3,Test Field Unit,2022-11-02,2025-01-20,General Duty
+1879,,TEST00832,1,Test Field Unit,2027-08-03,2028-08-27,Communication Duty
+1880,,TEST00832,2,Test Support Unit,2028-12-20,2031-01-09,Technical Duty
+1881,,TEST00833,1,Test Training Unit,2007-06-15,2009-03-06,Technical Duty
+1882,,TEST00833,2,Test Support Unit,2009-05-22,2010-01-17,Technical Duty
+1883,,TEST00834,1,Test Signal Unit B,2014-10-24,2016-01-17,Store Duty
+1884,,TEST00834,2,Test Signal Unit A,2016-03-18,2018-08-05,General Duty
+1885,,TEST00834,3,Test Communication Unit,2018-09-07,2019-08-03,Field Duty
+1886,,TEST00835,1,Test Field Unit,2015-08-13,2017-09-01,Store Duty
+1887,,TEST00835,2,Test Infantry Unit A,2017-09-23,2018-09-18,Store Duty
+1888,,TEST00836,1,Test Infantry Unit A,2003-03-13,2005-06-30,Communication Duty
+1889,,TEST00836,2,Test Infantry Unit B,2005-07-10,2007-03-02,Communication Duty
+1890,,TEST00836,3,Test Training Unit,2007-06-11,2009-08-29,General Duty
+1891,,TEST00837,1,Test Support Unit,2014-07-17,2015-10-10,Communication Duty
+1892,,TEST00837,2,Test Infantry Unit B,2016-01-27,2017-01-21,Store Duty
+1893,,TEST00838,1,Test Support Unit,2022-12-12,2024-03-06,Administrative Duty
+1894,,TEST00838,2,Test Infantry Unit B,2024-06-14,2026-06-04,Field Duty
+1895,,TEST00839,1,Test Field Unit,2027-07-28,2028-10-20,Field Duty
+1896,,TEST00839,2,Test Support Unit,2028-12-09,2029-09-05,Communication Duty
+1897,,TEST00839,3,Test Infantry Unit A,2029-11-16,2031-05-10,Communication Duty
+1898,,TEST00840,1,Test Training Unit,2002-02-25,2003-08-19,Administrative Duty
+1899,,TEST00840,2,Test Infantry Unit B,2003-11-25,2005-09-15,General Duty
+1900,,TEST00840,3,Test Infantry Unit A,2006-01-05,2007-11-26,Communication Duty
+1901,,TEST00841,1,Test Transport Unit,2023-02-09,2024-01-05,Administrative Duty
+1902,,TEST00841,2,Test ASC Unit,2024-02-26,2025-08-19,Field Duty
+1903,,TEST00842,1,Test Support Unit,2010-05-04,2011-11-25,Technical Duty
+1904,,TEST00842,2,Test Infantry Unit A,2012-02-25,2012-12-21,Store Duty
+1905,,TEST00843,1,Test Training Unit,2024-11-04,2027-04-23,Administrative Duty
+1906,,TEST00843,2,Test Field Unit,2027-06-05,2028-03-01,Administrative Duty
+1907,,TEST00844,1,Test Infantry Unit A,2023-01-16,2024-06-09,General Duty
+1908,,TEST00844,2,Test Training Unit,2024-07-28,2026-06-18,General Duty
+1909,,TEST00845,1,Test Ordnance Unit,2010-12-18,2013-04-06,Administrative Duty
+1910,,TEST00845,2,Test Store Unit,2013-08-02,2014-04-29,Technical Duty
+1911,,TEST00846,1,Test Infantry Unit A,2019-01-13,2020-09-04,Store Duty
+1912,,TEST00846,2,Test Field Unit,2020-11-30,2021-09-26,Field Duty
+1913,,TEST00846,3,Test Support Unit,2021-10-10,2023-11-29,Field Duty
+1914,,TEST00847,1,Test Training Unit,2007-08-05,2008-05-01,Technical Duty
+1915,,TEST00847,2,Test Support Unit,2008-06-09,2010-09-27,Administrative Duty
+1916,,TEST00847,3,Test Field Unit,2011-01-17,2013-05-06,Administrative Duty
+1917,,TEST00848,1,Test Training Unit,2009-08-09,2011-05-01,Communication Duty
+1918,,TEST00848,2,Test Field Unit,2011-07-23,2012-12-14,General Duty
+1919,,TEST00848,3,Test Infantry Unit B,2013-03-31,2014-06-24,Communication Duty
+1920,,TEST00849,1,Test Field Unit,2017-05-16,2019-02-05,Technical Duty
+1921,,TEST00849,2,Test Infantry Unit A,2019-03-04,2021-05-22,Administrative Duty
+1922,,TEST00849,3,Test Support Unit,2021-08-01,2022-09-25,Communication Duty
+1923,,TEST00850,1,Test EME Unit A,2014-12-24,2017-02-11,Communication Duty
+1924,,TEST00850,2,Test EME Unit B,2017-04-08,2019-01-28,Field Duty
+1925,,TEST00851,1,Test Engineer Unit,2007-09-30,2008-08-25,Store Duty
+1926,,TEST00851,2,Test EME Unit B,2008-10-24,2010-11-13,Field Duty
+1927,,TEST00852,1,Test Infantry Unit B,2004-12-17,2006-06-10,Store Duty
+1928,,TEST00852,2,Test Infantry Unit A,2006-08-06,2009-01-22,Field Duty
+1929,,TEST00853,1,Test Infantry Unit B,2012-09-22,2013-10-17,Administrative Duty
+1930,,TEST00853,2,Test Training Unit,2013-11-07,2015-06-30,Field Duty
+1931,,TEST00854,1,Test EME Unit B,2011-09-18,2013-10-07,Technical Duty
+1932,,TEST00854,2,Test EME Unit A,2013-12-30,2015-09-21,Communication Duty
+1933,,TEST00855,1,Test Infantry Unit B,2016-01-12,2017-09-03,Communication Duty
+1934,,TEST00855,2,Test Field Unit,2017-12-12,2019-04-06,Communication Duty
+1935,,TEST00855,3,Test Training Unit,2019-05-08,2020-04-02,Administrative Duty
+1936,,TEST00856,1,Test EME Unit B,2008-07-11,2010-10-29,Communication Duty
+1937,,TEST00856,2,Test EME Unit A,2010-12-12,2013-03-01,General Duty
+1938,,TEST00857,1,Test Support Unit,2002-03-28,2003-09-19,General Duty
+1939,,TEST00857,2,Test Infantry Unit A,2003-10-19,2004-11-12,General Duty
+1940,,TEST00858,1,Test Store Unit,2007-08-18,2009-12-05,Administrative Duty
+1941,,TEST00858,2,Test Ordnance Unit,2009-12-27,2011-03-22,Administrative Duty
+1942,,TEST00859,1,Test Communication Unit,2005-02-11,2006-10-04,Field Duty
+1943,,TEST00859,2,Test Signal Unit B,2006-10-21,2009-04-08,Store Duty
+1944,,TEST00860,1,Test Store Unit,2021-05-09,2022-10-01,General Duty
+1945,,TEST00860,2,Test Ordnance Unit,2023-01-13,2024-01-08,Store Duty
+1946,,TEST00861,1,Test ASC Unit,2000-09-14,2003-02-01,Field Duty
+1947,,TEST00861,2,Test Transport Unit,2003-03-13,2004-05-06,General Duty
+1948,,TEST00862,1,Test Signal Unit B,2010-04-13,2010-12-09,Store Duty
+1949,,TEST00862,2,Test Communication Unit,2011-03-21,2013-07-08,Store Duty
+1950,,TEST00863,1,Test Infantry Unit A,2020-02-08,2021-10-30,Communication Duty
+1951,,TEST00863,2,Test Infantry Unit B,2022-01-05,2023-10-27,General Duty
+1952,,TEST00864,1,Test Support Unit,2006-05-16,2007-03-12,General Duty
+1953,,TEST00864,2,Test Training Unit,2007-04-08,2008-09-29,Field Duty
+1954,,TEST00864,3,Test Infantry Unit B,2008-11-28,2010-02-21,Administrative Duty
+1955,,TEST00865,1,Test Artillery Unit A,2012-08-26,2013-08-21,Field Duty
+1956,,TEST00865,2,Test Artillery Unit B,2013-11-28,2015-02-21,Administrative Duty
+1957,,TEST00866,1,Test EME Unit B,2003-07-16,2005-05-06,Communication Duty
+1958,,TEST00866,2,Test Engineer Unit,2005-07-25,2006-10-18,Communication Duty
+1959,,TEST00867,1,Test Training Unit,2011-11-12,2012-10-07,Communication Duty
+1960,,TEST00867,2,Test Infantry Unit A,2013-02-04,2014-11-26,Store Duty
+1961,,TEST00868,1,Test Infantry Unit B,2022-02-22,2023-06-17,Communication Duty
+1962,,TEST00868,2,Test Field Unit,2023-07-12,2024-11-03,Administrative Duty
+1963,,TEST00869,1,Test EME Unit A,2009-06-16,2011-01-07,General Duty
+1964,,TEST00869,2,Test EME Unit B,2011-03-16,2012-08-07,Communication Duty
+1965,,TEST00870,1,Test Field Unit,2007-01-16,2007-10-13,General Duty
+1966,,TEST00870,2,Test Infantry Unit B,2008-01-01,2009-08-23,Technical Duty
+1967,,TEST00870,3,Test Support Unit,2009-11-03,2010-10-29,Communication Duty
+1968,,TEST00871,1,Test Administrative Unit,2006-01-28,2008-04-17,Field Duty
+1969,,TEST00871,2,Test HQ Unit,2008-06-08,2009-12-30,Store Duty
+1970,,TEST00872,1,Test Infantry Unit B,2008-04-30,2010-09-17,Communication Duty
+1971,,TEST00872,2,Test Support Unit,2010-11-14,2012-03-08,General Duty
+1972,,TEST00873,1,Test Infantry Unit A,2019-01-26,2021-02-14,Administrative Duty
+1973,,TEST00873,2,Test Infantry Unit B,2021-02-24,2022-03-21,Field Duty
+1974,,TEST00874,1,Test Field Unit,2002-08-08,2003-10-02,Administrative Duty
+1975,,TEST00874,2,Test Infantry Unit A,2004-01-19,2005-06-12,Field Duty
+1976,,TEST00875,1,Test Support Unit,2022-10-18,2024-11-06,Store Duty
+1977,,TEST00875,2,Test Infantry Unit B,2024-12-15,2027-02-03,General Duty
+1978,,TEST00875,3,Test Infantry Unit A,2027-03-23,2029-02-10,Technical Duty
+1979,,TEST00876,1,Test Field Unit,2014-06-07,2015-09-30,Communication Duty
+1980,,TEST00876,2,Test Training Unit,2016-01-11,2018-06-29,General Duty
+1981,,TEST00877,1,Test Field Unit,2011-08-01,2013-02-21,General Duty
+1982,,TEST00877,2,Test Infantry Unit B,2013-03-17,2014-07-10,Field Duty
+1983,,TEST00877,3,Test Infantry Unit A,2014-10-28,2016-12-16,Communication Duty
+1984,,TEST00878,1,Test Training Unit,2018-06-20,2019-04-16,Technical Duty
+1985,,TEST00878,2,Test Field Unit,2019-07-23,2020-03-19,Administrative Duty
+1986,,TEST00878,3,Test Infantry Unit A,2020-03-30,2022-05-19,Administrative Duty
+1987,,TEST00879,1,Test Support Unit,2004-08-27,2006-12-15,Communication Duty
+1988,,TEST00879,2,Test Training Unit,2007-02-17,2008-01-13,Store Duty
+1989,,TEST00880,1,Test Administrative Unit,2029-10-20,2030-07-17,General Duty
+1990,,TEST00880,2,Test HQ Unit,2030-10-27,2033-04-14,Store Duty
+1991,,TEST00881,1,Test Artillery Unit A,2021-04-28,2022-06-22,Store Duty
+1992,,TEST00881,2,Test Artillery Unit B,2022-07-12,2024-01-03,General Duty
+1993,,TEST00882,1,Test EME Unit A,2020-11-05,2022-09-26,Store Duty
+1994,,TEST00882,2,Test EME Unit B,2022-11-27,2023-12-22,Field Duty
+1995,,TEST00883,1,Test Engineer Unit,2017-10-12,2019-11-01,Communication Duty
+1996,,TEST00883,2,Test EME Unit B,2019-11-23,2020-08-19,Store Duty
+1997,,TEST00884,1,Test Training Unit,2016-01-28,2017-06-21,Technical Duty
+1998,,TEST00884,2,Test Field Unit,2017-08-12,2019-06-03,General Duty
+1999,,TEST00884,3,Test Infantry Unit B,2019-08-04,2021-11-21,Store Duty
+2000,,TEST00885,1,Test Signal Unit A,2022-01-28,2024-03-18,Field Duty
+2001,,TEST00885,2,Test Signal Unit B,2024-04-22,2025-07-16,Field Duty
+2002,,TEST00886,1,Test EME Unit B,2000-05-20,2002-11-06,Field Duty
+2003,,TEST00886,2,Test EME Unit A,2002-12-11,2003-08-08,Communication Duty
+2004,,TEST00887,1,Test HQ Unit,2028-10-16,2029-07-13,Technical Duty
+2005,,TEST00887,2,Test Administrative Unit,2029-09-25,2031-06-17,Administrative Duty
+2006,,TEST00888,1,Test Transport Unit,2015-10-26,2016-10-20,Technical Duty
+2007,,TEST00888,2,Test ASC Unit,2016-12-05,2017-10-31,General Duty
+2008,,TEST00889,1,Test Infantry Unit A,2018-07-06,2020-03-27,Communication Duty
+2009,,TEST00889,2,Test Support Unit,2020-04-10,2021-03-06,Administrative Duty
+2010,,TEST00890,1,Test Field Unit,2030-07-13,2031-03-10,General Duty
+2011,,TEST00890,2,Test Infantry Unit B,2031-07-08,2033-02-27,Communication Duty
+2012,,TEST00891,1,Test Training Unit,2017-03-23,2018-03-18,Technical Duty
+2013,,TEST00891,2,Test Infantry Unit B,2018-07-15,2019-07-10,Administrative Duty
+2014,,TEST00892,1,Test Engineer Unit,2010-04-21,2012-06-09,Technical Duty
+2015,,TEST00892,2,Test EME Unit B,2012-07-12,2014-11-29,Technical Duty
+2016,,TEST00893,1,Test Support Unit,2015-01-07,2017-04-26,General Duty
+2017,,TEST00893,2,Test Infantry Unit B,2017-05-18,2019-10-05,Field Duty
+2018,,TEST00894,1,Test Infantry Unit A,2009-11-04,2010-12-29,Administrative Duty
+2019,,TEST00894,2,Test Training Unit,2011-03-17,2012-08-08,Technical Duty
+2020,,TEST00895,1,Test EME Unit A,2005-08-17,2007-12-05,Technical Duty
+2021,,TEST00895,2,Test Workshop Unit,2008-01-30,2009-02-23,Store Duty
+2022,,TEST00896,1,Test Infantry Unit B,2000-02-18,2001-05-13,Field Duty
+2023,,TEST00896,2,Test Training Unit,2001-08-07,2002-11-30,Administrative Duty
+2024,,TEST00897,1,Test Communication Unit,2013-08-09,2014-08-04,Technical Duty
+2025,,TEST00897,2,Test Signal Unit B,2014-09-21,2015-10-16,Store Duty
+2026,,TEST00897,3,Test Signal Unit A,2015-12-16,2017-05-09,Administrative Duty
+2027,,TEST00898,1,Test Support Unit,2012-03-03,2013-06-26,Store Duty
+2028,,TEST00898,2,Test Infantry Unit A,2013-09-09,2015-06-01,Communication Duty
+2029,,TEST00898,3,Test Training Unit,2015-07-05,2016-10-27,Technical Duty
+2030,,TEST00899,1,Test Training Unit,2013-12-30,2015-03-25,Communication Duty
+2031,,TEST00899,2,Test Field Unit,2015-07-09,2017-04-29,Field Duty
+2032,,TEST00900,1,Test Infantry Unit B,2020-10-19,2022-12-08,Store Duty
+2033,,TEST00900,2,Test Field Unit,2023-03-09,2025-06-26,Administrative Duty
+2034,,TEST00900,3,Test Support Unit,2025-07-28,2027-10-16,Communication Duty
+2035,,TEST00901,1,Test Signal Unit B,2020-10-27,2021-08-23,Administrative Duty
+2036,,TEST00901,2,Test Communication Unit,2021-11-29,2022-12-24,Communication Duty
+2037,,TEST00902,1,Test Field Unit,2017-05-02,2018-08-25,Communication Duty
+2038,,TEST00902,2,Test Infantry Unit A,2018-12-10,2020-08-01,Technical Duty
+2039,,TEST00903,1,Test HQ Unit,2011-11-19,2013-08-10,Administrative Duty
+2040,,TEST00903,2,Test Administrative Unit,2013-09-02,2014-12-26,Communication Duty
+2041,,TEST00904,1,Test HQ Unit,2017-07-22,2019-03-14,Store Duty
+2042,,TEST00904,2,Test Administrative Unit,2019-06-21,2021-01-11,Technical Duty
+2043,,TEST00905,1,Test Field Unit,2002-11-08,2004-05-01,Field Duty
+2044,,TEST00905,2,Test Support Unit,2004-06-09,2005-12-01,Technical Duty
+2045,,TEST00905,3,Test Infantry Unit B,2006-02-20,2008-04-10,Field Duty
+2046,,TEST00906,1,Test Infantry Unit B,1999-12-07,2001-03-01,Technical Duty
+2047,,TEST00906,2,Test Field Unit,2001-04-17,2002-06-11,Field Duty
+2048,,TEST00906,3,Test Support Unit,2002-09-25,2004-05-17,Communication Duty
+2049,,TEST00907,1,Test Field Unit,2000-02-11,2001-08-04,Communication Duty
+2050,,TEST00907,2,Test Infantry Unit A,2001-08-24,2002-09-18,Field Duty
+2051,,TEST00908,1,Test Signal Unit A,2014-07-20,2015-11-12,Technical Duty
+2052,,TEST00908,2,Test Communication Unit,2016-02-14,2017-07-08,Communication Duty
+2053,,TEST00908,3,Test Signal Unit B,2017-09-26,2019-03-20,Store Duty
+2054,,TEST00909,1,Test Infantry Unit B,2005-11-04,2006-09-30,Communication Duty
+2055,,TEST00909,2,Test Infantry Unit A,2007-01-11,2009-01-30,Technical Duty
+2056,,TEST00909,3,Test Training Unit,2009-03-18,2011-05-07,Communication Duty
+2057,,TEST00910,1,Test Training Unit,2003-04-29,2005-01-18,General Duty
+2058,,TEST00910,2,Test Infantry Unit A,2005-03-14,2006-06-07,Field Duty
+2059,,TEST00911,1,Test Infantry Unit A,2024-01-18,2026-01-07,Field Duty
+2060,,TEST00911,2,Test Support Unit,2026-02-11,2028-07-30,Communication Duty
+2061,,TEST00912,1,Test Infantry Unit B,2001-04-06,2003-02-25,Technical Duty
+2062,,TEST00912,2,Test Infantry Unit A,2003-05-06,2004-04-30,Communication Duty
+2063,,TEST00913,1,Test Infantry Unit B,2026-04-03,2027-07-27,Store Duty
+2064,,TEST00913,2,Test Infantry Unit A,2027-10-23,2029-07-14,Communication Duty
+2065,,TEST00913,3,Test Support Unit,2029-10-02,2032-03-20,General Duty
+2066,,TEST00914,1,Test Support Unit,2023-04-18,2025-06-06,Technical Duty
+2067,,TEST00914,2,Test Field Unit,2025-07-01,2026-06-26,General Duty
+2068,,TEST00915,1,Test Infantry Unit B,2012-03-01,2013-10-22,Technical Duty
+2069,,TEST00915,2,Test Field Unit,2013-12-12,2016-03-31,Administrative Duty
+2070,,TEST00915,3,Test Training Unit,2016-07-26,2017-07-21,Field Duty
+2071,,TEST00916,1,Test Support Unit,2011-07-17,2013-02-06,Communication Duty
+2072,,TEST00916,2,Test Field Unit,2013-03-14,2014-05-08,Store Duty
+2073,,TEST00917,1,Test Infantry Unit B,2007-02-15,2008-04-10,Communication Duty
+2074,,TEST00917,2,Test Field Unit,2008-08-03,2010-09-22,Administrative Duty
+2075,,TEST00917,3,Test Infantry Unit A,2010-12-05,2013-04-23,General Duty
+2076,,TEST00918,1,Test Infantry Unit B,2019-05-17,2021-11-02,Communication Duty
+2077,,TEST00918,2,Test Support Unit,2022-02-11,2023-07-06,Store Duty
+2078,,TEST00919,1,Test EME Unit B,2019-05-30,2021-10-16,General Duty
+2079,,TEST00919,2,Test EME Unit A,2021-12-17,2024-05-05,Store Duty
+2080,,TEST00920,1,Test Signal Unit B,2025-12-03,2028-02-21,General Duty
+2081,,TEST00920,2,Test Signal Unit A,2028-03-06,2029-01-30,Communication Duty
+2082,,TEST00921,1,Test Field Unit,2022-06-12,2023-05-08,Communication Duty
+2083,,TEST00921,2,Test Infantry Unit A,2023-08-25,2026-02-10,Technical Duty
+2084,,TEST00922,1,Test Training Unit,2017-02-08,2017-12-05,Technical Duty
+2085,,TEST00922,2,Test Infantry Unit A,2018-01-12,2019-04-07,Administrative Duty
+2086,,TEST00923,1,Test Artillery Unit B,2010-09-11,2012-08-01,Field Duty
+2087,,TEST00923,2,Test Artillery Unit A,2012-11-21,2014-01-15,Field Duty
+2088,,TEST00924,1,Test Field Unit,2022-09-17,2024-11-05,Store Duty
+2089,,TEST00924,2,Test Infantry Unit A,2025-02-25,2027-08-14,Administrative Duty
+2090,,TEST00925,1,Test EME Unit A,2019-10-24,2021-09-13,Store Duty
+2091,,TEST00925,2,Test Workshop Unit,2021-10-20,2022-07-17,General Duty
+2092,,TEST00926,1,Test HQ Unit,2028-10-17,2029-06-14,Administrative Duty
+2093,,TEST00926,2,Test Administrative Unit,2029-09-06,2031-12-25,Field Duty
+2094,,TEST00927,1,Test Infantry Unit A,2005-09-17,2007-02-09,Field Duty
+2095,,TEST00927,2,Test Training Unit,2007-03-11,2007-12-06,Technical Duty
+2096,,TEST00928,1,Test Support Unit,2015-02-24,2017-03-15,General Duty
+2097,,TEST00928,2,Test Infantry Unit A,2017-06-28,2018-04-24,Store Duty
+2098,,TEST00928,3,Test Infantry Unit B,2018-07-20,2019-04-16,Technical Duty
+2099,,TEST00929,1,Test EME Unit A,2024-07-09,2025-11-01,Store Duty
+2100,,TEST00929,2,Test Workshop Unit,2026-02-14,2027-08-08,Administrative Duty
+2101,,TEST00930,1,Test Signal Unit A,2010-11-06,2011-12-31,Administrative Duty
+2102,,TEST00930,2,Test Communication Unit,2012-02-04,2012-11-30,Communication Duty
+2103,,TEST00931,1,Test Training Unit,2021-03-20,2023-05-09,General Duty
+2104,,TEST00931,2,Test Infantry Unit A,2023-06-14,2025-07-03,Communication Duty
+2105,,TEST00931,3,Test Infantry Unit B,2025-07-20,2026-05-16,Administrative Duty
+2106,,TEST00932,1,Test Infantry Unit A,2015-01-19,2015-12-15,Technical Duty
+2107,,TEST00932,2,Test Training Unit,2016-01-11,2018-06-29,General Duty
+2108,,TEST00932,3,Test Infantry Unit B,2018-09-21,2021-02-07,Administrative Duty
+2109,,TEST00933,1,Test EME Unit B,2021-10-10,2023-08-01,Field Duty
+2110,,TEST00933,2,Test Engineer Unit,2023-08-11,2024-09-04,Store Duty
+2111,,TEST00934,1,Test Field Unit,2015-11-28,2016-10-23,Technical Duty
+2112,,TEST00934,2,Test Infantry Unit A,2017-02-17,2019-03-09,Communication Duty
+2113,,TEST00935,1,Test Administrative Unit,2002-09-02,2004-07-23,Field Duty
+2114,,TEST00935,2,Test HQ Unit,2004-08-11,2006-10-30,Technical Duty
+2115,,TEST00936,1,Test Training Unit,2014-12-30,2016-08-21,Administrative Duty
+2116,,TEST00936,2,Test Field Unit,2016-12-19,2018-09-10,Technical Duty
+2117,,TEST00936,3,Test Infantry Unit B,2018-12-06,2019-10-02,Technical Duty
+2118,,TEST00937,1,Test EME Unit B,2016-03-31,2017-08-23,Store Duty
+2119,,TEST00937,2,Test Engineer Unit,2017-09-16,2020-02-03,Communication Duty
+2120,,TEST00938,1,Test Transport Unit,2008-10-07,2011-01-25,Technical Duty
+2121,,TEST00938,2,Test ASC Unit,2011-02-19,2012-09-11,Administrative Duty
+2122,,TEST00939,1,Test Infantry Unit B,2018-03-07,2019-08-29,Technical Duty
+2123,,TEST00939,2,Test Infantry Unit A,2019-10-20,2020-07-16,Communication Duty
+2124,,TEST00940,1,Test Infantry Unit B,2015-02-22,2016-11-13,Store Duty
+2125,,TEST00940,2,Test Support Unit,2016-12-25,2018-07-18,Administrative Duty
+2126,,TEST00940,3,Test Infantry Unit A,2018-08-18,2020-02-09,Technical Duty
+2127,,TEST00941,1,Test Field Unit,2011-05-27,2012-05-21,Field Duty
+2128,,TEST00941,2,Test Infantry Unit A,2012-07-16,2013-12-08,Communication Duty
+2129,,TEST00941,3,Test Support Unit,2014-03-20,2015-01-14,Field Duty
+2130,,TEST00942,1,Test EME Unit B,2006-04-10,2007-12-01,Store Duty
+2131,,TEST00942,2,Test EME Unit A,2008-01-16,2010-01-05,Store Duty
+2132,,TEST00943,1,Test EME Unit A,2003-10-12,2005-05-04,General Duty
+2133,,TEST00943,2,Test Workshop Unit,2005-07-28,2007-11-15,Field Duty
+2134,,TEST00944,1,Test Administrative Unit,2009-02-28,2010-09-21,Field Duty
+2135,,TEST00944,2,Test HQ Unit,2010-11-21,2012-01-15,Administrative Duty
+2136,,TEST00945,1,Test Infantry Unit B,2013-11-11,2015-09-02,Field Duty
+2137,,TEST00945,2,Test Training Unit,2015-12-13,2016-10-08,Communication Duty
+2138,,TEST00946,1,Test Support Unit,2009-11-23,2011-06-16,Communication Duty
+2139,,TEST00946,2,Test Infantry Unit B,2011-08-11,2012-04-07,Administrative Duty
+2140,,TEST00946,3,Test Field Unit,2012-06-04,2013-01-30,Communication Duty
+2141,,TEST00947,1,Test Infantry Unit A,2026-05-05,2028-08-22,Administrative Duty
+2142,,TEST00947,2,Test Field Unit,2028-09-15,2029-12-09,General Duty
+2143,,TEST00948,1,Test Training Unit,2020-11-27,2022-03-22,General Duty
+2144,,TEST00948,2,Test Support Unit,2022-07-10,2024-12-26,Store Duty
+2145,,TEST00948,3,Test Infantry Unit A,2025-03-02,2026-01-26,General Duty
+2146,,TEST00949,1,Test Support Unit,2021-07-02,2022-10-25,General Duty
+2147,,TEST00949,2,Test Infantry Unit A,2023-01-05,2023-12-31,Store Duty
+2148,,TEST00949,3,Test Field Unit,2024-01-28,2024-09-24,Communication Duty
+2149,,TEST00950,1,Test Infantry Unit B,2006-07-09,2007-06-04,Administrative Duty
+2150,,TEST00950,2,Test Infantry Unit A,2007-09-23,2010-02-09,Technical Duty
+2151,,TEST00951,1,Test HQ Unit,2012-07-03,2013-07-28,Technical Duty
+2152,,TEST00951,2,Test Administrative Unit,2013-10-17,2014-10-12,Administrative Duty
+2153,,TEST00952,1,Test Support Unit,2009-12-02,2010-11-27,Store Duty
+2154,,TEST00952,2,Test Field Unit,2010-12-31,2012-07-23,Store Duty
+2155,,TEST00953,1,Test EME Unit A,2006-07-17,2007-11-09,General Duty
+2156,,TEST00953,2,Test EME Unit B,2007-11-23,2009-12-12,Administrative Duty
+2157,,TEST00954,1,Test Infantry Unit B,2007-10-05,2008-08-30,Field Duty
+2158,,TEST00954,2,Test Field Unit,2008-09-23,2009-12-17,Administrative Duty
+2159,,TEST00955,1,Test Field Unit,2016-02-26,2017-08-19,Communication Duty
+2160,,TEST00955,2,Test Infantry Unit B,2017-09-16,2018-10-11,Field Duty
+2161,,TEST00956,1,Test HQ Unit,2015-06-18,2016-11-09,General Duty
+2162,,TEST00956,2,Test Administrative Unit,2017-02-08,2019-07-28,Field Duty
+2163,,TEST00957,1,Test Training Unit,2014-03-09,2015-12-29,Store Duty
+2164,,TEST00957,2,Test Infantry Unit A,2016-02-07,2016-10-04,Technical Duty
+2165,,TEST00957,3,Test Field Unit,2016-12-22,2017-08-19,General Duty
+2166,,TEST00958,1,Test Artillery Unit A,2014-10-26,2017-04-13,Administrative Duty
+2167,,TEST00958,2,Test Artillery Unit B,2017-05-24,2018-10-16,General Duty
+2168,,TEST00959,1,Test Infantry Unit B,2000-11-11,2003-03-01,Administrative Duty
+2169,,TEST00959,2,Test Infantry Unit A,2003-04-16,2005-03-06,Store Duty
+2170,,TEST00960,1,Test Field Unit,2020-01-13,2020-10-09,Technical Duty
+2171,,TEST00960,2,Test Infantry Unit B,2020-10-29,2023-02-16,Store Duty
+2172,,TEST00960,3,Test Training Unit,2023-05-23,2025-06-11,Store Duty
+2173,,TEST00961,1,Test Support Unit,2007-12-13,2009-07-05,Communication Duty
+2174,,TEST00961,2,Test Infantry Unit B,2009-09-24,2012-01-12,Field Duty
+2175,,TEST00962,1,Test Support Unit,2013-07-31,2015-12-18,Technical Duty
+2176,,TEST00962,2,Test Infantry Unit A,2016-01-09,2017-04-03,Field Duty
+2177,,TEST00963,1,Test Field Unit,2016-07-03,2018-02-23,Store Duty
+2178,,TEST00963,2,Test Infantry Unit B,2018-05-17,2019-01-12,Administrative Duty
+2179,,TEST00963,3,Test Training Unit,2019-05-06,2020-10-27,Store Duty
+2180,,TEST00964,1,Test Support Unit,2010-07-01,2012-08-19,Store Duty
+2181,,TEST00964,2,Test Field Unit,2012-10-07,2015-03-26,General Duty
+2182,,TEST00965,1,Test EME Unit A,2014-02-28,2015-11-20,Store Duty
+2183,,TEST00965,2,Test EME Unit B,2016-01-24,2018-03-14,Field Duty
+2184,,TEST00966,1,Test Workshop Unit,1998-12-02,2000-11-21,Store Duty
+2185,,TEST00966,2,Test EME Unit A,2001-03-13,2003-04-02,Communication Duty
+2186,,TEST00967,1,Test Infantry Unit A,2027-09-18,2029-03-11,Communication Duty
+2187,,TEST00967,2,Test Training Unit,2029-05-18,2030-08-11,Technical Duty
+2188,,TEST00967,3,Test Infantry Unit B,2030-10-17,2032-02-09,Administrative Duty
+2189,,TEST00968,1,Test EME Unit A,2007-11-19,2009-05-12,Technical Duty
+2190,,TEST00968,2,Test EME Unit B,2009-07-17,2011-04-08,General Duty
+2191,,TEST00969,1,Test Training Unit,2015-08-19,2017-10-07,Store Duty
+2192,,TEST00969,2,Test Infantry Unit A,2017-10-24,2018-10-19,Administrative Duty
+2193,,TEST00969,3,Test Infantry Unit B,2018-11-26,2021-03-15,General Duty
+2194,,TEST00970,1,Test Infantry Unit B,2024-02-16,2025-10-08,Store Duty
+2195,,TEST00970,2,Test Support Unit,2026-01-04,2027-01-29,Field Duty
+2196,,TEST00971,1,Test Field Unit,2014-04-23,2016-02-12,Communication Duty
+2197,,TEST00971,2,Test Training Unit,2016-06-11,2017-07-06,Administrative Duty
+2198,,TEST00971,3,Test Infantry Unit B,2017-10-26,2018-06-23,Store Duty
+2199,,TEST00972,1,Test Signal Unit A,2013-06-25,2014-10-18,Technical Duty
+2200,,TEST00972,2,Test Communication Unit,2014-11-24,2016-04-17,Store Duty
+2201,,TEST00973,1,Test Artillery Unit B,2003-08-13,2005-06-03,Field Duty
+2202,,TEST00973,2,Test Artillery Unit A,2005-06-29,2006-11-21,General Duty
+2203,,TEST00974,1,Test Field Unit,2011-01-13,2012-09-04,Store Duty
+2204,,TEST00974,2,Test Infantry Unit B,2012-09-27,2014-03-21,Store Duty
+2205,,TEST00975,1,Test Engineer Unit,2003-09-29,2005-11-17,General Duty
+2206,,TEST00975,2,Test EME Unit B,2006-01-15,2007-02-09,Communication Duty
+2207,,TEST00976,1,Test Infantry Unit A,2022-01-14,2023-02-08,Administrative Duty
+2208,,TEST00976,2,Test Infantry Unit B,2023-04-16,2024-01-11,Technical Duty
+2209,,TEST00976,3,Test Support Unit,2024-04-27,2025-06-21,Technical Duty
+2210,,TEST00977,1,Test Workshop Unit,2005-03-25,2006-10-16,Technical Duty
+2211,,TEST00977,2,Test EME Unit A,2006-11-23,2007-09-19,Administrative Duty
+2212,,TEST00978,1,Test ASC Unit,2004-09-05,2005-06-02,Administrative Duty
+2213,,TEST00978,2,Test Transport Unit,2005-06-14,2006-06-09,Store Duty
+2214,,TEST00979,1,Test Infantry Unit B,2012-02-24,2013-03-20,General Duty
+2215,,TEST00979,2,Test Infantry Unit A,2013-05-31,2014-10-23,Technical Duty
+2216,,TEST00979,3,Test Training Unit,2015-01-17,2016-01-12,Technical Duty
+2217,,TEST00980,1,Test EME Unit A,2019-08-10,2021-05-31,Store Duty
+2218,,TEST00980,2,Test EME Unit B,2021-09-16,2022-10-11,General Duty
+2219,,TEST00981,1,Test Training Unit,2018-03-08,2019-10-29,Communication Duty
+2220,,TEST00981,2,Test Infantry Unit B,2020-01-24,2021-03-19,Communication Duty
+2221,,TEST00982,1,Test Support Unit,2028-05-28,2029-05-23,Administrative Duty
+2222,,TEST00982,2,Test Infantry Unit B,2029-09-06,2030-06-03,Technical Duty
+2223,,TEST00983,1,Test Training Unit,2009-03-04,2011-02-22,General Duty
+2224,,TEST00983,2,Test Infantry Unit B,2011-04-11,2013-04-30,Administrative Duty
+2225,,TEST00984,1,Test Ordnance Unit,2014-02-05,2015-10-28,General Duty
+2226,,TEST00984,2,Test Store Unit,2016-01-31,2018-03-21,General Duty
+2227,,TEST00985,1,Test EME Unit A,2008-01-18,2009-08-10,Store Duty
+2228,,TEST00985,2,Test Workshop Unit,2009-09-17,2011-08-08,Store Duty
+2229,,TEST00986,1,Test Training Unit,2006-07-07,2007-03-04,General Duty
+2230,,TEST00986,2,Test Infantry Unit A,2007-06-04,2008-01-30,Technical Duty
+2231,,TEST00987,1,Test Engineer Unit,1999-10-01,2001-05-23,Technical Duty
+2232,,TEST00987,2,Test EME Unit B,2001-06-25,2002-12-17,Communication Duty
+2233,,TEST00988,1,Test Support Unit,2022-06-29,2024-06-18,Field Duty
+2234,,TEST00988,2,Test Infantry Unit A,2024-08-14,2026-03-07,Store Duty
+2235,,TEST00989,1,Test Support Unit,2018-11-12,2020-02-05,General Duty
+2236,,TEST00989,2,Test Infantry Unit B,2020-03-22,2021-10-13,Field Duty
+2237,,TEST00990,1,Test Artillery Unit A,2008-12-29,2009-10-25,Communication Duty
+2238,,TEST00990,2,Test Artillery Unit B,2010-01-26,2012-05-15,Communication Duty
+2239,,TEST00991,1,Test Field Unit,2008-01-01,2009-08-23,Administrative Duty
+2240,,TEST00991,2,Test Training Unit,2009-10-28,2011-03-22,Technical Duty
+2241,,TEST00992,1,Test Infantry Unit A,2005-04-19,2006-11-10,Technical Duty
+2242,,TEST00992,2,Test Field Unit,2007-02-14,2009-05-04,Field Duty
+2243,,TEST00993,1,Test Support Unit,2014-11-22,2016-08-13,Communication Duty
+2244,,TEST00993,2,Test Training Unit,2016-11-22,2018-08-14,Administrative Duty
+2245,,TEST00994,1,Test EME Unit A,2007-04-17,2009-08-04,Communication Duty
+2246,,TEST00994,2,Test EME Unit B,2009-08-22,2010-08-17,General Duty
+2247,,TEST00995,1,Test EME Unit A,2000-07-09,2002-05-30,Store Duty
+2248,,TEST00995,2,Test EME Unit B,2002-06-16,2004-03-07,Field Duty
+2249,,TEST00996,1,Test EME Unit A,2018-12-25,2020-03-19,General Duty
+2250,,TEST00996,2,Test EME Unit B,2020-06-23,2021-05-19,Communication Duty
+2251,,TEST00997,1,Test Infantry Unit A,2008-07-09,2010-05-30,Field Duty
+2252,,TEST00997,2,Test Support Unit,2010-08-02,2011-09-26,Administrative Duty
+2253,,TEST00997,3,Test Field Unit,2011-11-06,2012-10-31,Technical Duty
+2254,,TEST00998,1,Test Infantry Unit A,2027-05-31,2028-05-25,General Duty
+2255,,TEST00998,2,Test Field Unit,2028-06-21,2030-02-11,Field Duty
+2256,,TEST00998,3,Test Support Unit,2030-04-28,2031-09-20,Field Duty
+2257,,TEST00999,1,Test Support Unit,2017-07-23,2019-06-13,General Duty
+2258,,TEST00999,2,Test Infantry Unit B,2019-07-03,2020-11-24,Technical Duty
+2259,,TEST01000,1,Test Signal Unit A,2015-01-21,2015-10-18,General Duty
+2260,,TEST01000,2,Test Communication Unit,2016-01-31,2017-04-25,Communication Duty

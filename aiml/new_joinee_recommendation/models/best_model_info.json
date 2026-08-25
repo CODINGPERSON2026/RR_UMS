@@ -1,0 +1,9 @@
+{
+  "selected_model": "XGBoost",
+  "trained_at": "2026-08-24T22:00:50.902121",
+  "accuracy": 0.7051,
+  "macro_f1": 0.7048,
+  "top_1_accuracy": 0.7051,
+  "top_2_accuracy": 0.9051,
+  "cv_mean_accuracy": 0.7472
+}

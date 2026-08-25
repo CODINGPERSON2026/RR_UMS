@@ -14,6 +14,9 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-7.1.0-web/css/all.min.css') }}" />
 
+  <!-- HRMS Chatbot CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='chatbot/chatbot.css') }}">
+
   <script>
     (function () {
       try {
@@ -1204,7 +1207,8 @@
       </a>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
+
+      <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
       <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"
          data-tiptext="Task Management">
         <span class="nav-icon"><i class="fas fa-tasks"></i></span>
@@ -1607,6 +1611,41 @@
       document.addEventListener('DOMContentLoaded', updateAllPrintWatermarks);
     })();
   </script>
+
+  <!-- HRMS Chatbot Widget -->
+  <div id="hrms-chatbot-widget" class="hrms-chatbot-widget">
+    <button id="hrms-chatbot-toggle" class="hrms-chatbot-toggle" aria-label="Open HRMS Chatbot" title="Ask HRMS Chatbot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+    </button>
+    <div id="hrms-chatbot-panel" class="hrms-chatbot-panel">
+      <div class="hrms-chatbot-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          HRMS Assistant
+        </h3>
+        <button class="hrms-chatbot-close" aria-label="Close">&times;</button>
+      </div>
+      <div id="hrms-chatbot-messages" class="hrms-chatbot-messages"></div>
+      <div class="hrms-chatbot-input-area">
+        <form id="hrms-chatbot-form" class="hrms-chatbot-form">
+          <input id="hrms-chatbot-input" type="text" class="hrms-chatbot-input" placeholder="Ask anything about HRMS..." autocomplete="off" />
+          <button id="hrms-chatbot-send" type="submit" class="hrms-chatbot-send" aria-label="Send message">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- HRMS Chatbot JS -->
+  <script src="{{ url_for('static', filename='chatbot/chatbot.js') }}"></script>
 
   {% block extra_js %}{% endblock %}
 

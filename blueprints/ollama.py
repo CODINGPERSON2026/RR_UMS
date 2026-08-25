@@ -9,35 +9,27 @@ from schema import USERS_SCHEMA, PERSONNEL_SCHEMA, get_schema_for_question, get_
 ollama_bot_bp = Blueprint('bot', __name__, url_prefix='/bot')
 
 
-# -------------------------
-# CONNECT TO DATABASE
-# -------------------------
-_db_start = time.time()
-
-try:
+def _get_db():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-except mysql.connector.Error as err:
-    exit()
-
-# -------------------------
-# LOAD OLLAMA MODEL
-# -------------------------
-_model_start = time.time()
-
-try:
-    llm = OllamaLLM(
-        model="llama3.2:3b",
-        temperature=0,
-        keep_alive=-1,
-        base_url="http://127.0.0.1:11434"
-    )
-except Exception as e:
-    exit()
+    if not conn:
+        return None, None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        return conn, cursor
+    except Exception:
+        return conn, None
 
 
-
-
+def _get_llm():
+    try:
+        return OllamaLLM(
+            model="llama3.2:3b",
+            temperature=0,
+            keep_alive=-1,
+            base_url="http://127.0.0.1:11434"
+        )
+    except Exception:
+        return None
 
 
 # =====================================================
@@ -120,7 +112,7 @@ def extract_name_search(question: str):
 # =====================================================
 # 🔥 DUAL TABLE NAME SEARCH
 # =====================================================
-def search_name_in_both_tables(name: str):
+def search_name_in_both_tables(cursor, name: str):
     """
     Search name/army_number in users first, then personnel.
     Returns (result, source_table, sql_used)
@@ -191,7 +183,6 @@ def chat():
     # -------------------------
     # STEP 1: Extract Question
     # -------------------------
-    _step_start = time.time()
     question = request.json.get("message", "").strip()
 
     if not question:
@@ -200,35 +191,36 @@ def chat():
     # -------------------------
     # STEP 2: Normalize
     # -------------------------
-    _step_start = time.time()
     question = normalize_question(question)
 
     # -------------------------
     # STEP 2.5: Greeting Check
     # -------------------------
-    _step_start = time.time()
     if is_greeting(question):
         return jsonify({"answer": GREETING_RESPONSE})
 
+    conn, cursor = _get_db()
+    if not conn or not cursor:
+        return jsonify({"error": "Database connection unavailable"}), 500
 
-    # -------------------------
-    # STEP 3: Keyword Routing (ALWAYS FIRST)
-    # -------------------------
-    _step_start = time.time()
-    schema_to_use, matched_keyword, matched_table = get_schema_for_question(question)
+    try:
+        # -------------------------
+        # STEP 3: Keyword Routing (ALWAYS FIRST)
+        # -------------------------
+        schema_to_use, matched_keyword, matched_table = get_schema_for_question(question)
 
-    if schema_to_use:
-        # ========================
-        # PATH A: LLM FLOW
-        # ========================
+        if schema_to_use:
+            # ========================
+            # PATH A: LLM FLOW
+            # ========================
+            llm = _get_llm()
+            if not llm:
+                return jsonify({"error": "Ollama LLM service unavailable"}), 500
 
-        # STEP 4: Build Prompt
-        _step_start = time.time()
-        prompt = f"""
+            prompt = f"""
 You are an expert MySQL query generator for HRMS.
 
 STRICT RULES:
-    pass
 1. ONLY generate SELECT queries.
 2. NEVER use DELETE, UPDATE, INSERT, DROP, ALTER.
 3. NEVER select password column.
@@ -241,73 +233,63 @@ STRICT RULES:
 7. CRITICAL: `rank` is a reserved MySQL word — ALWAYS wrap in backticks: `rank`
 
 Database Information:
-    pass
 {schema_to_use}
 
 User Question:
-    pass
 {question}
 
 Return ONLY SQL query:
-    pass
 """
 
-        # STEP 5: LLM Call
-        _step_start = time.time()
-        try:
-            generated_sql = llm.invoke(prompt)
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-
-        # STEP 6: Clean SQL
-        _step_start = time.time()
-        generated_sql = re.sub(r"```sql|```", "", generated_sql).strip()
-        generated_sql = re.sub(r"^SQL:\s*", "", generated_sql, flags=re.IGNORECASE)
-
-        # STEP 7: Safety Checks
-        _step_start = time.time()
-        sql_lower = generated_sql.lower()
-        dangerous = ['delete', 'update', 'insert', 'drop', 'alter', 'create', 'truncate']
-        if any(word in sql_lower for word in dangerous):
-            return jsonify({"error": "Only SELECT allowed"}), 400
-        if not sql_lower.startswith("select"):
-            return jsonify({"error": "Invalid query"}), 400
-
-        # STEP 8: Execute Query
-        _step_start = time.time()
-        try:
-            cursor.execute(generated_sql)
-            result = cursor.fetchall()
-        except mysql.connector.Error as e:
-            return jsonify({"error": str(e)}), 500
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-
-        # STEP 9: Format & Return
-        _step_start = time.time()
-        natural_answer = format_result(result, generated_sql)
-        return jsonify({"answer": natural_answer})
-
-    else:
-        # ========================
-        # PATH B: NAME SEARCH
-        # ========================
-        _step_start = time.time()
-        name = extract_name_search(question)
-
-        if name:
-            _step_start = time.time()
-
             try:
-                result, source_table, generated_sql = search_name_in_both_tables(name)
-
-                natural_answer = format_result(result, generated_sql)
-                return jsonify({"answer": natural_answer})
-
-            except mysql.connector.Error as e:
+                generated_sql = llm.invoke(prompt)
+            except Exception as e:
                 return jsonify({"error": str(e)}), 500
 
-        # ========================
-        # PATH C: NO MATCH AT ALL
-        # ========================
-        return jsonify({"answer": "i could not understand your quetion"}), 400
+            generated_sql = re.sub(r"```sql|```", "", generated_sql).strip()
+            generated_sql = re.sub(r"^SQL:\s*", "", generated_sql, flags=re.IGNORECASE)
+
+            sql_lower = generated_sql.lower()
+            dangerous = ['delete', 'update', 'insert', 'drop', 'alter', 'create', 'truncate']
+            if any(word in sql_lower for word in dangerous):
+                return jsonify({"error": "Only SELECT allowed"}), 400
+            if not sql_lower.startswith("select"):
+                return jsonify({"error": "Invalid query"}), 400
+
+            try:
+                cursor.execute(generated_sql)
+                result = cursor.fetchall()
+            except mysql.connector.Error as e:
+                return jsonify({"error": str(e)}), 500
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+
+            natural_answer = format_result(result, generated_sql)
+            return jsonify({"answer": natural_answer})
+
+        else:
+            # ========================
+            # PATH B: NAME SEARCH
+            # ========================
+            name = extract_name_search(question)
+
+            if name:
+                try:
+                    result, source_table, generated_sql = search_name_in_both_tables(cursor, name)
+
+                    natural_answer = format_result(result, generated_sql)
+                    return jsonify({"answer": natural_answer})
+
+                except mysql.connector.Error as e:
+                    return jsonify({"error": str(e)}), 500
+
+            # ========================
+            # PATH C: NO MATCH AT ALL
+            # ========================
+            return jsonify({"answer": "i could not understand your quetion"}), 400
+
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass

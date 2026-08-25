@@ -1,0 +1,981 @@
+<!-- AI New Joinee Recommendation Insights Modal for CO / Adjutant / 2IC -->
+<div class="modal fade" id="aiJoineeInsightsModal" tabindex="-1" aria-labelledby="aiJoineeInsightsModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 96vw; width: 1460px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden; background: #f8fafc;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header text-white px-4 py-3 border-0" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);">
+        <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center justify-content-center rounded-3 bg-primary text-white shadow-sm" style="width: 44px; height: 44px; font-size: 1.3rem; flex-shrink: 0;">
+            <i class="fas fa-brain text-warning"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold mb-0 text-white" id="aiJoineeInsightsModalLabel" style="letter-spacing: -0.3px;">
+              AI New Joinee Recommendation Insights
+            </h5>
+            <p class="text-white-50 mb-0 small" style="font-size: 0.82rem;">
+              Executive allocation intelligence, SHAP explainability forces, and posting decisions.
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-sm btn-outline-light px-3 py-1.5 fw-semibold" onclick="fetchAiInsights(1)" title="Refresh Data" style="border-radius: 8px;">
+            <i class="fas fa-sync-alt me-1.5" id="insightsRefreshIcon"></i> Refresh
+          </button>
+          <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Filter & Search Toolbar -->
+      <div class="px-4 py-3 bg-white border-bottom shadow-sm">
+        <div class="row g-2 align-items-center">
+          
+          <!-- Search Box -->
+          <div class="col-lg-6 col-md-6 col-12">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+              <input type="text" id="insightsSearchInput" class="form-control border-start-0 ps-0" placeholder="Search Army No / Name / Trade..." oninput="onInsightsSearchInput()" />
+            </div>
+          </div>
+
+          <!-- Company Filter -->
+          <div class="col-lg-3 col-md-3 col-6">
+            <div class="input-group input-group-sm">
+              <label class="input-group-text bg-light text-muted" style="font-size: 0.76rem;"><i class="fas fa-building me-1"></i> Coy</label>
+              <select id="insightsCompanyFilter" class="form-select form-select-sm" onchange="onInsightsFilterChange()">
+                <option value="ALL">All Companies</option>
+                <option value="COMN Company">COMN Company</option>
+                <option value="HQ company">HQ Company</option>
+                <option value="3 Company">3 Company</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Rank Filter -->
+          <div class="col-lg-3 col-md-3 col-6">
+            <div class="input-group input-group-sm">
+              <label class="input-group-text bg-light text-muted" style="font-size: 0.76rem;"><i class="fas fa-medal me-1"></i> Rank</label>
+              <select id="insightsRankFilter" class="form-select form-select-sm" onchange="onInsightsFilterChange()">
+                <option value="ALL">All Ranks</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Modal Body / Table Container -->
+      <div class="modal-body p-0" style="min-height: 480px; max-height: calc(85vh - 180px); overflow-y: auto; overflow-x: auto;">
+        
+        <!-- Loading State -->
+        <div id="insightsLoadingState" class="text-center py-5">
+          <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h6 class="text-dark fw-bold mb-1">Loading AI recommendation insights...</h6>
+          <p class="text-muted small mb-0">Querying single-source-of-truth recommendation database and SHAP weights.</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="insightsEmptyState" class="text-center py-5 d-none">
+          <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light border p-4 mb-3 text-muted">
+            <i class="fas fa-folder-open fa-2x"></i>
+          </div>
+          <h6 class="text-dark fw-bold mb-1">No AI Recommendations Found</h6>
+          <p class="text-muted small mb-3" style="max-width: 440px; margin: 0 auto;">
+            Recommendations will appear here after personnel are evaluated by the AI New Joinee Recommendation system or when filters match records.
+          </p>
+          <button class="btn btn-sm btn-primary px-3" onclick="resetInsightsFilters()">
+            <i class="fas fa-undo me-1"></i> Reset Filters
+          </button>
+        </div>
+
+        <!-- Insights Table (EXACT 11 COLUMNS - BOLD & COLORFUL HEADINGS) -->
+        <div id="insightsTableWrapper" class="table-responsive d-none" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+          <table class="table table-hover align-middle mb-0" style="font-size: 0.82rem; min-width: 1160px; width: 100%;">
+            <thead class="sticky-top shadow-sm" style="z-index: 10; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important; border-bottom: 2.5px solid #a855f7;">
+              <tr style="font-weight: 800 !important; text-transform: uppercase; font-size: 0.77rem; letter-spacing: 0.4px;">
+                <th scope="col" class="py-3 px-2 text-center" style="width: 52px; color: #7e22ce !important; font-weight: 800 !important;">
+                  <i class="fas fa-hashtag me-1" style="color: #a855f7;"></i>S.No
+                </th>
+                <th scope="col" class="py-3 px-2" style="width: 115px; color: #4338ca !important; font-weight: 800 !important;">
+                  <i class="fas fa-id-card me-1.5" style="color: #6366f1;"></i>Army Number
+                </th>
+                <th scope="col" class="py-3 px-2" style="width: 135px; color: #0f172a !important; font-weight: 800 !important;">
+                  <i class="fas fa-user me-1.5" style="color: #64748b;"></i>Name
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 85px; color: #b45309 !important; font-weight: 800 !important;">
+                  <i class="fas fa-medal me-1" style="color: #d97706;"></i>Rank
+                </th>
+                <th scope="col" class="py-3 px-2" style="width: 170px; color: #1d4ed8 !important; font-weight: 800 !important;">
+                  <i class="fas fa-history me-1.5" style="color: #3b82f6;"></i>Previous Unit Served
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 140px; color: #047857 !important; font-weight: 800 !important;">
+                  <i class="fas fa-building me-1.5" style="color: #10b981;"></i>Recommended Company
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 145px; color: #0f766e !important; font-weight: 800 !important;">
+                  <i class="fas fa-shield-alt me-1.5" style="color: #14b8a6;"></i>Confidence Score
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 85px; color: #15803d !important; font-weight: 800 !important;">
+                  <i class="fas fa-percentage me-1" style="color: #22c55e;"></i>Percentage
+                </th>
+                <th scope="col" class="py-3 px-2" style="width: 180px; color: #6b21a8 !important; font-weight: 800 !important;">
+                  <i class="fas fa-check-circle me-1.5" style="color: #9333ea;"></i>Match
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 120px; color: #be123c !important; font-weight: 800 !important;">
+                  <i class="fas fa-comment-dots me-1.5" style="color: #f43f5e;"></i>Remarks
+                </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 78px; color: #0369a1 !important; font-weight: 800 !important;">
+                  <i class="fas fa-eye me-1" style="color: #0ea5e9;"></i>View
+                </th>
+              </tr>
+            </thead>
+            <tbody id="insightsTableBody" class="bg-white">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer & Pagination Controls -->
+      <div class="modal-footer d-flex justify-content-between align-items-center bg-white px-4 py-2.5 border-top">
+        <div class="text-muted small" id="insightsPaginationSummary">
+          Showing 0-0 of 0 recommendations
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <!-- Page Size Selector -->
+          <div class="d-flex align-items-center gap-1.5 me-2">
+            <span class="text-muted small" style="font-size: 0.76rem;">Rows:</span>
+            <select id="insightsPageSizeSelect" class="form-select form-select-sm py-0.5 px-2" style="font-size: 0.76rem; width: 68px;" onchange="onInsightsPageSizeChange()">
+              <option value="15">15</option>
+              <option value="20" selected>20</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+
+          <!-- Pagination Buttons -->
+          <nav aria-label="Insights pagination">
+            <ul class="pagination pagination-sm mb-0" id="insightsPaginationUl">
+              <!-- Rendered dynamically -->
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- SUB-DIALOG: DEEP-DIVE AI ANALYSIS & DECISION MODAL (VIBRANT THEMED) -->
+<!-- ========================================================================= -->
+<div class="modal fade" id="aiInsightDetailModal" tabindex="-1" aria-labelledby="aiInsightDetailModalLabel" aria-hidden="true" style="z-index: 1060;">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden; border: 2px solid #818cf8 !important; box-shadow: 0 25px 60px -10px rgba(67, 56, 202, 0.35) !important;">
+      
+      <!-- Detail Header -->
+      <div class="modal-header text-white px-4 py-3 border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 35%, #4c1d95 70%, #6b21a8 100%) !important; border-bottom: 2.5px solid #a855f7 !important;">
+        <div class="d-flex align-items-center gap-2.5">
+          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 38px; height: 38px; flex-shrink: 0;">
+            <i class="fas fa-brain text-warning"></i>
+          </div>
+          <div>
+            <h6 class="modal-title fw-bold mb-0 text-white" id="aiInsightDetailModalLabel" style="letter-spacing: 0.2px;">AI NEW JOINEE RECOMMENDATION</h6>
+            <span class="text-white-50 small" id="detailModalSubtitle" style="font-size: 0.78rem;">Executive Assignment Intelligence &amp; TreeSHAP Forces</span>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Detail Body (Clean Slate/Lavender Background) -->
+      <div class="modal-body p-4" style="max-height: 75vh; overflow-y: auto; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);">
+        
+        <!-- Section 1: Personnel Overview (Indigo Border Accent) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 bg-white" style="border-left: 5px solid #4f46e5 !important; box-shadow: 0 3px 10px rgba(0,0,0,0.03) !important;">
+          <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2.5">
+              <span class="text-uppercase fw-bold" style="font-size: 0.74rem; letter-spacing: 0.8px; color: #4338ca;">
+                <i class="fas fa-id-card me-1.5"></i> Personnel Identity
+              </span>
+              <span class="badge px-2 py-1 fw-bold" id="detailEvaluatedAt" style="font-size: 0.72rem; background: #ede9fe; color: #6b21a8; border: 1px solid #ddd6fe;">Evaluated: --</span>
+            </div>
+            
+            <div class="row g-2 text-dark" style="font-size: 0.84rem;">
+              <div class="col-sm-3 col-6">
+                <span class="text-muted d-block small">Army Number</span>
+                <strong id="detailArmyNo" class="text-primary fw-bold font-monospace">--</strong>
+              </div>
+              <div class="col-sm-3 col-6">
+                <span class="text-muted d-block small">Soldier Name</span>
+                <strong id="detailName" class="text-dark fw-bold">--</strong>
+              </div>
+              <div class="col-sm-3 col-6">
+                <span class="text-muted d-block small">Rank</span>
+                <strong id="detailRank" class="text-dark fw-bold">--</strong>
+              </div>
+              <div class="col-sm-3 col-6">
+                <span class="text-muted d-block small">Trade</span>
+                <strong id="detailTrade" class="text-success fw-bold">--</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Recommended Company Hero Banner (Vibrant Emerald-Teal-Cyan Gradient) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3" style="background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%) !important; box-shadow: 0 8px 24px rgba(13, 148, 136, 0.28) !important;">
+          <div class="card-body p-3 text-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.8px;">AI RECOMMENDATION</span>
+                <h4 class="fw-bold mb-0 text-white mt-0.5" id="detailRecommendedCoy">--</h4>
+              </div>
+              <div class="text-end">
+                <div class="display-6 fw-bold text-white mb-0" id="detailPercentage">--%</div>
+                <span class="badge bg-white text-success fw-bold px-2 py-0.5 shadow-sm" id="detailConfidenceBadge" style="font-size: 0.72rem;">
+                  --
+                </span>
+              </div>
+            </div>
+
+            <!-- Horizontal Ranked Probability Distribution -->
+            <div class="mt-3 pt-2.5 border-top border-white border-opacity-25" id="detailProbBarsContainer">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 3: Why AI Recommended This (Gold/Amber Accent) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 bg-white" style="border-left: 5px solid #f59e0b !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #b45309;">
+              <i class="fas fa-lightbulb text-warning me-1.5"></i> WHY AI RECOMMENDED THIS
+            </span>
+          </div>
+          <div class="card-body p-3" id="detailReasonsContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 4: Previous Units Served History (Blue Accent) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 bg-white" style="border-left: 5px solid #2563eb !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #1d4ed8;">
+              <i class="fas fa-history text-primary me-1.5"></i> PREVIOUS UNITS SERVED
+            </span>
+            <span class="badge" id="detailUnitsCountBadge" style="background: #dbeafe; color: #1e40af; font-weight: 700;">0 Postings</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-striped mb-0" style="font-size: 0.8rem;">
+                <thead style="background: #eff6ff; color: #1e40af;">
+                  <tr style="font-weight: 700;">
+                    <th class="py-2 px-3 fw-bold">#</th>
+                    <th class="py-2 px-3 fw-bold">Unit Name</th>
+                    <th class="py-2 px-3 fw-bold">From Date</th>
+                    <th class="py-2 px-3 fw-bold">To Date</th>
+                    <th class="py-2 px-3 fw-bold">Duty / Domain Performed</th>
+                  </tr>
+                </thead>
+                <tbody id="detailUnitsTableBody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 5: SHAP Explainability Breakdown (Purple Accent) -->
+        <div class="card border-0 shadow-sm rounded-3 mb-3 bg-white" style="border-left: 5px solid #9333ea !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #7e22ce;">
+              <i class="fas fa-layer-group text-purple me-1.5" style="color: #9333ea;"></i> SHAP EXPLAINABILITY
+            </span>
+            <span class="badge px-2 py-0.5 fw-bold" style="font-size: 0.68rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff;">TreeSHAP Feature Forces</span>
+          </div>
+          <div class="card-body p-3 d-flex flex-column gap-2.5" id="detailShapContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Section 6: Officer Decision Oversight (CO / 2IC / Adjutant - Indigo Card) -->
+        <div class="card shadow-sm rounded-3 bg-white" style="border: 1.5px solid #818cf8 !important; box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12) !important;">
+          <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #3730a3;">
+              <i class="fas fa-user-check me-1.5 text-primary"></i> FINAL POSTING DECISION &amp; REMARKS
+            </span>
+            <span class="badge bg-primary" id="detailDecisionTypeBadge">AI Recommended</span>
+          </div>
+          <div class="card-body p-3">
+            <input type="hidden" id="detailRecId" value="" />
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-muted small fw-semibold mb-1">Final Assigned Company</label>
+                <select id="detailFinalCompanySelect" class="form-select form-select-sm" onchange="onDetailCompanySelectChange()">
+                  <option value="COMN Company">COMN Company</option>
+                  <option value="HQ company">HQ Company</option>
+                  <option value="3 Company">3 Company</option>
+                </select>
+                <div class="form-text small" style="font-size: 0.72rem;">
+                  Original AI recommendation (<strong id="detailOriginalRecNotice">--</strong>) is permanently preserved.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-muted small fw-semibold mb-1">Decision Status</label>
+                <select id="detailDecisionTypeSelect" class="form-select form-select-sm">
+                  <option value="AI Recommended">AI Recommended</option>
+                  <option value="Manual">Manual</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label text-muted small fw-semibold mb-1">Decision Remarks / Justification</label>
+                <textarea id="detailDecisionRemarks" class="form-control form-control-sm" rows="2" placeholder="Enter remarks regarding this posting decision..."></textarea>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-3 pt-2.5 border-top">
+              <div class="text-muted small" style="font-size: 0.75rem;" id="detailDecidedInfo">
+                Default AI Recommendation.
+              </div>
+              <button type="button" class="btn btn-sm px-3.5 py-1.5 fw-bold text-white shadow-sm" id="btnSaveDetailDecision" onclick="saveInsightDecision()" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); border: none; border-radius: 6px;">
+                <i class="fas fa-save me-1.5"></i> Save Decision
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Detail Footer -->
+      <div class="modal-footer bg-white py-2.5 px-3 border-top d-flex justify-content-end">
+        <button type="button" class="btn btn-sm btn-detail-close px-3.5 py-1.5 fw-bold shadow-sm" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Styling for Detail Modal Close Button & Hover Visibility */
+  .btn-detail-close {
+    background-color: #334155 !important;
+    color: #ffffff !important;
+    border: 1px solid #334155 !important;
+    border-radius: 6px;
+    font-weight: 700 !important;
+    transition: all 0.18s ease-in-out;
+  }
+  .btn-detail-close:hover, .btn-detail-close:focus, .btn-detail-close:active {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+    border-color: #0f172a !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25) !important;
+  }
+
+  /* Styling for Insights Table & Badges */
+  #insightsTableWrapper {
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    max-height: calc(85vh - 190px);
+    scrollbar-width: thin;
+    scrollbar-color: #8b5cf6 #f1f5f9;
+  }
+
+  /* Custom Left-Right Scrollbar */
+  #insightsTableWrapper::-webkit-scrollbar {
+    height: 10px;
+    width: 8px;
+  }
+  #insightsTableWrapper::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  #insightsTableWrapper::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+  }
+  #insightsTableWrapper::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #7c3aed 0%, #4f46e5 100%);
+  }
+
+  #insightsTableWrapper table th {
+    font-weight: 800 !important;
+    font-size: 0.77rem;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  #aiInsightDetailModal table th {
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    font-size: 0.8rem;
+  }
+  #insightsTableWrapper table tbody tr:hover {
+    background-color: #f1f5f9 !important;
+  }
+  .match-badge-chip {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background-color: #f8fafc;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .match-more-btn, .match-less-btn {
+    transition: all 0.15s ease;
+  }
+  .match-more-btn:hover, .match-less-btn:hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+  }
+</style>
+
+<script>
+  // =========================================================================
+  // AI NEW JOINEE RECOMMENDATION INSIGHTS CLIENT JAVASCRIPT
+  // =========================================================================
+
+  let currentInsightsPage = 1;
+  let currentInsightsPageSize = 20;
+  let insightsSearchTimeout = null;
+
+  function openAiInsightsModal() {
+    const modalEl = document.getElementById('aiJoineeInsightsModal');
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+      fetchAiInsights(1);
+    }
+  }
+
+  function highlightMatch(text, query) {
+    if (!text) return text || '';
+    if (!query || !query.trim()) return text;
+    const q = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${q})`, 'gi');
+    return String(text).replace(regex, '<mark style="background-color: #fef08a; color: #713f12; font-weight: 700; padding: 1px 3px; border-radius: 3px;">$1</mark>');
+  }
+
+  function toggleMatchBadges(rowId) {
+    const moreBtn = document.getElementById(`matchMoreBtn_${rowId}`);
+    const hiddenSpan = document.getElementById(`matchHidden_${rowId}`);
+    if (moreBtn && hiddenSpan) {
+      if (hiddenSpan.classList.contains('d-none')) {
+        hiddenSpan.classList.remove('d-none');
+        moreBtn.classList.add('d-none');
+      } else {
+        hiddenSpan.classList.add('d-none');
+        moreBtn.classList.remove('d-none');
+      }
+    }
+  }
+
+  async function fetchAiInsights(page = 1) {
+    currentInsightsPage = page;
+    const searchVal = document.getElementById('insightsSearchInput')?.value?.trim() || '';
+    const coyVal = document.getElementById('insightsCompanyFilter')?.value || 'ALL';
+    const rankVal = document.getElementById('insightsRankFilter')?.value || 'ALL';
+
+    const loadingState = document.getElementById('insightsLoadingState');
+    const emptyState = document.getElementById('insightsEmptyState');
+    const tableWrap = document.getElementById('insightsTableWrapper');
+    const refreshIcon = document.getElementById('insightsRefreshIcon');
+
+    if (loadingState) loadingState.classList.remove('d-none');
+    if (emptyState) emptyState.classList.add('d-none');
+    if (tableWrap) tableWrap.classList.add('d-none');
+    if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+    try {
+      const params = new URLSearchParams({
+        page: page,
+        page_size: currentInsightsPageSize,
+        search: searchVal,
+        company: coyVal,
+        rank: rankVal,
+        decision: 'ALL',
+        sort_by: 'percentage',
+        sort_order: 'desc'
+      });
+
+      const res = await fetch(`/api/ai/company-recommendation/insights?${params.toString()}`);
+      if (res.status === 401) {
+        alert('Authentication required. Please log in again.');
+        window.location.href = '/admin_login';
+        return;
+      }
+      if (res.status === 403) {
+        alert('Access Denied: Only CO, Adjutant, and 2IC roles can view AI Recommendation Insights.');
+        const modalEl = document.getElementById('aiJoineeInsightsModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+          bootstrap.Modal.getInstance(modalEl)?.hide();
+        }
+        return;
+      }
+
+      const json = await res.json();
+      if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+      if (loadingState) loadingState.classList.add('d-none');
+
+      if (json.success && json.data && json.data.length > 0) {
+        renderInsightsTable(json.data, searchVal);
+        renderInsightsPagination(json.page, json.total_pages, json.total_count, json.page_size);
+        updateInsightsRankFilterOptions(json.available_ranks, rankVal);
+
+        if (tableWrap) tableWrap.classList.remove('d-none');
+      } else {
+        if (emptyState) emptyState.classList.remove('d-none');
+      }
+    } catch (err) {
+      console.error('Error fetching AI recommendation insights:', err);
+      if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+      if (loadingState) loadingState.classList.add('d-none');
+      alert('Unable to load AI recommendation insights. Please try again.');
+    }
+  }
+
+  function renderInsightsTable(rows, searchQuery = '') {
+    const tbody = document.getElementById('insightsTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    rows.forEach(r => {
+      // 1. S.No
+      const sNo = r.s_no || '--';
+
+      // 2. Army Number (with search match yellow highlighting)
+      const armyNo = r.army_number || 'N/A';
+      const armyNoHighlighted = highlightMatch(armyNo, searchQuery);
+
+      // 3. Name (with search match yellow highlighting)
+      const name = r.name || 'N/A';
+      const nameHighlighted = highlightMatch(name, searchQuery);
+
+      // 4. Rank (with search match yellow highlighting)
+      const rank = r.rank || 'N/A';
+      const rankHighlighted = highlightMatch(rank, searchQuery);
+
+      // 5. Previous Unit Served (with search match yellow highlighting)
+      const prevUnits = r.previous_units_formatted || 'No Previous Unit';
+      const prevUnitsHighlighted = highlightMatch(prevUnits, searchQuery);
+
+      // 6. Recommended Company
+      const recCompany = r.recommended_company || 'N/A';
+      let coyBadgeClass = 'bg-success text-white';
+      if (recCompany.includes('HQ') || recCompany === 'HQ Coy') coyBadgeClass = 'bg-primary text-white';
+      else if (recCompany.includes('3') || recCompany === '3 Coy') coyBadgeClass = 'bg-secondary text-white';
+      const recCompanyHighlighted = highlightMatch(recCompany, searchQuery);
+
+      // 7. Confidence Score
+      const confScore = r.confidence_score || 'Not Available';
+      let confBadgeClass = 'bg-success-subtle text-success border border-success-subtle';
+      if (confScore.includes('Moderate')) confBadgeClass = 'bg-info-subtle text-info border border-info-subtle';
+      else if (confScore.includes('Low')) confBadgeClass = 'bg-warning-subtle text-warning border border-warning-subtle';
+
+      // 8. Percentage (Safe float formatting, prevent double conversion)
+      let pctVal = r.recommendation_percentage;
+      if (typeof pctVal === 'number') {
+        if (pctVal > 0 && pctVal <= 1) pctVal = (pctVal * 100).toFixed(2);
+        else pctVal = pctVal.toFixed(2);
+      } else if (typeof pctVal === 'string') {
+        pctVal = pctVal.replace('%', '').trim();
+        let num = parseFloat(pctVal);
+        if (!isNaN(num)) {
+          if (num > 0 && num <= 1) pctVal = (num * 100).toFixed(2);
+          else pctVal = num.toFixed(2);
+        }
+      }
+      const pctDisplay = pctVal ? `${pctVal}%` : 'Not Available';
+
+      // 9. Match Column (Compact badges + Clickable Expand/Collapse)
+      const badges = r.match_badges || ['Trade Match', 'Service Profile', 'Cohort Balance', 'Comparison'];
+      const rowId = r.id;
+      let matchHtml = '';
+      if (badges.length <= 2) {
+        matchHtml = badges.map(b => `<span class="match-badge-chip">${b}</span>`).join(' ');
+      } else {
+        const visibleBadges = badges.slice(0, 2).map(b => `<span class="match-badge-chip">${b}</span>`).join(' ');
+        const hiddenBadges = badges.slice(2).map(b => `<span class="match-badge-chip">${b}</span>`).join(' ');
+        const extraCount = badges.length - 2;
+        matchHtml = `
+          <div class="d-flex flex-wrap align-items-center gap-1" id="matchContainer_${rowId}">
+            ${visibleBadges}
+            <span class="badge bg-light text-primary border match-more-btn" id="matchMoreBtn_${rowId}" onclick="toggleMatchBadges(${rowId})" title="Click to show all ${badges.length} match factors" style="cursor: pointer; font-size: 0.72rem; padding: 2px 6px;">
+              +${extraCount} more <i class="fas fa-chevron-down ms-0.5" style="font-size: 0.65rem;"></i>
+            </span>
+            <span class="d-none" id="matchHidden_${rowId}">
+              ${hiddenBadges}
+              <span class="badge bg-light text-muted border match-less-btn ms-1" onclick="toggleMatchBadges(${rowId})" title="Click to collapse" style="cursor: pointer; font-size: 0.72rem; padding: 2px 6px;">
+                Show less <i class="fas fa-chevron-up ms-0.5" style="font-size: 0.65rem;"></i>
+              </span>
+            </span>
+          </div>
+        `;
+      }
+
+      // 10. Remarks (Final decision status: AI Recommended vs Manual)
+      const remarks = r.remarks || (r.decision_type === 'Manual' ? 'Manual' : 'AI Recommended');
+      let remarksBadge = `<span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="fas fa-check me-1"></i>AI Recommended</span>`;
+      if (remarks === 'Manual' || r.decision_type === 'Manual') {
+        remarksBadge = `<span class="badge bg-warning-subtle text-dark border border-warning-subtle px-2 py-1"><i class="fas fa-pen-alt me-1 text-warning"></i>Manual</span>`;
+      }
+
+      // 11. View Action Button (Passes exact row ID)
+      const viewBtn = `
+        <button type="button" class="btn btn-sm btn-outline-primary fw-semibold px-2.5 py-1" onclick="openInsightDetail(${r.id})" title="View complete AI analysis for ${name}">
+          <i class="fas fa-eye me-1"></i> View
+        </button>
+      `;
+
+      tbody.innerHTML += `
+        <tr>
+          <td class="text-center fw-semibold text-muted">${sNo}</td>
+          <td class="fw-bold font-monospace text-primary">${armyNoHighlighted}</td>
+          <td class="fw-semibold text-dark text-truncate" style="max-width: 130px;" title="${name}">${nameHighlighted}</td>
+          <td class="text-center"><span class="badge bg-light text-dark border">${rankHighlighted}</span></td>
+          <td class="text-truncate" style="max-width: 160px;" title="${prevUnits}">
+            <span class="text-muted"><i class="fas fa-map-marker-alt me-1 text-secondary"></i>${prevUnitsHighlighted}</span>
+          </td>
+          <td class="text-center">
+            <span class="badge ${coyBadgeClass} px-2.5 py-1 fw-bold shadow-sm" style="font-size: 0.76rem;">
+              ${recCompanyHighlighted}
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="badge ${confBadgeClass} px-2 py-1" style="font-size: 0.72rem;">
+              ${confScore}
+            </span>
+          </td>
+          <td class="text-center">
+            <strong class="text-success" style="font-size: 0.88rem;">${pctDisplay}</strong>
+          </td>
+          <td>
+            <div class="d-flex flex-wrap align-items-center">
+              ${matchHtml}
+            </div>
+          </td>
+          <td class="text-center">${remarksBadge}</td>
+          <td class="text-center">${viewBtn}</td>
+        </tr>
+      `;
+    });
+  }
+
+  function renderInsightsPagination(currentPage, totalPages, totalCount, pageSize) {
+    const ul = document.getElementById('insightsPaginationUl');
+    const summary = document.getElementById('insightsPaginationSummary');
+    if (!ul) return;
+
+    ul.innerHTML = '';
+    const startIdx = Math.min((currentPage - 1) * pageSize + 1, totalCount);
+    const endIdx = Math.min(currentPage * pageSize, totalCount);
+    if (summary) summary.textContent = `Showing ${startIdx}-${endIdx} of ${totalCount} recommendations`;
+
+    if (totalPages <= 1) return;
+
+    // Prev
+    ul.innerHTML += `
+      <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="fetchAiInsights(${currentPage - 1})">Prev</a>
+      </li>
+    `;
+
+    // Max 5 visible page numbers
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, startPage + 4);
+    if (endPage - startPage < 4) {
+      startPage = Math.max(1, endPage - 4);
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+      ul.innerHTML += `
+        <li class="page-item ${p === currentPage ? 'active' : ''}">
+          <a class="page-link" href="javascript:void(0)" onclick="fetchAiInsights(${p})">${p}</a>
+        </li>
+      `;
+    }
+
+    // Next
+    ul.innerHTML += `
+      <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+        <a class="page-link" href="javascript:void(0)" onclick="fetchAiInsights(${currentPage + 1})">Next</a>
+      </li>
+    `;
+  }
+
+  function updateInsightsRankFilterOptions(ranks, currentRank) {
+    const select = document.getElementById('insightsRankFilter');
+    if (!select || !ranks) return;
+
+    const existingVal = currentRank || select.value;
+    select.innerHTML = '<option value="ALL">All Ranks</option>';
+    ranks.forEach(rk => {
+      select.innerHTML += `<option value="${rk}" ${rk === existingVal ? 'selected' : ''}>${rk}</option>`;
+    });
+  }
+
+  function onInsightsFilterChange() {
+    fetchAiInsights(1);
+  }
+
+  function onInsightsPageSizeChange() {
+    const sel = document.getElementById('insightsPageSizeSelect');
+    if (sel) {
+      currentInsightsPageSize = parseInt(sel.value, 10) || 20;
+      fetchAiInsights(1);
+    }
+  }
+
+  function onInsightsSearchInput() {
+    clearTimeout(insightsSearchTimeout);
+    insightsSearchTimeout = setTimeout(() => {
+      fetchAiInsights(1);
+    }, 300);
+  }
+
+  function resetInsightsFilters() {
+    if (document.getElementById('insightsSearchInput')) document.getElementById('insightsSearchInput').value = '';
+    if (document.getElementById('insightsCompanyFilter')) document.getElementById('insightsCompanyFilter').value = 'ALL';
+    if (document.getElementById('insightsRankFilter')) document.getElementById('insightsRankFilter').value = 'ALL';
+    fetchAiInsights(1);
+  }
+
+  // ================= DEEP DIVE MODAL & DECISION OVERRIDE =================
+
+  async function openInsightDetail(recId) {
+    const modalEl = document.getElementById('aiInsightDetailModal');
+    if (!modalEl || typeof bootstrap === 'undefined') return;
+
+    try {
+      const res = await fetch(`/api/ai/company-recommendation/insights/${recId}`);
+      const json = await res.json();
+      if (!json.success || !json.data) {
+        alert(json.error || 'Failed to load recommendation analysis.');
+        return;
+      }
+
+      const d = json.data;
+
+      // 1. Populate identity (Section 14: Army Number, Name, Rank, Trade)
+      document.getElementById('detailRecId').value = d.id;
+      document.getElementById('detailArmyNo').textContent = d.army_number || 'N/A';
+      document.getElementById('detailName').textContent = d.name || 'N/A';
+      document.getElementById('detailRank').textContent = d.rank || 'N/A';
+      document.getElementById('detailTrade').textContent = d.trade || 'N/A';
+      document.getElementById('detailEvaluatedAt').textContent = `Evaluated: ${d.created_at || 'Recently'}`;
+
+      // 2. Populate AI Recommendation Hero Banner (Section 14: Recommended Company, Confidence, Probability)
+      document.getElementById('detailRecommendedCoy').textContent = d.recommended_company;
+      document.getElementById('detailPercentage').textContent = `${d.recommendation_percentage}%`;
+      document.getElementById('detailConfidenceBadge').textContent = `${d.confidence_score}`;
+      document.getElementById('detailOriginalRecNotice').textContent = d.recommended_company;
+
+      // Populate ranked probability bars
+      const probContainer = document.getElementById('detailProbBarsContainer');
+      probContainer.innerHTML = '';
+      if (d.ranked_probabilities && d.ranked_probabilities.length > 0) {
+        d.ranked_probabilities.forEach((rp, idx) => {
+          let barCol = idx === 0 ? 'bg-white' : 'bg-white bg-opacity-50';
+          probContainer.innerHTML += `
+            <div class="mb-1.5">
+              <div class="d-flex justify-content-between align-items-center text-white small mb-0.5" style="font-size: 0.76rem;">
+                <span class="fw-semibold">#${idx + 1} ${rp.company}</span>
+                <span class="fw-bold">${rp.percentage}%</span>
+              </div>
+              <div class="progress bg-black bg-opacity-25" style="height: 5px; border-radius: 3px;">
+                <div class="progress-bar ${barCol}" role="progressbar" style="width: ${rp.percentage}%;"></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // 3. Populate WHY AI RECOMMENDED THIS (Section 14: Trade Match, Service Profile, Cohort Balance, Comparison)
+      const reasonsContainer = document.getElementById('detailReasonsContainer');
+      reasonsContainer.innerHTML = '';
+      if (d.match_reasons && d.match_reasons.length > 0) {
+        d.match_reasons.forEach(r => {
+          let badge = typeof r === 'object' ? (r.badge || r.type || 'Match') : 'Match';
+          let title = typeof r === 'object' ? (r.title || r.type || 'Match Factor') : 'Match Factor';
+          let text = typeof r === 'object' ? (r.text || JSON.stringify(r)) : r;
+
+          reasonsContainer.innerHTML += `
+            <div class="mb-2.5 p-3 rounded bg-light border-start border-4 border-success">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-success text-white px-2 py-0.5" style="font-size: 0.72rem;">${badge}</span>
+                <strong class="text-dark" style="font-size: 0.84rem;">${title}</strong>
+              </div>
+              <div class="text-dark small" style="font-size: 0.82rem; line-height: 1.45;">${text}</div>
+            </div>
+          `;
+        });
+      } else {
+        reasonsContainer.innerHTML = '<p class="text-muted small mb-0">Standard profile matching algorithm aligned with battalion requirements.</p>';
+      }
+
+      // 4. Populate PREVIOUS UNITS SERVED (Section 14: Complete history or fallback)
+      const unitsTbody = document.getElementById('detailUnitsTableBody');
+      const unitsBadge = document.getElementById('detailUnitsCountBadge');
+      unitsTbody.innerHTML = '';
+      const units = d.previous_units || [];
+      if (unitsBadge) unitsBadge.textContent = `${units.length} Posting(s)`;
+
+      if (units.length > 0) {
+        units.forEach((u, uIdx) => {
+          unitsTbody.innerHTML += `
+            <tr>
+              <td class="text-muted px-3">${uIdx + 1}</td>
+              <td class="fw-bold text-dark px-3">${u.unit || 'N/A'}</td>
+              <td class="px-3 text-muted">${u.from_date || '--'}</td>
+              <td class="px-3 text-muted">${u.to_date || '--'}</td>
+              <td class="px-3"><span class="badge bg-light text-dark border">${u.duty_performed || 'GENERAL'}</span></td>
+            </tr>
+          `;
+        });
+      } else {
+        unitsTbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center text-muted py-3">
+              <i class="fas fa-info-circle me-1"></i> No Previous Unit (Fresh Joinee Profile)
+            </td>
+          </tr>
+        `;
+      }
+
+      // 5. Populate SHAP EXPLAINABILITY (Section 14: Force values)
+      const shapContainer = document.getElementById('detailShapContainer');
+      shapContainer.innerHTML = '';
+      if (d.shap_breakdown && d.shap_breakdown.length > 0) {
+        d.shap_breakdown.forEach(sb => {
+          let icon = 'fas fa-tools text-primary';
+          let barColor = 'bg-primary';
+          if (sb.category === 'trade') { icon = 'fas fa-tools text-success'; barColor = 'bg-success'; }
+          else if (sb.category === 'service') { icon = 'fas fa-history text-primary'; barColor = 'bg-primary'; }
+          else if (sb.category === 'rank') { icon = 'fas fa-medal text-warning'; barColor = 'bg-warning'; }
+          else if (sb.category === 'station') { icon = 'fas fa-map-marker-alt text-secondary'; barColor = 'bg-secondary'; }
+
+          shapContainer.innerHTML += `
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+                <span class="fw-semibold text-dark"><i class="${icon} me-1.5"></i>${sb.feature}</span>
+                <span class="badge bg-light text-dark border px-2 py-0.5 fw-bold" style="font-size: 0.7rem;">${sb.force}</span>
+              </div>
+              <div class="progress" style="height: 5px; border-radius: 3px;">
+                <div class="progress-bar ${barColor}" role="progressbar" style="width: ${sb.val || 25}%;"></div>
+              </div>
+            </div>
+          `;
+        });
+      }
+
+      // 6. Populate Decision Oversight controls
+      const finalCoySelect = document.getElementById('detailFinalCompanySelect');
+      const decTypeSelect = document.getElementById('detailDecisionTypeSelect');
+      const decRemarks = document.getElementById('detailDecisionRemarks');
+      const decBadge = document.getElementById('detailDecisionTypeBadge');
+      const decInfo = document.getElementById('detailDecidedInfo');
+
+      if (finalCoySelect) finalCoySelect.value = d.final_company || d.recommended_company;
+      if (decTypeSelect) decTypeSelect.value = d.decision_type || 'AI Recommended';
+      if (decRemarks) decRemarks.value = d.decision_remarks || '';
+
+      if (decBadge) {
+        decBadge.textContent = d.decision_type || 'AI Recommended';
+        decBadge.className = d.decision_type === 'Manual' ? 'badge bg-warning text-dark' : 'badge bg-primary';
+      }
+
+      if (decInfo) {
+        if (d.decided_by && d.decided_at) {
+          decInfo.innerHTML = `<i class="fas fa-user-shield me-1"></i> Decided by <strong>${d.decided_by}</strong> on ${d.decided_at}`;
+        } else {
+          decInfo.innerHTML = `<i class="fas fa-info-circle me-1"></i> Default AI Recommendation`;
+        }
+      }
+
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    } catch (err) {
+      console.error('Error opening insight detail modal:', err);
+      alert('Failed to load recommendation details.');
+    }
+  }
+
+  function onDetailCompanySelectChange() {
+    const finalCoySelect = document.getElementById('detailFinalCompanySelect');
+    const decTypeSelect = document.getElementById('detailDecisionTypeSelect');
+    const origNotice = document.getElementById('detailOriginalRecNotice')?.textContent?.trim();
+
+    if (finalCoySelect && decTypeSelect && origNotice) {
+      if (finalCoySelect.value !== origNotice) {
+        decTypeSelect.value = 'Manual';
+      } else {
+        decTypeSelect.value = 'AI Recommended';
+      }
+    }
+  }
+
+  async function saveInsightDecision() {
+    const recId = document.getElementById('detailRecId')?.value;
+    const finalCoy = document.getElementById('detailFinalCompanySelect')?.value;
+    const decisionType = document.getElementById('detailDecisionTypeSelect')?.value;
+    const decisionRemarks = document.getElementById('detailDecisionRemarks')?.value?.trim();
+    const btn = document.getElementById('btnSaveDetailDecision');
+
+    if (!recId || !finalCoy) {
+      alert('Missing recommendation identifier.');
+      return;
+    }
+
+    const origBtnHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Saving...';
+
+    try {
+      const res = await fetch('/api/ai/company-recommendation/decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: parseInt(recId, 10),
+          final_company: finalCoy,
+          decision_type: decisionType,
+          decision_remarks: decisionRemarks
+        })
+      });
+
+      const json = await res.json();
+      btn.disabled = false;
+      btn.innerHTML = origBtnHtml;
+
+      if (json.success) {
+        alert('Posting decision successfully recorded.');
+        const modalEl = document.getElementById('aiInsightDetailModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+          bootstrap.Modal.getInstance(modalEl)?.hide();
+        }
+        // Refresh insights table
+        fetchAiInsights(currentInsightsPage);
+      } else {
+        alert(json.error || 'Failed to save posting decision.');
+      }
+    } catch (err) {
+      console.error('Error saving insight decision:', err);
+      btn.disabled = false;
+      btn.innerHTML = origBtnHtml;
+      alert('Failed to connect to server to save decision.');
+    }
+  }
+</script>
