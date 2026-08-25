@@ -1364,6 +1364,13 @@ STATUS COLORS
       </button>
       {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+      <button class="ab-btn ab-primary" onclick="openAiInsightsModal()" id="btnAiJoineeRecommendation" style="background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; border: none; font-weight: 700;">
+        <i class="fas fa-brain me-1" style="font-size: 13px;"></i>
+        AI NEW JOINEE RECOMMENDATION
+      </button>
+      {% endif %}
+
       <div class="ab-spacer"></div>
 
       <div class="schedule-actionbar-container" onclick="new bootstrap.Modal(document.getElementById('scheduleModal')).show()" style="cursor:pointer">
@@ -1447,6 +1454,14 @@ STATUS COLORS
         <span class="sc-label">Sensitive Indl</span>
         <div class="sc-right">
           <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+      <div class="sc" style="cursor: pointer" onclick="openAiInsightsModal()" id="card-ai-insights" title="AI New Joinee Company Recommendation Insights">
+        <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+        <div class="sc-right">
+          <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
@@ -1864,6 +1879,10 @@ STATUS COLORS
       safeSet("onleave_leave", data.agniveer_on_leave);
       safeSet("dues_in_count", data.dues_in);
       safeSet("dues_out_count", data.dues_out);
+      fetch('/api/ai/company-recommendation/insights-count')
+        .then(r => r.json())
+        .then(d => { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
+        .catch(() => {});
       await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents()]);
       hidePageLoader();
       showActionBar();
@@ -2511,5 +2530,7 @@ STATUS COLORS
     });
   });
 </script>
+
+{% include 'modals/ai_joinee_insights_modal.html' %}
 
 {% endblock %}

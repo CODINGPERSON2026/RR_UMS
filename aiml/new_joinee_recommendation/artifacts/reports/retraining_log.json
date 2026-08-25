@@ -22,5 +22,19 @@
     "macro_f1": 0.4346,
     "top_1_accuracy": 0.5263,
     "top_2_accuracy": 0.7895
+  },
+  {
+    "training_time": "2026-08-24T22:00:50.907716",
+    "record_count": 1475,
+    "database_records": 475,
+    "synthetic_csv_records": 1000,
+    "new_records_since_previous_training": 1001,
+    "random_forest_accuracy": 0.6881,
+    "xgboost_accuracy": 0.7051,
+    "selected_model": "XGBoost",
+    "selected_accuracy": 0.7051,
+    "macro_f1": 0.7048,
+    "top_1_accuracy": 0.7051,
+    "top_2_accuracy": 0.9051
   }
 ]

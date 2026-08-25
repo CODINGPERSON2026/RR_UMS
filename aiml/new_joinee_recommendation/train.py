@@ -16,6 +16,7 @@ from .config import (
     XGB_MODEL_DIR,
     METRICS_DIR,
     REPORTS_DIR,
+    MODELS_DIR,
     BEST_MODEL_FILE,
     BEST_MODEL_INFO_FILE,
     MODEL_METADATA_FILE,
@@ -28,6 +29,14 @@ from .evaluate import evaluate_model, run_cross_validation
 from .utils import get_logger, CustomJSONEncoder
 
 logger = get_logger("train")
+
+def ensure_directories():
+    """Ensures all artifact and model directories exist."""
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    RF_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    XGB_MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    METRICS_DIR.mkdir(parents=True, exist_ok=True)
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_feature_importances(model: Any, feature_names: list, top_n: int = 15) -> Dict[str, float]:
     """Extracts normalized feature importance dictionary."""
@@ -43,19 +52,22 @@ def get_feature_importances(model: Any, feature_names: list, top_n: int = 15) ->
 
 def train_pipeline() -> Dict[str, Any]:
     """
-    Executes the complete end-to-end training, evaluation, comparison, and artifact saving pipeline.
+    Executes the complete end-to-end training, evaluation, comparison, and artifact saving pipeline
+    on combined database and CSV dataset records.
     """
     logger.info("=" * 60)
     logger.info("STARTING AI NEW JOINEE COMPANY RECOMMENDATION TRAINING PIPELINE")
     logger.info("=" * 60)
     
     start_time = datetime.now()
+    ensure_directories()
 
-    # 1. Load raw data
+    # 1. Load combined raw data (DB + CSV Datasets)
     personnel_df, units_df = load_raw_data()
     
     # 2. Data profiling
     profile = profile_dataset(personnel_df, units_df)
+    logger.info(f"Dataset Profile: Total={profile.get('total_eligible')} (DB={profile.get('database_records')}, CSV={profile.get('synthetic_csv_records')})")
     
     # 3. Build feature dataset
     X, y = build_dataset(personnel_df, units_df)
@@ -99,8 +111,8 @@ def train_pipeline() -> Dict[str, Any]:
     # 7. Train & Evaluate Model 1: Random Forest
     logger.info("Training Model 1: RandomForestClassifier...")
     rf_model = RandomForestClassifier(
-        n_estimators=150,
-        max_depth=10,
+        n_estimators=200,
+        max_depth=12,
         min_samples_split=4,
         min_samples_leaf=2,
         class_weight="balanced_subsample",
@@ -119,9 +131,9 @@ def train_pipeline() -> Dict[str, Any]:
     # 8. Train & Evaluate Model 2: XGBoost
     logger.info("Training Model 2: XGBClassifier...")
     xgb_model = XGBClassifier(
-        n_estimators=150,
-        max_depth=5,
-        learning_rate=0.08,
+        n_estimators=200,
+        max_depth=6,
+        learning_rate=0.06,
         subsample=0.85,
         colsample_bytree=0.85,
         objective="multi:softprob",
@@ -141,7 +153,7 @@ def train_pipeline() -> Dict[str, Any]:
 
     # 9. Model Selection based on validation/test metrics
     logger.info("Comparing Random Forest vs XGBoost...")
-    # Selection criteria: Test Accuracy -> Macro F1 -> Top-2 Accuracy -> CV Mean Accuracy
+    # Selection criteria: Test Accuracy -> Macro F1 -> CV Mean Accuracy
     rf_score = (rf_metrics["accuracy"] * 0.40) + (rf_metrics["macro_f1"] * 0.35) + (rf_metrics["cv_mean_accuracy"] * 0.25)
     xgb_score = (xgb_metrics["accuracy"] * 0.40) + (xgb_metrics["macro_f1"] * 0.35) + (xgb_metrics["cv_mean_accuracy"] * 0.25)
 
@@ -179,6 +191,8 @@ def train_pipeline() -> Dict[str, Any]:
             "total_records": total_records,
             "train_records": len(X_train),
             "test_records": len(X_test),
+            "database_records": profile.get("database_records", 0),
+            "synthetic_csv_records": profile.get("synthetic_csv_records", 0),
             "feature_count": len(feature_names),
             "class_distribution_before_smote": before_dist,
             "class_distribution_after_smote": after_dist
@@ -206,6 +220,8 @@ def train_pipeline() -> Dict[str, Any]:
     log_entry = {
         "training_time": datetime.now().isoformat(),
         "record_count": total_records,
+        "database_records": profile.get("database_records", 0),
+        "synthetic_csv_records": profile.get("synthetic_csv_records", 0),
         "new_records_since_previous_training": delta_records,
         "random_forest_accuracy": rf_metrics["accuracy"],
         "xgboost_accuracy": xgb_metrics["accuracy"],
@@ -221,9 +237,11 @@ def train_pipeline() -> Dict[str, Any]:
 
     # Full Model Metadata
     metadata = {
-        "version": "1.0.0",
+        "version": "2.0.0",
         "last_trained_at": datetime.now().isoformat(),
         "total_eligible_records": total_records,
+        "database_records": profile.get("database_records", 0),
+        "synthetic_csv_records": profile.get("synthetic_csv_records", 0),
         "selected_model": selected_model_name,
         "canonical_classes": class_names,
         "feature_count": len(feature_names),
@@ -246,3 +264,4 @@ def train_pipeline() -> Dict[str, Any]:
 
 if __name__ == "__main__":
     train_pipeline()
+

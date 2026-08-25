@@ -37,19 +37,50 @@ class CustomJSONEncoder(json.JSONEncoder):
             return obj.tolist()
         return super().default(obj)
 
-def parse_date_safe(val):
-    """Safely parse various date formats or return None."""
+def parse_date_safe(val, allow_future: bool = False, max_future_cutoff: date = None) -> date:
+    """
+    Safely parse various date formats or return None.
+    If allow_future is False, dates after today (or max_future_cutoff) are clamped/ignored safely.
+    """
     if val is None or pd_is_na(val):
         return None
-    if isinstance(val, (datetime, date)):
-        return val
-    try:
-        return datetime.strptime(str(val).strip(), "%Y-%m-%d").date()
-    except Exception:
-        try:
-            return datetime.fromisoformat(str(val).strip()).date()
-        except Exception:
-            return None
+    
+    parsed = None
+    if isinstance(val, datetime):
+        parsed = val.date()
+    elif isinstance(val, date):
+        parsed = val
+    else:
+        s = str(val).strip()
+        # Try multiple formats
+        for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%Y/%m/%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S"):
+            try:
+                parsed = datetime.strptime(s, fmt).date()
+                break
+            except Exception:
+                pass
+        if parsed is None:
+            try:
+                parsed = datetime.fromisoformat(s).date()
+            except Exception:
+                parsed = None
+
+    if parsed is not None and not allow_future:
+        cutoff = max_future_cutoff or date.today()
+        if parsed > cutoff:
+            # Clamping future dates to cutoff to prevent negative service years or invalid model calculations
+            parsed = cutoff
+
+    return parsed
+
+def sanitize_text(val, default: str = "UNKNOWN") -> str:
+    """Sanitizes text inputs, stripping whitespace and standardizing empty/null."""
+    if val is None or pd_is_na(val):
+        return default
+    s = str(val).strip()
+    if s.upper() in ["", "NONE", "NAN", "NULL", "NAT", "UNDEFINED", "UNKNOWN"]:
+        return default
+    return s
 
 def pd_is_na(val) -> bool:
     """Helper to detect NA/None/Empty string."""
@@ -62,3 +93,4 @@ def pd_is_na(val) -> bool:
         return pd.isna(val)
     except Exception:
         return False
+

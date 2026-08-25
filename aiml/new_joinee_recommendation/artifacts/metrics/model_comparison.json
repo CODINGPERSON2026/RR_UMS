@@ -1,49 +1,51 @@
 {
-  "timestamp": "2026-08-20T14:06:14.182804",
-  "selected_model": "Random Forest",
+  "timestamp": "2026-08-24T22:00:50.902740",
+  "selected_model": "XGBoost",
   "dataset_summary": {
-    "total_records": 474,
-    "train_records": 379,
-    "test_records": 95,
-    "feature_count": 450,
+    "total_records": 1475,
+    "train_records": 1180,
+    "test_records": 295,
+    "database_records": 475,
+    "synthetic_csv_records": 1000,
+    "feature_count": 549,
     "class_distribution_before_smote": {
-      "3 Coy": 71,
-      "Comn Coy": 138,
-      "HQ Coy": 170
+      "3 Coy": 351,
+      "Comn Coy": 378,
+      "HQ Coy": 451
     },
     "class_distribution_after_smote": {
-      "3 Coy": 170,
-      "Comn Coy": 170,
-      "HQ Coy": 170
+      "3 Coy": 451,
+      "Comn Coy": 451,
+      "HQ Coy": 451
     }
   },
   "models": {
     "Random Forest": {
       "model_name": "Random Forest",
-      "accuracy": 0.5263,
-      "precision": 0.4475,
-      "recall": 0.445,
-      "f1": 0.4346,
-      "macro_f1": 0.4346,
-      "weighted_f1": 0.5005,
-      "top_1_accuracy": 0.5263,
-      "top_2_accuracy": 0.7895,
-      "roc_auc": 0.6737,
+      "accuracy": 0.6881,
+      "precision": 0.6922,
+      "recall": 0.687,
+      "f1": 0.6854,
+      "macro_f1": 0.6854,
+      "weighted_f1": 0.6862,
+      "top_1_accuracy": 0.6881,
+      "top_2_accuracy": 0.8441,
+      "roc_auc": 0.8528,
       "confusion_matrix": [
         [
-          2,
-          4,
-          12
+          66,
+          7,
+          15
         ],
         [
-          5,
           17,
-          13
+          55,
+          23
         ],
         [
-          2,
-          9,
-          31
+          17,
+          13,
+          82
         ]
       ],
       "class_names": [
@@ -53,72 +55,72 @@
       ],
       "per_class": {
         "3 Coy": {
-          "precision": 0.2222222222222222,
-          "recall": 0.1111111111111111,
-          "f1": 0.14814814814814814,
-          "support": 18
+          "precision": 0.66,
+          "recall": 0.75,
+          "f1": 0.7021276595744681,
+          "support": 88
         },
         "Comn Coy": {
-          "precision": 0.5666666666666667,
-          "recall": 0.4857142857142857,
-          "f1": 0.5230769230769231,
-          "support": 35
+          "precision": 0.7333333333333333,
+          "recall": 0.5789473684210527,
+          "f1": 0.6470588235294118,
+          "support": 95
         },
         "HQ Coy": {
-          "precision": 0.5535714285714286,
-          "recall": 0.7380952380952381,
-          "f1": 0.6326530612244898,
-          "support": 42
+          "precision": 0.6833333333333333,
+          "recall": 0.7321428571428571,
+          "f1": 0.7068965517241379,
+          "support": 112
         }
       },
-      "cv_mean_accuracy": 0.6196,
-      "cv_std_accuracy": 0.0722,
-      "cv_mean_f1": 0.6184,
-      "cv_std_f1": 0.0757,
+      "cv_mean_accuracy": 0.7257,
+      "cv_std_accuracy": 0.038,
+      "cv_mean_f1": 0.7259,
+      "cv_std_f1": 0.0382,
       "feature_importance": {
-        "cat__trade_TTC": 0.07076705152243525,
-        "num__age_years": 0.05442734792936223,
-        "num__service_years": 0.045842265748059045,
-        "cat__trade_DMV": 0.039815336112023945,
-        "num__avg_posting_duration_days": 0.03527041569589568,
-        "num__total_service_duration_days": 0.03198699388451742,
-        "num__duty_count": 0.029032420854934043,
-        "cat__rank_NK": 0.01943797692882721,
-        "cat__previous_unit_2_4 CSR": 0.01827909835066883,
-        "num__previous_unit_count": 0.01774530800873825,
-        "cat__previous_unit_3_WCSR": 0.01740460369684922,
-        "cat__trade_TTC -LL": 0.017161313004106872,
-        "cat__rank_L HAV": 0.017100446209861345,
-        "cat__most_recent_duty_NO_DUTY": 0.016099568108617127,
-        "cat__prior_station_NO": 0.015455371285565024
+        "cat__trade_GENERAL DUTY": 0.13000527373250295,
+        "cat__trade_CLERK": 0.04852294386052953,
+        "cat__trade_TECHNICAL": 0.03896697649039191,
+        "cat__trade_ELECTRICIAN": 0.036855769023132486,
+        "cat__trade_SIGNAL COMMUNICATION": 0.03585950970261331,
+        "cat__previous_unit_2_TEST EME UNIT B": 0.027967066709099077,
+        "cat__trade_STORE KEEPER TECHNICAL": 0.02631421553118634,
+        "cat__trade_GUNNER": 0.026100450855230807,
+        "cat__trade_DRIVER": 0.02412598181032862,
+        "num__avg_posting_duration_days": 0.02129331913710125,
+        "num__age_years": 0.019313665328481788,
+        "cat__trade_TTC": 0.018316301970165847,
+        "num__service_years": 0.016641137845050714,
+        "cat__previous_unit_1_TEST EME UNIT A": 0.01659692817458324,
+        "num__total_service_duration_days": 0.016334732881020185
       }
     },
     "XGBoost": {
       "model_name": "XGBoost",
-      "accuracy": 0.4737,
-      "precision": 0.4063,
-      "recall": 0.4101,
-      "f1": 0.4077,
-      "macro_f1": 0.4077,
-      "weighted_f1": 0.4715,
-      "top_1_accuracy": 0.4737,
-      "top_2_accuracy": 0.7684,
-      "roc_auc": 0.593,
+      "accuracy": 0.7051,
+      "precision": 0.706,
+      "recall": 0.704,
+      "f1": 0.7048,
+      "macro_f1": 0.7048,
+      "weighted_f1": 0.7047,
+      "top_1_accuracy": 0.7051,
+      "top_2_accuracy": 0.9051,
+      "roc_auc": 0.8823,
       "confusion_matrix": [
         [
-          2,
-          6,
+          66,
+          12,
           10
         ],
         [
-          8,
-          20,
-          7
+          12,
+          59,
+          24
         ],
         [
-          7,
-          12,
-          23
+          8,
+          21,
+          83
         ]
       ],
       "class_names": [
@@ -128,44 +130,44 @@
       ],
       "per_class": {
         "3 Coy": {
-          "precision": 0.11764705882352941,
-          "recall": 0.1111111111111111,
-          "f1": 0.11428571428571428,
-          "support": 18
+          "precision": 0.7674418604651163,
+          "recall": 0.75,
+          "f1": 0.7586206896551724,
+          "support": 88
         },
         "Comn Coy": {
-          "precision": 0.5263157894736842,
-          "recall": 0.5714285714285714,
-          "f1": 0.547945205479452,
-          "support": 35
+          "precision": 0.6413043478260869,
+          "recall": 0.6210526315789474,
+          "f1": 0.6310160427807486,
+          "support": 95
         },
         "HQ Coy": {
-          "precision": 0.575,
-          "recall": 0.5476190476190477,
-          "f1": 0.5609756097560976,
-          "support": 42
+          "precision": 0.7094017094017094,
+          "recall": 0.7410714285714286,
+          "f1": 0.7248908296943232,
+          "support": 112
         }
       },
-      "cv_mean_accuracy": 0.6824,
-      "cv_std_accuracy": 0.0437,
-      "cv_mean_f1": 0.6821,
-      "cv_std_f1": 0.0443,
+      "cv_mean_accuracy": 0.7472,
+      "cv_std_accuracy": 0.018,
+      "cv_mean_f1": 0.7473,
+      "cv_std_f1": 0.0172,
       "feature_importance": {
-        "cat__trade_TTC": 0.02770427241921425,
-        "cat__trade_TTC -LL": 0.02703038603067398,
-        "cat__previous_unit_1_1CSR": 0.026467500254511833,
-        "cat__previous_unit_1_4 AFSR": 0.025980269536376,
-        "cat__most_frequent_duty_DUTY DVR MTNCO": 0.025619614869356155,
-        "cat__previous_unit_1_ESG NSG": 0.022779669612646103,
-        "cat__previous_unit_3_WCSR": 0.02246810495853424,
-        "cat__most_recent_duty_DUTY EFS": 0.0221597570925951,
-        "cat__previous_unit_2_2 MDSR": 0.021296793594956398,
-        "cat__previous_unit_2_16 RSR": 0.020465724170207977,
-        "cat__previous_unit_1_31ADSR": 0.020111266523599625,
-        "cat__most_recent_duty_EXCHANGE": 0.019902588799595833,
-        "cat__trade_DMV": 0.018851405009627342,
-        "cat__most_recent_duty_NO_DUTY": 0.01684599556028843,
-        "cat__previous_unit_2_4 CSR": 0.016242876648902893
+        "cat__trade_GENERAL DUTY": 0.04426467418670654,
+        "cat__previous_unit_1_TEST HQ UNIT": 0.03747579827904701,
+        "cat__previous_unit_1_TEST SIGNAL UNIT A": 0.030164580792188644,
+        "cat__previous_unit_1_TEST ARTILLERY UNIT B": 0.028320301324129105,
+        "cat__most_frequent_duty_DUTY EFS": 0.027342142537236214,
+        "cat__trade_STORE KEEPER TECHNICAL": 0.027081161737442017,
+        "cat__previous_unit_2_TEST SIGNAL UNIT A": 0.02699793502688408,
+        "cat__most_recent_duty_NO_DUTY": 0.026340199634432793,
+        "cat__trade_CLERK": 0.025492200627923012,
+        "cat__previous_unit_1_TEST ARTILLERY UNIT A": 0.023715725168585777,
+        "cat__trade_DRIVER": 0.023198291659355164,
+        "cat__trade_GUNNER": 0.023119870573282242,
+        "cat__previous_unit_2_TEST ARTILLERY UNIT A": 0.021619409322738647,
+        "cat__trade_ELECTRICIAN": 0.018398836255073547,
+        "cat__most_frequent_unit_TEST ORDNANCE UNIT": 0.017341943457722664
       }
     }
   }

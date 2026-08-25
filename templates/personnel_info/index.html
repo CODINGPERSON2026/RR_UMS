@@ -3554,6 +3554,46 @@
     color: #ffffff !important;
     border-bottom: none !important;
   }
+  .ai-tab-btn {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .ai-tab-btn.btn-light {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  .ai-tab-btn.btn-outline-light {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  }
+  .ai-tab-btn.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+  }
+  .ai-tab-badge {
+    display: inline-block;
+    padding: 0.12rem 0.5rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border-radius: 999px;
+    line-height: 1.2;
+    transition: all 0.2s ease;
+  }
+  .ai-tab-btn.btn-light .ai-tab-badge {
+    background: #0f172a !important;
+    color: #ffffff !important;
+  }
+  .ai-tab-btn.btn-outline-light .ai-tab-badge {
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: #ffffff !important;
+  }
   .ai-modal-icon {
     width: 44px;
     height: 44px;
@@ -3566,6 +3606,7 @@
     font-size: 1.35rem;
     backdrop-filter: blur(8px);
   }
+
   .ai-card-box {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -3674,7 +3715,75 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
+
+  /* Duty / Domain Dropdown Menu Styles */
+  .ai-duty-dropdown-panel {
+    min-width: 260px;
+    max-width: 320px;
+    max-height: 250px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 14px 35px -4px rgba(0, 0, 0, 0.3), 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 999999 !important;
+  }
+  .ai-duty-dropdown-panel.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #aiUnitsContainer {
+    min-height: 120px;
+    overflow: visible !important;
+  }
+  #aiUnitsContainer .table-responsive {
+    overflow: visible !important;
+  }
+  #aiUnitsTable, #aiUnitsTable tbody, #aiUnitsTable tr, #aiUnitsTable td {
+    overflow: visible !important;
+  }
+  #aiUnitsTable td {
+    position: relative;
+  }
+
+
+
+
+  #aiTrade, #aiRankOtherInput, #aiPriorStation, .ai-u-name, .ai-duty-other-input {
+    text-transform: uppercase;
+  }
+
+
+
+  .ai-cb-option {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.45rem;
+    font-size: 0.78rem;
+    color: #334155;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 2px;
+    user-select: none;
+    transition: background 0.12s;
+  }
+  .ai-cb-option:hover {
+    background: #f1f5f9;
+  }
+  .ai-cb-option input[type="checkbox"] {
+    cursor: pointer;
+  }
+  /* Bold Table Headings */
+  #aiRecModal table thead th, #aiUnitsTable thead th, .table thead th {
+    font-weight: 700 !important;
+    color: #1e293b !important;
+  }
 </style>
+
+
 
 <div class="modal fade" id="aiRecModal" tabindex="-1" aria-labelledby="aiRecModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 780px;">
@@ -3700,17 +3809,18 @@
 
         <!-- Tab switcher -->
         <div class="d-flex align-items-center gap-2 mt-3 pt-2 border-top border-white border-opacity-10 w-100 overflow-auto">
-          <button type="button" class="btn btn-sm btn-light py-1 px-3 fw-bold" id="tabBtnLive" onclick="switchAiModalTab('live')">
+          <button type="button" class="btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn" id="tabBtnLive" onclick="switchAiModalTab('live')">
             <i class="fas fa-magic me-1 text-success"></i> Live Recommendation
           </button>
-          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold" id="tabBtnHistory" onclick="switchAiModalTab('history')">
-            <i class="fas fa-history me-1 text-warning"></i> History (<span id="historyBadgeCount">0</span>)
+          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn" id="tabBtnHistory" onclick="switchAiModalTab('history')">
+            <i class="fas fa-history me-1 text-warning"></i> History <span class="ai-tab-badge" id="historyBadgeCount">0</span>
           </button>
-          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold" id="tabBtnRetrain" onclick="switchAiModalTab('retrain')">
-            <i class="fas fa-sync-alt me-1 text-info"></i> Retraining Monitor (<span id="retrainBadgeCount">...</span>)
+          <button type="button" class="btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn" id="tabBtnRetrain" onclick="switchAiModalTab('retrain')">
+            <i class="fas fa-sync-alt me-1 text-info"></i> Retraining Monitor <span class="ai-tab-badge" id="retrainBadgeCount">...</span>
           </button>
         </div>
       </div>
+
 
       <!-- Modal Body -->
       <div class="modal-body p-3" style="background: #f8fafc;">
@@ -3728,11 +3838,11 @@
             <div class="row g-2 mb-2">
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Trade Specialty<span class="text-danger">*</span></label>
-                <input type="text" id="aiTrade" class="form-control form-control-sm" placeholder="e.g. TECH, TTC, LMN" />
+                <input type="text" id="aiTrade" class="form-control form-control-sm" placeholder="e.g. TECH, TTC, LMN" oninput="this.value = this.value.toUpperCase();" />
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Rank<span class="text-danger">*</span></label>
-                <select id="aiRank" class="form-select form-select-sm">
+                <select id="aiRank" class="form-select form-select-sm" onchange="onAiRankSelectChange(this)">
                   <option value="">Select Rank</option>
                   <option value="Officer">Officer</option>
                   <option value="Subedar Major">Subedar Major</option>
@@ -3746,25 +3856,38 @@
                   <option value="L NK">L NK</option>
                   <option value="Signal Man">Signal Man</option>
                   <option value="Agniveer">Agniveer</option>
+                  <option value="Other">Other</option>
                 </select>
+
+                <div id="aiRankOtherWrap" class="mt-1" style="display: none;">
+                  <input type="text" id="aiRankOtherInput" class="form-control form-control-sm" placeholder="Specify custom rank..." oninput="this.value = this.value.toUpperCase();" />
+                </div>
               </div>
             </div>
+
 
             <div class="row g-2 mb-3">
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Date of Enrollment</label>
-                <input type="date" id="aiDateOfEnrollment" class="form-control form-control-sm" />
+                <div class="input-group input-group-sm">
+                  <input type="text" id="aiDateOfEnrollment" class="form-control form-control-sm ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); checkEnrollmentYearForFreshJoinee();" />
+                  <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                    <i class="far fa-calendar-alt text-success"></i>
+                    <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
+                  </button>
+                </div>
               </div>
+
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Prior Station</label>
-                <input type="text" id="aiPriorStation" class="form-control form-control-sm" placeholder="e.g. Jammu And Kashmir, Pune" />
+                <input type="text" id="aiPriorStation" class="form-control form-control-sm" placeholder="e.g. Jammu And Kashmir, Pune" oninput="this.value = this.value.toUpperCase();" />
               </div>
             </div>
 
             <!-- Units Served Sub-section -->
             <div class="border-top pt-2">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold text-dark" style="font-size: 0.84rem;">
+                <span class="fw-bold text-dark" id="aiUnitsHistoryTitle" style="font-size: 0.84rem;">
                   <i class="fas fa-history text-secondary me-1"></i> Previous Units Served History
                 </span>
                 <div class="form-check form-check-inline m-0">
@@ -3779,31 +3902,81 @@
                 <div class="table-responsive">
                   <table class="table table-sm table-bordered align-middle mb-2" style="font-size: 0.8rem; background: #fff;" id="aiUnitsTable">
                     <thead class="table-light">
-                      <tr>
-                        <th>Unit Name</th>
-                        <th>From Date</th>
-                        <th>To Date</th>
-                        <th>Duty / Domain</th>
+                      <tr class="fw-bold" style="font-weight: 700; color: #1e293b;">
+                        <th class="fw-bold" style="min-width: 130px; font-weight: 700 !important;">Unit Name</th>
+                        <th class="fw-bold" style="min-width: 140px; font-weight: 700 !important;">From Date</th>
+                        <th class="fw-bold" style="min-width: 140px; font-weight: 700 !important;">To Date</th>
+                        <th class="fw-bold" style="min-width: 200px; font-weight: 700 !important;">Duty / Domain (Select Options)</th>
                         <th style="width: 36px;"></th>
                       </tr>
                     </thead>
                     <tbody id="aiUnitsTableBody">
                       <tr>
-                        <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" /></td>
-                        <td><input type="date" class="form-control form-control-sm ai-u-from" /></td>
-                        <td><input type="date" class="form-control form-control-sm ai-u-to" /></td>
+                        <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
                         <td>
-                          <select class="form-select form-select-sm ai-u-duty">
-                            <option value="NFS">NFS</option>
+                          <div class="input-group input-group-sm">
+                            <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
+                            <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                              <i class="far fa-calendar-alt text-success"></i>
+                              <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="input-group input-group-sm">
+                            <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
+                            <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                              <i class="far fa-calendar-alt text-success"></i>
+                              <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
+                            </button>
+                          </div>
+                        </td>
+                        <td>
+                          <select class="form-select form-select-sm ai-u-duty" onchange="onAiDutySelectChange(this)">
+                            <option value="GENERAL" selected>GENERAL</option>
+                            <option value="TM">TM</option>
+                            <option value="MULTI MEDIA">MULTI MEDIA</option>
+                            <option value="CODING">CODING</option>
+                            <option value="ACCOUNT">ACCOUNT</option>
                             <option value="PROJECTS">PROJECTS</option>
+                            <option value="SYSTEM">SYSTEM</option>
+                            <option value="IT">IT</option>
+                            <option value="EXCHANGE">EXCHANGE</option>
+                            <option value="NFS">NFS</option>
+                            <option value="RR">RR</option>
+                            <option value="ICN AND BTS">ICN AND BTS</option>
+                            <option value="PA">PA</option>
+                            <option value="RP">RP</option>
+                            <option value="RUNNER">RUNNER</option>
+                            <option value="BUDDY">BUDDY</option>
+                            <option value="CLK">CLK</option>
+                            <option value="ONCO">ONCO</option>
+                            <option value="DUTY EFS">DUTY EFS</option>
+                            <option value="LINE MAN CQ">LINE MAN CQ</option>
+                            <option value="RT JCO">RT JCO</option>
+                            <option value="ORH">ORH</option>
+                            <option value="MESS CDR">MESS CDR</option>
+                            <option value="TRG CLK">TRG CLK</option>
+                            <option value="CHM">CHM</option>
+                            <option value="RHM">RHM</option>
+                            <option value="STOREMAN">STOREMAN</option>
+                            <option value="NODE">NODE</option>
+                            <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
                             <option value="OPERATIONS">OPERATIONS</option>
                             <option value="COMMUNICATION">COMMUNICATION</option>
                             <option value="MAINTENANCE">MAINTENANCE</option>
                             <option value="SECURITY">SECURITY</option>
                             <option value="ADMINISTRATION">ADMINISTRATION</option>
-                            <option value="GENERAL">GENERAL</option>
+                            <option value="TECHNICAL">TECHNICAL</option>
+                            <option value="Other">Other</option>
                           </select>
+                          <div class="ai-duty-other-wrap mt-1" style="display: none;">
+                            <input type="text" class="form-control form-control-sm ai-duty-other-input" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
+                          </div>
                         </td>
+
+
+
                         <td class="text-center">
                           <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
                             <i class="fas fa-times"></i>
@@ -3814,11 +3987,15 @@
                   </table>
                 </div>
 
+
                 <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5" style="font-size: 0.76rem; border-radius: 6px;" onclick="addAiUnitRow()">
                   <i class="fas fa-plus me-1"></i> Add Another Unit
                 </button>
               </div>
             </div>
+
+
+
 
             <!-- Calculate Action Button (Vibrant Green) -->
             <div class="mt-3">
@@ -4035,17 +4212,191 @@
   let currentReasonDialogData = {};
   const HISTORY_STORAGE_KEY = 'ums_ai_recommendations_history_v1';
 
+  function getTodayDateString() {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  // ================= EASY DATE INPUT HELPERS =================
+  function normalizeDateToIso(str) {
+    if (!str) return '';
+    str = str.trim();
+    const dmyMatch = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      const day = dmyMatch[1].padStart(2, '0');
+      const month = dmyMatch[2].padStart(2, '0');
+      const year = dmyMatch[3];
+      return `${year}-${month}-${day}`;
+    }
+    const ymdMatch = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (ymdMatch) {
+      const year = ymdMatch[1];
+      const month = ymdMatch[2].padStart(2, '0');
+      const day = ymdMatch[3].padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+    return str;
+  }
+
+  function isoToDmy(isoStr) {
+    if (!isoStr) return '';
+    const parts = isoStr.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+    return isoStr;
+  }
+
+  function formatEasyDateInput(input) {
+    let val = input.value.replace(/[^\d]/g, '');
+    if (val.length > 8) val = val.substring(0, 8);
+    if (val.length >= 5) {
+      input.value = `${val.substring(0, 2)}-${val.substring(2, 4)}-${val.substring(4)}`;
+    } else if (val.length >= 3) {
+      input.value = `${val.substring(0, 2)}-${val.substring(2)}`;
+    } else {
+      input.value = val;
+    }
+  }
+
+  function openEasyCalendar(btn) {
+    const hiddenDate = btn.querySelector('.ai-native-date-hidden') || btn.parentElement.querySelector('.ai-native-date-hidden');
+    if (hiddenDate) {
+      const textInput = btn.closest('.input-group')?.querySelector('.ai-date-easy');
+      if (textInput && textInput.value) {
+        hiddenDate.value = normalizeDateToIso(textInput.value);
+      }
+      hiddenDate.max = getTodayDateString();
+      if (typeof hiddenDate.showPicker === 'function') {
+        hiddenDate.showPicker();
+      } else {
+        hiddenDate.click();
+      }
+    }
+  }
+
+  function onNativeDatePicked(nativeInput) {
+    if (!nativeInput.value) return;
+    const parent = nativeInput.closest('.input-group') || nativeInput.parentElement;
+    const textInput = parent.querySelector('.ai-date-easy');
+    if (textInput) {
+      textInput.value = isoToDmy(nativeInput.value);
+      textInput.dispatchEvent(new Event('input'));
+    }
+  }
+
+  function checkEnrollmentYearForFreshJoinee() {
+    const enrollVal = document.getElementById('aiDateOfEnrollment')?.value?.trim();
+    const isoDate = normalizeDateToIso(enrollVal);
+    const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
+    if (!isoDate || !freshCheck) return;
+
+    const parts = isoDate.split('-');
+    if (parts.length === 3 && parts[0].length === 4) {
+      const enrollYear = parseInt(parts[0], 10);
+      const currentYear = new Date().getFullYear();
+      if (enrollYear === currentYear) {
+        freshCheck.checked = true;
+        toggleAiFreshJoinee(true);
+      }
+    }
+  }
+
   function openAiRecommendationModal() {
-    // 1. Pre-fill from current main form if available
+    // 1. Reset state
+    lastAiRecommendationResult = null;
+    clearAiDisplay();
+
+    // Pre-fill from main form if available
     const mainTrade = document.getElementById('trade')?.value || '';
     const mainRank = document.getElementById('rank')?.value || '';
     const mainEnroll = document.getElementById('dateOfEnrollment')?.value || '';
     const mainStation = document.getElementById('priorStation')?.value || '';
 
-    if (mainTrade) document.getElementById('aiTrade').value = mainTrade;
-    if (mainRank) document.getElementById('aiRank').value = mainRank;
-    if (mainEnroll) document.getElementById('aiDateOfEnrollment').value = mainEnroll;
-    if (mainStation) document.getElementById('aiPriorStation').value = mainStation;
+    if (mainTrade) document.getElementById('aiTrade').value = mainTrade.toUpperCase();
+    if (mainEnroll) document.getElementById('aiDateOfEnrollment').value = isoToDmy(mainEnroll);
+    if (mainStation) document.getElementById('aiPriorStation').value = mainStation.toUpperCase();
+
+    // Set Rank dropdown from main form
+    const rankSelect = document.getElementById('aiRank');
+    const otherRankWrap = document.getElementById('aiRankOtherWrap');
+    const otherRankInput = document.getElementById('aiRankOtherInput');
+    if (rankSelect) {
+      rankSelect.value = mainRank;
+      if (mainRank && !rankSelect.value) {
+        rankSelect.value = 'Other';
+        if (otherRankWrap) otherRankWrap.style.display = 'block';
+        if (otherRankInput) otherRankInput.value = mainRank.toUpperCase();
+      } else {
+        if (otherRankWrap) otherRankWrap.style.display = rankSelect.value === 'Other' ? 'block' : 'none';
+        if (otherRankInput && rankSelect.value !== 'Other') otherRankInput.value = '';
+      }
+    }
+
+    // Pre-fill Units from main form if present
+    const mainUnitsTable = document.getElementById('unitsTable');
+    const aiTbody = document.getElementById('aiUnitsTableBody');
+    const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
+
+    if (mainUnitsTable && aiTbody) {
+      const mainRows = mainUnitsTable.querySelectorAll('tbody tr');
+      const validMainUnits = [];
+      mainRows.forEach(r => {
+        const u = r.querySelector('input[name="unit[]"]')?.value?.trim();
+        const f = r.querySelector('input[name="unitFrom[]"]')?.value;
+        const t = r.querySelector('input[name="unitTo[]"]')?.value;
+        const d = r.querySelector('select[name="unitDuty[]"]')?.value;
+        if (u || f || t) {
+          validMainUnits.push({ unit: u || '', from: f || '', to: t || '', duty: d ? [d] : ['GENERAL'] });
+        }
+      });
+
+      aiTbody.innerHTML = '';
+      if (validMainUnits.length > 0) {
+        validMainUnits.forEach(vu => {
+          const dutyVal = Array.isArray(vu.duty) ? (vu.duty[0] || 'GENERAL') : (vu.duty || 'GENERAL');
+          addAiUnitRow(dutyVal);
+          const lastRow = aiTbody.lastElementChild;
+          if (lastRow) {
+            const nameEl = lastRow.querySelector('.ai-u-name');
+            const fromEl = lastRow.querySelector('.ai-u-from');
+            const toEl = lastRow.querySelector('.ai-u-to');
+            const dutySel = lastRow.querySelector('.ai-u-duty');
+            const otherWrap = lastRow.querySelector('.ai-duty-other-wrap');
+            const otherInput = lastRow.querySelector('.ai-duty-other-input');
+
+            if (nameEl) nameEl.value = (vu.unit || '').toUpperCase();
+            if (fromEl) fromEl.value = isoToDmy(vu.from);
+            if (toEl) toEl.value = isoToDmy(vu.to);
+
+            if (dutySel) {
+              dutySel.value = dutyVal;
+              if (dutyVal && !dutySel.value) {
+                dutySel.value = 'Other';
+                if (otherWrap) otherWrap.style.display = 'block';
+                if (otherInput) otherInput.value = dutyVal.toUpperCase();
+              } else if (dutySel.value === 'Other') {
+                if (otherWrap) otherWrap.style.display = 'block';
+              }
+            }
+          }
+        });
+
+        if (freshCheck) {
+          freshCheck.checked = false;
+          toggleAiFreshJoinee(false);
+        }
+      } else {
+        addAiUnitRow('GENERAL');
+      }
+
+    }
+
+    // Automatically check fresh joinee if enrollment date is current year
+    checkEnrollmentYearForFreshJoinee();
 
     // 2. Default to Live Tab & refresh stats
     switchAiModalTab('live');
@@ -4053,6 +4404,7 @@
     fetchRetrainStatus();
 
     const modalEl = document.getElementById('aiRecModal');
+
     if (modalEl && typeof bootstrap !== 'undefined') {
       const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
       modal.show();
@@ -4073,28 +4425,29 @@
       historyContent.style.display = 'none';
       retrainContent.style.display = 'none';
 
-      btnLive.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
-      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
-      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnLive.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
+      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
     } else if (tabKey === 'history') {
       liveContent.style.display = 'none';
       historyContent.style.display = 'block';
       retrainContent.style.display = 'none';
 
-      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
-      btnHistory.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
-      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
+      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+      btnHistory.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
+      btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
       renderRecommendationHistory();
     } else if (tabKey === 'retrain') {
       liveContent.style.display = 'none';
       historyContent.style.display = 'none';
       retrainContent.style.display = 'block';
 
-      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
-      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold';
-      btnRetrain.className = 'btn btn-sm btn-light py-1 px-3 fw-bold';
+      btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+      btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+      btnRetrain.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
       fetchRetrainStatus();
     }
+
   }
 
   // ================= PERSISTENT HISTORY STORAGE LOGIC =================
@@ -4156,8 +4509,13 @@
       return;
     }
 
+    window.aiHistoryCache = {};
     container.innerHTML = '';
     history.forEach(item => {
+      const itemId = item.id || ('hist_' + Math.random().toString(36).substr(2, 9));
+      item.id = itemId;
+      window.aiHistoryCache[itemId] = item;
+
       let coyDisplay = item.recommended_company;
       if (coyDisplay === 'Comn Coy') coyDisplay = 'COMN Company';
       else if (coyDisplay === 'HQ Coy') coyDisplay = 'HQ company';
@@ -4197,7 +4555,7 @@
             <span class="text-muted">
               ${item.units && item.units.length > 0 ? `Postings: ${item.units.length} unit(s)` : 'Fresh Joinee Profile'}
             </span>
-            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 fw-semibold" style="font-size: 0.76rem; border-radius: 6px;" onclick='reapplyHistoricalItem(${JSON.stringify(item)})'>
+            <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 fw-semibold" style="font-size: 0.76rem; border-radius: 6px;" onclick="reapplyHistoricalItemById('${itemId}')">
               <i class="fas fa-reply me-1"></i> Re-apply to Form
             </button>
           </div>
@@ -4206,9 +4564,19 @@
     });
   }
 
+  function reapplyHistoricalItemById(itemId) {
+    const item = window.aiHistoryCache ? window.aiHistoryCache[itemId] : null;
+    if (item) {
+      lastAiRecommendationResult = item;
+      applyAiRecommendationToForm();
+    }
+  }
+
   function reapplyHistoricalItem(item) {
-    lastAiRecommendationResult = item;
-    applyAiRecommendationToForm();
+    if (item) {
+      lastAiRecommendationResult = item;
+      applyAiRecommendationToForm();
+    }
   }
 
   // ================= RETRAINING MONITOR INTEGRATION =================
@@ -4282,10 +4650,31 @@
       const baseEl = document.getElementById('retrainLastBaseline');
       if (baseEl) baseEl.textContent = baseline;
 
+      function formatReadableDateTime(isoString) {
+        if (!isoString) return 'Checked on load';
+
+        try {
+          const d = new Date(isoString);
+          if (isNaN(d.getTime())) return isoString;
+          return d.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }) + ' at ' + d.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+          });
+        } catch (e) {
+          return isoString;
+        }
+      }
+
       const dateEl = document.getElementById('retrainLastTrainedDate');
       if (dateEl && data.last_trained_at) {
-        dateEl.textContent = `Last trained: ${data.last_trained_at}`;
+        dateEl.textContent = `Last trained: ${formatReadableDateTime(data.last_trained_at)}`;
       }
+
     } catch (e) {
       console.error('Error fetching retrain status:', e);
     }
@@ -4317,33 +4706,121 @@
     }
   }
 
-  // ================= CALCULATION & FIELD SYNC =================
-  function toggleAiFreshJoinee(isFresh) {
-    const container = document.getElementById('aiUnitsContainer');
-    if (container) {
-      container.style.opacity = isFresh ? '0.4' : '1';
-      container.style.pointerEvents = isFresh ? 'none' : 'auto';
+  const AI_DOMAINS_LIST = [
+    "GENERAL", "TM", "MULTI MEDIA", "CODING", "ACCOUNT", "PROJECTS", "SYSTEM",
+    "IT", "EXCHANGE", "NFS", "RR", "ICN AND BTS", "PA", "RP", "RUNNER", "BUDDY",
+    "CLK", "ONCO", "DUTY EFS", "LINE MAN CQ", "RT JCO", "ORH", "MESS CDR",
+    "TRG CLK", "CHM", "RHM", "STOREMAN", "NODE", "DUTY DVR MTNCO",
+    "OPERATIONS", "COMMUNICATION", "MAINTENANCE", "SECURITY", "ADMINISTRATION", "TECHNICAL"
+  ];
+
+  const AI_DOMAINS_OPTIONS = [
+    "GENERAL", "TM", "MULTI MEDIA", "CODING", "ACCOUNT", "PROJECTS", "SYSTEM",
+    "IT", "EXCHANGE", "NFS", "RR", "ICN AND BTS", "PA", "RP", "RUNNER", "BUDDY",
+    "CLK", "ONCO", "DUTY EFS", "LINE MAN CQ", "RT JCO", "ORH", "MESS CDR",
+    "TRG CLK", "CHM", "RHM", "STOREMAN", "NODE", "DUTY DVR MTNCO",
+    "OPERATIONS", "COMMUNICATION", "MAINTENANCE", "SECURITY", "ADMINISTRATION", "TECHNICAL",
+    "Other"
+  ];
+
+  function buildDutySelectOptionsHtml(selectedVal = 'GENERAL') {
+    const selNorm = (selectedVal || 'GENERAL').trim().toUpperCase();
+    let isKnown = false;
+    let html = '';
+    AI_DOMAINS_OPTIONS.forEach(d => {
+      const isMatch = (d.toUpperCase() === selNorm);
+      if (isMatch) isKnown = true;
+      html += `<option value="${d}" ${isMatch ? 'selected' : ''}>${d}</option>`;
+    });
+    return { html, isOther: !isKnown && selectedVal && selectedVal !== 'GENERAL', customVal: !isKnown ? selectedVal : '' };
+  }
+
+  // ================= RANK DROPDOWN & "OTHER" HANDLERS =================
+  function onAiRankSelectChange(sel) {
+    const otherWrap = document.getElementById('aiRankOtherWrap');
+    const otherInput = document.getElementById('aiRankOtherInput');
+    if (sel.value === 'Other') {
+      if (otherWrap) otherWrap.style.display = 'block';
+      if (otherInput) otherInput.focus();
+    } else {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (otherInput) otherInput.value = '';
     }
   }
 
-  function addAiUnitRow() {
+  // ================= DUTY DROPDOWN & "OTHER" HANDLERS =================
+  function onAiDutySelectChange(sel) {
+    const row = sel.closest('tr');
+    if (!row) return;
+    const otherWrap = row.querySelector('.ai-duty-other-wrap');
+    const otherInput = row.querySelector('.ai-duty-other-input');
+    if (sel.value === 'Other') {
+      if (otherWrap) otherWrap.style.display = 'block';
+      if (otherInput) otherInput.focus();
+    } else {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (otherInput) otherInput.value = '';
+    }
+    onAiUnitInputEdited();
+  }
+
+  function onAiUnitInputEdited() {
+    const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
+    if (freshCheck && freshCheck.checked) {
+      freshCheck.checked = false;
+      toggleAiFreshJoinee(false);
+    }
+  }
+
+  // ================= CALCULATION & FIELD SYNC =================
+  function toggleAiFreshJoinee(isFresh) {
+    const container = document.getElementById('aiUnitsContainer');
+    const title = document.getElementById('aiUnitsHistoryTitle');
+    if (container) {
+      container.style.display = isFresh ? 'none' : 'block';
+      container.querySelectorAll('input, select, button').forEach(el => {
+        el.disabled = isFresh;
+      });
+    }
+    if (title) {
+      title.style.display = isFresh ? 'none' : 'inline-block';
+    }
+  }
+
+  function addAiUnitRow(initialDuty = 'GENERAL') {
     const tbody = document.getElementById('aiUnitsTableBody');
     const tr = document.createElement('tr');
+
+    const dutyStr = Array.isArray(initialDuty) ? (initialDuty[0] || 'GENERAL') : (initialDuty || 'GENERAL');
+    const { html: optionsHtml, isOther, customVal } = buildDutySelectOptionsHtml(dutyStr);
+
     tr.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 4 CSR" /></td>
-      <td><input type="date" class="form-control form-control-sm ai-u-from" /></td>
-      <td><input type="date" class="form-control form-control-sm ai-u-to" /></td>
+      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 4 CSR" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
       <td>
-        <select class="form-select form-select-sm ai-u-duty">
-          <option value="NFS">NFS</option>
-          <option value="PROJECTS">PROJECTS</option>
-          <option value="OPERATIONS">OPERATIONS</option>
-          <option value="COMMUNICATION">COMMUNICATION</option>
-          <option value="MAINTENANCE">MAINTENANCE</option>
-          <option value="SECURITY">SECURITY</option>
-          <option value="ADMINISTRATION">ADMINISTRATION</option>
-          <option value="GENERAL">GENERAL</option>
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
+          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+            <i class="far fa-calendar-alt text-success"></i>
+            <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
+          </button>
+        </div>
+      </td>
+      <td>
+        <div class="input-group input-group-sm">
+          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
+          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+            <i class="far fa-calendar-alt text-success"></i>
+            <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
+          </button>
+        </div>
+      </td>
+      <td>
+        <select class="form-select form-select-sm ai-u-duty" onchange="onAiDutySelectChange(this)">
+          ${optionsHtml}
         </select>
+        <div class="ai-duty-other-wrap mt-1" style="display: ${isOther ? 'block' : 'none'};">
+          <input type="text" class="form-control form-control-sm ai-duty-other-input" value="${isOther ? customVal : ''}" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
+        </div>
       </td>
       <td class="text-center">
         <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
@@ -4361,51 +4838,286 @@
       row.remove();
     } else {
       row.querySelectorAll('input').forEach(i => i.value = '');
+      const dutySel = row.querySelector('.ai-u-duty');
+      if (dutySel) dutySel.value = 'GENERAL';
+      const otherWrap = row.querySelector('.ai-duty-other-wrap');
+      if (otherWrap) otherWrap.style.display = 'none';
     }
+  }
+
+  function isValidCalendarDate(str) {
+    if (!str || typeof str !== 'string') return false;
+    str = str.trim();
+    let y, m, d;
+    const dmyMatch = str.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      d = parseInt(dmyMatch[1], 10);
+      m = parseInt(dmyMatch[2], 10);
+      y = parseInt(dmyMatch[3], 10);
+    } else {
+      const ymdMatch = str.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+      if (ymdMatch) {
+        y = parseInt(ymdMatch[1], 10);
+        m = parseInt(ymdMatch[2], 10);
+        d = parseInt(ymdMatch[3], 10);
+      } else {
+        return false;
+      }
+    }
+    if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return false;
+    const dateObj = new Date(y, m - 1, d);
+    return dateObj.getFullYear() === y && dateObj.getMonth() === (m - 1) && dateObj.getDate() === d;
   }
 
   async function calculateAiRecommendation() {
     const trade = document.getElementById('aiTrade').value.trim();
-    const rank = document.getElementById('aiRank').value;
-    const dateOfEnrollment = document.getElementById('aiDateOfEnrollment').value;
-    const priorStation = document.getElementById('aiPriorStation').value.trim();
-    const isFresh = document.getElementById('aiFreshJoineeCheckbox').checked;
+    let rank = document.getElementById('aiRank')?.value || '';
+    if (rank === 'Other') {
+      const customRank = document.getElementById('aiRankOtherInput')?.value?.trim();
+      if (!customRank) {
+        alert('Please specify the custom Rank.');
+        document.getElementById('aiRankOtherInput').focus();
+        return;
+      }
+      rank = customRank;
+    }
 
     if (!trade) {
       alert('Please provide Trade Specialty for recommendation.');
+      document.getElementById('aiTrade').focus();
       return;
     }
     if (!rank) {
       alert('Please select Rank for recommendation.');
+      document.getElementById('aiRank').focus();
       return;
     }
 
+    const todayStr = getTodayDateString();
+
+
+    // 1. Check Date of Birth (from main form if available)
+    const mainDobRaw = document.getElementById('dateOfBirth')?.value?.trim() || '';
+    let dobIso = '';
+    if (mainDobRaw) {
+      if (!isValidCalendarDate(mainDobRaw)) {
+        alert('Invalid Date of Birth: Please provide a valid calendar date (DD-MM-YYYY) in the personnel form.');
+        return;
+      }
+      dobIso = normalizeDateToIso(mainDobRaw);
+      if (dobIso > todayStr) {
+        alert('Invalid Date of Birth: Date of Birth cannot be in the future.');
+        return;
+      }
+    }
+
+    // 2. Check Date of Enrollment
+    const rawEnroll = document.getElementById('aiDateOfEnrollment')?.value?.trim() || '';
+    let dateOfEnrollment = '';
+    if (rawEnroll) {
+      if (!isValidCalendarDate(rawEnroll)) {
+        alert('Invalid Date of Enrollment: "' + rawEnroll + '" is not a valid calendar date. Please enter a valid date in DD-MM-YYYY format.');
+        document.getElementById('aiDateOfEnrollment').focus();
+        return;
+      }
+      dateOfEnrollment = normalizeDateToIso(rawEnroll);
+
+      if (dateOfEnrollment > todayStr) {
+        alert('Invalid Date of Enrollment: The date cannot be in the future (after current date ' + isoToDmy(todayStr) + ').');
+        document.getElementById('aiDateOfEnrollment').focus();
+        return;
+      }
+
+      if (dobIso) {
+        if (dateOfEnrollment <= dobIso) {
+          alert('Invalid Date of Enrollment (' + isoToDmy(dateOfEnrollment) + '): Date of Enrollment cannot be before or on Date of Birth (' + isoToDmy(dobIso) + ').');
+          document.getElementById('aiDateOfEnrollment').focus();
+          return;
+        }
+
+        // Check reasonable military age (min 17 years)
+        const d1 = new Date(dobIso);
+        const d2 = new Date(dateOfEnrollment);
+        const ageAtEnroll = (d2 - d1) / (365.25 * 24 * 3600 * 1000);
+        if (ageAtEnroll < 17.0) {
+          alert('Invalid Date of Enrollment: Age at enrollment must be at least 17 years (calculated ' + ageAtEnroll.toFixed(1) + ' years from DOB ' + isoToDmy(dobIso) + ').');
+          document.getElementById('aiDateOfEnrollment').focus();
+          return;
+        }
+      }
+    }
+
+    // 3. Check Date of TOS (from main form if available)
+    const mainTosRaw = (document.getElementById('dateOfTOS') || document.getElementById('tos'))?.value?.trim() || '';
+    let tosIso = '';
+    if (mainTosRaw) {
+      if (isValidCalendarDate(mainTosRaw)) {
+        tosIso = normalizeDateToIso(mainTosRaw);
+        if (tosIso > todayStr) {
+          alert('Invalid Date of TOS: Date of TOS (' + isoToDmy(tosIso) + ') cannot be in the future.');
+          return;
+        }
+        if (dateOfEnrollment && tosIso < dateOfEnrollment) {
+          alert('Invalid Date of TOS: Date of TOS (' + isoToDmy(tosIso) + ') cannot be before Date of Enrollment (' + isoToDmy(dateOfEnrollment) + ').');
+          return;
+        }
+      }
+    }
+
+    // 4. Check Date of TORS (from main form if available)
+    const mainTorsRaw = (document.getElementById('dateOfTORS') || document.getElementById('tors'))?.value?.trim() || '';
+    let torsIso = '';
+    if (mainTorsRaw) {
+      if (isValidCalendarDate(mainTorsRaw)) {
+        torsIso = normalizeDateToIso(mainTorsRaw);
+        if (tosIso && torsIso < tosIso) {
+          alert('Invalid Date of TORS: Date of TORS (' + isoToDmy(torsIso) + ') cannot be before Date of TOS (' + isoToDmy(tosIso) + ').');
+          return;
+        }
+        if (dateOfEnrollment && torsIso < dateOfEnrollment) {
+          alert('Invalid Date of TORS: Date of TORS (' + isoToDmy(torsIso) + ') cannot be before Date of Enrollment (' + isoToDmy(dateOfEnrollment) + ').');
+          return;
+        }
+      }
+    }
+
+    const priorStation = document.getElementById('aiPriorStation').value.trim();
+    const isFresh = document.getElementById('aiFreshJoineeCheckbox').checked;
+
+    // 5. Validate Previous Units Served History
     const units = [];
+    const parsedIntervals = [];
+
     if (!isFresh) {
       const rows = document.querySelectorAll('#aiUnitsTableBody tr');
-      rows.forEach(r => {
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
         const uName = r.querySelector('.ai-u-name')?.value?.trim();
-        const uFrom = r.querySelector('.ai-u-from')?.value;
-        const uTo = r.querySelector('.ai-u-to')?.value;
-        const uDuty = r.querySelector('.ai-u-duty')?.value;
-        if (uName) {
+        const rawFrom = r.querySelector('.ai-u-from')?.value?.trim();
+        const rawTo = r.querySelector('.ai-u-to')?.value?.trim();
+        
+        const dutySelect = r.querySelector('.ai-u-duty');
+        let uDuty = dutySelect ? dutySelect.value : 'GENERAL';
+        if (uDuty === 'Other') {
+          const customDuty = r.querySelector('.ai-duty-other-input')?.value?.trim();
+          uDuty = customDuty ? customDuty.toUpperCase() : 'OTHER';
+        }
+        
+        if (uName || rawFrom || rawTo) {
+          if (!uName) {
+            alert(`Unit row #${i + 1}: Please specify the Unit Name.`);
+            r.querySelector('.ai-u-name')?.focus();
+            return;
+          }
+
+          if (!rawFrom && !rawTo) {
+            alert(`Unit '${uName}': Please provide both From Date and To Date.`);
+            r.querySelector('.ai-u-from')?.focus();
+            return;
+          }
+
+          if (!rawFrom || !rawTo) {
+            alert(`Unit '${uName}': Please provide both From Date and To Date (partial date entry not permitted).`);
+            if (!rawFrom) r.querySelector('.ai-u-from')?.focus();
+            else r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          // Check valid calendar dates
+          if (!isValidCalendarDate(rawFrom)) {
+            alert(`Invalid From Date for unit "${uName}": "${rawFrom}" is not a valid calendar date. Please use DD-MM-YYYY format.`);
+            r.querySelector('.ai-u-from')?.focus();
+            return;
+          }
+
+          if (!isValidCalendarDate(rawTo)) {
+            alert(`Invalid To Date for unit "${uName}": "${rawTo}" is not a valid calendar date. Please use DD-MM-YYYY format.`);
+            r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          const uFrom = normalizeDateToIso(rawFrom);
+          const uTo = normalizeDateToIso(rawTo);
+
+          // Edge case: check if from date or to date is in the future
+          if (uFrom > todayStr) {
+            alert(`Invalid Posting Date for unit "${uName}": From Date (${rawFrom}) cannot be in the future.`);
+            r.querySelector('.ai-u-from')?.focus();
+            return;
+          }
+          if (uTo > todayStr) {
+            alert(`Invalid Posting Date for unit "${uName}": To Date (${rawTo}) cannot be in the future.`);
+            r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          // Edge case: check if from date > to date (same day is allowed)
+          if (uFrom > uTo) {
+            alert(`Invalid Posting Dates for unit "${uName}": To Date (${rawTo}) cannot be earlier than From Date (${rawFrom}).`);
+            r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          // Edge case: check if previous unit from date < enrollment date
+          if (dateOfEnrollment && uFrom < dateOfEnrollment) {
+            alert(`Invalid Posting Date for unit "${uName}": Previous posting From Date (${rawFrom}) cannot begin before Date of Enrollment (${isoToDmy(dateOfEnrollment)}).`);
+            r.querySelector('.ai-u-from')?.focus();
+            return;
+          }
+
+          parsedIntervals.push({
+            rowIdx: i + 1,
+            unit: uName,
+            from: uFrom,
+            to: uTo,
+            rawFrom: rawFrom,
+            rawTo: rawTo,
+            el: r
+          });
+
           units.push({
             unit: uName,
-            from_date: uFrom || null,
-            to_date: uTo || null,
+            from_date: uFrom,
+            to_date: uTo,
             duty_performed: uDuty || 'GENERAL'
           });
         }
-      });
+      }
+
+      // 6. Chronology & Overlapping Postings Check
+      for (let i = 0; i < parsedIntervals.length; i++) {
+        for (let j = i + 1; j < parsedIntervals.length; j++) {
+          const itemA = parsedIntervals[i];
+          const itemB = parsedIntervals[j];
+
+          // Two intervals [F1, T1] and [F2, T2] overlap if max(F1, F2) < min(T1, T2)
+          const overlapStart = itemA.from > itemB.from ? itemA.from : itemB.from;
+          const overlapEnd = itemA.to < itemB.to ? itemA.to : itemB.to;
+
+          if (overlapStart < overlapEnd) {
+            alert(
+              `Overlapping Posting Periods:\n` +
+              `Unit "${itemA.unit}" (${itemA.rawFrom} to ${itemA.rawTo}) overlaps with Unit "${itemB.unit}" (${itemB.rawFrom} to ${itemB.rawTo}).\n` +
+              `Please correct the posting dates.`
+            );
+            itemB.el.querySelector('.ai-u-from')?.focus();
+            return;
+          }
+        }
+      }
     }
 
     const payload = {
       trade: trade,
       rank: rank,
       date_of_enrollment: dateOfEnrollment || null,
+      date_of_birth: dobIso || null,
+      date_of_tos: tosIso || null,
+      date_of_tors: torsIso || null,
       prior_station: priorStation || 'NO',
       units: units
     };
+
 
     const btn = document.getElementById('btnCalculateAiRec');
     const origText = btn.innerHTML;
@@ -4445,9 +5157,31 @@
     }
   }
 
+
+
   function displayAiRecommendationResult(data, trade, rank, units, priorStation) {
+
     const resultContainer = document.getElementById('aiRecResultContainer');
     resultContainer.style.display = 'block';
+
+    // Persist result into database history
+    fetch('/api/ai/company-recommendation/save-history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        army_number: (document.getElementById('armyNumber')?.value || '').trim(),
+        name: (document.getElementById('name')?.value || '').trim(),
+        rank: rank,
+        trade: trade,
+        units: units,
+        recommended_company: data.recommended_company,
+        confidence: data.confidence,
+        top_percentage: data.top_percentage,
+        probabilities: data.probabilities,
+        reasons: data.reasons,
+        shap_breakdown: data.shap_breakdown
+      })
+    }).catch(e => console.warn('Recommendation auto-persist notice:', e));
 
     // Top company display
     let topCoy = data.recommended_company;
@@ -4641,6 +5375,33 @@
     document.getElementById('reasonDetailDialog').classList.remove('show');
   }
 
+  function notifyAiApplied(title, message) {
+    const toastId = 'aiToastNotification';
+    let toastEl = document.getElementById(toastId);
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.id = toastId;
+      toastEl.style.cssText = 'position: fixed; top: 24px; right: 24px; z-index: 99999; min-width: 320px; max-width: 450px; background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: #ffffff; padding: 14px 18px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-left: 5px solid #34d399; font-size: 0.88rem; transition: all 0.3s ease; display: flex; align-items: flex-start; gap: 12px;';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.innerHTML = `
+      <i class="fas fa-check-circle text-warning mt-1" style="font-size: 1.25rem;"></i>
+      <div style="flex: 1;">
+        <div style="font-weight: 700; font-size: 0.95rem; margin-bottom: 2px;">${title}</div>
+        <div style="font-size: 0.82rem; opacity: 0.92; line-height: 1.35;">${message}</div>
+      </div>
+      <button type="button" onclick="this.parentElement.remove()" style="background: none; border: none; color: white; opacity: 0.75; cursor: pointer; padding: 0; font-size: 1rem;"><i class="fas fa-times"></i></button>
+    `;
+    toastEl.style.display = 'flex';
+    toastEl.style.opacity = '1';
+    setTimeout(() => {
+      if (toastEl && toastEl.parentElement) {
+        toastEl.style.opacity = '0';
+        setTimeout(() => toastEl.remove(), 350);
+      }
+    }, 4500);
+  }
+
   function applyAiRecommendationToForm() {
     if (!lastAiRecommendationResult) return;
     const topCoy = lastAiRecommendationResult.recommended_company;
@@ -4651,17 +5412,30 @@
     else if (topCoy === 'HQ Coy' || topCoy === 'HQ company') topCoyDisplay = 'HQ company';
     else if (topCoy === '3 Coy' || topCoy === '3 Company') topCoyDisplay = '3 Company';
 
-    // 1. Apply Recommended Company & highlight
+    // 1. Switch to Personal Details tab first so inputs are visible
+    const personalTabBtn = document.getElementById('personal-tab');
+    if (personalTabBtn && typeof bootstrap !== 'undefined') {
+      const tab = bootstrap.Tab.getOrCreateInstance(personalTabBtn);
+      tab.show();
+    }
+
+    // 2. Apply Recommended Company & highlight
     if (companySelect) {
       companySelect.value = topCoyDisplay;
       companySelect.dispatchEvent(new Event('change'));
       companySelect.style.borderColor = '#10b981';
-      companySelect.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.25)';
+      companySelect.style.boxShadow = '0 0 0 3.5px rgba(16, 185, 129, 0.35)';
       const compBadge = document.getElementById('companyAiBadge');
       if (compBadge) compBadge.style.display = 'block';
+
+      // Remove strong glow after 4 seconds
+      setTimeout(() => {
+        companySelect.style.borderColor = '#10b981';
+        companySelect.style.boxShadow = 'none';
+      }, 4000);
     }
 
-    // 2. Sync all soldier parameters from AI modal back to main form fields
+    // 3. Sync soldier parameters back to main form fields
     const aiTradeVal = lastAiRecommendationResult.trade || document.getElementById('aiTrade')?.value?.trim();
     const aiRankVal = lastAiRecommendationResult.rank || document.getElementById('aiRank')?.value;
     const aiEnrollVal = lastAiRecommendationResult.date_of_enrollment || document.getElementById('aiDateOfEnrollment')?.value;
@@ -4680,7 +5454,7 @@
     }
     if (aiEnrollVal && document.getElementById('dateOfEnrollment')) {
       const el = document.getElementById('dateOfEnrollment');
-      el.value = aiEnrollVal;
+      el.value = normalizeDateToIso(aiEnrollVal);
       el.style.borderColor = '#10b981';
     }
     if (aiStationVal && document.getElementById('priorStation')) {
@@ -4689,7 +5463,7 @@
       el.style.borderColor = '#10b981';
     }
 
-    // 3. Populate Units Served Table in the main form with the accepted units
+    // 4. Populate Units Served Table in the main form with accepted units
     const modalUnits = lastAiRecommendationResult.units || [];
     const unitsTable = document.getElementById('unitsTable');
     if (unitsTable && modalUnits.length > 0) {
@@ -4697,7 +5471,6 @@
       const firstRow = tbody.querySelector('tr');
 
       if (firstRow) {
-        // Clone template row structure
         const rowTemplate = firstRow.cloneNode(true);
         tbody.innerHTML = '';
 
@@ -4710,14 +5483,15 @@
           const toInput = newRow.querySelector('input[name="unitTo[]"]');
           const dutySelect = newRow.querySelector('select[name="unitDuty[]"]');
 
-          if (unitInput) unitInput.value = u.unit;
-          if (fromInput) fromInput.value = u.from_date || '';
-          if (toInput) toInput.value = u.to_date || '';
-          if (dutySelect && u.duty_performed) {
-            dutySelect.value = u.duty_performed;
+          if (unitInput) unitInput.value = (u.unit || '').toUpperCase();
+          if (fromInput) fromInput.value = normalizeDateToIso(u.from_date || u.from || '');
+          if (toInput) toInput.value = normalizeDateToIso(u.to_date || u.to || '');
+          if (dutySelect) {
+            const dutyVal = u.duty_performed || (Array.isArray(u.duty) ? u.duty[0] : u.duty) || 'GENERAL';
+            dutySelect.value = dutyVal;
             if (!dutySelect.value) {
               Array.from(dutySelect.options).forEach(opt => {
-                if (opt.value.toUpperCase() === u.duty_performed.toUpperCase()) {
+                if (opt.value.toUpperCase() === dutyVal.toUpperCase()) {
                   dutySelect.value = opt.value;
                 }
               });
@@ -4726,7 +5500,6 @@
           tbody.appendChild(newRow);
         });
 
-        // Show AI Recommended Populated badge on units section
         const uBadge = document.getElementById('unitsAiBadge');
         if (uBadge) {
           uBadge.style.display = 'inline-flex';
@@ -4735,22 +5508,57 @@
       }
     }
 
-    // Mark as applied in persistent history
+    // 5. Mark as applied in persistent history
     lastAiRecommendationResult.applied = true;
     saveRecommendationToHistory(lastAiRecommendationResult);
 
-    // 4. Close modal
+    // 6. Close modal & completely remove lingering backdrops
     const modalEl = document.getElementById('aiRecModal');
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) modal.hide();
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      try {
+        const modal = bootstrap.Modal.getInstance(modalEl) || bootstrap.Modal.getOrCreateInstance(modalEl);
+        if (modal) modal.hide();
+      } catch (e) {
+        console.warn('Modal hide notice:', e);
+      }
+    }
 
-    // 5. Show success feedback popup
+    // Explicit backdrop & body unlock to prevent page freeze
+    setTimeout(() => {
+      document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      document.body.style.removeProperty('pointer-events');
+      if (modalEl) {
+        modalEl.classList.remove('show');
+        modalEl.style.display = 'none';
+        modalEl.setAttribute('aria-hidden', 'true');
+      }
+    }, 150);
+
+    // 7. Scroll Company field into view
+    if (companySelect) {
+      companySelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // 8. Show success feedback popup/toast
     const unitsMsg = modalUnits.length > 0 ? ` and populated ${modalUnits.length} Unit(s) Served` : '';
-    showPopup('success', 'AI Recommendation Applied!', `Assigned ${topCoyDisplay} as recommended company, synchronized soldier parameters${unitsMsg} into the registration form.`);
+    notifyAiApplied('AI Recommendation Applied!', `Assigned <strong>${topCoyDisplay}</strong> as recommended company, synchronized soldier parameters${unitsMsg} into the registration form.`);
   }
 
-  // Pre-load retrain status badge on initial window load
+  // Pre-load retrain status badge on initial window load and attach modal cleanup
   document.addEventListener('DOMContentLoaded', function() {
+    const aiModal = document.getElementById('aiRecModal');
+    if (aiModal) {
+      aiModal.addEventListener('hidden.bs.modal', function() {
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('overflow');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('pointer-events');
+      });
+    }
     updateHistoryBadge();
     fetchRetrainStatus();
   });

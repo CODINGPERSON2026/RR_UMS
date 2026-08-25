@@ -1,52 +1,54 @@
 {
-  "version": "1.0.0",
-  "last_trained_at": "2026-08-20T14:06:14.186557",
-  "total_eligible_records": 474,
-  "selected_model": "Random Forest",
+  "version": "2.0.0",
+  "last_trained_at": "2026-08-24T22:00:50.908702",
+  "total_eligible_records": 1475,
+  "database_records": 475,
+  "synthetic_csv_records": 1000,
+  "selected_model": "XGBoost",
   "canonical_classes": [
     "3 Coy",
     "Comn Coy",
     "HQ Coy"
   ],
-  "feature_count": 450,
+  "feature_count": 549,
   "smote_distribution": {
     "before": {
-      "3 Coy": 71,
-      "Comn Coy": 138,
-      "HQ Coy": 170
+      "3 Coy": 351,
+      "Comn Coy": 378,
+      "HQ Coy": 451
     },
     "after": {
-      "3 Coy": 170,
-      "Comn Coy": 170,
-      "HQ Coy": 170
+      "3 Coy": 451,
+      "Comn Coy": 451,
+      "HQ Coy": 451
     }
   },
   "metrics": {
-    "model_name": "Random Forest",
-    "accuracy": 0.5263,
-    "precision": 0.4475,
-    "recall": 0.445,
-    "f1": 0.4346,
-    "macro_f1": 0.4346,
-    "weighted_f1": 0.5005,
-    "top_1_accuracy": 0.5263,
-    "top_2_accuracy": 0.7895,
-    "roc_auc": 0.6737,
+    "model_name": "XGBoost",
+    "accuracy": 0.7051,
+    "precision": 0.706,
+    "recall": 0.704,
+    "f1": 0.7048,
+    "macro_f1": 0.7048,
+    "weighted_f1": 0.7047,
+    "top_1_accuracy": 0.7051,
+    "top_2_accuracy": 0.9051,
+    "roc_auc": 0.8823,
     "confusion_matrix": [
       [
-        2,
-        4,
-        12
+        66,
+        12,
+        10
       ],
       [
-        5,
-        17,
-        13
+        12,
+        59,
+        24
       ],
       [
-        2,
-        9,
-        31
+        8,
+        21,
+        83
       ]
     ],
     "class_names": [
@@ -56,75 +58,77 @@
     ],
     "per_class": {
       "3 Coy": {
-        "precision": 0.2222222222222222,
-        "recall": 0.1111111111111111,
-        "f1": 0.14814814814814814,
-        "support": 18
+        "precision": 0.7674418604651163,
+        "recall": 0.75,
+        "f1": 0.7586206896551724,
+        "support": 88
       },
       "Comn Coy": {
-        "precision": 0.5666666666666667,
-        "recall": 0.4857142857142857,
-        "f1": 0.5230769230769231,
-        "support": 35
+        "precision": 0.6413043478260869,
+        "recall": 0.6210526315789474,
+        "f1": 0.6310160427807486,
+        "support": 95
       },
       "HQ Coy": {
-        "precision": 0.5535714285714286,
-        "recall": 0.7380952380952381,
-        "f1": 0.6326530612244898,
-        "support": 42
+        "precision": 0.7094017094017094,
+        "recall": 0.7410714285714286,
+        "f1": 0.7248908296943232,
+        "support": 112
       }
     },
-    "cv_mean_accuracy": 0.6196,
-    "cv_std_accuracy": 0.0722,
-    "cv_mean_f1": 0.6184,
-    "cv_std_f1": 0.0757,
+    "cv_mean_accuracy": 0.7472,
+    "cv_std_accuracy": 0.018,
+    "cv_mean_f1": 0.7473,
+    "cv_std_f1": 0.0172,
     "feature_importance": {
-      "cat__trade_TTC": 0.07076705152243525,
-      "num__age_years": 0.05442734792936223,
-      "num__service_years": 0.045842265748059045,
-      "cat__trade_DMV": 0.039815336112023945,
-      "num__avg_posting_duration_days": 0.03527041569589568,
-      "num__total_service_duration_days": 0.03198699388451742,
-      "num__duty_count": 0.029032420854934043,
-      "cat__rank_NK": 0.01943797692882721,
-      "cat__previous_unit_2_4 CSR": 0.01827909835066883,
-      "num__previous_unit_count": 0.01774530800873825,
-      "cat__previous_unit_3_WCSR": 0.01740460369684922,
-      "cat__trade_TTC -LL": 0.017161313004106872,
-      "cat__rank_L HAV": 0.017100446209861345,
-      "cat__most_recent_duty_NO_DUTY": 0.016099568108617127,
-      "cat__prior_station_NO": 0.015455371285565024
+      "cat__trade_GENERAL DUTY": 0.04426467418670654,
+      "cat__previous_unit_1_TEST HQ UNIT": 0.03747579827904701,
+      "cat__previous_unit_1_TEST SIGNAL UNIT A": 0.030164580792188644,
+      "cat__previous_unit_1_TEST ARTILLERY UNIT B": 0.028320301324129105,
+      "cat__most_frequent_duty_DUTY EFS": 0.027342142537236214,
+      "cat__trade_STORE KEEPER TECHNICAL": 0.027081161737442017,
+      "cat__previous_unit_2_TEST SIGNAL UNIT A": 0.02699793502688408,
+      "cat__most_recent_duty_NO_DUTY": 0.026340199634432793,
+      "cat__trade_CLERK": 0.025492200627923012,
+      "cat__previous_unit_1_TEST ARTILLERY UNIT A": 0.023715725168585777,
+      "cat__trade_DRIVER": 0.023198291659355164,
+      "cat__trade_GUNNER": 0.023119870573282242,
+      "cat__previous_unit_2_TEST ARTILLERY UNIT A": 0.021619409322738647,
+      "cat__trade_ELECTRICIAN": 0.018398836255073547,
+      "cat__most_frequent_unit_TEST ORDNANCE UNIT": 0.017341943457722664
     }
   },
   "dataset_profile": {
-    "total_personnel": 474,
-    "total_eligible": 474,
-    "records_with_trade": 474,
-    "personnel_with_unit_history": 156,
-    "personnel_without_unit_history": 318,
-    "total_unit_records": 538,
+    "total_personnel": 1475,
+    "total_eligible": 1475,
+    "database_records": 475,
+    "synthetic_csv_records": 1000,
+    "records_with_trade": 1475,
+    "personnel_with_unit_history": 1156,
+    "personnel_without_unit_history": 319,
+    "total_unit_records": 2798,
     "company_distribution": {
-      "HQ Coy": 212,
-      "Comn Coy": 173,
-      "3 Coy": 89
+      "3 Coy": 439,
+      "Comn Coy": 473,
+      "HQ Coy": 563
     },
     "top_trades": {
-      "TTC": 163,
-      "LMN": 62,
-      "EFS": 49,
-      "DMV": 46,
-      "OCC": 38,
-      "DVR MT": 15,
-      "CC": 10,
-      "CLK SD": 8,
-      "JENE": 8,
-      "ATBV": 4
+      "GENERAL DUTY": 220,
+      "TTC": 166,
+      "TECHNICAL": 100,
+      "CLERK": 80,
+      "DRIVER": 70,
+      "STORE KEEPER TECHNICAL": 70,
+      "LMN": 65,
+      "MECHANIC": 50,
+      "SIGNAL COMMUNICATION": 50,
+      "GUNNER": 50
     },
     "canonical_classes": [
-      "HQ Coy",
+      "3 Coy",
       "Comn Coy",
-      "3 Coy"
+      "HQ Coy"
     ]
   },
-  "training_duration_seconds": 27.78
+  "training_duration_seconds": 36.11
 }

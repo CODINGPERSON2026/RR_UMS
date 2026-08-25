@@ -4,9 +4,14 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 MODELS_DIR = BASE_DIR / "models"
+DATASETS_DIR = BASE_DIR / "datasets"
 PREPROCESSING_DIR = ARTIFACTS_DIR / "preprocessing"
 METRICS_DIR = ARTIFACTS_DIR / "metrics"
 REPORTS_DIR = ARTIFACTS_DIR / "reports"
+
+# Dataset files
+SYNTHETIC_PERSONNEL_FILE = DATASETS_DIR / "synthetic_personnel_1000.csv"
+SYNTHETIC_UNITS_FILE = DATASETS_DIR / "synthetic_units_served.csv"
 
 # Model artifact directories
 RF_MODEL_DIR = MODELS_DIR / "random_forest"
@@ -27,3 +32,4 @@ RANDOM_STATE = 42
 TEST_SIZE = 0.20
 CV_FOLDS = 5
 AUTO_RETRAIN_THRESHOLD_RECORDS = 10
+

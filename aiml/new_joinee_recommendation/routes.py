@@ -83,6 +83,8 @@ def api_get_company_recommendation(personnel_id: int):
         logger.error(f"API Error for personnel_id={personnel_id}: {e}", exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
 
+from .validator import validate_recommendation_payload
+
 @company_rec_bp.route("/api/ai/company-recommendation/predict", methods=["POST"])
 def api_predict_custom_payload():
     """
@@ -97,9 +99,19 @@ def api_predict_custom_payload():
             "date_of_enrollment": data.get("date_of_enrollment"),
             "date_of_birth": data.get("date_of_birth"),
             "date_of_tos": data.get("date_of_tos"),
+            "date_of_tors": data.get("date_of_tors"),
             "detailed_course": data.get("detailed_course", "")
         }
         units_list = data.get("units", [])
+
+        # Server-side validation
+        is_valid, errors = validate_recommendation_payload(personnel_dict, units_list)
+        if not is_valid:
+            return jsonify({
+                "success": False,
+                "errors": errors,
+                "error": errors[0] if errors else "Validation failed."
+            }), 400
         
         res = rec_service.get_recommendation_for_payload(personnel_dict, units_list)
         status_code = 200 if res.get("success") else 400
@@ -107,6 +119,7 @@ def api_predict_custom_payload():
     except Exception as e:
         logger.error(f"API Error for custom payload: {e}", exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
+
 
 @company_rec_bp.route("/api/ai/company-recommendation/analytics", methods=["GET"])
 def api_get_analytics():
@@ -150,3 +163,193 @@ def api_trigger_retrain():
     except Exception as e:
         logger.error(f"API Error during retraining: {e}", exc_info=True)
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# =========================================================================
+# AI NEW JOINEE RECOMMENDATION INSIGHTS FOR CO / ADJUTANT / 2IC
+# =========================================================================
+
+def _is_authorized_insights_user(user: Optional[dict]) -> bool:
+    """
+    Verifies that the logged-in user has role CO, 2IC, ADJUTANT, or ADMIN.
+    """
+    if not user:
+        return False
+    role = str(user.get("role", "")).strip().upper()
+    company = str(user.get("company", "")).strip()
+    allowed_roles = {"CO", "2IC", "ADJUTANT", "ADMIN"}
+    if role in allowed_roles:
+        return True
+    if company in ("Admin", "Center") and ("CO" in role or "2IC" in role or "ADJUTANT" in role or "ADMIN" in role):
+        return True
+    return False
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/insights", methods=["GET"])
+def api_get_recommendation_insights():
+    """
+    REST API endpoint for CO / Adjutant / 2IC Recommendation Insights.
+    Supports server-side pagination, search by Army Number / Name,
+    filters by Company, Rank, Decision, and multi-field sorting.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required. Please log in."}), 401
+
+    if not _is_authorized_insights_user(user):
+        return jsonify({
+            "success": False,
+            "error": "Access Denied: Only CO, Adjutant, and 2IC can access AI Recommendation Insights."
+        }), 403
+
+    try:
+        page = request.args.get("page", 1, type=int)
+        page_size = request.args.get("page_size", 20, type=int)
+        search = request.args.get("search", "", type=str)
+        company_filter = request.args.get("company", "ALL", type=str)
+        rank_filter = request.args.get("rank", "ALL", type=str)
+        decision_filter = request.args.get("decision", "ALL", type=str)
+        sort_by = request.args.get("sort_by", "percentage", type=str)
+        sort_order = request.args.get("sort_order", "desc", type=str)
+
+        res = rec_service.get_insights_page(
+            page=page,
+            page_size=page_size,
+            search=search,
+            company_filter=company_filter,
+            rank_filter=rank_filter,
+            decision_filter=decision_filter,
+            sort_by=sort_by,
+            sort_order=sort_order
+        )
+        return jsonify(res), 200 if res.get("success") else 500
+    except Exception as e:
+        logger.error(f"API Error fetching recommendation insights: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "Unable to load AI recommendation insights. Please try again."}), 500
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/insights/<int:rec_id>", methods=["GET"])
+def api_get_single_recommendation_insight(rec_id: int):
+    """
+    REST API endpoint returning complete deep-dive AI analysis for a single recommendation.
+    Includes SHAP values, probability breakdowns, and complete previous unit postings.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required."}), 401
+
+    if not _is_authorized_insights_user(user):
+        return jsonify({"success": False, "error": "Access Denied."}), 403
+
+    try:
+        res = rec_service.get_single_insight(rec_id)
+        status_code = 200 if res.get("success") else 404
+        return jsonify(res), status_code
+    except Exception as e:
+        logger.error(f"API Error fetching single insight #{rec_id}: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "Unable to load AI analysis."}), 500
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/decision", methods=["POST"])
+def api_save_manual_decision():
+    """
+    REST API endpoint for CO / Adjutant / 2IC to record a final posting decision.
+    Guarantees that recommended_company is preserved as the single source of AI truth.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required."}), 401
+
+    if not _is_authorized_insights_user(user):
+        return jsonify({"success": False, "error": "Access Denied: Only CO, Adjutant, and 2IC can record posting decisions."}), 403
+
+    try:
+        data = request.get_json(silent=True) or {}
+        rec_id = data.get("id")
+        final_company = data.get("final_company")
+        decision_type = data.get("decision_type", "Manual")
+        decision_remarks = data.get("decision_remarks", "")
+        decided_by = user.get("username", "Officer")
+
+        if not rec_id or not final_company:
+            return jsonify({"success": False, "error": "Missing recommendation ID or final company."}), 400
+
+        res = rec_service.save_manual_decision(
+            rec_id=int(rec_id),
+            final_company=final_company,
+            decision_type=decision_type,
+            decision_remarks=decision_remarks,
+            decided_by=decided_by
+        )
+        return jsonify(res), 200 if res.get("success") else 400
+    except Exception as e:
+        logger.error(f"API Error saving decision: {e}", exc_info=True)
+        return jsonify({"success": False, "error": "Failed to save posting decision."}), 500
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/insights-count", methods=["GET"])
+def api_get_insights_count():
+    """
+    REST API endpoint returning total recommendation counts for dashboard stats badges.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required."}), 401
+
+    if not _is_authorized_insights_user(user):
+        return jsonify({"success": False, "error": "Access Denied."}), 403
+
+    try:
+        res = rec_service.get_insights_counts()
+        return jsonify(res), 200
+    except Exception as e:
+        logger.warning(f"Error fetching insights count: {e}")
+        return jsonify({"success": False, "total_count": 0}), 500
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/save-history", methods=["POST"])
+def api_save_recommendation_history():
+    """
+    REST API endpoint to persistently store calculated recommendations from the AI modal into MySQL.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "error": "Authentication required."}), 401
+
+    try:
+        data = request.get_json(silent=True) or {}
+        personnel_id = data.get("personnel_id")
+        army_number = data.get("army_number")
+        name = data.get("name")
+        rank = data.get("rank") or "SOLDIER"
+        trade = data.get("trade") or "GENERAL"
+        units_list = data.get("units") or []
+
+        rec_res = {
+            "recommended_company": data.get("recommended_company", "HQ Coy"),
+            "confidence": data.get("confidence", "Moderate Match Confidence"),
+            "top_percentage": data.get("top_percentage", 50.0),
+            "probabilities": data.get("probabilities", {}),
+            "reasons": data.get("reasons", []),
+            "shap_breakdown": data.get("shap_breakdown", [])
+        }
+
+        rec_id = rec_service.persist_recommendation(
+            personnel_id=int(personnel_id) if personnel_id else None,
+            army_number=army_number,
+            name=name,
+            rank=rank,
+            trade=trade,
+            rec_res=rec_res,
+            units_list=units_list,
+            final_company=data.get("final_company"),
+            decision_type=data.get("decision_type", "AI Recommended"),
+            decision_remarks=data.get("decision_remarks", "AI Recommended Assignment Accepted"),
+            decided_by=user.get("username")
+        )
+
+        return jsonify({"success": True, "id": rec_id}), 200
+    except Exception as e:
+        logger.error(f"API Error saving recommendation history: {e}", exc_info=True)
+        return jsonify({"success": False, "error": str(e)}), 500
+
