@@ -3441,6 +3441,7 @@
         discordCases: collectTableData("discordTable", [
           "discordCaseNo", "discordAmount", "discordSanction"
         ]),
+        accepted_ai_recommendation: window.acceptedAiRecommendation || null,
       };
 
       return data;
@@ -3497,8 +3498,10 @@
         submitBtn.disabled = false;
 
         if (response.ok && result.success) {
+          window.acceptedAiRecommendation = null;
           showPopup('success', 'Data Submitted Successfully!', `Personnel record has been saved. Personnel ID: ${result.personnel_id}`, function () {
             document.querySelector("form").reset();
+            window.acceptedAiRecommendation = null;
             showTab(0);
           });
         } else {
@@ -3829,16 +3832,137 @@
         <div id="aiTabLiveContent">
           <!-- 1. Soldier Parameters Card -->
           <div class="ai-card-box">
-            <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2.5">
               <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2" style="font-size: 0.92rem;">
                 <i class="fas fa-sliders-h text-success"></i> Soldier Parameters for Recommendation
               </h6>
+              <button type="button" class="btn btn-sm btn-outline-primary py-0.5 px-2.5 fw-semibold" onclick="syncAiModalFromMainForm()" style="font-size: 0.75rem; border-radius: 6px;" title="Re-read all entered details from the main personnel form">
+                <i class="fas fa-sync-alt me-1"></i> Re-sync from Form
+              </button>
+            </div>
+
+            <!-- Main Form Sync Notice -->
+            <div id="aiMainFormSyncNotice" class="p-2 mb-2.5 rounded border d-flex justify-content-between align-items-center" style="display: none; background: #eff6ff; border-color: #bfdbfe !important;">
+              <div style="font-size: 0.8rem; color: #1e40af;">
+                <i class="fas fa-id-card me-1.5 text-primary"></i>
+                Profile: <strong id="aiIdentityArmyNo" class="font-monospace text-primary">--</strong> • <strong id="aiIdentityName" class="text-dark">--</strong>
+              </div>
+              <span class="badge bg-primary text-white" style="font-size: 0.7rem;">✓ Auto-Synced from Form</span>
+            </div>
+
+            <!-- Soldier Identity Fields -->
+            <div class="row g-2 mb-2 p-2 rounded bg-white border">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">
+                  <i class="fas fa-id-badge text-primary me-1"></i>Army Number
+                </label>
+                <div class="input-group input-group-sm">
+                  <input type="text" id="aiArmyNumber" class="form-control form-control-sm font-monospace text-uppercase fw-bold" placeholder="e.g. 15678901A" oninput="this.value = this.value.toUpperCase(); onAiArmyNumberChange(this.value);" />
+                  <button class="btn btn-outline-secondary" type="button" onclick="lookupPersonnelByArmyNo()" title="Lookup details from database">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+                <small class="text-muted d-block" style="font-size: 0.72rem;" id="aiArmyNoLookupStatus">Auto-fills name &amp; details if registered</small>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">
+                  <i class="fas fa-user text-primary me-1"></i>Soldier Name
+                </label>
+                <input type="text" id="aiPersonnelName" class="form-control form-control-sm text-uppercase fw-semibold" placeholder="e.g. SEP AMIT KUMAR" />
+                <small class="text-muted d-block" style="font-size: 0.72rem;">Saved to recommendation records</small>
+              </div>
             </div>
 
             <div class="row g-2 mb-2">
               <div class="col-md-6">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Trade Specialty<span class="text-danger">*</span></label>
-                <input type="text" id="aiTrade" class="form-control form-control-sm" placeholder="e.g. TECH, TTC, LMN" oninput="this.value = this.value.toUpperCase();" />
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Trade / Core Category<span class="text-danger">*</span></label>
+                <select id="aiTrade" class="form-select form-select-sm mb-1.5" onchange="onAiTradeSelectChange(this)">
+                  <option value="">Select Trade</option>
+                  <option value="TTC">TTC</option>
+                  <option value="TECH SA">TECH SA</option>
+                  <option value="LMN">LMN (Line Man)</option>
+                  <option value="CLK SD">CLK SD (Clerk SD)</option>
+                  <option value="EFS">EFS</option>
+                  <option value="DVR">DVR (Driver MT)</option>
+                  <option value="JE SYS">JE SYS</option>
+                  <option value="JE NE">JE NE</option>
+                  <option value="SKT">SKT (Storekeeper)</option>
+                  <option value="RR">RR (Radio Relay)</option>
+                  <option value="RT JCO">RT JCO</option>
+                  <option value="DTMN">DTMN (Draftsman)</option>
+                  <option value="OP CIPH">OP CIPH (Cipher)</option>
+                  <option value="ARTSN">ARTSN (Artisan)</option>
+                  <option value="AEBV">AEBV</option>
+                  <option value="CHEF MESS">CHEF MESS</option>
+                  <option value="CHEF COM">CHEF COM</option>
+                  <option value="STWD">STWD (Steward)</option>
+                  <option value="HKEEPER">HKEEPER (Housekeeper)</option>
+                  <option value="WM">WM (Washerman)</option>
+                  <option value="WELDER">WELDER</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div id="aiTradeOtherWrap" class="mb-1.5" style="display: none;">
+                  <input type="text" id="aiTradeOtherInput" class="form-control form-control-sm" placeholder="Specify custom trade..." oninput="this.value = this.value.toUpperCase();" />
+                </div>
+                
+                <!-- Multi-Specialty Checkboxes -->
+                <div class="p-2 rounded bg-white border" style="max-height: 115px; overflow-y: auto;">
+                  <span class="d-block fw-semibold text-muted mb-1" style="font-size: 0.73rem;">Specialties (Select All That Apply):</span>
+                  <div class="row g-1" style="font-size: 0.76rem;">
+                    <div class="col-6">
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="IT" id="spec_it" />
+                        <label class="form-check-label" for="spec_it">IT / Computing</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Radio" id="spec_radio" />
+                        <label class="form-check-label" for="spec_radio">Radio / Wireless</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Technical" id="spec_tech" />
+                        <label class="form-check-label" for="spec_tech">Technical</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Clerk" id="spec_clerk" />
+                        <label class="form-check-label" for="spec_clerk">Clerk / SD</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="System" id="spec_sys" />
+                        <label class="form-check-label" for="spec_sys">System / Server</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Network" id="spec_net" />
+                        <label class="form-check-label" for="spec_net">Network / ICN</label>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="QM / Logistics" id="spec_qm" />
+                        <label class="form-check-label" for="spec_qm">QM / Store / SKT</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="MT / Driver" id="spec_mt" />
+                        <label class="form-check-label" for="spec_mt">MT / Driver</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Admin" id="spec_admin" />
+                        <label class="form-check-label" for="spec_admin">Administration</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Signal / Comn" id="spec_sig" />
+                        <label class="form-check-label" for="spec_sig">Signal / Comn</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Security" id="spec_sec" />
+                        <label class="form-check-label" for="spec_sec">Security / RP</label>
+                      </div>
+                      <div class="form-check m-0">
+                        <input class="form-check-input ai-spec-chk" type="checkbox" value="General Duty" id="spec_gd" />
+                        <label class="form-check-label" for="spec_gd">General Duty</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Rank<span class="text-danger">*</span></label>
@@ -4278,30 +4402,373 @@
     }
   }
 
-  function onNativeDatePicked(nativeInput) {
-    if (!nativeInput.value) return;
-    const parent = nativeInput.closest('.input-group') || nativeInput.parentElement;
-    const textInput = parent.querySelector('.ai-date-easy');
-    if (textInput) {
-      textInput.value = isoToDmy(nativeInput.value);
-      textInput.dispatchEvent(new Event('input'));
+  function isoToDmy(val) {
+    if (!val) return '';
+    val = String(val).trim();
+    if (val.includes('-')) {
+      const parts = val.split('-');
+      if (parts[0].length === 4) {
+        // YYYY-MM-DD -> DD-MM-YYYY
+        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
+      }
     }
+    return val;
+  }
+
+  function dmyToIso(val) {
+    if (!val) return '';
+    val = String(val).trim();
+    if (val.includes('-')) {
+      const parts = val.split('-');
+      if (parts.length === 3 && parts[2].length === 4) {
+        // DD-MM-YYYY -> YYYY-MM-DD
+        return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    return val;
+  }
+
+  function parseAndValidateDate(str) {
+    if (!str) return { valid: false, error: 'Date is empty' };
+    str = String(str).trim();
+    
+    let day, month, year;
+    // Check DD-MM-YYYY or DD/MM/YYYY
+    if (/^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/.test(str)) {
+      const parts = str.split(/[-\/]/);
+      day = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      year = parseInt(parts[2], 10);
+    } else if (/^\d{4}[-\/]\d{1,2}[-\/]\d{1,2}$/.test(str)) {
+      // YYYY-MM-DD
+      const parts = str.split(/[-\/]/);
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      day = parseInt(parts[2], 10);
+    } else {
+      return { valid: false, error: `Invalid date format "${str}". Proper format is DD-MM-YYYY.` };
+    }
+
+    if (month < 1 || month > 12) {
+      return { valid: false, error: `Invalid month (${month}) in "${str}". Month must be 1 to 12.` };
+    }
+
+    if (year < 1950) {
+      return { valid: false, error: `Invalid year (${year}) in "${str}". Year must be 1950 or later.` };
+    }
+
+    // Days in month validation (accounting for leap years)
+    const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const daysInMonths = [31, (isLeap ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const maxDays = daysInMonths[month - 1];
+
+    if (day < 1 || day > maxDays) {
+      if (month === 2 && day === 29 && !isLeap) {
+        return { valid: false, error: `Feb 29 is invalid in ${year} (not a leap year).` };
+      }
+      return { valid: false, error: `Invalid day (${day}) in date "${str}". Month ${month} in ${year} has ${maxDays} days.` };
+    }
+
+    const inputDate = new Date(year, month - 1, day);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    if (inputDate > today) {
+      return { 
+        valid: false, 
+        isFuture: true, 
+        error: `Date "${str}" exceeds current date. Future dates are not allowed.` 
+      };
+    }
+
+    const isoStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dmyStr = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${year}`;
+
+    return {
+      valid: true,
+      day, month, year,
+      iso: isoStr,
+      dmy: dmyStr,
+      isCurrentYear: (year === today.getFullYear())
+    };
+  }
+
+  function isValidCalendarDate(str) {
+    if (!str) return false;
+    return parseAndValidateDate(str).valid;
   }
 
   function checkEnrollmentYearForFreshJoinee() {
     const enrollVal = document.getElementById('aiDateOfEnrollment')?.value?.trim();
-    const isoDate = normalizeDateToIso(enrollVal);
     const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
-    if (!isoDate || !freshCheck) return;
+    if (!enrollVal || !freshCheck) return;
 
-    const parts = isoDate.split('-');
-    if (parts.length === 3 && parts[0].length === 4) {
-      const enrollYear = parseInt(parts[0], 10);
-      const currentYear = new Date().getFullYear();
-      if (enrollYear === currentYear) {
-        freshCheck.checked = true;
-        toggleAiFreshJoinee(true);
+    const dateRes = parseAndValidateDate(enrollVal);
+    if (dateRes.valid && dateRes.isCurrentYear) {
+      freshCheck.checked = true;
+      toggleAiFreshJoinee(true);
+    }
+  }
+
+  function mapMainTradeToAiTrade(raw) {
+    if (!raw) return '';
+    const s = String(raw).trim().toUpperCase();
+    if (s.includes('TTC')) return 'TTC';
+    if (s.includes('TECH SA') || s.includes('TECH') || s === 'SA') return 'TECH SA';
+    if (s.includes('LMN') || s.includes('LINE') || s.includes('LINEMAN')) return 'LMN';
+    if (s.includes('CLK') || s.includes('CLERK')) return 'CLK SD';
+    if (s.includes('EFS')) return 'EFS';
+    if (s.includes('DVR') || s.includes('DRIVER') || s.includes('MT')) return 'DVR';
+    if (s.includes('JE SYS') || s.includes('SYSTEM')) return 'JE SYS';
+    if (s.includes('JE NE') || s.includes('NE')) return 'JE NE';
+    if (s.includes('SKT') || s.includes('STORE')) return 'SKT';
+    if (s.includes('RR') || s.includes('RADIO')) return 'RR';
+    if (s.includes('RT JCO') || s.includes('RT')) return 'RT JCO';
+    if (s.includes('DTMN') || s.includes('DRAFTSMAN')) return 'DTMN';
+    if (s.includes('CIPH') || s.includes('CIPHER')) return 'OP CIPH';
+    if (s.includes('ARTSN') || s.includes('ARTISAN')) return 'ARTSN';
+    if (s.includes('AEBV')) return 'AEBV';
+    if (s.includes('MESS CHEF') || s.includes('CHEF MESS') || s.includes('COOK')) return 'CHEF MESS';
+    if (s.includes('CHEF COM') || s.includes('COMMUNITY CHEF')) return 'CHEF COM';
+    if (s.includes('STWD') || s.includes('STEWARD')) return 'STWD';
+    if (s.includes('HKEEPER') || s.includes('HOUSEKEEPER') || s.includes('SWEEPER') || s.includes('SAFAI')) return 'HKEEPER';
+    if (s.includes('WM') || s.includes('WASHERMAN') || s.includes('DHOBI')) return 'WM';
+    if (s.includes('WELDER')) return 'WELDER';
+    return s;
+  }
+
+  function mapMainRankToAiRank(raw) {
+    if (!raw) return '';
+    const s = String(raw).trim().toUpperCase();
+    if (s.includes('AGNIVEER') || s.includes('RECT') || s.includes('RECRUIT')) return 'RECT';
+    if (s.includes('SIGNAL') || s.includes('SIG') || s.includes('SIG MAN')) return 'SIG MAN';
+    if (s.includes('CFN') || s.includes('CRAFTSMAN')) return 'CFN';
+    if (s.includes('L NK') || s.includes('LANCE NAIK') || s.includes('L/NK')) return 'L NK';
+    if (s.includes('NK') || s.includes('NAIK')) return 'NK';
+    if (s.includes('CHM')) return 'CHM';
+    if (s.includes('CQMH')) return 'CQMH';
+    if (s.includes('RHM')) return 'RHM';
+    if (s.includes('HAV') || s.includes('HAVILDAR')) return 'HAV';
+    if (s.includes('NAIB') || s.includes('NB SUB') || s.includes('NB')) return 'NB SUB';
+    if (s.includes('SUBEDAR MAJOR') || s.includes('SUB MAJ')) return 'SUB MAJ';
+    if (s.includes('SUBEDAR') || s === 'SUB') return 'SUB';
+    if (s.includes('PA')) return 'PA';
+    return s;
+  }
+
+  function setSelectValueCaseInsensitive(selectEl, val) {
+    if (!selectEl || !val) return false;
+    const searchVal = String(val).trim().toUpperCase();
+    for (let opt of selectEl.options) {
+      if (opt.value && opt.value.trim().toUpperCase() === searchVal) {
+        selectEl.value = opt.value;
+        return true;
       }
+    }
+    for (let opt of selectEl.options) {
+      if (opt.text && opt.text.trim().toUpperCase().includes(searchVal)) {
+        selectEl.value = opt.value;
+        return true;
+      }
+    }
+    return false;
+  }
+
+  let aiLookupDebounceTimer = null;
+  function onAiArmyNumberChange(val) {
+    clearTimeout(aiLookupDebounceTimer);
+    if (!val || val.length < 3) return;
+    aiLookupDebounceTimer = setTimeout(() => {
+      lookupPersonnelByArmyNo(val);
+    }, 500);
+  }
+
+  async function lookupPersonnelByArmyNo(customArmyNo) {
+    const armyNo = (customArmyNo || document.getElementById('aiArmyNumber')?.value || '').trim();
+    if (!armyNo) return;
+    const statusEl = document.getElementById('aiArmyNoLookupStatus');
+    if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i> Looking up soldier...';
+
+    // 1. Check if main form already has this Army Number
+    const mainArmyNo = (document.getElementById('armyNumber')?.value || '').trim();
+    if (mainArmyNo && mainArmyNo.toUpperCase() === armyNo.toUpperCase()) {
+      const mainName = (document.getElementById('name')?.value || '').trim();
+      const mainTrade = (document.getElementById('trade')?.value || '').trim();
+      const mainRank = (document.getElementById('rank')?.value || '').trim();
+      const mainEnroll = (document.getElementById('dateOfEnrollment')?.value || '').trim();
+      if (mainName && document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = mainName.toUpperCase();
+      if (mainTrade) {
+        const mapped = mapMainTradeToAiTrade(mainTrade);
+        setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mainTrade);
+      }
+      if (mainRank) {
+        const mapped = mapMainRankToAiRank(mainRank);
+        setSelectValueCaseInsensitive(document.getElementById('aiRank'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiRank'), mainRank);
+      }
+      if (mainEnroll && document.getElementById('aiDateOfEnrollment')) document.getElementById('aiDateOfEnrollment').value = isoToDmy(mainEnroll);
+      if (statusEl) statusEl.innerHTML = '<span class="text-success fw-semibold"><i class="fas fa-check-circle"></i> Auto-filled from Main Form</span>';
+      return;
+    }
+
+    // 2. Fetch from Database
+    try {
+      const res = await fetch(`/api/ai/company-recommendation/lookup-personnel?army_number=${encodeURIComponent(armyNo)}`);
+      const data = await res.json();
+      if (data.success && data.found && data.data) {
+        const p = data.data;
+        if (document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = (p.name || '').toUpperCase();
+        if (p.trade) {
+          const mapped = mapMainTradeToAiTrade(p.trade);
+          setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiTrade'), p.trade);
+        }
+        if (p.rank) {
+          const mapped = mapMainRankToAiRank(p.rank);
+          setSelectValueCaseInsensitive(document.getElementById('aiRank'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiRank'), p.rank);
+        }
+        if (p.date_of_enrollment && document.getElementById('aiDateOfEnrollment')) {
+          document.getElementById('aiDateOfEnrollment').value = isoToDmy(p.date_of_enrollment);
+        }
+        if (statusEl) statusEl.innerHTML = `<span class="text-success fw-semibold"><i class="fas fa-check-circle"></i> Found in Database: ${p.name || ''} (${p.rank || ''})</span>`;
+      } else {
+        if (statusEl) statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> New soldier profile</span>';
+      }
+    } catch (e) {
+      if (statusEl) statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Enter details manually</span>';
+    }
+  }
+
+  function syncAiModalFromMainForm() {
+    try {
+      // 1. Read values from Main Form
+      const mainName = (document.getElementById('name')?.value || '').trim();
+      const mainArmyNo = (document.getElementById('armyNumber')?.value || '').trim();
+      const mainTrade = (document.getElementById('trade')?.value || '').trim();
+      const mainRank = (document.getElementById('rank')?.value || '').trim();
+      const mainEnroll = (document.getElementById('dateOfEnrollment')?.value || '').trim();
+      const mainStation = (document.getElementById('priorStation')?.value || 
+                           document.getElementById('homePO')?.value || 
+                           document.getElementById('homePS')?.value || 
+                           document.getElementById('homeVillage')?.value || '').trim();
+
+      // 2. Identity Sync Fields in AI Modal
+      if (document.getElementById('aiArmyNumber')) document.getElementById('aiArmyNumber').value = mainArmyNo;
+      if (document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = mainName;
+
+      const syncNotice = document.getElementById('aiMainFormSyncNotice');
+      const identityArmyNo = document.getElementById('aiIdentityArmyNo');
+      const identityName = document.getElementById('aiIdentityName');
+      if (mainName || mainArmyNo) {
+        if (identityArmyNo) identityArmyNo.textContent = mainArmyNo || 'N/A';
+        if (identityName) identityName.textContent = mainName || 'N/A';
+        if (syncNotice) syncNotice.style.display = 'flex';
+      } else {
+        if (syncNotice) syncNotice.style.display = 'none';
+      }
+
+      // 3. Trade Dropdown
+      const tradeSelect = document.getElementById('aiTrade');
+      const otherTradeWrap = document.getElementById('aiTradeOtherWrap');
+      const otherTradeInput = document.getElementById('aiTradeOtherInput');
+      if (tradeSelect && mainTrade) {
+        const mappedTrade = mapMainTradeToAiTrade(mainTrade);
+        const matched = setSelectValueCaseInsensitive(tradeSelect, mappedTrade) || setSelectValueCaseInsensitive(tradeSelect, mainTrade);
+        if (!matched) {
+          tradeSelect.value = 'Other';
+          if (otherTradeWrap) otherTradeWrap.style.display = 'block';
+          if (otherTradeInput) otherTradeInput.value = mainTrade.toUpperCase();
+        } else {
+          if (otherTradeWrap) otherTradeWrap.style.display = tradeSelect.value === 'Other' ? 'block' : 'none';
+          if (otherTradeInput && tradeSelect.value !== 'Other') otherTradeInput.value = '';
+        }
+      }
+
+      // 4. Date of Enrollment & Prior Station
+      if (mainEnroll && document.getElementById('aiDateOfEnrollment')) {
+        document.getElementById('aiDateOfEnrollment').value = isoToDmy(mainEnroll);
+      }
+      if (mainStation && document.getElementById('aiPriorStation')) {
+        document.getElementById('aiPriorStation').value = mainStation.toUpperCase();
+      }
+
+      // 5. Rank Dropdown
+      const rankSelect = document.getElementById('aiRank');
+      const otherRankWrap = document.getElementById('aiRankOtherWrap');
+      const otherRankInput = document.getElementById('aiRankOtherInput');
+      if (rankSelect && mainRank) {
+        const mappedRank = mapMainRankToAiRank(mainRank);
+        const matched = setSelectValueCaseInsensitive(rankSelect, mappedRank) || setSelectValueCaseInsensitive(rankSelect, mainRank);
+        if (!matched) {
+          rankSelect.value = 'Other';
+          if (otherRankWrap) otherRankWrap.style.display = 'block';
+          if (otherRankInput) otherRankInput.value = mainRank.toUpperCase();
+        } else {
+          if (otherRankWrap) otherRankWrap.style.display = rankSelect.value === 'Other' ? 'block' : 'none';
+          if (otherRankInput && rankSelect.value !== 'Other') otherRankInput.value = '';
+        }
+      }
+
+      // 6. Units Table Pre-Fill
+      const mainUnitsTable = document.getElementById('unitsTable');
+      const aiTbody = document.getElementById('aiUnitsTableBody');
+      const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
+
+      if (mainUnitsTable && aiTbody) {
+        const mainRows = mainUnitsTable.querySelectorAll('tbody tr');
+        const validMainUnits = [];
+        mainRows.forEach(r => {
+          const u = r.querySelector('input[name="unit[]"]')?.value?.trim();
+          const f = r.querySelector('input[name="unitFrom[]"]')?.value?.trim();
+          const t = r.querySelector('input[name="unitTo[]"]')?.value?.trim();
+          const d = r.querySelector('select[name="unitDuty[]"]')?.value?.trim();
+          if (u || f || t || d) {
+            validMainUnits.push({ unit: u || '', from: f || '', to: t || '', duty: d || 'GENERAL' });
+          }
+        });
+
+        aiTbody.innerHTML = '';
+        if (validMainUnits.length > 0) {
+          validMainUnits.forEach(vu => {
+            const dutyVal = vu.duty || 'GENERAL';
+            addAiUnitRow(dutyVal);
+            const lastRow = aiTbody.lastElementChild;
+            if (lastRow) {
+              const nameEl = lastRow.querySelector('.ai-u-name');
+              const fromEl = lastRow.querySelector('.ai-u-from');
+              const toEl = lastRow.querySelector('.ai-u-to');
+              const dutySel = lastRow.querySelector('.ai-u-duty');
+              const otherWrap = lastRow.querySelector('.ai-duty-other-wrap');
+              const otherInput = lastRow.querySelector('.ai-duty-other-input');
+
+              if (nameEl) nameEl.value = (vu.unit || '').toUpperCase();
+              if (fromEl) fromEl.value = isoToDmy(vu.from);
+              if (toEl) toEl.value = isoToDmy(vu.to);
+
+              if (dutySel) {
+                const matchedDuty = setSelectValueCaseInsensitive(dutySel, dutyVal);
+                if (!matchedDuty && dutyVal) {
+                  dutySel.value = 'Other';
+                  if (otherWrap) otherWrap.style.display = 'block';
+                  if (otherInput) otherInput.value = dutyVal.toUpperCase();
+                } else if (dutySel.value === 'Other') {
+                  if (otherWrap) otherWrap.style.display = 'block';
+                }
+              }
+            }
+          });
+
+          if (freshCheck) {
+            freshCheck.checked = false;
+            toggleAiFreshJoinee(false);
+          }
+        } else {
+          addAiUnitRow('GENERAL');
+        }
+      }
+
+      // Automatically check fresh joinee if enrollment date is current year
+      checkEnrollmentYearForFreshJoinee();
+    } catch (err) {
+      console.error('Error syncing AI modal from main form:', err);
     }
   }
 
@@ -4310,106 +4777,30 @@
     lastAiRecommendationResult = null;
     clearAiDisplay();
 
-    // Pre-fill from main form if available
-    const mainTrade = document.getElementById('trade')?.value || '';
-    const mainRank = document.getElementById('rank')?.value || '';
-    const mainEnroll = document.getElementById('dateOfEnrollment')?.value || '';
-    const mainStation = document.getElementById('priorStation')?.value || '';
+    // 2. Perform synchronization
+    syncAiModalFromMainForm();
 
-    if (mainTrade) document.getElementById('aiTrade').value = mainTrade.toUpperCase();
-    if (mainEnroll) document.getElementById('aiDateOfEnrollment').value = isoToDmy(mainEnroll);
-    if (mainStation) document.getElementById('aiPriorStation').value = mainStation.toUpperCase();
-
-    // Set Rank dropdown from main form
-    const rankSelect = document.getElementById('aiRank');
-    const otherRankWrap = document.getElementById('aiRankOtherWrap');
-    const otherRankInput = document.getElementById('aiRankOtherInput');
-    if (rankSelect) {
-      rankSelect.value = mainRank;
-      if (mainRank && !rankSelect.value) {
-        rankSelect.value = 'Other';
-        if (otherRankWrap) otherRankWrap.style.display = 'block';
-        if (otherRankInput) otherRankInput.value = mainRank.toUpperCase();
-      } else {
-        if (otherRankWrap) otherRankWrap.style.display = rankSelect.value === 'Other' ? 'block' : 'none';
-        if (otherRankInput && rankSelect.value !== 'Other') otherRankInput.value = '';
-      }
-    }
-
-    // Pre-fill Units from main form if present
-    const mainUnitsTable = document.getElementById('unitsTable');
-    const aiTbody = document.getElementById('aiUnitsTableBody');
-    const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
-
-    if (mainUnitsTable && aiTbody) {
-      const mainRows = mainUnitsTable.querySelectorAll('tbody tr');
-      const validMainUnits = [];
-      mainRows.forEach(r => {
-        const u = r.querySelector('input[name="unit[]"]')?.value?.trim();
-        const f = r.querySelector('input[name="unitFrom[]"]')?.value;
-        const t = r.querySelector('input[name="unitTo[]"]')?.value;
-        const d = r.querySelector('select[name="unitDuty[]"]')?.value;
-        if (u || f || t) {
-          validMainUnits.push({ unit: u || '', from: f || '', to: t || '', duty: d ? [d] : ['GENERAL'] });
-        }
-      });
-
-      aiTbody.innerHTML = '';
-      if (validMainUnits.length > 0) {
-        validMainUnits.forEach(vu => {
-          const dutyVal = Array.isArray(vu.duty) ? (vu.duty[0] || 'GENERAL') : (vu.duty || 'GENERAL');
-          addAiUnitRow(dutyVal);
-          const lastRow = aiTbody.lastElementChild;
-          if (lastRow) {
-            const nameEl = lastRow.querySelector('.ai-u-name');
-            const fromEl = lastRow.querySelector('.ai-u-from');
-            const toEl = lastRow.querySelector('.ai-u-to');
-            const dutySel = lastRow.querySelector('.ai-u-duty');
-            const otherWrap = lastRow.querySelector('.ai-duty-other-wrap');
-            const otherInput = lastRow.querySelector('.ai-duty-other-input');
-
-            if (nameEl) nameEl.value = (vu.unit || '').toUpperCase();
-            if (fromEl) fromEl.value = isoToDmy(vu.from);
-            if (toEl) toEl.value = isoToDmy(vu.to);
-
-            if (dutySel) {
-              dutySel.value = dutyVal;
-              if (dutyVal && !dutySel.value) {
-                dutySel.value = 'Other';
-                if (otherWrap) otherWrap.style.display = 'block';
-                if (otherInput) otherInput.value = dutyVal.toUpperCase();
-              } else if (dutySel.value === 'Other') {
-                if (otherWrap) otherWrap.style.display = 'block';
-              }
-            }
-          }
-        });
-
-        if (freshCheck) {
-          freshCheck.checked = false;
-          toggleAiFreshJoinee(false);
-        }
-      } else {
-        addAiUnitRow('GENERAL');
-      }
-
-    }
-
-    // Automatically check fresh joinee if enrollment date is current year
-    checkEnrollmentYearForFreshJoinee();
-
-    // 2. Default to Live Tab & refresh stats
+    // 3. Default to Live Tab & refresh stats
     switchAiModalTab('live');
     updateHistoryBadge();
     fetchRetrainStatus();
 
     const modalEl = document.getElementById('aiRecModal');
-
     if (modalEl && typeof bootstrap !== 'undefined') {
       const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
       modal.show();
     }
   }
+
+  // Ensure modal always auto-syncs when opened via data-bs-toggle or JS
+  document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('aiRecModal');
+    if (modalEl) {
+      modalEl.addEventListener('show.bs.modal', function () {
+        syncAiModalFromMainForm();
+      });
+    }
+  });
 
   function switchAiModalTab(tabKey) {
     const liveContent = document.getElementById('aiTabLiveContent');
@@ -4533,9 +4924,9 @@
               </span>
             </div>
             <div class="text-end">
-              <span class="fw-bold text-success" style="font-size: 1rem;">${item.top_percentage}%</span>
+              <span class="fw-bold text-success" style="font-size: 1rem;">${item.recommendation_percentage || item.top_percentage || 85.0}%</span>
               <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.7rem;">
-                ${item.confidence || 'Match'}
+                ${item.confidence_score || item.confidence || 'Match'}
               </span>
             </div>
           </div>
@@ -4546,8 +4937,8 @@
               <strong class="text-dark ms-1">${coyDisplay}</strong>
             </div>
             <div class="col-sm-6">
-              <span class="text-muted">Soldier Profile:</span>
-              <strong class="text-dark ms-1">${item.trade || 'N/A'} • ${item.rank || 'N/A'}</strong>
+              <span class="text-muted">Soldier:</span>
+              ${item.army_number ? `<strong class="text-primary font-monospace ms-1">${item.army_number}</strong> • ` : ''}<strong class="text-dark">${item.name || item.trade || 'N/A'}</strong>
             </div>
           </div>
 
@@ -4735,7 +5126,19 @@
     return { html, isOther: !isKnown && selectedVal && selectedVal !== 'GENERAL', customVal: !isKnown ? selectedVal : '' };
   }
 
-  // ================= RANK DROPDOWN & "OTHER" HANDLERS =================
+  // ================= TRADE & RANK DROPDOWN & "OTHER" HANDLERS =================
+  function onAiTradeSelectChange(sel) {
+    const otherWrap = document.getElementById('aiTradeOtherWrap');
+    const otherInput = document.getElementById('aiTradeOtherInput');
+    if (sel.value === 'Other') {
+      if (otherWrap) otherWrap.style.display = 'block';
+      if (otherInput) otherInput.focus();
+    } else {
+      if (otherWrap) otherWrap.style.display = 'none';
+      if (otherInput) otherInput.value = '';
+    }
+  }
+
   function onAiRankSelectChange(sel) {
     const otherWrap = document.getElementById('aiRankOtherWrap');
     const otherInput = document.getElementById('aiRankOtherInput');
@@ -4870,123 +5273,101 @@
   }
 
   async function calculateAiRecommendation() {
-    const trade = document.getElementById('aiTrade').value.trim();
+    let trade = (document.getElementById('aiTrade')?.value || '').trim();
+    if (trade === 'Other') {
+      const customTrade = document.getElementById('aiTradeOtherInput')?.value?.trim();
+      trade = customTrade || '';
+    }
+
     let rank = document.getElementById('aiRank')?.value || '';
     if (rank === 'Other') {
       const customRank = document.getElementById('aiRankOtherInput')?.value?.trim();
-      if (!customRank) {
-        alert('Please specify the custom Rank.');
-        document.getElementById('aiRankOtherInput').focus();
-        return;
-      }
-      rank = customRank;
+      rank = customRank || '';
     }
 
+    // Gather selected specialties from checkboxes
+    const selectedSpecs = Array.from(document.querySelectorAll('.ai-spec-chk:checked')).map(c => c.value);
+
+    // Auto-fallback trade if blank
     if (!trade) {
-      alert('Please provide Trade Specialty for recommendation.');
-      document.getElementById('aiTrade').focus();
-      return;
+      const mainTrade = (document.getElementById('trade')?.value || '').trim();
+      if (mainTrade) {
+        trade = mainTrade;
+        if (document.getElementById('aiTrade')) document.getElementById('aiTrade').value = trade.toUpperCase();
+      } else if (selectedSpecs.length > 0) {
+        trade = selectedSpecs[0];
+        if (document.getElementById('aiTrade')) document.getElementById('aiTrade').value = trade.toUpperCase();
+      } else {
+        trade = 'GENERAL DUTY';
+        if (document.getElementById('aiTrade')) document.getElementById('aiTrade').value = 'GENERAL DUTY';
+      }
     }
+
+    // Auto-fallback rank if blank
     if (!rank) {
-      alert('Please select Rank for recommendation.');
-      document.getElementById('aiRank').focus();
-      return;
+      const mainRank = (document.getElementById('rank')?.value || '').trim();
+      rank = mainRank || 'Signal Man';
+      if (document.getElementById('aiRank')) document.getElementById('aiRank').value = rank;
     }
 
     const todayStr = getTodayDateString();
-
 
     // 1. Check Date of Birth (from main form if available)
     const mainDobRaw = document.getElementById('dateOfBirth')?.value?.trim() || '';
     let dobIso = '';
     if (mainDobRaw) {
-      if (!isValidCalendarDate(mainDobRaw)) {
-        alert('Invalid Date of Birth: Please provide a valid calendar date (DD-MM-YYYY) in the personnel form.');
+      const dobRes = parseAndValidateDate(mainDobRaw);
+      if (!dobRes.valid) {
+        alert(`Date of Birth Error: ${dobRes.error}`);
         return;
       }
-      dobIso = normalizeDateToIso(mainDobRaw);
-      if (dobIso > todayStr) {
-        alert('Invalid Date of Birth: Date of Birth cannot be in the future.');
-        return;
-      }
+      dobIso = dobRes.iso;
     }
 
     // 2. Check Date of Enrollment
-    const rawEnroll = document.getElementById('aiDateOfEnrollment')?.value?.trim() || '';
+    const rawEnroll = document.getElementById('aiDateOfEnrollment')?.value?.trim() || document.getElementById('dateOfEnrollment')?.value?.trim() || '';
     let dateOfEnrollment = '';
+    let enrollRes = null;
     if (rawEnroll) {
-      if (!isValidCalendarDate(rawEnroll)) {
-        alert('Invalid Date of Enrollment: "' + rawEnroll + '" is not a valid calendar date. Please enter a valid date in DD-MM-YYYY format.');
-        document.getElementById('aiDateOfEnrollment').focus();
+      enrollRes = parseAndValidateDate(rawEnroll);
+      if (!enrollRes.valid) {
+        alert(`Date of Enrollment Error: ${enrollRes.error}`);
+        document.getElementById('aiDateOfEnrollment')?.focus();
         return;
       }
-      dateOfEnrollment = normalizeDateToIso(rawEnroll);
-
-      if (dateOfEnrollment > todayStr) {
-        alert('Invalid Date of Enrollment: The date cannot be in the future (after current date ' + isoToDmy(todayStr) + ').');
-        document.getElementById('aiDateOfEnrollment').focus();
-        return;
-      }
-
-      if (dobIso) {
-        if (dateOfEnrollment <= dobIso) {
-          alert('Invalid Date of Enrollment (' + isoToDmy(dateOfEnrollment) + '): Date of Enrollment cannot be before or on Date of Birth (' + isoToDmy(dobIso) + ').');
-          document.getElementById('aiDateOfEnrollment').focus();
-          return;
-        }
-
-        // Check reasonable military age (min 17 years)
-        const d1 = new Date(dobIso);
-        const d2 = new Date(dateOfEnrollment);
-        const ageAtEnroll = (d2 - d1) / (365.25 * 24 * 3600 * 1000);
-        if (ageAtEnroll < 17.0) {
-          alert('Invalid Date of Enrollment: Age at enrollment must be at least 17 years (calculated ' + ageAtEnroll.toFixed(1) + ' years from DOB ' + isoToDmy(dobIso) + ').');
-          document.getElementById('aiDateOfEnrollment').focus();
-          return;
-        }
-      }
+      dateOfEnrollment = enrollRes.iso;
     }
 
-    // 3. Check Date of TOS (from main form if available)
+    // 3. Check Date of TOS / TORS (from main form if available)
     const mainTosRaw = (document.getElementById('dateOfTOS') || document.getElementById('tos'))?.value?.trim() || '';
     let tosIso = '';
     if (mainTosRaw) {
-      if (isValidCalendarDate(mainTosRaw)) {
-        tosIso = normalizeDateToIso(mainTosRaw);
-        if (tosIso > todayStr) {
-          alert('Invalid Date of TOS: Date of TOS (' + isoToDmy(tosIso) + ') cannot be in the future.');
-          return;
-        }
-        if (dateOfEnrollment && tosIso < dateOfEnrollment) {
-          alert('Invalid Date of TOS: Date of TOS (' + isoToDmy(tosIso) + ') cannot be before Date of Enrollment (' + isoToDmy(dateOfEnrollment) + ').');
-          return;
-        }
+      const tosRes = parseAndValidateDate(mainTosRaw);
+      if (tosRes.valid) {
+        tosIso = tosRes.iso;
+      } else {
+        alert(`Date of TOS Error: ${tosRes.error}`);
+        return;
       }
     }
 
-    // 4. Check Date of TORS (from main form if available)
     const mainTorsRaw = (document.getElementById('dateOfTORS') || document.getElementById('tors'))?.value?.trim() || '';
     let torsIso = '';
     if (mainTorsRaw) {
-      if (isValidCalendarDate(mainTorsRaw)) {
-        torsIso = normalizeDateToIso(mainTorsRaw);
-        if (tosIso && torsIso < tosIso) {
-          alert('Invalid Date of TORS: Date of TORS (' + isoToDmy(torsIso) + ') cannot be before Date of TOS (' + isoToDmy(tosIso) + ').');
-          return;
-        }
-        if (dateOfEnrollment && torsIso < dateOfEnrollment) {
-          alert('Invalid Date of TORS: Date of TORS (' + isoToDmy(torsIso) + ') cannot be before Date of Enrollment (' + isoToDmy(dateOfEnrollment) + ').');
-          return;
-        }
+      const torsRes = parseAndValidateDate(mainTorsRaw);
+      if (torsRes.valid) {
+        torsIso = torsRes.iso;
+      } else {
+        alert(`Date of TORS Error: ${torsRes.error}`);
+        return;
       }
     }
 
-    const priorStation = document.getElementById('aiPriorStation').value.trim();
-    const isFresh = document.getElementById('aiFreshJoineeCheckbox').checked;
+    const priorStation = (document.getElementById('aiPriorStation')?.value || document.getElementById('priorStation')?.value || '').trim();
+    const isFresh = document.getElementById('aiFreshJoineeCheckbox')?.checked || false;
 
-    // 5. Validate Previous Units Served History
+    // 4. Validate Previous Units Served History
     const units = [];
-    const parsedIntervals = [];
 
     if (!isFresh) {
       const rows = document.querySelectorAll('#aiUnitsTableBody tr');
@@ -5004,125 +5385,77 @@
         }
         
         if (uName || rawFrom || rawTo) {
-          if (!uName) {
-            alert(`Unit row #${i + 1}: Please specify the Unit Name.`);
-            r.querySelector('.ai-u-name')?.focus();
-            return;
-          }
-
-          if (!rawFrom && !rawTo) {
-            alert(`Unit '${uName}': Please provide both From Date and To Date.`);
+          if (!rawFrom) {
+            alert(`Row #${i+1} (${uName || 'Unit'}): Please specify a valid From Date (DD-MM-YYYY).`);
             r.querySelector('.ai-u-from')?.focus();
             return;
           }
-
-          if (!rawFrom || !rawTo) {
-            alert(`Unit '${uName}': Please provide both From Date and To Date (partial date entry not permitted).`);
-            if (!rawFrom) r.querySelector('.ai-u-from')?.focus();
-            else r.querySelector('.ai-u-to')?.focus();
-            return;
-          }
-
-          // Check valid calendar dates
-          if (!isValidCalendarDate(rawFrom)) {
-            alert(`Invalid From Date for unit "${uName}": "${rawFrom}" is not a valid calendar date. Please use DD-MM-YYYY format.`);
-            r.querySelector('.ai-u-from')?.focus();
-            return;
-          }
-
-          if (!isValidCalendarDate(rawTo)) {
-            alert(`Invalid To Date for unit "${uName}": "${rawTo}" is not a valid calendar date. Please use DD-MM-YYYY format.`);
+          if (!rawTo) {
+            alert(`Row #${i+1} (${uName || 'Unit'}): Please specify a valid To Date (DD-MM-YYYY).`);
             r.querySelector('.ai-u-to')?.focus();
             return;
           }
 
-          const uFrom = normalizeDateToIso(rawFrom);
-          const uTo = normalizeDateToIso(rawTo);
-
-          // Edge case: check if from date or to date is in the future
-          if (uFrom > todayStr) {
-            alert(`Invalid Posting Date for unit "${uName}": From Date (${rawFrom}) cannot be in the future.`);
-            r.querySelector('.ai-u-from')?.focus();
-            return;
-          }
-          if (uTo > todayStr) {
-            alert(`Invalid Posting Date for unit "${uName}": To Date (${rawTo}) cannot be in the future.`);
-            r.querySelector('.ai-u-to')?.focus();
-            return;
-          }
-
-          // Edge case: check if from date > to date (same day is allowed)
-          if (uFrom > uTo) {
-            alert(`Invalid Posting Dates for unit "${uName}": To Date (${rawTo}) cannot be earlier than From Date (${rawFrom}).`);
-            r.querySelector('.ai-u-to')?.focus();
-            return;
-          }
-
-          // Edge case: check if previous unit from date < enrollment date
-          if (dateOfEnrollment && uFrom < dateOfEnrollment) {
-            alert(`Invalid Posting Date for unit "${uName}": Previous posting From Date (${rawFrom}) cannot begin before Date of Enrollment (${isoToDmy(dateOfEnrollment)}).`);
+          const fromRes = parseAndValidateDate(rawFrom);
+          if (!fromRes.valid) {
+            alert(`Row #${i+1} (${uName || 'Unit'}) From Date Error: ${fromRes.error}`);
             r.querySelector('.ai-u-from')?.focus();
             return;
           }
 
-          parsedIntervals.push({
-            rowIdx: i + 1,
-            unit: uName,
-            from: uFrom,
-            to: uTo,
-            rawFrom: rawFrom,
-            rawTo: rawTo,
-            el: r
-          });
+          const toRes = parseAndValidateDate(rawTo);
+          if (!toRes.valid) {
+            alert(`Row #${i+1} (${uName || 'Unit'}) To Date Error: ${toRes.error}`);
+            r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          if (fromRes.iso > toRes.iso) {
+            alert(`Row #${i+1} (${uName || 'Unit'}): To Date (${toRes.dmy}) cannot be earlier than From Date (${fromRes.dmy}).`);
+            r.querySelector('.ai-u-to')?.focus();
+            return;
+          }
+
+          if (enrollRes && enrollRes.valid && fromRes.iso < enrollRes.iso) {
+            alert(`Row #${i+1} (${uName || 'Unit'}): Posting From Date (${fromRes.dmy}) cannot precede Date of Enrollment (${enrollRes.dmy}).`);
+            r.querySelector('.ai-u-from')?.focus();
+            return;
+          }
 
           units.push({
-            unit: uName,
-            from_date: uFrom,
-            to_date: uTo,
+            unit: uName || 'FIELD UNIT',
+            from_date: fromRes.iso,
+            to_date: toRes.iso,
             duty_performed: uDuty || 'GENERAL'
           });
         }
       }
-
-      // 6. Chronology & Overlapping Postings Check
-      for (let i = 0; i < parsedIntervals.length; i++) {
-        for (let j = i + 1; j < parsedIntervals.length; j++) {
-          const itemA = parsedIntervals[i];
-          const itemB = parsedIntervals[j];
-
-          // Two intervals [F1, T1] and [F2, T2] overlap if max(F1, F2) < min(T1, T2)
-          const overlapStart = itemA.from > itemB.from ? itemA.from : itemB.from;
-          const overlapEnd = itemA.to < itemB.to ? itemA.to : itemB.to;
-
-          if (overlapStart < overlapEnd) {
-            alert(
-              `Overlapping Posting Periods:\n` +
-              `Unit "${itemA.unit}" (${itemA.rawFrom} to ${itemA.rawTo}) overlaps with Unit "${itemB.unit}" (${itemB.rawFrom} to ${itemB.rawTo}).\n` +
-              `Please correct the posting dates.`
-            );
-            itemB.el.querySelector('.ai-u-from')?.focus();
-            return;
-          }
-        }
-      }
     }
+
+    const armyNumberVal = (document.getElementById('aiArmyNumber')?.value || document.getElementById('armyNumber')?.value || '').trim();
+    const soldierNameVal = (document.getElementById('aiPersonnelName')?.value || document.getElementById('name')?.value || '').trim();
 
     const payload = {
       trade: trade,
       rank: rank,
+      specialties: selectedSpecs,
       date_of_enrollment: dateOfEnrollment || null,
       date_of_birth: dobIso || null,
       date_of_tos: tosIso || null,
       date_of_tors: torsIso || null,
       prior_station: priorStation || 'NO',
-      units: units
+      units_history: units,
+      is_fresh_joinee: isFresh || units.length === 0,
+      army_number: armyNumberVal,
+      name: soldierNameVal
     };
 
-
     const btn = document.getElementById('btnCalculateAiRec');
-    const origText = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Calculating Recommendation...';
+    const origText = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Calculating Recommendation...';
+    }
 
     try {
       const res = await fetch('/api/ai/company-recommendation/predict', {
@@ -5131,244 +5464,173 @@
         body: JSON.stringify(payload)
       });
       const data = await res.json();
-      btn.disabled = false;
-      btn.innerHTML = origText;
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
 
-      if (data.success) {
-        // Attach input fields to record for persistent history
-        data.trade = trade;
-        data.rank = rank;
-        data.date_of_enrollment = dateOfEnrollment;
-        data.prior_station = priorStation;
-        data.units = units;
-        data.applied = false;
+      if (data.success && data.data) {
+        const rec = data.data;
+        rec.army_number = armyNumberVal;
+        rec.name = soldierNameVal;
+        rec.trade = trade;
+        rec.rank = rank;
+        rec.specialties = selectedSpecs;
+        rec.date_of_enrollment = dateOfEnrollment;
+        rec.prior_station = priorStation;
+        rec.units = units;
+        rec.applied = false;
 
-        lastAiRecommendationResult = data;
-        saveRecommendationToHistory(data);
-        displayAiRecommendationResult(data, trade, rank, units, priorStation);
+        lastAiRecommendationResult = rec;
+        saveRecommendationToHistory(rec);
+        displayAiRecommendationResult(rec, trade, rank, units, priorStation);
       } else {
-        alert('Recommendation error: ' + (data.error || data.message || 'Unknown error'));
+        alert('Recommendation Notice: ' + (data.error || data.message || 'Unable to process recommendation'));
       }
     } catch (err) {
       console.error('AI Recommendation fetch error:', err);
-      btn.disabled = false;
-      btn.innerHTML = origText;
-      alert('Failed to connect to AI recommendation service.');
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origText;
+      }
+      alert('Error calculating recommendation: ' + (err.message || 'Please check server connection'));
     }
   }
-
 
 
   function displayAiRecommendationResult(data, trade, rank, units, priorStation) {
 
     const resultContainer = document.getElementById('aiRecResultContainer');
-    resultContainer.style.display = 'block';
+    if (resultContainer) resultContainer.style.display = 'block';
 
-    // Persist result into database history
-    fetch('/api/ai/company-recommendation/save-history', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        army_number: (document.getElementById('armyNumber')?.value || '').trim(),
-        name: (document.getElementById('name')?.value || '').trim(),
-        rank: rank,
-        trade: trade,
-        units: units,
-        recommended_company: data.recommended_company,
-        confidence: data.confidence,
-        top_percentage: data.top_percentage,
-        probabilities: data.probabilities,
-        reasons: data.reasons,
-        shap_breakdown: data.shap_breakdown
-      })
-    }).catch(e => console.warn('Recommendation auto-persist notice:', e));
+    const topCoy = data.recommended_company || 'HQ Coy';
+    const topCoyDisplay = topCoy;
+    const topPct = (typeof data.recommendation_percentage === 'number' ? data.recommendation_percentage : parseFloat(data.recommendation_percentage || 85.0)).toFixed(1);
+    const topPos = data.recommended_position || 'GD';
+    const topSec = data.recommended_section || 'GENERAL';
+    const posConf = data.position_confidence || '80.0%';
+    const armyNoVal = (document.getElementById('aiArmyNumber')?.value || document.getElementById('armyNumber')?.value || '').trim();
+    const nameVal = (document.getElementById('aiPersonnelName')?.value || document.getElementById('name')?.value || '').trim();
 
-    // Top company display
-    let topCoy = data.recommended_company;
-    let topCoyDisplay = topCoy;
-    if (topCoy === 'Comn Coy') topCoyDisplay = 'COMN Company';
-    else if (topCoy === 'HQ Coy') topCoyDisplay = 'HQ company';
-    else if (topCoy === '3 Coy') topCoyDisplay = '3 Company';
-
-    document.getElementById('aiTopCompanyName').textContent = topCoyDisplay;
-    document.getElementById('aiTopPercentage').textContent = `${data.top_percentage}%`;
+    // Top Company & Percentage UI
+    if (document.getElementById('aiTopCompanyName')) {
+      document.getElementById('aiTopCompanyName').textContent = topCoyDisplay;
+    }
+    if (document.getElementById('aiTopPercentage')) {
+      document.getElementById('aiTopPercentage').textContent = `${topPct}%`;
+    }
 
     const confBadge = document.getElementById('aiConfidenceBadge');
-    confBadge.textContent = `${data.confidence} Match Confidence`;
-    confBadge.className = 'badge px-2.5 py-1 ' + (data.confidence === 'High' ? 'bg-success' : (data.confidence === 'Moderate' ? 'bg-success' : 'bg-warning text-dark'));
+    if (confBadge) {
+      confBadge.textContent = data.confidence_type === 'rule_based_fresh_joinee' ? 'Rule-Based Specialty Mapping (Fresh Joinee)' : `${data.confidence_score || topPct + '%'} Confidence`;
+      confBadge.className = 'badge px-2.5 py-1 bg-success text-white';
+    }
 
-    // Ranked Probabilities Bars
+    // Ranked Company Probabilities
     const probList = document.getElementById('aiProbabilitiesList');
-    probList.innerHTML = '';
-    const recs = data.ranked_recommendations || [];
-
-    recs.forEach((r, idx) => {
-      let displayName = r.company;
-      if (r.company === 'Comn Coy') displayName = 'COMN Company';
-      else if (r.company === 'HQ Coy') displayName = 'HQ company';
-      else if (r.company === '3 Coy') displayName = '3 Company';
-
-      let barColor = idx === 0 ? 'bg-success' : (idx === 1 ? 'bg-primary' : 'bg-secondary');
-      probList.innerHTML += `
-        <div class="p-2.5 rounded border bg-white">
-          <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.84rem;">
-            <span class="fw-bold text-dark">#${r.rank} ${displayName}</span>
-            <strong class="text-primary">${r.percentage}%</strong>
+    if (probList) {
+      probList.innerHTML = '';
+      const probs = data.probabilities || { 'HQ Coy': 0.6, 'Comn Coy': 0.3, '3 Coy': 0.1 };
+      Object.entries(probs).forEach(([coy, pVal], idx) => {
+        const pct = (pVal * 100).toFixed(1);
+        let barColor = coy === topCoy ? 'bg-success' : 'bg-primary';
+        probList.innerHTML += `
+          <div class="p-2.5 rounded border bg-white mb-1.5">
+            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.84rem;">
+              <span class="fw-bold text-dark">${coy}</span>
+              <strong class="text-primary">${pct}%</strong>
+            </div>
+            <div class="progress" style="height: 6px; border-radius: 3px;">
+              <div class="progress-bar ${barColor}" role="progressbar" style="width: ${pct}%;"></div>
+            </div>
           </div>
-          <div class="progress" style="height: 6px; border-radius: 3px;">
-            <div class="progress-bar ${barColor}" role="progressbar" style="width: ${r.percentage}%;"></div>
-          </div>
-        </div>
-      `;
-    });
+        `;
+      });
+    }
 
     // SHAP Explainability Breakdown
     const shapContainer = document.getElementById('shapBarsContainer');
-    shapContainer.innerHTML = `
-      <div class="shap-feature-bar">
-        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-          <span class="fw-semibold text-dark">
-            <i class="fas fa-tools text-primary me-1"></i> Trade Specialty Alignment (${trade})
-          </span>
-          <span class="badge bg-success-subtle text-success border border-success-subtle">+38.5% Positive Force</span>
-        </div>
-        <div class="progress" style="height: 5px; border-radius: 3px;">
-          <div class="progress-bar bg-success" style="width: 38.5%;"></div>
-        </div>
-      </div>
+    if (shapContainer) {
+      shapContainer.innerHTML = '';
+      const posForces = data.shap_explanation?.positive || [
+        `+ Trade specialty '${trade}' strongly matches ${topCoyDisplay} establishment`,
+        `+ Service profile and postings fit ${topCoyDisplay} requirements`
+      ];
+      posForces.forEach(pf => {
+        shapContainer.innerHTML += `
+          <div class="shap-feature-bar mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+              <span class="fw-semibold text-dark"><i class="fas fa-check-circle text-success me-1"></i> ${pf}</span>
+              <span class="badge bg-success-subtle text-success border border-success-subtle">+ Positive Force</span>
+            </div>
+            <div class="progress" style="height: 4px; border-radius: 2px;">
+              <div class="progress-bar bg-success" style="width: 85%;"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
 
-      <div class="shap-feature-bar">
-        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-          <span class="fw-semibold text-dark">
-            <i class="fas fa-history text-success me-1"></i> Service Profile &amp; Postings (${units && units.length > 0 ? units.length + ' Unit(s)' : 'Fresh Joinee'})
-          </span>
-          <span class="badge bg-primary-subtle text-primary border border-primary-subtle">+26.0% Positive Force</span>
+    // Recommended Position Banner
+    let posBanner = document.getElementById('aiPositionRecBanner');
+    if (!posBanner && resultContainer) {
+      posBanner = document.createElement('div');
+      posBanner.id = 'aiPositionRecBanner';
+      posBanner.className = 'p-3 rounded mb-3 border border-info bg-info-subtle';
+      resultContainer.insertBefore(posBanner, resultContainer.firstChild);
+    }
+    if (posBanner) {
+      posBanner.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <span class="text-uppercase text-muted fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Recommended Appointment within ${topCoyDisplay}</span>
+            <h5 class="fw-bold text-dark mb-0 mt-0.5"><i class="fas fa-user-tag text-info me-1.5"></i> ${topPos}</h5>
+            <small class="text-secondary"><i class="fas fa-layer-group me-1"></i> Section: <strong>${topSec}</strong></small>
+          </div>
+          <div class="text-end">
+            <span class="badge bg-info text-dark fw-bold px-2 py-1">${posConf} Match</span>
+          </div>
         </div>
-        <div class="progress" style="height: 5px; border-radius: 3px;">
-          <div class="progress-bar bg-primary" style="width: 26%;"></div>
-        </div>
-      </div>
+      `;
+    }
 
-      <div class="shap-feature-bar">
-        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-          <span class="fw-semibold text-dark">
-            <i class="fas fa-user-shield text-warning me-1"></i> Rank Establishment Headroom (${rank})
-          </span>
-          <span class="badge bg-info-subtle text-info border border-info-subtle">+20.5% Positive Force</span>
-        </div>
-        <div class="progress" style="height: 5px; border-radius: 3px;">
-          <div class="progress-bar bg-info" style="width: 20.5%;"></div>
-        </div>
-      </div>
-
-      <div class="shap-feature-bar">
-        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-          <span class="fw-semibold text-dark">
-            <i class="fas fa-map-marker-alt text-secondary me-1"></i> Station Tenure &amp; Domain Diversity
-          </span>
-          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">+15.0% Baseline</span>
-        </div>
-        <div class="progress" style="height: 5px; border-radius: 3px;">
-          <div class="progress-bar bg-secondary" style="width: 15%;"></div>
-        </div>
-      </div>
-    `;
-
-    // Clickable Interactive Reason Cards
+    // Match Reason Cards
     const reasonsList = document.getElementById('aiReasonsList');
-    currentReasonDialogData = {
-      trade: {
-        title: "Trade Specialty Match Details",
-        category: "Skill & MOS Alignment",
-        icon: "fas fa-tools",
-        headline: `Trade ${trade} is optimally suited for ${topCoyDisplay}`,
-        content: `Soldier trade specialty '${trade}' possesses high historical placement density in ${topCoyDisplay}. Assignment models prioritize matching operational MOS qualifications with company-level technical requirement rosters.`,
-        stats: `Historical data shows that ${trade} soldiers in this unit have a dominant probability coefficient for ${topCoyDisplay}, reducing qualification re-training time and optimizing squad readiness.`
-      },
-      service: {
-        title: "Service History & Postings Profile",
-        category: "Operational Deployment Fit",
-        icon: "fas fa-history",
-        headline: units && units.length > 0 ? `Serving record across ${units.length} unit(s) aligned` : `Fresh Joinee induction aligned`,
-        content: units && units.length > 0 ? `Prior postings (${units.map(u => u.unit).join(', ')}) provide high duty domain transferability to ${topCoyDisplay} requirements.` : `Fresh joinee onboarding profile is ideally matched to ${topCoyDisplay} mentorship pipelines and vacancy slots.`,
-        stats: `The posting duration and domain history align directly with standard battalion rotation guidelines, giving ${topCoyDisplay} optimal capability continuity.`
-      },
-      cohort: {
-        title: "Rank Cohort & Establishment Strength",
-        category: "Unit Establishment & Authorization",
-        icon: "fas fa-users-cog",
-        headline: `Rank ${rank} balance optimization`,
-        content: `Matches establishment authorizations for rank '${rank}'. Placement in ${topCoyDisplay} prevents rank bunching and supports a balanced seniority pyramid across sub-units.`,
-        stats: `Company strength analytics indicate ${topCoyDisplay} currently maintains the healthiest establishment absorption capacity for ${rank} personnel.`
-      },
-      comparison: {
-        title: "Comparative Company Attribution",
-        category: "Cross-Company Probability Divergence",
-        icon: "fas fa-balance-scale",
-        headline: `Why ${topCoyDisplay} scored higher than alternatives`,
-        content: `Alternative companies (${recs.slice(1).map(x => x.company).join(', ')}) scored lower because their current trade specialty distribution and posting profile affinity exhibit greater divergence.`,
-        stats: `Probability gap: ${topCoyDisplay} leads the secondary option (${recs.length > 1 ? recs[1].company : 'N/A'}) by ${(data.top_percentage - (recs.length > 1 ? recs[1].percentage : 0)).toFixed(2)}% margin.`
-      }
-    };
-
-    reasonsList.innerHTML = `
-      <div class="ai-reason-card" onclick="openReasonDialog('trade')">
-        <div class="d-flex align-items-start gap-2">
-          <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.76rem;">✓ Trade Match</span>
-          <div style="font-size: 0.84rem;">
-            <strong>${trade}</strong> specialty has highest historical assignment rate in <strong>${topCoyDisplay}</strong>.
+    if (reasonsList) {
+      reasonsList.innerHTML = '';
+      const reasons = data.match_reasons || [
+        `Trade '${trade}' aligns with ${topCoyDisplay} operations.`,
+        `Appointment '${topPos}' in section '${topSec}' matches specialty profile.`
+      ];
+      reasons.forEach((r, idx) => {
+        reasonsList.innerHTML += `
+          <div class="ai-reason-card p-2.5 rounded border bg-light mb-1.5" style="border-left: 4px solid #10b981 !important;">
+            <div class="d-flex align-items-start gap-2">
+              <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.74rem;">✓ Factor #${idx + 1}</span>
+              <div style="font-size: 0.82rem; color: #1e293b;">${r}</div>
+            </div>
           </div>
-        </div>
-        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
-      </div>
-
-      <div class="ai-reason-card" onclick="openReasonDialog('service')">
-        <div class="d-flex align-items-start gap-2">
-          <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-0.5" style="font-size: 0.76rem;">✓ Service Profile</span>
-          <div style="font-size: 0.84rem;">
-            ${units && units.length > 0 ? `Prior postings across <strong>${units.length} unit(s)</strong> match <strong>${topCoyDisplay}</strong> duty requirements.` : `Fresh joinee profile aligns with <strong>${topCoyDisplay}</strong> induction and onboarding capacity.`}
-          </div>
-        </div>
-        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
-      </div>
-
-      <div class="ai-reason-card" onclick="openReasonDialog('cohort')">
-        <div class="d-flex align-items-start gap-2">
-          <span class="badge bg-info-subtle text-info border border-info-subtle mt-0.5" style="font-size: 0.76rem;">✓ Cohort Balance</span>
-          <div style="font-size: 0.84rem;">
-            Matches establishment strength and rank distribution for <strong>${rank}</strong>.
-          </div>
-        </div>
-        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
-      </div>
-
-      <div class="ai-reason-card" onclick="openReasonDialog('comparison')">
-        <div class="d-flex align-items-start gap-2">
-          <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-0.5" style="font-size: 0.76rem;">ℹ Comparison</span>
-          <div style="font-size: 0.84rem;">
-            Other companies (<em>${recs.slice(1).map(x => x.company).join(', ')}</em>) scored lower due to skill specialty divergence.
-          </div>
-        </div>
-        <span class="text-primary fw-bold" style="font-size: 0.75rem; white-space: nowrap;"><i class="fas fa-chevron-right"></i></span>
-      </div>
-    `;
+        `;
+      });
+    }
 
     // Scroll result into view
     resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   function openReasonDialog(key) {
-    const info = currentReasonDialogData[key];
+    const info = currentReasonDialogData ? currentReasonDialogData[key] : null;
     if (!info) return;
 
-    document.getElementById('reasonDialogTitle').textContent = info.title;
-    document.getElementById('reasonDialogCategory').textContent = info.category;
-    document.getElementById('reasonDialogIcon').className = info.icon + " text-warning";
-    document.getElementById('reasonDialogHeadline').textContent = info.headline;
-    document.getElementById('reasonDialogContent').textContent = info.content;
-    document.getElementById('reasonDialogStats').textContent = info.stats;
+    if (document.getElementById('reasonDialogTitle')) document.getElementById('reasonDialogTitle').textContent = info.title || 'Reason';
+    if (document.getElementById('reasonDialogCategory')) document.getElementById('reasonDialogCategory').textContent = info.category || 'Category';
+    if (document.getElementById('reasonDialogIcon')) document.getElementById('reasonDialogIcon').className = (info.icon || 'fas fa-info-circle') + " text-warning";
+    if (document.getElementById('reasonDialogHeadline')) document.getElementById('reasonDialogHeadline').textContent = info.headline || '';
+    if (document.getElementById('reasonDialogContent')) document.getElementById('reasonDialogContent').textContent = info.content || '';
+    if (document.getElementById('reasonDialogStats')) document.getElementById('reasonDialogStats').textContent = info.stats || '';
 
-    document.getElementById('reasonDetailDialog').classList.add('show');
+    const dialog = document.getElementById('reasonDetailDialog');
+    if (dialog) dialog.classList.add('show');
   }
 
   function closeReasonDialog() {
@@ -5462,6 +5724,11 @@
       el.value = aiStationVal;
       el.style.borderColor = '#10b981';
     }
+    if (lastAiRecommendationResult.recommended_section && document.getElementById('section')) {
+      const el = document.getElementById('section');
+      el.value = lastAiRecommendationResult.recommended_section;
+      el.style.borderColor = '#10b981';
+    }
 
     // 4. Populate Units Served Table in the main form with accepted units
     const modalUnits = lastAiRecommendationResult.units || [];
@@ -5508,9 +5775,9 @@
       }
     }
 
-    // 5. Mark as applied in persistent history
+    // 5. Store accepted AI recommendation into client state for final form submission
     lastAiRecommendationResult.applied = true;
-    saveRecommendationToHistory(lastAiRecommendationResult);
+    window.acceptedAiRecommendation = Object.assign({}, lastAiRecommendationResult);
 
     // 6. Close modal & completely remove lingering backdrops
     const modalEl = document.getElementById('aiRecModal');
@@ -5544,7 +5811,7 @@
 
     // 8. Show success feedback popup/toast
     const unitsMsg = modalUnits.length > 0 ? ` and populated ${modalUnits.length} Unit(s) Served` : '';
-    notifyAiApplied('AI Recommendation Applied!', `Assigned <strong>${topCoyDisplay}</strong> as recommended company, synchronized soldier parameters${unitsMsg} into the registration form.`);
+    notifyAiApplied('AI Recommendation Accepted', `AI recommended company <strong>${topCoyDisplay}</strong> and details have been populated. Record will be stored in AI recommendations once the personnel form is submitted.`);
   }
 
   // Pre-load retrain status badge on initial window load and attach modal cleanup

@@ -57,5 +57,7 @@ from blueprints.ollama import ollama_bot_bp
 from blueprints.onco_leave import onco_leave_bp
 from blueprints.sensitive_persons import sensitive_bp
 from chatbot import chatbot_bp
-from aiml.new_joinee_recommendation.routes import company_rec_bp
+from aiml.ai_new_joinee_recommendation.routes import company_rec_bp
+
+
 
