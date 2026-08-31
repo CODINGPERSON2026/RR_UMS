@@ -10,8 +10,8 @@ load_dotenv()
 DB_CONFIG = {
     'host': os.getenv('DB_HOST') or os.getenv('host') or 'localhost',
     'user': os.getenv('DB_USER') or 'root',
-    'password': os.getenv('DB_PASSWORD') or 'yawar@123',
-    'database': os.getenv('DB_NAME') or 'hrmsnew',
+    'password': os.getenv('DB_PASSWORD') or 'qaz123QAZ!@#',
+    'database': os.getenv('DB_NAME') or 'hrms',
     'port': int(os.getenv('DB_PORT') or 3306)
 }
 

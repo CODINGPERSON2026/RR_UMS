@@ -1495,12 +1495,13 @@ STATUS COLORS
         </div>
       </div>
       {% endif %}
-      <!-- <div class="sc" id="interview-card" style="cursor: pointer">
-        <span class="sc-label">Kunba Intrv</span>
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
+        <span class="sc-label">Interview</span>
         <div class="sc-right">
-          <span class="sc-val" id="interview-Count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-sub">Pending</span>
         </div>
-      </div> -->
+      </div>
       
     </div>
 
@@ -1915,11 +1916,9 @@ STATUS COLORS
     try {
       var r = await fetch("/interview_update/company_interview_count");
       var d = await r.json();
-      safeSet("co-company-interview-pending", d.pending != null ? d.pending : (d.count != null ? d.count : 0));
-      safeSet("co-company-interview-total", d.total != null ? d.total : 0);
+      safeSet("company-interview-count", d.pending != null ? d.pending : (d.count != null ? d.count : 0));
     } catch (e) {
-      safeSet("co-company-interview-pending", "0");
-      safeSet("co-company-interview-total", "0");
+      safeSet("company-interview-count", "0");
     }
   }
 
@@ -1950,7 +1949,7 @@ STATUS COLORS
         .then(r => r.json())
         .then(d => { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
         .catch(() => {});
-      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents()]);
+      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents(), loadCompanyInterviewCount()]);
       hidePageLoader();
       showActionBar();
       showStatsGrid();
