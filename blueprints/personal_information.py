@@ -1011,6 +1011,63 @@ def create_personnel():
             )
             cursor.execute(weight_query, weight_values)
 
+        # Save accepted AI Recommendation into ai_new_joinee_recommendations upon form submission
+        accepted_ai = data.get('accepted_ai_recommendation')
+        if accepted_ai and isinstance(accepted_ai, dict):
+            try:
+                top_coy = accepted_ai.get('recommended_company', 'HQ Coy')
+                top_pos = accepted_ai.get('recommended_position', 'GD')
+                pct = float(accepted_ai.get('recommendation_percentage', 85.0))
+                conf_score = str(accepted_ai.get('confidence_score', f"{pct:.1f}%"))
+                pos_conf = str(accepted_ai.get('position_confidence', '80.0%'))
+                conf_type = accepted_ai.get('confidence_type', 'ml')
+                probs_json = json.dumps(accepted_ai.get('probabilities', {}))
+                reasons_json = json.dumps(accepted_ai.get('match_reasons', []))
+                shap_json = json.dumps(accepted_ai.get('shap_explanation', {}))
+                units_json = json.dumps(accepted_ai.get('units', data.get('units', [])))
+                
+                final_coy = get_value('company') or top_coy
+                final_pos = top_pos
+
+                ai_query = """
+                INSERT INTO ai_new_joinee_recommendations (
+                    personnel_id, army_number, name, `rank`, trade,
+                    recommended_company, confidence_score, recommendation_percentage,
+                    recommended_position, position_confidence, confidence_type, model_version,
+                    probabilities_json, match_reasons_json, shap_json, units_history_json,
+                    final_company, final_position, decision_type
+                ) VALUES (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s
+                )
+                """
+                cursor.execute(ai_query, (
+                    personnel_id,
+                    army_number,
+                    get_value('name'),
+                    get_value('rank'),
+                    get_value('trade'),
+                    top_coy,
+                    conf_score,
+                    pct,
+                    top_pos,
+                    pos_conf,
+                    conf_type,
+                    'v1.0-15cesr',
+                    probs_json,
+                    reasons_json,
+                    shap_json,
+                    units_json,
+                    final_coy,
+                    final_pos,
+                    'pending'
+                ))
+            except Exception as ai_err:
+                print(f"Notice: Failed to persist accepted AI recommendation with personnel: {ai_err}")
+
         connection.commit()
         return jsonify({'success': True, 'personnel_id': personnel_id}), 201
     except Error as e:

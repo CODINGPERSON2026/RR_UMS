@@ -382,6 +382,33 @@ def search_person():
         return jsonify(results)
     
     else: # GET for Domain Specialization
+        if request.args.get('counts'):
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            try:
+                query = """
+                    SELECT 
+                        TRIM(u.duty_performed) AS domain,
+                        COUNT(DISTINCT p.id) AS count
+                    FROM personnel p
+                    JOIN units_served u ON p.id = u.personnel_id
+                    WHERE u.duty_performed IS NOT NULL AND u.duty_performed != ''
+                """
+                params = []
+                if user_company != "Admin":
+                    query += " AND p.company = %s"
+                    params.append(user_company)
+                query += " GROUP BY TRIM(u.duty_performed)"
+                cursor.execute(query, params)
+                rows = cursor.fetchall()
+                counts = {r['domain']: r['count'] for r in rows if r['domain']}
+                return jsonify(counts)
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+            finally:
+                cursor.close()
+                conn.close()
+
         trade = request.args.get('trade')
         if not trade:
             return jsonify([])

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Recommendation Probability Visualization - 15 CESR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .viz-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.5);
+      margin-bottom: 1.5rem;
+    }
+    .prob-bar-container {
+      background: #0f172a;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid #1e293b;
+    }
+    .prob-bar {
+      height: 28px;
+      border-radius: 6px;
+      transition: width 1s ease-in-out;
+    }
+    .coy-hq { background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); }
+    .coy-comn { background: linear-gradient(90deg, #10b981 0%, #047857 100%); }
+    .coy-3coy { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%); }
+    .pos-bar { background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%); }
+  </style>
+</head>
+<body>
+  <div class="container" style="max-width: 1000px;">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="p-2 rounded-3 bg-primary bg-opacity-25 text-primary">
+            <i class="fas fa-brain fa-lg"></i>
+          </div>
+          <h3 class="fw-bold mb-0 text-white">AI Placement Probability Distribution</h3>
+        </div>
+        <p class="text-secondary mb-0 small mt-1">Unit 15 CESR - Two-Stage Probabilistic Recommendation Model</p>
+      </div>
+      <div>
+        <button class="btn btn-outline-light btn-sm" onclick="window.close()">
+          <i class="fas fa-times me-1"></i> Close Tab
+        </button>
+      </div>
+    </div>
+
+    <!-- Personnel Identity Summary -->
+    <div class="viz-card">
+      <div class="row g-3 text-center">
+        <div class="col-3 border-end border-secondary border-opacity-25">
+          <span class="text-secondary small d-block">ARMY NUMBER</span>
+          <h5 class="fw-bold text-info mb-0 font-monospace" id="vArmyNo">--</h5>
+        </div>
+        <div class="col-3 border-end border-secondary border-opacity-25">
+          <span class="text-secondary small d-block">SOLDIER NAME</span>
+          <h5 class="fw-bold text-white mb-0" id="vName">--</h5>
+        </div>
+        <div class="col-3 border-end border-secondary border-opacity-25">
+          <span class="text-secondary small d-block">RANK</span>
+          <h5 class="fw-bold text-warning mb-0" id="vRank">--</h5>
+        </div>
+        <div class="col-3">
+          <span class="text-secondary small d-block">TRADE</span>
+          <h5 class="fw-bold text-success mb-0" id="vTrade">--</h5>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 1: Company Probabilities -->
+    <div class="viz-card">
+      <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        <i class="fas fa-building text-primary"></i> Stage 1: Company Probability Comparison
+      </h5>
+      <div id="companyProbList">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+
+    <!-- Stage 2: Position Probabilities inside Recommended Company -->
+    <div class="viz-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+          <i class="fas fa-user-tag text-info"></i> Stage 2: Available Appointments within <span id="vSelectedCoyName" class="text-success">--</span>
+        </h5>
+        <span class="badge bg-secondary" id="vSectionName">Section: --</span>
+      </div>
+      <div id="positionProbList">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+
+    <!-- SHAP Explainability Forces -->
+    <div class="viz-card">
+      <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        <i class="fas fa-layer-group text-purple" style="color: #a855f7;"></i> SHAP Feature Forces &amp; Rationale
+      </h5>
+      <div id="shapForcesList" class="d-flex flex-column gap-2">
+        <!-- Dynamically rendered -->
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const recId = urlParams.get('id') || '{{ rec_id or "" }}';
+
+    async function loadVisualizationData() {
+      if (!recId) return;
+      try {
+        const res = await fetch(`/api/ai/company-recommendation/insights/${recId}`);
+        const json = await res.json();
+        if (!json.success || !json.data) return;
+
+        const d = json.data;
+        document.getElementById('vArmyNo').textContent = d.army_number || 'N/A';
+        document.getElementById('vName').textContent = d.name || 'N/A';
+        document.getElementById('vRank').textContent = d.rank || 'N/A';
+        document.getElementById('vTrade').textContent = d.trade || 'N/A';
+        document.getElementById('vSelectedCoyName').textContent = d.recommended_company;
+        document.getElementById('vSectionName').textContent = `Section: ${d.recommended_section || 'GENERAL'}`;
+
+        // Stage 1: Companies
+        const coyList = document.getElementById('companyProbList');
+        coyList.innerHTML = '';
+        if (d.probabilities) {
+          Object.entries(d.probabilities).forEach(([coy, prob]) => {
+            const pct = (prob * 100).toFixed(1);
+            let cls = 'coy-hq';
+            if (coy.includes('Comn')) cls = 'coy-comn';
+            else if (coy.includes('3')) cls = 'coy-3coy';
+
+            coyList.innerHTML += `
+              <div class="prob-bar-container">
+                <div class="d-flex justify-content-between mb-1">
+                  <span class="fw-bold text-white">${coy}</span>
+                  <span class="fw-bold text-light">${pct}%</span>
+                </div>
+                <div class="progress bg-dark" style="height: 24px;">
+                  <div class="progress-bar ${cls} fw-bold" style="width: ${pct}%; font-size: 0.85rem;">${pct}%</div>
+                </div>
+              </div>
+            `;
+          });
+        }
+
+        // Stage 2: Positions
+        const posList = document.getElementById('positionProbList');
+        posList.innerHTML = '';
+        const topPosScore = parseFloat(d.position_confidence) || 88.5;
+        posList.innerHTML += `
+          <div class="prob-bar-container" style="border: 1.5px solid #06b6d4;">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="fw-bold text-info"><i class="fas fa-star text-warning me-1"></i> ${d.recommended_position} (Recommended Primary)</span>
+              <span class="fw-bold text-info">${topPosScore}%</span>
+            </div>
+            <div class="progress bg-dark" style="height: 22px;">
+              <div class="progress-bar pos-bar fw-bold" style="width: ${topPosScore}%;">${topPosScore}%</div>
+            </div>
+          </div>
+        `;
+
+        // Match Reasons & SHAP
+        const shapList = document.getElementById('shapForcesList');
+        shapList.innerHTML = '';
+        if (d.match_reasons) {
+          d.match_reasons.forEach(r => {
+            shapList.innerHTML += `
+              <div class="p-2.5 rounded bg-dark border border-secondary border-opacity-25 small text-light">
+                <i class="fas fa-check-circle text-success me-2"></i> ${r}
+              </div>
+            `;
+          });
+        }
+      } catch (err) {
+        console.error('Visualization load error:', err);
+      }
+    }
+
+    loadVisualizationData();
+  </script>
+</body>
+</html>
