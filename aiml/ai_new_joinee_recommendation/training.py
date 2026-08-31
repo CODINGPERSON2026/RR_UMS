@@ -1,5 +1,5 @@
 """
-Supervised ML Model Training and Retraining Pipeline
+Supervised ML Model Training and Retraining Pipeline (Hierarchical & Trade-Free)
 Implements 70/30 Stratified Split, SMOTE on Training Only, RF vs XGBoost Comparison,
 SHAP Explainer Setup, and Artifact Serialization.
 """
@@ -34,18 +34,19 @@ MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
 def run_training_pipeline() -> Dict[str, Any]:
     """
     Execute the end-to-end model training, evaluation, model selection, and artifact saving pipeline.
+    Strictly excludes trade from model features, datasets, and metadata.
     """
     os.makedirs(MODEL_DIR, exist_ok=True)
     start_time = datetime.now()
-    print(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] Starting AI New Joinee Model Training Pipeline...")
+    print(f"[{start_time.strftime('%Y-%m-%d %H:%M:%S')}] Starting AI New Joinee Model Training Pipeline (Trade-Free)...")
 
     # 1. Fetch and clean dataset
-    df_raw_features, s_targets = load_historical_dataset()
+    df_raw_features, s_targets, df_meta = load_historical_dataset()
     total_records = len(df_raw_features)
     print(f"Loaded {total_records} historical personnel records from database.")
 
     # Drop non-feature identifiers
-    feature_cols = [c for c in df_raw_features.columns if c not in ("personnel_id", "army_number", "target_company")]
+    feature_cols = [c for c in df_raw_features.columns if c not in ("personnel_id", "army_number", "target_company", "trade")]
     X = df_raw_features[feature_cols].copy().fillna(0.0)
     y = s_targets.copy()
 
@@ -59,13 +60,15 @@ def run_training_pipeline() -> Dict[str, Any]:
     print(f"Dataset split: Training Set = {len(X_train)} samples (70%), Unseen Test Set = {len(X_test)} samples (30%).")
 
     # 3. Apply SMOTE ONLY to the Training Dataset
-    smote = SMOTE(random_state=42, k_neighbors=min(3, y_train.value_counts().min() - 1))
+    min_class_count = y_train.value_counts().min()
+    k_neighbors = min(3, max(1, min_class_count - 1))
+    smote = SMOTE(random_state=42, k_neighbors=k_neighbors)
     X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
     print(f"SMOTE applied strictly to training data: Resampled training size = {len(X_train_res)} samples.")
 
     # 4. Train Random Forest Classifier
     rf_model = RandomForestClassifier(
-        n_estimators=150,
+        n_estimators=160,
         max_depth=8,
         min_samples_split=4,
         min_samples_leaf=2,
@@ -77,7 +80,6 @@ def run_training_pipeline() -> Dict[str, Any]:
     print(f"Random Forest Unseen Test Accuracy: {eval_rf['accuracy']}%, F1-Score: {eval_rf['f1_weighted']}%")
 
     # 5. Train XGBoost Classifier
-    # Map class strings to integers for XGBoost
     class_to_int = {cls: idx for idx, cls in enumerate(VALID_COMPANIES)}
     int_to_class = {idx: cls for idx, cls in enumerate(VALID_COMPANIES)}
 
@@ -104,7 +106,7 @@ def run_training_pipeline() -> Dict[str, Any]:
 
         def predict(self, X_input):
             preds_int = self.model.predict(X_input)
-            return np.array([self.int_to_class.get(i, "HQ Coy") for i in preds_int])
+            return np.array([self.int_to_class.get(i, "HQ COY") for i in preds_int])
 
         def predict_proba(self, X_input):
             return self.model.predict_proba(X_input)
@@ -156,7 +158,8 @@ def run_training_pipeline() -> Dict[str, Any]:
     training_duration_sec = round((end_time - start_time).total_seconds(), 2)
 
     metadata = {
-        "model_version": "v2.0-cesr",
+        "model_version": "company_position_model_v2",
+        "trade_excluded": True,
         "trained_at": end_time.strftime("%Y-%m-%d %H:%M:%S"),
         "training_duration_seconds": training_duration_sec,
         "selected_model": selected_name,
@@ -167,7 +170,12 @@ def run_training_pipeline() -> Dict[str, Any]:
         "test_records": len(X_test),
         "feature_count": len(feature_cols),
         "feature_names": feature_cols,
-        "classes": VALID_COMPANIES
+        "classes": VALID_COMPANIES,
+        "hierarchy_structure": {
+            "companies": len(VALID_COMPANIES),
+            "sections": 10,
+            "positions": 34
+        }
     }
 
     with open(os.path.join(MODEL_DIR, "model_metadata.json"), "w") as f:

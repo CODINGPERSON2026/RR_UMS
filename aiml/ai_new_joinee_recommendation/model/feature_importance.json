@@ -1,166 +1,74 @@
 [
   {
     "feature": "service_years",
-    "importance": 15.74
-  },
-  {
-    "feature": "rank_level",
-    "importance": 8.88
-  },
-  {
-    "feature": "trade_fam_ttc",
-    "importance": 6.91
-  },
-  {
-    "feature": "domain_tech",
-    "importance": 6.47
+    "importance": 19.55
   },
   {
     "feature": "avg_tenure_days",
-    "importance": 6.2
+    "importance": 12.34
   },
   {
-    "feature": "spec_Technical",
-    "importance": 5.45
+    "feature": "worked_it",
+    "importance": 10.82
   },
   {
-    "feature": "prior_aff_hq",
-    "importance": 5.3
+    "feature": "rank_level",
+    "importance": 10.78
+  },
+  {
+    "feature": "domain_tech",
+    "importance": 9.32
   },
   {
     "feature": "total_tenure_days",
-    "importance": 4.94
-  },
-  {
-    "feature": "prior_aff_comn",
-    "importance": 4.68
-  },
-  {
-    "feature": "prior_aff_3coy",
-    "importance": 4.01
-  },
-  {
-    "feature": "trade_fam_dvr",
-    "importance": 3.75
+    "importance": 8.2
   },
   {
     "feature": "num_units",
-    "importance": 3.66
-  },
-  {
-    "feature": "spec_MT___Driver",
-    "importance": 3.4
+    "importance": 6.14
   },
   {
     "feature": "domain_comn",
-    "importance": 2.71
-  },
-  {
-    "feature": "trade_fam_efs",
-    "importance": 2.46
+    "importance": 5.81
   },
   {
     "feature": "domain_it",
-    "importance": 2.28
-  },
-  {
-    "feature": "spec_General_Duty",
-    "importance": 2.24
-  },
-  {
-    "feature": "trade_fam_occ",
-    "importance": 1.64
-  },
-  {
-    "feature": "has_prev_units",
-    "importance": 1.59
-  },
-  {
-    "feature": "domain_dvr",
-    "importance": 1.3
+    "importance": 4.67
   },
   {
     "feature": "exp_sig_reg",
-    "importance": 1.25
+    "importance": 2.2
   },
   {
     "feature": "exp_corps",
-    "importance": 1.12
+    "importance": 2.07
   },
   {
-    "feature": "trade_fam_lmn",
-    "importance": 1.03
+    "feature": "domain_dvr",
+    "importance": 1.92
   },
   {
-    "feature": "trade_fam_tech",
-    "importance": 0.51
-  },
-  {
-    "feature": "domain_clerk",
-    "importance": 0.41
-  },
-  {
-    "feature": "trade_fam_services",
-    "importance": 0.35
-  },
-  {
-    "feature": "spec_QM___Logistics",
-    "importance": 0.34
-  },
-  {
-    "feature": "trade_fam_clk",
-    "importance": 0.34
-  },
-  {
-    "feature": "exp_rr",
-    "importance": 0.31
-  },
-  {
-    "feature": "trade_fam_logistics",
-    "importance": 0.28
-  },
-  {
-    "feature": "spec_Clerk",
-    "importance": 0.16
-  },
-  {
-    "feature": "spec_IT",
-    "importance": 0.12
-  },
-  {
-    "feature": "trade_fam_radio",
-    "importance": 0.07
-  },
-  {
-    "feature": "domain_qm",
-    "importance": 0.05
+    "feature": "has_prev_units",
+    "importance": 1.37
   },
   {
     "feature": "domain_gd",
-    "importance": 0.03
+    "importance": 1.29
   },
   {
-    "feature": "spec_System",
-    "importance": 0.01
+    "feature": "exp_rr",
+    "importance": 1.18
   },
   {
-    "feature": "spec_Radio",
-    "importance": 0.0
+    "feature": "has_prior_station",
+    "importance": 1.16
   },
   {
-    "feature": "spec_Network",
-    "importance": 0.0
+    "feature": "domain_clerk",
+    "importance": 0.89
   },
   {
-    "feature": "spec_Security",
-    "importance": 0.0
-  },
-  {
-    "feature": "spec_Admin",
-    "importance": 0.0
-  },
-  {
-    "feature": "spec_Signal___Comn",
-    "importance": 0.0
+    "feature": "domain_qm",
+    "importance": 0.29
   }
 ]

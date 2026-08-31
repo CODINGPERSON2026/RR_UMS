@@ -1,6 +1,7 @@
 """
 Model Explainability and SHAP Feature Attribution Engine
 Converts SHAP force factors and feature importances into clear, military-grade natural language explanations.
+STRICTLY TRADE-FREE: Trade is never referenced, calculated, or outputted in explanations.
 """
 
 import shap
@@ -9,37 +10,24 @@ import pandas as pd
 from typing import Dict, List, Any, Optional
 
 FEATURE_HUMAN_LABELS = {
-    "spec_IT": "IT & Computing Specialty",
-    "spec_Radio": "Radio & Wireless Specialty",
-    "spec_Technical": "Technical / Electronic Specialty",
-    "spec_Clerk": "Clerical / Administrative Specialty",
-    "spec_System": "System Administration Specialty",
-    "spec_Network": "Network Infrastructure Specialty",
-    "spec_QM___Logistics": "Logistics & Quartermaster Specialty",
-    "spec_MT___Driver": "Mechanical Transport / Driver Specialty",
-    "spec_Signal___Comn": "Signals & Communication Specialty",
-    "spec_General_Duty": "General Duty Specialty",
-    "spec_Security": "Security / Protection Specialty",
-    "spec_Admin": "Administrative Specialty",
-    "rank_level": "Rank / Seniority Profile",
+    "rank_level": "Rank & Seniority Profile",
     "service_years": "Total Military Service Experience",
-    "num_units": "Number of Previous Postings",
+    "num_units": "Number of Previous Field Postings",
     "total_tenure_days": "Cumulative Posting Tenure",
     "avg_tenure_days": "Average Posting Duration",
-    "has_prev_units": "Prior Field Posting Experience",
-    "domain_tech": "Technical Maintenance Duties",
-    "domain_comn": "Communication / Signal Center Duties",
-    "domain_it": "IT / Server Operations Experience",
-    "domain_clerk": "Administrative & Branch Work",
-    "domain_qm": "Quartermaster & Store Management",
-    "domain_dvr": "Transport Driving Tenures",
+    "has_prev_units": "Prior Field Unit Experience",
+    "domain_tech": "Technical & Maintenance Duties Experience",
+    "domain_comn": "Communication & Signal Center Duties",
+    "domain_it": "IT, Server & Computing Operations Experience",
+    "domain_clerk": "Administrative, Clerk & Branch Work",
+    "domain_qm": "Quartermaster & Store Management Duties",
+    "domain_dvr": "Transport Driving & Vehicle Operations",
     "domain_gd": "General / Regimental Duty Exposure",
-    "exp_rr": "Rashtriya Rifles (RR) Field Experience",
+    "exp_rr": "Rashtriya Rifles (RR) Operational Exposure",
     "exp_corps": "Corps HQ Operational Experience",
-    "exp_sig_reg": "Signal Regiment Core Exposure",
-    "prior_aff_comn": "Communication Coy Compatibility Profile",
-    "prior_aff_hq": "HQ Coy Regimental Profile",
-    "prior_aff_3coy": "3 Coy Technical Compatibility Profile"
+    "exp_sig_reg": "Signal Regiment Core Deployment Experience",
+    "has_prior_station": "Prior Station Posting Record",
+    "worked_it": "Information Technology Specialized Experience"
 }
 
 
@@ -59,21 +47,23 @@ class SHAPExplainerWrapper:
     def explain_sample(
         self,
         X_sample: pd.DataFrame,
-        predicted_class: str
+        predicted_company: str,
+        section: str = "",
+        position: str = ""
     ) -> Dict[str, Any]:
         """
         Generate feature-level SHAP explanation and natural language breakdown for a single sample.
         """
         if self.explainer is None:
-            return self._fallback_explanation(X_sample, predicted_class)
+            return self._fallback_explanation(X_sample, predicted_company, section, position)
 
         try:
             shap_values = self.explainer.shap_values(X_sample)
-            
+
             # Identify class index
             class_idx = 0
-            if predicted_class in self.class_names:
-                class_idx = self.class_names.index(predicted_class)
+            if predicted_company in self.class_names:
+                class_idx = self.class_names.index(predicted_company)
 
             # Handle SHAP multi-class output formats
             if isinstance(shap_values, list):
@@ -89,17 +79,19 @@ class SHAPExplainerWrapper:
                 else:
                     sample_shap = shap_values.flatten()
             else:
-                return self._fallback_explanation(X_sample, predicted_class)
+                return self._fallback_explanation(X_sample, predicted_company, section, position)
 
-            return self._format_shap_output(X_sample.iloc[0], sample_shap, predicted_class)
+            return self._format_shap_output(X_sample.iloc[0], sample_shap, predicted_company, section, position)
         except Exception:
-            return self._fallback_explanation(X_sample, predicted_class)
+            return self._fallback_explanation(X_sample, predicted_company, section, position)
 
     def _format_shap_output(
         self,
         sample_row: pd.Series,
         shap_array: np.ndarray,
-        predicted_class: str
+        predicted_company: str,
+        section: str = "",
+        position: str = ""
     ) -> Dict[str, Any]:
         """Format SHAP values into positive forces, negative forces, and natural language reasons."""
         factors = []
@@ -123,40 +115,61 @@ class SHAPExplainerWrapper:
         reasons = []
 
         for f in factors:
-            if f["abs_shap"] < 0.01:
+            if f["abs_shap"] < 0.005:
                 continue
             if f["impact"] == "positive":
-                msg = f"+ {f['label']} strongly supports placement in {predicted_class}"
+                msg = f"+ {f['label']} strongly supports placement in {predicted_company}"
                 positive_forces.append(msg)
                 if len(reasons) < 4:
-                    reasons.append(f"{f['label']} aligns with {predicted_class} technical & operational duties.")
+                    reasons.append(f"{f['label']} aligns with historical {predicted_company} assignments.")
             else:
-                msg = f"- {f['label']} slightly diminishes weight for {predicted_class}"
+                msg = f"- {f['label']} slightly diminishes weight for {predicted_company}"
                 negative_forces.append(msg)
 
+        # Ensure reasons are informative and non-empty
         if not reasons:
-            reasons.append(f"Personnel profile and trade match operational requirements for {predicted_class}.")
+            reasons.append(f"Personnel profile and service history match operational requirements for {predicted_company}.")
+            if section:
+                reasons.append(f"Historical posting pattern shows strong alignment with Section '{section}'.")
+            if position:
+                reasons.append(f"Personnel experience and seniority profile fit assignment to '{position}'.")
 
         return {
-            "predicted_company": predicted_class,
+            "predicted_company": predicted_company,
+            "recommended_section": section,
+            "recommended_position": position,
             "positive_forces": positive_forces[:5],
             "negative_forces": negative_forces[:3],
             "top_factors": factors[:8],
             "match_reasons": reasons
         }
 
-    def _fallback_explanation(self, X_sample: pd.DataFrame, predicted_class: str) -> Dict[str, Any]:
+    def _fallback_explanation(
+        self,
+        X_sample: pd.DataFrame,
+        predicted_company: str,
+        section: str = "",
+        position: str = ""
+    ) -> Dict[str, Any]:
         """Fallback explanation if SHAP explainer is unavailable."""
+        reasons = [
+            f"Previous unit history and duties strongly align with personnel historically assigned to {predicted_company}.",
+            f"Posting duration and seniority profile match {predicted_company} establishment."
+        ]
+        if section:
+            reasons.append(f"Service background demonstrates strong compatibility with Section '{section}'.")
+        if position:
+            reasons.append(f"Profile and past field duties align with historical '{position}' assignments.")
+
         return {
-            "predicted_company": predicted_class,
+            "predicted_company": predicted_company,
+            "recommended_section": section,
+            "recommended_position": position,
             "positive_forces": [
-                f"+ Specialty profile aligns with {predicted_class} technical roster",
-                f"+ Rank and service experience fit {predicted_class} establishment"
+                f"+ Service background and duty experience align with {predicted_company} establishment",
+                f"+ Rank and posting tenure fit {predicted_company} operational roster"
             ],
             "negative_forces": [],
             "top_factors": [],
-            "match_reasons": [
-                f"Trade and specialties match requirements for {predicted_class}.",
-                f"Service profile aligns with Unit 15 CESR deployment structure."
-            ]
+            "match_reasons": reasons
         }

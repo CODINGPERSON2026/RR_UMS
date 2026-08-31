@@ -850,32 +850,78 @@
                     </select>
                   </div>
 
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Position / Appointment</label>
+                    <select class="form-select" id="position">
+                      <option value="">Choose section first</option>
+                    </select>
+                  </div>
+
                   <script>
-                    // Map company to its sections
-                    const companySections = {
-                      "COMN Company": ["SIGCEN", "FAULT REPAIR", "IT", "MCCS", "CHQ","COMN",],
-                      "3 Company": ["DET", "System", "CHQ", "MT"],
-                      "HQ company": ["RHQ", "CHQ", "LRW", "QM", "RPNA", "MT",  "QRT", "TM",]
+                    // Canonical Company -> Section -> Position hierarchy master
+                    const companyHierarchy = {
+                      "HQ company": {
+                        "QM": ["Ration NCO", "Fresh NCO", "Clothing NCO", "MES NCO", "SKT"],
+                        "RHQ": ["O1", "O2", "O3", "TRG Clerk", "Clerk", "Warrant Clerk", "Part One Clerk", "Dispatcher Clerk", "A-Sigma Clerk", "PA"],
+                        "RP": ["Adm NCO", "Strict Orderly", "Runner", "RP NCO", "Guest Room NCO"],
+                        "TM": ["TM"],
+                        "MT": ["MT"],
+                        "LRW": ["LRW"],
+                        "CHQ": ["Buddy", "Office", "Mess Hav", "All Tradesmen", "JCO Mess Cdr"],
+                        "GENERAL DUTY": ["CHM", "CQMH", "RHM", "GD"]
+                      },
+                      "COMN Company": {
+                        "COMMUNICATION / TECHNICAL": ["Multimedia", "IT", "System", "Radio RR", "MCCS Exchange", "Communication Clerk", "Strip Clerk", "ICN", "NFS", "Server"]
+                      },
+                      "3 Company": {
+                        "TECHNICAL / CORPS HQ": ["VC", "Corps HQ", "System", "Branch"]
+                      }
                     };
+
+                    function getNormalizedHierarchyCompany(coy) {
+                      if (!coy) return "";
+                      const clean = String(coy).trim().toLowerCase();
+                      if (clean.includes("hq")) return "HQ company";
+                      if (clean.includes("comn") || clean.includes("communication")) return "COMN Company";
+                      if (clean.includes("3") || clean.includes("third")) return "3 Company";
+                      return coy;
+                    }
 
                     const companySelect = document.getElementById('company');
                     const sectionSelect = document.getElementById('section');
+                    const positionSelect = document.getElementById('position');
 
-                    companySelect.addEventListener('change', function () {
-                      const selectedCompany = this.value;
+                    if (companySelect && sectionSelect) {
+                      companySelect.addEventListener('change', function () {
+                        const selectedCompany = getNormalizedHierarchyCompany(this.value);
+                        sectionSelect.innerHTML = '<option value="">Select Section</option>';
+                        if (positionSelect) positionSelect.innerHTML = '<option value="">Choose section first</option>';
 
-                      // Clear previous options
-                      sectionSelect.innerHTML = '<option value="">Select</option>';
-
-                      if (selectedCompany && companySections[selectedCompany]) {
-                        companySections[selectedCompany].forEach(section => {
+                        const sectionsObj = companyHierarchy[selectedCompany] || {};
+                        Object.keys(sectionsObj).forEach(sec => {
                           const option = document.createElement('option');
-                          option.value = section;
-                          option.textContent = section;
+                          option.value = sec;
+                          option.textContent = sec;
                           sectionSelect.appendChild(option);
                         });
+                      });
+
+                      if (positionSelect) {
+                        sectionSelect.addEventListener('change', function () {
+                          const selectedCompany = getNormalizedHierarchyCompany(companySelect.value);
+                          const selectedSection = this.value;
+                          positionSelect.innerHTML = '<option value="">Select Position</option>';
+
+                          const positions = (companyHierarchy[selectedCompany] && companyHierarchy[selectedCompany][selectedSection]) || [];
+                          positions.forEach(pos => {
+                            const option = document.createElement('option');
+                            option.value = pos;
+                            option.textContent = pos;
+                            positionSelect.appendChild(option);
+                          });
+                        });
                       }
-                    });
+                    }
                   </script>
 
 
@@ -3652,6 +3698,16 @@
   .ai-calc-btn-green:active {
     transform: translateY(0);
   }
+  .ai-calc-btn-green:disabled,
+  .ai-calc-btn-green.disabled {
+    background: #94a3b8 !important;
+    color: #f1f5f9 !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+    opacity: 0.65 !important;
+    pointer-events: none;
+  }
 
   /* Clickable interactive reason cards */
   .ai-reason-card {
@@ -3776,8 +3832,36 @@
   .ai-cb-option:hover {
     background: #f1f5f9;
   }
-  .ai-cb-option input[type="checkbox"] {
-    cursor: pointer;
+  /* Section & Trade Multi-Select Dropdown Styles */
+  .ai-sec-trade-dropdown-panel {
+    min-width: 320px;
+    max-height: 340px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 14px 35px -4px rgba(0, 0, 0, 0.25), 0 4px 15px rgba(0, 0, 0, 0.08);
+    z-index: 1060 !important;
+  }
+  .ai-sec-group {
+    transition: all 0.15s ease;
+  }
+  .ai-sec-group:hover {
+    border-color: #94a3b8 !important;
+  }
+  .ai-sec-header:hover {
+    background-color: #f1f5f9;
+  }
+  .ai-trade-label {
+    transition: background 0.12s;
+  }
+  .ai-trade-label:hover {
+    background-color: #f1f5f9;
+  }
+  .ai-sec-chk:indeterminate {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10h8'/%3e%3c/svg%3e") !important;
   }
   /* Bold Table Headings */
   #aiRecModal table thead th, #aiUnitsTable thead th, .table thead th {
@@ -3807,7 +3891,12 @@
               </small>
             </div>
           </div>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1);"></button>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-outline-light rounded-circle d-flex align-items-center justify-content-center p-0 ai-modal-header-refresh-btn" onclick="syncAiModalFromMainForm(); if(typeof clearAllSecTrades === 'function') clearAllSecTrades();" title="Refresh / Re-sync All Fields" style="width: 32px; height: 32px; border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.15); transition: all 0.25s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.querySelector('i').style.transform='rotate(180deg)';" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.querySelector('i').style.transform='none';">
+              <i class="fas fa-sync-alt text-white" style="font-size: 0.82rem; transition: transform 0.25s;"></i>
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
         </div>
 
         <!-- Tab switcher -->
@@ -3875,96 +3964,6 @@
 
             <div class="row g-2 mb-2">
               <div class="col-md-6">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Trade / Core Category<span class="text-danger">*</span></label>
-                <select id="aiTrade" class="form-select form-select-sm mb-1.5" onchange="onAiTradeSelectChange(this)">
-                  <option value="">Select Trade</option>
-                  <option value="TTC">TTC</option>
-                  <option value="TECH SA">TECH SA</option>
-                  <option value="LMN">LMN (Line Man)</option>
-                  <option value="CLK SD">CLK SD (Clerk SD)</option>
-                  <option value="EFS">EFS</option>
-                  <option value="DVR">DVR (Driver MT)</option>
-                  <option value="JE SYS">JE SYS</option>
-                  <option value="JE NE">JE NE</option>
-                  <option value="SKT">SKT (Storekeeper)</option>
-                  <option value="RR">RR (Radio Relay)</option>
-                  <option value="RT JCO">RT JCO</option>
-                  <option value="DTMN">DTMN (Draftsman)</option>
-                  <option value="OP CIPH">OP CIPH (Cipher)</option>
-                  <option value="ARTSN">ARTSN (Artisan)</option>
-                  <option value="AEBV">AEBV</option>
-                  <option value="CHEF MESS">CHEF MESS</option>
-                  <option value="CHEF COM">CHEF COM</option>
-                  <option value="STWD">STWD (Steward)</option>
-                  <option value="HKEEPER">HKEEPER (Housekeeper)</option>
-                  <option value="WM">WM (Washerman)</option>
-                  <option value="WELDER">WELDER</option>
-                  <option value="Other">Other</option>
-                </select>
-                <div id="aiTradeOtherWrap" class="mb-1.5" style="display: none;">
-                  <input type="text" id="aiTradeOtherInput" class="form-control form-control-sm" placeholder="Specify custom trade..." oninput="this.value = this.value.toUpperCase();" />
-                </div>
-                
-                <!-- Multi-Specialty Checkboxes -->
-                <div class="p-2 rounded bg-white border" style="max-height: 115px; overflow-y: auto;">
-                  <span class="d-block fw-semibold text-muted mb-1" style="font-size: 0.73rem;">Specialties (Select All That Apply):</span>
-                  <div class="row g-1" style="font-size: 0.76rem;">
-                    <div class="col-6">
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="IT" id="spec_it" />
-                        <label class="form-check-label" for="spec_it">IT / Computing</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Radio" id="spec_radio" />
-                        <label class="form-check-label" for="spec_radio">Radio / Wireless</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Technical" id="spec_tech" />
-                        <label class="form-check-label" for="spec_tech">Technical</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Clerk" id="spec_clerk" />
-                        <label class="form-check-label" for="spec_clerk">Clerk / SD</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="System" id="spec_sys" />
-                        <label class="form-check-label" for="spec_sys">System / Server</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Network" id="spec_net" />
-                        <label class="form-check-label" for="spec_net">Network / ICN</label>
-                      </div>
-                    </div>
-                    <div class="col-6">
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="QM / Logistics" id="spec_qm" />
-                        <label class="form-check-label" for="spec_qm">QM / Store / SKT</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="MT / Driver" id="spec_mt" />
-                        <label class="form-check-label" for="spec_mt">MT / Driver</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Admin" id="spec_admin" />
-                        <label class="form-check-label" for="spec_admin">Administration</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Signal / Comn" id="spec_sig" />
-                        <label class="form-check-label" for="spec_sig">Signal / Comn</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="Security" id="spec_sec" />
-                        <label class="form-check-label" for="spec_sec">Security / RP</label>
-                      </div>
-                      <div class="form-check m-0">
-                        <input class="form-check-input ai-spec-chk" type="checkbox" value="General Duty" id="spec_gd" />
-                        <label class="form-check-label" for="spec_gd">General Duty</label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Rank<span class="text-danger">*</span></label>
                 <select id="aiRank" class="form-select form-select-sm" onchange="onAiRankSelectChange(this)">
                   <option value="">Select Rank</option>
@@ -3974,6 +3973,8 @@
                   <option value="Sub">Sub</option>
                   <option value="Naib Subedar">Nb Sub</option>
                   <option value="CHM">CHM</option>
+                  <option value="CQMH">CQMH</option>
+                  <option value="RHM">RHM</option>
                   <option value="HAV">HAV</option>
                   <option value="L HAV">L HAV</option>
                   <option value="NK">NK</option>
@@ -3982,15 +3983,11 @@
                   <option value="Agniveer">Agniveer</option>
                   <option value="Other">Other</option>
                 </select>
-
                 <div id="aiRankOtherWrap" class="mt-1" style="display: none;">
                   <input type="text" id="aiRankOtherInput" class="form-control form-control-sm" placeholder="Specify custom rank..." oninput="this.value = this.value.toUpperCase();" />
                 </div>
               </div>
-            </div>
 
-
-            <div class="row g-2 mb-3">
               <div class="col-md-6">
                 <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Date of Enrollment</label>
                 <div class="input-group input-group-sm">
@@ -4001,10 +3998,51 @@
                   </button>
                 </div>
               </div>
+            </div>
 
+            <div class="row g-2 mb-3">
               <div class="col-md-6">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Prior Station</label>
-                <input type="text" id="aiPriorStation" class="form-control form-control-sm" placeholder="e.g. Jammu And Kashmir, Pune" oninput="this.value = this.value.toUpperCase();" />
+                <label class="form-label fw-semibold mb-1" style="font-size: 0.82rem;">Prior Station / Field Record</label>
+                <input type="text" id="aiPriorStation" class="form-control form-control-sm" placeholder="e.g. Jammu And Kashmir, Pune, Leh" oninput="this.value = this.value.toUpperCase();" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold mb-1 d-flex justify-content-between align-items-center" style="font-size: 0.82rem;">
+                  <span><i class="fas fa-sitemap text-primary me-1"></i> Section &amp; Trade/Appointment</span>
+                  <div class="d-flex align-items-center gap-1.5">
+                    <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none text-muted" id="btnRefreshSecTrade" onclick="clearAllSecTrades(this)" title="Reset / Refresh all selections" style="font-size: 0.76rem; line-height: 1;">
+                      <i class="fas fa-redo-alt text-primary" style="transition: transform 0.25s;" onmouseover="this.style.transform='rotate(180deg)'" onmouseout="this.style.transform='none'"></i>
+                    </button>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle" id="aiSecTradeCountBadge" style="font-size: 0.68rem; font-weight: 600;" title="No selections yet">0 Selected</span>
+                  </div>
+                </label>
+                <div class="ai-sec-trade-dropdown-wrap position-relative">
+                  <button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center ai-sec-trade-select-btn" onclick="toggleSecTradeDropdown(this, event)" title="Click to select Section & Trade/Appointment checkboxes">
+                    <span class="ai-sec-trade-summary-text text-truncate text-muted" style="max-width: 250px; font-size: 0.78rem;">Select Section &amp; Trade/Appointment</span>
+                    <i class="fas fa-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
+                  </button>
+
+                  <div class="ai-sec-trade-dropdown-panel p-2 shadow" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 2px); left: 0; right: 0; min-width: 320px; max-height: 340px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; z-index: 1060;">
+                    <!-- Search and Action Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+                      <div class="input-group input-group-sm" style="max-width: 58%;">
+                        <span class="input-group-text bg-light border-end-0 py-0 px-2 text-muted"><i class="fas fa-search" style="font-size: 0.68rem;"></i></span>
+                        <input type="text" class="form-control form-control-sm border-start-0 py-0 ps-1" placeholder="Search..." oninput="filterSecTradeTree(this)" style="font-size: 0.75rem;" />
+                      </div>
+                      <div class="d-flex gap-1 align-items-center" style="font-size: 0.7rem;">
+                        <button type="button" class="btn btn-link p-0 text-decoration-none text-primary fw-semibold" onclick="selectAllSecTrades(this)">All</button>
+                        <span class="text-muted">•</span>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none text-danger fw-semibold" onclick="clearAllSecTrades(this)">Clear</button>
+                        <span class="text-muted">•</span>
+                        <button type="button" class="btn btn-link p-0 text-decoration-none text-secondary" onclick="toggleAllSecTradeExpands(this)" id="btnToggleAllExpands">Expand All</button>
+                      </div>
+                    </div>
+
+                    <!-- Nested Section & Trade Checklist -->
+                    <div class="ai-sec-trade-tree-list" id="aiSecTradeTreeList">
+                      <!-- Dynamically rendered via JavaScript -->
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -4012,7 +4050,7 @@
             <div class="border-top pt-2">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-dark" id="aiUnitsHistoryTitle" style="font-size: 0.84rem;">
-                  <i class="fas fa-history text-secondary me-1"></i> Previous Units Served History
+                  <i class="fas fa-history text-secondary me-1"></i> Previous Units Served History (Non-Trade)
                 </span>
                 <div class="form-check form-check-inline m-0">
                   <input class="form-check-input" type="checkbox" id="aiFreshJoineeCheckbox" onchange="toggleAiFreshJoinee(this.checked)" />
@@ -4056,51 +4094,172 @@
                           </div>
                         </td>
                         <td>
-                          <select class="form-select form-select-sm ai-u-duty" onchange="onAiDutySelectChange(this)">
-                            <option value="GENERAL" selected>GENERAL</option>
-                            <option value="TM">TM</option>
-                            <option value="MULTI MEDIA">MULTI MEDIA</option>
-                            <option value="CODING">CODING</option>
-                            <option value="ACCOUNT">ACCOUNT</option>
-                            <option value="PROJECTS">PROJECTS</option>
-                            <option value="SYSTEM">SYSTEM</option>
-                            <option value="IT">IT</option>
-                            <option value="EXCHANGE">EXCHANGE</option>
-                            <option value="NFS">NFS</option>
-                            <option value="RR">RR</option>
-                            <option value="ICN AND BTS">ICN AND BTS</option>
-                            <option value="PA">PA</option>
-                            <option value="RP">RP</option>
-                            <option value="RUNNER">RUNNER</option>
-                            <option value="BUDDY">BUDDY</option>
-                            <option value="CLK">CLK</option>
-                            <option value="ONCO">ONCO</option>
-                            <option value="DUTY EFS">DUTY EFS</option>
-                            <option value="LINE MAN CQ">LINE MAN CQ</option>
-                            <option value="RT JCO">RT JCO</option>
-                            <option value="ORH">ORH</option>
-                            <option value="MESS CDR">MESS CDR</option>
-                            <option value="TRG CLK">TRG CLK</option>
-                            <option value="CHM">CHM</option>
-                            <option value="RHM">RHM</option>
-                            <option value="STOREMAN">STOREMAN</option>
-                            <option value="NODE">NODE</option>
-                            <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
-                            <option value="OPERATIONS">OPERATIONS</option>
-                            <option value="COMMUNICATION">COMMUNICATION</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
-                            <option value="SECURITY">SECURITY</option>
-                            <option value="ADMINISTRATION">ADMINISTRATION</option>
-                            <option value="TECHNICAL">TECHNICAL</option>
-                            <option value="Other">Other</option>
-                          </select>
-                          <div class="ai-duty-other-wrap mt-1" style="display: none;">
-                            <input type="text" class="form-control form-control-sm ai-duty-other-input" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
+                          <div class="ai-duty-multi-wrap position-relative">
+                            <button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center ai-duty-select-btn" onclick="toggleAiDutyDropdown(this, event)" title="Click to select Duty / Domain checkboxes">
+                              <span class="ai-duty-summary-text text-truncate text-dark fw-bold" style="max-width: 175px; font-size: 0.78rem;">GENERAL</span>
+                              <i class="fas fa-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
+                            </button>
+                            <div class="ai-duty-dropdown-panel p-2 shadow" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 2px); left: 0; min-width: 260px; max-width: 300px; max-height: 250px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; z-index: 1060;">
+                              <div class="d-flex justify-content-between align-items-center mb-1.5 pb-1 border-bottom">
+                                <span class="fw-bold text-dark" style="font-size: 0.75rem;"><i class="fas fa-check-square text-primary me-1"></i> Domains (Checkboxes)</span>
+                                <div class="d-flex gap-1">
+                                  <button type="button" class="btn btn-link p-0 text-decoration-none text-primary" style="font-size: 0.7rem;" onclick="selectAllRowAiDutyCheckboxes(this)">All</button>
+                                  <span class="text-muted" style="font-size: 0.7rem;">•</span>
+                                  <button type="button" class="btn btn-link p-0 text-decoration-none text-danger" style="font-size: 0.7rem;" onclick="clearRowAiDutyCheckboxes(this)">Clear</button>
+                                </div>
+                              </div>
+                              <div class="ai-duty-checkboxes-list">
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="GENERAL" checked onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">GENERAL</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="TM" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">TM</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="MULTI MEDIA" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">MULTI MEDIA</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="CODING" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">CODING</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="ACCOUNT" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">ACCOUNT</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="PROJECTS" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">PROJECTS</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="SYSTEM" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">SYSTEM</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="IT" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">IT</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="EXCHANGE" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">EXCHANGE</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="NFS" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">NFS</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="RR" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">RR</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="ICN AND BTS" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">ICN AND BTS</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="PA" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">PA</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="RP" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">RP</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="RUNNER" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">RUNNER</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="BUDDY" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">BUDDY</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="CLK" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">CLK</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="ONCO" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">ONCO</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="DUTY EFS" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">DUTY EFS</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="LINE MAN CQ" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">LINE MAN CQ</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="RT JCO" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">RT JCO</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="ORH" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">ORH</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="MESS CDR" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">MESS CDR</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="TRG CLK" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">TRG CLK</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="CHM" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">CHM</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="RHM" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">RHM</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="STOREMAN" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">STOREMAN</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="NODE" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">NODE</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="DUTY DVR MTNCO" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">DUTY DVR MTNCO</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="OPERATIONS" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">OPERATIONS</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="COMMUNICATION" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">COMMUNICATION</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="MAINTENANCE" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">MAINTENANCE</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="SECURITY" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">SECURITY</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="ADMINISTRATION" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">ADMINISTRATION</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="TECHNICAL" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">TECHNICAL</span>
+                                </label>
+                                <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+                                  <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="Other" onchange="onAiDutyCheckboxChanged(this)" />
+                                  <span class="ai-domain-title text-dark">Other</span>
+                                </label>
+                              </div>
+                              <div class="ai-duty-other-wrap mt-1 pt-1 border-top" style="display: none;">
+                                <input type="text" class="form-control form-control-sm ai-duty-other-input" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiDutyOtherInput(this);" />
+                              </div>
+                            </div>
                           </div>
                         </td>
-
-
-
                         <td class="text-center">
                           <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
                             <i class="fas fa-times"></i>
@@ -4111,19 +4270,15 @@
                   </table>
                 </div>
 
-
                 <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-2.5" style="font-size: 0.76rem; border-radius: 6px;" onclick="addAiUnitRow()">
                   <i class="fas fa-plus me-1"></i> Add Another Unit
                 </button>
               </div>
             </div>
 
-
-
-
             <!-- Calculate Action Button (Vibrant Green) -->
             <div class="mt-3">
-              <button type="button" id="btnCalculateAiRec" class="ai-calc-btn-green" onclick="calculateAiRecommendation()">
+              <button type="button" id="btnCalculateAiRec" class="ai-calc-btn-green" disabled title="Select Rank and specify Previous Units or check Fresh Joinee to enable calculation" onclick="calculateAiRecommendation()">
                 <i class="fas fa-bolt text-warning"></i> Calculate AI Recommendation
               </button>
             </div>
@@ -4131,64 +4286,173 @@
 
           <!-- 2. AI Recommendation Results Container (Hidden initially) -->
           <div id="aiRecResultContainer" style="display: none;">
-            <!-- Top Recommended Company Banner -->
-            <div class="ai-rec-banner">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <span class="text-success fw-bold text-uppercase d-block" style="font-size: 0.72rem; letter-spacing: 0.5px;">
-                    👑 RECOMMENDED BEST COMPANY OPTION
-                  </span>
-                  <h3 class="fw-bold text-success mb-0 mt-0.5" id="aiTopCompanyName">COMN Company</h3>
+            
+            <!-- Hierarchical Recommendation Hero Banner -->
+            <div class="ai-rec-banner p-3 rounded-3 mb-3 text-white" style="background: linear-gradient(135deg, #059669 0%, #0d9488 50%, #0284c7 100%) !important;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-uppercase text-white-50 fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                  👑 RECOMMENDED PLACEMENT HIERARCHY
+                </span>
+                <div class="d-flex gap-1.5 align-items-center">
+                  <span class="badge bg-dark-subtle text-white px-2 py-0.5" id="aiModeBadge" style="font-size: 0.68rem; border-radius: 4px; display: none;">User Selected Section</span>
+                  <span class="badge bg-white text-success px-2.5 py-1 fw-bold" id="aiConfidenceBadge" style="font-size: 0.74rem; border-radius: 6px;">85.0% Match</span>
                 </div>
-                <div class="text-end">
-                  <div class="h3 fw-bold text-success mb-0" id="aiTopPercentage">46.07%</div>
-                  <span class="badge bg-success px-2.5 py-1" id="aiConfidenceBadge" style="font-size: 0.72rem; border-radius: 6px;">Moderate Match Confidence</span>
+              </div>
+              <div class="row g-2 align-items-center">
+                <div class="col-md-4">
+                  <span class="text-white-50 small d-block">1. Recommended Company</span>
+                  <h4 class="fw-bold mb-0 text-white mt-0.5" id="aiTopCompanyName">HQ COY</h4>
+                  <small class="text-white opacity-75" id="aiCompanyScoreText">Probability: 60.3%</small>
+                </div>
+                <div class="col-md-4 border-start border-white border-opacity-25 ps-md-3">
+                  <span class="text-white-50 small d-block" id="aiSectionHeaderLabel">2. Recommended Section</span>
+                  <h4 class="fw-bold mb-0 text-white mt-0.5" id="aiTopSectionName">RHQ</h4>
+                  <small class="text-white opacity-75" id="aiSectionScoreText">Probability: 75.0%</small>
+                </div>
+                <div class="col-md-4 border-start border-white border-opacity-25 ps-md-3">
+                  <span class="text-white-50 small d-block">3. Recommended Position</span>
+                  <h4 class="fw-bold mb-0 text-white mt-0.5" id="aiTopPositionName">O1</h4>
+                  <small class="text-white opacity-75" id="aiPositionScoreText">Probability: 53.0%</small>
                 </div>
               </div>
             </div>
 
-            <!-- Probability Distribution Bars -->
-            <div class="ai-card-box">
+            <!-- 1. COMPANY PROBABILITY DISTRIBUTION -->
+            <div class="ai-card-box mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-dark" style="font-size: 0.86rem;">
-                  <i class="fas fa-chart-pie text-primary me-1"></i> Company Distribution Probabilities
+                  <i class="fas fa-building text-primary me-1"></i> Company Probability Distribution
                 </span>
-                <small class="text-muted" style="font-size: 0.75rem;">Ranked Class Postings</small>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.70rem;">
+                  All Valid Companies (Sum ~ 100%)
+                </span>
               </div>
-              <div class="d-flex flex-column gap-2" id="aiProbabilitiesList">
-                <!-- Dynamically Populated -->
+              <div class="table-responsive mb-2">
+                <table class="table table-sm table-striped align-middle mb-0" style="font-size: 0.78rem;" id="aiCompanyProbTable">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="py-1 px-2">Company</th>
+                      <th class="py-1 px-2 text-end">Probability</th>
+                      <th class="py-1 px-2" style="width: 40%;">Distribution Bar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="aiCompanyProbTableBody">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <!-- 3. Enhanced SHAP Feature Impact Analysis -->
-            <div class="ai-card-box">
+            <!-- 2. SECTION PROBABILITY / COMPATIBILITY DISTRIBUTION -->
+            <div class="ai-card-box mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size: 0.86rem;" id="aiSecDistHeaderTitle">
+                  <i class="fas fa-sitemap text-primary me-1"></i> Section Probability Distribution
+                </span>
+                <span class="badge bg-secondary-subtle text-dark border" id="aiSecDistHeaderBadge" style="font-size: 0.70rem;">
+                  Valid Sections under Company
+                </span>
+              </div>
+              <div class="table-responsive mb-2">
+                <table class="table table-sm table-striped align-middle mb-0" style="font-size: 0.78rem;" id="aiSectionProbTable">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="py-1 px-2">Section</th>
+                      <th class="py-1 px-2">Parent Company</th>
+                      <th class="py-1 px-2 text-end" id="aiSecScoreColHeader">Probability</th>
+                      <th class="py-1 px-2" style="width: 35%;">Distribution Bar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="aiSectionProbTableBody">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 3. POSITION PROBABILITY DISTRIBUTION (CONDITIONAL) -->
+            <div class="ai-card-box mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                    <i class="fas fa-user-tag text-primary me-1"></i> Position Probability Distribution
+                  </span>
+                  <small class="text-muted d-block" id="aiPosDistSubtitle" style="font-size: 0.72rem;">
+                    P(Position | Profile, Section) for all valid appointments
+                  </small>
+                </div>
+                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none text-primary" id="btnToggleAllPositions" onclick="toggleAllPositionsView(this)" style="font-size: 0.74rem;">
+                  View All Positions
+                </button>
+              </div>
+              <div class="table-responsive mb-2">
+                <table class="table table-sm table-striped align-middle mb-0" style="font-size: 0.78rem;" id="aiPositionProbTable">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="py-1 px-2">Position / Appointment</th>
+                      <th class="py-1 px-2">Section</th>
+                      <th class="py-1 px-2 text-end">Probability</th>
+                      <th class="py-1 px-2" style="width: 35%;">Distribution Bar</th>
+                    </tr>
+                  </thead>
+                  <tbody id="aiPositionProbTableBody">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 4. TOP-N HIERARCHICAL RECOMMENDATIONS TABLE -->
+            <div class="ai-card-box mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                  <i class="fas fa-list-ol text-primary me-1"></i> Top-N Valid Hierarchical Recommendations
+                </span>
+                <span class="badge bg-light text-muted border" style="font-size: 0.70rem;">Strict Hierarchy Validated</span>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0" style="font-size: 0.78rem;" id="aiTopNTable">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="py-1 px-2">Rank</th>
+                      <th class="py-1 px-2">Company</th>
+                      <th class="py-1 px-2">Section</th>
+                      <th class="py-1 px-2">Position</th>
+                      <th class="py-1 px-2 text-end">Score</th>
+                    </tr>
+                  </thead>
+                  <tbody id="aiTopNTableBody">
+                    <!-- Dynamically populated -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 5. SHAP FEATURE ATTRIBUTION & EXPLAINABILITY (NO TRADE) -->
+            <div class="ai-card-box mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-dark" style="font-size: 0.86rem;">
                   <i class="fas fa-project-diagram text-success me-1"></i> SHAP Explainability &amp; Feature Attribution
                 </span>
-                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.72rem;">
+                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.70rem;">
                   TreeSHAP Model Values
                 </span>
               </div>
-              <p class="text-muted mb-3" style="font-size: 0.78rem;">
-                Breakdown of how soldier profile attributes positively or negatively influenced the final placement probability:
+              <p class="text-muted mb-2" style="font-size: 0.76rem;">
+                Attribution breakdown of how personnel profile, previous postings, and duty patterns influenced the recommendation (Trade is 100% excluded):
               </p>
-
               <div id="shapBarsContainer" class="d-flex flex-column gap-2">
                 <!-- Dynamically Populated SHAP Bars -->
               </div>
             </div>
 
-            <!-- 4. Interactive Clickable Reason Cards -->
-            <div class="ai-card-box">
+            <!-- 6. WHY HAS AI RECOMMENDED THIS? -->
+            <div class="ai-card-box mb-3">
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                  <span class="fw-bold text-dark" style="font-size: 0.86rem;">
-                    <i class="fas fa-lightbulb text-warning me-1"></i> Why has AI recommended this?
-                  </span>
-                  <span class="text-muted ms-1" style="font-size: 0.75rem;">(Click any reason card to open full dialog)</span>
-                </div>
-                <small class="badge bg-light text-dark border" style="font-size: 0.72rem;">Interactive Rationale</small>
+                <span class="fw-bold text-dark" style="font-size: 0.86rem;">
+                  <i class="fas fa-lightbulb text-warning me-1"></i> Why has AI recommended this?
+                </span>
+                <small class="badge bg-light text-dark border" style="font-size: 0.70rem;">Model-Backed Rationale</small>
               </div>
 
               <div class="d-flex flex-column gap-2" id="aiReasonsList">
@@ -4384,6 +4648,66 @@
     } else {
       input.value = val;
     }
+    validateLiveDateInput(input);
+  }
+
+  function validateLiveDateInput(input) {
+    if (!input) return;
+    const str = input.value.trim();
+    if (!str) {
+      input.classList.remove('is-invalid');
+      input.classList.remove('is-valid');
+      input.removeAttribute('title');
+      return;
+    }
+
+    if (str.length === 10) {
+      const res = parseAndValidateDate(str);
+      if (!res.valid) {
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        input.setAttribute('title', res.error);
+      } else {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        input.removeAttribute('title');
+      }
+    } else {
+      input.classList.remove('is-valid');
+    }
+  }
+
+  function onDateInputBlur(input) {
+    if (!input) return;
+    const str = input.value.trim();
+    if (!str) {
+      input.classList.remove('is-invalid');
+      input.classList.remove('is-valid');
+      input.removeAttribute('title');
+      return;
+    }
+    const res = parseAndValidateDate(str);
+    if (!res.valid) {
+      input.classList.add('is-invalid');
+      input.classList.remove('is-valid');
+      input.setAttribute('title', res.error);
+    } else {
+      input.classList.remove('is-invalid');
+      input.classList.add('is-valid');
+      input.removeAttribute('title');
+    }
+  }
+
+  function onNativeDatePicked(hiddenInput) {
+    if (!hiddenInput || !hiddenInput.value) return;
+    const textInput = hiddenInput.closest('.input-group')?.querySelector('.ai-date-easy');
+    if (textInput) {
+      textInput.value = isoToDmy(hiddenInput.value);
+      validateLiveDateInput(textInput);
+      if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      if (typeof checkEnrollmentYearForFreshJoinee === 'function') checkEnrollmentYearForFreshJoinee();
+      if (typeof onAiUnitInputEdited === 'function') onAiUnitInputEdited();
+    }
   }
 
   function openEasyCalendar(btn) {
@@ -4400,19 +4724,6 @@
         hiddenDate.click();
       }
     }
-  }
-
-  function isoToDmy(val) {
-    if (!val) return '';
-    val = String(val).trim();
-    if (val.includes('-')) {
-      const parts = val.split('-');
-      if (parts[0].length === 4) {
-        // YYYY-MM-DD -> DD-MM-YYYY
-        return `${parts[2].padStart(2, '0')}-${parts[1].padStart(2, '0')}-${parts[0]}`;
-      }
-    }
-    return val;
   }
 
   function dmyToIso(val) {
@@ -4433,15 +4744,15 @@
     str = String(str).trim();
     
     let day, month, year;
-    // Check DD-MM-YYYY or DD/MM/YYYY
-    if (/^\d{1,2}[-\/]\d{1,2}[-\/]\d{4}$/.test(str)) {
-      const parts = str.split(/[-\/]/);
+    // Check DD-MM-YYYY or DD/MM/YYYY or DD.MM.YYYY
+    if (/^\d{1,2}[-\/.]\d{1,2}[-\/.]\d{4}$/.test(str)) {
+      const parts = str.split(/[-\/.]/);
       day = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10);
       year = parseInt(parts[2], 10);
-    } else if (/^\d{4}[-\/]\d{1,2}[-\/]\d{1,2}$/.test(str)) {
-      // YYYY-MM-DD
-      const parts = str.split(/[-\/]/);
+    } else if (/^\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}$/.test(str)) {
+      // YYYY-MM-DD or YYYY/MM/DD
+      const parts = str.split(/[-\/.]/);
       year = parseInt(parts[0], 10);
       month = parseInt(parts[1], 10);
       day = parseInt(parts[2], 10);
@@ -4450,7 +4761,7 @@
     }
 
     if (month < 1 || month > 12) {
-      return { valid: false, error: `Invalid month (${month}) in "${str}". Month must be 1 to 12.` };
+      return { valid: false, error: `Invalid month (${month}) in "${str}". Month must be between 1 and 12.` };
     }
 
     if (year < 1950) {
@@ -4496,6 +4807,31 @@
   function isValidCalendarDate(str) {
     if (!str) return false;
     return parseAndValidateDate(str).valid;
+  }
+
+  function showAiDateErrorAlert(title, message, targetEl = null) {
+    if (targetEl) {
+      let el = targetEl;
+      if (typeof el === 'string') el = document.getElementById(el);
+      if (el) {
+        el.classList.add('is-invalid');
+        el.classList.remove('is-valid');
+        el.style.borderColor = '#ef4444';
+        el.style.boxShadow = '0 0 0 3.5px rgba(239, 68, 68, 0.35)';
+        if (typeof el.focus === 'function') el.focus();
+        if (typeof el.scrollIntoView === 'function') {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        setTimeout(() => {
+          if (el) el.style.boxShadow = '';
+        }, 3500);
+      }
+    }
+    if (typeof showPopup === 'function') {
+      showPopup('error', title, message);
+    } else {
+      alert(`${title}\n\n${message}`);
+    }
   }
 
   function checkEnrollmentYearForFreshJoinee() {
@@ -4735,24 +5071,10 @@
               const nameEl = lastRow.querySelector('.ai-u-name');
               const fromEl = lastRow.querySelector('.ai-u-from');
               const toEl = lastRow.querySelector('.ai-u-to');
-              const dutySel = lastRow.querySelector('.ai-u-duty');
-              const otherWrap = lastRow.querySelector('.ai-duty-other-wrap');
-              const otherInput = lastRow.querySelector('.ai-duty-other-input');
 
               if (nameEl) nameEl.value = (vu.unit || '').toUpperCase();
               if (fromEl) fromEl.value = isoToDmy(vu.from);
               if (toEl) toEl.value = isoToDmy(vu.to);
-
-              if (dutySel) {
-                const matchedDuty = setSelectValueCaseInsensitive(dutySel, dutyVal);
-                if (!matchedDuty && dutyVal) {
-                  dutySel.value = 'Other';
-                  if (otherWrap) otherWrap.style.display = 'block';
-                  if (otherInput) otherInput.value = dutyVal.toUpperCase();
-                } else if (dutySel.value === 'Other') {
-                  if (otherWrap) otherWrap.style.display = 'block';
-                }
-              }
             }
           });
 
@@ -4792,12 +5114,24 @@
     }
   }
 
-  // Ensure modal always auto-syncs when opened via data-bs-toggle or JS
+  // Ensure modal always auto-syncs and evaluates button validity
   document.addEventListener('DOMContentLoaded', function() {
+    initSectionTradeTree();
     const modalEl = document.getElementById('aiRecModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
+        initSectionTradeTree();
         syncAiModalFromMainForm();
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      });
+      modalEl.addEventListener('shown.bs.modal', function () {
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      });
+      modalEl.addEventListener('input', function () {
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      });
+      modalEl.addEventListener('change', function () {
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
       });
     }
   });
@@ -5114,16 +5448,549 @@
     "Other"
   ];
 
-  function buildDutySelectOptionsHtml(selectedVal = 'GENERAL') {
-    const selNorm = (selectedVal || 'GENERAL').trim().toUpperCase();
-    let isKnown = false;
-    let html = '';
+  function buildDutyCheckboxesHtml(selectedVal = 'GENERAL') {
+    let selValues = [];
+    if (Array.isArray(selectedVal)) {
+      selValues = selectedVal.map(v => String(v).trim().toUpperCase());
+    } else if (typeof selectedVal === 'string' && selectedVal.trim()) {
+      selValues = selectedVal.split(/[,;|]+/).map(v => v.trim().toUpperCase()).filter(Boolean);
+    }
+    if (selValues.length === 0) selValues = ['GENERAL'];
+
+    let checkboxesHtml = '';
+    let isOtherChecked = false;
+    let otherCustomVal = '';
+
+    const knownUpper = AI_DOMAINS_LIST.map(d => d.toUpperCase());
+
     AI_DOMAINS_OPTIONS.forEach(d => {
-      const isMatch = (d.toUpperCase() === selNorm);
-      if (isMatch) isKnown = true;
-      html += `<option value="${d}" ${isMatch ? 'selected' : ''}>${d}</option>`;
+      const dUpper = d.toUpperCase();
+      let isChecked = false;
+      if (dUpper === 'OTHER') {
+        const unknownVals = selValues.filter(v => v && !knownUpper.includes(v) && v !== 'OTHER');
+        if (unknownVals.length > 0 || selValues.includes('OTHER')) {
+          isChecked = true;
+          isOtherChecked = true;
+          otherCustomVal = unknownVals.join(', ');
+        }
+      } else {
+        isChecked = selValues.includes(dUpper);
+      }
+
+      checkboxesHtml += `
+        <label class="ai-cb-option d-flex align-items-center gap-2 py-1 px-2 mb-1 rounded hover-bg" style="cursor: pointer; font-size: 0.78rem; user-select: none;">
+          <input type="checkbox" class="form-check-input m-0 ai-duty-chk" value="${d}" ${isChecked ? 'checked' : ''} onchange="onAiDutyCheckboxChanged(this)" />
+          <span class="ai-domain-title text-dark">${d}</span>
+        </label>
+      `;
     });
-    return { html, isOther: !isKnown && selectedVal && selectedVal !== 'GENERAL', customVal: !isKnown ? selectedVal : '' };
+
+    let summaryText = 'GENERAL';
+    if (selValues.length === 1) summaryText = selValues[0];
+    else if (selValues.length === 2) summaryText = `${selValues[0]}, ${selValues[1]}`;
+    else if (selValues.length > 2) summaryText = `${selValues[0]}, ${selValues[1]} (+${selValues.length - 2})`;
+
+    return { checkboxesHtml, isOtherChecked, otherCustomVal, summaryText };
+  }
+
+  function toggleAiDutyDropdown(btn, ev) {
+    if (ev) ev.stopPropagation();
+    const wrap = btn.closest('.ai-duty-multi-wrap');
+    if (!wrap) return;
+    const panel = wrap.querySelector('.ai-duty-dropdown-panel');
+    if (!panel) return;
+
+    const isCurrentlyOpen = (panel.style.display === 'block');
+
+    // Close all other panels
+    document.querySelectorAll('.ai-duty-dropdown-panel').forEach(p => {
+      p.style.display = 'none';
+    });
+
+    panel.style.display = isCurrentlyOpen ? 'none' : 'block';
+  }
+
+  function onAiDutyCheckboxChanged(chk) {
+    const row = chk.closest('tr');
+    const wrap = chk.closest('.ai-duty-multi-wrap');
+    if (!row || !wrap) return;
+
+    if (chk.value === 'Other') {
+      const otherWrap = wrap.querySelector('.ai-duty-other-wrap');
+      const otherInput = wrap.querySelector('.ai-duty-other-input');
+      if (otherWrap) {
+        otherWrap.style.display = chk.checked ? 'block' : 'none';
+        if (chk.checked && otherInput) otherInput.focus();
+      }
+    }
+
+    updateAiRowDutySummary(row);
+    onAiUnitInputEdited();
+  }
+
+  function onAiDutyOtherInput(input) {
+    const row = input.closest('tr');
+    if (row) {
+      updateAiRowDutySummary(row);
+      onAiUnitInputEdited();
+    }
+  }
+
+  function selectAllRowAiDutyCheckboxes(btn) {
+    const wrap = btn.closest('.ai-duty-multi-wrap');
+    const row = btn.closest('tr');
+    if (!wrap || !row) return;
+    wrap.querySelectorAll('.ai-duty-chk').forEach(c => {
+      if (c.value !== 'Other') c.checked = true;
+    });
+    updateAiRowDutySummary(row);
+    onAiUnitInputEdited();
+  }
+
+  function clearRowAiDutyCheckboxes(btn) {
+    const wrap = btn.closest('.ai-duty-multi-wrap');
+    const row = btn.closest('tr');
+    if (!wrap || !row) return;
+    wrap.querySelectorAll('.ai-duty-chk').forEach(c => c.checked = false);
+    const otherWrap = wrap.querySelector('.ai-duty-other-wrap');
+    const otherInput = wrap.querySelector('.ai-duty-other-input');
+    if (otherWrap) otherWrap.style.display = 'none';
+    if (otherInput) otherInput.value = '';
+    updateAiRowDutySummary(row);
+    onAiUnitInputEdited();
+  }
+
+  function updateAiRowDutySummary(row) {
+    const wrap = row.querySelector('.ai-duty-multi-wrap');
+    if (!wrap) return;
+    const summaryEl = wrap.querySelector('.ai-duty-summary-text');
+    if (!summaryEl) return;
+
+    const checkedBoxes = Array.from(wrap.querySelectorAll('.ai-duty-chk:checked'));
+    const selected = [];
+    checkedBoxes.forEach(c => {
+      if (c.value === 'Other') {
+        const otherVal = wrap.querySelector('.ai-duty-other-input')?.value?.trim();
+        if (otherVal) selected.push(otherVal.toUpperCase());
+        else selected.push('OTHER');
+      } else {
+        selected.push(c.value);
+      }
+    });
+
+    if (selected.length === 0) {
+      summaryEl.textContent = 'Select Domains';
+      summaryEl.className = 'ai-duty-summary-text text-truncate text-muted';
+    } else if (selected.length === 1) {
+      summaryEl.textContent = selected[0];
+      summaryEl.className = 'ai-duty-summary-text text-truncate text-dark fw-bold';
+    } else if (selected.length === 2) {
+      summaryEl.textContent = `${selected[0]}, ${selected[1]}`;
+      summaryEl.className = 'ai-duty-summary-text text-truncate text-primary fw-bold';
+    } else {
+      summaryEl.textContent = `${selected[0]}, ${selected[1]} (+${selected.length - 2})`;
+      summaryEl.className = 'ai-duty-summary-text text-truncate text-primary fw-bold';
+    }
+  }
+
+  function getAiRowSelectedDuties(row) {
+    const wrap = row.querySelector('.ai-duty-multi-wrap');
+    if (!wrap) return ['GENERAL'];
+
+    const checkedBoxes = Array.from(wrap.querySelectorAll('.ai-duty-chk:checked'));
+    const selected = [];
+    checkedBoxes.forEach(c => {
+      if (c.value === 'Other') {
+        const otherVal = wrap.querySelector('.ai-duty-other-input')?.value?.trim();
+        if (otherVal) selected.push(otherVal.toUpperCase());
+        else selected.push('OTHER');
+      } else {
+        selected.push(c.value);
+      }
+    });
+
+    return selected.length > 0 ? selected : ['GENERAL'];
+  }
+
+  // ================= SECTION & TRADE/APPOINTMENT MASTER & NESTED CHECKBOX LOGIC =================
+  const SECTION_TRADE_DATA = {
+    "QM": ["Ration NCO", "Fresh NCO", "Clothing NCO", "MES NCO", "SKT"],
+    "RHQ": ["O1", "O2", "O3", "TRG Clerk", "Clerk", "Warrant Clerk", "Part One Clerk", "Dispatcher Clerk", "A-Sigma Clerk", "PA"],
+    "RP": ["Adm NCO", "Strict Orderly", "Runner", "RP NCO", "Guest Room NCO"],
+    "TM": ["TM"],
+    "MT": ["MT"],
+    "LRW": ["LRW"],
+    "CHQ": ["Buddy", "Office", "Mess Hav", "All Tradesmen", "JCO Mess Cdr"],
+    "GENERAL DUTY": ["CHM", "CQMH", "RHM", "GD"],
+    "COMMUNICATION / TECHNICAL": ["Multimedia", "IT", "System", "Radio RR", "MCCS Exchange", "Communication Clerk", "Strip Clerk", "ICN", "NFS", "Server"],
+    "TECHNICAL / CORPS HQ": ["VC", "Corps HQ", "System", "Branch"]
+  };
+
+  function initSectionTradeTree(force = false) {
+    const container = document.getElementById('aiSecTradeTreeList');
+    if (!container) return;
+    if (container.children.length > 0 && !force) return;
+
+    // Capture any existing checked trades
+    const checkedTradeSet = new Set();
+    container.querySelectorAll('.ai-trade-chk:checked').forEach(c => checkedTradeSet.add(`${c.dataset.section}:::${c.value}`));
+
+    let html = '';
+    Object.keys(SECTION_TRADE_DATA).forEach(sec => {
+      const trades = SECTION_TRADE_DATA[sec];
+      html += `
+        <div class="ai-sec-group mb-1.5 border rounded" style="background: #f8fafc;" data-section="${sec}">
+          <div class="ai-sec-header d-flex align-items-center justify-content-between px-2 py-1.5" style="cursor: pointer;" onclick="onSectionHeaderClick(this, event)">
+            <div class="d-flex align-items-center gap-2">
+              <input type="checkbox" class="form-check-input m-0 ai-sec-chk" data-section="${sec}" onchange="onSectionCheckboxChange(this, event)" onclick="event.stopPropagation()" />
+              <span class="fw-bold text-dark ai-sec-title" style="font-size: 0.8rem;">${sec}</span>
+              <span class="badge bg-secondary-subtle text-secondary border ai-sec-badge" style="font-size: 0.65rem;">0/${trades.length}</span>
+            </div>
+            <button type="button" class="btn btn-sm p-0 text-muted ai-sec-toggle-btn" onclick="toggleSectionCollapseBtn(this, event)" style="width: 20px; text-align: center;">
+              <i class="fas fa-chevron-right" style="font-size: 0.68rem; transition: transform 0.2s;"></i>
+            </button>
+          </div>
+          <div class="ai-sec-children ps-3 pe-2 pb-1.5 pt-1 border-top bg-white" style="display: none;">
+      `;
+      trades.forEach(trade => {
+        const isChecked = checkedTradeSet.has(`${sec}:::${trade}`);
+        html += `
+            <label class="ai-trade-label d-flex align-items-center gap-2 py-0.5 px-1 rounded hover-bg" style="cursor: pointer; font-size: 0.77rem; user-select: none; margin-bottom: 2px;">
+              <input type="checkbox" class="form-check-input m-0 ai-trade-chk" data-section="${sec}" data-trade="${trade}" value="${trade}" ${isChecked ? 'checked' : ''} onchange="onTradeCheckboxChange(this, event)" />
+              <span class="text-muted" style="font-size: 0.72rem;">↳</span>
+              <span class="ai-trade-name text-dark">${trade}</span>
+            </label>
+        `;
+      });
+      html += `
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+    updateSecTradeState();
+  }
+
+  function toggleSecTradeDropdown(btn, ev) {
+    if (ev) ev.stopPropagation();
+    const wrap = btn.closest('.ai-sec-trade-dropdown-wrap');
+    if (!wrap) return;
+    const panel = wrap.querySelector('.ai-sec-trade-dropdown-panel');
+    if (!panel) return;
+
+    // Ensure tree is initialized
+    const treeList = document.getElementById('aiSecTradeTreeList');
+    if (treeList && treeList.children.length === 0) {
+      initSectionTradeTree();
+    }
+
+    // Close domain dropdowns
+    document.querySelectorAll('.ai-duty-dropdown-panel').forEach(p => p.style.display = 'none');
+
+    const isOpen = (panel.style.display === 'block');
+    panel.style.display = isOpen ? 'none' : 'block';
+  }
+
+  function onSectionHeaderClick(header, ev) {
+    if (ev.target.tagName === 'INPUT') return;
+    const group = header.closest('.ai-sec-group');
+    if (!group) return;
+    const children = group.querySelector('.ai-sec-children');
+    const icon = group.querySelector('.ai-sec-toggle-btn i');
+    if (!children) return;
+
+    const isHidden = (children.style.display === 'none' || !children.style.display);
+    children.style.display = isHidden ? 'block' : 'none';
+    if (icon) icon.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
+
+  function toggleSectionCollapseBtn(btn, ev) {
+    if (ev) ev.stopPropagation();
+    const group = btn.closest('.ai-sec-group');
+    if (!group) return;
+    const children = group.querySelector('.ai-sec-children');
+    const icon = btn.querySelector('i');
+    if (!children) return;
+
+    const isHidden = (children.style.display === 'none' || !children.style.display);
+    children.style.display = isHidden ? 'block' : 'none';
+    if (icon) icon.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
+
+  function onSectionCheckboxChange(secChk, ev) {
+    if (ev) ev.stopPropagation();
+    const group = secChk.closest('.ai-sec-group');
+    if (!group) return;
+    const isChecked = secChk.checked;
+    secChk.indeterminate = false;
+
+    const childChks = group.querySelectorAll('.ai-trade-chk');
+    childChks.forEach(chk => {
+      chk.checked = isChecked;
+    });
+
+    const children = group.querySelector('.ai-sec-children');
+    const icon = group.querySelector('.ai-sec-toggle-btn i');
+    if (isChecked && children && children.style.display === 'none') {
+      children.style.display = 'block';
+      if (icon) icon.style.transform = 'rotate(90deg)';
+    }
+
+    updateSecTradeState();
+  }
+
+  function onTradeCheckboxChange(tradeChk, ev) {
+    if (ev) ev.stopPropagation();
+    const group = tradeChk.closest('.ai-sec-group');
+    if (!group) return;
+    const secChk = group.querySelector('.ai-sec-chk');
+    const allChildChks = Array.from(group.querySelectorAll('.ai-trade-chk'));
+    const checkedCount = allChildChks.filter(c => c.checked).length;
+    const totalCount = allChildChks.length;
+
+    if (secChk) {
+      if (checkedCount === totalCount && totalCount > 0) {
+        secChk.checked = true;
+        secChk.indeterminate = false;
+      } else if (checkedCount === 0) {
+        secChk.checked = false;
+        secChk.indeterminate = false;
+      } else {
+        secChk.checked = false;
+        secChk.indeterminate = true;
+      }
+    }
+
+    updateSecTradeState();
+  }
+
+  function updateSecTradeState() {
+    const groups = document.querySelectorAll('.ai-sec-group');
+    const selectedTrades = [];
+    const selectedSections = [];
+    const sectionTradesMap = {};
+
+    groups.forEach(group => {
+      const secName = group.dataset.section;
+      const childChks = Array.from(group.querySelectorAll('.ai-trade-chk'));
+      const checkedTrades = childChks.filter(c => c.checked).map(c => c.value);
+      const badge = group.querySelector('.ai-sec-badge');
+
+      if (badge) {
+        badge.textContent = `${checkedTrades.length}/${childChks.length}`;
+        if (checkedTrades.length > 0) {
+          badge.className = 'badge bg-primary text-white border border-primary ai-sec-badge';
+        } else {
+          badge.className = 'badge bg-secondary-subtle text-secondary border ai-sec-badge';
+        }
+      }
+
+      if (checkedTrades.length > 0) {
+        selectedSections.push(secName);
+        selectedTrades.push(...checkedTrades);
+        sectionTradesMap[secName] = checkedTrades;
+      }
+    });
+
+    // Build expanded tooltip breakdown for hover
+    let detailedHoverTitle = "";
+    if (selectedTrades.length === 0) {
+      detailedHoverTitle = "Click to open and select Section & Trade/Appointment options";
+    } else {
+      const lines = [`Selected Section & Trade/Appointments (${selectedTrades.length} Total):`];
+      selectedSections.forEach(sec => {
+        const trades = sectionTradesMap[sec] || [];
+        const total = SECTION_TRADE_DATA[sec]?.length || 0;
+        if (trades.length === total) {
+          lines.push(`• ${sec} (All ${total}): ${trades.join(', ')}`);
+        } else {
+          lines.push(`• ${sec} (${trades.length}/${total}): ${trades.join(', ')}`);
+        }
+      });
+      detailedHoverTitle = lines.join('\n');
+    }
+
+    // Update count badge
+    const countBadge = document.getElementById('aiSecTradeCountBadge');
+    if (countBadge) {
+      countBadge.textContent = `${selectedTrades.length} Selected`;
+      countBadge.setAttribute('title', detailedHoverTitle);
+      if (selectedTrades.length > 0) {
+        countBadge.className = 'badge bg-primary text-white border border-primary';
+      } else {
+        countBadge.className = 'badge bg-primary-subtle text-primary border border-primary-subtle';
+      }
+    }
+
+    // Update select button and summary text
+    const btnSelect = document.querySelector('.ai-sec-trade-select-btn');
+    if (btnSelect) {
+      btnSelect.setAttribute('title', detailedHoverTitle);
+    }
+
+    const summaryTextEl = document.querySelector('.ai-sec-trade-summary-text');
+    if (summaryTextEl) {
+      summaryTextEl.setAttribute('title', detailedHoverTitle);
+      if (selectedTrades.length === 0) {
+        summaryTextEl.textContent = 'Select Section & Trade/Appointment';
+        summaryTextEl.className = 'ai-sec-trade-summary-text text-truncate text-muted';
+      } else if (selectedSections.length === 1) {
+        const sec = selectedSections[0];
+        const trades = sectionTradesMap[sec] || [];
+        const total = SECTION_TRADE_DATA[sec]?.length || 0;
+        if (trades.length === total) {
+          summaryTextEl.textContent = `${sec} (All ${total})`;
+        } else if (trades.length <= 2) {
+          summaryTextEl.textContent = `${sec}: ${trades.join(', ')}`;
+        } else {
+          summaryTextEl.textContent = `${sec} (${trades.length} items)`;
+        }
+        summaryTextEl.className = 'ai-sec-trade-summary-text text-truncate text-primary fw-bold';
+      } else {
+        summaryTextEl.textContent = `${selectedSections.length} Sections (${selectedTrades.length} Selected)`;
+        summaryTextEl.className = 'ai-sec-trade-summary-text text-truncate text-primary fw-bold';
+      }
+    }
+  }
+
+  function getSelectedSectionsAndTrades() {
+    const groups = document.querySelectorAll('.ai-sec-group');
+    const selectedTrades = [];
+    const selectedSections = [];
+    const fullSections = [];
+    const sectionTradesMap = {};
+
+    groups.forEach(group => {
+      const secName = group.dataset.section;
+      const childChks = Array.from(group.querySelectorAll('.ai-trade-chk'));
+      const checkedTrades = childChks.filter(c => c.checked).map(c => c.value);
+
+      if (checkedTrades.length > 0) {
+        selectedSections.push(secName);
+        selectedTrades.push(...checkedTrades);
+        sectionTradesMap[secName] = checkedTrades;
+        if (checkedTrades.length === childChks.length) {
+          fullSections.push(secName);
+        }
+      }
+    });
+
+    return {
+      sections: selectedSections,
+      full_sections: fullSections,
+      trades: selectedTrades,
+      section_trades_map: sectionTradesMap
+    };
+  }
+
+  function selectAllSecTrades(btn) {
+    document.querySelectorAll('.ai-sec-chk').forEach(c => {
+      c.checked = true;
+      c.indeterminate = false;
+    });
+    document.querySelectorAll('.ai-trade-chk').forEach(c => c.checked = true);
+    updateSecTradeState();
+  }
+
+  function clearAllSecTrades(btn) {
+    document.querySelectorAll('.ai-sec-chk').forEach(c => {
+      c.checked = false;
+      c.indeterminate = false;
+    });
+    document.querySelectorAll('.ai-trade-chk').forEach(c => c.checked = false);
+    updateSecTradeState();
+  }
+
+  function toggleAllSecTradeExpands(btn) {
+    const isCurrentlyExpand = (btn.textContent.trim() === 'Expand All');
+    document.querySelectorAll('.ai-sec-group').forEach(group => {
+      const children = group.querySelector('.ai-sec-children');
+      const icon = group.querySelector('.ai-sec-toggle-btn i');
+      if (children) children.style.display = isCurrentlyExpand ? 'block' : 'none';
+      if (icon) icon.style.transform = isCurrentlyExpand ? 'rotate(90deg)' : 'rotate(0deg)';
+    });
+    btn.textContent = isCurrentlyExpand ? 'Collapse All' : 'Expand All';
+  }
+
+  function filterSecTradeTree(input) {
+    const q = (input.value || '').trim().toLowerCase();
+    const groups = document.querySelectorAll('.ai-sec-group');
+
+    groups.forEach(group => {
+      const secName = (group.dataset.section || '').toLowerCase();
+      const labels = group.querySelectorAll('.ai-trade-label');
+      let groupHasMatch = secName.includes(q);
+
+      labels.forEach(lbl => {
+        const tradeName = (lbl.querySelector('.ai-trade-name')?.textContent || '').toLowerCase();
+        const match = tradeName.includes(q) || secName.includes(q);
+        lbl.style.display = match ? 'flex' : 'none';
+        if (match) groupHasMatch = true;
+      });
+
+      group.style.display = (groupHasMatch || !q) ? 'block' : 'none';
+      if (q && groupHasMatch) {
+        const children = group.querySelector('.ai-sec-children');
+        const icon = group.querySelector('.ai-sec-toggle-btn i');
+        if (children) children.style.display = 'block';
+        if (icon) icon.style.transform = 'rotate(90deg)';
+      }
+    });
+  }
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.ai-duty-multi-wrap')) {
+      document.querySelectorAll('.ai-duty-dropdown-panel').forEach(p => p.style.display = 'none');
+    }
+    if (!e.target.closest('.ai-sec-trade-dropdown-wrap')) {
+      document.querySelectorAll('.ai-sec-trade-dropdown-panel').forEach(p => p.style.display = 'none');
+    }
+  });
+
+  // ================= REACTIVE VALIDATION: ENABLE/DISABLE CALCULATE BUTTON =================
+  function checkAiRecFormValidity() {
+    const btn = document.getElementById('btnCalculateAiRec');
+    if (!btn) return false;
+
+    // 1. Check Rank parameter
+    const rankSelect = document.getElementById('aiRank');
+    let rankVal = rankSelect ? rankSelect.value.trim() : '';
+    if (rankVal === 'Other') {
+      const otherRankInput = document.getElementById('aiRankOtherInput');
+      rankVal = otherRankInput ? otherRankInput.value.trim() : '';
+    }
+
+    // 2. Check Previous Units Served OR Fresh Joinee status
+    const isFresh = document.getElementById('aiFreshJoineeCheckbox')?.checked || false;
+    let hasUnitsOrFresh = isFresh;
+
+    if (!hasUnitsOrFresh) {
+      const rows = document.querySelectorAll('#aiUnitsTableBody tr');
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        const uName = r.querySelector('.ai-u-name')?.value?.trim();
+        const uFrom = r.querySelector('.ai-u-from')?.value?.trim();
+        const uTo = r.querySelector('.ai-u-to')?.value?.trim();
+        if (uName || (uFrom && uTo)) {
+          hasUnitsOrFresh = true;
+          break;
+        }
+      }
+    }
+
+    // Both Rank and Posting parameters must be present
+    const isValid = Boolean(rankVal && hasUnitsOrFresh);
+
+    btn.disabled = !isValid;
+    if (isValid) {
+      btn.classList.remove('disabled');
+      btn.title = 'Click to calculate AI recommendations';
+    } else {
+      btn.classList.add('disabled');
+      btn.title = 'Please select Rank and specify Previous Units or check Fresh Joinee';
+    }
+    return isValid;
   }
 
   // ================= TRADE & RANK DROPDOWN & "OTHER" HANDLERS =================
@@ -5137,6 +6004,7 @@
       if (otherWrap) otherWrap.style.display = 'none';
       if (otherInput) otherInput.value = '';
     }
+    checkAiRecFormValidity();
   }
 
   function onAiRankSelectChange(sel) {
@@ -5149,22 +6017,7 @@
       if (otherWrap) otherWrap.style.display = 'none';
       if (otherInput) otherInput.value = '';
     }
-  }
-
-  // ================= DUTY DROPDOWN & "OTHER" HANDLERS =================
-  function onAiDutySelectChange(sel) {
-    const row = sel.closest('tr');
-    if (!row) return;
-    const otherWrap = row.querySelector('.ai-duty-other-wrap');
-    const otherInput = row.querySelector('.ai-duty-other-input');
-    if (sel.value === 'Other') {
-      if (otherWrap) otherWrap.style.display = 'block';
-      if (otherInput) otherInput.focus();
-    } else {
-      if (otherWrap) otherWrap.style.display = 'none';
-      if (otherInput) otherInput.value = '';
-    }
-    onAiUnitInputEdited();
+    checkAiRecFormValidity();
   }
 
   function onAiUnitInputEdited() {
@@ -5173,6 +6026,7 @@
       freshCheck.checked = false;
       toggleAiFreshJoinee(false);
     }
+    checkAiRecFormValidity();
   }
 
   // ================= CALCULATION & FIELD SYNC =================
@@ -5188,14 +6042,14 @@
     if (title) {
       title.style.display = isFresh ? 'none' : 'inline-block';
     }
+    checkAiRecFormValidity();
   }
 
   function addAiUnitRow(initialDuty = 'GENERAL') {
     const tbody = document.getElementById('aiUnitsTableBody');
     const tr = document.createElement('tr');
 
-    const dutyStr = Array.isArray(initialDuty) ? (initialDuty[0] || 'GENERAL') : (initialDuty || 'GENERAL');
-    const { html: optionsHtml, isOther, customVal } = buildDutySelectOptionsHtml(dutyStr);
+    const { checkboxesHtml, isOtherChecked, otherCustomVal, summaryText } = buildDutyCheckboxesHtml(initialDuty);
 
     tr.innerHTML = `
       <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 4 CSR" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
@@ -5218,11 +6072,27 @@
         </div>
       </td>
       <td>
-        <select class="form-select form-select-sm ai-u-duty" onchange="onAiDutySelectChange(this)">
-          ${optionsHtml}
-        </select>
-        <div class="ai-duty-other-wrap mt-1" style="display: ${isOther ? 'block' : 'none'};">
-          <input type="text" class="form-control form-control-sm ai-duty-other-input" value="${isOther ? customVal : ''}" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
+        <div class="ai-duty-multi-wrap position-relative">
+          <button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center ai-duty-select-btn" onclick="toggleAiDutyDropdown(this, event)" title="Click to select Duty / Domain checkboxes">
+            <span class="ai-duty-summary-text text-truncate text-dark fw-bold" style="max-width: 175px; font-size: 0.78rem;">${summaryText}</span>
+            <i class="fas fa-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
+          </button>
+          <div class="ai-duty-dropdown-panel p-2 shadow" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 2px); left: 0; min-width: 260px; max-width: 300px; max-height: 250px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; z-index: 1060;">
+            <div class="d-flex justify-content-between align-items-center mb-1.5 pb-1 border-bottom">
+              <span class="fw-bold text-dark" style="font-size: 0.75rem;"><i class="fas fa-check-square text-primary me-1"></i> Domains (Checkboxes)</span>
+              <div class="d-flex gap-1">
+                <button type="button" class="btn btn-link p-0 text-decoration-none text-primary" style="font-size: 0.7rem;" onclick="selectAllRowAiDutyCheckboxes(this)">All</button>
+                <span class="text-muted" style="font-size: 0.7rem;">•</span>
+                <button type="button" class="btn btn-link p-0 text-decoration-none text-danger" style="font-size: 0.7rem;" onclick="clearRowAiDutyCheckboxes(this)">Clear</button>
+              </div>
+            </div>
+            <div class="ai-duty-checkboxes-list">
+              ${checkboxesHtml}
+            </div>
+            <div class="ai-duty-other-wrap mt-1 pt-1 border-top" style="display: ${isOtherChecked ? 'block' : 'none'};">
+              <input type="text" class="form-control form-control-sm ai-duty-other-input" value="${otherCustomVal}" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiDutyOtherInput(this);" />
+            </div>
+          </div>
         </div>
       </td>
       <td class="text-center">
@@ -5232,6 +6102,7 @@
       </td>
     `;
     tbody.appendChild(tr);
+    checkAiRecFormValidity();
   }
 
   function removeAiUnitRow(btn) {
@@ -5241,11 +6112,9 @@
       row.remove();
     } else {
       row.querySelectorAll('input').forEach(i => i.value = '');
-      const dutySel = row.querySelector('.ai-u-duty');
-      if (dutySel) dutySel.value = 'GENERAL';
-      const otherWrap = row.querySelector('.ai-duty-other-wrap');
-      if (otherWrap) otherWrap.style.display = 'none';
+      clearRowAiDutyCheckboxes(btn);
     }
+    checkAiRecFormValidity();
   }
 
   function isValidCalendarDate(str) {
@@ -5318,7 +6187,7 @@
     if (mainDobRaw) {
       const dobRes = parseAndValidateDate(mainDobRaw);
       if (!dobRes.valid) {
-        alert(`Date of Birth Error: ${dobRes.error}`);
+        showAiDateErrorAlert('Date of Birth Error', dobRes.error, 'dateOfBirth');
         return;
       }
       dobIso = dobRes.iso;
@@ -5331,8 +6200,7 @@
     if (rawEnroll) {
       enrollRes = parseAndValidateDate(rawEnroll);
       if (!enrollRes.valid) {
-        alert(`Date of Enrollment Error: ${enrollRes.error}`);
-        document.getElementById('aiDateOfEnrollment')?.focus();
+        showAiDateErrorAlert('Date of Enrollment Error', enrollRes.error, 'aiDateOfEnrollment');
         return;
       }
       dateOfEnrollment = enrollRes.iso;
@@ -5346,7 +6214,7 @@
       if (tosRes.valid) {
         tosIso = tosRes.iso;
       } else {
-        alert(`Date of TOS Error: ${tosRes.error}`);
+        showAiDateErrorAlert('Date of TOS Error', tosRes.error, document.getElementById('dateOfTOS') || document.getElementById('tos'));
         return;
       }
     }
@@ -5358,7 +6226,7 @@
       if (torsRes.valid) {
         torsIso = torsRes.iso;
       } else {
-        alert(`Date of TORS Error: ${torsRes.error}`);
+        showAiDateErrorAlert('Date of TORS Error', torsRes.error, document.getElementById('dateOfTORS') || document.getElementById('tors'));
         return;
       }
     }
@@ -5377,48 +6245,38 @@
         const rawFrom = r.querySelector('.ai-u-from')?.value?.trim();
         const rawTo = r.querySelector('.ai-u-to')?.value?.trim();
         
-        const dutySelect = r.querySelector('.ai-u-duty');
-        let uDuty = dutySelect ? dutySelect.value : 'GENERAL';
-        if (uDuty === 'Other') {
-          const customDuty = r.querySelector('.ai-duty-other-input')?.value?.trim();
-          uDuty = customDuty ? customDuty.toUpperCase() : 'OTHER';
-        }
+        const dutyArray = getAiRowSelectedDuties(r);
+        const uDuty = dutyArray.join(' ');
         
         if (uName || rawFrom || rawTo) {
           if (!rawFrom) {
-            alert(`Row #${i+1} (${uName || 'Unit'}): Please specify a valid From Date (DD-MM-YYYY).`);
-            r.querySelector('.ai-u-from')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} Posting Error`, `Please specify a valid From Date (DD-MM-YYYY) for ${uName || 'Unit'}.`, r.querySelector('.ai-u-from'));
             return;
           }
           if (!rawTo) {
-            alert(`Row #${i+1} (${uName || 'Unit'}): Please specify a valid To Date (DD-MM-YYYY).`);
-            r.querySelector('.ai-u-to')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} Posting Error`, `Please specify a valid To Date (DD-MM-YYYY) for ${uName || 'Unit'}.`, r.querySelector('.ai-u-to'));
             return;
           }
 
           const fromRes = parseAndValidateDate(rawFrom);
           if (!fromRes.valid) {
-            alert(`Row #${i+1} (${uName || 'Unit'}) From Date Error: ${fromRes.error}`);
-            r.querySelector('.ai-u-from')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} From Date Error`, `${uName || 'Unit'}: ${fromRes.error}`, r.querySelector('.ai-u-from'));
             return;
           }
 
           const toRes = parseAndValidateDate(rawTo);
           if (!toRes.valid) {
-            alert(`Row #${i+1} (${uName || 'Unit'}) To Date Error: ${toRes.error}`);
-            r.querySelector('.ai-u-to')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} To Date Error`, `${uName || 'Unit'}: ${toRes.error}`, r.querySelector('.ai-u-to'));
             return;
           }
 
           if (fromRes.iso > toRes.iso) {
-            alert(`Row #${i+1} (${uName || 'Unit'}): To Date (${toRes.dmy}) cannot be earlier than From Date (${fromRes.dmy}).`);
-            r.querySelector('.ai-u-to')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} Date Sequence Error`, `Posting To Date (${toRes.dmy}) cannot be earlier than From Date (${fromRes.dmy}) for ${uName || 'Unit'}.`, r.querySelector('.ai-u-to'));
             return;
           }
 
           if (enrollRes && enrollRes.valid && fromRes.iso < enrollRes.iso) {
-            alert(`Row #${i+1} (${uName || 'Unit'}): Posting From Date (${fromRes.dmy}) cannot precede Date of Enrollment (${enrollRes.dmy}).`);
-            r.querySelector('.ai-u-from')?.focus();
+            showAiDateErrorAlert(`Row #${i+1} Service Timeline Error`, `Posting From Date (${fromRes.dmy}) cannot precede Date of Enrollment (${enrollRes.dmy}) for ${uName || 'Unit'}.`, r.querySelector('.ai-u-from'));
             return;
           }
 
@@ -5434,11 +6292,11 @@
 
     const armyNumberVal = (document.getElementById('aiArmyNumber')?.value || document.getElementById('armyNumber')?.value || '').trim();
     const soldierNameVal = (document.getElementById('aiPersonnelName')?.value || document.getElementById('name')?.value || '').trim();
+    const secTradeInfo = typeof getSelectedSectionsAndTrades === 'function' ? getSelectedSectionsAndTrades() : { sections: [], trades: [], section_trades_map: {} };
+    const primarySection = (secTradeInfo.sections && secTradeInfo.sections.length > 0) ? secTradeInfo.sections[0] : '';
 
     const payload = {
-      trade: trade,
       rank: rank,
-      specialties: selectedSpecs,
       date_of_enrollment: dateOfEnrollment || null,
       date_of_birth: dobIso || null,
       date_of_tos: tosIso || null,
@@ -5447,7 +6305,12 @@
       units_history: units,
       is_fresh_joinee: isFresh || units.length === 0,
       army_number: armyNumberVal,
-      name: soldierNameVal
+      name: soldierNameVal,
+      section: primarySection,
+      selected_section: primarySection,
+      target_sections: secTradeInfo.sections,
+      target_trades: secTradeInfo.trades,
+      section_trades_map: secTradeInfo.section_trades_map
     };
 
     const btn = document.getElementById('btnCalculateAiRec');
@@ -5465,17 +6328,15 @@
       });
       const data = await res.json();
       if (btn) {
-        btn.disabled = false;
         btn.innerHTML = origText;
+        checkAiRecFormValidity();
       }
 
       if (data.success && data.data) {
         const rec = data.data;
         rec.army_number = armyNumberVal;
         rec.name = soldierNameVal;
-        rec.trade = trade;
         rec.rank = rank;
-        rec.specialties = selectedSpecs;
         rec.date_of_enrollment = dateOfEnrollment;
         rec.prior_station = priorStation;
         rec.units = units;
@@ -5483,79 +6344,242 @@
 
         lastAiRecommendationResult = rec;
         saveRecommendationToHistory(rec);
-        displayAiRecommendationResult(rec, trade, rank, units, priorStation);
+        displayAiRecommendationResult(rec, rank, units, priorStation);
       } else {
         alert('Recommendation Notice: ' + (data.error || data.message || 'Unable to process recommendation'));
       }
     } catch (err) {
       console.error('AI Recommendation fetch error:', err);
       if (btn) {
-        btn.disabled = false;
         btn.innerHTML = origText;
+        checkAiRecFormValidity();
       }
       alert('Error calculating recommendation: ' + (err.message || 'Please check server connection'));
     }
   }
 
 
-  function displayAiRecommendationResult(data, trade, rank, units, priorStation) {
+  window._showAllPositions = false;
+  window._currentPositionProbabilities = [];
+  window._currentTopPosition = '';
+
+  function toggleAllPositionsView(btn) {
+    window._showAllPositions = !window._showAllPositions;
+    renderPositionProbTable(window._currentPositionProbabilities || [], window._showAllPositions);
+    if (btn) btn.textContent = window._showAllPositions ? 'Show Top 5 Positions' : 'View All Positions';
+  }
+
+  function renderPositionProbTable(posList, showAll) {
+    const posBody = document.getElementById('aiPositionProbTableBody');
+    if (!posBody) return;
+    posBody.innerHTML = '';
+    const sliceList = showAll ? posList : posList.slice(0, 5);
+    sliceList.forEach(pItem => {
+      const isTop = (pItem.position === window._currentTopPosition);
+      const pctVal = (pItem.probability * 100).toFixed(1);
+      posBody.innerHTML += `
+        <tr class="${isTop ? 'table-success fw-bold' : ''}">
+          <td class="px-2">
+            <span class="d-inline-flex align-items-center gap-1.5">
+              ${isTop ? '<i class="fas fa-star text-warning" title="Top Position"></i>' : '<i class="far fa-circle text-muted"></i>'}
+              <span class="text-dark">${pItem.position}</span>
+              ${isTop ? '<span class="badge bg-success text-white py-0 px-1" style="font-size: 0.65rem;">Top Match</span>' : ''}
+            </span>
+          </td>
+          <td class="px-2 text-muted">${pItem.section || ''}</td>
+          <td class="px-2 text-end text-success fw-bold">${pItem.score_str || pctVal + '%'}</td>
+          <td class="px-2">
+            <div class="progress" style="height: 6px; border-radius: 3px;">
+              <div class="progress-bar ${isTop ? 'bg-success' : 'bg-info'}" style="width: ${pctVal}%;"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+
+  function displayAiRecommendationResult(data, rank, units, priorStation) {
 
     const resultContainer = document.getElementById('aiRecResultContainer');
     if (resultContainer) resultContainer.style.display = 'block';
 
-    const topCoy = data.recommended_company || 'HQ Coy';
-    const topCoyDisplay = topCoy;
-    const topPct = (typeof data.recommendation_percentage === 'number' ? data.recommendation_percentage : parseFloat(data.recommendation_percentage || 85.0)).toFixed(1);
-    const topPos = data.recommended_position || 'GD';
-    const topSec = data.recommended_section || 'GENERAL';
-    const posConf = data.position_confidence || '80.0%';
-    const armyNoVal = (document.getElementById('aiArmyNumber')?.value || document.getElementById('armyNumber')?.value || '').trim();
-    const nameVal = (document.getElementById('aiPersonnelName')?.value || document.getElementById('name')?.value || '').trim();
+    const topCoy = data.recommended_company || 'HQ COY';
+    const topCoyProb = data.company_score || 0.603;
+    const topCoyScorePct = (topCoyProb * 100).toFixed(1);
 
-    // Top Company & Percentage UI
-    if (document.getElementById('aiTopCompanyName')) {
-      document.getElementById('aiTopCompanyName').textContent = topCoyDisplay;
+    const topSec = data.recommended_section || 'RHQ';
+    const isUserSec = Boolean(data.is_section_user_selected);
+    const secCompatibility = data.section_compatibility || 75.0;
+
+    const topPos = data.recommended_position || 'O1';
+    const topPosProb = data.position_score || 0.53;
+    const topPosScorePct = (topPosProb * 100).toFixed(1);
+
+    const topPct = (typeof data.recommendation_percentage === 'number' ? data.recommendation_percentage : parseFloat(data.recommendation_percentage || 85.0)).toFixed(1);
+
+    // 1. Mode Badge
+    const modeBadge = document.getElementById('aiModeBadge');
+    if (modeBadge) {
+      if (isUserSec) {
+        modeBadge.style.display = 'inline-block';
+        modeBadge.textContent = 'Selected Section Mode';
+        modeBadge.className = 'badge bg-primary text-white px-2 py-0.5';
+      } else {
+        modeBadge.style.display = 'none';
+      }
     }
-    if (document.getElementById('aiTopPercentage')) {
-      document.getElementById('aiTopPercentage').textContent = `${topPct}%`;
+
+    // 2. Hero UI Elements
+    if (document.getElementById('aiTopCompanyName')) {
+      document.getElementById('aiTopCompanyName').textContent = topCoy;
+    }
+    if (document.getElementById('aiCompanyScoreText')) {
+      document.getElementById('aiCompanyScoreText').textContent = `Probability: ${topCoyScorePct}%`;
+    }
+
+    const secHeaderLabel = document.getElementById('aiSectionHeaderLabel');
+    if (secHeaderLabel) {
+      secHeaderLabel.textContent = isUserSec ? '2. Selected Section' : '2. Recommended Section';
+    }
+    if (document.getElementById('aiTopSectionName')) {
+      document.getElementById('aiTopSectionName').textContent = topSec;
+    }
+    if (document.getElementById('aiSectionScoreText')) {
+      document.getElementById('aiSectionScoreText').textContent = isUserSec 
+        ? `AI Compatibility: ${secCompatibility}%`
+        : `Probability: ${Math.round((data.section_score || 0.75) * 100)}%`;
+    }
+
+    if (document.getElementById('aiTopPositionName')) {
+      document.getElementById('aiTopPositionName').textContent = topPos;
+    }
+    if (document.getElementById('aiPositionScoreText')) {
+      document.getElementById('aiPositionScoreText').textContent = `Probability: ${topPosScorePct}%`;
     }
 
     const confBadge = document.getElementById('aiConfidenceBadge');
     if (confBadge) {
-      confBadge.textContent = data.confidence_type === 'rule_based_fresh_joinee' ? 'Rule-Based Specialty Mapping (Fresh Joinee)' : `${data.confidence_score || topPct + '%'} Confidence`;
-      confBadge.className = 'badge px-2.5 py-1 bg-success text-white';
+      confBadge.textContent = data.confidence_type === 'rule_based_fresh_joinee' ? 'Rule-Based (Fresh Joinee)' : `${data.confidence_score || topPct + '%'} Match`;
+      confBadge.className = 'badge bg-white text-success fw-bold px-2.5 py-1';
     }
 
-    // Ranked Company Probabilities
-    const probList = document.getElementById('aiProbabilitiesList');
-    if (probList) {
-      probList.innerHTML = '';
-      const probs = data.probabilities || { 'HQ Coy': 0.6, 'Comn Coy': 0.3, '3 Coy': 0.1 };
-      Object.entries(probs).forEach(([coy, pVal], idx) => {
-        const pct = (pVal * 100).toFixed(1);
-        let barColor = coy === topCoy ? 'bg-success' : 'bg-primary';
-        probList.innerHTML += `
-          <div class="p-2.5 rounded border bg-white mb-1.5">
-            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.84rem;">
-              <span class="fw-bold text-dark">${coy}</span>
-              <strong class="text-primary">${pct}%</strong>
-            </div>
-            <div class="progress" style="height: 6px; border-radius: 3px;">
-              <div class="progress-bar ${barColor}" role="progressbar" style="width: ${pct}%;"></div>
-            </div>
-          </div>
+    // 3. Company Probability Distribution Table
+    const coyBody = document.getElementById('aiCompanyProbTableBody');
+    if (coyBody) {
+      coyBody.innerHTML = '';
+      const coyList = data.company_probabilities || [
+        { company: 'HQ COY', probability: 0.603, score_str: '60.3%' },
+        { company: '3 COY', probability: 0.215, score_str: '21.5%' },
+        { company: 'COMN COY', probability: 0.182, score_str: '18.2%' }
+      ];
+      coyList.forEach(cItem => {
+        const isWinner = (cItem.company === topCoy);
+        const pctVal = (cItem.probability * 100).toFixed(1);
+        coyBody.innerHTML += `
+          <tr class="${isWinner ? 'table-success fw-bold' : ''}">
+            <td class="px-2">
+              <span class="d-inline-flex align-items-center gap-1.5">
+                ${isWinner ? '<i class="fas fa-crown text-warning" title="Recommended Company"></i>' : '<i class="far fa-circle text-muted"></i>'}
+                <span class="text-dark">${cItem.company}</span>
+                ${isWinner ? '<span class="badge bg-success text-white py-0 px-1" style="font-size: 0.65rem;">Recommended</span>' : ''}
+              </span>
+            </td>
+            <td class="px-2 text-end text-primary fw-bold">${cItem.score_str || pctVal + '%'}</td>
+            <td class="px-2">
+              <div class="progress" style="height: 6px; border-radius: 3px;">
+                <div class="progress-bar ${isWinner ? 'bg-success' : 'bg-primary'}" style="width: ${pctVal}%;"></div>
+              </div>
+            </td>
+          </tr>
         `;
       });
     }
 
-    // SHAP Explainability Breakdown
+    // 4. Section Probability / Compatibility Table
+    const secDistTitle = document.getElementById('aiSecDistHeaderTitle');
+    const secDistBadge = document.getElementById('aiSecDistHeaderBadge');
+    if (secDistTitle) {
+      secDistTitle.innerHTML = isUserSec
+        ? `<i class="fas fa-sitemap text-primary me-1"></i> Section Compatibility Breakdown <span class="badge bg-primary text-white ms-1" style="font-size: 0.70rem;">User Selected: ${topSec}</span>`
+        : `<i class="fas fa-sitemap text-primary me-1"></i> Section Probability Distribution`;
+    }
+    if (secDistBadge) {
+      secDistBadge.textContent = `Valid Sections under ${topCoy}`;
+    }
+
+    const secBody = document.getElementById('aiSectionProbTableBody');
+    if (secBody) {
+      secBody.innerHTML = '';
+      const secList = data.section_probabilities || [];
+      secList.forEach(sItem => {
+        const isSelectedOrTop = (sItem.section === topSec);
+        const pctVal = (sItem.probability * 100).toFixed(1);
+        const scoreDisplay = sItem.score_str || pctVal + '%';
+        secBody.innerHTML += `
+          <tr class="${isSelectedOrTop ? 'table-success fw-bold' : ''}">
+            <td class="px-2">
+              <span class="d-inline-flex align-items-center gap-1.5">
+                ${isSelectedOrTop ? '<i class="fas fa-check-circle text-success"></i>' : '<i class="far fa-circle text-muted"></i>'}
+                <span class="text-dark">${sItem.section}</span>
+                ${sItem.is_selected ? '<span class="badge bg-primary text-white py-0 px-1" style="font-size: 0.65rem;">User Selected</span>' : (isSelectedOrTop ? '<span class="badge bg-success text-white py-0 px-1" style="font-size: 0.65rem;">Top Section</span>' : '')}
+              </span>
+            </td>
+            <td class="px-2 text-muted">${sItem.company || topCoy}</td>
+            <td class="px-2 text-end text-primary fw-bold">${scoreDisplay}</td>
+            <td class="px-2">
+              <div class="progress" style="height: 6px; border-radius: 3px;">
+                <div class="progress-bar ${isSelectedOrTop ? 'bg-success' : 'bg-secondary'}" style="width: ${pctVal}%;"></div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // 5. Position Probability Distribution Table (Conditional)
+    window._currentPositionProbabilities = data.position_probabilities || [];
+    window._currentTopPosition = topPos;
+    window._showAllPositions = false;
+    const togglePosBtn = document.getElementById('btnToggleAllPositions');
+    if (togglePosBtn) togglePosBtn.textContent = 'View All Positions';
+    const posSubtitle = document.getElementById('aiPosDistSubtitle');
+    if (posSubtitle) {
+      posSubtitle.textContent = `P(Position | Profile, Section: ${topSec}) across valid appointments`;
+    }
+    renderPositionProbTable(window._currentPositionProbabilities, false);
+
+    // 6. Top-N Valid Alternative Recommendations Table
+    const topNBody = document.getElementById('aiTopNTableBody');
+    if (topNBody) {
+      topNBody.innerHTML = '';
+      const recs = data.top_recommendations || data.recommendations || [
+        { rank: 1, company: topCoy, section: topSec, position: topPos, score: `${topPosScorePct}%` }
+      ];
+      recs.forEach(r => {
+        const isTop = (r.rank === 1);
+        topNBody.innerHTML += `
+          <tr class="${isTop ? 'table-success fw-bold' : ''}">
+            <td class="px-2"><span class="badge ${isTop ? 'bg-success text-white' : 'bg-light text-dark border'}">#${r.rank}</span></td>
+            <td class="px-2 fw-semibold text-dark">${r.company}</td>
+            <td class="px-2 text-secondary">${r.section}</td>
+            <td class="px-2 text-primary fw-bold">${r.position}</td>
+            <td class="px-2 text-end text-success fw-bold">${r.score}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // 7. TreeSHAP Explainability Breakdown (NO TRADE)
     const shapContainer = document.getElementById('shapBarsContainer');
     if (shapContainer) {
       shapContainer.innerHTML = '';
       const posForces = data.shap_explanation?.positive || [
-        `+ Trade specialty '${trade}' strongly matches ${topCoyDisplay} establishment`,
-        `+ Service profile and postings fit ${topCoyDisplay} requirements`
+        `+ Service profile and posting tenure strongly align with ${topCoy} establishment`,
+        `+ Rank and seniority profile fit ${topCoy} operational structure`
       ];
+      const negForces = data.shap_explanation?.negative || [];
+
       posForces.forEach(pf => {
         shapContainer.innerHTML += `
           <div class="shap-feature-bar mb-2">
@@ -5569,38 +6593,29 @@
           </div>
         `;
       });
+      negForces.forEach(nf => {
+        shapContainer.innerHTML += `
+          <div class="shap-feature-bar mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
+              <span class="fw-semibold text-danger"><i class="fas fa-minus-circle text-danger me-1"></i> ${nf}</span>
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">- Negative Force</span>
+            </div>
+            <div class="progress" style="height: 4px; border-radius: 2px;">
+              <div class="progress-bar bg-danger" style="width: 45%;"></div>
+            </div>
+          </div>
+        `;
+      });
     }
 
-    // Recommended Position Banner
-    let posBanner = document.getElementById('aiPositionRecBanner');
-    if (!posBanner && resultContainer) {
-      posBanner = document.createElement('div');
-      posBanner.id = 'aiPositionRecBanner';
-      posBanner.className = 'p-3 rounded mb-3 border border-info bg-info-subtle';
-      resultContainer.insertBefore(posBanner, resultContainer.firstChild);
-    }
-    if (posBanner) {
-      posBanner.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <span class="text-uppercase text-muted fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Recommended Appointment within ${topCoyDisplay}</span>
-            <h5 class="fw-bold text-dark mb-0 mt-0.5"><i class="fas fa-user-tag text-info me-1.5"></i> ${topPos}</h5>
-            <small class="text-secondary"><i class="fas fa-layer-group me-1"></i> Section: <strong>${topSec}</strong></small>
-          </div>
-          <div class="text-end">
-            <span class="badge bg-info text-dark fw-bold px-2 py-1">${posConf} Match</span>
-          </div>
-        </div>
-      `;
-    }
-
-    // Match Reason Cards
+    // 8. Match Reason Cards
     const reasonsList = document.getElementById('aiReasonsList');
     if (reasonsList) {
       reasonsList.innerHTML = '';
       const reasons = data.match_reasons || [
-        `Trade '${trade}' aligns with ${topCoyDisplay} operations.`,
-        `Appointment '${topPos}' in section '${topSec}' matches specialty profile.`
+        `Previous unit history is strongly associated with ${topCoy} assignments.`,
+        `Historical posting patterns match Section '${topSec}' personnel.`,
+        `The personnel profile has high similarity to historical '${topPos}' assignments.`
       ];
       reasons.forEach((r, idx) => {
         reasonsList.innerHTML += `
@@ -5669,10 +6684,11 @@
     const topCoy = lastAiRecommendationResult.recommended_company;
     const companySelect = document.getElementById('company');
 
-    let topCoyDisplay = topCoy;
-    if (topCoy === 'Comn Coy' || topCoy === 'COMN Company') topCoyDisplay = 'COMN Company';
-    else if (topCoy === 'HQ Coy' || topCoy === 'HQ company') topCoyDisplay = 'HQ company';
-    else if (topCoy === '3 Coy' || topCoy === '3 Company') topCoyDisplay = '3 Company';
+    let topCoyDisplay = topCoy || '';
+    const cleanCoy = String(topCoy || '').trim().toUpperCase();
+    if (cleanCoy.includes('COMN') || cleanCoy.includes('COMMUNICATION')) topCoyDisplay = 'COMN Company';
+    else if (cleanCoy.includes('HQ')) topCoyDisplay = 'HQ company';
+    else if (cleanCoy.includes('3') || cleanCoy.includes('THIRD')) topCoyDisplay = '3 Company';
 
     // 1. Switch to Personal Details tab first so inputs are visible
     const personalTabBtn = document.getElementById('personal-tab');
@@ -5681,9 +6697,22 @@
       tab.show();
     }
 
-    // 2. Apply Recommended Company & highlight
+    // 2. Apply Recommended Company & trigger cascade
     if (companySelect) {
-      companySelect.value = topCoyDisplay;
+      let matched = false;
+      Array.from(companySelect.options).forEach(opt => {
+        if (opt.value && (opt.value.trim().toUpperCase() === topCoyDisplay.toUpperCase() || opt.textContent.trim().toUpperCase() === topCoyDisplay.toUpperCase() || opt.value.trim().toUpperCase() === cleanCoy)) {
+          companySelect.value = opt.value;
+          matched = true;
+        }
+      });
+      if (!matched && topCoyDisplay) {
+        const opt = document.createElement('option');
+        opt.value = topCoyDisplay;
+        opt.textContent = topCoyDisplay;
+        companySelect.appendChild(opt);
+        companySelect.value = topCoyDisplay;
+      }
       companySelect.dispatchEvent(new Event('change'));
       companySelect.style.borderColor = '#10b981';
       companySelect.style.boxShadow = '0 0 0 3.5px rgba(16, 185, 129, 0.35)';
@@ -5724,53 +6753,173 @@
       el.value = aiStationVal;
       el.style.borderColor = '#10b981';
     }
-    if (lastAiRecommendationResult.recommended_section && document.getElementById('section')) {
-      const el = document.getElementById('section');
-      el.value = lastAiRecommendationResult.recommended_section;
-      el.style.borderColor = '#10b981';
+
+    // Populate Section with cascade
+    const recSection = lastAiRecommendationResult.recommended_section;
+    const secSelect = document.getElementById('section');
+    if (recSection && secSelect) {
+      const cleanSec = String(recSection).trim().toUpperCase();
+      let matchedSec = false;
+      Array.from(secSelect.options).forEach(opt => {
+        if (opt.value && (opt.value.trim().toUpperCase() === cleanSec || opt.textContent.trim().toUpperCase() === cleanSec)) {
+          secSelect.value = opt.value;
+          matchedSec = true;
+        }
+      });
+      if (!matchedSec) {
+        const opt = document.createElement('option');
+        opt.value = recSection;
+        opt.textContent = recSection;
+        secSelect.appendChild(opt);
+        secSelect.value = recSection;
+      }
+      secSelect.dispatchEvent(new Event('change'));
+      secSelect.style.borderColor = '#10b981';
+    }
+
+    // Populate Position
+    const recPosition = lastAiRecommendationResult.recommended_position;
+    const posSelect = document.getElementById('position');
+    if (recPosition && posSelect) {
+      const cleanPos = String(recPosition).trim().toUpperCase();
+      let matchedPos = false;
+      Array.from(posSelect.options).forEach(opt => {
+        if (opt.value && (opt.value.trim().toUpperCase() === cleanPos || opt.textContent.trim().toUpperCase() === cleanPos)) {
+          posSelect.value = opt.value;
+          matchedPos = true;
+        }
+      });
+      if (!matchedPos) {
+        const opt = document.createElement('option');
+        opt.value = recPosition;
+        opt.textContent = recPosition;
+        posSelect.appendChild(opt);
+        posSelect.value = recPosition;
+      }
+      posSelect.style.borderColor = '#10b981';
     }
 
     // 4. Populate Units Served Table in the main form with accepted units
-    const modalUnits = lastAiRecommendationResult.units || [];
+    let modalUnits = (lastAiRecommendationResult && (lastAiRecommendationResult.units || lastAiRecommendationResult.units_history)) || [];
+    if (!modalUnits || modalUnits.length === 0) {
+      const aiRows = document.querySelectorAll('#aiUnitsTable tbody tr');
+      if (aiRows.length > 0) {
+        modalUnits = [];
+        aiRows.forEach(r => {
+          const uName = (r.querySelector('.ai-u-name')?.value || '').trim();
+          const uFrom = (r.querySelector('.ai-u-from')?.value || '').trim();
+          const uTo = (r.querySelector('.ai-u-to')?.value || '').trim();
+          const uDuties = typeof getAiRowSelectedDuties === 'function' ? getAiRowSelectedDuties(r) : ['GENERAL'];
+          if (uName || uFrom || uTo) {
+            modalUnits.push({
+              unit: uName || 'FIELD UNIT',
+              from_date: normalizeDateToIso(uFrom),
+              to_date: normalizeDateToIso(uTo),
+              duty_performed: uDuties.join(', ')
+            });
+          }
+        });
+      }
+    }
+
     const unitsTable = document.getElementById('unitsTable');
     if (unitsTable && modalUnits.length > 0) {
       const tbody = unitsTable.querySelector('tbody');
-      const firstRow = tbody.querySelector('tr');
+      if (tbody) {
+        // Save first row innerHTML as row template
+        const sampleRow = tbody.querySelector('tr');
+        const defaultDutyOptions = `
+          <option value="">-- SELECT DOMAIN --</option>
+          <option value="TM">TM</option>
+          <option value="MULTI MEDIA">MULTI MEDIA</option>
+          <option value="CODING">CODING</option>
+          <option value="ACCOUNT">ACCOUNT</option>
+          <option value="PROJECTS">PROJECTS</option>
+          <option value="SYSTEM">SYSTEM</option>
+          <option value="IT">IT</option>
+          <option value="EXCHANGE">EXCHANGE</option>
+          <option value="NFS">NFS</option>
+          <option value="RR">RR</option>
+          <option value="ICN AND BTS">ICN AND BTS</option>
+          <option value="PA">PA</option>
+          <option value="RP">RP</option>
+          <option value="RUNNER">RUNNER</option>
+          <option value="BUDDY">BUDDY</option>
+          <option value="CLK">CLK</option>
+          <option value="ONCO">ONCO</option>
+          <option value="DUTY EFS">DUTY EFS</option>
+          <option value="LINE MAN ">LINE MAN CQ</option>
+          <option value="RT JCO">RT JCO</option>
+          <option value="ORH">ORH</option>
+          <option value="MESS CDR">MESS CDR</option>
+          <option value="TRG CLK">TRG CLK</option>
+          <option value="CHM">CHM</option>
+          <option value="RHM">RHM</option>
+          <option value="STOREMAN">STOREMAN</option>
+          <option value="NODE">NODE</option>
+          <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
+        `;
 
-      if (firstRow) {
-        const rowTemplate = firstRow.cloneNode(true);
         tbody.innerHTML = '';
 
         modalUnits.forEach((u, idx) => {
-          const newRow = rowTemplate.cloneNode(true);
-          newRow.cells[0].textContent = idx + 1;
+          const uName = (u.unit || u.unit_name || '').toUpperCase();
+          const uFrom = normalizeDateToIso(u.from_date || u.from || '');
+          const uTo = normalizeDateToIso(u.to_date || u.to || '');
+          const dutyVal = u.duty_performed || (Array.isArray(u.duty) ? u.duty[0] : u.duty) || 'GENERAL';
 
-          const unitInput = newRow.querySelector('input[name="unit[]"]');
-          const fromInput = newRow.querySelector('input[name="unitFrom[]"]');
-          const toInput = newRow.querySelector('input[name="unitTo[]"]');
-          const dutySelect = newRow.querySelector('select[name="unitDuty[]"]');
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>
+              <input type="text" class="form-control form-control-sm unit-input" name="unit[]" value="${uName}" style="border-color: #10b981;" />
+            </td>
+            <td>
+              <input type="date" class="form-control form-control-sm" name="unitFrom[]" value="${uFrom}" style="border-color: #10b981;" />
+            </td>
+            <td>
+              <input type="date" class="form-control form-control-sm" name="unitTo[]" value="${uTo}" style="border-color: #10b981;" />
+            </td>
+            <td>
+              <select class="form-select form-select-sm unit-input" name="unitDuty[]" style="border-color: #10b981;">
+                ${defaultDutyOptions}
+              </select>
+            </td>
+          `;
 
-          if (unitInput) unitInput.value = (u.unit || '').toUpperCase();
-          if (fromInput) fromInput.value = normalizeDateToIso(u.from_date || u.from || '');
-          if (toInput) toInput.value = normalizeDateToIso(u.to_date || u.to || '');
+          const dutySelect = tr.querySelector('select[name="unitDuty[]"]');
           if (dutySelect) {
-            const dutyVal = u.duty_performed || (Array.isArray(u.duty) ? u.duty[0] : u.duty) || 'GENERAL';
-            dutySelect.value = dutyVal;
-            if (!dutySelect.value) {
-              Array.from(dutySelect.options).forEach(opt => {
-                if (opt.value.toUpperCase() === dutyVal.toUpperCase()) {
-                  dutySelect.value = opt.value;
-                }
-              });
+            let matched = false;
+            Array.from(dutySelect.options).forEach(opt => {
+              if (opt.value && (opt.value.toUpperCase() === dutyVal.toUpperCase() || opt.textContent.toUpperCase() === dutyVal.toUpperCase())) {
+                dutySelect.value = opt.value;
+                matched = true;
+              }
+            });
+            if (!matched && dutyVal) {
+              const newOpt = document.createElement('option');
+              newOpt.value = dutyVal;
+              newOpt.textContent = dutyVal;
+              newOpt.selected = true;
+              dutySelect.appendChild(newOpt);
+              dutySelect.value = dutyVal;
             }
           }
-          tbody.appendChild(newRow);
+
+          tbody.appendChild(tr);
         });
 
+        // Show AI badge on Unit Served table
         const uBadge = document.getElementById('unitsAiBadge');
         if (uBadge) {
           uBadge.style.display = 'inline-flex';
           uBadge.innerHTML = `<i class="fas fa-sparkles me-1"></i> AI Recommended Populated (${modalUnits.length} Unit${modalUnits.length > 1 ? 's' : ''})`;
+        }
+
+        // Add badge to Courses & Service tab if present
+        const coursesTab = document.getElementById('courses-tab');
+        if (coursesTab && !coursesTab.querySelector('.badge-units-ai')) {
+          coursesTab.innerHTML += ` <span class="badge bg-success badge-units-ai" style="font-size: 0.65rem; border-radius: 999px;">${modalUnits.length} Units</span>`;
         }
       }
     }
@@ -5816,8 +6965,12 @@
 
   // Pre-load retrain status badge on initial window load and attach modal cleanup
   document.addEventListener('DOMContentLoaded', function() {
+    initSectionTradeTree();
     const aiModal = document.getElementById('aiRecModal');
     if (aiModal) {
+      aiModal.addEventListener('shown.bs.modal', function() {
+        initSectionTradeTree();
+      });
       aiModal.addEventListener('hidden.bs.modal', function() {
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
         document.body.classList.remove('modal-open');

@@ -1,6 +1,7 @@
 """
 Flask Blueprint & REST API Routes for AI New Joinee Recommendation (Unit 15 CESR)
-Enforces Role-Based Access Control (CO, Adjutant, 2IC) and integrates seamlessly with UMS.
+Enforces Hierarchical Placement, Role-Based Access Control (CO, Adjutant, 2IC),
+and Trade-Free Supervised Recommendation Pipeline.
 """
 
 import os
@@ -24,9 +25,14 @@ from aiml.ai_new_joinee_recommendation.position_mapping import (
     normalize_company_name,
     to_db_company_name,
     to_display_company_name,
+    get_all_companies,
+    get_sections_for_company,
+    get_positions_for_section,
     get_positions_for_company,
     get_section_for_position,
-    is_position_valid_for_company
+    is_position_valid_for_company,
+    is_valid_hierarchy,
+    get_full_hierarchy_dict
 )
 from aiml.ai_new_joinee_recommendation.recommendation import (
     recommend_placement,
@@ -51,15 +57,12 @@ def check_executive_authorization(user: Optional[Dict[str, Any]]) -> bool:
     if not user:
         return False
     role = str(user.get("role", "")).strip().upper()
-    
-    # Exact match in authorized roles
+
     if role in AUTHORIZED_DECISION_ROLES:
         return True
-    
-    # Word boundary matching (e.g. 'OFFICER CO', but NOT 'NCO' or 'JCO')
+
     import re
     if re.search(r'\b(CO|ADJUTANT|2IC)\b', role):
-        # Exclude NCO / JCO prefix roles
         if not re.search(r'\b(NCO|JCO|ONCO)\b', role):
             return True
 
@@ -76,10 +79,36 @@ def check_view_authorization(user: Optional[Dict[str, Any]]) -> bool:
     return check_executive_authorization(user)
 
 
+# =============================================================================
+# 1. HIERARCHY & LOOKUP ROUTES
+# =============================================================================
 
-# =============================================================================
-# 1. LIVE PREDICTION & SAVE ROUTES
-# =============================================================================
+@company_rec_bp.route("/api/ai/company-recommendation/hierarchy", methods=["GET"])
+def api_get_hierarchy():
+    """
+    Return the centralized canonical company -> section -> position hierarchy.
+    Used by frontend dropdowns to enforce dynamic dependent hierarchy without duplication.
+    """
+    # Flatten section -> trades mapping across all companies
+    section_trades_map = {}
+    for coy, sec_dict in UNIT_15_CESR_STRUCTURE.items():
+        for sec, trades in sec_dict.items():
+            section_trades_map[sec] = trades
+
+    return jsonify({
+        "success": True,
+        "hierarchy": UNIT_15_CESR_STRUCTURE,
+        "companies": get_all_companies(),
+        "sections": list(section_trades_map.keys()),
+        "section_trades_map": section_trades_map,
+        "company_sections_map": {
+            coy: get_sections_for_company(coy) for coy in get_all_companies()
+        },
+        "company_positions_map": {
+            coy: get_positions_for_company(coy) for coy in get_all_companies()
+        }
+    })
+
 
 @company_rec_bp.route("/api/ai/company-recommendation/lookup-personnel", methods=["GET"])
 def api_lookup_personnel():
@@ -98,7 +127,7 @@ def api_lookup_personnel():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT id, army_number, name, `rank`, trade, 
-                   date_of_enrollment, company, section
+                   date_of_enrollment, company, section, prior_station
             FROM personnel 
             WHERE army_number = %s 
             LIMIT 1
@@ -123,10 +152,11 @@ def api_lookup_personnel():
                     "army_number": row["army_number"],
                     "name": row["name"],
                     "rank": row["rank"],
-                    "trade": row["trade"],
+                    "trade": row.get("trade") or "",  # Returned for display only
                     "date_of_enrollment": enroll_str,
                     "company": row["company"],
-                    "section": row["section"]
+                    "section": row["section"],
+                    "prior_station": row.get("prior_station") or ""
                 }
             })
         else:
@@ -141,16 +171,52 @@ def api_lookup_personnel():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
+def validate_date_field(val: Any, field_name: str, allow_future: bool = False, min_year: int = 1950) -> tuple:
+    """
+    Validates calendar date string format (DD-MM-YYYY, YYYY-MM-DD), days per month,
+    leap years, year bounds, and future date limits.
+    """
+    if not val:
+        return True, None, ""
+    val_str = str(val).strip()
+    if not val_str:
+        return True, None, ""
+
+    parsed_dt = None
+    # Try standard formats
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d", "%d.%m.%Y"):
+        try:
+            parsed_dt = datetime.strptime(val_str, fmt).date()
+            break
+        except ValueError:
+            pass
+
+    if not parsed_dt:
+        return False, None, f"Invalid date format for {field_name} ('{val_str}'). Proper format is DD-MM-YYYY or YYYY-MM-DD."
+
+    if parsed_dt.year < min_year:
+        return False, None, f"{field_name} year ({parsed_dt.year}) must be {min_year} or later."
+
+    today = date.today()
+    if not allow_future and parsed_dt > today:
+        return False, None, f"{field_name} ({parsed_dt.strftime('%d-%m-%Y')}) exceeds current date ({today.strftime('%d-%m-%Y')}). Future dates are not allowed."
+
+    return True, parsed_dt, ""
+
+
+# =============================================================================
+# 2. LIVE PREDICTION & SAVE ROUTES (TRADE-FREE)
+# =============================================================================
+
 @company_rec_bp.route("/api/ai/company-recommendation/predict", methods=["POST"])
 def api_predict_recommendation():
     """
-    Generate real-time 2-stage AI recommendation for a soldier.
+    Generate real-time hierarchical AI recommendation (Company -> Section -> Position).
+    STRICTLY TRADE-FREE: Trade is not accepted or used as a prediction feature.
     """
     try:
         data = request.get_json() or {}
-        trade = data.get("trade", "")
         rank = data.get("rank", "Signal Man")
-        specialties = data.get("specialties", [])
         date_of_enrollment = data.get("date_of_enrollment") or data.get("enrollment_date")
         prior_station = data.get("prior_station", "")
         units_history = data.get("units_history") or data.get("units") or []
@@ -163,22 +229,40 @@ def api_predict_recommendation():
         parsed_enroll_dt = None
 
         if date_of_enrollment:
-            for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-                try:
-                    parsed_enroll_dt = datetime.strptime(str(date_of_enrollment).strip(), fmt).date()
-                    break
-                except ValueError:
-                    pass
-            if not parsed_enroll_dt:
+            valid_dt, parsed_enroll_dt, err_msg = validate_date_field(date_of_enrollment, "Date of Enrollment", allow_future=False)
+            if not valid_dt:
+                return jsonify({"success": False, "error": err_msg}), 400
+
+        # Validate Date of Birth (if provided)
+        date_of_birth = data.get("date_of_birth") or data.get("dob")
+        if date_of_birth:
+            valid_dt, parsed_birth_dt, err_msg = validate_date_field(date_of_birth, "Date of Birth", allow_future=False)
+            if not valid_dt:
+                return jsonify({"success": False, "error": err_msg}), 400
+            if parsed_enroll_dt and parsed_birth_dt and (parsed_enroll_dt - parsed_birth_dt).days < (16 * 365):
                 return jsonify({
                     "success": False,
-                    "error": f"Invalid Date of Enrollment '{date_of_enrollment}'. Must be valid DD-MM-YYYY or YYYY-MM-DD."
+                    "error": f"Date of Enrollment ({parsed_enroll_dt.strftime('%d-%m-%Y')}) must be at least 16 years after Date of Birth ({parsed_birth_dt.strftime('%d-%m-%Y')})."
                 }), 400
-            if parsed_enroll_dt > today:
+
+        # Validate Date of TOS (if provided)
+        date_of_tos = data.get("date_of_tos") or data.get("tos")
+        if date_of_tos:
+            valid_dt, parsed_tos_dt, err_msg = validate_date_field(date_of_tos, "Date of TOS", allow_future=False)
+            if not valid_dt:
+                return jsonify({"success": False, "error": err_msg}), 400
+            if parsed_enroll_dt and parsed_tos_dt and parsed_tos_dt < parsed_enroll_dt:
                 return jsonify({
                     "success": False,
-                    "error": f"Date of Enrollment ({date_of_enrollment}) exceeds current date ({today.strftime('%d-%m-%Y')}). Future dates are not allowed."
+                    "error": f"Date of TOS ({parsed_tos_dt.strftime('%d-%m-%Y')}) cannot precede Date of Enrollment ({parsed_enroll_dt.strftime('%d-%m-%Y')})."
                 }), 400
+
+        # Validate Date of TORS (if provided)
+        date_of_tors = data.get("date_of_tors") or data.get("tors")
+        if date_of_tors:
+            valid_dt, parsed_tors_dt, err_msg = validate_date_field(date_of_tors, "Date of TORS", allow_future=False)
+            if not valid_dt:
+                return jsonify({"success": False, "error": err_msg}), 400
 
         # Validate units history dates
         if not is_fresh_joinee and units_history:
@@ -190,22 +274,9 @@ def api_predict_recommendation():
                 dt_to = None
 
                 if raw_from:
-                    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-                        try:
-                            dt_from = datetime.strptime(str(raw_from).strip(), fmt).date()
-                            break
-                        except ValueError:
-                            pass
-                    if not dt_from:
-                        return jsonify({
-                            "success": False,
-                            "error": f"Invalid From Date '{raw_from}' for {u_name}. Must be valid DD-MM-YYYY."
-                        }), 400
-                    if dt_from > today:
-                        return jsonify({
-                            "success": False,
-                            "error": f"Posting From Date for {u_name} exceeds current date. Future dates are not allowed."
-                        }), 400
+                    valid_dt, dt_from, err_msg = validate_date_field(raw_from, f"Posting From Date for {u_name}", allow_future=False)
+                    if not valid_dt:
+                        return jsonify({"success": False, "error": err_msg}), 400
                     if parsed_enroll_dt and dt_from < parsed_enroll_dt:
                         return jsonify({
                             "success": False,
@@ -213,39 +284,29 @@ def api_predict_recommendation():
                         }), 400
 
                 if raw_to:
-                    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-                        try:
-                            dt_to = datetime.strptime(str(raw_to).strip(), fmt).date()
-                            break
-                        except ValueError:
-                            pass
-                    if not dt_to:
-                        return jsonify({
-                            "success": False,
-                            "error": f"Invalid To Date '{raw_to}' for {u_name}. Must be valid DD-MM-YYYY."
-                        }), 400
-                    if dt_to > today:
-                        return jsonify({
-                            "success": False,
-                            "error": f"Posting To Date for {u_name} exceeds current date. Future dates are not allowed."
-                        }), 400
+                    valid_dt, dt_to, err_msg = validate_date_field(raw_to, f"Posting To Date for {u_name}", allow_future=False)
+                    if not valid_dt:
+                        return jsonify({"success": False, "error": err_msg}), 400
 
                 if dt_from and dt_to and dt_from > dt_to:
                     return jsonify({
                         "success": False,
-                        "error": f"Posting From Date cannot be later than To Date for {u_name}."
+                        "error": f"Posting From Date ({dt_from.strftime('%d-%m-%Y')}) cannot be later than To Date ({dt_to.strftime('%d-%m-%Y')}) for {u_name}."
                     }), 400
 
+        selected_section = data.get("section") or data.get("selected_section") or data.get("target_section")
+        if isinstance(selected_section, list) and len(selected_section) > 0:
+            selected_section = selected_section[0]
+
         rec = recommend_placement(
-            trade=trade,
             rank=rank,
-            specialties=specialties,
             date_of_enrollment=date_of_enrollment,
             prior_station=prior_station,
             units_history=units_history,
             is_fresh_joinee=is_fresh_joinee,
             army_number=army_number,
-            name=name
+            name=name,
+            selected_section=selected_section
         )
 
         return jsonify({
@@ -268,11 +329,11 @@ def api_save_recommendation():
     try:
         user = require_login()
         data = request.get_json() or {}
-        
+
         army_number = data.get("army_number") or ""
         name = data.get("name") or ""
         rank = data.get("rank") or ""
-        trade = data.get("trade") or ""
+        trade = data.get("trade") or ""  # Stored for record display only
         personnel_id = data.get("personnel_id")
 
         rec_coy = normalize_company_name(data.get("recommended_company"))
@@ -281,7 +342,7 @@ def api_save_recommendation():
         rec_pos = data.get("recommended_position") or ""
         pos_conf = str(data.get("position_confidence") or "80.0%")
         conf_type = data.get("confidence_type") or "ml"
-        model_ver = data.get("model_version") or "v2.0-cesr"
+        model_ver = data.get("model_version") or "company_position_model_v2"
 
         prob_json = json.dumps(data.get("probabilities") or {})
         reasons_json = json.dumps(data.get("match_reasons") or [])
@@ -294,7 +355,6 @@ def api_save_recommendation():
 
         cursor = conn.cursor(dictionary=True)
 
-        # Lookup personnel_id if missing
         if not personnel_id and army_number:
             cursor.execute("SELECT id FROM personnel WHERE army_number = %s LIMIT 1", (army_number,))
             row = cursor.fetchone()
@@ -339,7 +399,7 @@ def api_save_recommendation():
 
 
 # =============================================================================
-# 2. INSIGHTS LIST, SEARCH & DETAIL ROUTES (CO / ADJUTANT / 2IC)
+# 3. INSIGHTS LIST, SEARCH & DETAIL ROUTES (CO / ADJUTANT / 2IC)
 # =============================================================================
 
 @company_rec_bp.route("/api/ai/company-recommendation/insights", methods=["GET"])
@@ -376,9 +436,9 @@ def api_get_insights_list():
         params = []
 
         if search:
-            where_clauses.append("(army_number LIKE %s OR name LIKE %s OR trade LIKE %s)")
+            where_clauses.append("(army_number LIKE %s OR name LIKE %s)")
             s_param = f"%{search}%"
-            params.extend([s_param, s_param, s_param])
+            params.extend([s_param, s_param])
 
         if coy_filter and coy_filter != "ALL":
             canon = normalize_company_name(coy_filter)
@@ -405,7 +465,6 @@ def api_get_insights_list():
         rank_rows = cursor.fetchall()
         available_ranks = [r["rank"] for r in rank_rows if r.get("rank")]
 
-        # Query paginated rows
         order_col = "recommendation_percentage" if sort_by == "percentage" else "id"
         order_dir = "DESC" if sort_order == "desc" else "ASC"
 
@@ -431,7 +490,7 @@ def api_get_insights_list():
                 if units_json:
                     u_list = json.loads(units_json)
                     if isinstance(u_list, list) and len(u_list) > 0:
-                        unit_names = [u.get("unit") or u.get("unit_name") for u in u_list if u.get("unit") or u.get("unit_name")]
+                        unit_names = [u.get("unit") or u.get("unit_name") for u in u_list if (u.get("unit") or u.get("unit_name"))]
                         prev_units_str = ", ".join(unit_names) if unit_names else f"{len(u_list)} Unit(s)"
             except Exception:
                 pass
@@ -443,6 +502,10 @@ def api_get_insights_list():
             except Exception:
                 pass
 
+            canonical_coy = normalize_company_name(r.get("recommended_company"))
+            rec_pos = r.get("recommended_position") or "GD"
+            rec_sec = get_section_for_position(canonical_coy, rec_pos)
+
             formatted_rows.append({
                 "id": r["id"],
                 "s_no": s_no,
@@ -452,10 +515,11 @@ def api_get_insights_list():
                 "rank": r.get("rank") or "N/A",
                 "trade": r.get("trade") or "N/A",
                 "previous_units_formatted": prev_units_str,
-                "recommended_company": normalize_company_name(r.get("recommended_company")),
+                "recommended_company": canonical_coy,
+                "recommended_section": rec_sec,
                 "confidence_score": r.get("confidence_score") or "85.0%",
                 "recommendation_percentage": float(r.get("recommendation_percentage") or 85.0),
-                "recommended_position": r.get("recommended_position") or "GD",
+                "recommended_position": rec_pos,
                 "position_confidence": r.get("position_confidence") or "80.0%",
                 "final_company": r.get("final_company"),
                 "final_position": r.get("final_position"),
@@ -517,12 +581,6 @@ def api_get_insight_detail(rec_id: int):
             conn.close()
             return jsonify({"success": False, "error": "Recommendation not found"}), 404
 
-        # Fetch live personnel additional info if available
-        personnel_row = None
-        if row.get("personnel_id"):
-            cursor.execute("SELECT * FROM personnel WHERE id = %s", (row["personnel_id"],))
-            personnel_row = cursor.fetchone()
-
         cursor.close()
         conn.close()
 
@@ -535,12 +593,6 @@ def api_get_insight_detail(rec_id: int):
         canonical_coy = normalize_company_name(row.get("recommended_company"))
         rec_pos = row.get("recommended_position") or "GD"
         rec_sec = get_section_for_position(canonical_coy, rec_pos)
-
-        # Available positions for final update selection
-        available_companies = VALID_COMPANIES
-        company_positions_map = {
-            coy: get_positions_for_company(coy) for coy in VALID_COMPANIES
-        }
 
         user_role = str(user.get("role", "")).strip().upper()
         is_co = user_role in ["CO", "COMMANDING OFFICER"]
@@ -555,7 +607,7 @@ def api_get_insight_detail(rec_id: int):
                 "army_number": row.get("army_number"),
                 "name": row.get("name"),
                 "rank": row.get("rank"),
-                "trade": row.get("trade"),
+                "trade": row.get("trade") or "N/A",
                 "recommended_company": canonical_coy,
                 "confidence_score": row.get("confidence_score") or "85.0%",
                 "recommendation_percentage": float(row.get("recommendation_percentage") or 85.0),
@@ -573,8 +625,10 @@ def api_get_insight_detail(rec_id: int):
                 "decision_remarks": row.get("decision_remarks") or "",
                 "decided_by": row.get("decided_by") or "",
                 "decided_at": row.get("decided_at").strftime("%d-%m-%Y %H:%M") if row.get("decided_at") else "",
-                "available_companies": available_companies,
-                "company_positions_map": company_positions_map,
+                "hierarchy": UNIT_15_CESR_STRUCTURE,
+                "available_companies": get_all_companies(),
+                "company_sections_map": {coy: get_sections_for_company(coy) for coy in get_all_companies()},
+                "company_positions_map": {coy: get_positions_for_company(coy) for coy in get_all_companies()},
                 "user_role": user_role,
                 "can_add_remarks": (is_adjutant or is_2ic),
                 "can_assign_company": is_2ic,
@@ -587,7 +641,7 @@ def api_get_insight_detail(rec_id: int):
 
 
 # =============================================================================
-# 3. EXECUTIVE DECISION WORKFLOW (ROLE-BASED: CO / ADJUTANT / 2IC)
+# 4. EXECUTIVE DECISION WORKFLOW (ROLE-BASED: CO / ADJUTANT / 2IC)
 # =============================================================================
 
 @company_rec_bp.route("/api/ai/company-recommendation/decision", methods=["POST"])
@@ -595,8 +649,8 @@ def api_record_decision():
     """
     Record executive decision or remarks on a recommendation.
     Rules:
-    - CO: Strictly READ-ONLY. Cannot add remarks, cannot update, cannot accept/reject.
-    - ADJUTANT: Can add / update remarks only (cannot assign company or change final placement).
+    - CO: Strictly READ-ONLY.
+    - ADJUTANT: Can add / update remarks only.
     - 2IC / ADMIN: Authorized to assign company, modify placement, and execute final assignment into personnel.
     """
     user = require_login()
@@ -605,14 +659,12 @@ def api_record_decision():
 
     user_role = str(user.get("role", "")).strip().upper()
 
-    # 1. CO Role: Strictly Forbidden from mutating data
     if user_role in ["CO", "COMMANDING OFFICER"]:
         return jsonify({
             "success": False,
-            "error": "Access Denied: Role CO has read-only access. You cannot add remarks or modify recommendation records."
+            "error": "Access Denied: Role CO has read-only access. You cannot modify recommendation records."
         }), 403
 
-    # 2. Check general executive authorization
     if not check_executive_authorization(user):
         return jsonify({"success": False, "error": "Forbidden: Executive access required"}), 403
 
@@ -642,7 +694,7 @@ def api_record_decision():
         user_id = str(user.get("user_id", user.get("id", "1")))
         decided_by_str = f"{user_role} - {user_id}"
 
-        # 3. Role ADJUTANT: Can only add/update remarks
+        # ADJUTANT: remarks only
         if user_role == "ADJUTANT" or action == "remarks":
             cursor.execute("""
                 UPDATE ai_new_joinee_recommendations
@@ -671,7 +723,7 @@ def api_record_decision():
                 "decided_by": decided_by_str
             })
 
-        # 4. Role 2IC / ADMIN: Full Assignment & Decision Authority
+        # 2IC / ADMIN: full assignment
         if user_role not in ["2IC", "ADMIN", "SUPER ADMIN"]:
             cursor.close()
             conn.close()
@@ -689,7 +741,7 @@ def api_record_decision():
         else:
             decision_type = "pending"
 
-        # Validate final company & position hierarchy if provided
+        # Validate hierarchy
         final_coy_val = normalize_company_name(final_company or existing.get("recommended_company"))
         final_pos_val = final_position or existing.get("recommended_position")
 
@@ -723,7 +775,7 @@ def api_record_decision():
         ))
         conn.commit()
 
-        # If accepted, also sync with personnel table if personnel_id is present
+        # If accepted, sync company & section to personnel record
         if decision_type == "accepted" and existing.get("personnel_id"):
             db_coy_val = to_db_company_name(final_coy_val)
             pos_sec = get_section_for_position(final_coy_val, final_pos_val)
@@ -751,13 +803,13 @@ def api_record_decision():
 
 
 # =============================================================================
-# 4. RETRAINING & ANALYTICS ROUTES
+# 5. RETRAINING & ANALYTICS ROUTES (50-NEW-RECORD THRESHOLD)
 # =============================================================================
 
 @company_rec_bp.route("/api/ai/company-recommendation/retrain-status", methods=["GET"])
 def api_retrain_status():
     """
-    Check retraining status and dataset threshold counts.
+    Check retraining status and dataset threshold counts (50 new records).
     """
     try:
         conn = get_db_connection()
@@ -777,19 +829,21 @@ def api_retrain_status():
 
         trained_records = metadata.get("total_records", total_personnel)
         new_records = max(0, total_personnel - trained_records)
+        threshold = 50
 
         return jsonify({
             "success": True,
             "status": {
                 "trained": bool(metadata),
-                "model_version": metadata.get("model_version", "v2.0-cesr"),
+                "model_version": metadata.get("model_version", "company_position_model_v2"),
                 "selected_model": metadata.get("selected_model", "Random Forest"),
                 "last_trained_at": metadata.get("trained_at", "N/A"),
                 "total_records_in_db": total_personnel,
                 "trained_records_count": trained_records,
                 "new_records_since_last_training": new_records,
-                "retrain_threshold": 10,
-                "ready_for_retrain": (new_records >= 10),
+                "retrain_threshold": threshold,
+                "ready_for_retrain": (new_records >= threshold),
+                "trade_excluded": metadata.get("trade_excluded", True),
                 "champion_metrics": metadata.get("champion_metrics", {})
             }
         })
@@ -800,7 +854,7 @@ def api_retrain_status():
 @company_rec_bp.route("/api/ai/company-recommendation/retrain", methods=["POST"])
 def api_trigger_retrain():
     """
-    Trigger complete retraining pipeline (RF vs XGBoost + SMOTE + Evaluation).
+    Trigger complete retraining pipeline (Hierarchical RF vs XGBoost + SMOTE + Evaluation).
     """
     try:
         user = require_login()
@@ -851,7 +905,7 @@ def api_insights_count():
 
 
 # =============================================================================
-# 5. TESTING & EVALUATION DASHBOARD ROUTE
+# 6. TESTING & EVALUATION DASHBOARD ROUTE
 # =============================================================================
 
 @company_rec_bp.route("/testing/company-recommendation", methods=["GET"])
@@ -881,10 +935,10 @@ def testing_company_recommendation_view():
         analytics = {
             "metadata": metadata,
             "evaluation": eval_report,
-            "top_features": features[:8]
+            "top_features": features[:10],
+            "hierarchy": UNIT_15_CESR_STRUCTURE
         }
 
-        # Check if template exists in templates/testing/ or native
         template_name = "testing/company_recommendation_test.html"
         return render_template(template_name, analytics=analytics, retrain_status={
             "new_records_since_last_training": 0,

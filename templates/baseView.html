@@ -306,30 +306,26 @@
       color: #ffffff !important;
     }
 
-    .modal-header .btn-close, .modal-header .leave-app-close, .modal-header .lh-close {
-      filter: invert(1) grayscale(100%) brightness(200%) !important;
-      opacity: 0.95 !important;
-    }
-
-    /* ── Global Modal Close Button: red bg + white X, no hover effect ── */
+    /* ── Global Modal Close Button: High-contrast, crystal-clear white X on crimson/red ── */
     .modal-header .btn-close,
     .modal .btn-close,
     .btn-close {
-      background-color: #e53935 !important;
+      background-color: #ef4444 !important;
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
       border-radius: 50% !important;
       opacity: 1 !important;
-      width: 28px !important;
-      height: 28px !important;
+      width: 30px !important;
+      height: 30px !important;
       padding: 0 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: center !important;
       flex-shrink: 0 !important;
-      box-shadow: none !important;
-      transition: none !important;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+      transition: all 0.2s ease !important;
       filter: none !important;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z' fill='%23fff'/%3E%3C/svg%3E") !important;
-      background-size: 14px 14px !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z' fill='%23ffffff' stroke='%23ffffff' stroke-width='0.5'/%3E%3C/svg%3E") !important;
+      background-size: 13px 13px !important;
       background-repeat: no-repeat !important;
       background-position: center !important;
       pointer-events: auto !important;
@@ -342,11 +338,24 @@
     .modal-header .btn-close:focus,
     .modal .btn-close:focus,
     .btn-close:focus {
-      background-color: #e53935 !important;
+      background-color: #dc2626 !important;
+      border-color: #b91c1c !important;
       opacity: 1 !important;
-      box-shadow: none !important;
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.4) !important;
       outline: none !important;
-      transform: none !important;
+      transform: scale(1.08) !important;
+      filter: none !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z' fill='%23ffffff' stroke='%23ffffff' stroke-width='0.5'/%3E%3C/svg%3E") !important;
+      background-size: 13px 13px !important;
+      background-repeat: no-repeat !important;
+      background-position: center !important;
+    }
+
+    .modal-header .btn-close:active,
+    .modal .btn-close:active,
+    .btn-close:active {
+      transform: scale(0.94) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
     }
 
     .modal-body {
@@ -931,32 +940,6 @@
     .modal-title {
       font-weight: 600;
       font-size: 1.25rem;
-    }
-
-    .btn-close {
-      width: 40px !important;
-      height: 40px !important;
-      background-color: #f9f9f9 !important;
-      border-radius: 10px !important;
-      color: white !important;
-      filter: none !important;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-      transition: all 0.3s ease;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      font-size: 1.2rem !important;
-    }
-
-    .btn-close:hover {
-      background-color: #c82333 !important;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-      transform: translateY(-1px);
-    }
-
-    .btn-close:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
     }
 
     .modal-body {
