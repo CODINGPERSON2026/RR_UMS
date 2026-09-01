@@ -20,7 +20,7 @@ def submit_roll_call():
         if not category or not point_title or not points or len(points) == 0:
             return jsonify({"success": False, "message": "All fields are required"}), 400
 
-        status = "SUGGESSTED"
+        status = "PENDING"
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -61,14 +61,7 @@ def get_pending_roll_call_points():
     company = user['company']
     role = user['role']
 
-    category = request.args.get('category', 'OR_REQUEST')
-
-    status_map = {
-        'OR_REQUEST': 'PENDING',
-        'SM_SUGGESTION': 'SUGGESSTED'
-    }
-
-    status = status_map.get(category, 'PENDING')
+    category = request.args.get('category')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -88,10 +81,14 @@ def get_pending_roll_call_points():
                 p.company
             FROM roll_call_points rcp
             LEFT JOIN personnel p ON rcp.army_number = p.army_number
-            WHERE rcp.status = %s
+            WHERE rcp.status IN ('PENDING', 'SUGGESSTED')
         '''
 
-        params = [status]
+        params = []
+
+        if category:
+            query += " AND rcp.category = %s"
+            params.append(category)
 
         # if company != "Admin" or company == 'Center':
         #     print('filtered')
@@ -162,12 +159,12 @@ def update_roll_call_status():
                 "message": "Roll call record not found"
             }), 404
 
-        if record["status"] != "PENDING":
+        if record["status"] not in ["PENDING", "SUGGESSTED"]:
             cursor.close()
             conn.close()
             return jsonify({
                 "status": "error",
-                "message": "Only PENDING records can be updated"
+                "message": "Only PENDING or SUGGESSTED records can be updated"
             }), 400
 
         # ✅ UPDATE WITH REMARK

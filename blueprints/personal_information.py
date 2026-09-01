@@ -565,9 +565,9 @@ def rank_graph():
                 aggregated[short_name] = count
                 seniority_map[short_name] = seniority
 
-        # Format and sort by rank order (Ascending: Agniveer first up to Subedar Major)
+        # Format and sort by rank order (Descending: Subedar Major down to Agniveer)
         result_list = [{'rank': k, 'count': v} for k, v in aggregated.items()]
-        result_list.sort(key=lambda item: (seniority_map.get(item['rank'], 999), item['rank']))
+        result_list.sort(key=lambda item: (seniority_map.get(item['rank'], -1), item['rank']), reverse=True)
 
         return jsonify({'rank_distribution': result_list}), 200
 

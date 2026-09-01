@@ -366,7 +366,7 @@ def get_sql(question_type, entities):
 
         # 10) Roll call pending points
         sql_parts.append(
-            "(SELECT COUNT(*) FROM roll_call_points WHERE status = 'PENDING') AS roll_call_pending_points"
+            "(SELECT COUNT(*) FROM roll_call_points WHERE status IN ('PENDING', 'SUGGESSTED')) AS roll_call_pending_points"
         )
 
         # 11) Tasks for current user (if available)

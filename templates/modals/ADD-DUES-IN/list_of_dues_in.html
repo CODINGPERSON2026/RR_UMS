@@ -450,6 +450,13 @@
             </svg>
             <input type="text" id="duesInSearch" placeholder="Search army no or name…">
           </div>
+          <div class="d-flex align-items-center gap-2">
+            <label class="form-label mb-0 fw-semibold text-secondary" style="font-size: 0.82rem;"><i class="fas fa-sort me-1"></i>Date of Move:</label>
+            <select id="duesInSortOrder" class="form-select form-select-sm" style="width: auto; font-size: 0.82rem;" onchange="duesInSortOrder = this.value; duesInCurrentPage = 1; duesInFilterAndPaginate();">
+              <option value="desc">Descending (Newest First)</option>
+              <option value="asc">Ascending (Oldest First)</option>
+            </select>
+          </div>
         </div>
 
         <div id="duesInLoader" class="text-center py-4">
@@ -468,7 +475,9 @@
                   <th style="width: 8%;">Trade</th>
                   <th style="width: 8%;">Unit</th>
                   <th style="width: 10%;">Order no</th>
-                  <th style="width: 10%;">Date Of Move</th>
+                  <th style="width: 12%; cursor: pointer;" onclick="toggleDuesInSort()" title="Click to toggle Date of Move sort (Ascending / Descending)">
+                    Date Of Move <span id="duesInSortIcon">▼</span>
+                  </th>
                   <th style="width: 8%;">DOR</th>
                   <th style="width: 13%;">Remarks</th>
                 </tr>
@@ -557,6 +566,15 @@
   let duesInPageSize = 20;
   let duesInCurrentPage = 1;
   let deleteTargetId = null;
+  let duesInSortOrder = 'desc';
+
+  function toggleDuesInSort() {
+    duesInSortOrder = duesInSortOrder === 'asc' ? 'desc' : 'asc';
+    const sel = document.getElementById('duesInSortOrder');
+    if (sel) sel.value = duesInSortOrder;
+    duesInCurrentPage = 1;
+    duesInFilterAndPaginate();
+  }
 
   function initials(name) {
     const p = (name || '').split(' ');
@@ -587,13 +605,25 @@
 
   function duesInFilterAndPaginate() {
     const v = (document.getElementById('duesInSearch')?.value || '').toLowerCase().trim();
-    duesInFilteredData = v ? duesInData.filter(r =>
+    let filtered = v ? duesInData.filter(r =>
       (r.army_number || '').toLowerCase().includes(v) ||
       (r.name || '').toLowerCase().includes(v) ||
       (r.rank || '').toLowerCase().includes(v) ||
       (r.unit || '').toLowerCase().includes(v) ||
       (r.trade || '').toLowerCase().includes(v)
-    ) : duesInData;
+    ) : [...duesInData];
+
+    // Sort by date_of_move
+    filtered.sort((a, b) => {
+      const dateA = a.date_of_move ? new Date(a.date_of_move).getTime() : 0;
+      const dateB = b.date_of_move ? new Date(b.date_of_move).getTime() : 0;
+      return duesInSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+
+    duesInFilteredData = filtered;
+
+    const icon = document.getElementById('duesInSortIcon');
+    if (icon) icon.textContent = duesInSortOrder === 'asc' ? '▲' : '▼';
 
     updateCount(duesInData.length);
 

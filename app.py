@@ -2195,7 +2195,7 @@ WHERE company = %s
         loan_count = loan_result['count'] if loan_result else 0
         
         # 8️⃣ Roll Call Pending Points
-        cursor.execute("SELECT count(id) as count FROM roll_call_points WHERE status = 'PENDING'")
+        cursor.execute("SELECT count(id) as count FROM roll_call_points WHERE status IN ('PENDING', 'SUGGESSTED')")
         roll_call_result = cursor.fetchone()
         roll_call_pending_count = roll_call_result['count'] if roll_call_result else 0
 
@@ -3623,12 +3623,14 @@ def update_project_full():
         return jsonify({"status": "error", "message": "Project ID, Title, and Head are required"}), 400
 
     try:
-        cost_val = float(project_cost) if project_cost is not None and str(project_cost).strip() != '' else 0.0
+        cost_str = str(project_cost or 0).replace(',', '').replace('₹', '').replace('$', '').strip()
+        cost_val = float(cost_str) if cost_str != '' else 0.0
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Invalid cost value"}), 400
 
     try:
-        qty_val = int(quantity) if quantity is not None and str(quantity).strip() != '' else 0
+        qty_str = str(quantity or 0).replace(',', '').strip()
+        qty_val = int(qty_str) if qty_str != '' else 0
     except (ValueError, TypeError):
         return jsonify({"status": "error", "message": "Invalid quantity value"}), 400
 
@@ -4391,7 +4393,7 @@ def get_rollcall_points():
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
     try:
-        cursor.execute("SELECT count(id) as count FROM roll_call_points WHERE status = 'PENDING'")
+        cursor.execute("SELECT count(id) as count FROM roll_call_points WHERE status IN ('PENDING', 'SUGGESSTED')")
         result = cursor.fetchone()
         count = result['count'] if result else 0
         
@@ -5899,9 +5901,9 @@ def get_posted_strength():
                 aggregated[short_name] = count
                 seniority_map[short_name] = seniority
 
-        # Format and sort by rank order ascending: Agniveer first up to Subedar Major
+        # Format and sort by rank order descending: Subedar Major down to Agniveer
         final_rows = [{'rank': k, 'count': v} for k, v in aggregated.items()]
-        final_rows.sort(key=lambda item: (seniority_map.get(item['rank'], 99), item['rank']))
+        final_rows.sort(key=lambda item: (seniority_map.get(item['rank'], -1), item['rank']), reverse=True)
 
         total = sum(r['count'] for r in final_rows)
 
