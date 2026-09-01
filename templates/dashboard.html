@@ -438,8 +438,8 @@
 
       <!-- AI New Joinee Posting Recommendation Button — hidden for CO/2IC/ADJUTANT (they use AI Joinee Insights instead) -->
       {% if role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] %}
-      <button class="ab-btn ab-teal" data-bs-toggle="modal" data-bs-target="#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();" title="AI New Joinee Posting Recommendation &amp; Hierarchical Allocation">
-        <i class="fas fa-brain text-warning" style="font-size:12px"></i> AI NEW JOINEE RECOMMENDATION
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();" title="AI New Joinee Posting Recommendation &amp; Hierarchical Allocation">
+        AI NEW JOINEE RECOMMENDATION
       </button>
       {% endif %}
 

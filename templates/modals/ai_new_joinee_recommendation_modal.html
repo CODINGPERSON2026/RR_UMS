@@ -604,10 +604,7 @@
               </small>
             </div>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-light rounded-circle d-flex align-items-center justify-content-center p-0 ai-modal-header-refresh-btn" onclick="resetAiRecommendationModal()" title="Refresh / Reset All Fields" style="width: 32px; height: 32px; border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.15); transition: all 0.25s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
-              <i class="fas fa-sync-alt text-white" style="font-size: 0.82rem; transition: transform 0.4s ease;"></i>
-            </button>
+          <div class="d-flex align-items-center">
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>
@@ -664,7 +661,7 @@
                     <i class="fas fa-search"></i>
                   </button>
                 </div>
-                <small class="text-muted d-block" style="font-size: 0.69rem;" id="aiArmyNoLookupStatus">Auto-fills if registered</small>
+                <small class="text-muted d-block" style="font-size: 0.69rem;" id="aiArmyNoLookupStatus"></small>
               </div>
 
               <div class="col-md-3">
@@ -672,7 +669,6 @@
                   <i class="fas fa-user text-primary me-1"></i>Soldier Name
                 </label>
                 <input type="text" id="aiPersonnelName" class="form-control form-control-sm text-uppercase fw-semibold" placeholder="e.g. SEP AMIT KUMAR" />
-                <small class="text-muted d-block" style="font-size: 0.69rem;">Personnel identity</small>
               </div>
 
               <div class="col-md-3">
@@ -703,7 +699,6 @@
                 <div id="aiRankOtherWrap" style="display: none;" class="mt-1">
                   <input type="text" id="aiRankOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom rank" />
                 </div>
-                <small class="text-muted d-block" style="font-size: 0.69rem;">For records &amp; seniority</small>
               </div>
 
               <div class="col-md-3">
@@ -737,7 +732,6 @@
                 <div id="aiTradeOtherWrap" style="display: none;" class="mt-1">
                   <input type="text" id="aiTradeOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom trade" />
                 </div>
-                <small class="text-muted d-block" style="font-size: 0.69rem;">For records (zero-bias)</small>
               </div>
             </div>
 
@@ -773,18 +767,18 @@
                           <input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
                         </td>
                         <td>
-                          <div class="input-group input-group-sm">
-                            <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-                            <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                          <div class="input-group input-group-sm flex-nowrap">
+                            <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
+                            <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
                               <i class="far fa-calendar-alt text-success"></i>
                               <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
                             </button>
                           </div>
                         </td>
                         <td>
-                          <div class="input-group input-group-sm">
-                            <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-                            <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                          <div class="input-group input-group-sm flex-nowrap">
+                            <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
+                            <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
                               <i class="far fa-calendar-alt text-success"></i>
                               <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
                             </button>
@@ -3766,18 +3760,18 @@
     tr.innerHTML = `
       <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
       <td>
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+        <div class="input-group input-group-sm flex-nowrap">
+          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
+          <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
             <i class="far fa-calendar-alt text-success"></i>
             <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
           </button>
         </div>
       </td>
       <td>
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+        <div class="input-group input-group-sm flex-nowrap">
+          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
+          <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
             <i class="far fa-calendar-alt text-success"></i>
             <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
           </button>
@@ -3940,85 +3934,6 @@
       title.style.display = isFresh ? 'none' : 'inline-block';
     }
     onAiParameterModified(true);
-  }
-
-  function addAiUnitRow(initialDuty = 'GENERAL') {
-    const tbody = document.getElementById('aiUnitsTableBody');
-    const tr = document.createElement('tr');
-    tr.className = 'ai-unit-row-anim';
-
-    const { checkboxesHtml, isOtherChecked, otherCustomVal, summaryText } = buildDutyCheckboxesHtml(initialDuty);
-
-    tr.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 4 CSR" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
-      <td>
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
-            <i class="far fa-calendar-alt text-success"></i>
-            <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
-          </button>
-        </div>
-      </td>
-      <td>
-        <div class="input-group input-group-sm">
-          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" />
-          <button class="btn btn-outline-secondary px-2 py-0" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
-            <i class="far fa-calendar-alt text-success"></i>
-            <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
-          </button>
-        </div>
-      </td>
-      <td>
-        <div class="ai-duty-multi-wrap position-relative">
-          <button type="button" class="btn btn-sm btn-outline-secondary w-100 text-start d-flex justify-content-between align-items-center ai-duty-select-btn" onclick="toggleAiDutyDropdown(this, event)" title="Click to select Duty / Domain checkboxes">
-            <span class="ai-duty-summary-text text-truncate text-dark fw-bold" style="max-width: 175px; font-size: 0.78rem;">${summaryText}</span>
-            <i class="fas fa-chevron-down ms-1 text-muted" style="font-size: 0.65rem;"></i>
-          </button>
-          <div class="ai-duty-dropdown-panel p-2 shadow" onclick="event.stopPropagation()" style="display: none; position: absolute; top: calc(100% + 2px); left: 0; min-width: 260px; max-width: 300px; max-height: 250px; overflow-y: auto; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; z-index: 1060;">
-            <div class="d-flex justify-content-between align-items-center mb-1.5 pb-1 border-bottom">
-              <span class="fw-bold text-dark" style="font-size: 0.75rem;"><i class="fas fa-check-square text-primary me-1"></i> Domains (Checkboxes)</span>
-              <div class="d-flex gap-1">
-                <button type="button" class="btn btn-link p-0 text-decoration-none text-primary" style="font-size: 0.7rem;" onclick="selectAllRowAiDutyCheckboxes(this)">All</button>
-                <span class="text-muted" style="font-size: 0.7rem;">•</span>
-                <button type="button" class="btn btn-link p-0 text-decoration-none text-danger" style="font-size: 0.7rem;" onclick="clearRowAiDutyCheckboxes(this)">Clear</button>
-              </div>
-            </div>
-            <div class="ai-duty-checkboxes-list">
-              ${checkboxesHtml}
-            </div>
-            <div class="ai-duty-other-wrap mt-1 pt-1 border-top" style="display: ${isOtherChecked ? 'block' : 'none'};">
-              <input type="text" class="form-control form-control-sm ai-duty-other-input" value="${otherCustomVal}" placeholder="Specify custom domain..." oninput="this.value = this.value.toUpperCase(); onAiDutyOtherInput(this);" />
-            </div>
-          </div>
-        </div>
-      </td>
-      <td class="text-center">
-        <button type="button" class="btn btn-sm text-danger p-0" onclick="removeAiUnitRow(this)">
-          <i class="fas fa-times"></i>
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-    onAiParameterModified(true);
-  }
-
-  function removeAiUnitRow(btn) {
-    const row = btn.closest('tr');
-    const tbody = document.getElementById('aiUnitsTableBody');
-    if (tbody.children.length > 1) {
-      row.style.transition = 'opacity 0.2s, transform 0.2s';
-      row.style.opacity = '0';
-      row.style.transform = 'translateY(-6px)';
-      setTimeout(() => {
-        row.remove();
-        onAiParameterModified(true);
-      }, 200);
-    } else {
-      row.querySelectorAll('input').forEach(i => i.value = '');
-      clearRowAiDutyCheckboxes(btn);
-      onAiParameterModified(true);
-    }
   }
 
   function isValidCalendarDate(str) {
