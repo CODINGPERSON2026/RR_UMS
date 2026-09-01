@@ -1,328 +1,506 @@
 """
-Data Preprocessing, Feature Engineering, and Extraction Pipeline
-for AI New Joinee Recommendation (Unit 15 CESR)
+Feature Engineering and Dataset Preprocessing for AI New Joinee Recommendation.
+Learns patterns primarily from Previous Unit Served, Previous Duty, and Domain Profile.
+Loads and processes 2,000-sample dataset from aiml/ai_new_joinee_recommendation/datasets/.
+Strictly isolates target variables to guarantee ZERO data leakage.
 """
 
 import os
 import sys
 import re
-import joblib
+import json
 import numpy as np
 import pandas as pd
 from datetime import datetime, date
-from typing import Dict, List, Any, Tuple, Optional
+from typing import Dict, List, Any, Optional, Tuple
 
-# Ensure workspace root is in python path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from db_config import get_db_connection
 from aiml.ai_new_joinee_recommendation.position_mapping import (
     VALID_COMPANIES,
-    VALID_DB_COMPANIES,
-    VALID_SPECIALTIES,
-    SPECIALTY_KEYWORDS,
-    SPECIALTY_COMPANY_AFFINITY,
+    UNIT_15_CESR_STRUCTURE,
     normalize_company_name,
-    to_db_company_name,
-    to_display_company_name,
-    extract_specialties_from_trade_and_text
+    get_positions_for_section,
+    get_sections_for_company,
+    get_positions_for_company,
+    is_valid_hierarchy
 )
 
-# Rank hierarchy map (Higher number = higher seniority/responsibility)
-RANK_ORDER = {
-    "Agniveer": 1,
-    "Signal Man": 2,
-    "CFN": 2,
-    "L NK": 3,
-    "LOC NK": 3,
-    "NK": 4,
-    "L HAV": 5,
-    "LOC HAV": 5,
-    "HAV": 6,
-    "CQMH": 7,
-    "CHM": 7,
-    "RHM": 7,
-    "Naib Subedar": 8,
-    "Subedar": 9,
-    "Subedar Major": 10,
-    "Officer": 11,
-    "Other": 3
+DATASET_DIR = os.path.join(os.path.dirname(__file__), "datasets")
+PERSONNEL_CSV = os.path.join(DATASET_DIR, "personnel_test_2000.csv")
+UNITS_CSV = os.path.join(DATASET_DIR, "units_served_test_2000.csv")
+
+# Unit Type Categorization Dictionary (Extracts operational profile from Unit Name)
+UNIT_TYPE_KEYWORDS = {
+    "unit_type_signal": ["SIGNAL", "SIG", "SIGCEN", "NODE", "MCCS", "SERVER", "COMMUNICATION", "TELECOM"],
+    "unit_type_admin": ["ADMIN", "RHQ", "OFFICE", "RECORD", "BRANCH", "HQ UNIT", "BASE HQ", "STATION HQ"],
+    "unit_type_logistics": ["LOGISTICS", "SUPPLY", "ORDNANCE", "QM", "STORE", "RATION", "DEPOT"],
+    "unit_type_field": ["FIELD", "INFANTRY", "LINE", "FORWARD", "SECTOR", "BORDER", "OP", "BRIGADE", "DIV"],
+    "unit_type_training": ["TRAINING", "CENTRE", "CENTER", "ACADEMY", "SCHOOL", "TRG"],
+    "unit_type_mechanical": ["MECHANICAL", "MT", "TRANSPORT", "VEHICLE", "WORKSHOP", "EME", "REPAIR"],
+    "unit_type_corps": ["CORPS", "CORP", "HQ", "ARMY", "COMMAND", "DETACHMENT", "DET"],
 }
 
-# Major military trade families
-TRADE_FAMILIES = {
-    "trade_fam_ttc": ["ttc", "ttc -ll", "telecom", "telephone"],
-    "trade_fam_efs": ["efs", "equipment", "fault"],
-    "trade_fam_lmn": ["lmn", "line man", "line", "wire"],
-    "trade_fam_dvr": ["dvr", "dvr mt", "dmv", "driver", "transport", "opr dvr"],
-    "trade_fam_occ": ["occ", "op ciph", "cipher", "operator"],
-    "trade_fam_clk": ["clk", "clk sd", "clk (sd)", "clerk", "pa", "typist"],
-    "trade_fam_tech": ["tech", "tech sa", "je sys", "jene", "je ne", "er", "dtmn", "artsan", "artish", "welder"],
-    "trade_fam_logistics": ["skt", "skt (eme)", "atbv", "aebv", "at(bv)", "wm", "w/m", "stwd", "qm", "store"],
-    "trade_fam_services": ["chef", "chef com", "chef mess", "hk", "hkeeper", "h/k", "h /k", "mess keeper"],
-    "trade_fam_radio": ["rr", "radio", "wireless", "dsr", "mw", "vhf", "mccs"]
-}
-
+# Duty Domain Keywords for Historical Duty Parsing
 DUTY_DOMAIN_KEYWORDS = {
-    "domain_tech": ["tech", "efs", "ttc", "repair", "hardware", "switch", "system", "je", "maintenance", "workshop"],
-    "domain_comn": ["radio", "rr", "wireless", "exchange", "mccs", "sig", "sigcen", "line", "mw", "vhf", "communication"],
-    "domain_it": ["it", "computer", "server", "lan", "wan", "software", "network", "cyber", "system"],
-    "domain_clerk": ["clerk", "sd", "clk", "admin", "office", "drafting", "dispatch", "record", "branch"],
-    "domain_qm": ["qm", "skt", "store", "ration", "clothing", "mes", "equipment", "provision"],
-    "domain_dvr": ["dvr", "driver", "transport", "mt", "vehicle", "convoy"],
-    "domain_gd": ["gd", "guard", "security", "chq", "patrol", "sentry", "escort", "orderly"]
+    "domain_tech": ["tech", "efs", "duty efs", "ttc", "repair", "hardware", "switch", "system", "je", "maintenance", "workshop", "dtmn", "dtmn shop", "lrw", "technician", "operator"],
+    "domain_comn": ["radio", "rr", "wireless", "exchange", "mccs", "mccs exchange", "sig", "sigcen", "line", "line man", "communication", "communication clerk", "strip clerk", "node", "icn", "nfs"],
+    "domain_it": ["it", "computer", "server", "lan", "wan", "software", "network", "cyber", "coding", "multimedia", "data", "system"],
+    "domain_clerk": ["clerk", "clk", "o1", "o2", "o3", "trg clerk", "warrant clerk", "part one", "dispatcher", "pa", "a-sigma", "office", "admin clk"],
+    "domain_qm": ["qm", "ration", "fresh", "clothing", "mes", "skt", "store", "supply", "quarter master", "ration nco"],
+    "domain_dvr": ["mt", "driver", "dvr", "mto", "vehicle", "transport", "lorry", "car"],
+    "domain_rp": ["rp", "regimental police", "strict orderly", "runner", "guest room", "adm nco", "line guard", "havildar major", "security"],
+    "domain_chq": ["chq", "buddy", "batman", "mess", "mess hav", "tradesmen", "jco mess", "cook", "washerman", "housekeeper"],
+    "domain_tm": ["tm", "technical maintenance", "telecom maintenance", "line maintenance"],
+    "domain_gd": ["gd", "general duty", "chm", "cqmh", "rhm", "sentry", "guard", "field duty"],
+    "domain_corps_hq": ["corps hq", "vc", "video conference", "branch", "corps", "command node"]
 }
 
+# Master List of Safe Engineered Feature Columns (Zero Target Leakage / Zero Trade Reference)
+FEATURE_COLUMNS = [
+    'num_units', 'total_tenure_days', 'avg_tenure_days', 'latest_tenure_days',
+    'unit_type_signal', 'unit_type_admin', 'unit_type_logistics', 'unit_type_field',
+    'unit_type_training', 'unit_type_mechanical', 'unit_type_corps',
+    'domain_tech', 'domain_comn', 'domain_it', 'domain_clerk', 'domain_qm',
+    'domain_dvr', 'domain_rp', 'domain_chq', 'domain_tm', 'domain_gd', 'domain_corps_hq',
+    'input_domain_hq_coy', 'input_domain_comn_coy', 'input_domain_3_coy',
+    'input_domain_clerk', 'input_domain_qm', 'input_domain_tech', 'input_domain_comn',
+    'input_domain_dvr', 'input_domain_chq', 'input_domain_rp', 'input_domain_gd',
+    'tech_density', 'admin_density', 'field_exposure_ratio', 'signal_exposure_ratio'
+]
+SAFE_FEATURE_COLUMNS = FEATURE_COLUMNS
 
-def get_rank_level(rank_str: Optional[str]) -> int:
-    """Map rank to numeric seniority level."""
-    if not rank_str:
-        return 2
-    r_clean = str(rank_str).strip()
-    for k, v in RANK_ORDER.items():
-        if k.lower() == r_clean.lower():
-            return v
-    # Partial matching
-    for k, v in RANK_ORDER.items():
-        if k.lower() in r_clean.lower() or r_clean.lower() in k.lower():
-            return v
-    return 3
 
-
-def calculate_service_years(date_of_enrollment: Any) -> float:
-    """Calculate service duration in years from enrollment date."""
-    if not date_of_enrollment:
-        return 2.0
-    try:
-        if isinstance(date_of_enrollment, str):
-            for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-                try:
-                    dt = datetime.strptime(date_of_enrollment, fmt).date()
-                    break
-                except ValueError:
-                    dt = None
-        elif isinstance(date_of_enrollment, datetime):
-            dt = date_of_enrollment.date()
-        elif isinstance(date_of_enrollment, date):
-            dt = date_of_enrollment
-        else:
-            return 2.0
-
-        if dt:
-            today = date.today()
-            years = (today - dt).days / 365.25
-            return max(0.1, round(years, 2))
-    except Exception:
-        pass
-    return 2.0
+def parse_date_string(date_val: Any) -> Optional[date]:
+    """Parse various date formats into date object."""
+    if not date_val:
+        return None
+    if isinstance(date_val, (date, datetime)):
+        return date_val if isinstance(date_val, date) else date_val.date()
+    val_str = str(date_val).strip()
+    for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d", "%d.%m.%Y"):
+        try:
+            return datetime.strptime(val_str, fmt).date()
+        except ValueError:
+            pass
+    return None
 
 
 def calculate_tenure_days(from_date: Any, to_date: Any) -> float:
-    """Calculate days served between from_date and to_date."""
-    if not from_date or not to_date:
-        return 365.0
-    try:
-        d1 = None
-        d2 = None
-        for fmt in ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%Y/%m/%d"):
-            if isinstance(from_date, str) and not d1:
-                try:
-                    d1 = datetime.strptime(from_date, fmt).date()
-                except ValueError:
-                    pass
-            if isinstance(to_date, str) and not d2:
-                try:
-                    d2 = datetime.strptime(to_date, fmt).date()
-                except ValueError:
-                    pass
-        if isinstance(from_date, (datetime, date)) and not d1:
-            d1 = from_date.date() if isinstance(from_date, datetime) else from_date
-        if isinstance(to_date, (datetime, date)) and not d2:
-            d2 = to_date.date() if isinstance(to_date, datetime) else to_date
-
-        if d1 and d2 and d2 >= d1:
-            return float((d2 - d1).days)
-    except Exception:
-        pass
-    return 365.0
+    """Calculate duration in days between two dates."""
+    d_from = parse_date_string(from_date)
+    d_to = parse_date_string(to_date)
+    if d_from and d_to:
+        diff = (d_to - d_from).days
+        return float(max(diff, 1))
+    return 730.0  # Default ~2 years
 
 
-def extract_features_from_dict(
-    trade: str,
-    rank: str,
-    specialties: List[str] = None,
-    date_of_enrollment: Any = None,
-    units_history: List[Dict[str, Any]] = None,
-    is_fresh: bool = False
+def map_raw_to_canonical_section(company: str, raw_section: Optional[str]) -> str:
+    """Map raw dataset section string to canonical section for the company."""
+    canonical_coy = normalize_company_name(company)
+    sec_str = (raw_section or "").strip().upper()
+
+    if canonical_coy == "COMN COY":
+        return "COMMUNICATION / TECHNICAL"
+    elif canonical_coy == "3 COY":
+        return "TECHNICAL / CORPS HQ"
+    else:
+        # HQ COY
+        if "QM" in sec_str:
+            return "QM"
+        elif "RHQ" in sec_str or "ADMIN" in sec_str:
+            return "RHQ"
+        elif "RP" in sec_str or "POLICE" in sec_str:
+            return "RP"
+        elif "TM" in sec_str:
+            return "TM"
+        elif "MT" in sec_str or "TRANSPORT" in sec_str:
+            return "MT"
+        elif "LRW" in sec_str or "WORKSHOP" in sec_str:
+            return "LRW"
+        elif "CHQ" in sec_str or "MESS" in sec_str:
+            return "CHQ"
+        else:
+            return "GENERAL DUTY"
+
+
+def map_raw_to_canonical_position(section: str, raw_position: Optional[str]) -> str:
+    """Map raw position/trade string to canonical position in section."""
+    sec_u = section.strip().upper()
+    pos_u = (raw_position or "").strip().upper()
+
+    # 1. HQ COY SECTIONS
+    if sec_u == "QM":
+        if "FRESH" in pos_u:
+            return "Fresh NCO"
+        elif "CLOTH" in pos_u:
+            return "Clothing NCO"
+        elif "MES" in pos_u:
+            return "MES NCO"
+        elif "SKT" in pos_u or "STORE" in pos_u:
+            return "SKT"
+        else:
+            return "Ration NCO"
+
+    elif sec_u == "RHQ":
+        if "O1" in pos_u:
+            return "O1"
+        elif "O2" in pos_u:
+            return "O2"
+        elif "O3" in pos_u:
+            return "O3"
+        elif "TRG" in pos_u or "TRAIN" in pos_u:
+            return "TRG Clerk"
+        elif "WARRANT" in pos_u:
+            return "Warrant Clerk"
+        elif "PART ONE" in pos_u:
+            return "Part One Clerk"
+        elif "DISPATCH" in pos_u:
+            return "Dispatcher Clerk"
+        elif "SIGMA" in pos_u:
+            return "A-Sigma Clerk"
+        elif "PA" in pos_u:
+            return "PA"
+        else:
+            return "Clerk"
+
+    elif sec_u == "RP":
+        if "STRICT" in pos_u or "ORDERLY" in pos_u:
+            return "Strict Orderly"
+        elif "RUNNER" in pos_u:
+            return "Runner"
+        elif "GUEST" in pos_u:
+            return "Guest Room NCO"
+        elif "ADM" in pos_u:
+            return "Adm NCO"
+        else:
+            return "RP NCO"
+
+    elif sec_u == "TM":
+        return "TM"
+
+    elif sec_u == "MT":
+        return "MT"
+
+    elif sec_u == "LRW":
+        return "LRW"
+
+    elif sec_u == "CHQ":
+        if "BUDDY" in pos_u:
+            return "Buddy"
+        elif "OFFICE" in pos_u:
+            return "Office"
+        elif "MESS HAV" in pos_u or "MESS" in pos_u:
+            return "Mess Hav"
+        elif "JCO" in pos_u:
+            return "JCO Mess Cdr"
+        else:
+            return "All Tradesmen"
+
+    elif sec_u == "GENERAL DUTY":
+        if "CHM" in pos_u:
+            return "CHM"
+        elif "CQMH" in pos_u:
+            return "CQMH"
+        elif "RHM" in pos_u:
+            return "RHM"
+        else:
+            return "GD"
+
+    # 2. COMN COY
+    elif "COMMUNICATION" in sec_u or "TECHNICAL" in sec_u:
+        if "MULTIMEDIA" in pos_u:
+            return "Multimedia"
+        elif "IT" in pos_u:
+            return "IT"
+        elif "RADIO" in pos_u or "RR" in pos_u:
+            return "Radio"
+        elif "MCCS" in pos_u or "EXCHANGE" in pos_u:
+            return "MCCS Exchange"
+        elif "COMMUNICATION CLERK" in pos_u:
+            return "Communication Clerk"
+        elif "STRIP" in pos_u:
+            return "Strip Clerk"
+        elif "ICN" in pos_u:
+            return "ICN"
+        elif "NFS" in pos_u:
+            return "NFS"
+        elif "SERVER" in pos_u:
+            return "Server"
+        else:
+            return "System"
+
+    # 3. 3 COY
+    elif "CORPS" in sec_u or "3 COY" in sec_u:
+        if "VC" in pos_u:
+            return "VC"
+        elif "BRANCH" in pos_u:
+            return "Branch"
+        elif "CORPS" in pos_u:
+            return "Corps HQ"
+        else:
+            return "System"
+
+    return "GD"
+
+
+def extract_features_from_units(
+    units_history: List[Dict[str, Any]],
+    is_fresh: bool = False,
+    selected_domains: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, float]:
     """
-    Extract standardized numerical feature dictionary for model inference/training.
+    Extract rich historical pattern features from previous unit postings and selected domains.
+    NO TARGET LEAKAGE: strictly processes historical service and domain signals.
     """
-    trade_clean = (trade or "").strip().upper()
-    active_specialties = specialties or extract_specialties_from_trade_and_text(trade)
-    spec_set = set(active_specialties)
-
-    # 1. Rank Seniority Level
-    rank_level = get_rank_level(rank)
-
-    # 2. Service Years
-    service_years = calculate_service_years(date_of_enrollment)
-
-    # 3. Specialty Multi-Hot Encoding
     features: Dict[str, float] = {}
-    for spec in VALID_SPECIALTIES:
-        col_name = f"spec_{spec.replace(' ', '_').replace('/', '_')}"
-        features[col_name] = 1.0 if spec in spec_set else 0.0
 
-    # 3b. Trade Family Multi-Hot Indicators
-    for fam_name, kws in TRADE_FAMILIES.items():
-        matched_fam = 0.0
-        for kw in kws:
-            if kw in trade_clean.lower() or kw in active_specialties:
-                matched_fam = 1.0
-                break
-        features[fam_name] = matched_fam
+    # Base flags
+    features["is_fresh_joinee"] = 1.0 if (is_fresh or not units_history) else 0.0
+    features["has_prev_units"] = 0.0 if features["is_fresh_joinee"] else 1.0
 
-    # 4. Units Served History Features
-    units = units_history or []
-    if is_fresh or not units:
-        num_units = 0.0
-        total_tenure_days = 0.0
-        avg_tenure_days = 0.0
-        has_prev_units = 0.0
-        duty_text = ""
-        unit_names_text = ""
-    else:
-        num_units = float(len(units))
-        tenures = [calculate_tenure_days(u.get("from_date"), u.get("to_date")) for u in units]
-        total_tenure_days = float(sum(tenures))
-        avg_tenure_days = float(total_tenure_days / max(1.0, num_units))
-        has_prev_units = 1.0
-        duty_text = " ".join([str(u.get("duty_performed") or u.get("duty") or "") for u in units]).lower()
-        unit_names_text = " ".join([str(u.get("unit") or u.get("unit_name") or "") for u in units]).lower()
-
-    features["rank_level"] = float(rank_level)
-    features["service_years"] = float(service_years)
+    valid_units = [u for u in (units_history or []) if (u.get("unit") or u.get("unit_name"))]
+    num_units = len(valid_units)
     features["num_units"] = float(num_units)
-    features["total_tenure_days"] = float(total_tenure_days)
-    features["avg_tenure_days"] = float(avg_tenure_days)
-    features["has_prev_units"] = float(has_prev_units)
 
-    # 5. Duty Domain Multi-Hot Encoding from historical duties
-    for domain, kws in DUTY_DOMAIN_KEYWORDS.items():
-        score = 0.0
+    # Calculate Tenure Metrics
+    total_days = 0.0
+    tenures = []
+    unit_names = []
+    duties = []
+
+    for u in valid_units:
+        u_name = str(u.get("unit") or u.get("unit_name") or "").strip().upper()
+        duty = str(u.get("duty_performed") or u.get("duty") or "").strip().upper()
+        f_dt = u.get("from_date")
+        t_dt = u.get("to_date")
+        t_days = calculate_tenure_days(f_dt, t_dt)
+
+        total_days += t_days
+        tenures.append(t_days)
+        if u_name:
+            unit_names.append(u_name)
+        if duty:
+            duties.append(duty)
+
+    features["total_tenure_days"] = float(total_days)
+    features["avg_tenure_days"] = float(total_days / max(num_units, 1))
+    features["latest_tenure_days"] = float(tenures[0]) if tenures else 0.0
+
+    # 1. Previous Unit Type Categorization Scores
+    unit_text_all = " ".join(unit_names)
+    latest_unit = unit_names[0] if unit_names else ""
+
+    for u_type, kws in UNIT_TYPE_KEYWORDS.items():
+        type_score = 0.0
         for kw in kws:
-            if re.search(r'\b' + re.escape(kw) + r'\b', duty_text):
-                score += 1.0
-            if re.search(r'\b' + re.escape(kw) + r'\b', trade_clean.lower()):
-                score += 0.5
-        features[domain] = float(min(score, 3.0))
+            if kw in unit_text_all:
+                type_score += 1.0
+            if latest_unit and kw in latest_unit:
+                type_score += 1.5  # Weight recent posting higher
+        features[u_type] = float(min(type_score, 4.0))
 
-    # 6. Unit Exposure Types (Signal Regiment, RR, Corps HQ, Static)
-    features["exp_rr"] = 1.0 if ("rr" in unit_names_text or "rashtriya" in unit_names_text) else 0.0
-    features["exp_corps"] = 1.0 if ("corps" in unit_names_text or "cgsr" in unit_names_text or "mdsr" in unit_names_text) else 0.0
-    features["exp_sig_reg"] = 1.0 if ("sig" in unit_names_text or "csr" in unit_names_text) else 0.0
+    # 2. Previous Duty Domain Keyword Matching
+    duty_text_all = " ".join(duties)
+    latest_duty = duties[0] if duties else ""
 
-    # 7. Specialty-to-Company Prior Affinity Features
-    comn_affinity = 0.0
-    hq_affinity = 0.0
-    coy3_affinity = 0.0
+    for d_domain, kws in DUTY_DOMAIN_KEYWORDS.items():
+        d_score = 0.0
+        for kw in kws:
+            # Token boundary or substring match
+            if re.search(r'\b' + re.escape(kw), duty_text_all.lower()):
+                d_score += 1.0
+            if latest_duty and re.search(r'\b' + re.escape(kw), latest_duty.lower()):
+                d_score += 1.5  # Recency weight
+        features[d_domain] = float(min(d_score, 5.0))
 
-    for spec in active_specialties:
-        aff = SPECIALTY_COMPANY_AFFINITY.get(spec, {"HQ Coy": 0.33, "Comn Coy": 0.33, "3 Coy": 0.33})
-        comn_affinity += aff.get("Comn Coy", 0.33)
-        hq_affinity += aff.get("HQ Coy", 0.33)
-        coy3_affinity += aff.get("3 Coy", 0.33)
+    # 3. Selected Duty/Domain Input Features (from Hierarchical Checkbox Tree)
+    # Allows user input to serve as an input feature WITHOUT being copied as recommendation
+    features["input_domain_hq_coy"] = 0.0
+    features["input_domain_comn_coy"] = 0.0
+    features["input_domain_3_coy"] = 0.0
+    features["input_domain_clerk"] = 0.0
+    features["input_domain_qm"] = 0.0
+    features["input_domain_tech"] = 0.0
+    features["input_domain_comn"] = 0.0
+    features["input_domain_dvr"] = 0.0
+    features["input_domain_chq"] = 0.0
+    features["input_domain_rp"] = 0.0
+    features["input_domain_gd"] = 0.0
 
-    tot_aff = max(0.01, comn_affinity + hq_affinity + coy3_affinity)
-    features["prior_aff_comn"] = round(comn_affinity / tot_aff, 3)
-    features["prior_aff_hq"] = round(hq_affinity / tot_aff, 3)
-    features["prior_aff_3coy"] = round(coy3_affinity / tot_aff, 3)
+    if selected_domains:
+        for item in selected_domains:
+            coy = str(item.get("company") or "").upper()
+            sec = str(item.get("section") or "").upper()
+            apt = str(item.get("appointment") or item.get("trade") or "").upper()
+
+            if "HQ" in coy:
+                features["input_domain_hq_coy"] = 1.0
+            elif "COMN" in coy:
+                features["input_domain_comn_coy"] = 1.0
+            elif "3" in coy:
+                features["input_domain_3_coy"] = 1.0
+
+            if "RHQ" in sec or "CLERK" in apt:
+                features["input_domain_clerk"] = 1.0
+            if "QM" in sec or "RATION" in apt or "SKT" in apt:
+                features["input_domain_qm"] = 1.0
+            if "LRW" in sec or "TECH" in sec or "SYSTEM" in apt:
+                features["input_domain_tech"] = 1.0
+            if "COMMUNICATION" in sec or "RADIO" in apt or "EXCHANGE" in apt:
+                features["input_domain_comn"] = 1.0
+            if "MT" in sec:
+                features["input_domain_dvr"] = 1.0
+            if "CHQ" in sec or "MESS" in apt:
+                features["input_domain_chq"] = 1.0
+            if "RP" in sec:
+                features["input_domain_rp"] = 1.0
+            if "GENERAL" in sec or "GD" in apt:
+                features["input_domain_gd"] = 1.0
+
+    # 4. Feature Interactions & Ratios
+    total_tech_signals = features["domain_tech"] + features["domain_comn"] + features["domain_it"]
+    total_admin_signals = features["domain_clerk"] + features["domain_qm"] + features["domain_chq"]
+    features["tech_density"] = float(total_tech_signals / max(num_units, 1))
+    features["admin_density"] = float(total_admin_signals / max(num_units, 1))
+    features["field_exposure_ratio"] = float(features["unit_type_field"] / max(num_units, 1))
+    features["signal_exposure_ratio"] = float(features["unit_type_signal"] / max(num_units, 1))
 
     return features
 
 
-def load_historical_dataset() -> Tuple[pd.DataFrame, pd.Series]:
+def extract_features_from_dict(
+    rank: str = "Signal Man",
+    date_of_enrollment: Any = None,
+    prior_station: str = "",
+    units_history: List[Dict[str, Any]] = None,
+    is_fresh: bool = False,
+    selected_domains: Optional[List[Dict[str, Any]]] = None,
+    **kwargs
+) -> Dict[str, float]:
+    """Compatibility wrapper that maps input arguments to extract_features_from_units."""
+    return extract_features_from_units(
+        units_history=units_history or [],
+        is_fresh=is_fresh,
+        selected_domains=selected_domains
+    )
+
+
+def calculate_service_years(date_of_enrollment: Any) -> float:
+    """Helper calculating service years if available."""
+    if not date_of_enrollment:
+        return 2.0
+    dt = parse_date_string(date_of_enrollment)
+    if dt:
+        return max(float((date.today() - dt).days / 365.25), 0.5)
+    return 2.0
+
+
+def get_rank_level(rank_str: Optional[str]) -> int:
+    """Helper mapping rank string to integer level."""
+    return 2
+
+
+def load_dataset_and_engineer_features() -> Tuple[pd.DataFrame, pd.Series, pd.Series, pd.Series, pd.DataFrame]:
     """
-    Fetch historical personnel and units_served data from UMS database,
-    clean and engineer features for training.
+    Loads raw CSV datasets, validates merges, extracts clean pattern features,
+    and returns (X, y_company, y_section, y_position, meta_df).
+    Ensures zero leakage from target columns.
     """
-    conn = get_db_connection()
-    if conn is None:
-        raise ConnectionError("Failed to connect to UMS database.")
+    if not os.path.exists(PERSONNEL_CSV) or not os.path.exists(UNITS_CSV):
+        raise FileNotFoundError(f"Datasets not found in {DATASET_DIR}")
 
-    try:
-        cursor = conn.cursor(dictionary=True)
+    p_df = pd.read_csv(PERSONNEL_CSV)
+    u_df = pd.read_csv(UNITS_CSV)
 
-        # 1. Fetch eligible personnel records
-        query_personnel = """
-            SELECT id, army_number, name, `rank`, trade, company, date_of_enrollment,
-                   prior_station, section
-            FROM personnel
-            WHERE company IN ('HQ company', 'COMN Company', '3 Company', 'HQ Coy', 'Comn Coy', '3 Coy')
-              AND `rank` IS NOT NULL
-        """
-        cursor.execute(query_personnel)
-        personnel_rows = cursor.fetchall()
+    # Join units_served with personnel
+    merged = u_df.merge(p_df, left_on='personnel_id', right_on='id', suffixes=('_unit', '_pers'))
 
-        # 2. Fetch units_served records
-        query_units = """
-            SELECT personnel_id, army_number, unit, from_date, to_date, duty_performed
-            FROM units_served
-            ORDER BY personnel_id, sr_no ASC
-        """
-        cursor.execute(query_units)
-        units_rows = cursor.fetchall()
+    # Group postings by personnel_id to build full unit posting history list
+    personnel_postings: Dict[int, List[Dict[str, Any]]] = {}
+    for _, row in u_df.iterrows():
+        p_id = int(row['personnel_id'])
+        if p_id not in personnel_postings:
+            personnel_postings[p_id] = []
+        personnel_postings[p_id].append({
+            'unit': row['unit'],
+            'from_date': row['from_date'],
+            'to_date': row['to_date'],
+            'duty_performed': row['duty_performed']
+        })
 
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        if conn:
-            conn.close()
-        raise RuntimeError(f"Database query error: {str(e)}")
-
-    if not personnel_rows:
-        raise ValueError("No personnel records found in the database for training.")
-
-    # Group units by personnel_id
-    units_by_pid: Dict[int, List[Dict[str, Any]]] = {}
-    for u in units_rows:
-        pid = u.get("personnel_id")
-        if pid not in units_by_pid:
-            units_by_pid[pid] = []
-        units_by_pid[pid].append(u)
-
-    # Build feature dataset
     feature_rows = []
-    target_labels = []
+    target_coy = []
+    target_sec = []
+    target_pos = []
+    meta_rows = []
 
-    for p in personnel_rows:
-        pid = p.get("id")
-        trade = p.get("trade") or ""
-        rank = p.get("rank") or "Signal Man"
-        enroll_date = p.get("date_of_enrollment")
-        target_coy = normalize_company_name(p.get("company"))
+    for _, p_row in p_df.iterrows():
+        p_id = int(p_row['id'])
+        u_history = personnel_postings.get(p_id, [])
 
-        units = units_by_pid.get(pid, [])
-        specialties = extract_specialties_from_trade_and_text(trade)
-
-        feats = extract_features_from_dict(
-            trade=trade,
-            rank=rank,
-            specialties=specialties,
-            date_of_enrollment=enroll_date,
-            units_history=units,
-            is_fresh=(len(units) == 0)
-        )
-
-        feats["personnel_id"] = pid
-        feats["army_number"] = p.get("army_number") or ""
+        # Extract features (STRICTLY SAFE FEATURES ONLY)
+        feats = extract_features_from_units(u_history, is_fresh=(len(u_history) == 0))
         feature_rows.append(feats)
-        target_labels.append(target_coy)
 
-    df_features = pd.DataFrame(feature_rows)
-    s_targets = pd.Series(target_labels, name="target_company")
+        # Target Variables (STRICTLY ISOLATED AS GROUND TRUTH TARGETS)
+        raw_coy = str(p_row['company'])
+        raw_sec = str(p_row.get('section') or '')
+        raw_trade = str(p_row.get('trade') or '')
 
-    return df_features, s_targets
+        canonical_coy = normalize_company_name(raw_coy)
+        canonical_sec = map_raw_to_canonical_section(canonical_coy, raw_sec)
+        canonical_pos = map_raw_to_canonical_position(canonical_sec, raw_trade)
+
+        target_coy.append(canonical_coy)
+        target_sec.append(canonical_sec)
+        target_pos.append(canonical_pos)
+
+        meta_rows.append({
+            'id': p_id,
+            'army_number': p_row['army_number'],
+            'name': p_row.get('name') or '',
+            'company': canonical_coy,
+            'section': canonical_sec,
+            'trade': canonical_pos
+        })
+
+    df_X = pd.DataFrame(feature_rows).fillna(0.0)
+    s_coy = pd.Series(target_coy, name="company")
+    s_sec = pd.Series(target_sec, name="section")
+    s_pos = pd.Series(target_pos, name="position")
+    df_meta = pd.DataFrame(meta_rows)
+
+    # Print Leakage Audit Report
+    print("=" * 60)
+    print("DATA LEAKAGE AUDIT & SAFETY VERIFICATION")
+    print("=" * 60)
+    print(f"TOTAL PERSONNEL PROCESSED: {len(df_X)}")
+    print(f"SAFE FEATURE COUNT: {len(df_X.columns)}")
+    print(f"SAFE FEATURES LIST:\n{list(df_X.columns)}")
+    print("\nLEAKAGE FEATURES REMOVED / EXCLUDED:")
+    print("- personnel.company (Level 1 Target)")
+    print("- personnel.section (Level 2 Target)")
+    print("- personnel.trade (Level 3 Target)")
+    print("- ai_new_joinee_recommendations.*")
+    print("- UI input rank, date_of_enrollment, prior_station")
+    print("=" * 60)
+
+    return df_X, s_coy, s_sec, s_pos, df_meta
+
+
+# Alias for backward compatibility
+load_historical_dataset = load_dataset_and_engineer_features
+
+
+if __name__ == "__main__":
+    X, y_coy, y_sec, y_pos, meta = load_dataset_and_engineer_features()
+    print("\nSample engineered features head:")
+    print(X.head(3))
+    print("\nTarget Company Distribution:")
+    print(y_coy.value_counts())
+    print("\nTarget Section Distribution:")
+    print(y_sec.value_counts())

@@ -29,11 +29,6 @@
       margin-bottom: 0.75rem;
       border: 1px solid #1e293b;
     }
-    .prob-bar {
-      height: 28px;
-      border-radius: 6px;
-      transition: width 1s ease-in-out;
-    }
     .coy-hq { background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%); }
     .coy-comn { background: linear-gradient(90deg, #10b981 0%, #047857 100%); }
     .coy-3coy { background: linear-gradient(90deg, #8b5cf6 0%, #6d28d9 100%); }
@@ -52,7 +47,7 @@
           </div>
           <h3 class="fw-bold mb-0 text-white">AI Placement Probability Distribution</h3>
         </div>
-        <p class="text-secondary mb-0 small mt-1">Unit 15 CESR - Two-Stage Probabilistic Recommendation Model</p>
+        <p class="text-secondary mb-0 small mt-1">Unit 15 CESR - 3-Stage Hierarchical Recommendation Model (Company → Section → Position)</p>
       </div>
       <div>
         <button class="btn btn-outline-light btn-sm" onclick="window.close()">
@@ -64,21 +59,21 @@
     <!-- Personnel Identity Summary -->
     <div class="viz-card">
       <div class="row g-3 text-center">
-        <div class="col-3 border-end border-secondary border-opacity-25">
+        <div class="col-md-3 col-6 border-end border-secondary border-opacity-25">
           <span class="text-secondary small d-block">ARMY NUMBER</span>
           <h5 class="fw-bold text-info mb-0 font-monospace" id="vArmyNo">--</h5>
         </div>
-        <div class="col-3 border-end border-secondary border-opacity-25">
+        <div class="col-md-3 col-6 border-end border-secondary border-opacity-25">
           <span class="text-secondary small d-block">SOLDIER NAME</span>
           <h5 class="fw-bold text-white mb-0" id="vName">--</h5>
         </div>
-        <div class="col-3 border-end border-secondary border-opacity-25">
+        <div class="col-md-3 col-6 border-end border-secondary border-opacity-25">
           <span class="text-secondary small d-block">RANK</span>
           <h5 class="fw-bold text-warning mb-0" id="vRank">--</h5>
         </div>
-        <div class="col-3">
-          <span class="text-secondary small d-block">TRADE</span>
-          <h5 class="fw-bold text-success mb-0" id="vTrade">--</h5>
+        <div class="col-md-3 col-6">
+          <span class="text-secondary small d-block">RECOMMENDED PLACEMENT</span>
+          <h5 class="fw-bold text-success mb-0" id="vTopPlacement">--</h5>
         </div>
       </div>
     </div>
@@ -93,11 +88,11 @@
       </div>
     </div>
 
-    <!-- Stage 2: Position Probabilities inside Recommended Company -->
+    <!-- Stage 2 & 3: Section & Position Recommendations -->
     <div class="viz-card">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
-          <i class="fas fa-user-tag text-info"></i> Stage 2: Available Appointments within <span id="vSelectedCoyName" class="text-success">--</span>
+          <i class="fas fa-user-tag text-info"></i> Stage 2 &amp; 3: Section &amp; Position Appointments
         </h5>
         <span class="badge bg-secondary" id="vSectionName">Section: --</span>
       </div>
@@ -106,12 +101,38 @@
       </div>
     </div>
 
-    <!-- SHAP Explainability Forces -->
+    <!-- Top-N Alternative Recommendations -->
     <div class="viz-card">
       <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
-        <i class="fas fa-layer-group text-purple" style="color: #a855f7;"></i> SHAP Feature Forces &amp; Rationale
+        <i class="fas fa-list-ol text-warning"></i> Valid Hierarchical Placement Rankings
       </h5>
-      <div id="shapForcesList" class="d-flex flex-column gap-2">
+      <div class="table-responsive">
+        <table class="table table-dark table-striped align-middle mb-0" style="font-size: 0.85rem;" id="vTopNTable">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Company</th>
+              <th>Section</th>
+              <th>Position</th>
+              <th class="text-end">Score</th>
+            </tr>
+          </thead>
+          <tbody id="vTopNTableBody">
+            <!-- Dynamically rendered -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TreeSHAP Explainability Forces & Rationale -->
+    <div class="viz-card">
+      <h5 class="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        <i class="fas fa-project-diagram" style="color: #a855f7;"></i> TreeSHAP Explainability &amp; Key Rationale
+      </h5>
+      <div id="shapForcesList" class="d-flex flex-column gap-2 mb-3">
+        <!-- Dynamically rendered -->
+      </div>
+      <div id="reasonsList" class="d-flex flex-column gap-2">
         <!-- Dynamically rendered -->
       </div>
     </div>
@@ -133,9 +154,8 @@
         document.getElementById('vArmyNo').textContent = d.army_number || 'N/A';
         document.getElementById('vName').textContent = d.name || 'N/A';
         document.getElementById('vRank').textContent = d.rank || 'N/A';
-        document.getElementById('vTrade').textContent = d.trade || 'N/A';
-        document.getElementById('vSelectedCoyName').textContent = d.recommended_company;
-        document.getElementById('vSectionName').textContent = `Section: ${d.recommended_section || 'GENERAL'}`;
+        document.getElementById('vTopPlacement').textContent = `${d.recommended_company} → ${d.recommended_section || 'RHQ'} → ${d.recommended_position || 'GD'}`;
+        document.getElementById('vSectionName').textContent = `Section: ${d.recommended_section || 'RHQ'}`;
 
         // Stage 1: Companies
         const coyList = document.getElementById('companyProbList');
@@ -144,8 +164,8 @@
           Object.entries(d.probabilities).forEach(([coy, prob]) => {
             const pct = (prob * 100).toFixed(1);
             let cls = 'coy-hq';
-            if (coy.includes('Comn')) cls = 'coy-comn';
-            else if (coy.includes('3')) cls = 'coy-3coy';
+            if (coy.toUpperCase().includes('COMN')) cls = 'coy-comn';
+            else if (coy.toUpperCase().includes('3')) cls = 'coy-3coy';
 
             coyList.innerHTML += `
               <div class="prob-bar-container">
@@ -161,15 +181,15 @@
           });
         }
 
-        // Stage 2: Positions
+        // Stage 2 & 3: Positions
         const posList = document.getElementById('positionProbList');
         posList.innerHTML = '';
-        const topPosScore = parseFloat(d.position_confidence) || 88.5;
+        const topPosScore = parseFloat(d.position_confidence) || 85.0;
         posList.innerHTML += `
           <div class="prob-bar-container" style="border: 1.5px solid #06b6d4;">
             <div class="d-flex justify-content-between mb-1">
-              <span class="fw-bold text-info"><i class="fas fa-star text-warning me-1"></i> ${d.recommended_position} (Recommended Primary)</span>
-              <span class="fw-bold text-info">${topPosScore}%</span>
+              <span class="fw-bold text-info"><i class="fas fa-star text-warning me-1"></i> ${d.recommended_position} in ${d.recommended_section || 'RHQ'}</span>
+              <span class="fw-bold text-info">${topPosScore}% Match</span>
             </div>
             <div class="progress bg-dark" style="height: 22px;">
               <div class="progress-bar pos-bar fw-bold" style="width: ${topPosScore}%;">${topPosScore}%</div>
@@ -177,13 +197,51 @@
           </div>
         `;
 
-        // Match Reasons & SHAP
+        // Top-N Table
+        const topNBody = document.getElementById('vTopNTableBody');
+        topNBody.innerHTML = '';
+        const recs = d.recommendations || [
+          { rank: 1, company: d.recommended_company, section: d.recommended_section || 'RHQ', position: d.recommended_position, score: `${topPosScore}%` }
+        ];
+        recs.forEach(r => {
+          topNBody.innerHTML += `
+            <tr>
+              <td><span class="badge ${r.rank === 1 ? 'bg-success' : 'bg-secondary'}">#${r.rank}</span></td>
+              <td class="fw-bold text-white">${r.company}</td>
+              <td class="text-secondary">${r.section}</td>
+              <td class="text-info">${r.position}</td>
+              <td class="text-end text-success fw-bold">${r.score}</td>
+            </tr>
+          `;
+        });
+
+        // TreeSHAP forces
         const shapList = document.getElementById('shapForcesList');
         shapList.innerHTML = '';
+        const shapPos = d.shap_explanation?.positive || [];
+        const shapNeg = d.shap_explanation?.negative || [];
+        shapPos.forEach(p => {
+          shapList.innerHTML += `
+            <div class="p-2 rounded bg-dark border border-success border-opacity-50 small text-success">
+              <i class="fas fa-plus-circle me-2"></i> ${p}
+            </div>
+          `;
+        });
+        shapNeg.forEach(n => {
+          shapList.innerHTML += `
+            <div class="p-2 rounded bg-dark border border-danger border-opacity-50 small text-danger">
+              <i class="fas fa-minus-circle me-2"></i> ${n}
+            </div>
+          `;
+        });
+
+        // Match Reasons
+        const reasonsList = document.getElementById('reasonsList');
+        reasonsList.innerHTML = '';
         if (d.match_reasons) {
           d.match_reasons.forEach(r => {
-            shapList.innerHTML += `
-              <div class="p-2.5 rounded bg-dark border border-secondary border-opacity-25 small text-light">
+            reasonsList.innerHTML += `
+              <div class="p-2 rounded bg-dark border border-secondary border-opacity-25 small text-light">
                 <i class="fas fa-check-circle text-success me-2"></i> ${r}
               </div>
             `;

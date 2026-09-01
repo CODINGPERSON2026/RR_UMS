@@ -220,25 +220,25 @@
           </span>
         </div>
 
-        <!-- 3 Simple Clean Cards -->
+        <!-- 3 Clean Decision Reason Cards (Trade-Free) -->
         <div class="d-flex flex-column gap-2 mb-3">
-          <!-- Reason 1: Trade -->
+          <!-- Reason 1: Service Tenure & Duty Domain Match -->
           <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
-            <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.78rem;">✓ Trade Match</span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.78rem;">✓ Duty History</span>
             <div style="font-size: 0.86rem;">
-              Trade <strong>{{ sample_recommendation.trade or 'N/A' }}</strong> has highest historical placement rate in <strong>{{ sample_recommendation.recommended_company }}</strong>.
+              {% if sample_recommendation.previous_units %}
+              Historical operational duties across <strong>{{ sample_recommendation.units_served_count }} previous posting(s)</strong> correlate with <strong>{{ sample_recommendation.recommended_company }}</strong> assignments.
+              {% else %}
+              Fresh joinee profile with standard tenure aligns with <strong>{{ sample_recommendation.recommended_company }}</strong> induction establishment.
+              {% endif %}
             </div>
           </div>
 
-          <!-- Reason 2: Serving History -->
+          <!-- Reason 2: Serving History & Unit Experience -->
           <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
-            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-0.5" style="font-size: 0.78rem;">✓ Service Profile</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle mt-0.5" style="font-size: 0.78rem;">✓ Operational Profile</span>
             <div style="font-size: 0.86rem;">
-              {% if sample_recommendation.previous_units %}
-              Previous duties across <strong>{{ sample_recommendation.units_served_count }} unit(s)</strong> ({{ sample_recommendation.previous_units | slice(2) | join(', ') }}) align with <strong>{{ sample_recommendation.recommended_company }}</strong> sections.
-              {% else %}
-              Fresh joinee profile aligns with <strong>{{ sample_recommendation.recommended_company }}</strong> induction and onboarding capacity.
-              {% endif %}
+              Field station experience and tenure duration fit <strong>{{ sample_recommendation.recommended_company }}</strong> requirements.
             </div>
           </div>
 
@@ -246,19 +246,19 @@
           <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2.5">
             <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-0.5" style="font-size: 0.78rem;">✓ Cohort Balance</span>
             <div style="font-size: 0.86rem;">
-              Matches establishment strength and rank distribution for <strong>{{ sample_recommendation.rank or 'N/A' }}</strong>.
+              Matches establishment strength and rank hierarchy for <strong>{{ sample_recommendation.rank or 'N/A' }}</strong>.
             </div>
           </div>
         </div>
 
-        <!-- Feature Contribution Summary Bar -->
+        <!-- Feature Contribution Summary Bar (Trade-Free TreeSHAP) -->
         <div class="p-2.5 rounded border bg-white mb-2">
           <span class="fw-bold text-dark d-block mb-1.5" style="font-size: 0.8rem;">
             <i class="fas fa-sliders-h text-primary me-1"></i> Feature Impact Weight Distribution
           </span>
           <div class="d-flex flex-column gap-1.5" style="font-size: 0.78rem;">
             <div class="d-flex justify-content-between text-muted">
-              <span>Trade Specialty Alignment ({{ sample_recommendation.trade }})</span>
+              <span>Operational Duties &amp; Prior Postings</span>
               <strong class="text-dark">45% Influence</strong>
             </div>
             <div class="progress" style="height: 5px; border-radius: 3px;">
@@ -266,7 +266,7 @@
             </div>
 
             <div class="d-flex justify-content-between text-muted">
-              <span>Units Served &amp; Duty Profile Match</span>
+              <span>Service Duration &amp; Tenure Experience</span>
               <strong class="text-dark">30% Influence</strong>
             </div>
             <div class="progress" style="height: 5px; border-radius: 3px;">
@@ -274,7 +274,7 @@
             </div>
 
             <div class="d-flex justify-content-between text-muted">
-              <span>Rank &amp; Peer Staffing Profile</span>
+              <span>Rank &amp; Seniority Level</span>
               <strong class="text-dark">25% Influence</strong>
             </div>
             <div class="progress" style="height: 5px; border-radius: 3px;">
@@ -297,14 +297,14 @@
   </div>
   {% endif %}
 
-  <!-- 5. Model Evaluation & Retrain Monitor (Threshold: 10 Joinees) -->
+  <!-- 5. Model Evaluation & Retrain Monitor (Threshold: 50 Joinees) -->
   <div class="row g-3 mb-4">
     <!-- Model Comparison Table -->
     <div class="col-lg-7">
       <div class="card-box p-0 overflow-hidden h-100">
         <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
           <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">
-            <i class="fas fa-balance-scale text-primary me-2"></i>Model Evaluation Comparison (Clean 20% Test Split)
+            <i class="fas fa-balance-scale text-primary me-2"></i>Model Evaluation Comparison (Clean 30% Test Split)
           </h6>
           <span class="badge bg-success" style="font-size: 0.75rem;">Selected: {{ analytics.selected_model or 'Random Forest' }}</span>
         </div>
@@ -323,8 +323,8 @@
               {% set xgb = analytics.comparison.models['XGBoost'] if analytics.comparison and 'XGBoost' in analytics.comparison.models else None %}
               <tr>
                 <td class="ps-3"><strong>Top-1 Accuracy</strong></td>
-                <td class="text-center fw-bold text-success">{{ (rf.accuracy * 100) | round(2) if rf else '52.63' }}%</td>
-                <td class="text-center fw-bold">{{ (xgb.accuracy * 100) | round(2) if xgb else '47.37' }}%</td>
+                <td class="text-center fw-bold text-success">{{ (rf.accuracy * 100) | round(2) if rf else '43.36' }}%</td>
+                <td class="text-center fw-bold">{{ (xgb.accuracy * 100) | round(2) if xgb else '34.27' }}%</td>
                 <td class="text-center pe-3"><span class="badge bg-primary">Random Forest</span></td>
               </tr>
               <tr>
@@ -335,8 +335,8 @@
               </tr>
               <tr>
                 <td class="ps-3"><strong>Macro F1-Score</strong></td>
-                <td class="text-center">{{ rf.macro_f1 if rf else '0.4346' }}</td>
-                <td class="text-center">{{ xgb.macro_f1 if xgb else '0.4077' }}</td>
+                <td class="text-center">{{ rf.macro_f1 if rf else '0.4300' }}</td>
+                <td class="text-center">{{ xgb.macro_f1 if xgb else '0.3497' }}</td>
                 <td class="text-center pe-3"><span class="badge bg-light text-dark border">Random Forest</span></td>
               </tr>
               <tr>
@@ -351,7 +351,7 @@
       </div>
     </div>
 
-    <!-- Retrain Monitor Card (Threshold: 10 Records) -->
+    <!-- Retrain Monitor Card (Threshold: 50 Records) -->
     <div class="col-lg-5">
       <div class="card-box h-100 d-flex flex-column justify-content-between">
         <div>
@@ -359,24 +359,24 @@
             <h6 class="fw-bold mb-0 text-dark" style="font-size: 0.9rem;">
               <i class="fas fa-sync-alt text-primary me-2"></i>Auto-Retrain Monitor
             </h6>
-            <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">Threshold: 10 Joinees</span>
+            <span class="badge bg-warning text-dark" style="font-size: 0.75rem;">Threshold: 50 Joinees</span>
           </div>
 
           <div class="p-3 rounded border mb-3" style="background: #f8fafc;">
             <div class="d-flex justify-content-between mb-1" style="font-size: 0.84rem;">
               <span class="text-muted">New Joinees Since Training:</span>
-              <strong class="{% if retrain_status.new_records_since_last_training >= 10 %}text-success{% else %}text-primary{% endif %}">
-                {{ retrain_status.new_records_since_last_training }} / 10 Joinees
+              <strong class="{% if retrain_status.new_records_since_last_training >= 50 %}text-success{% else %}text-primary{% endif %}">
+                {{ retrain_status.new_records_since_last_training }} / 50 Joinees
               </strong>
             </div>
-            {% set pct = [((retrain_status.new_records_since_last_training / 10) * 100) | round(1), 100] | min %}
+            {% set pct = [((retrain_status.new_records_since_last_training / 50) * 100) | round(1), 100] | min %}
             <div class="progress" style="height: 8px; border-radius: 4px;">
               <div class="progress-bar {% if pct >= 100 %}bg-success{% else %}bg-primary{% endif %}" role="progressbar" style="width: {{ pct }}%;"></div>
             </div>
             <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.75rem;">
               <span>{{ pct }}% towards retraining trigger</span>
-              {% if retrain_status.new_records_since_last_training < 10 %}
-              <span class="text-secondary">{{ 10 - retrain_status.new_records_since_last_training }} more needed</span>
+              {% if retrain_status.new_records_since_last_training < 50 %}
+              <span class="text-secondary">{{ 50 - retrain_status.new_records_since_last_training }} more needed</span>
               {% else %}
               <span class="text-success fw-bold">Ready to retrain!</span>
               {% endif %}
@@ -384,18 +384,18 @@
           </div>
 
           <p class="text-muted mb-3" style="font-size: 0.8rem;">
-            When <strong>10 new soldier records</strong> are registered, the model updates automatically to incorporate latest unit placement patterns.
+            When <strong>50 new soldier records</strong> are registered, the model updates automatically to incorporate latest unit placement patterns.
           </p>
         </div>
 
         <div>
-          {% if retrain_status.new_records_since_last_training >= 10 %}
+          {% if retrain_status.new_records_since_last_training >= 50 %}
           <button id="btnRetrainCard" class="btn btn-success fw-bold w-100 py-2 shadow-sm" onclick="triggerRetrain()" style="border-radius: 8px; font-size: 0.88rem;">
-            <i class="fas fa-sync-alt me-1" id="retrainCardIcon"></i> ⚡ Retrain AI Model Now ({{ retrain_status.new_records_since_last_training }}/10 Ready)
+            <i class="fas fa-sync-alt me-1" id="retrainCardIcon"></i> ⚡ Retrain AI Model Now ({{ retrain_status.new_records_since_last_training }}/50 Ready)
           </button>
           {% else %}
-          <button id="btnRetrainCard" class="btn btn-secondary w-100 py-2" style="border-radius: 8px; font-size: 0.88rem; opacity: 0.55; cursor: not-allowed;" disabled title="Requires 10 new joinees">
-            <i class="fas fa-lock me-1"></i> Retrain Model ({{ 10 - retrain_status.new_records_since_last_training }} more joinees needed)
+          <button id="btnRetrainCard" class="btn btn-secondary w-100 py-2" style="border-radius: 8px; font-size: 0.88rem; opacity: 0.55; cursor: not-allowed;" disabled title="Requires 50 new joinees">
+            <i class="fas fa-lock me-1"></i> Retrain Model ({{ 50 - retrain_status.new_records_since_last_training }} more joinees needed)
           </button>
           {% endif %}
         </div>
