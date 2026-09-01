@@ -323,11 +323,11 @@ attachmentCountBadgeUniqueScope.textContent =
 
           <!-- LOCATION -->
 
-          <td>
+          <td style="text-transform: uppercase;">
 
             <div class="attachmentCellScrollUnique">
 
-              ${item.location || ""}
+              ${(item.location || "").toUpperCase()}
 
             </div>
 
@@ -335,11 +335,11 @@ attachmentCountBadgeUniqueScope.textContent =
 
           <!-- AUTHORITY -->
 
-          <td>
+          <td style="text-transform: uppercase;">
 
             <div class="attachmentCellScrollUnique">
 
-              ${(item.authority || "").charAt(0).toUpperCase() + (item.authority || "").slice(1).toLowerCase()}
+              ${(item.authority || "").toUpperCase()}
 
             </div>
 

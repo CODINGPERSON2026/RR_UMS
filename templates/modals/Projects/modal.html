@@ -595,9 +595,9 @@
             <option value="">All Stages</option>
             <option value="PPP">PPP</option>
             <option value="AON">AON</option>
-            <option value="FBU">FBU</option>
+            <option value="BIDDING">BIDDING</option>
             <option value="TOB & TEC">TOB & TEC</option>
-            <option value="B BD">B BD</option>
+            <option value="BENCH MARKING BOARD">BENCH MARKING BOARD</option>
             <option value="OCB RA">OCB RA</option>
             <option value="Placement Of SO">Placement Of SO</option>
             <option value="Store/Items Delivery">Store / Items Delivery</option>
@@ -640,9 +640,14 @@
 
     <!-- Dynamic Header with Prominently Visible Project Name -->
     <div class="projdash-popup-header" id="popupHeader">
-      <div class="d-flex align-items-center gap-2">
-        <span id="popupBadge" class="badge text-white"
-              style="background:rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">PRJ-001</span>
+      <div class="d-flex align-items-center justify-content-between w-100 pe-4 mb-2">
+        <div class="d-flex align-items-center gap-2">
+          <span id="popupBadge" class="badge text-white"
+                style="background:rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">PRJ-001</span>
+          <button id="popupEditBtn" class="btn btn-sm btn-light fw-bold ms-2" onclick="openModalEditProject()" style="border-radius: 8px; font-size:0.8rem; padding: 3px 12px;">
+            <i class="fas fa-pencil-alt me-1"></i>Edit Project
+          </button>
+        </div>
       </div>
       <h3 id="popupTitle" class="mb-0 text-white fw-bold"></h3>
       <button class="projdash-popup-close" onclick="closeProjectPopup()" aria-label="Close">×</button>
@@ -693,6 +698,88 @@
           <div class="popup-info-value" id="popupItems" style="font-size:0.95rem;">—</div>
         </div>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= EDIT PROJECT MODAL ================= -->
+<div class="modal fade" id="modalPrjEditModal" tabindex="-1" style="z-index: 1060;" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2"></i>Edit Project</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <input type="hidden" id="modalEditPrjId">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Project Title *</label>
+            <input type="text" id="modalEditPrjTitle" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Project Head *</label>
+            <select id="modalEditPrjHead" class="form-select" required>
+              <option value="">-- Select Head --</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Company</label>
+            <input type="text" id="modalEditPrjCompany" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Stage</label>
+            <select id="modalEditPrjStage" class="form-select">
+              <option value="PPP">PPP</option>
+              <option value="AON">AON</option>
+              <option value="BIDDING">BIDDING</option>
+              <option value="TOB & TEC">TOB & TEC</option>
+              <option value="BENCH MARKING BOARD">BENCH MARKING BOARD</option>
+              <option value="OCB RA">OCB RA</option>
+              <option value="Placement Of SO">Placement Of SO</option>
+              <option value="Store/Items Delivery">Store/Items Delivery</option>
+              <option value="ATP">ATP</option>
+              <option value="PRAC & CRAC">PRAC & CRAC</option>
+              <option value="Payment">Payment</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Cost (₹) *</label>
+            <input type="number" id="modalEditPrjCost" class="form-control" min="0" step="any">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Quantity</label>
+            <input type="number" id="modalEditPrjQuantity" class="form-control" min="0">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label fw-bold">Items</label>
+            <input type="text" id="modalEditPrjItems" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Status</label>
+            <select id="modalEditPrjStatus" class="form-select">
+              <option value="Active">Active</option>
+              <option value="On Hold">On Hold</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Deadline</label>
+            <input type="date" id="modalEditPrjDeadline" class="form-control">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label fw-bold">Description</label>
+            <textarea id="modalEditPrjDescription" class="form-control" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary px-4" id="modalSaveEditBtn" onclick="saveModalProjectEdit()">
+          <i class="fas fa-save me-1"></i>Save Changes
+        </button>
       </div>
     </div>
   </div>
@@ -762,9 +849,9 @@
     if (s.includes('STORE') || s.includes('DELIVERY')) return 80;
     if (s.includes('SO') || s.includes('PLACEMENT')) return 70;
     if (s.includes('OCB') || s.includes('RA')) return 60;
-    if (s.includes('B BD')) return 50;
+    if (s.includes('BENCH') || s.includes('B BD')) return 50;
     if (s.includes('TOB') || s.includes('TEC')) return 40;
-    if (s.includes('FBU')) return 30;
+    if (s.includes('BID') || s.includes('FBU')) return 30;
     if (s.includes('AON')) return 20;
     if (s.includes('PPP')) return 10;
     return 10;
@@ -838,12 +925,17 @@
           </div>
 
           <!-- Footer row -->
-          <div class="projdash-card-footer">
+          <div class="projdash-card-footer d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-2">
               <div class="projdash-owner-avatar" style="background:${accentGrad};">${initials}</div>
-              <span style="font-size:0.78rem;font-weight:600;color:#475569;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtmlText(ownerName)}</span>
+              <span style="font-size:0.78rem;font-weight:600;color:#475569;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtmlText(ownerName)}</span>
             </div>
-            <div style="font-size:1rem;font-weight:800;color:#15803d;">${formatProjectCurrency(p.cost)}</div>
+            <div class="d-flex align-items-center gap-2">
+              <div style="font-size:0.95rem;font-weight:800;color:#15803d;">${formatProjectCurrency(p.cost)}</div>
+              <button class="btn btn-sm btn-outline-primary py-0 px-2 fw-bold" style="font-size:0.72rem; border-radius:6px;" onclick="event.stopPropagation(); openModalEditProject(${p.id})">
+                <i class="fas fa-edit me-1"></i>Edit
+              </button>
+            </div>
           </div>
         </div>
       `;
@@ -887,14 +979,14 @@
       `<span class="projdash-stage-badge ${stageClass}">${p.stage || 'Planning'}</span>`;
 
     // Build stage stepper
-    const stages = ['PPP','AON','FBU','TOB & TEC','B BD','OCB RA','Placement Of SO','Store/Items Delivery','ATP','PRAC & CRAC','Payment','Completed'];
-    const currentIdx = stages.findIndex(s => s.toUpperCase() === (p.stage||'').toUpperCase());
+    const stages = ['PPP','AON','BIDDING','TOB & TEC','BENCH MARKING BOARD','OCB RA','Placement Of SO','Store/Items Delivery','ATP','PRAC & CRAC','Payment','Completed'];
+    const currentIdx = stages.findIndex(s => s.toUpperCase() === (p.stage||'').toUpperCase() || (s === 'BIDDING' && (p.stage||'').toUpperCase() === 'FBU') || (s === 'BENCH MARKING BOARD' && (p.stage||'').toUpperCase() === 'B BD'));
     const stepper = document.getElementById('popupStepper');
     stepper.innerHTML = stages.map((s, i) => {
       const isDone = i < currentIdx;
       const isActive = i === currentIdx;
       const cls = isDone ? 'done' : isActive ? 'active' : '';
-      const shortLabel = s.replace('Placement Of SO','SO').replace('Store/Items Delivery','Delivery').replace('TOB & TEC','TEC').replace('PRAC & CRAC','CRAC');
+      const shortLabel = s.replace('Placement Of SO','SO').replace('Store/Items Delivery','Delivery').replace('TOB & TEC','TEC').replace('PRAC & CRAC','CRAC').replace('BENCH MARKING BOARD','BENCHMARK');
       const dotContent = isDone ? '✓' : (i + 1);
       const lineHtml = i < stages.length - 1
         ? `<div class="projdash-step-line ${isDone ? 'done' : ''}"></div>`
@@ -923,7 +1015,13 @@
     const search = document.getElementById('prjSearchInput').value.toLowerCase();
 
     filteredProjectsData = allProjectsData.filter(p => {
-      const matchStage = !stageF || (p.stage || '').toLowerCase() === stageF;
+      const pStage = (p.stage || '').toLowerCase();
+      let matchStage = !stageF;
+      if (stageF) {
+        if (stageF === 'bidding') matchStage = pStage === 'bidding' || pStage === 'fbu';
+        else if (stageF === 'bench marking board') matchStage = pStage === 'bench marking board' || pStage === 'b bd';
+        else matchStage = pStage === stageF;
+      }
       const matchHead = !headF || (p.owner || '').toLowerCase() === headF;
       const matchSearch = !search || 
         (p.title || '').toLowerCase().includes(search) ||
@@ -940,9 +1038,9 @@
   const ALL_STAGES_CONFIG = [
     { key: 'PPP', label: 'PPP', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.08)', border: '#6366f1' },
     { key: 'AON', label: 'AON', color: '#7b1fa2', bg: 'rgba(123, 31, 162, 0.08)', border: '#7b1fa2' },
-    { key: 'FBU', label: 'FBU', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.08)', border: '#0284c7' },
+    { key: 'BIDDING', label: 'BIDDING', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.08)', border: '#0284c7' },
     { key: 'TOB & TEC', label: 'TOB & TEC', color: '#388e3c', bg: 'rgba(56, 142, 60, 0.08)', border: '#388e3c' },
-    { key: 'B BD', label: 'B BD', color: '#d97706', bg: 'rgba(217, 119, 6, 0.08)', border: '#d97706' },
+    { key: 'BENCH MARKING BOARD', label: 'BENCHMARKING BOARD', color: '#d97706', bg: 'rgba(217, 119, 6, 0.08)', border: '#d97706' },
     { key: 'OCB RA', label: 'OCB RA', color: '#4f46e5', bg: 'rgba(79, 70, 229, 0.08)', border: '#4f46e5' },
     { key: 'Placement Of SO', label: 'SO Placement', color: '#a16207', bg: 'rgba(161, 98, 7, 0.08)', border: '#a16207' },
     { key: 'Store/Items Delivery', label: 'Store Delivery', color: '#0891b2', bg: 'rgba(8, 145, 178, 0.08)', border: '#0891b2' },
@@ -1014,8 +1112,8 @@
   function getProjectStageClass(stage) {
     if (!stage) return 'projdash-stage-ppp';
     const n = stage.toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
-    const map = { 'ppp':'projdash-stage-ppp','aon':'projdash-stage-aon','fbu':'projdash-stage-fbu','tob_tec':'projdash-stage-tob-tec',
-      'b_bd':'projdash-stage-b-bd','ocb_ra':'projdash-stage-ocb-ra','placement_of_so':'projdash-stage-placement-of-so',
+    const map = { 'ppp':'projdash-stage-ppp','aon':'projdash-stage-aon','fbu':'projdash-stage-fbu','bidding':'projdash-stage-fbu','tob_tec':'projdash-stage-tob-tec',
+      'b_bd':'projdash-stage-b-bd','bench_marking_board':'projdash-stage-b-bd','benchmarking_board':'projdash-stage-b-bd','ocb_ra':'projdash-stage-ocb-ra','placement_of_so':'projdash-stage-placement-of-so',
       'store_items_delivery':'projdash-stage-store-delivery','atp':'projdash-stage-atp',
       'prac_crac':'projdash-stage-prac-crac','payment':'projdash-stage-payment','completed':'projdash-stage-completed' };
     return map[n] || 'projdash-stage-ppp';
@@ -1041,4 +1139,106 @@
   document.getElementById('projdashPopupOverlay')?.addEventListener('click', e => {
     if (e.target === e.currentTarget) closeProjectPopup();
   });
+
+  async function openModalEditProject(id) {
+    const p = id ? allProjectsData.find(item => item.id == id || item.project_id == id) : selectedProjectData;
+    if (!p) return;
+
+    try {
+      const res = await fetch('/get_project_heads');
+      const heads = await res.json();
+      const headSelect = document.getElementById('modalEditPrjHead');
+      if (headSelect) {
+        headSelect.innerHTML = '<option value="">-- Select Head --</option>';
+        heads.forEach(h => {
+          const hName = h.head_name || h;
+          const opt = document.createElement('option');
+          opt.value = hName;
+          opt.textContent = hName;
+          if (hName === (p.head || p.owner)) opt.selected = true;
+          headSelect.appendChild(opt);
+        });
+      }
+    } catch(e) {}
+
+    document.getElementById('modalEditPrjId').value = p.id || p.project_id;
+    document.getElementById('modalEditPrjTitle').value = p.project_name || p.title || '';
+    document.getElementById('modalEditPrjCompany').value = p.company || '';
+    document.getElementById('modalEditPrjStage').value = p.stage || p.current_stage || 'PPP';
+    document.getElementById('modalEditPrjCost').value = p.cost || p.project_cost || 0;
+    document.getElementById('modalEditPrjItems').value = p.items || p.project_items || '';
+    document.getElementById('modalEditPrjQuantity').value = p.quantity || 0;
+    document.getElementById('modalEditPrjDeadline').value = p.deadline || '';
+    document.getElementById('modalEditPrjStatus').value = p.status || 'Active';
+    document.getElementById('modalEditPrjDescription').value = p.description || p.project_description || '';
+
+    const modalEl = document.getElementById('modalPrjEditModal');
+    let modalObj = bootstrap.Modal.getInstance(modalEl);
+    if (!modalObj) {
+      modalObj = new bootstrap.Modal(modalEl);
+    }
+    modalObj.show();
+  }
+
+  async function saveModalProjectEdit() {
+    const getVal = (id) => {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : '';
+    };
+
+    const project_id = getVal('modalEditPrjId');
+    const project_name = getVal('modalEditPrjTitle');
+    const head = getVal('modalEditPrjHead');
+    const company = getVal('modalEditPrjCompany');
+    const current_stage = getVal('modalEditPrjStage');
+    const project_cost = getVal('modalEditPrjCost');
+    const project_items = getVal('modalEditPrjItems');
+    const quantity = getVal('modalEditPrjQuantity');
+    const deadline = getVal('modalEditPrjDeadline');
+    const status = getVal('modalEditPrjStatus') || 'Active';
+    const project_description = getVal('modalEditPrjDescription');
+
+    if (!project_name || !head || !project_cost) {
+      alert("Project Title, Head, and Cost are required.");
+      return;
+    }
+
+    const btn = document.getElementById('modalSaveEditBtn');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>Saving...`;
+    }
+
+    try {
+      const res = await fetch('/update_project', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id, project_name, head, company, current_stage,
+          project_cost, project_items, quantity, deadline, status, project_description
+        })
+      });
+      const result = await res.json();
+      if (result.status === 'success') {
+        const modalEl = document.getElementById('modalPrjEditModal');
+        if (modalEl) {
+          const editModalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (editModalInstance) editModalInstance.hide();
+        }
+        if (typeof closeProjectPopup === 'function') closeProjectPopup();
+        if (typeof loadAllProjectsData === 'function') loadAllProjectsData();
+        if (typeof loadProjects === 'function') loadProjects();
+      } else {
+        alert(result.message || "Failed to update project");
+      }
+    } catch(e) {
+      console.error(e);
+      alert("Error updating project");
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fas fa-save me-1"></i>Save Changes`;
+      }
+    }
+  }
 </script>

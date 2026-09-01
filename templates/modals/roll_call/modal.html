@@ -415,26 +415,31 @@
       Object.values(groups).forEach(group => {
         group.forEach((r, i) => {
           const tr = document.createElement("tr");
-  
+          const isSM = r.category === "SM_SUGGESTION";
+
           let armyCell = "";
           if (i === 0) {
-            armyCell = `<td rowspan="${group.length}" class="align-middle text-center fw-bold">${r.army_number || "-"}</td>`;
+            armyCell = isSM 
+              ? `<td rowspan="${group.length}" class="align-middle text-center text-muted small">N/A</td>`
+              : `<td rowspan="${group.length}" class="align-middle text-center fw-bold">${r.army_number || "-"}</td>`;
           }
-  
+
           tr.innerHTML = `
-            <td>${r.category}</td>
-            ${armyCell}
-            <td>${r.rank || "-"}</td>
-            <td><strong>${r.name || "-"}</strong></td>
-            <td>${r.company || "-"}</td>
             <td>
-              <small>${r.point_description.substring(0,25)}...</small><br>
-              <button class="btn btn-sm btn-outline-primary"
-                onclick="viewDescription(\`${r.point_description}\`)">View</button>
+              <span class="badge ${isSM ? 'bg-info text-dark' : 'bg-secondary'}">${r.category}</span>
+              ${r.point_title ? `<br><small class="text-muted fw-semibold">${r.point_title}</small>` : ''}
+            </td>
+            ${armyCell}
+            <td>${isSM ? 'N/A' : (r.rank || "-")}</td>
+            <td><strong>${isSM ? 'SM Suggestion' : (r.name || "-")}</strong></td>
+            <td>${isSM ? 'N/A' : (r.company || "-")}</td>
+            <td>
+              <div class="fw-bold text-primary mb-1">${r.point_title || ''}</div>
+              <div>${r.point_description || ''}</div>
             </td>
             <td><span class="badge bg-warning">${r.status}</span></td>
             <td>
-              <button class="btn btn-success btn-sm"
+              <button class="btn btn-success btn-sm me-1"
                 onclick="updateStatus(${r.id},'APPROVED')">Approve</button>
               <button class="btn btn-danger btn-sm"
                 onclick="updateStatus(${r.id},'REJECTED')">Reject</button>
@@ -475,22 +480,27 @@
       Object.values(groups).forEach(group => {
         group.forEach((r, i) => {
           const tr = document.createElement("tr");
-  
+          const isSM = r.category === "SM_SUGGESTION";
+
           let armyCell = "";
           if (i === 0) {
-            armyCell = `<td rowspan="${group.length}" class="align-middle text-center fw-bold">${r.army_number || "-"}</td>`;
+            armyCell = isSM 
+              ? `<td rowspan="${group.length}" class="align-middle text-center text-muted small">N/A</td>`
+              : `<td rowspan="${group.length}" class="align-middle text-center fw-bold">${r.army_number || "-"}</td>`;
           }
-  
+
           tr.innerHTML = `
-            <td>${r.category}</td>
-            ${armyCell}
-            <td>${r.rank || "-"}</td>
-            <td><strong>${r.name || "-"}</strong></td>
-            <td>${r.company || "-"}</td>
             <td>
-              <small>${r.point_description.substring(0,25)}...</small><br>
-              <button class="btn btn-sm btn-outline-primary"
-                onclick="viewDescription(\`${r.point_description}\`)">View</button>
+              <span class="badge ${isSM ? 'bg-info text-dark' : 'bg-secondary'}">${r.category}</span>
+              ${r.point_title ? `<br><small class="text-muted fw-semibold">${r.point_title}</small>` : ''}
+            </td>
+            ${armyCell}
+            <td>${isSM ? 'N/A' : (r.rank || "-")}</td>
+            <td><strong>${isSM ? 'SM Suggestion' : (r.name || "-")}</strong></td>
+            <td>${isSM ? 'N/A' : (r.company || "-")}</td>
+            <td>
+              <div class="fw-bold text-success mb-1">${r.point_title || ''}</div>
+              <div>${r.point_description || ''}</div>
             </td>
             <td><span class="badge bg-success">${r.status}</span></td>
           `;

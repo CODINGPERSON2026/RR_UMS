@@ -360,9 +360,9 @@
                     <option value="all">All Stages</option>
                     <option>PPP</option>
                     <option>AON</option>
-                    <option>FBU</option>
+                    <option value="BIDDING">BIDDING</option>
                     <option>TOB & TEC</option>
-                    <option>B BD</option>
+                    <option value="BENCH MARKING BOARD">BENCH MARKING BOARD</option>
                     <option>OCB RA</option>
                     <option>Placement Of SO</option>
                     <option>Store / Items Delivery</option>
@@ -503,18 +503,18 @@
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Stage</label>
                         <select id="editPrjStage" class="form-select">
-                            <option>PPP</option>
-                            <option>AON</option>
-                            <option>FBU</option>
-                            <option>TOB & TEC</option>
-                            <option>B BD</option>
-                            <option>OCB RA</option>
-                            <option>Placement Of SO</option>
-                            <option>Store / Items Delivery</option>
-                            <option>ATP</option>
-                            <option>PRAC & CRAC</option>
-                            <option>Payment</option>
-                            <option>Completed</option>
+                            <option value="PPP">PPP</option>
+                            <option value="AON">AON</option>
+                            <option value="BIDDING">BIDDING</option>
+                            <option value="TOB & TEC">TOB & TEC</option>
+                            <option value="BENCH MARKING BOARD">BENCH MARKING BOARD</option>
+                            <option value="OCB RA">OCB RA</option>
+                            <option value="Placement Of SO">Placement Of SO</option>
+                            <option value="Store / Items Delivery">Store / Items Delivery</option>
+                            <option value="ATP">ATP</option>
+                            <option value="PRAC & CRAC">PRAC & CRAC</option>
+                            <option value="Payment">Payment</option>
+                            <option value="Completed">Completed</option>
                         </select>
                     </div>
                 </div>
@@ -536,13 +536,19 @@
                     <input type="text" id="editPrjItems" class="form-control">
                 </div>
 
-                <div class="mb-3">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
                     <label class="form-label fw-semibold">Status</label>
                     <select id="editPrjStatus" class="form-select">
                         <option value="Active">Active</option>
                         <option value="On Hold">On Hold</option>
                         <option value="Completed">Completed</option>
                     </select>
+                </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Deadline</label>
+                        <input type="date" id="editPrjDeadline" class="form-control">
+                    </div>
                 </div>
 
                 <div class="mb-3">
@@ -571,9 +577,12 @@ let currentTab = "active";
 const STAGE_BADGE_MAP = {
     'ppp': { bg: '#e0f2fe', color: '#0369a1', label: 'PPP' },
     'aon': { bg: '#f3e8ff', color: '#7e22ce', label: 'AON' },
-    'fbu': { bg: '#e0f2fe', color: '#0284c7', label: 'FBU' },
+    'fbu': { bg: '#e0f2fe', color: '#0284c7', label: 'BIDDING' },
+    'bidding': { bg: '#e0f2fe', color: '#0284c7', label: 'BIDDING' },
     'tob & tec': { bg: '#dcfce7', color: '#15803d', label: 'TOB & TEC' },
-    'b bd': { bg: '#fef3c7', color: '#b45309', label: 'B BD' },
+    'b bd': { bg: '#fef3c7', color: '#b45309', label: 'BENCH MARKING BOARD' },
+    'bench marking board': { bg: '#fef3c7', color: '#b45309', label: 'BENCH MARKING BOARD' },
+    'benchmarking board': { bg: '#fef3c7', color: '#b45309', label: 'BENCH MARKING BOARD' },
     'ocb ra': { bg: '#e0e7ff', color: '#4338ca', label: 'OCB RA' },
     'placement of so': { bg: '#fef9c3', color: '#a16207', label: 'SO Placement' },
     'store / items delivery': { bg: '#cff4fc', color: '#0891b2', label: 'Store Delivery' },
@@ -603,27 +612,36 @@ async function loadHeads() {
 
         // Filter dropdown
         const filterDropdown = document.getElementById("headFilter");
-        filterDropdown.innerHTML = '<option value="all">All Heads</option>';
-        heads.forEach(h => {
-            filterDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
-        });
+        if (filterDropdown) {
+            filterDropdown.innerHTML = '<option value="all">All Heads</option>';
+            heads.forEach(h => {
+                const name = h.head_name || h;
+                filterDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+        }
 
         // Create modal dropdown
-        const modalDropdown = document.getElementById("newPrjOwner");
-        modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
-        heads.forEach(h => {
-            modalDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
-        });
+        const modalDropdown = document.getElementById("newPrjHead") || document.getElementById("newPrjOwner");
+        if (modalDropdown) {
+            modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+            heads.forEach(h => {
+                const name = h.head_name || h;
+                modalDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+            });
+        }
 
         // Edit modal dropdown
         const editDropdown = document.getElementById("editPrjHead");
         if (editDropdown) {
             editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
             heads.forEach(h => {
-                editDropdown.innerHTML += `<option value="${h.head_name}">${h.head_name}</option>`;
+                const name = h.head_name || h;
+                editDropdown.innerHTML += `<option value="${name}">${name}</option>`;
             });
         }
-    } catch(e) { console.error('Error loading heads:', e); }
+    } catch (e) {
+        console.error('Error loading heads:', e);
+    }
 }
 
 // ── LOAD PROJECTS ──
@@ -704,7 +722,7 @@ function renderTable() {
             <td class="fw-bold text-success">${formatCurrency(p.project_cost)}</td>
             <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.project_items || '-'}</td>
             <td>
-                    <button class="btn btn-action-edit" onclick='editProject(${JSON.stringify(p)})'>
+                    <button class="btn btn-action-edit" onclick="editProject(${p.project_id})">
                         <i class="fas fa-pencil-alt me-1"></i>Edit
                     </button>
             </td>
@@ -712,24 +730,42 @@ function renderTable() {
     });
 }
 
-
-
 // ── EDIT PROJECT ──
-function editProject(p) {
-    loadHeads().then(() => {
-        document.getElementById("editPrjId").value = p.project_id;
-        document.getElementById("editPrjTitle").value = p.project_name;
-        document.getElementById("editPrjHead").value = p.head;
-        document.getElementById("editPrjCompany").value = p.company || '';
-        document.getElementById("editPrjStage").value = p.current_stage || 'PPP';
-        document.getElementById("editPrjCost").value = p.project_cost || 0;
-        document.getElementById("editPrjItems").value = p.project_items || '';
-        document.getElementById("editPrjQuantity").value = p.quantity || 0;
-        document.getElementById("editPrjDeadline").value = p.deadline || '';
-        document.getElementById("editPrjStatus").value = p.status || 'Active';
-        document.getElementById("editPrjDescription").value = p.project_description || '';
-        new bootstrap.Modal(document.getElementById("prjEditModal")).show();
-    });
+async function editProject(p) {
+    const proj = (typeof p === 'object' && p !== null) ? p : allProjects.find(item => item.project_id == p || item.id == p);
+    if (!proj) return;
+
+    try {
+        await loadHeads();
+    } catch(e) {
+        console.error("Failed loading heads:", e);
+    }
+
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val || '';
+    };
+
+    setVal("editPrjId", proj.project_id || proj.id);
+    setVal("editPrjTitle", proj.project_name || proj.title);
+    setVal("editPrjHead", proj.head || proj.owner);
+    setVal("editPrjCompany", proj.company);
+    setVal("editPrjStage", proj.current_stage || proj.stage || 'PPP');
+    setVal("editPrjCost", proj.project_cost || proj.cost || 0);
+    setVal("editPrjItems", proj.project_items || proj.items);
+    setVal("editPrjQuantity", proj.quantity || 0);
+    setVal("editPrjDeadline", proj.deadline);
+    setVal("editPrjStatus", proj.status || 'Active');
+    setVal("editPrjDescription", proj.project_description || proj.description);
+
+    const modalEl = document.getElementById("prjEditModal");
+    if (modalEl) {
+        let modalObj = bootstrap.Modal.getInstance(modalEl);
+        if (!modalObj) {
+            modalObj = new bootstrap.Modal(modalEl);
+        }
+        modalObj.show();
+    }
 }
 
 // ── SAVE PROJECT EDIT ──
