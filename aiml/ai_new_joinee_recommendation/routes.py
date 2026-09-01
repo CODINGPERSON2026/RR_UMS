@@ -38,6 +38,7 @@ from aiml.ai_new_joinee_recommendation.recommendation import (
     recommend_placement,
     load_model_artifacts
 )
+from aiml.ai_new_joinee_recommendation.explainability import generate_domain_and_contrastive_explainability
 from aiml.ai_new_joinee_recommendation.training import run_training_pipeline
 
 company_rec_bp = Blueprint(
@@ -294,19 +295,32 @@ def api_predict_recommendation():
                         "error": f"Posting From Date ({dt_from.strftime('%d-%m-%Y')}) cannot be later than To Date ({dt_to.strftime('%d-%m-%Y')}) for {u_name}."
                     }), 400
 
-        selected_section = data.get("section") or data.get("selected_section") or data.get("target_section")
-        if isinstance(selected_section, list) and len(selected_section) > 0:
-            selected_section = selected_section[0]
+        selected_domains = data.get("selected_domains") or data.get("domains") or []
+        selected_section = data.get("selected_section")
+        target_sections = data.get("target_sections") or data.get("sections") or []
+        target_trades = data.get("target_trades") or data.get("trades") or []
+        section_trades_map = data.get("section_trades_map") or {}
+
+        # If selected_section is not explicitly set but target_sections has exactly 1 section, use it
+        if not selected_section:
+            if isinstance(target_sections, list) and len(target_sections) == 1:
+                selected_section = target_sections[0]
+            elif isinstance(data.get("section"), str) and data.get("section").strip() and len(target_sections) <= 1:
+                selected_section = data.get("section").strip()
 
         rec = recommend_placement(
-            rank=rank,
-            date_of_enrollment=date_of_enrollment,
-            prior_station=prior_station,
             units_history=units_history,
             is_fresh_joinee=is_fresh_joinee,
             army_number=army_number,
             name=name,
-            selected_section=selected_section
+            selected_domains=selected_domains,
+            rank=rank,
+            date_of_enrollment=date_of_enrollment,
+            prior_station=prior_station,
+            selected_section=selected_section,
+            target_sections=target_sections,
+            target_trades=target_trades,
+            section_trades_map=section_trades_map
         )
 
         return jsonify({
@@ -361,37 +375,80 @@ def api_save_recommendation():
             if row:
                 personnel_id = row["id"]
 
-        insert_sql = """
-            INSERT INTO ai_new_joinee_recommendations (
-                personnel_id, army_number, name, `rank`, trade,
-                recommended_company, confidence_score, recommendation_percentage,
-                recommended_position, position_confidence, confidence_type, model_version,
-                probabilities_json, match_reasons_json, shap_json, units_history_json,
-                decision_type, created_at, updated_at
-            ) VALUES (
-                %s, %s, %s, %s, %s,
-                %s, %s, %s,
-                %s, %s, %s, %s,
-                %s, %s, %s, %s,
-                'pending', NOW(), NOW()
-            )
-        """
-        cursor.execute(insert_sql, (
-            personnel_id, army_number, name, rank, trade,
-            rec_coy, conf_score, rec_pct,
-            rec_pos, pos_conf, conf_type, model_ver,
-            prob_json, reasons_json, shap_json, units_json
-        ))
-        conn.commit()
-        new_id = cursor.lastrowid
+        # Check if record with same army_number or name already exists to override
+        existing_id = None
+        if army_number:
+            cursor.execute("SELECT id FROM ai_new_joinee_recommendations WHERE army_number = %s ORDER BY id DESC LIMIT 1", (army_number,))
+            existing_row = cursor.fetchone()
+            if existing_row:
+                existing_id = existing_row["id"]
+        elif name:
+            cursor.execute("SELECT id FROM ai_new_joinee_recommendations WHERE name = %s ORDER BY id DESC LIMIT 1", (name,))
+            existing_row = cursor.fetchone()
+            if existing_row:
+                existing_id = existing_row["id"]
+
+        if existing_id:
+            # OVERRIDE existing record with new recommendation and update timestamp
+            update_sql = """
+                UPDATE ai_new_joinee_recommendations SET
+                    personnel_id = %s, army_number = %s, name = %s, `rank` = %s, trade = %s,
+                    recommended_company = %s, confidence_score = %s, recommendation_percentage = %s,
+                    recommended_position = %s, position_confidence = %s, confidence_type = %s, model_version = %s,
+                    probabilities_json = %s, match_reasons_json = %s, shap_json = %s, units_history_json = %s,
+                    decision_type = 'pending', updated_at = NOW()
+                WHERE id = %s
+            """
+            cursor.execute(update_sql, (
+                personnel_id, army_number, name, rank, trade,
+                rec_coy, conf_score, rec_pct,
+                rec_pos, pos_conf, conf_type, model_ver,
+                prob_json, reasons_json, shap_json, units_json,
+                existing_id
+            ))
+            conn.commit()
+            saved_id = existing_id
+            status_msg = "Recommendation updated successfully"
+            is_updated = True
+        else:
+            # INSERT new recommendation record
+            insert_sql = """
+                INSERT INTO ai_new_joinee_recommendations (
+                    personnel_id, army_number, name, `rank`, trade,
+                    recommended_company, confidence_score, recommendation_percentage,
+                    recommended_position, position_confidence, confidence_type, model_version,
+                    probabilities_json, match_reasons_json, shap_json, units_history_json,
+                    decision_type, created_at, updated_at
+                ) VALUES (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    'pending', NOW(), NOW()
+                )
+            """
+            cursor.execute(insert_sql, (
+                personnel_id, army_number, name, rank, trade,
+                rec_coy, conf_score, rec_pct,
+                rec_pos, pos_conf, conf_type, model_ver,
+                prob_json, reasons_json, shap_json, units_json
+            ))
+            conn.commit()
+            saved_id = cursor.lastrowid
+            status_msg = "Recommendation saved successfully"
+            is_updated = False
 
         cursor.close()
         conn.close()
 
+        now_str = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
         return jsonify({
             "success": True,
-            "id": new_id,
-            "message": "Recommendation saved successfully"
+            "id": saved_id,
+            "is_updated": is_updated,
+            "status": "Updated" if is_updated else "Saved",
+            "updated_at": now_str,
+            "message": status_msg
         })
     except Exception as e:
         print(f"Error saving recommendation: {e}")
@@ -506,6 +563,17 @@ def api_get_insights_list():
             rec_pos = r.get("recommended_position") or "GD"
             rec_sec = get_section_for_position(canonical_coy, rec_pos)
 
+            created_at_dt = r.get("created_at")
+            updated_at_dt = r.get("updated_at")
+            created_at_str = created_at_dt.strftime("%d-%m-%Y %H:%M") if created_at_dt else ""
+            updated_at_str = updated_at_dt.strftime("%d-%m-%Y %H:%M") if updated_at_dt else ""
+
+            # Mark as re-calculated if updated_at is more than 30 seconds after created_at
+            is_re_calculated = False
+            if created_at_dt and updated_at_dt:
+                diff_seconds = (updated_at_dt - created_at_dt).total_seconds()
+                is_re_calculated = diff_seconds > 30
+
             formatted_rows.append({
                 "id": r["id"],
                 "s_no": s_no,
@@ -527,7 +595,9 @@ def api_get_insights_list():
                 "decision_remarks": r.get("decision_remarks") or "",
                 "decided_by": r.get("decided_by") or "",
                 "decided_at": r.get("decided_at").strftime("%d-%m-%Y %H:%M") if r.get("decided_at") else "",
-                "created_at": r.get("created_at").strftime("%d-%m-%Y %H:%M") if r.get("created_at") else "",
+                "created_at": created_at_str,
+                "updated_at": updated_at_str,
+                "is_re_calculated": is_re_calculated,
                 "match_reasons": match_reasons
             })
 
@@ -599,6 +669,16 @@ def api_get_insight_detail(rec_id: int):
         is_adjutant = (user_role == "ADJUTANT")
         is_2ic = user_role in ["2IC", "ADMIN", "SUPER ADMIN"]
 
+        domain_xai = generate_domain_and_contrastive_explainability(
+            units_history=units_history,
+            selected_domains=[],
+            predicted_company=canonical_coy,
+            section=rec_sec,
+            position=rec_pos,
+            company_probabilities=probs,
+            rank=row.get("rank") or ""
+        )
+
         return jsonify({
             "success": True,
             "data": {
@@ -616,8 +696,11 @@ def api_get_insight_detail(rec_id: int):
                 "position_confidence": row.get("position_confidence") or "80.0%",
                 "confidence_type": row.get("confidence_type") or "ml",
                 "probabilities": probs,
-                "match_reasons": reasons,
+                "match_reasons": reasons or domain_xai.get("why_recommended", []),
                 "shap_explanation": shap_data,
+                "domain_explainability": domain_xai.get("duty_domain_breakdown", []),
+                "why_recommended": domain_xai.get("why_recommended", []),
+                "why_not_others": domain_xai.get("why_not_others", []),
                 "units_history": units_history,
                 "final_company": row.get("final_company") or canonical_coy,
                 "final_position": row.get("final_position") or rec_pos,

@@ -189,6 +189,9 @@
                 <th scope="col" class="py-3 px-2 text-center" style="width: 170px; color: #6b21a8 !important; background: #ede9fe;">
                   <i class="fas fa-map-marker-alt me-1.5" style="color: #9333ea;"></i>Recommended Position
                 </th>
+                <th scope="col" class="py-3 px-2 text-center" style="width: 160px; color: #0369a1 !important; background: #ede9fe;">
+                  <i class="fas fa-calendar-check me-1.5" style="color: #0284c7;"></i>Date / Status
+                </th>
                 <th scope="col" class="py-3 px-2 text-center" style="width: 140px; color: #4f46e5 !important; background: #ede9fe;">
                   <i class="fas fa-poll-h me-1.5" style="color: #6366f1;"></i>View Result
                 </th>
@@ -321,15 +324,41 @@
           </div>
         </div>
 
-        <!-- 4. Why Has AI Recommended This? -->
-        <div class="card border-0 shadow-sm rounded-3 bg-white">
+        <!-- 4. Duty / Domain (Selected Options) Explainability Impact -->
+        <div class="card border-0 shadow-sm rounded-3 bg-white" style="border-left: 4px solid #3b82f6 !important;">
           <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
-            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #b45309;">
-              <i class="fas fa-lightbulb text-warning me-1.5"></i> WHY HAS AI RECOMMENDED THIS?
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #2563eb;">
+              <i class="fas fa-tasks text-primary me-1.5"></i> DUTY / DOMAIN (SELECTED OPTIONS) IMPACT
             </span>
-            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-0.5" style="font-size: 0.7rem;">Key Decision Rationale</span>
+            <span class="badge bg-primary-subtle text-primary border px-2 py-0.5" style="font-size: 0.7rem;">Domain Experience Fit</span>
+          </div>
+          <div class="card-body p-3 d-flex flex-column gap-2" id="vrDutyDomainContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- 5. Why Has AI Recommended This? -->
+        <div class="card border-0 shadow-sm rounded-3 bg-white" style="border-left: 4px solid #10b981 !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #047857;">
+              <i class="fas fa-check-circle text-success me-1.5"></i> WHY HAS AI RECOMMENDED THIS?
+            </span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.7rem;">Primary Evidence</span>
           </div>
           <div class="card-body p-3 d-flex flex-column gap-2" id="vrReasonsContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- 6. Why NOT Other Companies? (Contrastive Explainability) -->
+        <div class="card border-0 shadow-sm rounded-3 bg-white" style="border-left: 4px solid #f59e0b !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #b45309;">
+              <i class="fas fa-exchange-alt text-warning me-1.5"></i> WHY NOT OTHER COMPANIES?
+            </span>
+            <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-2 py-0.5" style="font-size: 0.7rem;">Contrastive Analysis</span>
+          </div>
+          <div class="card-body p-3 d-flex flex-column gap-2" id="vrWhyNotOthersContainer">
             <!-- Populated via JS -->
           </div>
         </div>
@@ -732,12 +761,40 @@
       const trade = highlightMatch(r.trade || 'N/A', searchQuery);
       const recCompany = r.recommended_company || 'HQ Coy';
       const recPos = r.recommended_position || 'GD';
+      const recSec = r.recommended_section || '';
       const decisionType = (r.decision_type || 'pending').toLowerCase();
       const remarksText = r.decision_remarks ? r.decision_remarks.trim() : '';
+      const isReCal = r.is_re_calculated || false;
+      const createdAt = r.created_at || '';
+      const updatedAt = r.updated_at || '';
+      const dateDisplay = updatedAt || createdAt || '--';
 
       let coyBadgeClass = 'bg-primary text-white';
       if (recCompany.includes('Comn') || recCompany.includes('COMN')) coyBadgeClass = 'bg-success text-white';
       else if (recCompany.includes('3')) coyBadgeClass = 'bg-secondary text-white';
+
+      // Date + Status cell
+      let dateStatusHtml;
+      if (isReCal) {
+        dateStatusHtml = `
+          <div class="d-flex flex-column align-items-center gap-1">
+            <span class="badge fw-bold px-2 py-1" style="background: #3b82f6; font-size: 0.72rem; border-radius: 8px;">
+              <i class="fas fa-sync-alt me-1"></i>Updated
+            </span>
+            <span class="text-muted" style="font-size: 0.7rem; line-height: 1.3;">${updatedAt}</span>
+          </div>`;
+      } else {
+        const decBadge = decisionType === 'accepted'
+          ? `<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.68rem;"><i class="fas fa-check-circle me-1"></i>Accepted</span>`
+          : decisionType === 'rejected'
+            ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.68rem;"><i class="fas fa-times-circle me-1"></i>Rejected</span>`
+            : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.68rem;"><i class="fas fa-clock me-1"></i>Pending</span>`;
+        dateStatusHtml = `
+          <div class="d-flex flex-column align-items-center gap-1">
+            ${decBadge}
+            <span class="text-muted" style="font-size: 0.7rem; line-height: 1.3;">${createdAt}</span>
+          </div>`;
+      }
 
       let actionCellHtml = '';
       if (!isUserReadOnly) {
@@ -772,15 +829,19 @@
         }
       }
 
+      const rowBorderStyle = isReCal ? 'border-left: 3px solid #3b82f6 !important;' : '';
+
       const tr = document.createElement('tr');
+      if (isReCal) tr.style.backgroundColor = '#eff6ff';
       tr.innerHTML = `
-        <td class="text-center fw-bold text-muted">${sNo}</td>
+        <td class="text-center fw-bold text-muted" style="${rowBorderStyle}">${sNo}</td>
         <td class="fw-bold font-monospace text-primary">${armyNo}</td>
         <td class="fw-bold text-dark">${name}</td>
         <td class="text-center">${rank}</td>
         <td class="text-center fw-semibold text-secondary">${trade}</td>
-        <td class="text-center"><span class="badge ${coyBadgeClass} px-2 py-1 fw-bold">${recCompany}</span></td>
+        <td class="text-center"><span class="badge ${coyBadgeClass} px-2 py-1 fw-bold">${recCompany}</span>${recSec ? `<div class="text-muted mt-0.5" style="font-size:0.68rem;">${recSec}</div>` : ''}</td>
         <td class="text-center fw-bold text-indigo" style="color: #4f46e5;">${recPos}</td>
+        <td class="text-center">${dateStatusHtml}</td>
         <td class="text-center">
           <button class="btn btn-sm btn-outline-primary py-1 px-2.5 fw-bold shadow-sm" onclick="openViewResultDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;">
             <i class="fas fa-poll-h me-1 text-primary"></i> View Result
@@ -879,21 +940,73 @@
         `;
       });
 
-      // 4. Why Has AI Recommended This?
+      // 4. Duty / Domain (Selected Options) Impact Breakdown
+      const dutyContainer = document.getElementById('vrDutyDomainContainer');
+      if (dutyContainer) {
+        dutyContainer.innerHTML = '';
+        const domainXai = d.domain_explainability || [];
+        if (domainXai.length === 0) {
+          dutyContainer.innerHTML = `
+            <div class="p-2.5 rounded border bg-light text-muted small">
+              <i class="fas fa-info-circle me-1"></i> Standard candidate profile evaluated according to general establishment requirements.
+            </div>`;
+        } else {
+          domainXai.forEach(dx => {
+            const badgeClass = dx.is_primary_support ? 'bg-success text-white' : 'bg-secondary text-white';
+            dutyContainer.innerHTML += `
+              <div class="p-2.5 rounded border bg-light" style="border-left: 3.5px solid ${dx.is_primary_support ? '#10b981' : '#64748b'} !important;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <strong class="text-dark" style="font-size: 0.82rem;"><i class="fas fa-tasks text-primary me-1"></i>${dx.duty}</strong>
+                  <span class="badge ${badgeClass}" style="font-size: 0.68rem;">Favors ${dx.favors_company}</span>
+                </div>
+                <div class="text-secondary small" style="font-size: 0.78rem; line-height: 1.4;">${dx.explanation}</div>
+              </div>`;
+          });
+        }
+      }
+
+      // 5. Why Has AI Recommended This?
       const reasonsContainer = document.getElementById('vrReasonsContainer');
-      reasonsContainer.innerHTML = '';
-      const reasons = d.match_reasons || [
-        `Trade '${d.trade}' aligns with ${d.recommended_company} establishment.`,
-        `Appointment '${d.recommended_position}' in section '${d.recommended_section || 'GENERAL'}' matches specialty profile.`
-      ];
-      reasons.forEach((r, idx) => {
-        reasonsContainer.innerHTML += `
-          <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2" style="border-left: 4px solid #10b981 !important;">
-            <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.72rem;">Factor #${idx + 1}</span>
-            <div style="font-size: 0.82rem; color: #1e293b;">${r}</div>
-          </div>
-        `;
-      });
+      if (reasonsContainer) {
+        reasonsContainer.innerHTML = '';
+        const reasons = d.why_recommended || d.match_reasons || [
+          `Posting and duty patterns strongly correlate with ${d.recommended_company} operational profile.`,
+          `Candidate experience directly fits Appointment '${d.recommended_position}' in Section '${d.recommended_section || 'GENERAL'}'.`
+        ];
+        reasons.forEach((r, idx) => {
+          const text = typeof r === 'string' ? r : (r.headline || r.text || '');
+          reasonsContainer.innerHTML += `
+            <div class="p-2.5 rounded border bg-light d-flex align-items-start gap-2" style="border-left: 4px solid #10b981 !important;">
+              <span class="badge bg-success-subtle text-success border border-success-subtle mt-0.5" style="font-size: 0.72rem;">Factor #${idx + 1}</span>
+              <div style="font-size: 0.82rem; color: #1e293b;">${text}</div>
+            </div>
+          `;
+        });
+      }
+
+      // 6. Why NOT Other Companies? (Contrastive Explainability)
+      const whyNotContainer = document.getElementById('vrWhyNotOthersContainer');
+      if (whyNotContainer) {
+        whyNotContainer.innerHTML = '';
+        const whyNot = d.why_not_others || [];
+        if (whyNot.length === 0) {
+          whyNotContainer.innerHTML = `
+            <div class="p-2.5 rounded border bg-light text-muted small">
+              <i class="fas fa-info-circle me-1"></i> Alternative options evaluated and ranked with lower historical duty similarity scores.
+            </div>`;
+        } else {
+          whyNot.forEach(wn => {
+            whyNotContainer.innerHTML += `
+              <div class="p-2.5 rounded border bg-light" style="border-left: 3.5px solid #f59e0b !important;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <strong class="text-dark" style="font-size: 0.82rem;"><i class="fas fa-times-circle text-warning me-1"></i> Why NOT ${wn.company}?</strong>
+                  <span class="badge bg-light text-muted border" style="font-size: 0.68rem;">Score: ${wn.probability_pct}</span>
+                </div>
+                <div class="text-secondary small" style="font-size: 0.78rem; line-height: 1.4;">${wn.contrast_reason}</div>
+              </div>`;
+          });
+        }
+      }
 
       // Action Button in View Result Dialog based on role
       const btnAction = document.getElementById('vrBtnGoToAction');

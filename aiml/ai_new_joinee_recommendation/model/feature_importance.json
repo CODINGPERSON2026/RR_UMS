@@ -1,74 +1,41 @@
-[
-  {
-    "feature": "service_years",
-    "importance": 19.55
-  },
-  {
-    "feature": "avg_tenure_days",
-    "importance": 12.34
-  },
-  {
-    "feature": "worked_it",
-    "importance": 10.82
-  },
-  {
-    "feature": "rank_level",
-    "importance": 10.78
-  },
-  {
-    "feature": "domain_tech",
-    "importance": 9.32
-  },
-  {
-    "feature": "total_tenure_days",
-    "importance": 8.2
-  },
-  {
-    "feature": "num_units",
-    "importance": 6.14
-  },
-  {
-    "feature": "domain_comn",
-    "importance": 5.81
-  },
-  {
-    "feature": "domain_it",
-    "importance": 4.67
-  },
-  {
-    "feature": "exp_sig_reg",
-    "importance": 2.2
-  },
-  {
-    "feature": "exp_corps",
-    "importance": 2.07
-  },
-  {
-    "feature": "domain_dvr",
-    "importance": 1.92
-  },
-  {
-    "feature": "has_prev_units",
-    "importance": 1.37
-  },
-  {
-    "feature": "domain_gd",
-    "importance": 1.29
-  },
-  {
-    "feature": "exp_rr",
-    "importance": 1.18
-  },
-  {
-    "feature": "has_prior_station",
-    "importance": 1.16
-  },
-  {
-    "feature": "domain_clerk",
-    "importance": 0.89
-  },
-  {
-    "feature": "domain_qm",
-    "importance": 0.29
-  }
-]
+{
+  "tech_density": 0.1233,
+  "unit_type_admin": 0.0973,
+  "signal_exposure_ratio": 0.0927,
+  "unit_type_signal": 0.0897,
+  "domain_comn": 0.0572,
+  "admin_density": 0.0495,
+  "unit_type_field": 0.0454,
+  "field_exposure_ratio": 0.045,
+  "domain_qm": 0.0436,
+  "domain_it": 0.0405,
+  "latest_tenure_days": 0.0383,
+  "total_tenure_days": 0.0379,
+  "domain_rp": 0.0377,
+  "avg_tenure_days": 0.0372,
+  "unit_type_corps": 0.0361,
+  "domain_clerk": 0.0306,
+  "unit_type_training": 0.0225,
+  "unit_type_logistics": 0.0221,
+  "domain_gd": 0.0196,
+  "domain_tech": 0.0164,
+  "unit_type_mechanical": 0.0083,
+  "domain_dvr": 0.008,
+  "domain_chq": 0.0011,
+  "is_fresh_joinee": 0.0,
+  "has_prev_units": 0.0,
+  "num_units": 0.0,
+  "domain_tm": 0.0,
+  "domain_corps_hq": 0.0,
+  "input_domain_hq_coy": 0.0,
+  "input_domain_comn_coy": 0.0,
+  "input_domain_3_coy": 0.0,
+  "input_domain_clerk": 0.0,
+  "input_domain_qm": 0.0,
+  "input_domain_tech": 0.0,
+  "input_domain_comn": 0.0,
+  "input_domain_dvr": 0.0,
+  "input_domain_chq": 0.0,
+  "input_domain_rp": 0.0,
+  "input_domain_gd": 0.0
+}
