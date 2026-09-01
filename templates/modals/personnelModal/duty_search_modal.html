@@ -12,7 +12,7 @@
 
                 <!-- Search -->
                 <div class="row g-2 mb-3">
-                    <div class="col-md-10">
+                    <div class="col-md-12">
                         <select id="dutySearchDropdown" class="form-select">
                             <option value="">-- SELECT DOMAIN --</option>
                             <option value="TM">TM</option>
@@ -44,9 +44,6 @@
                             <option value="NODE">NODE</option>
                             <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
                         </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-primary w-100" id="dutySearchBtn">Search</button>
                     </div>
                 </div>
 
@@ -84,19 +81,41 @@
 <script>
     (function () {
         const searchDropdown = document.getElementById('dutySearchDropdown');
-        const searchBtn = document.getElementById('dutySearchBtn');
         const tableBody = document.getElementById('dutySearchTableBody');
         const warningMsg = document.getElementById('dutySearchWarning');
 
-        searchBtn.addEventListener('click', async () => {
+        async function loadDomainCounts() {
+            try {
+                const res = await fetch('/search_personnel?counts=1');
+                if (!res.ok) return;
+                const counts = await res.json();
+
+                Array.from(searchDropdown.options).forEach(opt => {
+                    if (!opt.value) return;
+                    if (!opt.dataset.baseText) {
+                        opt.dataset.baseText = opt.text.replace(/\s*\(\d+\)$/, '');
+                    }
+                    const baseText = opt.dataset.baseText;
+                    const valTrimmed = opt.value.trim();
+                    const cnt = counts[opt.value] || counts[valTrimmed] || 0;
+                    opt.text = `${baseText} (${cnt})`;
+                });
+            } catch (err) {
+                console.error('Error loading domain counts:', err);
+            }
+        }
+
+        // Fetch domain counts on load and whenever modal opens
+        loadDomainCounts();
+        document.getElementById('dutySearchModal')?.addEventListener('show.bs.modal', loadDomainCounts);
+
+        searchDropdown.addEventListener('change', async () => {
             const duty = searchDropdown.value;
 
             warningMsg.innerText = "";
             tableBody.innerHTML = "";
 
             if (!duty) {
-                warningMsg.innerText = "Please select a Duty to search";
-                warningMsg.style.color = "red";
                 return;
             }
 
@@ -147,8 +166,6 @@
                 warningMsg.style.color = "red";
             }
         });
-
-
 
         // Clear on close
         document.getElementById('dutySearchModal')?.addEventListener('hidden.bs.modal', () => {

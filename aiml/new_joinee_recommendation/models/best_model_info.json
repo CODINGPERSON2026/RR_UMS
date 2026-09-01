@@ -1,9 +1,0 @@
-{
-  "selected_model": "Random Forest",
-  "trained_at": "2026-08-20T14:06:14.182106",
-  "accuracy": 0.5263,
-  "macro_f1": 0.4346,
-  "top_1_accuracy": 0.5263,
-  "top_2_accuracy": 0.7895,
-  "cv_mean_accuracy": 0.6196
-}

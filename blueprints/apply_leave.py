@@ -798,7 +798,7 @@ def recommend_leave():
         return jsonify({"message": "Leave ID missing"}), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True,buffered =True)
 
     try:
         conn.start_transaction()
@@ -1013,6 +1013,7 @@ def recommend_leave():
         return jsonify({"message": "Leave recommended successfully"}), 200
 
     except Exception as e:
+        print(str(e))
         conn.rollback()
         return jsonify({"message": "Server error"}), 500
 

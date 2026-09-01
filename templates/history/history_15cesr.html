@@ -17,6 +17,59 @@
             padding: 50px 60px;
             border-radius: 18px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.09);
+            position: relative;
+        }
+
+        /* 3x3 Inch Photo on Right Side */
+        .photo-card-right {
+            width: 3in;
+            height: 3in;
+            float: right;
+            margin: 10px 0 25px 35px;
+            border-radius: 14px;
+            border: 3px solid #1e5631;
+            box-shadow: 0 10px 25px rgba(30, 86, 49, 0.18);
+            overflow: hidden;
+            background: #f4faf6;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .photo-card-right:hover {
+            box-shadow: 0 14px 30px rgba(30, 86, 49, 0.28);
+            transform: translateY(-2px);
+        }
+
+        .photo-card-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 10px;
+            transition: transform 0.4s ease;
+        }
+
+        .photo-card-right:hover img {
+            transform: scale(1.04);
+        }
+
+        .photo-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            right: 8px;
+            background: rgba(30, 86, 49, 0.92);
+            color: #fff;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 5px 6px;
+            border-radius: 8px;
+            backdrop-filter: blur(4px);
+            letter-spacing: 0.4px;
+            text-align: center;
+            line-height: 1.3;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            text-transform: uppercase;
         }
 
         .history-title {
@@ -93,6 +146,20 @@
             margin-top: 40px;
         }
 
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        @media (max-width: 768px) {
+            .photo-card-right {
+                float: none;
+                margin: 0 auto 25px auto;
+                display: block;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -100,7 +167,13 @@
     {% set subscript = "Formation → Operations → Legacy → Achievements" %}
     {% include 'navbar/navbar.html' %}
 
-    <div class="history-container">
+    <div class="history-container clearfix">
+
+        <!-- 3x3 Inch Photo on Right Side -->
+        <div class="photo-card-right" title="Commanding Officer 15 CESR (3x3 inch)">
+            <img src="{{ url_for('static', filename='photos/sgxgyjgsxgug.JPG') }}" alt="Commanding Officer 15 CESR" id="cesr-photo" onerror="this.src='{{ url_for('static', filename='photos/signal.jpg') }}'" />
+            <div class="photo-badge">COMMANDING OFFICER 15 CESR<br><span style="font-weight: 400; font-size: 0.62rem; opacity: 0.95;">SINCE 21 AUG 2025</span></div>
+        </div>
 
         <h1 class="history-title">15 Corps Engineer Signal Regiment</h1>
         <p class="history-subtitle">Formation &nbsp;·&nbsp; Operations &nbsp;·&nbsp; Legacy &nbsp;·&nbsp; Achievements</p>

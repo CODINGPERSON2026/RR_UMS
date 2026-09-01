@@ -527,12 +527,6 @@
       </button>
       {% endif %}
 
-      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
-      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#projDash_modal">
-        PROJECTS
-      </button>
-      {% endif %}
-
       <div class="ab-spacer"></div>
 
       <button class="ab-messenger position-relative" id="chatBtn" title="Messages">
@@ -646,9 +640,22 @@
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      <div class="sc" style="cursor: pointer" onclick="openAiInsightsModal()" id="card-ai-insights-dash" title="AI New Joinee Company Recommendation Insights">
+        <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+        <div class="sc-right">
+          <span class="sc-val" id="ai-insights-count-dash"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
       {% endif %}
 
-
+      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
+      <div class="sc" id="openProjects">
+        <span class="sc-label">Total Projects</span>
+        <div class="sc-right">
+          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
@@ -1453,6 +1460,15 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     reloadDashboardCharts();
+    fetch('/api/ai/company-recommendation/insights-count')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.success) {
+          const el = document.getElementById("ai-insights-count-dash");
+          if (el) el.textContent = d.total_count;
+        }
+      })
+      .catch(() => {});
   });
 
   window.addEventListener('themechange', function() {
@@ -1460,6 +1476,6 @@
   });
 </script>
 
-{% include 'modals/Projects/modal.html' %}
+{% include 'modals/ai_joinee_insights_modal.html' %}
 
 {% endblock %}
