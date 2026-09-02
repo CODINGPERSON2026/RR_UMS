@@ -1126,6 +1126,11 @@
                 </script>
             </div>
             
+            <div class="ai-fitness-header-action" style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+                <a href="/fitness/" class="btn" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.88rem; border-radius: 10px; padding: 7px 16px; text-decoration: none; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; border: none; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); transition: all 0.25s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(139, 92, 246, 0.5)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 14px rgba(59, 130, 246, 0.4)';">
+                    <i class="fas fa-brain"></i> AI Fitness Prediction &amp; Report
+                </a>
+            </div>
         </div>
     </div>
 
@@ -2409,6 +2414,14 @@ function renderPersonDetails(data, statusClass) {
             <h4>Restrictions</h4>
             <div class="reason-box"><p>${escapeHtml(restrictions)}</p></div>
         </div>` : ""}
+
+        <div class="person-details-section text-center pt-3" style="border-top: 1px solid var(--border-color, #e2e8f0); margin-top: 20px;">
+            <a href="/fitness/?army_number=${encodeURIComponent(data.army_number)}" 
+               class="btn btn-primary w-100 py-2" 
+               style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.95rem; border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; border: none; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); text-decoration: none;">
+                <i class="fas fa-brain"></i> Generate AI Fitness Prediction &amp; Report
+            </a>
+        </div>
     `;
 }
 

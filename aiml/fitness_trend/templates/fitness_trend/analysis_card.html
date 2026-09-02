@@ -1,0 +1,55 @@
+<!-- ================= STAGE 2: ANALYSIS CARD ================= -->
+<div class="fit-card">
+  <div class="fit-card-header">
+    <h5 class="fit-card-title">
+      <i class="fas fa-chart-pie text-success"></i> Physiological &amp; Performance Analysis
+    </h5>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="metric-box">
+        <div class="metric-label">Body Mass Index (BMI)</div>
+        <div class="metric-value" id="anaBmiVal">--</div>
+        <div class="metric-sub fw-bold" id="anaBmiCat">--</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="metric-box">
+        <div class="metric-label">Weight Status</div>
+        <div class="metric-value text-primary" id="anaWeightStatus" style="font-size: 1.15rem;">--</div>
+        <div class="metric-sub">Authorization Benchmark</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="metric-box">
+        <div class="metric-label">Weight Deviation %</div>
+        <div class="metric-value" id="anaWeightDev">--</div>
+        <div class="metric-sub" id="anaWeightDiffKg">--</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="metric-box">
+        <div class="metric-label">Physical Activity Level</div>
+        <div class="metric-value text-success" id="anaActivityLevel">--</div>
+        <div class="metric-sub" id="anaCombinedPhysical">--</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Analytics Charts Row -->
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-weight-scale me-1"></i> Actual vs Ideal Weight Comparison (kg)</h6>
+        <canvas id="chartWeightComp" height="200"></canvas>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <h6 class="fw-bold mb-3 text-primary"><i class="fas fa-bullseye me-1"></i> 5-Axis Physical Readiness Radar</h6>
+        <canvas id="chartPhysicalRadar" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

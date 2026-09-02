@@ -1,0 +1,586 @@
+/* ====================================================================
+   UMS - AI/ML Individual Fitness Prediction & Personalized Report CSS
+   Tactical Military Theme, Glassmorphism, and Dynamic Visuals
+   ==================================================================== */
+
+:root {
+  --fit-primary: #3b82f6;
+  --fit-primary-glow: rgba(59, 130, 246, 0.4);
+  --fit-success: #10b981;
+  --fit-warning: #f59e0b;
+  --fit-danger: #ef4444;
+  --fit-purple: #8b5cf6;
+  --fit-card-bg: rgba(255, 255, 255, 0.96);
+  --fit-card-border: rgba(203, 213, 225, 0.9);
+  --fit-text-main: #0f172a;
+  --fit-text-muted: #64748b;
+  --fit-bg-soft: #f8fafc;
+  --fit-tab-unselected-bg: #ffffff;
+  --fit-tab-unselected-text: #334155;
+  --fit-tab-unselected-border: #cbd5e1;
+  --fit-military-green: #1b382b;
+  --fit-military-gold: #fbbf24;
+}
+
+[data-theme="dark"] {
+  --fit-card-bg: rgba(30, 41, 59, 0.96);
+  --fit-card-border: rgba(51, 65, 85, 0.9);
+  --fit-text-main: #f8fafc;
+  --fit-text-muted: #94a3b8;
+  --fit-bg-soft: #0f172a;
+  --fit-tab-unselected-bg: #1e293b;
+  --fit-tab-unselected-text: #cbd5e1;
+  --fit-tab-unselected-border: #334155;
+}
+
+/* Container & Header */
+.fitness-container {
+  padding: 1.5rem 2rem;
+  max-width: 1560px;
+  margin: 0 auto;
+}
+
+.fitness-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--fit-primary);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* ====================================================================
+   SEARCH INPUT & COMMAND-STYLE DROPDOWN
+   ==================================================================== */
+.fitness-search-card {
+  position: relative;
+  z-index: 1000;
+  background: var(--fit-card-bg);
+  border: 1px solid var(--fit-card-border);
+  border-radius: 18px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.75rem;
+  backdrop-filter: blur(12px);
+  overflow: visible !important;
+}
+
+.search-input-group {
+  position: relative;
+  z-index: 1001;
+}
+
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-leading-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--fit-primary);
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.search-field-custom {
+  padding-left: 46px !important;
+  padding-right: 42px !important;
+  height: 52px;
+  border-radius: 12px !important;
+  border: 1.5px solid var(--fit-card-border) !important;
+  background: var(--fit-bg-soft) !important;
+  color: var(--fit-text-main) !important;
+  font-size: 0.98rem !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+
+.search-field-custom:focus {
+  border-color: var(--fit-primary) !important;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+  background: var(--fit-card-bg) !important;
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  background: rgba(100, 116, 139, 0.15);
+  border: none;
+  color: var(--fit-text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.clear-search-btn:hover {
+  background: var(--fit-danger);
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Goal Selector & Export Button */
+.custom-goal-select {
+  height: 52px;
+  border-radius: 12px !important;
+  border: 1.5px solid var(--fit-card-border) !important;
+  background-color: var(--fit-bg-soft) !important;
+  color: var(--fit-text-main) !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+}
+
+.export-pdf-btn {
+  height: 52px;
+  border-radius: 12px !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.3px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+  transition: all 0.25s ease !important;
+}
+
+.export-pdf-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45) !important;
+}
+
+.export-pdf-btn:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  background: #94a3b8 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Floating Search Results Dropdown */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--fit-card-bg);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-radius: 14px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22), 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 99999;
+  max-height: 360px;
+  overflow-y: auto;
+  backdrop-filter: blur(16px);
+  animation: dropdownSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes dropdownSlideIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.search-results-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.search-results-dropdown::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.search-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--fit-card-border);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:hover, .search-item.active-item {
+  background: rgba(59, 130, 246, 0.12);
+  border-left: 4px solid var(--fit-primary);
+  padding-left: 14px;
+}
+
+.search-soldier-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+  color: var(--fit-primary);
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.search-soldier-army-no {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 700;
+  color: var(--fit-primary);
+  background: rgba(59, 130, 246, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+
+/* ====================================================================
+   WORKFLOW STAGE TABS (1. Profile -> 6. PDF Report)
+   ==================================================================== */
+.workflow-nav {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--fit-bg-soft);
+  border: 1.5px solid var(--fit-card-border);
+  padding: 6px 8px;
+  border-radius: 14px;
+  margin: 1rem 0 1.5rem 0;
+  overflow-x: auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  scrollbar-width: thin;
+}
+
+.workflow-nav::-webkit-scrollbar {
+  height: 4px;
+}
+.workflow-nav::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+
+.workflow-tab-btn {
+  flex: 1;
+  min-width: 140px;
+  height: 44px;
+  border: 1px solid var(--fit-tab-unselected-border);
+  background: var(--fit-tab-unselected-bg);
+  color: var(--fit-tab-unselected-text);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0 16px;
+  margin: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  user-select: none;
+}
+
+.workflow-tab-btn i {
+  font-size: 0.98rem;
+  color: var(--fit-primary);
+  transition: transform 0.2s ease;
+}
+
+.workflow-tab-btn:hover {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: var(--fit-primary);
+  color: var(--fit-primary);
+  transform: translateY(-1px);
+}
+
+.workflow-tab-btn:hover i {
+  transform: scale(1.12);
+}
+
+.workflow-tab-btn.active {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+}
+
+.workflow-tab-btn.active i {
+  color: #ffffff !important;
+}
+
+.workflow-tab-btn.active.tab-pred {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35) !important;
+}
+
+.workflow-tab-btn.active.tab-rec {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+}
+
+/* ====================================================================
+   CARD COMPONENTS & METRICS (Padding & Margin Tuning)
+   ==================================================================== */
+.fit-card {
+  position: relative;
+  z-index: 1;
+  background: var(--fit-card-bg);
+  border: 1px solid var(--fit-card-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.fit-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.35rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--fit-card-border);
+}
+
+.fit-card-title {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: var(--fit-text-main);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* Metrics Box */
+.metric-box {
+  background: var(--fit-bg-soft);
+  border: 1px solid var(--fit-card-border);
+  border-radius: 14px;
+  padding: 15px 18px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--fit-text-muted);
+  margin-bottom: 4px;
+}
+
+.metric-value {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: var(--fit-text-main);
+}
+
+.metric-sub {
+  font-size: 0.78rem;
+  color: var(--fit-text-muted);
+  margin-top: 2px;
+}
+
+/* Prediction Score Circle */
+.score-circle-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.score-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: conic-gradient(var(--score-color, #10b981) calc(var(--score-val, 75) * 1%), rgba(203, 213, 225, 0.3) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.score-circle::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--fit-card-bg);
+}
+
+.score-inner {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.score-number {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--fit-text-main);
+}
+
+.score-max {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--fit-text-muted);
+}
+
+/* Explainability Factor Lists */
+.factor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.factor-item {
+  padding: 11px 15px;
+  border-radius: 12px;
+  margin-bottom: 9px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.factor-item.strength {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #065f46;
+}
+
+[data-theme="dark"] .factor-item.strength {
+  color: #6ee7b7;
+}
+
+.factor-item.improvement {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #92400e;
+}
+
+[data-theme="dark"] .factor-item.improvement {
+  color: #fcd34d;
+}
+
+.factor-icon {
+  font-size: 1.15rem;
+  margin-top: 2px;
+}
+
+/* Workout Table */
+.workout-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.workout-table th {
+  background: var(--fit-bg-soft);
+  color: var(--fit-text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 800;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--fit-card-border);
+}
+
+.workout-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--fit-card-border);
+  font-size: 0.88rem;
+  color: var(--fit-text-main);
+  vertical-align: middle;
+}
+
+.workout-table tr:hover td {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* Milestone Cards */
+.milestone-card {
+  background: var(--fit-bg-soft);
+  border: 1px solid var(--fit-card-border);
+  border-radius: 16px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.milestone-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.milestone-badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  text-transform: uppercase;
+}
+
+/* Spinner */
+.fit-loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem;
+  text-align: center;
+}
+
+.fit-spinner {
+  width: 52px;
+  height: 52px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
+  border-top-color: var(--fit-primary);
+  border-radius: 50%;
+  animation: fitSpin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes fitSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 992px) {
+  .fitness-container {
+    padding: 1rem;
+  }
+}

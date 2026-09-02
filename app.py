@@ -35,6 +35,7 @@ app.register_blueprint(dues_bp)
 app.register_blueprint(sensitive_bp)
 app.register_blueprint(chatbot_bp)
 app.register_blueprint(company_rec_bp)
+app.register_blueprint(fitness_trend_bp)
 
 
 @app.route("/history/15cesr")

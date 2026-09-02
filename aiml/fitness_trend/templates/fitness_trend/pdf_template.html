@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Individual Fitness Report - {{ soldier.army_number }}</title>
+<style>
+    @page {
+        size: a4 portrait;
+        margin: 1.2cm 1.2cm 1.2cm 1.2cm;
+    }
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        color: #1e293b;
+        font-size: 9.5pt;
+        line-height: 1.35;
+    }
+
+    .header-table {
+        width: 100%;
+        border-bottom: 2px solid #1b382b;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+    }
+
+    .unit-title {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #1b382b;
+        text-align: center;
+        letter-spacing: 0.5px;
+    }
+
+    .report-title {
+        font-size: 11pt;
+        font-weight: bold;
+        color: #2563eb;
+        text-align: center;
+        margin-top: 3px;
+    }
+
+    .meta-sub {
+        font-size: 8pt;
+        color: #64748b;
+        text-align: center;
+        margin-top: 2px;
+    }
+
+    .section-heading {
+        font-size: 10pt;
+        font-weight: bold;
+        color: #1e3a8a;
+        background-color: #f1f5f9;
+        padding: 4px 8px;
+        border-left: 4px solid #2563eb;
+        margin-top: 10px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+    }
+
+    .data-table th, .data-table td {
+        border: 1px solid #cbd5e1;
+        padding: 4px 6px;
+        font-size: 8.5pt;
+    }
+
+    .data-table th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .score-card {
+        border: 1px solid #93c5fd;
+        background-color: #eff6ff;
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+
+    .score-val {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #1d4ed8;
+    }
+
+    .badge-pill {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 7.5pt;
+        font-weight: bold;
+        text-transform: uppercase;
+        background-color: #e2e8f0;
+        color: #1e293b;
+    }
+
+    .badge-success { background-color: #d1fae5; color: #065f46; }
+    .badge-primary { background-color: #dbeafe; color: #1e40af; }
+    .badge-warning { background-color: #fef3c7; color: #92400e; }
+    .badge-danger { background-color: #fee2e2; color: #991b1b; }
+
+    ul {
+        margin: 2px 0 6px 14px;
+        padding: 0;
+    }
+
+    li {
+        margin-bottom: 2px;
+        font-size: 8.5pt;
+    }
+
+    .sign-block {
+        margin-top: 18px;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<table class="header-table">
+    <tr>
+        <td style="text-align: center;">
+            <div class="unit-title">15 CORPS / 15 CESR — UNIT MANAGEMENT SYSTEM</div>
+            <div class="report-title">AI/ML INDIVIDUAL FITNESS PREDICTION &amp; PERSONALIZED FITNESS REPORT</div>
+            <div class="meta-sub">Report Generated: {{ generated_at }} | Model Version: {{ model_version }} | CONFIDENTIAL</div>
+        </td>
+    </tr>
+</table>
+
+<!-- Section 1: Soldier Particulars -->
+<div class="section-heading">1. Soldier Particulars &amp; Service Profile</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 20%;">Army Number:</th>
+        <td style="width: 30%;"><strong>{{ soldier.army_number }}</strong></td>
+        <th style="width: 20%;">Full Name:</th>
+        <td style="width: 30%;"><strong>{{ soldier.name }}</strong></td>
+    </tr>
+    <tr>
+        <th>Rank / Trade:</th>
+        <td>{{ soldier.rank }} / {{ soldier.trade }}</td>
+        <th>Company / Section:</th>
+        <td>{{ soldier.company }} / {{ soldier.section or 'N/A' }}</td>
+    </tr>
+    <tr>
+        <th>Age / Service:</th>
+        <td>{{ soldier.age or 'N/A' }} Years / {{ soldier.service_years or '0' }} Years</td>
+        <th>Medical Status:</th>
+        <td>
+            {% if soldier.has_medical_restriction %}
+                <span class="badge-pill badge-danger">Restricted / LMC</span>
+            {% else %}
+                <span class="badge-pill badge-success">SHAPE-1 Cleared</span>
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<!-- Section 2: Physiological & Physical Performance -->
+<div class="section-heading">2. Physiological Metrics &amp; Physical Performance</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 25%;">Height / Actual Weight:</th>
+        <td style="width: 25%;">{{ soldier.height_cm }} cm / {{ soldier.actual_weight_kg }} kg</td>
+        <th style="width: 25%;">Ideal Reference Weight:</th>
+        <td style="width: 25%;">{{ soldier.ideal_weight_kg or 'N/A' }} kg ({{ soldier.weight_status }})</td>
+    </tr>
+    <tr>
+        <th>BMI Index &amp; Category:</th>
+        <td>{{ soldier.bmi }} ({{ soldier.bmi_category }})</td>
+        <th>Weight Deviation:</th>
+        <td>
+            {% if soldier.weight_deviation_percent is not none %}
+                {{ "+" if soldier.weight_deviation_percent > 0 else "" }}{{ soldier.weight_deviation_percent }}% ({{ soldier.weight_difference_kg }} kg)
+            {% else %}
+                N/A
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <th>BPET Grading:</th>
+        <td><span class="badge-pill badge-success">{{ soldier.bpet_grade or 'Untested' }}</span></td>
+        <th>PPT Grading:</th>
+        <td><span class="badge-pill badge-success">{{ soldier.ppt_grade or 'Untested' }}</span></td>
+    </tr>
+    <tr>
+        <th>Sports &amp; Athletics:</th>
+        <td>{{ soldier.sports_list or 'None' }} ({{ soldier.sport_count or 0 }} Sports)</td>
+        <th>Physical Activity Level:</th>
+        <td>{{ soldier.physical_activity_level or 'Moderate' }}</td>
+    </tr>
+</table>
+
+<!-- Section 3: AI Physical Readiness Prediction -->
+<div class="section-heading">3. AI Physical Readiness Prediction</div>
+<div class="score-card">
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 50%;">
+                <div style="font-size: 8pt; color: #475569; text-transform: uppercase; font-weight: bold;">AI Physical Readiness Score:</div>
+                <div class="score-val">{{ prediction.fitness_score }} <span style="font-size: 10pt; color: #64748b;">/ 100 PTS</span></div>
+                <div style="margin-top: 2px;">
+                    <span class="badge-pill badge-primary" style="font-size: 8.5pt;">{{ prediction.category_label }}</span>
+                </div>
+            </td>
+            <td style="width: 50%; text-align: right;">
+                <div style="font-size: 8pt; color: #475569; font-weight: bold;">Prediction Confidence:</div>
+                <div style="font-size: 14pt; font-weight: bold; color: #2563eb;">{{ prediction.confidence_score }}%</div>
+                <div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Algorithm: {{ prediction.algorithm or 'GradientBoosting' }}</div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table style="width: 100%; margin-bottom: 6px;">
+    <tr>
+        <td style="width: 50%; vertical-align: top; padding-right: 6px;">
+            <strong style="color: #065f46; font-size: 8.5pt;">Key Strengths (Positive Indicators):</strong>
+            <ul>
+                {% for str in prediction.strengths %}
+                <li>{{ str }}</li>
+                {% endfor %}
+            </ul>
+        </td>
+        <td style="width: 50%; vertical-align: top; padding-left: 6px;">
+            <strong style="color: #92400e; font-size: 8.5pt;">Priority Action Areas:</strong>
+            <ul>
+                {% for imp in prediction.improvements %}
+                <li>{{ imp }}</li>
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<!-- Section 4: Personalized Nutrition Plan -->
+<div class="section-heading">4. Personalized Dietary &amp; Macronutrient Plan</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 25%;">Daily Energy Target:</th>
+        <td style="width: 25%;"><strong>{{ recommendations.diet.target_calories }} kcal / Day</strong></td>
+        <th style="width: 25%;">Daily Hydration Target:</th>
+        <td style="width: 25%;"><strong>{{ recommendations.diet.hydration_liters }} Liters / Day</strong></td>
+    </tr>
+    <tr>
+        <th>Protein Target:</th>
+        <td>{{ recommendations.diet.macros.protein_grams }}g ({{ recommendations.diet.macros.protein_pct }}%)</td>
+        <th>Carbs / Fats:</th>
+        <td>{{ recommendations.diet.macros.carb_grams }}g ({{ recommendations.diet.macros.carb_pct }}%) / {{ recommendations.diet.macros.fat_grams }}g ({{ recommendations.diet.macros.fat_pct }}%)</td>
+    </tr>
+</table>
+<div style="font-size: 8pt; color: #475569; margin-bottom: 6px;"><strong>Diet Strategy:</strong> {{ recommendations.diet.strategy }}</div>
+
+<!-- Section 5: Tactical Exercise Plan -->
+<div class="section-heading">5. Tactical Physical Training Regimen ({{ recommendations.exercise.title }})</div>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 35%;">Exercise / Drill</th>
+            <th style="width: 10%;">Sets</th>
+            <th style="width: 20%;">Reps / Volume</th>
+            <th style="width: 15%;">Duration</th>
+            <th style="width: 20%;">Frequency</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in recommendations.exercise.exercises %}
+        <tr>
+            <td><strong>{{ item.exercise }}</strong></td>
+            <td>{{ item.sets }}</td>
+            <td>{{ item.reps }}</td>
+            <td>{{ item.duration }}</td>
+            <td>{{ item.frequency }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Section 6: Goal-based Progression (30 / 60 / 90 Days) -->
+<div class="section-heading">6. Projected Progression Milestones (30 / 60 / 90 Days)</div>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 25%;">Timeline</th>
+            <th style="width: 20%;">Projected Weight</th>
+            <th style="width: 20%;">Projected BMI</th>
+            <th style="width: 35%;">Estimated Physical Readiness Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for m in progression.milestones %}
+        <tr>
+            <td><strong>{{ m.period }}</strong></td>
+            <td>{{ m.weight_kg }} kg</td>
+            <td>{{ m.bmi }}</td>
+            <td><strong>{{ m.fitness_score }} / 100</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Section 7: Medical Endorsement -->
+<div class="section-heading">7. Safety &amp; Medical Clearance Endorsement</div>
+<div style="font-size: 8pt; color: #334155; margin-bottom: 8px;">
+    <strong>Medical Clearance Status:</strong> {{ recommendations.medical_notice.title }} &mdash; {{ recommendations.medical_notice.message }}
+</div>
+
+<table class="sign-block">
+    <tr>
+        <td style="width: 33%; text-align: center; font-size: 8pt;">
+            ___________________________<br>
+            <strong>Physical Training Instructor</strong><br>
+            15 CESR
+        </td>
+        <td style="width: 33%; text-align: center; font-size: 8pt;">
+            ___________________________<br>
+            <strong>Medical Officer / RMO</strong><br>
+            15 CESR Medical Inspection Room
+        </td>
+        <td style="width: 33%; text-align: center; font-size: 8pt;">
+            ___________________________<br>
+            <strong>Officer Commanding / 2IC</strong><br>
+            15 CESR
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>

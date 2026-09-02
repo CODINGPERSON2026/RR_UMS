@@ -60,6 +60,7 @@ from blueprints.onco_leave import onco_leave_bp
 from blueprints.sensitive_persons import sensitive_bp
 from chatbot import chatbot_bp
 from aiml.ai_new_joinee_recommendation.routes import company_rec_bp
+from aiml.fitness_trend.routes import fitness_trend_bp
 
 
 

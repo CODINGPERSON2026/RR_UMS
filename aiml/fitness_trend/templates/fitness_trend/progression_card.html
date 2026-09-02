@@ -1,0 +1,27 @@
+<!-- ================= STAGE 5: PROGRESSION CARD ================= -->
+<div class="fit-card">
+  <div class="fit-card-header">
+    <h5 class="fit-card-title">
+      <i class="fas fa-chart-line text-info"></i> Goal-based Fitness Progression (30 / 60 / 90 Days)
+    </h5>
+    <span class="badge bg-secondary px-3 py-2">
+      <i class="fas fa-compass me-1"></i> Projected Progress Trajectory
+    </span>
+  </div>
+
+  <div class="alert alert-info py-2 px-3 small d-flex align-items-center mb-4">
+    <i class="fas fa-info-circle fa-lg me-2"></i>
+    <span><strong>Note:</strong> Progression targets represent goal-based physiological estimates assuming structured adherence to the tactical nutrition and training protocol.</span>
+  </div>
+
+  <!-- Milestone Cards Container -->
+  <div class="row mb-4" id="progMilestonesContainer">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- Trajectory Chart -->
+  <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+    <h6 class="fw-bold text-primary mb-3"><i class="fas fa-route me-1"></i> 90-Day Readiness Score &amp; Weight Projection Curve</h6>
+    <canvas id="chartProgressionTrajectory" height="220"></canvas>
+  </div>
+</div>

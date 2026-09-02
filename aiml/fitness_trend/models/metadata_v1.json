@@ -1,0 +1,291 @@
+{
+  "model_version": "v1",
+  "trained_at": "2026-09-02 14:08:09",
+  "dataset_size_total": 476,
+  "dataset_size_valid": 473,
+  "train_samples": 378,
+  "test_samples": 95,
+  "feature_names": [
+    "age",
+    "height_cm",
+    "actual_weight_kg",
+    "ideal_weight_kg",
+    "weight_difference_kg",
+    "weight_deviation_percent",
+    "bmi",
+    "service_years",
+    "bpet_score",
+    "ppt_score",
+    "sport_count",
+    "has_sport",
+    "team_sport_indicator",
+    "individual_sport_indicator",
+    "endurance_sport_indicator",
+    "strength_sport_indicator",
+    "combat_sport_indicator",
+    "water_sport_indicator",
+    "has_medical_restriction",
+    "is_low_medical_category",
+    "medical_risk_penalty"
+  ],
+  "label_encoder_classes": [
+    "AVERAGE",
+    "EXCELLENT",
+    "GOOD",
+    "NEEDS_IMPROVEMENT"
+  ],
+  "selected_classifier": "GradientBoostingClassifier",
+  "classifier_metrics": {
+    "accuracy": 0.7053,
+    "precision_weighted": 0.7095,
+    "recall_weighted": 0.7053,
+    "f1_weighted": 0.7027,
+    "f1_macro": 0.7494,
+    "confusion_matrix": [
+      [
+        23,
+        8,
+        6,
+        0
+      ],
+      [
+        1,
+        21,
+        2,
+        0
+      ],
+      [
+        8,
+        2,
+        17,
+        0
+      ],
+      [
+        1,
+        0,
+        0,
+        6
+      ]
+    ],
+    "classes": [
+      "AVERAGE",
+      "EXCELLENT",
+      "GOOD",
+      "NEEDS_IMPROVEMENT"
+    ]
+  },
+  "all_classifier_metrics": {
+    "RandomForestClassifier": {
+      "accuracy": 0.6947,
+      "precision_weighted": 0.7105,
+      "recall_weighted": 0.6947,
+      "f1_weighted": 0.69,
+      "f1_macro": 0.754,
+      "confusion_matrix": [
+        [
+          20,
+          11,
+          6,
+          0
+        ],
+        [
+          1,
+          21,
+          2,
+          0
+        ],
+        [
+          6,
+          3,
+          18,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          7
+        ]
+      ],
+      "classes": [
+        "AVERAGE",
+        "EXCELLENT",
+        "GOOD",
+        "NEEDS_IMPROVEMENT"
+      ]
+    },
+    "GradientBoostingClassifier": {
+      "accuracy": 0.7053,
+      "precision_weighted": 0.7095,
+      "recall_weighted": 0.7053,
+      "f1_weighted": 0.7027,
+      "f1_macro": 0.7494,
+      "confusion_matrix": [
+        [
+          23,
+          8,
+          6,
+          0
+        ],
+        [
+          1,
+          21,
+          2,
+          0
+        ],
+        [
+          8,
+          2,
+          17,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          6
+        ]
+      ],
+      "classes": [
+        "AVERAGE",
+        "EXCELLENT",
+        "GOOD",
+        "NEEDS_IMPROVEMENT"
+      ]
+    },
+    "LogisticRegression": {
+      "accuracy": 0.6,
+      "precision_weighted": 0.6,
+      "recall_weighted": 0.6,
+      "f1_weighted": 0.5835,
+      "f1_macro": 0.6673,
+      "confusion_matrix": [
+        [
+          18,
+          10,
+          9,
+          0
+        ],
+        [
+          1,
+          22,
+          1,
+          0
+        ],
+        [
+          10,
+          7,
+          10,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          7
+        ]
+      ],
+      "classes": [
+        "AVERAGE",
+        "EXCELLENT",
+        "GOOD",
+        "NEEDS_IMPROVEMENT"
+      ]
+    },
+    "XGBClassifier": {
+      "accuracy": 0.6526,
+      "precision_weighted": 0.6623,
+      "recall_weighted": 0.6526,
+      "f1_weighted": 0.6388,
+      "f1_macro": 0.7023,
+      "confusion_matrix": [
+        [
+          19,
+          12,
+          6,
+          0
+        ],
+        [
+          0,
+          24,
+          0,
+          0
+        ],
+        [
+          11,
+          3,
+          13,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          6
+        ]
+      ],
+      "classes": [
+        "AVERAGE",
+        "EXCELLENT",
+        "GOOD",
+        "NEEDS_IMPROVEMENT"
+      ]
+    }
+  },
+  "selected_regressor": "RidgeRegressor",
+  "regressor_metrics": {
+    "mae": 7.4443,
+    "mse": 76.1081,
+    "rmse": 8.724,
+    "r2_score": 0.6299
+  },
+  "all_regressor_metrics": {
+    "RandomForestRegressor": {
+      "mae": 7.5952,
+      "mse": 83.6567,
+      "rmse": 9.1464,
+      "r2_score": 0.5932
+    },
+    "GradientBoostingRegressor": {
+      "mae": 7.4484,
+      "mse": 84.4084,
+      "rmse": 9.1874,
+      "r2_score": 0.5896
+    },
+    "RidgeRegressor": {
+      "mae": 7.4443,
+      "mse": 76.1081,
+      "rmse": 8.724,
+      "r2_score": 0.6299
+    },
+    "XGBRegressor": {
+      "mae": 7.3679,
+      "mse": 82.1861,
+      "rmse": 9.0657,
+      "r2_score": 0.6004
+    }
+  },
+  "feature_importances": {
+    "age": 0.0407,
+    "height_cm": 0.0558,
+    "actual_weight_kg": 0.0376,
+    "ideal_weight_kg": 0.0214,
+    "weight_difference_kg": 0.0229,
+    "weight_deviation_percent": 0.1638,
+    "bmi": 0.2721,
+    "service_years": 0.0721,
+    "bpet_score": 0.049,
+    "ppt_score": 0.0569,
+    "sport_count": 0.0549,
+    "has_sport": 0.0173,
+    "team_sport_indicator": 0.0282,
+    "individual_sport_indicator": 0.0,
+    "endurance_sport_indicator": 0.0002,
+    "strength_sport_indicator": 0.0,
+    "combat_sport_indicator": 0.0012,
+    "water_sport_indicator": 0.0002,
+    "has_medical_restriction": 0.0034,
+    "is_low_medical_category": 0.0048,
+    "medical_risk_penalty": 0.0975
+  }
+}

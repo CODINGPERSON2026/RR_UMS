@@ -1,0 +1,77 @@
+<!-- ================= STAGE 3: PREDICTION CARD ================= -->
+<div class="fit-card">
+  <div class="fit-card-header">
+    <h5 class="fit-card-title">
+      <i class="fas fa-brain text-purple"></i> AI Physical Readiness Prediction
+    </h5>
+    <div>
+      <span class="badge bg-dark px-3 py-2">
+        <i class="fas fa-code-branch me-1"></i> Model: <span id="predModelVer">v1</span> (<span id="predAlgorithm">GradientBoosting</span>)
+      </span>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4 align-items-center">
+    <!-- Score Circle & Category -->
+    <div class="col-md-5 text-center">
+      <div class="score-circle-wrapper">
+        <div class="score-circle" id="predScoreCircle" style="--score-val: 75; --score-color: #10b981;">
+          <div class="score-inner">
+            <div class="score-number" id="predScoreNumber">75</div>
+            <div class="score-max">/ 100 PTS</div>
+          </div>
+        </div>
+        <div class="mt-3">
+          <span class="badge fs-6 px-4 py-2 text-white" id="predCategoryBadge" style="background-color: #10b981; border-radius: 999px;">
+            Good Fitness
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confidence Meter & Metric Summary -->
+    <div class="col-md-7">
+      <div class="p-3 border rounded mb-3" style="background: var(--fit-bg-soft);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small fw-bold text-uppercase text-muted">AI Prediction Confidence</span>
+          <span class="fw-bold text-primary fs-5" id="predConfidenceVal">88.5%</span>
+        </div>
+        <div class="progress" style="height: 10px; border-radius: 999px;">
+          <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" id="predConfidenceBar" style="width: 88.5%;"></div>
+        </div>
+        <div class="small text-muted mt-2">
+          <i class="fas fa-info-circle me-1"></i> Confidence reflects demographic completeness, verified test scores, and model class margin.
+        </div>
+      </div>
+
+      <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+        <div class="small text-muted mb-1"><strong>Operational Readout:</strong> Soldier is evaluated against the 15 CESR operational physical standards.</div>
+        <div class="small text-muted"><strong>Safety Classification:</strong> Continuous conditioning recommended to maintain high military readiness.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Explainability: Positive Strengths & Areas for Improvement -->
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <h6 class="fw-bold text-success mb-3">
+          <i class="fas fa-check-circle me-1"></i> Positive Predictive Factors (Strengths)
+        </h6>
+        <ul class="factor-list" id="predStrengthsList">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <h6 class="fw-bold text-warning mb-3">
+          <i class="fas fa-arrow-circle-up me-1"></i> Areas for Improvement &amp; Risk Flags
+        </h6>
+        <ul class="factor-list" id="predImprovementsList">
+          <!-- Populated by JS -->
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

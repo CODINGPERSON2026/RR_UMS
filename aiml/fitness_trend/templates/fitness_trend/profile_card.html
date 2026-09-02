@@ -1,0 +1,108 @@
+<!-- ================= STAGE 1: PROFILE CARD ================= -->
+<div class="fit-card">
+  <div class="fit-card-header">
+    <h5 class="fit-card-title">
+      <i class="fas fa-id-card text-primary"></i> Personnel Fitness Profile
+    </h5>
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-primary px-3 py-2" id="profRank">Soldier</span>
+      <span class="badge bg-secondary px-3 py-2" id="profCompany">Company</span>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="metric-box">
+        <div class="metric-label">Personnel Name</div>
+        <div class="metric-value text-primary" id="profSoldierName">--</div>
+        <div class="metric-sub" id="profArmyNumber">--</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="metric-box">
+        <div class="metric-label">Trade / Sec</div>
+        <div class="metric-value" id="profTrade">--</div>
+        <div class="metric-sub" id="profSection">--</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="metric-box">
+        <div class="metric-label">Age &amp; Service</div>
+        <div class="metric-value" id="profAge">--</div>
+        <div class="metric-sub">Age in Years</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="metric-box">
+        <div class="metric-label">Height (cm)</div>
+        <div class="metric-value" id="profHeight">--</div>
+        <div class="metric-sub">Standard Stature</div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="metric-box">
+        <div class="metric-label">Actual Weight</div>
+        <div class="metric-value text-primary" id="profActualWeight">--</div>
+        <div class="metric-sub">Recorded Weight</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Physical Testing & Ideal Comparison Row -->
+  <div class="row g-3 mb-3">
+    <div class="col-md-3">
+      <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+        <div class="small text-muted fw-bold text-uppercase mb-1">Ideal Military Weight</div>
+        <h4 class="fw-bold mb-1" id="profIdealWeight">--</h4>
+        <div class="small text-muted">Ref: Table Standards</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+        <div class="small text-muted fw-bold text-uppercase mb-1">Weight Difference</div>
+        <h4 class="fw-bold mb-1" id="profWeightDiff">--</h4>
+        <div class="small text-muted">Variance vs Standard</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+        <div class="small text-muted fw-bold text-uppercase mb-1">BPET Test Grading</div>
+        <div class="mt-1"><span class="badge bg-success fs-6" id="profBpetBadge">EX</span></div>
+        <div class="small text-muted mt-1">Battle Physical Efficiency</div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
+        <div class="small text-muted fw-bold text-uppercase mb-1">PPT Test Grading</div>
+        <div class="mt-1"><span class="badge bg-success fs-6" id="profPptBadge">EX</span></div>
+        <div class="small text-muted mt-1">Physical Proficiency Test</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sports and Medical Summary -->
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold text-primary"><i class="fas fa-volleyball-ball me-1"></i> Sports &amp; Activities</span>
+          <span class="badge bg-info" id="profSportCount">0 Sports</span>
+        </div>
+        <div class="small text-muted mb-1">Primary Sport: <strong style="color: var(--fit-text-main);" id="profPrimarySport">None</strong></div>
+        <div class="small text-muted">Registered Sports: <strong style="color: var(--fit-text-main);" id="profSportsList">None</strong></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="p-3 border rounded h-100" style="background: var(--fit-bg-soft);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-bold text-danger"><i class="fas fa-notes-medical me-1"></i> Medical Status &amp; Restrictions</span>
+          <span class="badge bg-success" id="profMedBadge">SHAPE-1</span>
+        </div>
+        <div class="small text-muted">Restrictions / Conditions: <strong style="color: var(--fit-text-main);" id="profRestrictionsText">None</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quality Flags -->
+  <div class="mt-3 d-none" id="profQualityFlagsContainer"></div>
+</div>

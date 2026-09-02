@@ -1,0 +1,205 @@
+{% extends "baseView.html" %}
+
+{% block extra_css %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Fitness Trend Module CSS -->
+<link rel="stylesheet" href="{{ url_for('fitness_trend_bp.static', filename='css/fitness_trend.css') }}?v=2.4">
+{% endblock %}
+
+{% block content %}
+<div class="fitness-container">
+
+  <!-- Header Banner -->
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <div>
+      <div class="fitness-header-badge mb-2">
+        <i class="fas fa-microchip me-1"></i> AI/ML Operational Readiness
+      </div>
+      <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">
+        Individual Fitness Prediction &amp; Personalized Report
+      </h3>
+      <p class="text-muted small mb-0">
+        15 CESR Tactical Physical Readiness Engine &bull; Grounded in BPET, PPT, and Official Body Composition Standards
+      </p>
+    </div>
+
+    <!-- Retrain Modal Trigger (Visible to Admin/Officers) -->
+    <div>
+      <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#fitnessRetrainModal">
+        <i class="fas fa-sync-alt me-1 text-primary"></i> Retrain Model
+      </button>
+    </div>
+  </div>
+
+  <!-- Search & Filter Card -->
+  <div class="fitness-search-card">
+    <div class="row g-3 align-items-center">
+      <!-- Personnel Autocomplete Search -->
+      <div class="col-lg-6">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+          <i class="fas fa-search text-primary me-1"></i> Select Personnel (Army Number / Name)
+        </label>
+        <div class="search-input-group">
+          <div class="input-icon-wrapper">
+            <i class="fas fa-search search-leading-icon"></i>
+            <input type="text"
+                   id="fitnessSearchInput"
+                   class="form-control form-control-lg search-field-custom"
+                   placeholder="Type Army Number (e.g. 15744604X) or Soldier Name..."
+                   autocomplete="off">
+            <button type="button" id="clearSearchBtn" class="clear-search-btn d-none" title="Clear search">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div id="searchResultsDropdown" class="search-results-dropdown d-none"></div>
+        </div>
+      </div>
+
+      <!-- Fitness Goal Selector -->
+      <div class="col-lg-4">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+          <i class="fas fa-bullseye text-primary me-1"></i> Primary Training Goal
+        </label>
+        <select id="fitnessGoalSelect" class="form-select form-select-lg custom-goal-select shadow-none">
+          <option value="Overall Fitness" selected>Overall Tactical Fitness (SHAPE-1)</option>
+          <option value="Weight Loss">Weight Loss &amp; Fat Reduction</option>
+          <option value="BPET Improvement">BPET 5km Speed &amp; Obstacle Endurance</option>
+          <option value="PPT Improvement">PPT Calisthenics &amp; Functional Power</option>
+          <option value="Strength">Tactical Strength &amp; Rope Power</option>
+          <option value="Endurance">Aerobic Stamina &amp; Cross-Country Pacing</option>
+        </select>
+      </div>
+
+      <!-- Quick Action / PDF Download -->
+      <div class="col-lg-2 text-lg-end mt-lg-auto">
+        <button id="downloadPdfBtn" class="btn btn-primary btn-lg w-100 export-pdf-btn fw-bold shadow-sm" disabled title="Select a soldier to enable PDF export">
+          <i class="fas fa-file-pdf me-1"></i> Export PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Alert Container -->
+  <div id="fitnessErrorAlert" class="alert alert-danger py-3 px-4 rounded-3 d-none mb-4"></div>
+
+  <!-- Initial Welcome Placeholder -->
+  <div id="fitnessWelcomeState" class="fit-card text-center py-5">
+    <div class="mb-3">
+      <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle" style="width: 80px; height: 80px;">
+        <i class="fas fa-user-astronaut fa-3x"></i>
+      </div>
+    </div>
+    <h4 class="fw-bold mb-2">Select a Soldier to Generate AI Fitness Analysis</h4>
+    <p class="text-muted small max-w-500 mx-auto mb-4" style="max-width: 540px;">
+      Search by Army Number, Soldier Name, or Company in the box above to extract vital body metrics, evaluate military test readiness, predict AI score, and build a personalized training plan.
+    </p>
+  </div>
+
+  <!-- Loading State Spinner -->
+  <div id="fitnessLoadingState" class="fit-card fit-loading-overlay d-none">
+    <div class="fit-spinner"></div>
+    <h5 class="fw-bold text-primary mb-1">Processing Soldier Fitness Records...</h5>
+    <p class="text-muted small mb-0">Aggregating sports, evaluating ideal weight table, running AI predictor and medical safety checks.</p>
+  </div>
+
+  <!-- Active Analysis Content (Visible when a soldier is loaded) -->
+  <div id="fitnessActiveContent" class="d-none">
+
+    <!-- 6-Stage Workflow Navigation Bar -->
+    <div class="workflow-nav" id="workflowStageNav">
+      <button class="workflow-tab-btn active" data-stage="profile">
+        <i class="fas fa-id-badge"></i> 1. Profile
+      </button>
+      <button class="workflow-tab-btn" data-stage="analysis">
+        <i class="fas fa-chart-pie"></i> 2. Body Analysis
+      </button>
+      <button class="workflow-tab-btn tab-pred" data-stage="prediction">
+        <i class="fas fa-brain"></i> 3. AI Prediction
+      </button>
+      <button class="workflow-tab-btn tab-rec" data-stage="recommendations">
+        <i class="fas fa-utensils"></i> 4. Recommendations
+      </button>
+      <button class="workflow-tab-btn" data-stage="progression">
+        <i class="fas fa-chart-line"></i> 5. Progression
+      </button>
+      <button class="workflow-tab-btn" data-stage="report">
+        <i class="fas fa-file-alt"></i> 6. PDF Report
+      </button>
+    </div>
+
+    <!-- Stage 1: Profile -->
+    <div id="stageViewProfile">
+      {% include "fitness_trend/profile_card.html" %}
+    </div>
+
+    <!-- Stage 2: Analysis -->
+    <div id="stageViewAnalysis" class="d-none">
+      {% include "fitness_trend/analysis_card.html" %}
+    </div>
+
+    <!-- Stage 3: Prediction -->
+    <div id="stageViewPrediction" class="d-none">
+      {% include "fitness_trend/prediction_card.html" %}
+    </div>
+
+    <!-- Stage 4: Recommendations -->
+    <div id="stageViewRecommendations" class="d-none">
+      {% include "fitness_trend/recommendations_card.html" %}
+    </div>
+
+    <!-- Stage 5: Progression -->
+    <div id="stageViewProgression" class="d-none">
+      {% include "fitness_trend/progression_card.html" %}
+    </div>
+
+    <!-- Stage 6: Report Preview -->
+    <div id="stageViewReport" class="d-none">
+      <div class="fit-card">
+        <div class="fit-card-header">
+          <h5 class="fit-card-title">
+            <i class="fas fa-print text-primary"></i> Official Individual Fitness Report Preview
+          </h5>
+          <div>
+            <button class="btn btn-success btn-sm shadow-sm" onclick="document.getElementById('downloadPdfBtn').click();">
+              <i class="fas fa-download me-1"></i> Download PDF Document
+            </button>
+          </div>
+        </div>
+        <div id="reportHtmlPreviewCont" class="p-2">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Model Retrain Modal -->
+<div class="modal fade" id="fitnessRetrainModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+      <div class="modal-header bg-primary text-white" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+        <h5 class="modal-title fw-bold"><i class="fas fa-sync-alt me-2"></i> Retrain AI Fitness Models</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="small text-muted mb-3">
+          This operation extracts all current personnel, weight records, sports, and physical test scores from the database, runs multi-model evaluation (Random Forest, Gradient Boosting, Ridge, XGBoost), and persists the top-performing model version.
+        </p>
+        <div id="retrainStatusMsg"></div>
+      </div>
+      <div class="modal-footer border-top-0 pt-0 pb-3 px-4">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" id="triggerRetrainBtn">
+          <i class="fas fa-play me-1"></i> Start Retraining
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fitness Trend Module JS Controller -->
+<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_trend.js') }}?v=2.4"></script>
+{% endblock %}
