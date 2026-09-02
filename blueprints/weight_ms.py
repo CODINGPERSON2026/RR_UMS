@@ -60,8 +60,8 @@ def compute_authorization(company=None):
             weight_deviation_percent = None
             weight_deviation_kg = None
         else:
-            lower = round(ideal_weight * 0.80, 2)
-            upper = round(ideal_weight * 1.20, 2)
+            lower = round(ideal_weight * 0.88, 2)
+            upper = round(ideal_weight * 1.12, 2)
 
             if lower <= actual_weight <= upper:
                 status = "Fit"
@@ -244,8 +244,8 @@ def add_user():
             return jsonify({'error': 'Could not determine ideal weight for the given age and height'}), 400
 
         # Calculate limits and status
-        lower_limit = round(ideal_weight * 0.9, 2)
-        upper_limit = round(ideal_weight * 1.1, 2)
+        lower_limit = round(ideal_weight * 0.88, 2)
+        upper_limit = round(ideal_weight * 1.12, 2)
 
         if lower_limit <= actual_weight <= upper_limit:
             status = "Fit"
@@ -455,8 +455,8 @@ def api_status_data():
                 weight_deviation_percent = None
                 weight_deviation_kg = None
             else:
-                lower = round(ideal_weight * 0.80, 2)
-                upper = round(ideal_weight * 1.20, 2)
+                lower = round(ideal_weight * 0.88, 2)
+                upper = round(ideal_weight * 1.12, 2)
 
                 if lower <= actual_weight <= upper:
                     status = "Fit"
@@ -855,8 +855,8 @@ def api_person_details(army_number):
             weight_deviation_percent = None
             weight_deviation_kg = None
         else:
-            lower = round(ideal_weight * 0.80, 2)
-            upper = round(ideal_weight * 1.20, 2)
+            lower = round(ideal_weight * 0.88, 2)
+            upper = round(ideal_weight * 1.12, 2)
             if lower <= actual_weight <= upper:
                 status = "Fit"
                 weight_deviation_kg = 0

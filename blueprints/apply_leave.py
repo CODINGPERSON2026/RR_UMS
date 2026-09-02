@@ -2167,7 +2167,7 @@ def download_leave_certificate(leave_id):
             "suffix_days": suffix_days,                 
             "prefix_details": prefix_details,           
             "suffix_details": suffix_details,           
-            "issue_date": data['issue_date'] if data['issue_date'] else datetime.now(),
+            "issue_date": datetime.now(),
             "applied_on": data['applied_on'],
             "leave_reason": data.get('leave_reason', 'Not specified'),
             "remarks": data.get('remarks', 'N/A'),
