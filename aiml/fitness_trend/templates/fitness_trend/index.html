@@ -10,18 +10,14 @@
 {% block content %}
 <div class="fitness-container">
 
-  <!-- Header Banner -->
-  <div class="d-flex align-items-center justify-content-between mb-4">
-    <div>
-      <div class="fitness-header-badge mb-2">
-        <i class="fas fa-microchip me-1"></i> AI/ML Operational Readiness
-      </div>
-      <h3 class="fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">
-        Individual Fitness Prediction &amp; Personalized Report
-      </h3>
-      <p class="text-muted small mb-0">
-        15 CESR Tactical Physical Readiness Engine &bull; Grounded in BPET, PPT, and Official Body Composition Standards
-      </p>
+  <!-- Standard Navbar -->
+  {% set header = "15 CESR UMS" %}
+  {% include 'navbar/navbar.html' %}
+
+  <!-- Sub-Header Bar & Retrain Button -->
+  <div class="d-flex align-items-center justify-content-between my-3 px-1">
+    <div class="fitness-header-badge">
+      <i class="fas fa-microchip me-1"></i> AI/ML Operational Readiness &bull; Grounded in BPET, PPT &amp; Body Composition Standards
     </div>
 
     <!-- Retrain Modal Trigger (Visible to Admin/Officers) -->

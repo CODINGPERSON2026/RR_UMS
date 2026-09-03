@@ -24,26 +24,32 @@
     }
 
     .unit-title {
-        font-size: 14pt;
+        font-size: 13.5pt;
         font-weight: bold;
         color: #1b382b;
         text-align: center;
         letter-spacing: 0.5px;
+        margin: 0;
+        padding: 0;
     }
 
     .report-title {
-        font-size: 11pt;
+        font-size: 9.5pt;
         font-weight: bold;
         color: #2563eb;
         text-align: center;
-        margin-top: 3px;
+        margin-top: 1px;
+        margin-bottom: 0;
+        padding: 0;
     }
 
     .meta-sub {
-        font-size: 8pt;
+        font-size: 7.5pt;
         color: #64748b;
         text-align: center;
         margin-top: 2px;
+        margin-bottom: 0;
+        padding: 0;
     }
 
     .section-heading {
@@ -126,12 +132,22 @@
 <body>
 
 <!-- Header -->
-<table class="header-table">
+<table class="header-table" style="width: 100%;">
     <tr>
-        <td style="text-align: center;">
-            <div class="unit-title">15 CORPS / 15 CESR — UNIT MANAGEMENT SYSTEM</div>
-            <div class="report-title">AI/ML INDIVIDUAL FITNESS PREDICTION &amp; PERSONALIZED FITNESS REPORT</div>
+        <td width="18%" align="left" valign="middle">
+            {% if chinar_logo_path %}
+            <img src="{{ chinar_logo_path }}" width="75" height="75" style="border-radius:50%">
+            {% endif %}
+        </td>
+        <td width="64%" align="center" valign="middle">
+            <div class="unit-title">15 CORPS ENGINEERING SIGNAL REGIMENT</div>
+            <div class="report-title">INDIVIDUAL FITNESS PREDICTION REPORT</div>
             <div class="meta-sub">Report Generated: {{ generated_at }} | Model Version: {{ model_version }} | CONFIDENTIAL</div>
+        </td>
+        <td width="18%" align="right" valign="middle">
+            {% if rt_logo_path %}
+            <img src="{{ rt_logo_path }}" width="85" height="85">
+            {% endif %}
         </td>
     </tr>
 </table>

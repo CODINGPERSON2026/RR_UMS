@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import logging
+from datetime import datetime
 from flask import (
     Blueprint,
     request,
@@ -64,7 +65,7 @@ def fitness_dashboard_view():
         role=role,
         current_user_name=current_user_name,
         company=company,
-        header="AI/ML Individual Fitness Prediction & Personalized Report"
+        header="15 CESR UMS"
     )
 
 
@@ -181,13 +182,18 @@ def preview_fitness_report(army_number):
         progression_data=result['progression'],
         client_ip=client_ip
     )
-    return html
+    
+    response = make_response(html)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 @fitness_trend_bp.route("/report/pdf/<army_number>", methods=["GET"])
 def download_fitness_pdf(army_number):
     """
-    Generates and streams the downloadable PDF Personalized Fitness Report with watermark.
+    Generates and streams the downloadable PDF Personalized Fitness Report with watermark and unique timestamp.
     """
     user_payload = require_login()
     if not user_payload:
@@ -217,15 +223,18 @@ def download_fitness_pdf(army_number):
     raw_name = result.get('soldier', {}).get('name') or ''
     clean_name = re.sub(r'[^a-zA-Z0-9_\- ]', '', raw_name).strip().replace(' ', '_')
     safe_army_no = re.sub(r'[^a-zA-Z0-9_\-]', '_', army_number)
-    
     if clean_name:
         filename = f"{clean_name}_{safe_army_no}_Fitness_Report.pdf"
     else:
         filename = f"Fitness_Report_{safe_army_no}.pdf"
     
-    return send_file(
+    response = make_response(send_file(
         pdf_stream,
         mimetype="application/pdf",
         as_attachment=True,
         download_name=filename
-    )
+    ))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response

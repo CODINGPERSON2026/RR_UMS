@@ -6,6 +6,7 @@ and overlays an official diagonal watermark with '15 CESR REGM', IP address, and
 
 import os
 import io
+import base64
 import logging
 from datetime import datetime
 from jinja2 import Environment, FileSystemLoader
@@ -22,12 +23,68 @@ def get_jinja_env():
     return Environment(loader=FileSystemLoader(TEMPLATES_DIR), autoescape=True)
 
 
+def get_certificate_logos():
+    """
+    Returns absolute file paths for Chinar and RT logos identical to certificate.html.
+    Creates rounded Chinar logo if it doesn't already exist.
+    """
+    try:
+        from PIL import Image, ImageDraw
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        static_dir = os.path.join(base_dir, "static")
+
+        chinar_logo_path = os.path.abspath(os.path.join(static_dir, "image_for_login_page", "chinar.jpg"))
+        rt_logo_path = os.path.abspath(os.path.join(static_dir, "image_for_login_page", "rt.jpg"))
+        chinar_rounded_path = os.path.abspath(os.path.join(static_dir, "image_for_login_page", "chinar_rounded.jpg"))
+
+        if not os.path.exists(chinar_rounded_path) and os.path.exists(chinar_logo_path):
+            try:
+                img = Image.open(chinar_logo_path).convert("RGBA")
+                min_dim = min(img.size)
+                left = (img.width - min_dim) / 2
+                top = (img.height - min_dim) / 2
+                right = (img.width + min_dim) / 2
+                bottom = (img.height + min_dim) / 2
+                img = img.crop((left, top, right, bottom))
+                
+                mask = Image.new("L", img.size, 0)
+                draw = ImageDraw.Draw(mask)
+                draw.ellipse((0, 0, min_dim, min_dim), fill=255)
+                
+                white_bg = Image.new("RGB", img.size, (255, 255, 255))
+                white_bg.paste(img, mask=mask)
+                white_bg.save(chinar_rounded_path, "JPEG")
+            except Exception as e:
+                logger.warning(f"Error cropping rounded chinar logo: {e}")
+                chinar_rounded_path = chinar_logo_path
+        elif not os.path.exists(chinar_logo_path):
+            chinar_rounded_path = chinar_logo_path
+
+        def to_base64_uri(file_path):
+            if file_path and os.path.exists(file_path):
+                try:
+                    with open(file_path, "rb") as img_f:
+                        b64_str = base64.b64encode(img_f.read()).decode("utf-8")
+                        ext = file_path.rsplit(".", 1)[-1].lower()
+                        mime = "image/png" if ext == "png" else "image/jpeg"
+                        return f"data:{mime};base64,{b64_str}"
+                except Exception:
+                    return file_path
+            return file_path
+
+        return to_base64_uri(chinar_rounded_path), to_base64_uri(rt_logo_path)
+    except Exception as e:
+        logger.warning(f"Failed to get certificate logos: {e}")
+        return "", ""
+
+
 def generate_fitness_html_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1"):
     """
     Renders the standalone printable HTML report string using pdf_template.html.
     """
     env = get_jinja_env()
     template = env.get_template("fitness_trend/pdf_template.html")
+    chinar_logo_path, rt_logo_path = get_certificate_logos()
     
     rendered_html = template.render(
         soldier=soldier_features,
@@ -36,7 +93,9 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
         progression=progression_data,
         client_ip=client_ip,
         generated_at=datetime.now().strftime("%d %b %Y, %H:%M hrs"),
-        model_version=prediction_result.get('model_version', DEFAULT_MODEL_VERSION)
+        model_version=prediction_result.get('model_version', DEFAULT_MODEL_VERSION),
+        chinar_logo_path=chinar_logo_path,
+        rt_logo_path=rt_logo_path
     )
     return rendered_html
 
