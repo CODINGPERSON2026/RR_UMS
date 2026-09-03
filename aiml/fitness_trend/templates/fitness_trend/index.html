@@ -32,7 +32,7 @@
   <div class="fitness-search-card">
     <div class="row g-3 align-items-center">
       <!-- Personnel Autocomplete Search -->
-      <div class="col-lg-6">
+      <div class="col-lg-4">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
           <i class="fas fa-search text-primary me-1"></i> Select Personnel (Army Number / Name)
         </label>
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Fitness Goal Selector -->
-      <div class="col-lg-4">
+      <div class="col-lg-3">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
           <i class="fas fa-bullseye text-primary me-1"></i> Primary Training Goal
         </label>
@@ -64,6 +64,27 @@
           <option value="PPT Improvement">PPT Calisthenics &amp; Functional Power</option>
           <option value="Strength">Tactical Strength &amp; Rope Power</option>
           <option value="Endurance">Aerobic Stamina &amp; Cross-Country Pacing</option>
+        </select>
+      </div>
+
+      <!-- PDF Export Language Selector -->
+      <div class="col-lg-3">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+          <i class="fas fa-language text-primary me-1"></i> Report Language
+        </label>
+        <select id="fitnessLangSelect" class="form-select form-select-lg custom-goal-select shadow-none">
+          <option value="en" selected>English (Default)</option>
+          <option value="hi">हिन्दी (Hindi)</option>
+          <option value="ur">اردو (Urdu)</option>
+          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+          <option value="ml">മലയാളം (Malayalam)</option>
+          <option value="or">ଓଡ଼ିଆ (Odia)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+          <option value="bho">भोजपुरी (Bhojpuri)</option>
+          <option value="gu">ગુજરાતી (Gujarati)</option>
+          <option value="mr">मराठी (Marathi)</option>
+          <option value="bn">বাংলা (Bengali)</option>
+          <option value="mwr">मेवाड़ी (Mewari)</option>
         </select>
       </div>
 

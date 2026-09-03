@@ -400,6 +400,12 @@
   color: var(--fit-text-main);
 }
 
+.metric-value.text-primary { color: #3b82f6 !important; }
+.metric-value.text-success { color: #10b981 !important; }
+.metric-value.text-warning { color: #f59e0b !important; }
+.metric-value.text-info { color: #06b6d4 !important; }
+.metric-value.text-danger { color: #ef4444 !important; }
+
 .metric-sub {
   font-size: 0.78rem;
   color: var(--fit-text-muted);

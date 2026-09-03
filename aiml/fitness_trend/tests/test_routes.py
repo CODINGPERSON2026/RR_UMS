@@ -149,6 +149,53 @@ class TestFitnessRoutes(unittest.TestCase):
         self.assertTrue(len(pdf_bytes) > 500)
         self.assertTrue(pdf_bytes.startswith(b'%PDF'))
 
+    def test_multilingual_pdf_generation(self):
+        """Test generating PDF report in international languages (Hindi, French)."""
+        mock_soldier = {
+            'army_number': '15744604X', 'name': 'RAMESH KUMAR', 'rank': 'HAV',
+            'trade': 'DVR', 'company': '1 Company', 'section': 'HQ', 'age': 32,
+            'service_years': 12.0, 'height_cm': 175.0, 'actual_weight_kg': 73.0,
+            'ideal_weight_kg': 70.0, 'weight_status': 'Normal', 'bmi': 23.84,
+            'bmi_category': 'Normal', 'weight_deviation_percent': 4.29,
+            'weight_difference_kg': 3.0, 'bpet_grade': 'EXCELLENT',
+            'ppt_grade': 'EXCELLENT', 'sports_list': 'Cross-Country', 'sport_count': 1,
+            'physical_activity_level': 'Active', 'has_medical_restriction': False
+        }
+        mock_pred = {
+            'fitness_score': 82.5, 'fitness_category': 'Good Fitness',
+            'category_label': 'Good Fitness', 'confidence_score': 91.0,
+            'model_version': 'v1', 'algorithm': 'GradientBoostingClassifier',
+            'strengths': ['Solid BPET Performance'], 'improvements': ['Weight conditioning']
+        }
+        mock_rec = {
+            'medical_notice': {'title': 'Medically Cleared', 'message': 'Fit'},
+            'diet': {
+                'target_calories': 2400, 'strategy': 'Maintenance',
+                'hydration_liters': 3.6,
+                'macros': {'protein_grams': 120, 'carb_grams': 290, 'fat_grams': 60, 'protein_pct': 20, 'carb_pct': 55, 'fat_pct': 25}
+            },
+            'exercise': {
+                'title': 'Tactical Regimen',
+                'exercises': [{'exercise': '5km Interval Run', 'sets': 4, 'reps': '500m', 'duration': '30m', 'frequency': '3 days'}]
+            }
+        }
+        mock_prog = {
+            'milestones': [
+                {'period': 'Current', 'weight_kg': 73.0, 'bmi': 23.84, 'fitness_score': 82.5},
+                {'period': '30 Days', 'weight_kg': 72.0, 'bmi': 23.51, 'fitness_score': 86.0}
+            ]
+        }
+
+        # Test Hindi compilation
+        pdf_hi = generate_fitness_pdf_report(mock_soldier, mock_pred, mock_rec, mock_prog, lang='hi')
+        self.assertIsNotNone(pdf_hi)
+        self.assertTrue(pdf_hi.getvalue().startswith(b'%PDF'))
+
+        # Test French compilation
+        pdf_fr = generate_fitness_pdf_report(mock_soldier, mock_pred, mock_rec, mock_prog, lang='fr')
+        self.assertIsNotNone(pdf_fr)
+        self.assertTrue(pdf_fr.getvalue().startswith(b'%PDF'))
+
 
 if __name__ == '__main__':
     unittest.main()

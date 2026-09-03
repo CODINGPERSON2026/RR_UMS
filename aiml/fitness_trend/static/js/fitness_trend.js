@@ -9,6 +9,7 @@ class FitnessTrendApp {
     this.currentData = null;
     this.activeStage = 'profile';
     this.currentGoal = 'Overall Fitness';
+    this.currentLang = 'en';
     this.charts = {};
     
     this.initElements();
@@ -22,6 +23,7 @@ class FitnessTrendApp {
     this.clearBtn = document.getElementById('clearSearchBtn');
     this.pdfBtn = document.getElementById('downloadPdfBtn');
     this.goalSelect = document.getElementById('fitnessGoalSelect');
+    this.langSelect = document.getElementById('fitnessLangSelect');
     this.stageNav = document.getElementById('workflowStageNav');
     this.activeSearchIndex = -1;
     
@@ -129,6 +131,16 @@ class FitnessTrendApp {
       });
     }
 
+    // Language change
+    if (this.langSelect) {
+      this.langSelect.addEventListener('change', (e) => {
+        this.currentLang = e.target.value;
+        if (this.currentArmyNumber) {
+          this.loadAnalysis(this.currentArmyNumber, this.currentGoal);
+        }
+      });
+    }
+
     // Workflow tabs
     if (this.stageNav) {
       this.stageNav.querySelectorAll('.workflow-tab-btn').forEach(btn => {
@@ -143,9 +155,25 @@ class FitnessTrendApp {
     const pdfBtn = document.getElementById('downloadPdfBtn');
     if (pdfBtn) {
       pdfBtn.addEventListener('click', () => {
-        if (this.currentArmyNumber) {
-          window.open(`/fitness/report/pdf/${encodeURIComponent(this.currentArmyNumber)}?goal=${encodeURIComponent(this.currentGoal)}`, '_blank');
-        }
+        if (!this.currentArmyNumber) return;
+
+        const originalHtml = pdfBtn.innerHTML;
+        pdfBtn.disabled = true;
+        pdfBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Exporting...`;
+
+        const lang = this.currentLang || (this.langSelect ? this.langSelect.value : 'en');
+        const pdfUrl = `/fitness/report/pdf/${encodeURIComponent(this.currentArmyNumber)}?goal=${encodeURIComponent(this.currentGoal)}&lang=${encodeURIComponent(lang)}`;
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.setAttribute('download', '');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(() => {
+          pdfBtn.disabled = false;
+          pdfBtn.innerHTML = originalHtml;
+        }, 2500);
       });
     }
 
@@ -279,7 +307,11 @@ class FitnessTrendApp {
       const res = await fetch('/fitness/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ army_number: armyNumber, goal: goal })
+        body: JSON.stringify({
+          army_number: armyNumber,
+          goal: goal,
+          lang: this.currentLang || 'en'
+        })
       });
 
       const json = await res.json();
@@ -343,7 +375,7 @@ class FitnessTrendApp {
   renderAllStages(data) {
     this.renderProfileCard(data.soldier);
     this.renderAnalysisCard(data.soldier);
-    this.renderPredictionCard(data.soldier, data.prediction);
+    this.renderPredictionCard(data.soldier, data.prediction, data.recommendations);
     this.renderRecommendationsCard(data.soldier, data.recommendations);
     this.renderProgressionCard(data.progression);
     this.renderReportPreview(data);
@@ -482,7 +514,7 @@ class FitnessTrendApp {
     }
   }
 
-  renderPredictionCard(s, pred) {
+  renderPredictionCard(s, pred, rec) {
     const scoreVal = pred.fitness_score || 70;
     document.getElementById('predScoreNumber').textContent = scoreVal;
     
@@ -518,6 +550,25 @@ class FitnessTrendApp {
         <span>${imp}</span>
       </li>
     `).join('');
+
+    // Targeted Nutritional Metrics in Prediction Results View
+    if (rec && rec.diet) {
+      const diet = rec.diet;
+      const targetCalsEl = document.getElementById('predTargetCals');
+      if (targetCalsEl) targetCalsEl.textContent = `${diet.target_calories} kcal / Day`;
+
+      const carbEl = document.getElementById('predCarbGrams');
+      if (carbEl && diet.macros) carbEl.textContent = `${diet.macros.carb_grams}g (${diet.macros.carb_pct}%)`;
+
+      const fatEl = document.getElementById('predFatGrams');
+      if (fatEl && diet.macros) fatEl.textContent = `${diet.macros.fat_grams}g (${diet.macros.fat_pct}%)`;
+
+      const proteinEl = document.getElementById('predProteinGrams');
+      if (proteinEl && diet.macros) proteinEl.textContent = `${diet.macros.protein_grams}g (${diet.macros.protein_pct}%)`;
+
+      const hydEl = document.getElementById('predHydration');
+      if (hydEl) hydEl.textContent = `${diet.hydration_liters} L / Day`;
+    }
   }
 
   renderRecommendationsCard(s, rec) {
@@ -734,16 +785,38 @@ class FitnessTrendApp {
           </div>
         </div>
 
-        <hr class="my-2">
-        <h6 class="fw-bold text-primary mb-2"><i class="fas fa-utensils me-1"></i> Personalized Nutrition (${rec.diet.target_calories} kcal / Day):</h6>
-        <p class="small text-muted mb-2">${rec.diet.strategy}</p>
-
-        <h6 class="fw-bold text-primary mb-2 mt-3"><i class="fas fa-running me-1"></i> Tactical Physical Training Regimen:</h6>
-        <p class="small text-muted mb-2">${rec.exercise.title} &mdash; ${rec.exercise.focus_area}</p>
-        
-        <div class="alert alert-secondary py-2 small mb-0 mt-3 text-center">
-          <i class="fas fa-shield-alt me-1"></i> Endorsement: Subject to periodic medical inspection and unit officer physical authorization.
+        <hr class="my-3">
+        <h6 class="fw-bold text-primary mb-2"><i class="fas fa-utensils me-1"></i> 4. Personalized Dietary &amp; Macronutrient Plan (${rec.diet.target_calories} kcal / Day):</h6>
+        <div class="row g-2 mb-2 text-center">
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">COMPLEX CARBS</small>
+              <strong class="text-success" style="color: #10b981 !important; font-size: 0.95rem;">${rec.diet.macros.carb_grams}g (${rec.diet.macros.carb_pct}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">HEALTHY FATS</small>
+              <strong class="text-warning" style="color: #f59e0b !important; font-size: 0.95rem;">${rec.diet.macros.fat_grams}g (${rec.diet.macros.fat_pct}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">DAILY PROTEIN</small>
+              <strong class="text-primary" style="color: #3b82f6 !important; font-size: 0.95rem;">${rec.diet.macros.protein_grams}g (${rec.diet.macros.protein_pct}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">HYDRATION</small>
+              <strong class="text-info" style="color: #06b6d4 !important; font-size: 0.95rem;">${rec.diet.hydration_liters} L / Day</strong>
+            </div>
+          </div>
         </div>
+        <p class="small text-muted mb-3">${rec.diet.strategy}</p>
+
+        <h6 class="fw-bold text-primary mb-2 mt-2"><i class="fas fa-running me-1"></i> 5. Physical Training:</h6>
+        <p class="small text-muted mb-2">${rec.exercise.title} &mdash; ${rec.exercise.focus_area}</p>
       </div>
     `;
   }
