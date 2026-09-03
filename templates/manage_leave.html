@@ -722,24 +722,47 @@
     // Fetch history
     try {
       const res  = await fetch(`/apply_leave/leave_history/${armyNumber}`);
-      const rows = await res.json();
+      const json = await res.json();
 
       document.getElementById('histLoading').classList.add('d-none');
 
-      if (!Array.isArray(rows)) throw new Error('Unexpected response format.');
+      let yearlyRows = [];
+      let detailedRows = [];
+
+      if (Array.isArray(json)) {
+        yearlyRows = json;
+      } else if (json && (json.success !== false)) {
+        yearlyRows = json.yearly_summary || [];
+        detailedRows = json.detailed_history || [];
+      } else {
+        throw new Error(json.error || 'Failed to load leave history.');
+      }
 
       // ── Current year aggregation ──
       const currentYear = new Date().getFullYear().toString();
       let totals = { AL: 0, CL: 0, AAL: 0, PL: 0 };
 
-      rows.forEach(r => {
-        if (r.year === currentYear) {
-          totals.AL  += parseInt(r.AL  || 0);
-          totals.CL  += parseInt(r.CL  || 0);
-          totals.AAL += parseInt(r.AAL || 0);
-          totals.PL  += parseInt(r.PL  || 0);
-        }
-      });
+      if (yearlyRows.length > 0) {
+        yearlyRows.forEach(r => {
+          if (String(r.year) === currentYear) {
+            totals.AL  += parseInt(r.AL  || r.Annual_Leave || 0);
+            totals.CL  += parseInt(r.CL  || 0);
+            totals.AAL += parseInt(r.AAL || 0);
+            totals.PL  += parseInt(r.PL  || 0);
+          }
+        });
+      } else if (detailedRows.length > 0) {
+        detailedRows.forEach(r => {
+          if (String(r.year) === currentYear) {
+            const type = (r.leave_type || '').toUpperCase();
+            const days = parseInt(r.days_taken || 0);
+            if (type === 'AL' || type === 'ANNUAL LEAVE') totals.AL += days;
+            else if (type === 'CL' || type === 'CASUAL LEAVE') totals.CL += days;
+            else if (type === 'AAL') totals.AAL += days;
+            else if (type === 'PL') totals.PL += days;
+          }
+        });
+      }
 
       // Build summary cards
       const grid = document.getElementById('histSummaryGrid');
@@ -758,19 +781,31 @@
 
       // Build table rows
       const tbody = document.getElementById('histTableBody');
-      if (rows.length === 0) {
+      if (yearlyRows.length === 0 && detailedRows.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-3">No records found.</td></tr>`;
-      } else {
-        tbody.innerHTML = rows.map(r => `
+      } else if (yearlyRows.length > 0) {
+        tbody.innerHTML = yearlyRows.map(r => `
           <tr>
             <td><span class="year-badge">${r.year || '—'}</span></td>
-            <td>${r.AL  ?? '—'}</td>
+            <td>${r.AL  ?? r.Annual_Leave ?? '—'}</td>
             <td>${r.CL  ?? '—'}</td>
             <td>${r.AAL ?? '—'}</td>
             <td>${r.PL  ?? '—'}</td>
-            <td>${formatDate(r.leave_start_date)}</td>
-            <td>${formatDate(r.leave_end_date)}</td>
-            <td>${r.remarks || '—'}</td>
+            <td>${formatDate(r.leave_start_date || r.from_date)}</td>
+            <td>${formatDate(r.leave_end_date || r.to_date)}</td>
+            <td>${r.remarks || r.leave_reason || '—'}</td>
+          </tr>`).join('');
+      } else {
+        tbody.innerHTML = detailedRows.map(r => `
+          <tr>
+            <td><span class="year-badge">${r.year || '—'}</span></td>
+            <td>${(r.leave_type === 'AL' || r.leave_type === 'Annual Leave') ? r.days_taken + 'd' : '—'}</td>
+            <td>${r.leave_type === 'CL' ? r.days_taken + 'd' : '—'}</td>
+            <td>${r.leave_type === 'AAL' ? r.days_taken + 'd' : '—'}</td>
+            <td>${r.leave_type === 'PL' ? r.days_taken + 'd' : '—'}</td>
+            <td>${formatDate(r.from_date)}</td>
+            <td>${formatDate(r.to_date)}</td>
+            <td>${r.leave_reason || r.leave_type || '—'}</td>
           </tr>`).join('');
       }
 
@@ -876,7 +911,12 @@
         if (toDateCell) toDateCell.textContent = formatDate(json.new_to_date);
         if (daysCell)   daysCell.textContent   = `${json.leave_days} days`;
 
-        showAlert(`Leave extended successfully (${leaveType}). New duration: ${json.leave_days} days.`, 'success');
+        // Auto download specific Leave Extension Certificate
+        if (json.download_url) {
+          window.open(json.download_url, '_blank');
+        }
+
+        showAlert(`Leave extended successfully (${leaveType}). Extension certificate downloading...`, 'success');
       } else {
         errBox.textContent = json.message || 'Failed to extend leave.';
         errBox.classList.remove('d-none');

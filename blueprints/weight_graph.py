@@ -74,7 +74,7 @@ def get_graph_personnel():
             actual_weight = r.get('actual_weight')
 
             ideal_weight = comp.get('ideal_weight') or get_ideal_weight(age, height_cm, cursor)
-            status = comp.get('status') or ("Fit" if (ideal_weight and ideal_weight * 0.8 <= actual_weight <= ideal_weight * 1.2) else "UnFit")
+            status = comp.get('status') or ("Fit" if (ideal_weight and ideal_weight * 0.88 <= actual_weight <= ideal_weight * 1.12) else "UnFit")
             weight_dev_kg = comp.get('weight_deviation_kg', 0)
             weight_dev_pct = comp.get('weight_deviation_percent', 0)
 

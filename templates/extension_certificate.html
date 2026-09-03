@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 0.8cm 1.2cm 0.8cm 1.2cm;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Times New Roman", serif;
+            font-size: 11pt;
+            line-height: 1.35;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            position: relative;
+        }
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+        .header-table td {
+            text-align: center;
+            vertical-align: middle;
+            padding-bottom: 10px;
+        }
+        h2 {
+            margin: 0;
+            font-size: 18pt;
+            font-weight: bold;
+            text-decoration: underline;
+            letter-spacing: 1.5px;
+            color: #1a365d;
+        }
+        .sub-header {
+            font-size: 12pt;
+            margin-top: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .info-header {
+            margin: 8px 0;
+            font-size: 10.5pt;
+        }
+        .cert-body {
+            margin-top: 12px;
+            text-align: justify;
+            font-size: 11pt;
+            line-height: 1.45;
+        }
+        .cert-body strong {
+            font-weight: bold;
+        }
+        .extension-badge-box {
+            margin: 12px 0;
+            padding: 10px 14px;
+            background: #eef2ff;
+            border: 1px solid #6366f1;
+            border-left: 5px solid #4f46e5;
+            font-size: 10.5pt;
+        }
+        .details-table td {
+            padding: 4px 5px;
+            vertical-align: top;
+        }
+        .label {
+            font-weight: bold;
+            width: 170px;
+        }
+        .report-line {
+            margin: 12px 0;
+            padding: 8px 12px;
+            background: #fdf4f4;
+            border-left: 4px solid #c00;
+            font-weight: bold;
+            font-size: 10.5pt;
+        }
+        .signature-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .seal-box {
+            border: 3px solid #c00;
+            color: #c00;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 9.5pt;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        .digital-sig {
+            border: 2px solid #c00;
+            background: #fff9f9;
+            padding: 6px 10px;
+            font-size: 9pt;
+            text-align: center;
+            border-radius: 3px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 6px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <table class="header-table" style="width: 100%;">
+            <tr>
+                <td width="20%" align="left" valign="middle">
+                    <img src="{{ chinar_logo_path }}" width="80" height="80" style="border-radius:50%">
+                </td>
+                <td width="60%" align="center" valign="middle">
+                    <h2>LEAVE EXTENSION CERTIFICATE</h2>
+                    <div class="sub-header">15 CORPS ENGG SIG REGT</div>
+                </td>
+                <td width="20%" align="right" valign="middle">
+                    <img src="{{ rt_logo_path }}" width="90" height="90">
+                </td>
+            </tr>
+        </table>
+
+        <!-- Info Header -->
+        <table class="info-header">
+            <tr>
+                <td align="left"><strong>Extension Cert No:</strong> EXT-{{ leave.leave_id }}-{{ issue_date.strftime('%Y%m%d') }}</td>
+                <td align="right"><strong>DATE:</strong> {{ issue_date.strftime('%d %b %Y') }}</td>
+            </tr>
+        </table>
+
+        <!-- Main Body -->
+        <div class="cert-body">
+            <strong>It is CERTIFIED</strong> that Army No <strong>{{ applicant.army_number }}</strong> 
+            Rank <strong>{{ applicant.rank }}</strong> 
+            Name <strong>{{ applicant.name }}</strong> 
+            Trade <strong>{{ applicant.trade or '—' }}</strong> 
+            (I-Card No: <strong>{{ applicant.i_card_no or 'N/A' }}</strong>) of 
+            <strong>{{ applicant.company_name or applicant.company }}, {{ applicant.section_name or 'HQ' }}</strong> Section,
+            who was previously granted leave from <strong>{{ leave.orig_start_date.strftime('%d-%m-%Y') }}</strong> to <strong>{{ leave.orig_end_date.strftime('%d-%m-%Y') }}</strong>,
+            is hereby granted an <strong>EXTENSION OF LEAVE</strong> under <strong>{{ leave.leave_type }}</strong>.
+        </div>
+
+        <div class="extension-badge-box">
+            <strong>EXTENSION DETAILS:</strong><br>
+            • Extended Duration: <strong>{{ leave.extended_days }} day(s)</strong><br>
+            • Extension Period: w.e.f. <strong>{{ leave.ext_start_date.strftime('%d-%m-%Y') }}</strong> to <strong>{{ leave.ext_end_date.strftime('%d-%m-%Y') }}</strong><br>
+            • Revised Total Absence: <strong>{{ leave.revised_total_days }} day(s)</strong> (w.e.f. {{ leave.orig_start_date.strftime('%d-%m-%Y') }} to {{ leave.ext_end_date.strftime('%d-%m-%Y') }})
+        </div>
+
+        <!-- Personal Details -->
+        <table class="details-table" style="margin-top: 10px;">
+            <tr>
+                <td class="label">Unit Contact:</td>
+                <td>{{ applicant.contact or 'N/A' }}</td>
+                <td class="label">Leave Contact:</td>
+                <td>{{ applicant.mobile_number or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Address During Leave:</td>
+                <td colspan="3">
+                    {{ applicant.home_village or '' }} {{ applicant.home_po or '' }} {{ applicant.home_ps or '' }} {{ applicant.home_district or '' }} {{ applicant.home_state or '' }}
+                </td>
+            </tr>
+        </table>
+
+        <!-- Reporting Instruction -->
+        <div class="report-line">
+            ⚡ DIRECTIVE: The individual is directed to report back to the unit by 
+            <strong>{{ leave.reporting_date.strftime('%d-%m-%Y') }}</strong> (1800 hrs) on expiry of extended leave.
+        </div>
+
+        <!-- Signature Section -->
+        <table class="signature-table">
+            <tr>
+                <td width="33%" style="vertical-align: bottom;">
+                    <br><br>
+                    ________________________<br>
+                    <strong>Signature of Applicant</strong><br>
+                    <span style="font-size:9pt;">(with date)</span>
+                </td>
+                <td width="34%" align="center" style="vertical-align: bottom;">
+                    <div class="seal-box">
+                        UNIT<br>SEAL
+                    </div>
+                </td>
+                <td width="33%" style="vertical-align: bottom;">
+                    <div class="digital-sig">
+                        Officer Commanding <br>
+                        <strong>Date:</strong> {{ issue_date.strftime('%d-%m-%Y') }}
+                    </div>
+                    <strong>Approving Authority</strong><br>
+                    (Signature, Rank & Date)
+                </td>
+            </tr>
+        </table>
+
+        <!-- Footer -->
+        <div class="footer">
+            15 CORPS ENGG SIG REGT • Subedar Major: 9431780109 • Adjt: 8377835539 • Extension Certificate Generated from IP: {{ client_ip or '127.0.0.1' }}
+        </div>
+    </div>
+</body>
+</html>
