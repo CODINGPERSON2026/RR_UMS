@@ -127,7 +127,7 @@ class TestMultilingualPDFExport(unittest.TestCase):
             pdf_stream = generate_multilingual_fitness_pdf(
                 self.soldier, self.prediction, self.recommendations, self.progression,
                 client_ip="192.168.1.50",
-                watermark_text="15 CESR REGM",
+                watermark_text="UMS 15 CESR",
                 language=lang_code
             )
             self.assertIsNotNone(pdf_stream, f"Failed for language: {lang_code}")

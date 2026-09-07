@@ -35,7 +35,7 @@ def generate_multilingual_fitness_pdf(
     recommendations,
     progression_data,
     client_ip="127.0.0.1",
-    watermark_text="15 CESR REGM",
+    watermark_text="UMS 15 CESR",
     language="en"
 ):
     """

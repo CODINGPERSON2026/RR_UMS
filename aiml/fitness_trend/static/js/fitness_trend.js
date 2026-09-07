@@ -34,6 +34,11 @@ class FitnessTrendApp {
     this.latestPdfBlob = null;
     this.latestPdfFilename = null;
     
+    // Total Count Badge Elements
+    this.totalPersonnelCount = document.getElementById('totalPersonnelCount');
+    this.searchCardTotalCount = document.getElementById('searchCardTotalCount');
+    this.welcomeTotalCount = document.getElementById('welcomeTotalCount');
+
     // Ensure export & preview buttons are disabled initially
     if (this.pdfBtn) this.pdfBtn.disabled = true;
     if (this.previewBtn) this.previewBtn.disabled = true;
@@ -72,11 +77,8 @@ class FitnessTrendApp {
     });
 
     this.searchInput.addEventListener('focus', () => {
-      if (this.searchResults.children.length > 0) {
-        this.searchResults.classList.remove('d-none');
-      } else {
-        this.performSearch(this.searchInput.value.trim(), true);
-      }
+      const currentVal = this.searchInput.value.trim();
+      this.performSearch(currentVal, true);
     });
 
     // Keyboard navigation in search results
@@ -110,7 +112,8 @@ class FitnessTrendApp {
         e.stopPropagation();
         this.searchInput.value = '';
         this.clearBtn.classList.add('d-none');
-        this.searchResults.classList.add('d-none');
+        this.searchResults.innerHTML = '';
+        this.performSearch('', true);
         this.currentArmyNumber = null;
         this.currentData = null;
         if (this.pdfBtn) this.pdfBtn.disabled = true;
@@ -298,12 +301,18 @@ class FitnessTrendApp {
         }
       });
     }
-
     // Retrain modal trigger
     const retrainBtn = document.getElementById('triggerRetrainBtn');
     if (retrainBtn) {
       retrainBtn.addEventListener('click', () => this.triggerModelRetrain());
     }
+  }
+
+  updateTotalCounts(count) {
+    const formatted = count !== null && count !== undefined ? count : '--';
+    if (this.totalPersonnelCount) this.totalPersonnelCount.textContent = formatted;
+    if (this.searchCardTotalCount) this.searchCardTotalCount.textContent = formatted;
+    if (this.welcomeTotalCount) this.welcomeTotalCount.textContent = formatted;
   }
 
   updateActiveSearchItem(items) {
@@ -318,11 +327,17 @@ class FitnessTrendApp {
   }
 
   async performSearch(query = '', showDropdown = false) {
+    this.latestSearchQuery = query;
     try {
       const res = await fetch(`/fitness/api/personnel-list?q=${encodeURIComponent(query)}&limit=15`);
       const json = await res.json();
+      if (this.latestSearchQuery !== query) return;
+
       if (json.success) {
-        this.renderSearchResults(json.data, showDropdown);
+        if (json.total_count !== undefined) {
+          this.updateTotalCounts(json.total_count);
+        }
+        this.renderSearchResults(json.data, showDropdown, json.total_count);
       }
     } catch (e) {
       console.error("Search error:", e);
@@ -344,6 +359,39 @@ class FitnessTrendApp {
     }
   }
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  highlightMatch(text, query) {
+    if (!text) return '';
+    const textStr = String(text);
+    const currentInputValue = (this.searchInput ? this.searchInput.value : '').trim();
+    const effectiveQuery = (query || currentInputValue || '').trim();
+
+    if (!effectiveQuery) return this.escapeHtml(textStr);
+    
+    const q = effectiveQuery;
+    const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    
+    const parts = textStr.split(regex);
+    if (parts.length <= 1) return this.escapeHtml(textStr);
+
+    return parts.map(part => {
+      if (part.toLowerCase() === q.toLowerCase()) {
+        return `<span class="search-highlight">${this.escapeHtml(part)}</span>`;
+      }
+      return this.escapeHtml(part);
+    }).join('');
+  }
+
   getInitials(name) {
     if (!name) return 'SO';
     const parts = name.trim().split(/\s+/);
@@ -351,14 +399,16 @@ class FitnessTrendApp {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  renderSearchResults(soldiers, showDropdown = true) {
+  renderSearchResults(soldiers, showDropdown = true, totalCount = null) {
     this.searchResults.innerHTML = '';
     this.activeSearchIndex = -1;
 
+    const currentQuery = (this.searchInput ? this.searchInput.value : '').trim();
+
     if (!soldiers || soldiers.length === 0) {
       this.searchResults.innerHTML = `
-        <div class="p-3 text-muted text-center small">
-          <i class="fas fa-search me-1"></i> No personnel found matching query.
+        <div class="p-3 text-muted text-center small font-monospace">
+          <i class="fas fa-search text-warning me-1"></i> No personnel found matching query "${this.escapeHtml(currentQuery)}".
         </div>
       `;
       if (showDropdown && document.activeElement === this.searchInput) {
@@ -375,25 +425,30 @@ class FitnessTrendApp {
       const statusText = s.status_type === 'category' ? 'LMC' : 'SHAPE-1';
       const initials = this.getInitials(s.name);
 
+      const highlightedName = this.highlightMatch(s.name, currentQuery);
+      const highlightedArmyNo = this.highlightMatch(s.army_number, currentQuery);
+      const highlightedCompany = this.highlightMatch(s.company || 'Unit HQ', currentQuery);
+      const highlightedRank = this.highlightMatch(s.rank || 'Soldier', currentQuery);
+
       item.innerHTML = `
-        <div class="d-flex align-items-center gap-3">
-          <div class="search-soldier-avatar">${initials}</div>
-          <div>
-            <div class="fw-bold" style="color: var(--fit-text-main); font-size: 0.95rem;">
-              ${s.name} <span class="badge bg-secondary ms-1 fw-normal" style="font-size: 0.72rem;">${s.rank || 'Soldier'}</span>
+        <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+          <div class="search-soldier-avatar flex-shrink-0">${initials}</div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-bold text-truncate" style="color: var(--fit-text-main); font-size: 0.95rem; line-height: 1.3;">
+              ${highlightedName} <span class="badge bg-secondary text-white ms-1 fw-semibold" style="font-size: 0.72rem; vertical-align: middle;">${highlightedRank}</span>
             </div>
-            <div class="small text-muted d-flex align-items-center gap-2 mt-1">
-              <span class="search-soldier-army-no">${s.army_number}</span>
-              <span>&bull;</span>
-              <span>${s.company || 'Unit HQ'}</span>
-              <span>&bull;</span>
-              <span>${s.trade || 'GD'}</span>
+            <div class="small text-muted d-flex align-items-center flex-wrap gap-2 mt-1" style="font-size: 0.82rem; line-height: 1.4;">
+              <span class="search-soldier-army-no">${highlightedArmyNo}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-medium text-secondary">${highlightedCompany}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-medium text-secondary">${s.trade || 'GD'}</span>
             </div>
           </div>
         </div>
-        <div class="text-end">
-          <span class="badge ${badgeClass} text-uppercase mb-1" style="font-size: 0.72rem;">${statusText}</span>
-          <div class="small text-muted fw-bold">${s.weight ? s.weight + ' kg' : 'Wt: --'}</div>
+        <div class="text-end flex-shrink-0 ms-2">
+          <span class="badge ${badgeClass} text-uppercase px-2 py-1 shadow-sm" style="font-size: 0.72rem; letter-spacing: 0.5px;">${statusText}</span>
+          <div class="small text-muted fw-bold mt-1" style="font-size: 0.8rem;">${s.weight ? s.weight + ' kg' : 'Wt: --'}</div>
         </div>
       `;
 
@@ -408,6 +463,17 @@ class FitnessTrendApp {
 
       this.searchResults.appendChild(item);
     });
+
+    if (totalCount !== null && totalCount !== undefined) {
+      const footer = document.createElement('div');
+      footer.className = 'p-2 px-3 bg-light border-top text-muted small d-flex justify-content-between align-items-center font-monospace';
+      footer.style.fontSize = '0.78rem';
+      footer.innerHTML = `
+        <span><i class="fas fa-list me-1 text-primary"></i> Showing ${soldiers.length}</span>
+        <span><i class="fas fa-database me-1 text-primary"></i> Total Weight Info: <strong>${totalCount}</strong></span>
+      `;
+      this.searchResults.appendChild(footer);
+    }
 
     if (showDropdown && document.activeElement === this.searchInput) {
       this.searchResults.classList.remove('d-none');
@@ -518,7 +584,18 @@ class FitnessTrendApp {
     document.getElementById('profHeight').textContent = s.height_cm ? `${s.height_cm} cm` : 'N/A';
     document.getElementById('profActualWeight').textContent = s.actual_weight_kg ? `${s.actual_weight_kg} kg` : 'N/A';
     document.getElementById('profIdealWeight').textContent = s.ideal_weight_kg ? `${s.ideal_weight_kg} kg` : 'N/A';
-    document.getElementById('profWeightDiff').textContent = s.weight_difference_kg !== null ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg` : 'N/A';
+    
+    const diffKg = s.weight_difference_kg !== null && s.weight_difference_kg !== undefined
+      ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg`
+      : '';
+
+    const profStatusEl = document.getElementById('profWeightStatus');
+    if (profStatusEl) profStatusEl.textContent = s.weight_status || 'N/A';
+
+    const profSubEl = document.getElementById('profWeightSub');
+    if (profSubEl) {
+      profSubEl.textContent = diffKg ? `${diffKg} Variance vs Standard (Authorization Benchmark)` : 'Authorization Benchmark';
+    }
     
     // BPET & PPT Badges
     const bpetEl = document.getElementById('profBpetBadge');
@@ -561,9 +638,16 @@ class FitnessTrendApp {
     document.getElementById('anaBmiCat').style.color = s.bmi_color || '#3b82f6';
     
     document.getElementById('anaWeightStatus').textContent = s.weight_status || 'N/A';
-    document.getElementById('anaWeightDev').textContent = s.weight_deviation_percent !== null ? `${s.weight_deviation_percent > 0 ? '+' : ''}${s.weight_deviation_percent}%` : 'N/A';
-    document.getElementById('anaWeightDiffKg').textContent = s.weight_difference_kg !== null ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg` : 'N/A';
     
+    const diffKg = s.weight_difference_kg !== null && s.weight_difference_kg !== undefined
+      ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg`
+      : '';
+
+    const anaSubEl = document.getElementById('anaWeightSub');
+    if (anaSubEl) {
+      anaSubEl.textContent = diffKg ? `${diffKg} Variance vs Standard (Authorization Benchmark)` : 'Authorization Benchmark';
+    }
+
     document.getElementById('anaCombinedPhysical').textContent = `${s.ground_truth_score || 70} / 100`;
     document.getElementById('anaActivityLevel').textContent = s.physical_activity_level || 'Moderate';
   }

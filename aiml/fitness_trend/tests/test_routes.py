@@ -50,6 +50,8 @@ class TestFitnessRoutes(unittest.TestCase):
         json_data = json.loads(response.data)
         self.assertTrue(json_data.get('success'))
         self.assertIsInstance(json_data.get('data'), list)
+        self.assertIn('total_count', json_data)
+        self.assertIsInstance(json_data.get('total_count'), int)
 
     def test_api_model_info(self):
         self.client.set_cookie('token', self.token)

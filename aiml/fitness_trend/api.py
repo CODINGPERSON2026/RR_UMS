@@ -7,7 +7,8 @@ import logging
 from .data.db_loader import (
     fetch_single_personnel_data,
     fetch_personnel_list_for_search,
-    fetch_all_personnel_fitness_data
+    fetch_all_personnel_fitness_data,
+    fetch_total_weight_info_count
 )
 from .features.feature_engineering import generate_features_for_soldier
 from .prediction.predictor import predict_soldier_fitness, get_model_info
@@ -21,7 +22,7 @@ logger = logging.getLogger("fitness_trend.api")
 def analyze_personnel_fitness(army_number, goal="Overall Fitness"):
     """
     Executes complete end-to-end fitness evaluation for a soldier:
-    1. Fetches DB data across 4 tables.
+    1. Fetches DB data across tables.
     2. Cleans & validates data (source priority rules).
     3. Engineers feature vector (BMI, Ideal Weight, Sports, Medical).
     4. Runs AI Prediction (Score, Category, Confidence, Factors).
@@ -41,7 +42,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness"):
     if not data_dict or not data_dict.get('personnel'):
         return {
             'success': False,
-            'error': f'Personnel record with Army Number "{army_number}" was not found in the database.'
+            'error': f'Personnel record with Army Number "{army_number}" was not found in weight_info table.'
         }
         
     p_row = data_dict['personnel']
@@ -79,6 +80,7 @@ def search_personnel_records(query_str="", limit=50):
     Returns search results for personnel selection.
     """
     rows = fetch_personnel_list_for_search(query_str, limit)
+    total_count = fetch_total_weight_info_count()
     results = []
     for r in rows:
         results.append({
@@ -92,7 +94,12 @@ def search_personnel_records(query_str="", limit=50):
             'height': r.get('height'),
             'age': r.get('age')
         })
-    return {'success': True, 'count': len(results), 'data': results}
+    return {
+        'success': True,
+        'count': len(results),
+        'total_count': total_count,
+        'data': results
+    }
 
 
 def trigger_retraining(version=None):

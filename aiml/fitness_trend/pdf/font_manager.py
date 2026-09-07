@@ -124,7 +124,7 @@ class FontManager:
         """
         self.register_unicode_fonts()
         if not lang_code or lang_code == "en":
-            return "Helvetica, Arial, sans-serif"
+            return "Arial, Helvetica, sans-serif"
 
         # Non-English languages require Unicode font
         return "arialunicode, nirmala, Arial, sans-serif"

@@ -60,12 +60,16 @@ def fitness_dashboard_view():
     current_user_name = user_payload.get('name') or user_payload.get('username') or 'Personnel'
     company = user_payload.get('company', 'Unit HQ')
     
+    from .data.db_loader import fetch_total_weight_info_count
+    total_count = fetch_total_weight_info_count()
+
     return render_template(
         "fitness_trend/index.html",
         role=role,
         current_user_name=current_user_name,
         company=company,
-        header="15 CESR UMS"
+        header="15 CESR UMS",
+        total_count=total_count
     )
 
 
@@ -297,7 +301,7 @@ def export_fitness_pdf_api():
             recommendations=result['recommendations'],
             progression_data=result['progression'],
             client_ip=client_ip,
-            watermark_text="15 CESR REGM",
+            watermark_text="UMS 15 CESR",
             language=language
         )
     except Exception as e:
@@ -353,7 +357,7 @@ def download_fitness_pdf(army_number):
         recommendations=result['recommendations'],
         progression_data=result['progression'],
         client_ip=client_ip,
-        watermark_text="15 CESR REGM",
+        watermark_text="UMS 15 CESR",
         language=lang
     )
     

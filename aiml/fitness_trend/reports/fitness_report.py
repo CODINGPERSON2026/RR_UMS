@@ -564,9 +564,10 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
     return rendered_html
 
 
-def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_text="15 CESR REGM"):
+def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_text="UMS 15 CESR"):
     """
-    Overlays a subtle, military diagonal watermark on each page of the generated PDF using ReportLab and pypdf.
+    Overlays a clear, single diagonal military watermark on top of each page of the generated PDF using ReportLab and pypdf.
+    Includes Unit Name, IP Address, and Date & Time stamp centered on each page.
     """
     try:
         from reportlab.pdfgen import canvas
@@ -581,39 +582,43 @@ def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_t
         # A4 size in points: 595.27 x 841.89
         c = canvas.Canvas(wm_buffer, pagesize=(595.27, 841.89))
         
-        # Position origin at center of the page and rotate 38 degrees
+        # Position origin at center of the page and rotate 35 degrees
         cx, cy = 595.27 / 2.0, 841.89 / 2.0
         c.translate(cx, cy)
-        c.rotate(38)
+        c.rotate(35)
         
-        # Soft grey color with subtle transparency
-        c.setFillColor(colors.Color(0.68, 0.70, 0.75))
+        # Slate color with clean background visibility (0.22 opacity)
+        c.setFillColor(colors.HexColor('#475569'))
         try:
             c.setFillAlpha(0.22)
         except Exception:
             pass
-            
-        c.setFont("Helvetica-Bold", 36)
-        c.drawCentredString(0, 40, watermark_text)
+
+        dt_str = datetime.now().strftime('%d/%m/%Y %I:%M %p')
         
-        c.setFont("Helvetica-Bold", 24)
-        c.drawCentredString(0, 5, f"IP: {client_ip}")
+        # Exactly ONE centered diagonal watermark block per page with increased font size and lighter opacity
+        c.setFont("Helvetica-Bold", 60)
+        c.drawCentredString(0, 55, watermark_text)
         
-        c.setFont("Helvetica", 13)
-        c.drawCentredString(0, -25, datetime.now().strftime('%d/%m/%Y %I:%M %p'))
+        c.setFont("Helvetica-Bold", 30)
+        c.drawCentredString(0, 5, f"IP ADDRESS: {client_ip}")
+        
+        c.setFont("Helvetica-Bold", 20)
+        c.drawCentredString(0, -35, f"DATE & TIME: {dt_str}")
         
         c.showPage()
         c.save()
         wm_buffer.seek(0)
         
-        # Merge watermark onto each page
+        # Merge watermark ON TOP of document page content (1 watermark per page)
         base_pdf_stream.seek(0)
         base_reader = PdfReader(base_pdf_stream)
-        wm_reader = PdfReader(wm_buffer)
-        wm_page = wm_reader.pages[0]
+        wm_bytes = wm_buffer.getvalue()
         
         writer = PdfWriter()
         for page in base_reader.pages:
+            wm_reader = PdfReader(io.BytesIO(wm_bytes))
+            wm_page = wm_reader.pages[0]
             new_page = writer.add_page(page)
             new_page.merge_page(wm_page)
             
@@ -627,7 +632,7 @@ def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_t
         return base_pdf_stream
 
 
-def generate_fitness_pdf_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1", watermark_text="15 CESR REGM", lang="en", language=None):
+def generate_fitness_pdf_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1", watermark_text="UMS 15 CESR", lang="en", language=None):
     """
     Generates a high-quality PDF binary stream with AI prediction, recommendations, progression,
     and an official '15 CESR REGM' with IP address watermark.
