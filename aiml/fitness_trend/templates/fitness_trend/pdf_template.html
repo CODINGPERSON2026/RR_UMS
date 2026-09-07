@@ -2,29 +2,30 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Individual Fitness Report - {{ soldier.army_number }}</title>
+<title>Individual Fitness Report - {{ report.header.army_number or soldier.army_number }}</title>
 <style>
     @page {
         size: a4 portrait;
-        margin: 1.2cm 1.2cm 1.2cm 1.2cm;
+        margin: 1.0cm 1.0cm 1.0cm 1.0cm;
     }
 
     body {
-        font-family: Helvetica, Arial, sans-serif;
+        font-family: {{ font_family or 'Helvetica, Arial, sans-serif' }};
         color: #1e293b;
-        font-size: 9.5pt;
+        font-size: 8.5pt;
         line-height: 1.35;
+        {% if is_rtl %}direction: rtl; text-align: right;{% endif %}
     }
 
     .header-table {
         width: 100%;
-        border-bottom: 2px solid #1b382b;
-        padding-bottom: 8px;
-        margin-bottom: 12px;
+        border-bottom: 2px solid #1e3a8a;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .unit-title {
-        font-size: 13.5pt;
+        font-size: 13pt;
         font-weight: bold;
         color: #1b382b;
         text-align: center;
@@ -38,7 +39,7 @@
         font-weight: bold;
         color: #2563eb;
         text-align: center;
-        margin-top: 1px;
+        margin-top: 2px;
         margin-bottom: 0;
         padding: 0;
     }
@@ -53,54 +54,84 @@
     }
 
     .section-heading {
-        font-size: 10pt;
+        font-size: 9pt;
         font-weight: bold;
         color: #1e3a8a;
         background-color: #f1f5f9;
-        padding: 4px 8px;
+        padding: 3px 6px;
+        {% if is_rtl %}
+        border-right: 4px solid #2563eb;
+        text-align: right;
+        {% else %}
         border-left: 4px solid #2563eb;
-        margin-top: 10px;
-        margin-bottom: 6px;
+        text-align: left;
+        {% endif %}
+        margin-top: 7px;
+        margin-bottom: 4px;
         text-transform: uppercase;
+        page-break-inside: avoid;
     }
 
     .data-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        page-break-inside: avoid;
     }
 
     .data-table th, .data-table td {
         border: 1px solid #cbd5e1;
-        padding: 4px 6px;
-        font-size: 8.5pt;
+        padding: 3px 5px;
+        font-size: 8pt;
+        {% if is_rtl %}text-align: right;{% endif %}
     }
 
     .data-table th {
         background-color: #f8fafc;
-        color: #475569;
+        color: #334155;
         font-weight: bold;
+        {% if is_rtl %}
+        text-align: right;
+        {% else %}
         text-align: left;
+        {% endif %}
     }
 
     .score-card {
         border: 1px solid #93c5fd;
         background-color: #eff6ff;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border-radius: 4px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
+        page-break-inside: avoid;
     }
 
     .score-val {
-        font-size: 18pt;
+        font-size: 16pt;
         font-weight: bold;
         color: #1d4ed8;
     }
 
+    .callout-box {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-left: 3px solid #64748b;
+        padding: 4px 8px;
+        font-size: 8pt;
+        color: #334155;
+        margin-bottom: 6px;
+        page-break-inside: avoid;
+        {% if is_rtl %}
+        border-left: 1px solid #e2e8f0;
+        border-right: 3px solid #64748b;
+        text-align: right;
+        {% endif %}
+    }
+
     .badge-pill {
         display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
+        padding: 1px 5px;
+        border-radius: 3px;
         font-size: 7.5pt;
         font-weight: bold;
         text-transform: uppercase;
@@ -114,88 +145,149 @@
     .badge-danger { background-color: #fee2e2; color: #991b1b; }
 
     ul {
-        margin: 2px 0 6px 14px;
+        {% if is_rtl %}
+        margin: 2px 14px 4px 0;
+        padding: 0 12px 0 0;
+        text-align: right;
+        {% else %}
+        margin: 2px 0 4px 14px;
         padding: 0;
+        {% endif %}
     }
 
     li {
         margin-bottom: 2px;
-        font-size: 8.5pt;
+        font-size: 8pt;
+        {% if is_rtl %}text-align: right;{% endif %}
     }
 
-    .sign-block {
-        margin-top: 18px;
+    .sign-table {
         width: 100%;
+        margin-top: 14px;
+        margin-bottom: 4px;
+        page-break-inside: avoid;
+    }
+
+    .sign-table td {
+        text-align: center;
+        font-size: 7.5pt;
+        color: #475569;
+        vertical-align: top;
+        padding: 0 10px;
+    }
+
+    .sign-line {
+        border-top: 1px dashed #94a3b8;
+        margin-bottom: 4px;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
     }
 </style>
 </head>
 <body>
 
-<!-- Header -->
+<!-- Section 1: Report Header / Cover -->
+{% if banner_image_path and (not lang or lang == 'en') %}
+<div style="width: 100%; text-align: center; margin-bottom: 6px;">
+    <img src="{{ banner_image_path }}" width="526" style="display: block; margin: 0 auto;">
+</div>
+{% else %}
 <table class="header-table" style="width: 100%;">
     <tr>
-        <td width="18%" align="left" valign="middle">
-            {% if chinar_logo_path %}
-            <img src="{{ chinar_logo_path }}" width="75" height="75" style="border-radius:50%">
-            {% endif %}
-        </td>
-        <td width="64%" align="center" valign="middle">
-            <div class="unit-title">15 CORPS ENGINEERING SIGNAL REGIMENT</div>
-            <div class="report-title">INDIVIDUAL FITNESS PREDICTION REPORT</div>
-            <div class="meta-sub">Report Generated: {{ generated_at }} | Model Version: {{ model_version }} | CONFIDENTIAL</div>
-        </td>
-        <td width="18%" align="right" valign="middle">
+        <td width="16%" align="left" valign="middle">
             {% if rt_logo_path %}
-            <img src="{{ rt_logo_path }}" width="85" height="85">
+            <img src="{{ rt_logo_path }}" width="68" height="68">
+            {% endif %}
+        </td>
+        <td width="68%" align="center" valign="middle">
+            <div class="unit-title">{{ labels.unit_title }}</div>
+            <div class="report-title">{{ labels.report_title }}</div>
+            <div class="meta-sub">{{ labels.report_generated }}: {{ generated_at or report.header.date }} | {{ labels.model_version }}: {{ model_version }} | {{ labels.confidential }}</div>
+        </td>
+        <td width="16%" align="right" valign="middle">
+            {% if chinar_logo_path %}
+            <img src="{{ chinar_logo_path }}" width="65" height="65" style="border-radius:50%">
             {% endif %}
         </td>
     </tr>
 </table>
+{% endif %}
 
-<!-- Section 1: Soldier Particulars -->
-<div class="section-heading">1. Soldier Particulars &amp; Service Profile</div>
+<div class="section-heading">{{ labels.sec1_title }}</div>
 <table class="data-table">
     <tr>
-        <th style="width: 20%;">Army Number:</th>
-        <td style="width: 30%;"><strong>{{ soldier.army_number }}</strong></td>
-        <th style="width: 20%;">Full Name:</th>
-        <td style="width: 30%;"><strong>{{ soldier.name }}</strong></td>
+        <th style="width: 15%;">{{ labels.army_number }}</th>
+        <td style="width: 25%;"><strong>{{ report.header.army_number or soldier.army_number }}</strong></td>
+        <th style="width: 15%;">{{ labels.full_name }}</th>
+        <td style="width: 25%;"><strong>{{ report.header.name or soldier.name }}</strong></td>
+        <th style="width: 10%;">{{ labels.confidential }}</th>
+        <td style="width: 10%; text-align: center;"><span class="badge-pill badge-primary">{{ labels.confidential }}</span></td>
     </tr>
     <tr>
-        <th>Rank / Trade:</th>
-        <td>{{ soldier.rank }} / {{ soldier.trade }}</td>
-        <th>Company / Section:</th>
-        <td>{{ soldier.company }} / {{ soldier.section or 'N/A' }}</td>
+        <th>{{ labels.rank_trade }}</th>
+        <td>{{ report.profile.rank or soldier.rank }} / {{ report.profile.trade or soldier.trade }}</td>
+        <th>{{ labels.company_section }}</th>
+        <td>{{ report.profile.company or soldier.company }} / {{ report.profile.section or soldier.section or 'N/A' }}</td>
+        <th>{{ labels.report_id }}</th>
+        <td><strong>{{ report.header.report_id or report.report_id }}</strong></td>
     </tr>
     <tr>
-        <th>Age / Service:</th>
-        <td>{{ soldier.age or 'N/A' }} Years / {{ soldier.service_years or '0' }} Years</td>
-        <th>Medical Status:</th>
+        <th>{{ labels.report_generated }}</th>
+        <td>{{ report.header.date or generated_at }}</td>
+        <th>{{ labels.report_lang }}</th>
+        <td><strong>{{ report.header.language or lang|upper }}</strong></td>
+        <th>{{ labels.model_version }}</th>
+        <td>{{ model_version }}</td>
+    </tr>
+</table>
+
+<!-- Section 2: Personal & Fitness Profile -->
+<div class="section-heading">{{ labels.sec2_title }}</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 20%;">{{ labels.army_number }}</th>
+        <td style="width: 30%;"><strong>{{ report.profile.army_number or soldier.army_number }}</strong></td>
+        <th style="width: 20%;">{{ labels.full_name }}</th>
+        <td style="width: 30%;"><strong>{{ report.profile.name or soldier.name }}</strong></td>
+    </tr>
+    <tr>
+        <th>{{ labels.rank_trade }}</th>
+        <td>{{ report.profile.rank or soldier.rank }} / {{ report.profile.trade or soldier.trade }}</td>
+        <th>{{ labels.company_section }}</th>
+        <td>{{ report.profile.company or soldier.company }} / {{ report.profile.section or soldier.section or 'N/A' }}</td>
+    </tr>
+    <tr>
+        <th>{{ labels.age_service }}</th>
+        <td>{{ report.profile.age or soldier.age or 'N/A' }} {{ labels.years }} / {{ report.profile.service_years or soldier.service_years or '0' }} {{ labels.years }}</td>
+        <th>{{ labels.medical_status }}</th>
         <td>
-            {% if soldier.has_medical_restriction %}
-                <span class="badge-pill badge-danger">Restricted / LMC</span>
+            {% if soldier.has_medical_restriction or report.profile.medical_status == 'LMC' %}
+                <span class="badge-pill badge-danger">{{ labels.lmc }}</span>
             {% else %}
-                <span class="badge-pill badge-success">SHAPE-1 Cleared</span>
+                <span class="badge-pill badge-success">{{ labels.shape1 }}</span>
             {% endif %}
         </td>
     </tr>
 </table>
 
-<!-- Section 2: Physiological & Physical Performance -->
-<div class="section-heading">2. Physiological Metrics &amp; Physical Performance</div>
+<!-- Section 3: Current Fitness Analysis -->
+<div class="section-heading">{{ labels.sec3_title }}</div>
 <table class="data-table">
     <tr>
-        <th style="width: 25%;">Height / Actual Weight:</th>
-        <td style="width: 25%;">{{ soldier.height_cm }} cm / {{ soldier.actual_weight_kg }} kg</td>
-        <th style="width: 25%;">Ideal Reference Weight:</th>
-        <td style="width: 25%;">{{ soldier.ideal_weight_kg or 'N/A' }} kg ({{ soldier.weight_status }})</td>
+        <th style="width: 25%;">{{ labels.height_weight }}</th>
+        <td style="width: 25%;">{{ report.analysis.height_cm or soldier.height_cm }} cm / {{ report.analysis.actual_weight_kg or soldier.actual_weight_kg }} kg</td>
+        <th style="width: 25%;">{{ labels.ideal_weight }}</th>
+        <td style="width: 25%;">{{ report.analysis.ideal_weight_kg or soldier.ideal_weight_kg or 'N/A' }} kg ({{ report.analysis.weight_status or soldier.weight_status }})</td>
     </tr>
     <tr>
-        <th>BMI Index &amp; Category:</th>
-        <td>{{ soldier.bmi }} ({{ soldier.bmi_category }})</td>
-        <th>Weight Deviation:</th>
+        <th>{{ labels.bmi_cat }}</th>
+        <td>{{ report.analysis.bmi or soldier.bmi }} ({{ report.analysis.bmi_category or soldier.bmi_category }})</td>
+        <th>{{ labels.weight_dev }}</th>
         <td>
-            {% if soldier.weight_deviation_percent is not none %}
+            {% if report.analysis.weight_deviation_percent is not none and report.analysis.weight_deviation_percent != '' %}
+                {{ "+" if report.analysis.weight_deviation_percent > 0 else "" }}{{ report.analysis.weight_deviation_percent }}% ({{ report.analysis.weight_difference_kg }} kg)
+            {% elif soldier.weight_deviation_percent is not none %}
                 {{ "+" if soldier.weight_deviation_percent > 0 else "" }}{{ soldier.weight_deviation_percent }}% ({{ soldier.weight_difference_kg }} kg)
             {% else %}
                 N/A
@@ -203,54 +295,73 @@
         </td>
     </tr>
     <tr>
-        <th>BPET Grading:</th>
-        <td><span class="badge-pill badge-success">{{ soldier.bpet_grade or 'Untested' }}</span></td>
-        <th>PPT Grading:</th>
-        <td><span class="badge-pill badge-success">{{ soldier.ppt_grade or 'Untested' }}</span></td>
+        <th>{{ labels.bpet_grading }}</th>
+        <td><span class="badge-pill badge-success">{{ report.analysis.bpet_grade or soldier.bpet_grade or labels.untested }}</span></td>
+        <th>{{ labels.ppt_grading }}</th>
+        <td><span class="badge-pill badge-success">{{ report.analysis.ppt_grade or soldier.ppt_grade or labels.untested }}</span></td>
     </tr>
     <tr>
-        <th>Sports &amp; Athletics:</th>
-        <td>{{ soldier.sports_list or 'None' }} ({{ soldier.sport_count or 0 }} Sports)</td>
-        <th>Physical Activity Level:</th>
-        <td>{{ soldier.physical_activity_level or 'Moderate' }}</td>
+        <th>{{ labels.sports }}</th>
+        <td>{{ report.analysis.sports_list or soldier.sports_list or labels.none }} ({{ report.analysis.sport_count or soldier.sport_count or 0 }} {{ labels.sports }})</td>
+        <th>{{ labels.activity_level }}</th>
+        <td>{{ report.analysis.activity_level or soldier.physical_activity_level or 'Moderate' }}</td>
     </tr>
 </table>
+{% if report.analysis.condition_summary %}
+<div class="callout-box">
+    <strong>{{ labels.condition_summary }}</strong> {{ report.analysis.condition_summary }}
+</div>
+{% endif %}
 
-<!-- Section 3: AI Physical Readiness Prediction -->
-<div class="section-heading">3. AI Physical Readiness Prediction</div>
+<!-- Section 4: AI Fitness Assessment -->
+<div class="section-heading">{{ labels.sec4_title }}</div>
 <div class="score-card">
     <table style="width: 100%;">
         <tr>
             <td style="width: 50%;">
-                <div style="font-size: 8pt; color: #475569; text-transform: uppercase; font-weight: bold;">AI Physical Readiness Score:</div>
-                <div class="score-val">{{ prediction.fitness_score }} <span style="font-size: 10pt; color: #64748b;">/ 100 PTS</span></div>
+                <div style="font-size: 7.5pt; color: #475569; text-transform: uppercase; font-weight: bold;">{{ labels.readiness_score }}</div>
+                <div class="score-val">{{ report.assessment.fitness_score or prediction.fitness_score }} <span style="font-size: 9pt; color: #64748b;">/ 100 {{ labels.pts or 'PTS' }}</span></div>
                 <div style="margin-top: 2px;">
-                    <span class="badge-pill badge-primary" style="font-size: 8.5pt;">{{ prediction.category_label }}</span>
+                    <span class="badge-pill badge-primary" style="font-size: 8pt;">{{ report.assessment.category_label or prediction.category_label }}</span>
                 </div>
             </td>
-            <td style="width: 50%; text-align: right;">
-                <div style="font-size: 8pt; color: #475569; font-weight: bold;">Prediction Confidence:</div>
-                <div style="font-size: 14pt; font-weight: bold; color: #2563eb;">{{ prediction.confidence_score }}%</div>
-                <div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">Algorithm: {{ prediction.algorithm or 'GradientBoosting' }}</div>
+            <td style="width: 50%; text-align: {% if is_rtl %}left{% else %}right{% endif %};">
+                <div style="font-size: 7.5pt; color: #475569; font-weight: bold;">{{ labels.prediction_conf }}</div>
+                <div style="font-size: 13pt; font-weight: bold; color: #2563eb;">{{ report.assessment.confidence_score or prediction.confidence_score }}%</div>
+                <div style="font-size: 7.5pt; color: #64748b; margin-top: 2px;">{{ report.assessment.readiness_tier or 'Tier 1 Combat Ready' }}</div>
             </td>
         </tr>
     </table>
 </div>
 
+<!-- Section 5: AI Fitness Prediction -->
+<div class="section-heading">{{ labels.sec5_title }}</div>
+<table class="data-table" style="margin-bottom: 4px;">
+    <tr>
+        <th style="width: 25%;">{{ labels.algorithm }}</th>
+        <td style="width: 25%;">{{ report.prediction.algorithm or prediction.algorithm or 'GradientBoosting' }}</td>
+        <th style="width: 25%;">{{ labels.model_version }}</th>
+        <td style="width: 25%;">{{ report.prediction.model_version or model_version }}</td>
+    </tr>
+    <tr>
+        <th>{{ labels.readiness_tier or 'Predicted Status' }}</th>
+        <td colspan="3"><span class="badge-pill badge-success">{{ report.prediction.predicted_status or prediction.predicted_status or report.assessment.category_label }}</span></td>
+    </tr>
+</table>
 <table style="width: 100%; margin-bottom: 6px;">
     <tr>
-        <td style="width: 50%; vertical-align: top; padding-right: 6px;">
-            <strong style="color: #065f46; font-size: 8.5pt;">Key Strengths (Positive Indicators):</strong>
+        <td style="width: 50%; vertical-align: top; padding-right: 4px;">
+            <strong style="color: #065f46; font-size: 8pt;">{{ labels.key_strengths }}</strong>
             <ul>
-                {% for str in prediction.strengths %}
+                {% for str in (report.prediction.strengths or prediction.strengths) %}
                 <li>{{ str }}</li>
                 {% endfor %}
             </ul>
         </td>
-        <td style="width: 50%; vertical-align: top; padding-left: 6px;">
-            <strong style="color: #92400e; font-size: 8.5pt;">Priority Action Areas:</strong>
+        <td style="width: 50%; vertical-align: top; padding-left: 4px;">
+            <strong style="color: #92400e; font-size: 8pt;">{{ labels.action_areas }}</strong>
             <ul>
-                {% for imp in prediction.improvements %}
+                {% for imp in (report.prediction.improvements or prediction.improvements) %}
                 <li>{{ imp }}</li>
                 {% endfor %}
             </ul>
@@ -258,38 +369,74 @@
     </tr>
 </table>
 
-<!-- Section 4: Personalized Nutrition Plan -->
-<div class="section-heading">4. Personalized Dietary &amp; Macronutrient Plan</div>
+<!-- Section 6: Weight / Fitness Trend -->
+<div class="section-heading">{{ labels.sec6_title }}</div>
 <table class="data-table">
     <tr>
-        <th style="width: 25%;">Daily Energy Target:</th>
-        <td style="width: 25%;"><strong>{{ recommendations.diet.target_calories }} kcal / Day</strong></td>
-        <th style="width: 25%;">Daily Hydration Target:</th>
-        <td style="width: 25%;"><strong>{{ recommendations.diet.hydration_liters }} Liters / Day</strong></td>
+        <th style="width: 25%;">{{ labels.baseline_weight }}</th>
+        <td style="width: 25%;"><strong>{{ report.trend.baseline_weight or soldier.actual_weight_kg }} kg</strong></td>
+        <th style="width: 25%;">{{ labels.target_benchmark }}</th>
+        <td style="width: 25%;"><strong>{{ report.trend.target_weight or soldier.ideal_weight_kg or 'N/A' }} kg</strong></td>
     </tr>
     <tr>
-        <th>Protein Target:</th>
-        <td>{{ recommendations.diet.macros.protein_grams }}g ({{ recommendations.diet.macros.protein_pct }}%)</td>
-        <th>Carbs / Fats:</th>
-        <td>{{ recommendations.diet.macros.carb_grams }}g ({{ recommendations.diet.macros.carb_pct }}%) / {{ recommendations.diet.macros.fat_grams }}g ({{ recommendations.diet.macros.fat_pct }}%)</td>
+        <th>{{ labels.variance }}</th>
+        <td>{{ report.analysis.weight_difference_kg or soldier.weight_difference_kg or 0 }} kg</td>
+        <th>{{ labels.bmi_cat }}</th>
+        <td>{{ report.trend.current_bmi or soldier.bmi }}</td>
     </tr>
 </table>
-<div style="font-size: 8pt; color: #475569; margin-bottom: 6px;"><strong>Diet Strategy:</strong> {{ recommendations.diet.strategy }}</div>
+{% if report.trend.notice %}
+<div class="callout-box">
+    <strong>{{ labels.trend_status }}</strong> {{ report.trend.notice }}
+</div>
+{% endif %}
 
-<!-- Section 5: Tactical Exercise Plan -->
-<div class="section-heading">5. Tactical Physical Training Regimen ({{ recommendations.exercise.title }})</div>
+<!-- Section 7: Fitness Progression -->
+<div class="section-heading">{{ labels.sec7_title }}</div>
 <table class="data-table">
     <thead>
         <tr>
-            <th style="width: 35%;">Exercise / Drill</th>
-            <th style="width: 10%;">Sets</th>
-            <th style="width: 20%;">Reps / Volume</th>
-            <th style="width: 15%;">Duration</th>
-            <th style="width: 20%;">Frequency</th>
+            <th style="width: 28%;">{{ labels.timeline }}</th>
+            <th style="width: 24%;">{{ labels.proj_weight }}</th>
+            <th style="width: 24%;">{{ labels.proj_bmi }}</th>
+            <th style="width: 24%;">{{ labels.est_score }}</th>
         </tr>
     </thead>
     <tbody>
-        {% for item in recommendations.exercise.exercises %}
+        {% for m in (report.progression.milestones or progression.milestones) %}
+        <tr>
+            <td><strong>{{ m.period }}</strong></td>
+            <td>{{ m.weight_kg }} kg</td>
+            <td>{{ m.bmi }}</td>
+            <td><strong>{{ m.fitness_score }} / 100</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if progression_chart_uri or report.progression.chart_image_uri %}
+<div style="width: 100%; text-align: center; margin-top: 5px; margin-bottom: 5px; page-break-inside: avoid;">
+    <img src="{{ progression_chart_uri or report.progression.chart_image_uri }}" width="520" style="display: block; margin: 0 auto; border: 1px solid #cbd5e1; border-radius: 3px;">
+</div>
+{% endif %}
+
+<!-- Section 8: Personalized Exercise Plan -->
+<div class="section-heading">{{ labels.sec8_title }}</div>
+<div style="font-size: 8pt; color: #475569; margin-bottom: 3px;">
+    <strong>{{ report.exercise_plan.title }}:</strong> {{ report.exercise_plan.focus_area }}
+</div>
+<table class="data-table">
+    <thead>
+        <tr>
+            <th style="width: 35%;">{{ labels.exercise_drill }}</th>
+            <th style="width: 10%;">{{ labels.sets }}</th>
+            <th style="width: 20%;">{{ labels.reps_volume }}</th>
+            <th style="width: 15%;">{{ labels.duration }}</th>
+            <th style="width: 20%;">{{ labels.frequency }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in (report.exercise_plan.exercises or recommendations.exercise.exercises) %}
         <tr>
             <td><strong>{{ item.exercise }}</strong></td>
             <td>{{ item.sets }}</td>
@@ -301,54 +448,145 @@
     </tbody>
 </table>
 
-<!-- Section 6: Goal-based Progression (30 / 60 / 90 Days) -->
-<div class="section-heading">6. Projected Progression Milestones (30 / 60 / 90 Days)</div>
+<!-- Section 9: Personalized Nutrition Recommendations -->
+<div class="section-heading">{{ labels.sec9_title }}</div>
+<div style="font-size: 8pt; color: #475569; margin-bottom: 3px;">
+    <strong>{{ labels.diet_strategy }}</strong> {{ report.nutrition.strategy or recommendations.diet.strategy }}
+</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 25%;">{{ labels.daily_energy }}</th>
+        <td style="width: 25%;"><strong>{{ report.nutrition.target_calories or recommendations.diet.target_calories }} {{ labels.kcal_day }}</strong></td>
+        <th style="width: 25%;">{{ labels.daily_hydration }}</th>
+        <td style="width: 25%;"><strong>{{ report.nutrition.hydration_liters or recommendations.diet.hydration_liters }} {{ labels.liters_day }}</strong></td>
+    </tr>
+    <tr>
+        <th>{{ labels.protein_target }}</th>
+        <td>{{ report.nutrition.macros.protein_grams or recommendations.diet.macros.protein_grams }}g ({{ report.nutrition.macros.protein_pct or recommendations.diet.macros.protein_pct }}%)</td>
+        <th>{{ labels.carbs_fats }}</th>
+        <td>{{ report.nutrition.macros.carb_grams or recommendations.diet.macros.carb_grams }}g / {{ report.nutrition.macros.fat_grams or recommendations.diet.macros.fat_grams }}g</td>
+    </tr>
+</table>
+<table style="width: 100%; margin-bottom: 6px;">
+    <tr>
+        <td style="width: 50%; vertical-align: top; padding-right: 4px;">
+            <strong style="color: #065f46; font-size: 8pt;">{{ labels.recommended_nutrition }}</strong>
+            <ul>
+                {% for item in (report.nutrition.recommended_items or ['Lean poultry', 'Lentils', 'Brown rice', 'Vegetables']) %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </td>
+        <td style="width: 50%; vertical-align: top; padding-left: 4px;">
+            <strong style="color: #991b1b; font-size: 8pt;">{{ labels.limit_nutrition }}</strong>
+            <ul>
+                {% for item in (report.nutrition.limit_items or ['Deep-fried foods', 'Refined sugar', 'Excess salt']) %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </td>
+    </tr>
+</table>
+
+<!-- Section 10: Areas for Improvement -->
+<div class="section-heading">{{ labels.sec10_title }}</div>
+<ul>
+    {% for item in (report.improvement_areas or prediction.improvements) %}
+    <li>{{ item }}</li>
+    {% endfor %}
+</ul>
+
+<!-- Section 11: AI Personalized Recommendations -->
+<div class="section-heading">{{ labels.sec11_title }}</div>
+<table class="data-table">
+    {% for pr in report.priority_recs %}
+    <tr>
+        <th style="width: 32%;">{{ pr.priority }}</th>
+        <td style="width: 68%;">
+            <strong>{{ pr.title }}:</strong> {{ pr.detail }}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Section 12: Fitness Goals -->
+<div class="section-heading">{{ labels.sec12_title }}</div>
+<table class="data-table">
+    <tr>
+        <th style="width: 32%;">{{ labels.short_term_goals }}</th>
+        <td style="width: 68%;">{{ report.goals.short_term }}</td>
+    </tr>
+    <tr>
+        <th>{{ labels.medium_term_goals }}</th>
+        <td>{{ report.goals.medium_term }}</td>
+    </tr>
+    <tr>
+        <th>{{ labels.long_term_goals }}</th>
+        <td>{{ report.goals.long_term }}</td>
+    </tr>
+</table>
+
+<!-- Section 13: Progress Monitoring -->
+<div class="section-heading">{{ labels.sec13_title }}</div>
 <table class="data-table">
     <thead>
         <tr>
-            <th style="width: 25%;">Timeline</th>
-            <th style="width: 20%;">Projected Weight</th>
-            <th style="width: 20%;">Projected BMI</th>
-            <th style="width: 35%;">Estimated Physical Readiness Score</th>
+            <th style="width: 32%;">{{ labels.param }}</th>
+            <th style="width: 22%;">{{ labels.current_val }}</th>
+            <th style="width: 22%;">{{ labels.target_val }}</th>
+            <th style="width: 24%;">{{ labels.monitoring_freq }}</th>
         </tr>
     </thead>
     <tbody>
-        {% for m in progression.milestones %}
+        {% for row in report.monitoring %}
         <tr>
-            <td><strong>{{ m.period }}</strong></td>
-            <td>{{ m.weight_kg }} kg</td>
-            <td>{{ m.bmi }}</td>
-            <td><strong>{{ m.fitness_score }} / 100</strong></td>
+            <td><strong>{{ row.parameter }}</strong></td>
+            <td>{{ row.current }}</td>
+            <td>{{ row.target }}</td>
+            <td><span class="badge-pill badge-primary">{{ row.frequency }}</span></td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<!-- Section 7: Medical Endorsement -->
-<div class="section-heading">7. Safety &amp; Medical Clearance Endorsement</div>
-<div style="font-size: 8pt; color: #334155; margin-bottom: 8px;">
-    <strong>Medical Clearance Status:</strong> {{ recommendations.medical_notice.title }} &mdash; {{ recommendations.medical_notice.message }}
+<!-- Section 14: AI Fitness Insights -->
+<div class="section-heading">{{ labels.sec14_title }}</div>
+<div class="callout-box">
+    <div><strong>{{ labels.overall_assessment }}</strong> {{ report.insights.overall_assessment }}</div>
+    <div style="margin-top: 2px;"><strong>{{ labels.recommended_focus }}</strong> {{ report.insights.recommended_focus }}</div>
 </div>
 
-<table class="sign-block">
+<!-- Section 15: Important Note / Disclaimer -->
+<div class="section-heading">{{ labels.sec15_title }}</div>
+<div class="callout-box" style="border-left-color: #92400e; background-color: #fffbeb;">
+    <strong>{{ labels.disclaimer_title }}</strong> {{ report.disclaimer or labels.disclaimer_text }}
+</div>
+
+<!-- Section 16: Official Record Authentication & Footer -->
+<div class="section-heading">{{ labels.sec16_title }}</div>
+<table class="sign-table">
     <tr>
-        <td style="width: 33%; text-align: center; font-size: 8pt;">
-            ___________________________<br>
-            <strong>Physical Training Instructor</strong><br>
-            15 CESR
+        <td style="width: 33%;">
+            <div class="sign-line"></div>
+            <strong>Unit PT Instructor</strong><br>
+            Physical Training Staff
         </td>
-        <td style="width: 33%; text-align: center; font-size: 8pt;">
-            ___________________________<br>
-            <strong>Medical Officer / RMO</strong><br>
-            15 CESR Medical Inspection Room
+        <td style="width: 34%;">
+            <div class="sign-line"></div>
+            <strong>Regimental Medical Officer</strong><br>
+            Medical Inspection Room
         </td>
-        <td style="width: 33%; text-align: center; font-size: 8pt;">
-            ___________________________<br>
-            <strong>Officer Commanding / 2IC</strong><br>
-            15 CESR
+        <td style="width: 33%;">
+            <div class="sign-line"></div>
+            <strong>Officer Commanding</strong><br>
+            15 CESR REGM
         </td>
     </tr>
 </table>
+
+<div style="border-top: 1px solid #cbd5e1; padding-top: 4px; margin-top: 6px; font-size: 7pt; color: #64748b; text-align: center;">
+    {{ report.footer.regiment or '15 CORPS ENGINEERING SIGNAL REGIMENT' }} • {{ labels.report_id }} {{ report.footer.report_id or report.report_id }} • IP: {{ report.footer.client_ip or client_ip }} • {{ report.footer.timestamp or generated_at }} • {{ labels.confidential }}
+</div>
 
 </body>
 </html>

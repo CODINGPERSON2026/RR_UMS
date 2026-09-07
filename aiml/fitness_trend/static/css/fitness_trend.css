@@ -149,22 +149,73 @@
   height: 52px;
   border-radius: 12px !important;
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
   border: none !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.3px;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3) !important;
   transition: all 0.25s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0 10px !important;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 6px;
 }
 
 .export-pdf-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45) !important;
+  color: #ffffff !important;
 }
 
 .export-pdf-btn:disabled {
   opacity: 0.55 !important;
   cursor: not-allowed !important;
   background: #94a3b8 !important;
+  color: #f1f5f9 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.preview-report-btn {
+  height: 52px;
+  border-radius: 12px !important;
+  border: 1.5px solid #2563eb !important;
+  background-color: #ffffff !important;
+  color: #2563eb !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12) !important;
+  transition: all 0.25s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0 10px !important;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 6px;
+}
+
+.preview-report-btn:hover:not(:disabled) {
+  background-color: #eff6ff !important;
+  border-color: #1d4ed8 !important;
+  color: #1d4ed8 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2) !important;
+}
+
+.preview-report-btn:disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  background-color: #f8fafc !important;
   box-shadow: none !important;
   transform: none !important;
 }

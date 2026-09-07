@@ -89,7 +89,7 @@ def api_search_personnel():
 def api_analyze_fitness():
     """
     Primary AI Fitness Prediction API endpoint.
-    JSON payload: {"army_number": "15744604X", "goal": "Overall Fitness"}
+    JSON payload: {"army_number": "15744604X", "goal": "Overall Fitness", "lang": "hi"}
     """
     user_payload = require_login()
     if not user_payload:
@@ -98,6 +98,7 @@ def api_analyze_fitness():
     data = request.get_json(silent=True) or {}
     army_number = data.get("army_number", "").strip()
     goal = data.get("goal", "Overall Fitness").strip()
+    lang = (data.get("lang") or data.get("language") or "en").lower().strip()
     
     if not army_number:
         return jsonify({'success': False, 'error': 'Missing required parameter "army_number".'}), 400
@@ -106,6 +107,23 @@ def api_analyze_fitness():
         result = analyze_personnel_fitness(army_number, goal=goal)
         if not result.get('success'):
             return jsonify(result), 404
+
+        from .translation import translate_report_data, get_report_labels, is_supported_language
+        if not is_supported_language(lang):
+            lang = 'en'
+
+        if lang != 'en':
+            t_soldier, t_prediction, t_recommendations, t_progression = translate_report_data(
+                result['soldier'], result['prediction'], result['recommendations'], result['progression'],
+                target_lang=lang, for_pdf=False
+            )
+            result['soldier'] = t_soldier
+            result['prediction'] = t_prediction
+            result['recommendations'] = t_recommendations
+            result['progression'] = t_progression
+
+        result['labels'] = get_report_labels(target_lang=lang, for_pdf=False)
+        result['lang'] = lang
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error in analyze_fitness for {army_number}: {e}", exc_info=True)
@@ -163,6 +181,11 @@ def preview_fitness_report(army_number):
         return redirect("/admin_login")
         
     goal = request.args.get("goal", "Overall Fitness")
+    lang = request.args.get("lang", "en").lower().strip()
+    from .translation import is_supported_language
+    if not is_supported_language(lang):
+        lang = "en"
+
     result = analyze_personnel_fitness(army_number, goal=goal)
     
     if not result.get('success'):
@@ -180,10 +203,123 @@ def preview_fitness_report(army_number):
         prediction_result=result['prediction'],
         recommendations=result['recommendations'],
         progression_data=result['progression'],
-        client_ip=client_ip
+        client_ip=client_ip,
+        lang=lang
     )
     
     response = make_response(html)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+
+@fitness_trend_bp.route("/report/pdf", methods=["POST"])
+@fitness_trend_bp.route("/api/export-pdf", methods=["POST"])
+@fitness_trend_bp.route("/api/fitness-trend/export-pdf", methods=["POST"])
+def export_fitness_pdf_api():
+    """
+    API endpoint for Multilingual PDF Report generation.
+    Expected JSON:
+    {
+        "personnel_id": 123,
+        "language": "hi",
+        "goal": "Overall Fitness"
+    }
+    """
+    logger.info("Fitness PDF generation started")
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({"success": False, "error": "Unauthorized. Please login."}), 401
+
+    data = request.get_json(silent=True) or {}
+    personnel_id = data.get("personnel_id")
+    army_number = data.get("army_number")
+    language = (data.get("language") or data.get("lang") or "en").lower().strip()
+    goal = data.get("goal", "Overall Fitness")
+
+    logger.info(f"Language selected: {language}")
+
+    # 1. Validate language code
+    from .translation.language_config import is_supported_language
+    if not is_supported_language(language):
+        logger.warning(f"Unsupported language code requested: {language}. Falling back to English.")
+        return jsonify({
+            "success": False,
+            "error": f"Unsupported language: '{language}'"
+        }), 400
+
+    # 2. Resolve army_number from personnel_id if needed
+    target_army_no = None
+    if army_number:
+        target_army_no = str(army_number).strip()
+    elif personnel_id is not None:
+        p_str = str(personnel_id).strip()
+        if p_str.isdigit():
+            from .data.db_loader import get_db_connection
+            conn = get_db_connection()
+            if conn:
+                try:
+                    cursor = conn.cursor(dictionary=True)
+                    cursor.execute("SELECT army_number FROM personnel WHERE id = %s", (int(p_str),))
+                    row = cursor.fetchone()
+                    if row and row.get("army_number"):
+                        target_army_no = row["army_number"]
+                finally:
+                    cursor.close()
+                    conn.close()
+        if not target_army_no:
+            target_army_no = p_str
+
+    if not target_army_no:
+        return jsonify({
+            "success": False,
+            "error": "Missing required parameter 'personnel_id' or 'army_number'."
+        }), 400
+
+    # 3. Analyze fitness
+    result = analyze_personnel_fitness(target_army_no, goal=goal)
+    if not result.get("success"):
+        return jsonify({
+            "success": False,
+            "error": result.get("error", "Soldier record not found.")
+        }), 404
+
+    # 4. Generate PDF using multilingual generator
+    raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+    client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
+
+    try:
+        from .pdf.report_generator import generate_multilingual_fitness_pdf
+        pdf_stream = generate_multilingual_fitness_pdf(
+            soldier_features=result['soldier'],
+            prediction_result=result['prediction'],
+            recommendations=result['recommendations'],
+            progression_data=result['progression'],
+            client_ip=client_ip,
+            watermark_text="15 CESR REGM",
+            language=language
+        )
+    except Exception as e:
+        logger.error(f"Error generating multilingual PDF for {target_army_no} in '{language}': {e}", exc_info=True)
+        return jsonify({"success": False, "error": "Failed to generate report PDF."}), 500
+
+    if not pdf_stream:
+        return jsonify({"success": False, "error": "Failed to compile report PDF stream."}), 500
+
+    logger.info(f"PDF generated successfully for language: {language}")
+
+    safe_army_no = re.sub(r'[^a-zA-Z0-9_\-]', '', target_army_no)
+    lang_suffix = language.upper()
+    date_str = datetime.now().strftime("%Y%m%d")
+    filename = f"UMS_Fitness_Report_{safe_army_no}_{lang_suffix}_{date_str}.pdf"
+
+    response = make_response(send_file(
+        pdf_stream,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=filename
+    ))
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -200,6 +336,8 @@ def download_fitness_pdf(army_number):
         return redirect("/admin_login")
         
     goal = request.args.get("goal", "Overall Fitness")
+    lang = request.args.get("lang", "en").lower().strip()
+    
     result = analyze_personnel_fitness(army_number, goal=goal)
     
     if not result.get('success'):
@@ -208,25 +346,24 @@ def download_fitness_pdf(army_number):
     raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
     client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
     
-    pdf_stream = generate_fitness_pdf_report(
+    from .pdf.report_generator import generate_multilingual_fitness_pdf
+    pdf_stream = generate_multilingual_fitness_pdf(
         soldier_features=result['soldier'],
         prediction_result=result['prediction'],
         recommendations=result['recommendations'],
         progression_data=result['progression'],
         client_ip=client_ip,
-        watermark_text="15 CESR REGM"
+        watermark_text="15 CESR REGM",
+        language=lang
     )
     
     if not pdf_stream:
         return jsonify({'error': 'Failed to compile PDF report binary stream.'}), 500
         
-    raw_name = result.get('soldier', {}).get('name') or ''
-    clean_name = re.sub(r'[^a-zA-Z0-9_\- ]', '', raw_name).strip().replace(' ', '_')
-    safe_army_no = re.sub(r'[^a-zA-Z0-9_\-]', '_', army_number)
-    if clean_name:
-        filename = f"{clean_name}_{safe_army_no}_Fitness_Report.pdf"
-    else:
-        filename = f"Fitness_Report_{safe_army_no}.pdf"
+    safe_army_no = re.sub(r'[^a-zA-Z0-9_\-]', '', army_number)
+    lang_suffix = lang.upper()
+    date_str = datetime.now().strftime("%Y%m%d")
+    filename = f"UMS_Fitness_Report_{safe_army_no}_{lang_suffix}_{date_str}.pdf"
     
     response = make_response(send_file(
         pdf_stream,

@@ -38,6 +38,14 @@ app.register_blueprint(company_rec_bp)
 app.register_blueprint(fitness_trend_bp)
 
 
+@app.route("/api/fitness-trend/export-pdf", methods=["POST"])
+@app.route("/fitness-trend/report/pdf", methods=["POST"])
+@app.route("/fitness/report/pdf", methods=["POST"])
+def root_export_fitness_pdf():
+    from aiml.fitness_trend.routes import export_fitness_pdf_api
+    return export_fitness_pdf_api()
+
+
 @app.route("/history/15cesr")
 def history_15cesr():
     return render_template("history/history_15cesr.html")

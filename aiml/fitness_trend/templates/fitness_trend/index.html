@@ -4,7 +4,7 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <!-- Fitness Trend Module CSS -->
-<link rel="stylesheet" href="{{ url_for('fitness_trend_bp.static', filename='css/fitness_trend.css') }}?v=2.4">
+<link rel="stylesheet" href="{{ url_for('fitness_trend_bp.static', filename='css/fitness_trend.css') }}?v=2.5">
 {% endblock %}
 
 {% block content %}
@@ -30,11 +30,11 @@
 
   <!-- Search & Filter Card -->
   <div class="fitness-search-card">
-    <div class="row g-3 align-items-center">
+    <div class="row g-3 align-items-end">
       <!-- Personnel Autocomplete Search -->
-      <div class="col-lg-4">
+      <div class="col-xl-3 col-lg-3 col-md-6">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
-          <i class="fas fa-search text-primary me-1"></i> Select Personnel (Army Number / Name)
+          <i class="fas fa-search text-primary me-1"></i> Select Personnel (Army No / Name)
         </label>
         <div class="search-input-group">
           <div class="input-icon-wrapper">
@@ -42,7 +42,7 @@
             <input type="text"
                    id="fitnessSearchInput"
                    class="form-control form-control-lg search-field-custom"
-                   placeholder="Type Army Number (e.g. 15744604X) or Soldier Name..."
+                   placeholder="Type Army Number or Name..."
                    autocomplete="off">
             <button type="button" id="clearSearchBtn" class="clear-search-btn d-none" title="Clear search">
               <i class="fas fa-times"></i>
@@ -53,7 +53,7 @@
       </div>
 
       <!-- Fitness Goal Selector -->
-      <div class="col-lg-3">
+      <div class="col-xl-3 col-lg-3 col-md-6">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
           <i class="fas fa-bullseye text-primary me-1"></i> Primary Training Goal
         </label>
@@ -68,32 +68,67 @@
       </div>
 
       <!-- PDF Export Language Selector -->
-      <div class="col-lg-3">
+      <div class="col-xl-2 col-lg-2 col-md-4">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
-          <i class="fas fa-language text-primary me-1"></i> Report Language
+          <i class="fas fa-language text-primary me-1"></i> Language
         </label>
         <select id="fitnessLangSelect" class="form-select form-select-lg custom-goal-select shadow-none">
-          <option value="en" selected>English (Default)</option>
-          <option value="hi">हिन्दी (Hindi)</option>
-          <option value="ur">اردو (Urdu)</option>
-          <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
-          <option value="ml">മലയാളം (Malayalam)</option>
-          <option value="or">ଓଡ଼ିଆ (Odia)</option>
-          <option value="te">తెలుగు (Telugu)</option>
-          <option value="bho">भोजपुरी (Bhojpuri)</option>
-          <option value="gu">ગુજરાતી (Gujarati)</option>
-          <option value="mr">मराठी (Marathi)</option>
-          <option value="bn">বাংলা (Bengali)</option>
-          <option value="mwr">मेवाड़ी (Mewari)</option>
+          <option value="en" selected>English</option>
+          <option value="hi">Hindi</option>
+          <option value="ur">Urdu</option>
+          <option value="bn">Bengali</option>
+          <option value="pa">Punjabi</option>
+          <option value="mr">Marathi</option>
+          <option value="gu">Gujarati</option>
+          <option value="ta">Tamil</option>
+          <option value="te">Telugu</option>
+          <option value="kn">Kannada</option>
+          <option value="ml">Malayalam</option>
+          <option value="or">Odia</option>
+          <option value="as">Assamese</option>
         </select>
       </div>
 
-      <!-- Quick Action / PDF Download -->
-      <div class="col-lg-2 text-lg-end mt-lg-auto">
-        <button id="downloadPdfBtn" class="btn btn-primary btn-lg w-100 export-pdf-btn fw-bold shadow-sm" disabled title="Select a soldier to enable PDF export">
-          <i class="fas fa-file-pdf me-1"></i> Export PDF
-        </button>
+      <!-- Quick Action / PDF Preview & Generate -->
+      <div class="col-xl-4 col-lg-4 col-md-8">
+        <label class="form-label small fw-bold text-muted text-uppercase mb-1">
+          <i class="fas fa-file-invoice text-primary me-1"></i> Report Actions
+        </label>
+        <div class="d-flex gap-2">
+          <button id="previewPdfBtn" type="button" class="btn preview-report-btn flex-fill shadow-sm" disabled title="Select a soldier to preview report">
+            <i class="fas fa-eye me-1"></i> Preview Report
+          </button>
+          <button id="downloadPdfBtn" type="button" class="btn export-pdf-btn flex-fill shadow-sm" disabled title="Select a soldier to generate PDF">
+            <i class="fas fa-file-pdf me-1"></i> Generate PDF
+          </button>
+        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- PDF Export Feedback Alert -->
+  <div id="pdfExportStatusAlert" class="alert py-2 px-3 rounded-3 d-none mb-3 d-flex align-items-center gap-2 shadow-sm" role="status">
+    <div id="pdfExportSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></div>
+    <i id="pdfExportSuccessIcon" class="fas fa-check-circle text-success d-none"></i>
+    <span id="pdfExportStatusText" class="small fw-semibold"></span>
+  </div>
+
+  <!-- PDF Success Action Bar -->
+  <div id="pdfSuccessActions" class="alert alert-success py-2 px-3 rounded-3 d-none mb-3 d-flex align-items-center justify-content-between shadow-sm flex-wrap gap-2">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fas fa-check-circle text-success fs-5"></i>
+      <div>
+        <span class="fw-bold small d-block">PDF Report Generated Successfully</span>
+        <span id="pdfSuccessFileName" class="text-muted font-monospace" style="font-size: 0.78rem;"></span>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button id="viewPdfBtn" type="button" class="btn btn-sm btn-outline-primary fw-semibold">
+        <i class="fas fa-external-link-alt me-1"></i> View PDF
+      </button>
+      <button id="savePdfBtn" type="button" class="btn btn-sm btn-success fw-semibold">
+        <i class="fas fa-download me-1"></i> Download PDF
+      </button>
     </div>
   </div>
 
@@ -175,11 +210,11 @@
       <div class="fit-card">
         <div class="fit-card-header">
           <h5 class="fit-card-title">
-            <i class="fas fa-print text-primary"></i> Official Individual Fitness Report Preview
+            <i class="fas fa-print text-primary"></i> <span id="reportPreviewTitle">Official Individual Fitness Report Preview</span>
           </h5>
           <div>
             <button class="btn btn-success btn-sm shadow-sm" onclick="document.getElementById('downloadPdfBtn').click();">
-              <i class="fas fa-download me-1"></i> Download PDF Document
+              <i class="fas fa-download me-1"></i> <span id="reportPreviewDownloadText">Download PDF Document</span>
             </button>
           </div>
         </div>
