@@ -32,10 +32,45 @@ except ImportError:
 from .api import (
     analyze_personnel_fitness,
     search_personnel_records,
-    trigger_retraining
+    trigger_retraining,
+    get_all_reports_paginated,
+    get_reports_statistics,
+    get_saved_fitness_report_by_id,
+    regenerate_personnel_fitness_report
 )
 from .prediction.predictor import get_model_info
 from .reports.fitness_report import generate_fitness_pdf_report, generate_fitness_html_report
+
+from .data.reports_db import ensure_ai_fitness_reports_table
+
+# Ensure database table exists on module startup
+try:
+    ensure_ai_fitness_reports_table()
+except Exception as _table_err:
+    logger.warning(f"Could not initialize ai_fitness_reports table on load: {_table_err}")
+
+# Allowed executive roles for reports dashboard and management
+AUTHORIZED_FITNESS_ROLES = ["CO", "2IC", "ADJUTANT", "COMMANDING OFFICER"]
+
+
+def check_fitness_executive_access(user_payload):
+    """
+    Strict backend authorization:
+    Accessible only to authenticated users with roles CO, 2IC, or Adjutant.
+    Returns True if authorized, False otherwise.
+    """
+    if not user_payload:
+        return False
+    role = str(user_payload.get("role", "")).strip().upper()
+    if role in AUTHORIZED_FITNESS_ROLES:
+        return True
+    import re
+    # Match standalone CO, 2IC, or ADJUTANT without NCO, JCO, or ONCO prefixes/suffixes
+    if re.search(r'\b(CO|2IC|ADJUTANT)\b', role):
+        if not re.search(r'\b(NCO|JCO|ONCO)\b', role):
+            return True
+    return False
+
 
 # Initialize Blueprint with isolated templates and static assets
 fitness_trend_bp = Blueprint(
@@ -379,3 +414,217 @@ def download_fitness_pdf(army_number):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
+
+
+# =========================================================================
+# Executive AI Fitness Reports Dashboard & Management Routes (CO, 2IC, Adjutant)
+# =========================================================================
+
+@fitness_trend_bp.route("/reports", methods=["GET"])
+def fitness_reports_dashboard_view():
+    """
+    Renders the AI Fitness Reports executive dashboard showing all personnel
+    for whom an AI fitness report has been generated.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return redirect("/admin_login")
+
+    if not check_fitness_executive_access(user_payload):
+        role = user_payload.get('role', 'User')
+        current_user_name = user_payload.get('name') or user_payload.get('username') or 'Personnel'
+        return render_template(
+            "fitness_trend/unauthorized.html",
+            role=role,
+            current_user_name=current_user_name,
+            required_roles="Commanding Officer (CO), 2IC, or Adjutant"
+        ), 403
+
+    role = user_payload.get('role', 'Executive')
+    current_user_name = user_payload.get('name') or user_payload.get('username') or 'Executive'
+    company = user_payload.get('company', 'HQ')
+
+    return render_template(
+        "fitness_trend/reports_dashboard.html",
+        role=role,
+        current_user_name=current_user_name,
+        company=company,
+        header="15 CESR UMS"
+    )
+
+
+@fitness_trend_bp.route("/api/reports", methods=["GET"])
+def api_get_reports():
+    """
+    Returns paginated list of all generated AI fitness reports with search & filters.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({
+            'success': False,
+            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
+        }), 403
+
+    search_query = request.args.get("search", "").strip()
+    company = request.args.get("company", "").strip()
+    status = request.args.get("status", "").strip()
+    from_date = request.args.get("from_date", "").strip() or None
+    to_date = request.args.get("to_date", "").strip() or None
+    sort_by = request.args.get("sort_by", "generated_at").strip()
+    sort_order = request.args.get("sort_order", "desc").strip()
+    try:
+        page = int(request.args.get("page", 1))
+    except (ValueError, TypeError):
+        page = 1
+    try:
+        per_page = int(request.args.get("per_page", 10))
+    except (ValueError, TypeError):
+        per_page = 10
+
+    data = get_all_reports_paginated(
+        search_query=search_query,
+        company=company,
+        status=status,
+        from_date=from_date,
+        to_date=to_date,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        page=page,
+        per_page=per_page
+    )
+    return jsonify(data)
+
+
+@fitness_trend_bp.route("/api/reports/stats", methods=["GET"])
+def api_get_reports_stats():
+    """
+    Returns dynamic aggregate counts (Total Reports, Healthy, Needs Improvement, At Risk).
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({
+            'success': False,
+            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
+        }), 403
+
+    stats = get_reports_statistics()
+    return jsonify(stats)
+
+
+@fitness_trend_bp.route("/reports/<army_number>", methods=["GET"])
+def api_get_single_soldier_report(army_number):
+    """
+    Fetches the generated AI fitness report for a specific soldier.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({
+            'success': False,
+            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
+        }), 403
+
+    result = analyze_personnel_fitness(army_number, regenerate=False)
+    if not result.get('success'):
+        return jsonify(result), 404
+    return jsonify(result)
+
+
+@fitness_trend_bp.route("/api/reports/regenerate", methods=["POST"])
+def api_regenerate_report():
+    """
+    Forces AI re-analysis and updates ai_fitness_reports table.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({
+            'success': False,
+            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
+        }), 403
+
+    data = request.get_json(silent=True) or {}
+    army_number = data.get("army_number", "").strip()
+    goal = data.get("goal", "Overall Fitness")
+    lang = data.get("language", "en")
+
+    if not army_number:
+        return jsonify({'success': False, 'error': 'Army number is required.'}), 400
+
+    result = regenerate_personnel_fitness_report(army_number, goal=goal, language=lang)
+    return jsonify(result)
+
+
+@fitness_trend_bp.route("/reports/<int:report_id>/pdf", methods=["GET"])
+def download_saved_report_pdf(report_id):
+    """
+    Downloads PDF for a specific saved report from ai_fitness_reports table.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return redirect("/admin_login")
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({'error': 'Forbidden: Access restricted to CO, 2IC, or Adjutant.'}), 403
+
+    saved = get_saved_fitness_report_by_id(report_id)
+    if not saved:
+        return jsonify({'error': f'Report #{report_id} not found.'}), 404
+
+    from .api import _reconstruct_soldier_features
+    soldier_features = _reconstruct_soldier_features(saved)
+    prediction = saved.get('prediction_result') or {}
+    recommendations = saved.get('recommendations') or {}
+    progression = saved.get('progression_prediction') or {}
+
+    raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+    client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
+    lang = request.args.get("lang", saved.get("report_language", "en")).lower().strip()
+
+    from .pdf.report_generator import generate_multilingual_fitness_pdf
+    pdf_stream = generate_multilingual_fitness_pdf(
+        soldier_features=soldier_features,
+        prediction_result=prediction,
+        recommendations=recommendations,
+        progression_data=progression,
+        client_ip=client_ip,
+        watermark_text="UMS 15 CESR",
+        language=lang
+    )
+
+    if not pdf_stream:
+        return jsonify({'error': 'Failed to compile PDF report binary stream.'}), 500
+
+    army_no = saved.get('army_number', 'SOLDIER')
+    safe_army_no = re.sub(r'[^a-zA-Z0-9_\-]', '', army_no)
+    lang_suffix = lang.upper()
+    date_str = datetime.now().strftime("%Y%m%d")
+    filename = f"UMS_Fitness_Report_{safe_army_no}_{lang_suffix}_{date_str}.pdf"
+
+    response = make_response(send_file(
+        pdf_stream,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=filename
+    ))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+

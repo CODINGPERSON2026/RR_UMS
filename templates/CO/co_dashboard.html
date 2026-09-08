@@ -1488,6 +1488,13 @@ STATUS COLORS
           <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+
+      <div class="sc" style="cursor: pointer;" onclick="openAiFitnessReportsModal()" id="card-ai-fitness-reports" title="AI Individual Fitness Reports & Operational Readiness">
+        <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
+        <div class="sc-right">
+          <span class="sc-val" id="co-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
       {% endif %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
         <span class="sc-label">Interview</span>
@@ -2589,10 +2596,29 @@ STATUS COLORS
     document.querySelectorAll(".chart-row-card").forEach(function (c) {
       c.classList.add("visible");
     });
+
+    // Fetch live aggregate stats for executive AI Fitness Reports card
+    fetch('/fitness/api/reports/stats')
+      .then(function(res) { return res.ok ? res.json() : null; })
+      .then(function(data) {
+        if (data && data.success && data.stats) {
+          var s = data.stats;
+          var totalEl = document.getElementById('co-fit-total');
+          var healthyEl = document.getElementById('co-fit-healthy');
+          var needsEl = document.getElementById('co-fit-needs-imp');
+          var riskEl = document.getElementById('co-fit-at-risk');
+          if (totalEl) totalEl.textContent = s.total_reports || 0;
+          if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
+          if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
+          if (riskEl) riskEl.textContent = s.at_risk_count || 0;
+        }
+      })
+      .catch(function(err) { console.warn('Could not load AI fitness stats:', err); });
   });
 </script>
 
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
+{% include 'modals/ai_fitness_reports_modal.html' %}
 
 {% endblock %}

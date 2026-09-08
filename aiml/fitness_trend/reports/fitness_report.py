@@ -404,17 +404,23 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
             "fat_grams": 55, "fat_pct": 20
         }),
         "recommended_items": rec_diet.get("recommended_items") or [
-            "Lean poultry & boiled eggs",
-            "Whole lentils & beans (dal)",
-            "Whole grains (oats, brown rice, whole wheat roti)",
-            "Seasonal fresh vegetables and fruit",
-            "Clean water & electrolyte fluids"
+            "Lean poultry, boiled eggs & paneer for muscle protein synthesis",
+            "Whole lentils, dal & sprouted beans for sustained amino acids",
+            "Whole grains (oats, brown rice, whole wheat roti) for glycogen replenishment",
+            "Seasonal fresh fruits & leafy vegetables for electrolytes and micronutrients",
+            "Consistent hydration with minimum 3.0 to 3.5 Liters of clean water daily"
         ],
         "limit_items": rec_diet.get("limit_items") or [
-            "Deep-fried snacks & processed foods",
-            "Refined sugar and sweetened beverages",
-            "Excessive sodium / table salt",
-            "Irregular meal timing"
+            "Deep-fried mess snacks, pakoras, and processed canteen confectionery",
+            "Refined sugar, sugary tea/coffee, and carbonated beverages",
+            "Excessive table salt, pickles, and high-sodium processed rations",
+            "Irregular meal timings or skipping breakfast prior to morning PT",
+            "Heavy meals consumed less than 2 hours before lights out"
+        ],
+        "guidelines": rec_diet.get("dietary_guidelines") or [
+            "Meal Timing Discipline: Ensure dinner is finished at least 2 hours before sleep; consume recovery protein within 45 minutes after intensive PT.",
+            "Operational Hydration: Consume 500 ml of clean water 30 minutes prior to outdoor drills; maintain continuous fluid replenishment in hot terrain.",
+            "Mess Selection Strategy: Prioritize roasted, boiled, or grilled mess items over deep-fried curries; incorporate fresh salads and curd daily."
         ]
     }
 

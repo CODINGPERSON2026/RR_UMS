@@ -574,6 +574,15 @@
       </div>
       {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+      <div class="sc" style="cursor: pointer;" onclick="openAiFitnessReportsModal()" id="card-ai-fitness-reports-dash" title="AI Individual Fitness Reports & Operational Readiness">
+        <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
+        <div class="sc-right">
+          <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+      {% endif %}
+
       {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
       <div class="sc" id="openCourses">
         <span class="sc-label">On Course</span>
@@ -1476,6 +1485,24 @@
         }
       })
       .catch(() => {});
+
+    // Fetch live aggregate stats for executive AI Fitness Reports card
+    fetch('/fitness/api/reports/stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d && d.success && d.stats) {
+          const s = d.stats;
+          const totalEl = document.getElementById('dash-fit-total');
+          const healthyEl = document.getElementById('dash-fit-healthy');
+          const needsEl = document.getElementById('dash-fit-needs-imp');
+          const riskEl = document.getElementById('dash-fit-at-risk');
+          if (totalEl) totalEl.textContent = s.total_reports || 0;
+          if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
+          if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
+          if (riskEl) riskEl.textContent = s.at_risk_count || 0;
+        }
+      })
+      .catch(() => {});
   });
 
   window.addEventListener('themechange', function() {
@@ -1485,5 +1512,6 @@
 
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
+{% include 'modals/ai_fitness_reports_modal.html' %}
 
 {% endblock %}
