@@ -2152,7 +2152,7 @@ def download_leave_certificate(leave_id):
             "company_name": data['company'],
             "section_name": data['section'] if data['section'] else "HQ",
             "trade": data.get('trade', 'N/A'),
-            "contact": data.get('mobile_number', 'N/A'),
+            "contact": data.get('home_phone') or data.get('mobile_number', 'N/A'),
             "i_card_no": data.get('i_card_no', 'N/A')
         }
 

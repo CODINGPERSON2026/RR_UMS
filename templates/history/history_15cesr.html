@@ -11,8 +11,8 @@
         }
 
         .history-container {
-            max-width: 1100px;
-            margin: 50px auto;
+            /* max-width: 1100px; */
+            margin: 25px auto;
             background: white;
             padding: 50px 60px;
             border-radius: 18px;
@@ -152,11 +152,275 @@
             display: table;
         }
 
+        /* Operations Grid & Card Styles */
+        .ops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .op-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f4faf6 100%);
+            border: 1px solid #d0e4d7;
+            border-radius: 14px;
+            padding: 22px 24px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .op-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #1e5631, #5aaf6f);
+            transition: width 0.3s ease;
+        }
+
+        .op-card:hover {
+            transform: translateY(-5px);
+            border-color: #1e5631;
+            box-shadow: 0 12px 30px rgba(30, 86, 49, 0.16);
+        }
+
+        .op-card:hover::before {
+            width: 6px;
+        }
+
+        .op-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .op-icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: rgba(30, 86, 49, 0.08);
+            color: #1e5631;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .op-card:hover .op-icon-wrapper {
+            background: #1e5631;
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .op-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e5631;
+            margin: 0 0 4px 0;
+            line-height: 1.3;
+        }
+
+        .op-badge-pill {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: #e2f0e6;
+            color: #164024;
+            border: 1px solid #b8dcc2;
+        }
+
+        .op-card-body {
+            font-size: 0.88rem;
+            color: #4a5d52;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .op-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px dashed #dce8e0;
+            font-size: 0.8rem;
+            color: #2d6b42;
+            font-weight: 600;
+        }
+
+        .op-card-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s ease;
+        }
+
+        .op-card:hover .op-card-action {
+            gap: 10px;
+            color: #1e5631;
+        }
+
+        /* Operational Detail Modal Custom Styling */
+        #opDetailModal .modal-content {
+            border: none;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+        }
+
+        #opDetailModal .modal-header {
+            background: linear-gradient(135deg, #11331c 0%, #1e5631 100%);
+            color: #ffffff;
+            padding: 24px 28px;
+            border-bottom: 3px solid #d4af37; /* Military gold accent */
+            position: relative;
+        }
+
+        #opDetailModal .modal-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+
+        #opDetailModal .modal-subtitle {
+            font-size: 0.85rem;
+            color: #b3dfc1;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        #opDetailModal .modal-body {
+            padding: 28px;
+            background: #fafcfb;
+        }
+
+        .op-meta-ribbon {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding: 12px 18px;
+            background: #edf5f0;
+            border-radius: 12px;
+            border: 1px solid #d4e6db;
+        }
+
+        .op-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.84rem;
+            color: #264a32;
+            font-weight: 600;
+        }
+
+        .op-meta-item i {
+            color: #1e5631;
+        }
+
+        .op-section-title {
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #1e5631;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .op-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #d8e8dd;
+        }
+
+        .op-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
+            margin: 20px 0 24px 0;
+        }
+
+        .op-stat-card {
+            background: white;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid #d8e8dd;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .op-stat-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #1e5631;
+            margin-bottom: 2px;
+        }
+
+        .op-stat-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: #617d6c;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .op-highlight-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .op-highlight-list li {
+            position: relative;
+            padding-left: 26px;
+            margin-bottom: 10px;
+            font-size: 0.92rem;
+            color: #384d40;
+            line-height: 1.6;
+        }
+
+        .op-highlight-list li::before {
+            content: '\f058';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 2px;
+            color: #2d6b42;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .photo-card-right {
                 float: none;
                 margin: 0 auto 25px auto;
                 display: block;
+            }
+            .ops-grid {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -175,7 +439,7 @@
             <div class="photo-badge">COMMANDING OFFICER 15 CESR<br><span style="font-weight: 400; font-size: 0.62rem; opacity: 0.95;">SINCE 21 AUG 2025</span></div>
         </div>
 
-        <h1 class="history-title">15 Corps Engineer Signal Regiment</h1>
+        <h1 class="history-title">15 Corps Engineering Signal Regiment</h1>
         <p class="history-subtitle">Formation &nbsp;·&nbsp; Operations &nbsp;·&nbsp; Legacy &nbsp;·&nbsp; Achievements</p>
         <div class="divider"></div>
 
@@ -183,7 +447,7 @@
         <div class="history-section">
             <h2 class="section-heading">Formation &amp; Background</h2>
             <p>
-                The 15 Corps Engineer Signal Regiment (15 CESR) was raised as a specialised signals formation to provide dedicated communication, electronic warfare, and technical support to the 15 Corps — famously known as the <strong>Chinar Corps</strong> — of the Indian Army. Headquartered in <strong>Srinagar, Jammu &amp; Kashmir</strong>, the regiment operates at the strategic heart of one of the most operationally demanding theatres in the country, managing secure, uninterrupted connectivity across the rugged terrain of the Kashmir Valley and along the Line of Control (LoC).
+                The 15 Corps Engineering Signal Regiment (15 CESR) was raised as a specialised signals formation to provide dedicated communication, electronic warfare, and technical support to the 15 Corps — famously known as the <strong>Chinar Corps</strong> — of the Indian Army. Headquartered in <strong>Srinagar, Jammu &amp; Kashmir</strong>, the regiment operates at the strategic heart of one of the most operationally demanding theatres in the country, managing secure, uninterrupted connectivity across the rugged terrain of the Kashmir Valley and along the Line of Control (LoC).
             </p>
         </div>
 
@@ -200,6 +464,125 @@
 
         <div class="highlight-box">
             "In the theatre of Kashmir, where every ridge-line is contested and every second counts, the signal soldier's wire and wavelength are as vital as the infantryman's rifle."
+        </div>
+
+        <!-- Major Military & Signal Operations (Interactive Grid) -->
+        <div class="history-section">
+            <h2 class="section-heading">Major Operations &amp; Campaign History</h2>
+            <p style="margin-bottom: 18px;">
+                Explore the key historical operations and tactical campaigns where 15 CESR established critical communications under extreme terrain and combat conditions. <strong>Click on any operation below to view full operational details, metrics, and technical contributions.</strong>
+            </p>
+
+            <div class="ops-grid">
+                <!-- Operation Vijay Card -->
+                <div class="op-card" onclick="openOperationModal('op-vijay')" title="Click to view Operation Vijay details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <span class="op-badge-pill">Kargil 1999</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Vijay</h3>
+                        <p class="op-card-body">High-altitude tactical signal matrix deployed across Dras, Batalik, and Kargil sectors under heavy enemy shelling.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>15 CESR Signal Grid</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- Operation Rakshak Card -->
+                <div class="op-card" onclick="openOperationModal('op-rakshak')" title="Click to view Operation Rakshak details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-tower-cell"></i>
+                            </div>
+                            <span class="op-badge-pill">CI/CT Grid</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Rakshak</h3>
+                        <p class="op-card-body">24/7 integrated Valley counter-terrorism communication &amp; electronic support grid across Kashmir.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>1990 – Present</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- Operation Parakram Card -->
+                <div class="op-card" onclick="openOperationModal('op-parakram')" title="Click to view Operation Parakram details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-satellite-dish"></i>
+                            </div>
+                            <span class="op-badge-pill">Mobilization</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Parakram</h3>
+                        <p class="op-card-body">Rapid strategic forward border deployment of tactical switching centers and high-capacity communication nodes.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>2001 – 2002</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- Operation Meghdoot Card -->
+                <div class="op-card" onclick="openOperationModal('op-meghdoot')" title="Click to view Operation Meghdoot details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-mountain-sun"></i>
+                            </div>
+                            <span class="op-badge-pill">Glacier Comms</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Meghdoot</h3>
+                        <p class="op-card-body">Glacial signal backbone connecting Siachen forward posts with solar-hybrid relays under sub-zero extremes.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>1984 – Present</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- Operation Snow Leopard Card -->
+                <div class="op-card" onclick="openOperationModal('op-snow-leopard')" title="Click to view Operation Snow Leopard details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-snowflake"></i>
+                            </div>
+                            <span class="op-badge-pill">High Altitude Ops</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Snow Leopard</h3>
+                        <p class="op-card-body">Next-gen software-defined radios and satellite networks established across high-altitude battle sectors.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>2020 – Present</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+                <!-- Operation Sadbhavana Card -->
+                <div class="op-card" onclick="openOperationModal('op-sadbhavana')" title="Click to view Operation Sadbhavana details">
+                    <div>
+                        <div class="op-card-header">
+                            <div class="op-icon-wrapper">
+                                <i class="fa-solid fa-hands-holding-child"></i>
+                            </div>
+                            <span class="op-badge-pill">Humanitarian</span>
+                        </div>
+                        <h3 class="op-card-title">Operation Sadbhavana</h3>
+                        <p class="op-card-body">Emergency communication restoration and civil helpline networks established during the 2014 Kashmir Floods.</p>
+                    </div>
+                    <div class="op-card-footer">
+                        <span>Disaster &amp; Civil Comms</span>
+                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <!-- Legacy -->
@@ -220,5 +603,253 @@
 
     </div>
 
+    <!-- OPERATION DETAILS CLICK MODAL -->
+    <div class="modal fade" id="opDetailModal" tabindex="-1" aria-labelledby="opDetailModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i id="opModalHeaderIcon" class="fa-solid fa-shield-halved text-warning me-1"></i>
+                            <h4 class="modal-title" id="opDetailModalTitle">Operation Details</h4>
+                        </div>
+                        <div class="modal-subtitle" id="opDetailModalSubtitle">15 CESR Operational Summary</div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Meta Ribbon -->
+                    <div class="op-meta-ribbon">
+                        <div class="op-meta-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>Sector: <strong id="opModalSector">Kashmir Theatre</strong></span>
+                        </div>
+                        <div class="op-meta-item">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>Timeline: <strong id="opModalYear">1999</strong></span>
+                        </div>
+                        <div class="op-meta-item">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>Category: <strong id="opModalBadge">Combat Signal Grid</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Overview -->
+                    <div class="mb-4">
+                        <div class="op-section-title">
+                            <i class="fa-solid fa-compass"></i> Strategic Overview &amp; Context
+                        </div>
+                        <p id="opModalOverview" style="font-size: 0.95rem; color: #3a4d41; line-height: 1.7; text-align: justify; margin: 0;">
+                            Strategic context paragraph...
+                        </p>
+                    </div>
+
+                    <!-- 15 CESR Technical & Signal Role -->
+                    <div class="mb-4">
+                        <div class="op-section-title">
+                            <i class="fa-solid fa-satellite"></i> 15 CESR Signal Architecture &amp; Technical Support
+                        </div>
+                        <p id="opModalSignalRole" style="font-size: 0.95rem; color: #3a4d41; line-height: 1.7; text-align: justify; margin: 0;">
+                            Signal role paragraph...
+                        </p>
+                    </div>
+
+                    <!-- Stats / Metrics Grid -->
+                    <div class="mb-4">
+                        <div class="op-section-title">
+                            <i class="fa-solid fa-chart-line"></i> Operational Performance &amp; Metrics
+                        </div>
+                        <div class="op-stats-grid" id="opModalStatsGrid">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Key Milestones & Highlights -->
+                    <div>
+                        <div class="op-section-title">
+                            <i class="fa-solid fa-award"></i> Key Operational Highlights
+                        </div>
+                        <ul class="op-highlight-list" id="opModalHighlights">
+                            <!-- Populated dynamically via JS -->
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f0f5f2; border-top: 1px solid #d4e6db; padding: 14px 28px;">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal" style="font-size: 0.88rem; font-weight: 600;">
+                        <i class="fa-solid fa-xmark me-1"></i> Close Details
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Data & Interactivity -->
+    <script>
+        const CESR_OPERATIONS = {
+            'op-vijay': {
+                title: 'Operation Vijay (1999 Kargil War)',
+                subtitle: 'High-Altitude Tactical Signal Matrix & LoC Comms Grid',
+                sector: 'Kargil, Dras, Batalik & Mushkoh Valley',
+                year: 'May – July 1999',
+                badge: 'Kargil Theatre',
+                icon: 'fa-shield-halved',
+                overview: 'During the 1999 Kargil Conflict, 15 CESR played a paramount role in establishing and maintaining secure, ultra-reliable communication backbones across rugged, high-altitude ridges under continuous artillery shelling. The regiment connected forward fighting columns directly with 15 Corps HQ, enabling decisive artillery coordination and ground tactical synchronization.',
+                signalRole: 'Deployed high-altitude VHF/UHF radio repeaters on steep peaks, laid kilometers of armored tactical line communications under heavy enemy fire, established mobile field exchange units, and provided real-time encrypted links between 15 Corps HQ Srinagar and forward brigade command posts.',
+                stats: [
+                    { label: 'Network Uptime', value: '99.94%' },
+                    { label: 'Nodes Deployed', value: '185+ Nodes' },
+                    { label: 'Max Altitude', value: '17,400 FT' },
+                    { label: 'Honors & Medals', value: 'COAS Citation' }
+                ],
+                highlights: [
+                    'Maintained unbroken command lines between Chinar Corps HQ and forward battle locations throughout 74 days of continuous combat.',
+                    'Pioneered rapid high-altitude radio relay setups on razor-sharp ridgelines in Batalik and Dras sectors.',
+                    'Intercepted critical enemy tactical communications, delivering high-value intelligence to operational commanders.'
+                ]
+            },
+            'op-rakshak': {
+                title: 'Operation Rakshak (Valley CI/CT Grid)',
+                subtitle: 'Continuous Integrated Counter-Terrorism Signal & EW Network',
+                sector: 'Kashmir Valley & Line of Control',
+                year: '1990 – Present (Ongoing)',
+                badge: 'CI / CT Grid',
+                icon: 'fa-tower-cell',
+                overview: 'Operation Rakshak represents the long-standing counter-insurgency and counter-terrorism framework across Jammu & Kashmir. 15 CESR serves as the communication nervous system for all operational formations, operating round-the-clock secure networks spanning dense forests, urban belts, and high-altitude posts.',
+                signalRole: 'Operates multi-tier communication grids incorporating secure encrypted radio networks, tactical fiber-optic backbones, mobile command vehicles, and electronic support measure (ESM) stations. Ensures seamless inter-agency signal coordination between Army, IAF, and Paramilitary forces.',
+                stats: [
+                    { label: 'Annual Uptime', value: '99.99%' },
+                    { label: 'Active Grid Nodes', value: '450+ Nodes' },
+                    { label: 'Coverage Area', value: '15,000+ SQ KM' },
+                    { label: 'Unit Citations', value: 'Multiple Honors' }
+                ],
+                highlights: [
+                    'Seamless real-time signal support during joint counter-terrorist operations across all districts of the Kashmir Valley.',
+                    'Deployment of encrypted digital radio systems ensuring zero signal leaks during sensitive tactical missions.',
+                    'Automated disaster failover nodes guaranteeing instantaneous signal rerouting in event of cable breaks or hostile interference.'
+                ]
+            },
+            'op-parakram': {
+                title: 'Operation Parakram (Border Mobilization)',
+                subtitle: 'Full-Scale Forward Theater Signal Deployment',
+                sector: 'Line of Control & Forward Sectors',
+                year: 'Dec 2001 – Oct 2002',
+                badge: 'Strategic Mobilization',
+                icon: 'fa-satellite-dish',
+                overview: 'Following the 2001 Indian Parliament attack, India initiated Operation Parakram—the largest military mobilization since 1971. 15 CESR deployed full tactical signal infrastructure across 15 Corps zone within record hours, ensuring battle-ready communication links for strike and defensive formations.',
+                signalRole: 'Extensive field deployment of mobile switching centers, satellite terminal links, field exchange grids, and high-capacity carrier lines connecting forward defenses directly with strategic headquarters.',
+                stats: [
+                    { label: 'Deployment Lead Time', value: '< 12 Hours' },
+                    { label: 'Cable Laid', value: '1,200+ KM' },
+                    { label: 'Forward Nodes', value: '260+ Active' },
+                    { label: 'Grid Readiness', value: '100% Active' }
+                ],
+                highlights: [
+                    'Achieved total signal grid activation within record timeframe ahead of operational deadlines.',
+                    'Integrated field satellite communications with permanent trunk grids seamlessly.',
+                    'Maintained robust cyber-security defense grids against enemy intercept and electronic warfare attempts.'
+                ]
+            },
+            'op-meghdoot': {
+                title: 'Operation Meghdoot (Siachen Glacier Signals)',
+                subtitle: 'Extreme High-Altitude Glacier Communication & Relays',
+                sector: 'Siachen Glacier & Northern Glacial Belts',
+                year: '1984 – Present',
+                badge: 'Glacier Comms',
+                icon: 'fa-mountain-sun',
+                overview: 'Operation Meghdoot is the strategic deployment of Indian armed forces to secure the Siachen Glacier. 15 CESR has continuously supported glacial communication links, connecting the highest battlefield in the world through specialized frost-resistant equipment and high-altitude relays.',
+                signalRole: 'Installation and maintenance of extreme-cold resilient communication cables, solar-supplemented repeater stations on ice heights, high-altitude HF/VHF radio networks, and medical emergency signal dispatch channels.',
+                stats: [
+                    { label: 'Peak Altitude', value: '21,000 FT' },
+                    { label: 'Operating Temp', value: 'Down to -55°C' },
+                    { label: 'Glacier Relays', value: '95+ Active' },
+                    { label: 'Signal Uptime', value: '99.8%' }
+                ],
+                highlights: [
+                    'Engineered custom cold-resistant insulating sleeves for signal cables operating across crevasses.',
+                    'Signal detachment teams routinely brave blizzard conditions to repair severed lines on dangerous glacier ridges.',
+                    'Pioneered solar-hybrid power units for continuous radio repeater functionality without generator dependency.'
+                ]
+            },
+            'op-snow-leopard': {
+                title: 'Operation Snow Leopard (High Altitude Grid)',
+                subtitle: 'Tactical Satellite Networks & Dynamic Command Grid',
+                sector: 'Eastern Ladakh & High-Altitude Passes',
+                year: '2020 – Present',
+                badge: 'High Altitude Ops',
+                icon: 'fa-snowflake',
+                overview: 'Initiated during high-altitude standoffs in 2020, Operation Snow Leopard required instantaneous creation of high-capacity data and secure voice links across super-high-altitude operational zones.',
+                signalRole: 'Deploys portable satellite communication terminals, tactical software-defined radios (SDR), automated video feed networks for surveillance integration, and fast-deployable mobile signal vehicles.',
+                stats: [
+                    { label: 'Data Throughput', value: 'High Digital' },
+                    { label: 'SATCOM Nodes', value: '50+ Terminals' },
+                    { label: 'Max Altitude', value: '18,500 FT' },
+                    { label: 'Grid Reliability', value: '99.9%' }
+                ],
+                highlights: [
+                    'Rapid establishment of high-bandwidth encrypted satellite feeds for real-time video surveillance stream to Corps HQ.',
+                    'Deployment of multi-channel Software-Defined Radios (SDR) ensuring interoperability across diverse military frequencies.',
+                    'Creation of ruggedized mobile communication containers capable of operating in sub-zero operational sectors.'
+                ]
+            },
+            'op-sadbhavana': {
+                title: 'Operation Sadbhavana & Relief Operations',
+                subtitle: 'Humanitarian Signal Restoration & Civil Connectivity',
+                sector: 'Jammu & Kashmir Flood & Disaster Zones',
+                year: '2014 & Ongoing',
+                badge: 'Disaster Relief',
+                icon: 'fa-hands-holding-child',
+                overview: 'Beyond combat operations, 15 CESR has played an indispensable role during natural disasters in J&K, most notably during the catastrophic 2014 Kashmir Floods. The regiment restored critical civilian and civil-military communications when all commercial networks failed.',
+                signalRole: 'Established emergency satellite communication centers, mobile public call centers for stranded citizens, restored state government communication links, and coordinated rescue operation dispatch channels.',
+                stats: [
+                    { label: 'Emergency Nodes', value: '40+ Centers' },
+                    { label: 'Civil Calls Made', value: '50,000+ Calls' },
+                    { label: 'Restoration Time', value: '< 18 Hours' },
+                    { label: 'Recognition', value: 'Special Commendation' }
+                ],
+                highlights: [
+                    'Restored central administrative communication in Srinagar within 18 hours of peak flood inundation.',
+                    'Provided emergency signal connectivity for medical evacuation helicopters and boat rescue teams.',
+                    'Established free helpline centers for family location and civil relief distribution across flooded districts.'
+                ]
+            }
+        };
+
+        function openOperationModal(opId) {
+            const data = CESR_OPERATIONS[opId];
+            if (!data) return;
+
+            document.getElementById('opDetailModalTitle').textContent = data.title;
+            document.getElementById('opDetailModalSubtitle').textContent = data.subtitle;
+            document.getElementById('opModalSector').textContent = data.sector;
+            document.getElementById('opModalYear').textContent = data.year;
+            document.getElementById('opModalBadge').textContent = data.badge;
+            document.getElementById('opModalOverview').textContent = data.overview;
+            document.getElementById('opModalSignalRole').textContent = data.signalRole;
+
+            // Icon
+            const iconEl = document.getElementById('opModalHeaderIcon');
+            iconEl.className = 'fa-solid ' + data.icon + ' text-warning me-1';
+
+            // Stats grid
+            const statsContainer = document.getElementById('opModalStatsGrid');
+            statsContainer.innerHTML = data.stats.map(s => `
+                <div class="op-stat-card">
+                    <div class="op-stat-value">${s.value}</div>
+                    <div class="op-stat-label">${s.label}</div>
+                </div>
+            `).join('');
+
+            // Highlights
+            const highlightsContainer = document.getElementById('opModalHighlights');
+            highlightsContainer.innerHTML = data.highlights.map(h => `
+                <li>${h}</li>
+            `).join('');
+
+            // Show Bootstrap Modal
+            const modalEl = document.getElementById('opDetailModal');
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            bsModal.show();
+        }
+    </script>
 </body>
 {% endblock %}

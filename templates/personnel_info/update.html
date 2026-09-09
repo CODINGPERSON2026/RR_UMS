@@ -755,13 +755,45 @@
                   <div class="row">
                     <div class="col-md-6 mb-3">
                       <label for="rank" class="form-label required">Rank</label>
-                      <input type="text" class="form-control" id="rank" required />
-                      <div class="error-message" id="rank-error">Only letters, numbers, hyphens, and underscores are allowed</div>
+                      <select class="form-select" id="rank" required>
+                        <option value="" disabled selected>Select Rank</option>
+                        <option value="Agniveer">Agniveer</option>
+                        <option value="Signal Man">Signal Man</option>
+                        <option value="CFN">CFN</option>
+                        <option value="L NK">L NK</option>
+                        <option value="LOC NK">LOC NK</option>
+                        <option value="NK">NK</option>
+                        <option value="LOC HAV">LOC HAV</option>
+                        <option value="L HAV">L HAV</option>
+                        <option value="HAV">HAV</option>
+                        <option value="CHM">CHM</option>
+                        <option value="RHM">RHM</option>
+                        <option value="Naib Subedar">Nb Sub</option>
+                        <option value="Subedar">SUB</option>
+                        <option value="Subedar Major">SUB MAJ</option>
+                      </select>
+                      <div class="error-message" id="rank-error">Please select a rank</div>
                     </div>
                     <div class="col-md-6 mb-3">
                       <label for="trade" class="form-label required">Trade</label>
                       <input type="text" class="form-control" id="trade" required />
                       <div class="error-message" id="trade-error">Only letters, numbers, hyphens, and underscores are allowed</div>
+                    </div>
+
+                    <!-- Batch dropdown, hidden by default -->
+                    <div class="col-md-6 mb-3" id="batch-container" style="display: none;">
+                      <label for="batch" class="form-label required">Batch</label>
+                      <select class="form-select" id="batch">
+                        <option value="" disabled selected>Select Batch</option>
+                        <option value="Batch 1">Batch 1</option>
+                        <option value="Batch 2">Batch 2</option>
+                        <option value="Batch 3">Batch 3</option>
+                        <option value="Batch 4">Batch 4</option>
+                        <option value="Batch 5">Batch 5</option>
+                        <option value="Batch 6">Batch 6</option>
+                        <option value="Batch 7">Batch 7</option>
+                        <option value="Batch 8">Batch 8</option>
+                      </select>
                     </div>
                   </div>
                   <div class="row">
@@ -848,28 +880,67 @@
                   <script>
                     // Map company to its sections
                     const companySections = {
-                      "COMN Company": ["SIGCEN", "FAULT REPAIR", "IT", "MCCS", "CHQ","COMN","MM"],
-                      "3 Company": ["DET", "System", "CHQ", "MT"],
-                      "HQ company": ["RHQ", "CHQ", "LRW", "QM", "RPNA", "MT",, "QRT", "TM",]
+                      "COMN Company": [
+                        "SIGCEN",
+                        "FAULT REPAIR",
+                        "IT",
+                        "MCCS",
+                        "CHQ",
+                        "COMN"
+                      ],
+                      "3 Company": [
+                        "DET",
+                        "System",
+                        "CHQ",
+                        "MT"
+                      ],
+                      "HQ company": [
+                        "RHQ",
+                        "CHQ",
+                        "LRW",
+                        "QY",
+                        "RPNA",
+                        "MT",
+                        "QRT",
+                        "TM"
+                      ],
+                      "HQ Company": [
+                        "RHQ",
+                        "CHQ",
+                        "LRW",
+                        "QY",
+                        "RPNA",
+                        "MT",
+                        "QRT",
+                        "TM"
+                      ]
                     };
+
+                    function getNormalizedCompany(coy) {
+                      if (!coy) return "";
+                      const clean = String(coy).trim().toLowerCase();
+                      if (clean.includes("hq")) return "HQ company";
+                      if (clean.includes("comn") || clean.includes("communication")) return "COMN Company";
+                      if (clean.includes("3") || clean.includes("third")) return "3 Company";
+                      return coy;
+                    }
 
                     const companySelect = document.getElementById('company');
                     const sectionSelect = document.getElementById('section');
 
                     companySelect.addEventListener('change', function () {
-                      const selectedCompany = this.value;
+                      const selectedCompany = getNormalizedCompany(this.value);
 
                       // Clear previous options
                       sectionSelect.innerHTML = '<option value="">Select</option>';
 
-                      if (selectedCompany && companySections[selectedCompany]) {
-                        companySections[selectedCompany].forEach(section => {
-                          const option = document.createElement('option');
-                          option.value = section;
-                          option.textContent = section;
-                          sectionSelect.appendChild(option);
-                        });
-                      }
+                      const sections = companySections[selectedCompany] || companySections[this.value] || [];
+                      sections.forEach(section => {
+                        const option = document.createElement('option');
+                        option.value = section;
+                        option.textContent = section;
+                        sectionSelect.appendChild(option);
+                      });
                     });
                   </script>
                   <div class="row">
@@ -1509,7 +1580,7 @@
                   </div>
 
                   <!-- Mobile Phones Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-mobile-alt"></i> Mobile Phone Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-mobile-alt"></i> NOK Mobile Phone Details</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="mobileTable">
                       <thead class="table-light">
@@ -1895,7 +1966,10 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('originalArmyNumber').value = p.army_number;
 
     setValue('name', p.name); setValue('armyNumber', p.army_number);
-    setValue('rank', p.rank); setValue('trade', p.trade);
+    setValue('rank', p.rank);
+    handleRankBatchToggle();
+    setValue('batch', p.batch);
+    setValue('trade', p.trade);
     setValue('dateOfEnrollment', p.date_of_enrollment);
     setValue('dateOfBirth', p.date_of_birth);
     setValue('dateOfTOS', p.date_of_tos); setValue('dateOfTORS', p.date_of_tors);
@@ -2118,6 +2192,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  const DUTY_OPTIONS = [
+    "A-SIGMA CLERK", "ADM NCO", "ALL TRADESMEN", "BRANCH", "BUDDY", "CHM", "CLERK", "COMMUNICATION CLERK",
+    "CQMH", "DET 2IC", "DET COMMANDER", "DISPATCHER CLERK", "DRIVER", "FAULT REPAIR NCO", "GUEST ROOM NCO",
+    "HARDWARE TECH", "ICN", "JCO MESS CDR", "LINE NCO", "LRW NCO", "LRW OPERATOR", "MCCS EXCHANGE",
+    "MESS HAV", "MT NCO", "MULTIMEDIA", "NCO CHQ", "NCO COMN", "NCO IT", "NCO MCCS", "NCO SIGCEN",
+    "NETWORK NCO", "NFS", "O1", "O2", "O3", "OFFICE", "OPERATOR", "PA", "PART ONE CLERK",
+    "QRT COMMANDER", "QRT MEMBER", "QY NCO", "RADIO OPERATOR", "RADIO RR", "RP NCO", "RUNNER",
+    "SERVER", "STOREKEEPER", "STRICT ORDERLY", "STRIP CLERK", "SYSTEM ADMIN", "SYSTEM OPERATOR",
+    "TECH MECHANIC", "TM NCO", "TM OPERATOR", "TRG CLK", "VEHICLE MECHANIC", "WARRANT CLERK"
+  ];
+
+  function getUnitDutySelectHtml(selectedVal = '') {
+    let html = `<select class="form-select form-select-sm unit-input" name="unitDuty[]">`;
+    html += `<option value="">-- SELECT DUTY / DOMAIN --</option>`;
+    const sNorm = String(selectedVal || '').trim().toUpperCase();
+    DUTY_OPTIONS.forEach(opt => {
+      const isSel = (opt === sNorm) ? 'selected' : '';
+      html += `<option value="${esc(opt)}" ${isSel}>${esc(opt)}</option>`;
+    });
+    html += `</select>`;
+    return html;
+  }
+
   function populateUnits(units) {
     const tbody = document.querySelector('#unitsTable tbody');
     tbody.innerHTML = '';
@@ -2128,7 +2225,7 @@ document.addEventListener("DOMContentLoaded", function () {
         td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]" value="${esc(u.unit)}">`),
         td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]" value="${esc(u.from_date)}">`),
         td(`<input type="date" class="form-control form-control-sm" name="unitTo[]" value="${esc(u.to_date)}">`),
-        td(`<input type="text" class="form-control form-control-sm unit-input" name="unitDuty[]" value="${esc(u.duty_performed)}">`)
+        td(getUnitDutySelectHtml(u.duty_performed))
       ], u.id, 'units_served');
       tbody.appendChild(tr);
     });
@@ -2306,7 +2403,7 @@ document.addEventListener("DOMContentLoaded", function () {
       td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]">`),
       td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]">`),
       td(`<input type="date" class="form-control form-control-sm" name="unitTo[]">`),
-      td(`<input type="text" class="form-control form-control-sm unit-input" name="unitDuty[]">`)
+      td(getUnitDutySelectHtml(''))
     ], null, 'units_served');
     tbody.appendChild(tr);
   }
@@ -2571,6 +2668,27 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  function handleRankBatchToggle() {
+    const rankVal = document.getElementById('rank')?.value || '';
+    const batchContainer = document.getElementById('batch-container');
+    const batchSelect = document.getElementById('batch');
+    if (rankVal.trim().toLowerCase() === 'agniveer') {
+      if (batchContainer) batchContainer.style.display = 'block';
+      if (batchSelect) batchSelect.required = true;
+    } else {
+      if (batchContainer) batchContainer.style.display = 'none';
+      if (batchSelect) {
+        batchSelect.required = false;
+        batchSelect.value = '';
+      }
+    }
+  }
+
+  const rankSelectEl = document.getElementById('rank');
+  if (rankSelectEl) {
+    rankSelectEl.addEventListener('change', handleRankBatchToggle);
+  }
+
   // ======================================================================
   // COLLECT FORM DATA
   // ======================================================================
@@ -2578,7 +2696,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const g  = id => document.getElementById(id)?.value || '';
     const gr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
     return {
-      name: g('name'), armyNumber: g('armyNumber'), rank: g('rank'), trade: g('trade'),
+      name: g('name'), armyNumber: g('armyNumber'), rank: g('rank'), batch: g('batch') || null, trade: g('trade'),
       dateOfEnrollment: g('dateOfEnrollment'), dateOfBirth: g('dateOfBirth'),
       dateOfTOS: g('dateOfTOS'), dateOfTORS: g('dateOfTORS'),
       bloodGroup: g('bloodGroup'), religion: g('religion'),
