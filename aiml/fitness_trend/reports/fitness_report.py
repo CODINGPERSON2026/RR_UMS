@@ -549,6 +549,7 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
         lang=target_lang
     )
 
+    watermark_datetime = datetime.now().strftime('%d/%m/%Y %I:%M %p')
     rendered_html = template.render(
         report=t_report,
         soldier=t_report.get('soldier', soldier_features),
@@ -557,6 +558,9 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
         progression=t_report.get('progression', progression_data),
         labels=labels,
         client_ip=client_ip,
+        watermark_text="UMS 15 CESR",
+        watermark_datetime=watermark_datetime,
+        show_html_watermark=True,
         lang=target_lang,
         direction="rtl" if target_lang == "ur" else "ltr",
         is_rtl=(target_lang == "ur"),

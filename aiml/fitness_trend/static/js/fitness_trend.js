@@ -206,15 +206,34 @@ class FitnessTrendApp {
         }
 
         try {
-          const res = await fetch('/api/fitness-trend/export-pdf', {
+          const exportPayload = {
+            army_number: this.currentArmyNumber,
+            language: lang,
+            goal: this.currentGoal
+          };
+
+          // Try canonical blueprint route first, fallback to aliases
+          let res = await fetch('/fitness/report/pdf', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              army_number: this.currentArmyNumber,
-              language: lang,
-              goal: this.currentGoal
-            })
+            body: JSON.stringify(exportPayload)
           });
+
+          if (!res.ok && res.status === 404) {
+            res = await fetch('/fitness/api/export-pdf', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(exportPayload)
+            });
+          }
+
+          if (!res.ok && res.status === 404) {
+            res = await fetch('/api/fitness-trend/export-pdf', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(exportPayload)
+            });
+          }
 
           if (!res.ok) {
             const errData = await res.json().catch(() => ({}));

@@ -57,6 +57,13 @@ class IndicTrans2Translator:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             logger.info(f"Loading IndicTrans2 model '{self.model_name}' on device '{self.device}'...")
             
+            import os
+            # If not a local path and offline mode / not local directory, don't stall with network attempts
+            if not os.path.exists(self.model_name) and not os.environ.get("USE_INDICTRANS2_HUB", "").lower() in ("1", "true"):
+                logger.info(f"IndicTrans2 local path '{self.model_name}' not found. Fast offline dictionary translator will be active.")
+                self._available = False
+                return False
+
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name, trust_remote_code=True)
             self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name, trust_remote_code=True).to(self.device)
             self.model.eval()

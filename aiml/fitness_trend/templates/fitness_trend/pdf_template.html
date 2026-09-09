@@ -198,9 +198,111 @@
         margin-left: auto;
         margin-right: auto;
     }
+
+    {% if show_html_watermark %}
+    /* HTML Preview Watermark - uses repeating background image approach for perfect scroll behavior */
+    body {
+        position: relative;
+    }
+
+    .preview-watermark-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        min-height: 100%;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+    .preview-watermark-page {
+        position: absolute;
+        left: 50%;
+        width: 100%;
+        max-width: 800px;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        user-select: none;
+        -webkit-user-select: none;
+        transform: translateX(-50%);
+    }
+
+    .preview-watermark-page-1 {
+        top: 380px;
+    }
+
+    .preview-watermark-page-2 {
+        top: 1320px;
+    }
+
+    .preview-watermark-box {
+        transform: rotate(-35deg);
+        text-align: center;
+        color: rgba(51, 65, 85, 0.22);
+        font-family: 'Helvetica-Bold', 'Helvetica', Arial, sans-serif;
+        font-weight: bold;
+        user-select: none;
+        -webkit-user-select: none;
+        line-height: 1.35;
+        white-space: nowrap;
+    }
+
+    .preview-watermark-title {
+        font-size: 38pt;
+        font-weight: 900;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+    }
+
+    .preview-watermark-ip {
+        font-size: 19pt;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+    }
+
+    .preview-watermark-time {
+        font-size: 16pt;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+    {% endif %}
 </style>
 </head>
 <body>
+
+{% if show_html_watermark %}
+<div class="preview-watermark-overlay" aria-hidden="true" id="wmOverlay">
+    <div class="preview-watermark-page preview-watermark-page-1">
+        <div class="preview-watermark-box">
+            <div class="preview-watermark-title">{{ watermark_text or 'UMS 15 CESR' }}</div>
+            <div class="preview-watermark-ip">IP ADDRESS: {{ client_ip or '127.0.0.1' }}</div>
+            <div class="preview-watermark-time">DATE &amp; TIME: {{ watermark_datetime or '' }}</div>
+        </div>
+    </div>
+    <div class="preview-watermark-page preview-watermark-page-2">
+        <div class="preview-watermark-box">
+            <div class="preview-watermark-title">{{ watermark_text or 'UMS 15 CESR' }}</div>
+            <div class="preview-watermark-ip">IP ADDRESS: {{ client_ip or '127.0.0.1' }}</div>
+            <div class="preview-watermark-time">DATE &amp; TIME: {{ watermark_datetime or '' }}</div>
+        </div>
+    </div>
+</div>
+<script>
+// Ensure overlay covers full document height so watermarks stay anchored to content
+window.addEventListener('load', function() {
+    var ov = document.getElementById('wmOverlay');
+    if (ov) {
+        var h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+        ov.style.height = h + 'px';
+    }
+});
+</script>
+{% endif %}
 
 <!-- Header (Clean centered military typography matching reference PDF) -->
 <table class="header-table">

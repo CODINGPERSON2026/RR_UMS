@@ -272,6 +272,7 @@ def preview_fitness_report(army_number):
 @fitness_trend_bp.route("/report/pdf", methods=["POST"])
 @fitness_trend_bp.route("/api/export-pdf", methods=["POST"])
 @fitness_trend_bp.route("/api/fitness-trend/export-pdf", methods=["POST"])
+@fitness_trend_bp.route("/export-pdf", methods=["POST"])
 def export_fitness_pdf_api():
     """
     API endpoint for Multilingual PDF Report generation.
@@ -433,6 +434,15 @@ def download_fitness_pdf(army_number):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
     return response
+
+
+@fitness_trend_bp.route("/report/preview/<army_number>", methods=["GET"])
+@fitness_trend_bp.route("/preview/<army_number>", methods=["GET"])
+def preview_fitness_pdf(army_number):
+    """
+    Direct preview alias: streams the PDF report inline for browser viewing.
+    """
+    return download_fitness_pdf(army_number)
 
 
 # =========================================================================
