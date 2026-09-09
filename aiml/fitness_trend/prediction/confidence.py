@@ -85,7 +85,7 @@ def extract_explainable_factors(soldier_features):
             improvements.append(f"Underweight Status: Body weight is {abs(dev_pct)}% below the authorized physical benchmark.")
             
     if bmi is not None and 19.0 <= bmi <= 24.5:
-        strengths.append(f"Healthy BMI Index: Body Mass Index ({bmi}) indicates prime physical conditioning.")
+        strengths.append(f"Healthy BMI ({bmi}) indicates prime physical conditioning.")
         
     # Sports & Physical Activities
     has_sport = soldier_features.get('has_sport')

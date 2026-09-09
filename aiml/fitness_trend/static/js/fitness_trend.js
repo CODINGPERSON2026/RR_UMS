@@ -9,6 +9,7 @@ class FitnessTrendApp {
     this.currentData = null;
     this.activeStage = 'profile';
     this.currentGoal = 'Overall Fitness';
+    this.currentLang = 'en';
     this.charts = {};
     
     this.initElements();
@@ -21,12 +22,26 @@ class FitnessTrendApp {
     this.searchResults = document.getElementById('searchResultsDropdown');
     this.clearBtn = document.getElementById('clearSearchBtn');
     this.pdfBtn = document.getElementById('downloadPdfBtn');
+    this.previewBtn = document.getElementById('previewPdfBtn');
+    this.viewPdfBtn = document.getElementById('viewPdfBtn');
+    this.savePdfBtn = document.getElementById('savePdfBtn');
+    this.pdfSuccessActions = document.getElementById('pdfSuccessActions');
+    this.pdfSuccessFileName = document.getElementById('pdfSuccessFileName');
     this.goalSelect = document.getElementById('fitnessGoalSelect');
+    this.langSelect = document.getElementById('fitnessLangSelect');
     this.stageNav = document.getElementById('workflowStageNav');
     this.activeSearchIndex = -1;
+    this.latestPdfBlob = null;
+    this.latestPdfFilename = null;
     
-    // Ensure export button is disabled initially
+    // Total Count Badge Elements
+    this.totalPersonnelCount = document.getElementById('totalPersonnelCount');
+    this.searchCardTotalCount = document.getElementById('searchCardTotalCount');
+    this.welcomeTotalCount = document.getElementById('welcomeTotalCount');
+
+    // Ensure export & preview buttons are disabled initially
     if (this.pdfBtn) this.pdfBtn.disabled = true;
+    if (this.previewBtn) this.previewBtn.disabled = true;
     
     // Main Content Containers
     this.welcomeState = document.getElementById('fitnessWelcomeState');
@@ -62,11 +77,8 @@ class FitnessTrendApp {
     });
 
     this.searchInput.addEventListener('focus', () => {
-      if (this.searchResults.children.length > 0) {
-        this.searchResults.classList.remove('d-none');
-      } else {
-        this.performSearch(this.searchInput.value.trim(), true);
-      }
+      const currentVal = this.searchInput.value.trim();
+      this.performSearch(currentVal, true);
     });
 
     // Keyboard navigation in search results
@@ -100,10 +112,13 @@ class FitnessTrendApp {
         e.stopPropagation();
         this.searchInput.value = '';
         this.clearBtn.classList.add('d-none');
-        this.searchResults.classList.add('d-none');
+        this.searchResults.innerHTML = '';
+        this.performSearch('', true);
         this.currentArmyNumber = null;
         this.currentData = null;
         if (this.pdfBtn) this.pdfBtn.disabled = true;
+        if (this.previewBtn) this.previewBtn.disabled = true;
+        if (this.pdfSuccessActions) this.pdfSuccessActions.classList.add('d-none');
         this.activeContent.classList.add('d-none');
         this.errorAlert.classList.add('d-none');
         this.welcomeState.classList.remove('d-none');
@@ -129,6 +144,16 @@ class FitnessTrendApp {
       });
     }
 
+    // Language change
+    if (this.langSelect) {
+      this.langSelect.addEventListener('change', (e) => {
+        this.currentLang = e.target.value;
+        if (this.currentArmyNumber) {
+          this.loadAnalysis(this.currentArmyNumber, this.currentGoal);
+        }
+      });
+    }
+
     // Workflow tabs
     if (this.stageNav) {
       this.stageNav.querySelectorAll('.workflow-tab-btn').forEach(btn => {
@@ -139,21 +164,155 @@ class FitnessTrendApp {
       });
     }
 
-    // PDF Download button
-    const pdfBtn = document.getElementById('downloadPdfBtn');
+    // Preview Report button (opens printable HTML view in new tab)
+    if (this.previewBtn) {
+      this.previewBtn.addEventListener('click', () => {
+        if (!this.currentArmyNumber) return;
+        const lang = this.currentLang || (this.langSelect ? this.langSelect.value : 'en');
+        const goal = this.currentGoal || (this.goalSelect ? this.goalSelect.value : 'Overall Fitness');
+        const previewUrl = `/fitness/report/preview/${encodeURIComponent(this.currentArmyNumber)}?lang=${encodeURIComponent(lang)}&goal=${encodeURIComponent(goal)}`;
+        window.open(previewUrl, '_blank');
+      });
+    }
+
+    // PDF Download button with status notifications & Action Bar
+    const pdfBtn = this.pdfBtn || document.getElementById('downloadPdfBtn');
+    const statusAlert = document.getElementById('pdfExportStatusAlert');
+    const statusSpinner = document.getElementById('pdfExportSpinner');
+    const successIcon = document.getElementById('pdfExportSuccessIcon');
+    const statusText = document.getElementById('pdfExportStatusText');
+
     if (pdfBtn) {
-      pdfBtn.addEventListener('click', () => {
-        if (this.currentArmyNumber) {
-          window.open(`/fitness/report/pdf/${encodeURIComponent(this.currentArmyNumber)}?goal=${encodeURIComponent(this.currentGoal)}`, '_blank');
+      pdfBtn.addEventListener('click', async () => {
+        if (!this.currentArmyNumber) return;
+
+        const lang = this.currentLang || (this.langSelect ? this.langSelect.value : 'en');
+        const langName = this.langSelect && this.langSelect.selectedIndex >= 0
+          ? this.langSelect.options[this.langSelect.selectedIndex].text
+          : 'English';
+
+        const originalHtml = pdfBtn.innerHTML;
+        pdfBtn.disabled = true;
+        if (this.previewBtn) this.previewBtn.disabled = true;
+        pdfBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Generating...`;
+
+        // Display "Generating <Language> report..."
+        if (statusAlert) {
+          statusAlert.className = 'alert alert-info py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2 shadow-sm';
+          statusAlert.classList.remove('d-none');
+          if (statusSpinner) statusSpinner.classList.remove('d-none');
+          if (successIcon) successIcon.classList.add('d-none');
+          if (statusText) statusText.textContent = `Generating ${langName} report...`;
+        }
+
+        try {
+          const res = await fetch('/api/fitness-trend/export-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              army_number: this.currentArmyNumber,
+              language: lang,
+              goal: this.currentGoal
+            })
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || `HTTP ${res.status}: Failed to generate ${langName} report.`);
+          }
+
+          const blob = await res.blob();
+          this.latestPdfBlob = blob;
+          
+          // Determine filename from header or fallback
+          const contentDisposition = res.headers.get('Content-Disposition');
+          const todayStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
+          let filename = `UMS_Fitness_Report_${this.currentArmyNumber}_${lang.toUpperCase()}_${todayStr}.pdf`;
+          if (contentDisposition && contentDisposition.includes('filename=')) {
+            const match = contentDisposition.match(/filename="?([^"]+)"?/);
+            if (match && match[1]) filename = match[1];
+          }
+          this.latestPdfFilename = filename;
+
+          // Trigger automatic download
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.setAttribute('download', filename);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+
+          // Reveal Action Bar with [ View PDF ] and [ Download PDF ]
+          if (this.pdfSuccessActions) {
+            this.pdfSuccessActions.classList.remove('d-none');
+            if (this.pdfSuccessFileName) this.pdfSuccessFileName.textContent = filename;
+          }
+
+          // Display "<Language> Fitness Report generated successfully."
+          if (statusAlert) {
+            statusAlert.className = 'alert alert-success py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2 shadow-sm';
+            if (statusSpinner) statusSpinner.classList.add('d-none');
+            if (successIcon) successIcon.classList.remove('d-none');
+            if (statusText) statusText.textContent = `${langName} Fitness Report generated successfully.`;
+            setTimeout(() => {
+              statusAlert.classList.add('d-none');
+            }, 5000);
+          }
+        } catch (err) {
+          console.error('PDF Export error:', err);
+          if (statusAlert) {
+            statusAlert.className = 'alert alert-danger py-2 px-3 rounded-3 mb-3 d-flex align-items-center gap-2 shadow-sm';
+            if (statusSpinner) statusSpinner.classList.add('d-none');
+            if (successIcon) successIcon.classList.add('d-none');
+            if (statusText) statusText.textContent = err.message || 'Error generating report PDF.';
+          }
+        } finally {
+          pdfBtn.disabled = false;
+          if (this.previewBtn) this.previewBtn.disabled = false;
+          pdfBtn.innerHTML = originalHtml;
         }
       });
     }
 
+    // Wire [ View PDF ] action button
+    if (this.viewPdfBtn) {
+      this.viewPdfBtn.addEventListener('click', () => {
+        if (this.latestPdfBlob) {
+          const viewUrl = window.URL.createObjectURL(this.latestPdfBlob);
+          window.open(viewUrl, '_blank');
+        }
+      });
+    }
+
+    // Wire [ Download PDF ] action button
+    if (this.savePdfBtn) {
+      this.savePdfBtn.addEventListener('click', () => {
+        if (this.latestPdfBlob) {
+          const downloadUrl = window.URL.createObjectURL(this.latestPdfBlob);
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.setAttribute('download', this.latestPdfFilename || `UMS_Fitness_Report_${this.currentArmyNumber}.pdf`);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(downloadUrl);
+        }
+      });
+    }
     // Retrain modal trigger
     const retrainBtn = document.getElementById('triggerRetrainBtn');
     if (retrainBtn) {
       retrainBtn.addEventListener('click', () => this.triggerModelRetrain());
     }
+  }
+
+  updateTotalCounts(count) {
+    const formatted = count !== null && count !== undefined ? count : '--';
+    if (this.totalPersonnelCount) this.totalPersonnelCount.textContent = formatted;
+    if (this.searchCardTotalCount) this.searchCardTotalCount.textContent = formatted;
+    if (this.welcomeTotalCount) this.welcomeTotalCount.textContent = formatted;
   }
 
   updateActiveSearchItem(items) {
@@ -168,11 +327,17 @@ class FitnessTrendApp {
   }
 
   async performSearch(query = '', showDropdown = false) {
+    this.latestSearchQuery = query;
     try {
       const res = await fetch(`/fitness/api/personnel-list?q=${encodeURIComponent(query)}&limit=15`);
       const json = await res.json();
+      if (this.latestSearchQuery !== query) return;
+
       if (json.success) {
-        this.renderSearchResults(json.data, showDropdown);
+        if (json.total_count !== undefined) {
+          this.updateTotalCounts(json.total_count);
+        }
+        this.renderSearchResults(json.data, showDropdown, json.total_count);
       }
     } catch (e) {
       console.error("Search error:", e);
@@ -194,6 +359,39 @@ class FitnessTrendApp {
     }
   }
 
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  highlightMatch(text, query) {
+    if (!text) return '';
+    const textStr = String(text);
+    const currentInputValue = (this.searchInput ? this.searchInput.value : '').trim();
+    const effectiveQuery = (query || currentInputValue || '').trim();
+
+    if (!effectiveQuery) return this.escapeHtml(textStr);
+    
+    const q = effectiveQuery;
+    const escapedQuery = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    
+    const parts = textStr.split(regex);
+    if (parts.length <= 1) return this.escapeHtml(textStr);
+
+    return parts.map(part => {
+      if (part.toLowerCase() === q.toLowerCase()) {
+        return `<span class="search-highlight">${this.escapeHtml(part)}</span>`;
+      }
+      return this.escapeHtml(part);
+    }).join('');
+  }
+
   getInitials(name) {
     if (!name) return 'SO';
     const parts = name.trim().split(/\s+/);
@@ -201,14 +399,16 @@ class FitnessTrendApp {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  renderSearchResults(soldiers, showDropdown = true) {
+  renderSearchResults(soldiers, showDropdown = true, totalCount = null) {
     this.searchResults.innerHTML = '';
     this.activeSearchIndex = -1;
 
+    const currentQuery = (this.searchInput ? this.searchInput.value : '').trim();
+
     if (!soldiers || soldiers.length === 0) {
       this.searchResults.innerHTML = `
-        <div class="p-3 text-muted text-center small">
-          <i class="fas fa-search me-1"></i> No personnel found matching query.
+        <div class="p-3 text-muted text-center small font-monospace">
+          <i class="fas fa-search text-warning me-1"></i> No personnel found matching query "${this.escapeHtml(currentQuery)}".
         </div>
       `;
       if (showDropdown && document.activeElement === this.searchInput) {
@@ -225,25 +425,30 @@ class FitnessTrendApp {
       const statusText = s.status_type === 'category' ? 'LMC' : 'SHAPE-1';
       const initials = this.getInitials(s.name);
 
+      const highlightedName = this.highlightMatch(s.name, currentQuery);
+      const highlightedArmyNo = this.highlightMatch(s.army_number, currentQuery);
+      const highlightedCompany = this.highlightMatch(s.company || 'Unit HQ', currentQuery);
+      const highlightedRank = this.highlightMatch(s.rank || 'Soldier', currentQuery);
+
       item.innerHTML = `
-        <div class="d-flex align-items-center gap-3">
-          <div class="search-soldier-avatar">${initials}</div>
-          <div>
-            <div class="fw-bold" style="color: var(--fit-text-main); font-size: 0.95rem;">
-              ${s.name} <span class="badge bg-secondary ms-1 fw-normal" style="font-size: 0.72rem;">${s.rank || 'Soldier'}</span>
+        <div class="d-flex align-items-center gap-3 flex-grow-1 min-w-0">
+          <div class="search-soldier-avatar flex-shrink-0">${initials}</div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-bold text-truncate" style="color: var(--fit-text-main); font-size: 0.95rem; line-height: 1.3;">
+              ${highlightedName} <span class="badge bg-secondary text-white ms-1 fw-semibold" style="font-size: 0.72rem; vertical-align: middle;">${highlightedRank}</span>
             </div>
-            <div class="small text-muted d-flex align-items-center gap-2 mt-1">
-              <span class="search-soldier-army-no">${s.army_number}</span>
-              <span>&bull;</span>
-              <span>${s.company || 'Unit HQ'}</span>
-              <span>&bull;</span>
-              <span>${s.trade || 'GD'}</span>
+            <div class="small text-muted d-flex align-items-center flex-wrap gap-2 mt-1" style="font-size: 0.82rem; line-height: 1.4;">
+              <span class="search-soldier-army-no">${highlightedArmyNo}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-medium text-secondary">${highlightedCompany}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-medium text-secondary">${s.trade || 'GD'}</span>
             </div>
           </div>
         </div>
-        <div class="text-end">
-          <span class="badge ${badgeClass} text-uppercase mb-1" style="font-size: 0.72rem;">${statusText}</span>
-          <div class="small text-muted fw-bold">${s.weight ? s.weight + ' kg' : 'Wt: --'}</div>
+        <div class="text-end flex-shrink-0 ms-2">
+          <span class="badge ${badgeClass} text-uppercase px-2 py-1 shadow-sm" style="font-size: 0.72rem; letter-spacing: 0.5px;">${statusText}</span>
+          <div class="small text-muted fw-bold mt-1" style="font-size: 0.8rem;">${s.weight ? s.weight + ' kg' : 'Wt: --'}</div>
         </div>
       `;
 
@@ -258,6 +463,17 @@ class FitnessTrendApp {
 
       this.searchResults.appendChild(item);
     });
+
+    if (totalCount !== null && totalCount !== undefined) {
+      const footer = document.createElement('div');
+      footer.className = 'p-2 px-3 bg-light border-top text-muted small d-flex justify-content-between align-items-center font-monospace';
+      footer.style.fontSize = '0.78rem';
+      footer.innerHTML = `
+        <span><i class="fas fa-list me-1 text-primary"></i> Showing ${soldiers.length}</span>
+        <span><i class="fas fa-database me-1 text-primary"></i> Total Weight Info: <strong>${totalCount}</strong></span>
+      `;
+      this.searchResults.appendChild(footer);
+    }
 
     if (showDropdown && document.activeElement === this.searchInput) {
       this.searchResults.classList.remove('d-none');
@@ -279,7 +495,11 @@ class FitnessTrendApp {
       const res = await fetch('/fitness/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ army_number: armyNumber, goal: goal })
+        body: JSON.stringify({
+          army_number: armyNumber,
+          goal: goal,
+          lang: this.currentLang || 'en'
+        })
       });
 
       const json = await res.json();
@@ -287,6 +507,7 @@ class FitnessTrendApp {
 
       if (!json.success) {
         if (this.pdfBtn) this.pdfBtn.disabled = true;
+        if (this.previewBtn) this.previewBtn.disabled = true;
         this.errorAlert.textContent = json.error || 'Failed to analyze soldier records.';
         this.errorAlert.classList.remove('d-none');
         return;
@@ -294,11 +515,13 @@ class FitnessTrendApp {
 
       this.currentData = json;
       if (this.pdfBtn) this.pdfBtn.disabled = false;
+      if (this.previewBtn) this.previewBtn.disabled = false;
       this.renderAllStages(json);
       this.activeContent.classList.remove('d-none');
       this.switchStage(this.activeStage);
     } catch (e) {
       if (this.pdfBtn) this.pdfBtn.disabled = true;
+      if (this.previewBtn) this.previewBtn.disabled = true;
       this.loadingState.classList.add('d-none');
       this.errorAlert.textContent = 'Server connection error. Please try again.';
       this.errorAlert.classList.remove('d-none');
@@ -343,7 +566,7 @@ class FitnessTrendApp {
   renderAllStages(data) {
     this.renderProfileCard(data.soldier);
     this.renderAnalysisCard(data.soldier);
-    this.renderPredictionCard(data.soldier, data.prediction);
+    this.renderPredictionCard(data.soldier, data.prediction, data.recommendations);
     this.renderRecommendationsCard(data.soldier, data.recommendations);
     this.renderProgressionCard(data.progression);
     this.renderReportPreview(data);
@@ -361,7 +584,18 @@ class FitnessTrendApp {
     document.getElementById('profHeight').textContent = s.height_cm ? `${s.height_cm} cm` : 'N/A';
     document.getElementById('profActualWeight').textContent = s.actual_weight_kg ? `${s.actual_weight_kg} kg` : 'N/A';
     document.getElementById('profIdealWeight').textContent = s.ideal_weight_kg ? `${s.ideal_weight_kg} kg` : 'N/A';
-    document.getElementById('profWeightDiff').textContent = s.weight_difference_kg !== null ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg` : 'N/A';
+    
+    const diffKg = s.weight_difference_kg !== null && s.weight_difference_kg !== undefined
+      ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg`
+      : '';
+
+    const profStatusEl = document.getElementById('profWeightStatus');
+    if (profStatusEl) profStatusEl.textContent = s.weight_status || 'N/A';
+
+    const profSubEl = document.getElementById('profWeightSub');
+    if (profSubEl) {
+      profSubEl.textContent = diffKg ? `${diffKg} Variance vs Standard (Authorization Benchmark)` : 'Authorization Benchmark';
+    }
     
     // BPET & PPT Badges
     const bpetEl = document.getElementById('profBpetBadge');
@@ -404,9 +638,16 @@ class FitnessTrendApp {
     document.getElementById('anaBmiCat').style.color = s.bmi_color || '#3b82f6';
     
     document.getElementById('anaWeightStatus').textContent = s.weight_status || 'N/A';
-    document.getElementById('anaWeightDev').textContent = s.weight_deviation_percent !== null ? `${s.weight_deviation_percent > 0 ? '+' : ''}${s.weight_deviation_percent}%` : 'N/A';
-    document.getElementById('anaWeightDiffKg').textContent = s.weight_difference_kg !== null ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg` : 'N/A';
     
+    const diffKg = s.weight_difference_kg !== null && s.weight_difference_kg !== undefined
+      ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg`
+      : '';
+
+    const anaSubEl = document.getElementById('anaWeightSub');
+    if (anaSubEl) {
+      anaSubEl.textContent = diffKg ? `${diffKg} Variance vs Standard (Authorization Benchmark)` : 'Authorization Benchmark';
+    }
+
     document.getElementById('anaCombinedPhysical').textContent = `${s.ground_truth_score || 70} / 100`;
     document.getElementById('anaActivityLevel').textContent = s.physical_activity_level || 'Moderate';
   }
@@ -482,7 +723,7 @@ class FitnessTrendApp {
     }
   }
 
-  renderPredictionCard(s, pred) {
+  renderPredictionCard(s, pred, rec) {
     const scoreVal = pred.fitness_score || 70;
     document.getElementById('predScoreNumber').textContent = scoreVal;
     
@@ -518,6 +759,25 @@ class FitnessTrendApp {
         <span>${imp}</span>
       </li>
     `).join('');
+
+    // Targeted Nutritional Metrics in Prediction Results View
+    if (rec && rec.diet) {
+      const diet = rec.diet;
+      const targetCalsEl = document.getElementById('predTargetCals');
+      if (targetCalsEl) targetCalsEl.textContent = `${diet.target_calories} kcal / Day`;
+
+      const carbEl = document.getElementById('predCarbGrams');
+      if (carbEl && diet.macros) carbEl.textContent = `${diet.macros.carb_grams}g (${diet.macros.carb_pct}%)`;
+
+      const fatEl = document.getElementById('predFatGrams');
+      if (fatEl && diet.macros) fatEl.textContent = `${diet.macros.fat_grams}g (${diet.macros.fat_pct}%)`;
+
+      const proteinEl = document.getElementById('predProteinGrams');
+      if (proteinEl && diet.macros) proteinEl.textContent = `${diet.macros.protein_grams}g (${diet.macros.protein_pct}%)`;
+
+      const hydEl = document.getElementById('predHydration');
+      if (hydEl) hydEl.textContent = `${diet.hydration_liters} L / Day`;
+    }
   }
 
   renderRecommendationsCard(s, rec) {
@@ -631,43 +891,80 @@ class FitnessTrendApp {
       this.charts.progression = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: prog.chart_data.labels,
+          labels: prog.chart_data.labels || ['Current Baseline', '30 Days Projected', '60 Days Projected', '90 Days Projected'],
           datasets: [
             {
-              label: 'Readiness Score (0-100)',
+              label: 'Readiness Score (Actual vs AI Projected)',
               data: prog.chart_data.score_series,
-              borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderColor: '#059669',
+              backgroundColor: 'rgba(5, 150, 105, 0.12)',
+              pointBackgroundColor: '#059669',
+              pointBorderColor: '#047857',
+              pointRadius: 5,
+              pointHoverRadius: 7,
               fill: true,
-              tension: 0.3,
+              tension: 0.25,
               yAxisID: 'yScore'
             },
             {
-              label: 'Projected Weight (kg)',
+              label: 'Body Weight (Actual vs AI Target kg)',
               data: prog.chart_data.weight_series,
-              borderColor: '#3b82f6',
-              borderDash: [5, 5],
+              borderColor: '#2563eb',
+              backgroundColor: 'transparent',
+              pointBackgroundColor: '#2563eb',
+              pointBorderColor: '#1d4ed8',
+              pointStyle: 'rectRot',
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              borderDash: [5, 4],
               fill: false,
-              tension: 0.3,
+              tension: 0.25,
               yAxisID: 'yWeight'
             }
           ]
         },
         options: {
           responsive: true,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 14,
+                font: { weight: 'bold', size: 12 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.dataset.label || '';
+                  const val = context.parsed.y;
+                  if (context.datasetIndex === 0) {
+                    return `${label}: ${val} / 100 PTS`;
+                  }
+                  return `${label}: ${val} kg`;
+                }
+              }
+            }
+          },
           scales: {
             yScore: {
               type: 'linear',
               position: 'left',
               min: 40,
               max: 100,
-              title: { display: true, text: 'Readiness Score' }
+              title: { display: true, text: 'Readiness Score (PTS)', color: '#059669', font: { weight: 'bold' } },
+              ticks: { color: '#059669' }
             },
             yWeight: {
               type: 'linear',
               position: 'right',
               grid: { drawOnChartArea: false },
-              title: { display: true, text: 'Body Weight (kg)' }
+              title: { display: true, text: 'Body Weight (kg)', color: '#2563eb', font: { weight: 'bold' } },
+              ticks: { color: '#2563eb' }
             }
           }
         }
@@ -679,71 +976,112 @@ class FitnessTrendApp {
     const previewCont = document.getElementById('reportHtmlPreviewCont');
     if (!previewCont) return;
 
-    const s = data.soldier;
-    const pred = data.prediction;
-    const rec = data.recommendations;
-    const prog = data.progression;
+    const s = data.soldier || {};
+    const pred = data.prediction || {};
+    const rec = data.recommendations || {};
+    const prog = data.progression || {};
+    const lbl = data.labels || {};
+    const lang = this.currentLang || data.lang || 'en';
+    const isRtl = lang === 'ur';
+
+    // Helper to get translated label with fallback
+    const t = (key, fallback) => (lbl && lbl[key]) ? lbl[key] : fallback;
+
+    // Update Stage 6 Preview Card title & button text if available
+    const prevTitleEl = document.getElementById('reportPreviewTitle');
+    if (prevTitleEl) prevTitleEl.textContent = t('official_preview_title', 'Official Individual Fitness Report Preview');
+    const prevBtnTextEl = document.getElementById('reportPreviewDownloadText');
+    if (prevBtnTextEl) prevBtnTextEl.textContent = t('download_pdf', 'Download PDF Document');
 
     previewCont.innerHTML = `
-      <div class="card p-4 shadow-sm border" style="background: white; color: #1e293b; max-width: 900px; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif;">
-        <div class="text-center pb-3 border-bottom mb-3">
-          <h4 class="fw-bold mb-1" style="color: #1b382b;">15 CORPS / 15 CESR — UNIT MANAGEMENT SYSTEM</h4>
-          <h5 class="fw-bold text-primary mb-1">INDIVIDUAL FITNESS PREDICTION &amp; PERSONALIZED FITNESS REPORT</h5>
-          <div class="small text-muted">Generated: ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} hrs &bull; Model: ${pred.model_version || 'v1'}</div>
+      <div class="card p-4 shadow-sm border" style="background: white; color: #1e293b; max-width: 900px; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; ${isRtl ? 'direction: rtl; text-align: right;' : ''}">
+        <!-- Official Regiment Header Banner -->
+        <div class="page-title mb-4" style="height: auto; min-height: 95px; background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%) !important; color: white; padding: 0.8rem 1.4rem; border-radius: 15px; box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25); display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <img src="/static/image_for_login_page/rt.jpg" class="org-logo" alt="15 CESR Logo" style="width: 75px; height: 75px; object-fit: contain; border-radius: 20%; padding: 6px; background: rgba(255, 255, 255, 0.15); flex-shrink: 0;">
+          <div class="title-section text-center flex-grow-1">
+            <h4 class="fw-bold mb-1 text-white" style="font-size: 1.35rem; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">${t('unit_title', '15 CORPS ENGINEERING SIGNAL REGIMENT')}</h4>
+            <div style="display: inline-block; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 3px 14px; font-size: 0.8rem; font-weight: 600; color: rgba(255, 255, 255, 0.95); margin-top: 3px;">
+              ${t('report_title', 'AI/ML INDIVIDUAL FITNESS PREDICTION & READINESS REPORT')}
+            </div>
+            <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">${t('military_record_sub', 'UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL')} &bull; ${t('report_generated', 'Generated')}: ${new Date().toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} hrs</div>
+          </div>
+          <img src="/static/image_for_login_page/chinar.jpg" class="org-logo" alt="15 COR Logo" style="width: 75px; height: 75px; object-fit: contain; border-radius: 20%; padding: 6px; background: rgba(255, 255, 255, 0.15); flex-shrink: 0;">
         </div>
 
         <table class="table table-bordered table-sm mb-3" style="font-size: 0.88rem;">
           <tr style="background: #f1f5f9;">
-            <th style="width: 20%;">Name</th><td>${s.name}</td>
-            <th style="width: 20%;">Army Number</th><td>${s.army_number}</td>
+            <th style="width: 20%;">${t('name', 'Name')}</th><td>${s.name || 'N/A'}</td>
+            <th style="width: 20%;">${t('army_number', 'Army Number')}</th><td>${s.army_number || 'N/A'}</td>
           </tr>
           <tr>
-            <th>Rank / Trade</th><td>${s.rank} / ${s.trade}</td>
-            <th>Company / Section</th><td>${s.company} / ${s.section || 'N/A'}</td>
+            <th>${t('rank_trade', 'Rank / Trade')}</th><td>${s.rank || 'N/A'} / ${s.trade || 'N/A'}</td>
+            <th>${t('company_section', 'Company / Section')}</th><td>${s.company || 'N/A'} / ${s.section || 'N/A'}</td>
           </tr>
           <tr style="background: #f1f5f9;">
-            <th>Height / Weight</th><td>${s.height_cm} cm / ${s.actual_weight_kg} kg</td>
-            <th>Ideal Wt / Deviation</th><td>${s.ideal_weight_kg} kg (${s.weight_deviation_percent > 0 ? '+' : ''}${s.weight_deviation_percent}%)</td>
+            <th>${t('height_weight', 'Height / Weight')}</th><td>${s.height_cm} cm / ${s.actual_weight_kg} kg</td>
+            <th>${t('ideal_wt_dev', 'Ideal Wt / Deviation')}</th><td>${s.ideal_weight_kg || 'N/A'} kg (${s.weight_deviation_percent > 0 ? '+' : ''}${s.weight_deviation_percent}%)</td>
           </tr>
           <tr>
-            <th>BMI &amp; Category</th><td>${s.bmi} (${s.bmi_category})</td>
-            <th>BPET / PPT Grading</th><td>${s.bpet_grade || 'N/A'} / ${s.ppt_grade || 'N/A'}</td>
+            <th>${t('bmi_cat', 'BMI & Category')}</th><td>${s.bmi || 'N/A'} (${s.bmi_category || 'N/A'})</td>
+            <th>${t('bpet_ppt_grading', 'BPET / PPT Grading')}</th><td>${s.bpet_grade || 'N/A'} / ${s.ppt_grade || 'N/A'}</td>
           </tr>
         </table>
 
         <div class="p-3 mb-3 rounded" style="background: rgba(59, 130, 246, 0.08); border-left: 5px solid #3b82f6;">
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <div class="small text-muted text-uppercase fw-bold">AI Physical Readiness Prediction</div>
-              <h3 class="fw-bold mb-0 text-primary">${pred.fitness_score} / 100 &mdash; ${pred.category_label}</h3>
+              <div class="small text-muted text-uppercase fw-bold">${t('readiness_prediction', 'AI Physical Readiness Prediction')}</div>
+              <h3 class="fw-bold mb-0 text-primary">${pred.fitness_score} / 100 &mdash; ${pred.category_label || pred.fitness_category}</h3>
             </div>
             <div class="text-end">
-              <span class="badge bg-primary fs-6">Confidence: ${pred.confidence_score}%</span>
+              <span class="badge bg-primary fs-6">${t('confidence', 'Confidence')}: ${pred.confidence_score}%</span>
             </div>
           </div>
         </div>
 
         <div class="row mb-3">
           <div class="col-6">
-            <h6 class="fw-bold text-success mb-2"><i class="fas fa-check-circle me-1"></i> Key Positive Factors:</h6>
+            <h6 class="fw-bold text-success mb-2"><i class="fas fa-check-circle me-1"></i> ${t('key_positive_factors', 'Key Positive Factors:')}</h6>
             <ul class="small ps-3 mb-0">${(pred.strengths || []).map(str => `<li>${str}</li>`).join('')}</ul>
           </div>
           <div class="col-6">
-            <h6 class="fw-bold text-warning mb-2"><i class="fas fa-arrow-circle-up me-1"></i> Priority Action Areas:</h6>
+            <h6 class="fw-bold text-warning mb-2"><i class="fas fa-arrow-circle-up me-1"></i> ${t('action_areas', 'Priority Action Areas:')}</h6>
             <ul class="small ps-3 mb-0">${(pred.improvements || []).map(imp => `<li>${imp}</li>`).join('')}</ul>
           </div>
         </div>
 
-        <hr class="my-2">
-        <h6 class="fw-bold text-primary mb-2"><i class="fas fa-utensils me-1"></i> Personalized Nutrition (${rec.diet.target_calories} kcal / Day):</h6>
-        <p class="small text-muted mb-2">${rec.diet.strategy}</p>
-
-        <h6 class="fw-bold text-primary mb-2 mt-3"><i class="fas fa-running me-1"></i> Tactical Physical Training Regimen:</h6>
-        <p class="small text-muted mb-2">${rec.exercise.title} &mdash; ${rec.exercise.focus_area}</p>
-        
-        <div class="alert alert-secondary py-2 small mb-0 mt-3 text-center">
-          <i class="fas fa-shield-alt me-1"></i> Endorsement: Subject to periodic medical inspection and unit officer physical authorization.
+        <hr class="my-3">
+        <h6 class="fw-bold text-primary mb-2"><i class="fas fa-utensils me-1"></i> ${t('sec4_title', '4. Personalized Dietary & Macronutrient Plan')} (${rec.diet ? rec.diet.target_calories : 0} kcal / Day):</h6>
+        <div class="row g-2 mb-2 text-center">
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">${t('complex_carbs', 'COMPLEX CARBS')}</small>
+              <strong class="text-success" style="color: #10b981 !important; font-size: 0.95rem;">${rec.diet && rec.diet.macros ? rec.diet.macros.carb_grams : 0}g (${rec.diet && rec.diet.macros ? rec.diet.macros.carb_pct : 0}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">${t('healthy_fats', 'HEALTHY FATS')}</small>
+              <strong class="text-warning" style="color: #f59e0b !important; font-size: 0.95rem;">${rec.diet && rec.diet.macros ? rec.diet.macros.fat_grams : 0}g (${rec.diet && rec.diet.macros ? rec.diet.macros.fat_pct : 0}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">${t('daily_protein', 'DAILY PROTEIN')}</small>
+              <strong class="text-primary" style="color: #3b82f6 !important; font-size: 0.95rem;">${rec.diet && rec.diet.macros ? rec.diet.macros.protein_grams : 0}g (${rec.diet && rec.diet.macros ? rec.diet.macros.protein_pct : 0}%)</strong>
+            </div>
+          </div>
+          <div class="col-3">
+            <div class="p-2 border rounded bg-light">
+              <small class="text-muted d-block fw-bold" style="font-size: 0.72rem;">${t('hydration', 'HYDRATION')}</small>
+              <strong class="text-info" style="color: #06b6d4 !important; font-size: 0.95rem;">${rec.diet ? rec.diet.hydration_liters : 0} L / Day</strong>
+            </div>
+          </div>
         </div>
+        <p class="small text-muted mb-3">${rec.diet ? rec.diet.strategy : ''}</p>
+
+        <h6 class="fw-bold text-primary mb-2 mt-2"><i class="fas fa-running me-1"></i> ${t('sec5_title', '5. Physical Training')}:</h6>
+        <p class="small text-muted mb-2">${rec.exercise ? rec.exercise.title : ''} &mdash; ${rec.exercise ? rec.exercise.focus_area : ''}</p>
       </div>
     `;
   }

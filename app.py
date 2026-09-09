@@ -38,6 +38,33 @@ app.register_blueprint(company_rec_bp)
 app.register_blueprint(fitness_trend_bp)
 
 
+@app.route("/api/fitness-trend/export-pdf", methods=["POST"])
+@app.route("/fitness-trend/report/pdf", methods=["POST"])
+@app.route("/fitness/report/pdf", methods=["POST"])
+def root_export_fitness_pdf():
+    from aiml.fitness_trend.routes import export_fitness_pdf_api
+    return export_fitness_pdf_api()
+
+
+@app.route("/fitness-trend/reports", methods=["GET"])
+def root_fitness_reports():
+    from flask import redirect
+    return redirect("/fitness/reports")
+
+
+@app.route("/fitness-trend/api/reports", methods=["GET"])
+def root_fitness_api_reports():
+    from aiml.fitness_trend.routes import api_get_reports
+    return api_get_reports()
+
+
+@app.route("/fitness-trend/api/reports/stats", methods=["GET"])
+def root_fitness_api_reports_stats():
+    from aiml.fitness_trend.routes import api_get_reports_stats
+    return api_get_reports_stats()
+
+
+
 @app.route("/history/15cesr")
 def history_15cesr():
     return render_template("history/history_15cesr.html")
@@ -126,9 +153,9 @@ def inject_user():
 
     return {
         "current_user": user,
-        "current_user_name": user['username'] if user else None,
-        "role": user['role'] if user else None,
-        "company": user['company'] if user else None,
+        "current_user_name": user.get('username') if user else None,
+        "role": user.get('role') if user else None,
+        "company": user.get('company') if user else None,
         "dated_url_for": dated_url_for,
         "client_ip": client_ip,
         "current_datetime": datetime.now()

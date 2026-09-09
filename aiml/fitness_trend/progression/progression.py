@@ -144,5 +144,23 @@ def generate_fitness_progression_trajectory(soldier_features, predicted_score=No
             'weight_series': [cur_wt, wt_30, wt_60, wt_90],
             'bmi_series': [cur_bmi, bmi_30, bmi_60, bmi_90],
             'score_series': [cur_score, score_30, score_60, score_90]
+        },
+        'trajectory_30d': {
+            'projected_fitness_score': score_30,
+            'projected_weight_kg': wt_30,
+            'projected_bmi': bmi_30,
+            'bmi': bmi_30
+        },
+        'trajectory_60d': {
+            'projected_fitness_score': score_60,
+            'projected_weight_kg': wt_60,
+            'projected_bmi': bmi_60,
+            'bmi': bmi_60
+        },
+        'trajectory_90d': {
+            'projected_fitness_score': score_90,
+            'projected_weight_kg': wt_90,
+            'projected_bmi': bmi_90,
+            'bmi': bmi_90
         }
     }

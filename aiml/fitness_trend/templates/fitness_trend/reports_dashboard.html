@@ -1,0 +1,308 @@
+{% extends "baseView.html" %}
+
+{% block extra_css %}
+<!-- Dashboard Custom CSS -->
+<link rel="stylesheet" href="{{ url_for('fitness_trend_bp.static', filename='css/fitness_reports_dashboard.css') }}?v=4.0">
+<style>
+  .tab-pane-custom {
+    display: none;
+  }
+  .tab-pane-custom.active {
+    display: block;
+  }
+  .btn-modal-close-custom {
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.45) !important;
+    color: #ffffff !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.05rem !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease-in-out !important;
+    opacity: 0.95 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+  }
+  .btn-modal-close-custom:hover,
+  .btn-modal-close-custom:focus {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6) !important;
+  }
+  .metric-card {
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    user-select: none;
+  }
+  .metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+  }
+  .metric-card.active-filter {
+    outline: 2.5px solid #2563eb !important;
+    background: #eff6ff !important;
+  }
+  .metric-card.healthy.active-filter {
+    outline: 2.5px solid #10b981 !important;
+    background: #f0fdf4 !important;
+  }
+  .metric-card.needs-imp.active-filter {
+    outline: 2.5px solid #f59e0b !important;
+    background: #fffbeb !important;
+  }
+  .metric-card.at-risk.active-filter {
+    outline: 2.5px solid #ef4444 !important;
+    background: #fef2f2 !important;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+
+  <!-- Standard Navbar -->
+  {% set header = "15 CESR UMS" %}
+  {% include 'navbar/navbar.html' %}
+
+  <!-- Executive Header Banner -->
+  <div class="reports-header-banner mt-3">
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <span class="confidential-pill"><i class="fas fa-lock"></i> Executive Access Only</span>
+      <span class="badge bg-dark text-white-50 border border-secondary font-monospace" style="font-size: 0.72rem;">CO / 2IC / ADJUTANT DIRECTORY</span>
+    </div>
+    <h2 style="color: #38bdf8 !important;"><i class="fas fa-heartbeat text-warning me-2"></i>AI Fitness Reports &amp; Combat Readiness Directory</h2>
+    <p>Unit-wide directory of all personnel with generated AI fitness evaluations, predictive trajectories, and personalized nutrition/exercise regimes.</p>
+  </div>
+
+  <!-- Real-Time Metrics Cards Row -->
+  <div class="metrics-row">
+    <div class="metric-card total active-filter" id="dashMetricTotal" onclick="FitnessReportsDashboard.filterByStatus('')" title="Click to view all reports">
+      <div class="metric-info">
+        <h4>Total Generated Reports <i class="fas fa-filter text-primary ms-1" style="font-size: 0.75rem;"></i></h4>
+        <div class="metric-num" id="statTotalReports">--</div>
+      </div>
+      <div class="metric-icon">
+        <i class="fas fa-file-medical-alt"></i>
+      </div>
+    </div>
+
+    <div class="metric-card healthy" id="dashMetricHealthy" onclick="FitnessReportsDashboard.filterByStatus('Healthy')" title="Click to filter Healthy / Combat Ready soldiers">
+      <div class="metric-info">
+        <h4>Healthy / Combat Ready <i class="fas fa-filter text-success ms-1" style="font-size: 0.75rem;"></i></h4>
+        <div class="metric-num text-success" id="statHealthyReports">--</div>
+      </div>
+      <div class="metric-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+    </div>
+
+    <div class="metric-card needs-imp" id="dashMetricNeedsImp" onclick="FitnessReportsDashboard.filterByStatus('Needs Improvement')" title="Click to filter Needs Improvement soldiers">
+      <div class="metric-info">
+        <h4>Needs Improvement <i class="fas fa-filter text-warning ms-1" style="font-size: 0.75rem;"></i></h4>
+        <div class="metric-num text-warning" id="statNeedsImpReports">--</div>
+      </div>
+      <div class="metric-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+    </div>
+
+    <div class="metric-card at-risk" id="dashMetricAtRisk" onclick="FitnessReportsDashboard.filterByStatus('At Risk')" title="Click to filter At Risk / Attention soldiers">
+      <div class="metric-info">
+        <h4>At Risk / Attention <i class="fas fa-filter text-danger ms-1" style="font-size: 0.75rem;"></i></h4>
+        <div class="metric-num text-danger" id="statAtRiskReports">--</div>
+      </div>
+      <div class="metric-icon">
+        <i class="fas fa-user-shield"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filters Card -->
+  <div class="filter-card">
+    <div class="filter-grid">
+      <div class="filter-group">
+        <label for="filterSearchInput"><i class="fas fa-search me-1"></i> Search Personnel</label>
+        <input type="text" id="filterSearchInput" class="filter-input" placeholder="Search by Army No or Full Name...">
+      </div>
+
+      <div class="filter-group">
+        <label for="filterCompanySelect"><i class="fas fa-building me-1"></i> Sub-Unit / Company</label>
+        <select id="filterCompanySelect" class="filter-select">
+          <option value="">All Companies</option>
+          <option value="COMN">COMN Company</option>
+          <option value="ADMN">ADMN Company</option>
+          <option value="TECH">TECH Company</option>
+          <option value="SPT">SPT Company</option>
+          <option value="HQ">HQ Company</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterStatusSelect"><i class="fas fa-filter me-1"></i> Fitness Status</label>
+        <select id="filterStatusSelect" class="filter-select">
+          <option value="">All Statuses</option>
+          <option value="Healthy">Healthy / Combat Ready</option>
+          <option value="Needs Improvement">Needs Improvement</option>
+          <option value="At Risk">At Risk</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterFromDate"><i class="fas fa-calendar-alt me-1"></i> From Date</label>
+        <input type="date" id="filterFromDate" class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label for="filterToDate"><i class="fas fa-calendar-alt me-1"></i> To Date</label>
+        <input type="date" id="filterToDate" class="filter-input">
+      </div>
+
+      <div class="filter-group d-flex gap-2">
+        <button id="btnResetFilters" class="btn btn-outline-secondary btn-sm px-3" style="height: 38px;" title="Reset all filters">
+          <i class="fas fa-redo-alt me-1"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reports Table Card -->
+  <div class="table-card">
+    <div class="table-toolbar">
+      <div class="results-counter" id="resultsCounterText">
+        Showing records...
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-1">
+          <label for="pageSizeSelect" class="text-muted small mb-0">Rows:</label>
+          <select id="pageSizeSelect" class="form-select form-select-sm" style="width: 75px;">
+            <option value="10" selected>10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="reports-table">
+        <thead>
+          <tr>
+            <th class="text-center" style="width: 50px;">S.No</th>
+            <th class="sortable" data-sort="army_number">Army Number <i class="fas fa-sort text-muted ms-1"></i></th>
+            <th class="sortable" data-sort="name">Name <i class="fas fa-sort text-muted ms-1"></i></th>
+            <th>Rank</th>
+            <th>Company</th>
+            <th>Age</th>
+            <th>Height</th>
+            <th>Actual Weight</th>
+            <th class="sortable" data-sort="fitness_status">Fitness Status <i class="fas fa-sort text-muted ms-1"></i></th>
+            <th class="sortable text-center" data-sort="fitness_score">Fitness Score <i class="fas fa-sort text-muted ms-1"></i></th>
+            <th class="text-center">Report Generated</th>
+            <th class="sortable" data-sort="generated_at">Generated At <i class="fas fa-sort-down text-primary ms-1"></i></th>
+            <th class="text-center" style="min-width: 320px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="reportsTableBody">
+          <tr>
+            <td colspan="13" class="text-center py-5 text-muted">
+              <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+              Loading AI Fitness Reports from database...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Server-Side Pagination Controls -->
+    <div class="pagination-container">
+      <div class="text-muted small">
+        Authorized by Commanding Officer &bull; 15 CESR
+      </div>
+      <div class="pagination-controls" id="paginationControls">
+        <!-- Injected dynamically by JS -->
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Multi-Tab Report Detail Modal -->
+<div class="modal fade" id="reportDetailModal" tabindex="-1" aria-labelledby="reportDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header report-modal-header py-3 px-4">
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning text-dark font-monospace">CONFIDENTIAL</span>
+            <h5 class="modal-title fw-bold mb-0" id="modalSoldierTitle" style="color: #38bdf8 !important;">Soldier Fitness Evaluation</h5>
+          </div>
+          <div class="small text-white-50 mt-1" id="modalSoldierMeta">Loading profile...</div>
+        </div>
+        <button type="button" class="btn-modal-close-custom" data-bs-dismiss="modal" aria-label="Close" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Tab Nav -->
+      <div class="tab-nav-custom" id="reportModalTabs">
+        <button type="button" class="active" data-target="tabPaneOverview">
+          <i class="fas fa-id-card me-1"></i> Full Overview
+        </button>
+        <button type="button" data-target="tabPaneAnalysis">
+          <i class="fas fa-brain me-1"></i> AI Analysis &amp; Strengths
+        </button>
+        <button type="button" data-target="tabPaneRecs">
+          <i class="fas fa-utensils me-1"></i> Nutrition &amp; Workout
+        </button>
+        <button type="button" data-target="tabPaneProgression">
+          <i class="fas fa-chart-line me-1"></i> 30-60-90 Day Progression
+        </button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div id="tabPaneOverview" class="tab-pane-custom active">
+          <!-- Overview content injected by JS -->
+        </div>
+
+        <div id="tabPaneAnalysis" class="tab-pane-custom">
+          <!-- Analysis content injected by JS -->
+        </div>
+
+        <div id="tabPaneRecs" class="tab-pane-custom">
+          <!-- Recs content injected by JS -->
+        </div>
+
+        <div id="tabPaneProgression" class="tab-pane-custom">
+          <!-- Progression content injected by JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light justify-content-between px-4 py-2">
+        <span class="text-muted small"><i class="fas fa-shield-alt text-success me-1"></i> Grounded in Indian Army Physical Standards</span>
+        <div class="d-flex gap-2">
+          <button type="button" id="modalDownloadPdfBtn" class="btn btn-danger btn-sm px-3">
+            <i class="fas fa-file-pdf me-1"></i> Export Official PDF
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Dashboard Controller Script -->
+<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_reports_dashboard.js') }}?v=3.0"></script>
+{% endblock %}
