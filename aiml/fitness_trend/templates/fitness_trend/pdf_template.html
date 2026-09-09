@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Individual Fitness Report - {{ (report.header.army_number or soldier.army_number) if report and report.header else (soldier.army_number or '') }}</title>
+<title>{{ labels.report_title or 'Personal Fitness Report' }} - {{ (report.header.army_number or soldier.army_number) if report and report.header else (soldier.army_number or '') }}</title>
 <style>
     @page {
         size: a4 portrait;
@@ -206,8 +206,8 @@
 <table class="header-table">
     <tr>
         <td style="text-align: center;">
-            <div class="unit-title">{{ labels.unit_title or '15 CORPS / 15 CESR — UNIT MANAGEMENT SYSTEM' }}</div>
-            <div class="report-title">{{ labels.report_title or 'AI/ML INDIVIDUAL FITNESS PREDICTION &amp; PERSONALIZED FITNESS REPORT' }}</div>
+            <div class="unit-title">{{ labels.unit_title or 'UNIT MANAGEMENT SYSTEM' }}</div>
+            <div class="report-title">{{ labels.report_title or 'Personal Fitness Report' }}</div>
             <div class="meta-sub">{{ (labels.report_generated or 'Report Generated') | replace(':', '') }}: {{ (report.header.date if report and report.header else generated_at) or generated_at }}{% if report and report.header and report.header.report_id %} | {{ (labels.report_id or 'Report ID') | replace(':', '') }}: {{ report.header.report_id }}{% endif %} | {{ (labels.model_version or 'Model Version') | replace(':', '') }}: {{ model_version or 'v1' }} | {{ labels.confidential or 'CONFIDENTIAL' }}</div>
         </td>
     </tr>
@@ -504,7 +504,7 @@
 
 <!-- Official Confidential Footer -->
 <div style="border-top: 1px solid #cbd5e1; padding-top: 3px; margin-top: 6px; font-size: 7pt; color: #64748b; text-align: center;">
-    {{ (report.footer.regiment if report and report.footer else '15 CORPS ENGINEERING SIGNAL REGIMENT') or '15 CORPS ENGINEERING SIGNAL REGIMENT' }} • {{ labels.report_id or 'Report ID:' }} {{ (report.footer.report_id if report and report.footer else report.report_id) or report.report_id or '' }} • IP: {{ (report.footer.client_ip if report and report.footer else client_ip) or client_ip }} • {{ (report.footer.timestamp if report and report.footer else generated_at) or generated_at }} • {{ labels.confidential or 'CONFIDENTIAL' }}
+    {{ (report.footer.regiment if report and report.footer else (labels.regiment_name or 'UNIT MANAGEMENT SYSTEM')) or labels.regiment_name or 'UNIT MANAGEMENT SYSTEM' }} • {{ labels.report_id or 'Report ID:' }} {{ (report.footer.report_id if report and report.footer else report.report_id) or report.report_id or '' }} • IP: {{ (report.footer.client_ip if report and report.footer else client_ip) or client_ip }} • {{ (report.footer.timestamp if report and report.footer else generated_at) or generated_at }} • {{ labels.confidential or 'CONFIDENTIAL' }}
 </div>
 
 </body>

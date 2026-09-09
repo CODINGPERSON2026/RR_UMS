@@ -119,5 +119,19 @@ def generate_personalized_diet(soldier_features, goal="Overall Fitness"):
             "Ensure adequate hydration of at least 3.5 to 4.0 liters daily, especially during outdoor PT sessions.",
             "Include green leafy vegetables and seasonal citrus fruits for vital micronutrients and electrolytes."
         ],
+        'recommended_items': [
+            "Lean poultry, boiled eggs & paneer for muscle protein synthesis",
+            "Whole lentils, dal & sprouted beans for sustained amino acids",
+            "Whole grains (oats, brown rice, whole wheat roti) for glycogen replenishment",
+            "Seasonal fresh fruits & leafy vegetables for electrolytes and micronutrients",
+            "Consistent hydration with minimum 3.0 to 3.5 Liters of clean water daily"
+        ],
+        'limit_items': [
+            "Deep-fried mess snacks, pakoras, and processed canteen confectionery",
+            "Refined sugar, sugary tea/coffee, and carbonated beverages",
+            "Excessive table salt, pickles, and high-sodium processed rations",
+            "Irregular meal timings or skipping breakfast prior to morning PT",
+            "Heavy meals consumed less than 2 hours before lights out"
+        ],
         'sample_menu': sample_menu
     }

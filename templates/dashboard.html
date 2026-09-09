@@ -575,7 +575,7 @@
       {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT'] %}
-      <div class="sc" style="cursor: pointer;" onclick="openAiFitnessReportsModal()" id="card-ai-fitness-reports-dash" title="AI Individual Fitness Reports & Operational Readiness">
+      <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" title="AI Individual Fitness Reports & Operational Readiness">
         <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
         <div class="sc-right">
           <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1115,6 +1115,7 @@
   async function loadAllDashboardCards() {
     var simpleCards = [
       { id: "locationCount",           endpoint: "/api/dashboard/detachments",              key: "count" },
+      { id: "dash-fit-total",          endpoint: "/api/dashboard/fitness_reports",          key: "count" },
       { id: "attachment-count",        endpoint: "/api/dashboard/attachments",               key: "count" },
       { id: "agniveer_count",          endpoint: "/api/dashboard/agniveers",                key: "count" },
       { id: "get_projects_count",      endpoint: "/api/dashboard/projects",                 key: "count" },
@@ -1486,6 +1487,7 @@
       })
       .catch(() => {});
 
+    {% if role in ['CO', '2IC', 'ADJUTANT'] %}
     // Fetch live aggregate stats for executive AI Fitness Reports card
     fetch('/fitness/api/reports/stats')
       .then(r => r.ok ? r.json() : null)
@@ -1503,6 +1505,7 @@
         }
       })
       .catch(() => {});
+    {% endif %}
   });
 
   window.addEventListener('themechange', function() {
@@ -1512,6 +1515,8 @@
 
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
+{% if role in ['CO', '2IC', 'ADJUTANT'] %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% endif %}
 
 {% endblock %}
