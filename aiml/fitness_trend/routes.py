@@ -103,7 +103,7 @@ def fitness_dashboard_view():
         role=role,
         current_user_name=current_user_name,
         company=company,
-        header="15 CESR UMS",
+        header="Unit Management System",
         total_count=total_count
     )
 
@@ -170,6 +170,22 @@ def api_analyze_fitness():
             'success': False,
             'error': 'An internal error occurred while analyzing soldier fitness. Please check logs.'
         }), 500
+
+
+@fitness_trend_bp.route("/api/analyze/<army_number>", methods=["GET"])
+def api_analyze_fitness_by_get(army_number):
+    """
+    GET endpoint for retrieving AI fitness analysis of a soldier.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+
+    goal = request.args.get("goal", "Overall Fitness").strip()
+    result = analyze_personnel_fitness(army_number, goal=goal, regenerate=False)
+    if not result.get('success'):
+        return jsonify(result), 404
+    return jsonify(result)
 
 
 @fitness_trend_bp.route("/api/model-info", methods=["GET"])
@@ -404,12 +420,15 @@ def download_fitness_pdf(army_number):
     date_str = datetime.now().strftime("%Y%m%d")
     filename = f"UMS_Fitness_Report_{safe_army_no}_{lang_suffix}_{date_str}.pdf"
     
+    as_attachment = request.args.get("download", "").lower() in ("1", "true", "yes")
     response = make_response(send_file(
         pdf_stream,
         mimetype="application/pdf",
-        as_attachment=True,
+        as_attachment=as_attachment,
         download_name=filename
     ))
+    if not as_attachment:
+        response.headers['Content-Disposition'] = f'inline; filename="{filename}"'
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '0'
@@ -450,7 +469,7 @@ def fitness_reports_dashboard_view():
         role=role,
         current_user_name=current_user_name,
         company=company,
-        header="15 CESR UMS"
+        header="Unit Management System"
     )
 
 

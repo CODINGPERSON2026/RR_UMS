@@ -306,7 +306,6 @@
       color: #ffffff !important;
     }
 
-<<<<<<< HEAD
     /* ── Universal Modal Count Badge / Pill (High Contrast for All Themes) ── */
     .modal-header .modal-count-pill,
     .modal-header .alarm-alert-count-box,
@@ -1180,14 +1179,6 @@
       </a>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ'] %}
-      <a class="nav-link {% if '/fitness' in request.path %}active{% endif %}" href="/fitness"
-        data-tiptext="AI/ML Fitness Prediction">
-        <span class="nav-icon"><i class="fas fa-heartbeat"></i></span>
-        <span class="nav-label-text">AI Fitness Prediction</span>
-        <span class="nav-tooltip">AI Fitness</span>
-      </a>
-      {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
       <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}"

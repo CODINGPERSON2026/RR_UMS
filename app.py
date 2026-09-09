@@ -64,6 +64,18 @@ def root_fitness_api_reports_stats():
     return api_get_reports_stats()
 
 
+@app.route("/api/analyze/<army_number>", methods=["GET"])
+def root_fitness_api_analyze_soldier(army_number):
+    from aiml.fitness_trend.routes import api_analyze_fitness_by_get
+    return api_analyze_fitness_by_get(army_number)
+
+
+@app.route("/api/analyze", methods=["POST"])
+def root_fitness_api_analyze():
+    from aiml.fitness_trend.routes import api_analyze_fitness
+    return api_analyze_fitness()
+
+
 
 @app.route("/history/15cesr")
 def history_15cesr():
@@ -3966,6 +3978,17 @@ def get_detachments_count():
     finally:
         cursor.close()
         conn.close()
+
+# ========== 1.0B FITNESS REPORTS COUNT ==========
+@app.route('/api/dashboard/fitness_reports', methods=['GET'])
+def get_dashboard_fitness_reports_count():
+    try:
+        from aiml.fitness_trend.api import get_reports_statistics
+        stats_data = get_reports_statistics()
+        count = stats_data.get('stats', {}).get('total_reports', 0) if stats_data else 0
+        return jsonify({"status": "success", "count": count}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "count": 0, "message": str(e)}), 200
 
 # ========== 1.1 DOMAIN SPECIALIZATION COUNT ==========
 @app.route('/api/dashboard/duty_count', methods=['GET'])

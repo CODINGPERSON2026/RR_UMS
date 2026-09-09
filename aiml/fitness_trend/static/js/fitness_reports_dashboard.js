@@ -365,15 +365,16 @@
       let badgeClass = 'status-badge';
       let statusIcon = 'fa-info-circle';
       const sLower = statusRaw.toLowerCase();
-      if (sLower.includes('healthy') || sLower.includes('ready') || sLower.includes('good') || sLower.includes('combat')) {
+      const scoreNum = (row.fitness_score !== null && row.fitness_score !== undefined) ? Number(row.fitness_score) : null;
+      if (sLower.includes('healthy') || sLower.includes('ready') || sLower.includes('good') || sLower.includes('combat') || (scoreNum !== null && scoreNum >= 70 && !sLower.includes('risk') && !sLower.includes('improve'))) {
         badgeClass += ' healthy';
         statusIcon = 'fa-check-circle';
-      } else if (sLower.includes('improve') || sLower.includes('moderate')) {
-        badgeClass += ' needs-imp';
-        statusIcon = 'fa-exclamation-circle';
-      } else if (sLower.includes('risk') || sLower.includes('poor') || sLower.includes('critical')) {
+      } else if (sLower.includes('risk') || sLower.includes('poor') || sLower.includes('critical') || sLower.includes('fail') || (scoreNum !== null && scoreNum < 50)) {
         badgeClass += ' at-risk';
         statusIcon = 'fa-times-circle';
+      } else if (sLower.includes('improve') || sLower.includes('moderate') || sLower.includes('average') || sLower.includes('satisfactory') || sLower.includes('sat') || (scoreNum !== null && scoreNum >= 50 && scoreNum < 70)) {
+        badgeClass += ' needs-imp';
+        statusIcon = 'fa-exclamation-circle';
       } else {
         badgeClass += ' needs-imp';
       }

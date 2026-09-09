@@ -60,12 +60,13 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         if saved and saved.get('prediction_result') and saved.get('recommendations') and saved.get('progression_prediction'):
             logger.info(f"Loaded existing AI fitness report ID {saved.get('id')} from database for {clean_army_no}.")
             soldier_features = _reconstruct_soldier_features(saved)
-            progression = _ensure_complete_progression(saved['progression_prediction'], soldier_features, saved['prediction_result'])
+            prediction = _ensure_complete_prediction(saved['prediction_result'], soldier_features)
+            progression = _ensure_complete_progression(saved['progression_prediction'], soldier_features, prediction)
             recommendations = _ensure_complete_recommendations(saved.get('recommendations'), soldier_features)
             return {
                 'success': True,
                 'soldier': soldier_features,
-                'prediction': saved['prediction_result'],
+                'prediction': prediction,
                 'recommendations': recommendations,
                 'progression': progression,
                 'report_id': saved.get('id'),
@@ -91,6 +92,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
     
     # 4. AI Prediction
     prediction = predict_soldier_fitness(features)
+    prediction = _ensure_complete_prediction(prediction, features)
     
     # 5. Recommendations
     recommendations = generate_full_recommendations(features, goal=goal)
@@ -342,4 +344,120 @@ def _ensure_complete_recommendations(recs, soldier_features):
         recs['exercise'] = fresh_recs['exercise']
 
     return recs
+
+
+def _generate_soldier_strengths(soldier, pred=None):
+    """
+    Synthesizes technically accurate, context-aware positive predictive factors (strengths)
+    based on the soldier's actual demographic, physical, medical, and athletic attributes.
+    """
+    strengths = []
+    age = soldier.get('age') or 26
+    svc = soldier.get('service_years') or 4
+    bmi = float(soldier.get('bmi') or 22.0)
+    dev_pct = float(soldier.get('weight_deviation_percent') or 0.0)
+    bpet = str(soldier.get('bpet_grade') or '').upper()
+    ppt = str(soldier.get('ppt_grade') or '').upper()
+    has_sport = soldier.get('has_sport') or (soldier.get('sport_count', 0) > 0)
+    is_med_restricted = soldier.get('has_medical_restriction') or soldier.get('is_low_medical_category')
+
+    if not is_med_restricted:
+        strengths.append("Medical SHAPE-1 Clearance: Fully cleared for unrestricted high-tempo physical conditioning with zero active contraindications.")
+    
+    if 18.5 <= bmi <= 24.9:
+        strengths.append(f"Healthy Body Composition: BMI ({bmi}) supports optimal tactical agility, endurance, and field mobility.")
+    elif abs(dev_pct) <= 10.0:
+        strengths.append("Authorized Weight Range: Current body weight is within permissible military SHAPE-1 authorization benchmark.")
+    
+    if bpet in ['EXCELLENT', 'GOOD']:
+        strengths.append(f"High BPET Endurance: Graded '{bpet}' in military physical endurance standards and 5km road run.")
+    if ppt in ['EXCELLENT', 'GOOD']:
+        strengths.append(f"Solid Physical Proficiency: Graded '{ppt}' in military calisthenics, chin-ups, and sprint agility.")
+    
+    if has_sport:
+        sport_name = soldier.get('primary_sport') or soldier.get('sports_list') or 'Athletics'
+        strengths.append(f"Athletic Engagement: Regularly participates in active unit sports competitions ({sport_name}).")
+    
+    if len(strengths) < 2:
+        strengths.append(f"Demographic Baseline Resilience: Optimal operational age ({age} yrs, {svc} yrs service) provides strong conditioning capacity.")
+    if len(strengths) < 3:
+        strengths.append("Metabolic Responsiveness: High physiological receptivity to structured military nutrition and targeted conditioning protocols.")
+    if len(strengths) < 4:
+        strengths.append("Cardiovascular Foundation: Baseline aerobic capacity capable of sustaining progressive 5km road-run tempos.")
+
+    return strengths[:4]
+
+
+def _generate_soldier_improvements(soldier, pred=None):
+    """
+    Synthesizes priority conditioning and improvement areas based on the soldier's
+    body metrics, medical profile, or assigns maintenance conditioning targets.
+    """
+    improvements = []
+    bmi = float(soldier.get('bmi') or 22.0)
+    cur_wt = float(soldier.get('actual_weight_kg') or 70.0)
+    ideal_wt = float(soldier.get('ideal_weight_kg') or cur_wt)
+    diff_wt = round(cur_wt - ideal_wt, 1)
+    bpet = str(soldier.get('bpet_grade') or '').upper()
+    ppt = str(soldier.get('ppt_grade') or '').upper()
+    is_med_restricted = soldier.get('has_medical_restriction') or soldier.get('is_low_medical_category')
+    has_sport = soldier.get('has_sport') or (soldier.get('sport_count', 0) > 0)
+
+    if diff_wt > 2.0:
+        improvements.append(f"Body Weight Optimization: Target progressive reduction of +{diff_wt} kg excess body weight toward authorized military standard.")
+    elif diff_wt < -2.0:
+        improvements.append(f"Lean Mass Accretion: Target progressive gain of +{abs(diff_wt)} kg lean muscle mass to meet standard.")
+
+    if bmi >= 25.0:
+        improvements.append(f"Elevated BMI ({bmi}): Implement moderate caloric deficit and structured aerobic fat-oxidation drills.")
+    elif bmi < 18.5:
+        improvements.append(f"Low BMI ({bmi}): Increase daily caloric density and high-protein intake for muscle stabilization.")
+
+    if is_med_restricted:
+        restr = soldier.get('restrictions') or soldier.get('medical_problem') or 'Low medical category limitations'
+        improvements.append(f"Medical Adherence: Strictly observe prescribed restrictions ({restr}); avoid high-impact joint loading.")
+
+    if bpet not in ['EXCELLENT', 'GOOD']:
+        improvements.append("BPET Road-Run Conditioning: Improve 5km pacing and aerobic threshold to achieve Good/Excellent standard.")
+
+    if ppt not in ['EXCELLENT', 'GOOD']:
+        improvements.append("Calisthenics & Agility: Elevate chin-ups, push-up repetitions, and horizontal rope traverse endurance.")
+
+    if not has_sport:
+        improvements.append("Battalion Sports Participation: Actively participate in scheduled unit athletic and intramural sports.")
+
+    if not improvements:
+        improvements = [
+            "Threshold Aerobic Stamina: Sustain high-intensity interval training (HIIT) to maintain peak cardiovascular VO2 max.",
+            "Tactical Load Carriage: Progressively incorporate weighted endurance marches (BPET battle-load conditioning).",
+            "Core & Lumbar Spine Stability: Integrate functional abdominal, glute bridge, and spinal stability drills.",
+            "Hydration Discipline: Maintain strict 3.5+ L daily hydration and electrolyte replenishment during field exercises."
+        ]
+
+    return improvements[:4]
+
+
+def _ensure_complete_prediction(prediction, soldier_features):
+    """
+    Guarantees that prediction payload always contains non-empty, technically
+    accurate Positive Predictive Factors (strengths) and Priority Areas Requiring Improvement
+    (improvements), derived from the soldier's physical profile.
+    """
+    if not isinstance(prediction, dict):
+        prediction = {}
+
+    strengths = prediction.get('strengths') or prediction.get('key_strengths')
+    if not isinstance(strengths, list) or len(strengths) == 0:
+        strengths = _generate_soldier_strengths(soldier_features, prediction)
+
+    improvements = prediction.get('improvements') or prediction.get('risk_factors')
+    if not isinstance(improvements, list) or len(improvements) == 0:
+        improvements = _generate_soldier_improvements(soldier_features, prediction)
+
+    prediction['strengths'] = strengths
+    prediction['key_strengths'] = strengths
+    prediction['improvements'] = improvements
+    prediction['risk_factors'] = improvements
+    return prediction
+
 

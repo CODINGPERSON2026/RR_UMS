@@ -320,11 +320,11 @@ def fetch_reports_paginated(search_query="", company="", status="", from_date=No
     if status and status.strip() and status.strip().lower() != 'all':
         st_lower = status.strip().lower()
         if 'healthy' in st_lower or 'good' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%')")
-        elif 'improvement' in st_lower or 'overweight' in st_lower or 'moderate' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%')")
-        elif 'risk' in st_lower or 'underweight' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%')")
+            where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70)")
+        elif 'improvement' in st_lower or 'overweight' in st_lower or 'moderate' in st_lower or 'average' in st_lower or 'satisfactory' in st_lower:
+            where_clauses.append("(LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70))")
+        elif 'risk' in st_lower or 'underweight' in st_lower or 'poor' in st_lower:
+            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%poor%' OR (fitness_score IS NOT NULL AND fitness_score < 50))")
         else:
             where_clauses.append("fitness_status LIKE %s")
             params.append(f"%{status.strip()}%")
@@ -450,9 +450,9 @@ def fetch_dynamic_report_stats():
         stats_sql = """
             SELECT
                 COUNT(*) AS total_reports,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' THEN 1 ELSE 0 END) AS healthy,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' THEN 1 ELSE 0 END) AS needs_improvement,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' THEN 1 ELSE 0 END) AS at_risk,
+                SUM(CASE WHEN LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70 THEN 1 ELSE 0 END) AS healthy,
+                SUM(CASE WHEN (LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70)) AND NOT (LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%at-risk%') THEN 1 ELSE 0 END) AS needs_improvement,
+                SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%poor%' OR (fitness_score IS NOT NULL AND fitness_score < 50) THEN 1 ELSE 0 END) AS at_risk,
                 AVG(fitness_score) AS avg_score,
                 SUM(CASE WHEN DATE(generated_at) = CURDATE() THEN 1 ELSE 0 END) AS today_count,
                 SUM(CASE WHEN MONTH(generated_at) = MONTH(CURDATE()) AND YEAR(generated_at) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month_count

@@ -1,7 +1,7 @@
 """
 Professional Individual Fitness Report Generator.
 Renders HTML and converts to PDF using xhtml2pdf / pisa with military styling,
-and overlays an official diagonal watermark with '15 CESR REGM', IP address, and timestamp.
+and overlays an official diagonal watermark with 'UNIT MANAGEMENT SYSTEM', IP address, and timestamp.
 """
 
 import os
@@ -103,7 +103,7 @@ def get_regiment_banner_uri():
 
         # Check navbar config for dynamic overrides
         navbar_cfg_file = os.path.join(static_dir, "uploads", "navbar", "config.json")
-        header_text = "15 CORPS ENGINEERING SIGNAL REGIMENT"
+        header_text = "UNIT MANAGEMENT SYSTEM"
         left_logo_file = os.path.join(static_dir, "image_for_login_page", "rt.jpg")
         right_logo_file = os.path.join(static_dir, "image_for_login_page", "chinar.jpg")
 
@@ -214,7 +214,7 @@ def get_regiment_banner_uri():
                 sub_font = ImageFont.load_default()
                 meta_font = ImageFont.load_default()
 
-            sub_text = "AI/ML INDIVIDUAL FITNESS PREDICTION & READINESS REPORT"
+            sub_text = "PERSONAL FITNESS REPORT"
             meta_text = "UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL"
 
             # Draw Title
@@ -266,13 +266,13 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
     safe_army_no = "".join(c for c in raw_army if c.isalnum() or c in ("-", "_"))
     date_str = datetime.now().strftime("%Y%m%d")
     report_id = f"UMS-FIT-{date_str}-{safe_army_no}"
-    timestamp_str = datetime.now().strftime("%d %b %Y, %H:%M hrs")
+    timestamp_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
     lang_code = (language or "en").lower().strip()
 
     # Section 1: Header / Cover
     header = {
-        "title": "15 CORPS ENGINEERING SIGNAL REGIMENT",
-        "report_title": "UMS AI FITNESS & PERSONALIZED FITNESS REPORT",
+        "title": "UNIT MANAGEMENT SYSTEM",
+        "report_title": "PERSONAL FITNESS REPORT",
         "report_id": report_id,
         "date": timestamp_str,
         "army_number": soldier_features.get("army_number", ""),
@@ -482,7 +482,7 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
     # Section 16: Footer
     footer = {
         "report_id": report_id,
-        "regiment": "15 CORPS ENGINEERING SIGNAL REGIMENT",
+        "regiment": "UNIT MANAGEMENT SYSTEM",
         "sub": "UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL",
         "client_ip": client_ip,
         "timestamp": timestamp_str
@@ -573,7 +573,7 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
 def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_text="UMS 15 CESR"):
     """
     Overlays a clear, single diagonal military watermark on top of each page of the generated PDF using ReportLab and pypdf.
-    Includes Unit Name, IP Address, and Date & Time stamp centered on each page.
+    Includes Unit Name, IP Address, and Date & Time stamp (in 12-hour format) centered on each page.
     """
     try:
         from reportlab.pdfgen import canvas
@@ -593,24 +593,25 @@ def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_t
         c.translate(cx, cy)
         c.rotate(35)
         
-        # Slate color with clean background visibility (0.22 opacity)
-        c.setFillColor(colors.HexColor('#475569'))
+        # Slate color with clear visibility (0.22 opacity)
+        c.setFillColor(colors.HexColor('#334155'))
         try:
             c.setFillAlpha(0.22)
         except Exception:
             pass
 
+        # 12-hour format timestamp with AM/PM
         dt_str = datetime.now().strftime('%d/%m/%Y %I:%M %p')
         
-        # Exactly ONE centered diagonal watermark block per page with increased font size and lighter opacity
-        c.setFont("Helvetica-Bold", 60)
-        c.drawCentredString(0, 55, watermark_text)
+        # Centered diagonal watermark block per page with clear military visibility
+        c.setFont("Helvetica-Bold", 34)
+        c.drawCentredString(0, 26, watermark_text)
         
-        c.setFont("Helvetica-Bold", 30)
-        c.drawCentredString(0, 5, f"IP ADDRESS: {client_ip}")
+        c.setFont("Helvetica-Bold", 17)
+        c.drawCentredString(0, 2, f"IP ADDRESS: {client_ip}")
         
-        c.setFont("Helvetica-Bold", 20)
-        c.drawCentredString(0, -35, f"DATE & TIME: {dt_str}")
+        c.setFont("Helvetica-Bold", 14)
+        c.drawCentredString(0, -20, f"DATE & TIME: {dt_str}")
         
         c.showPage()
         c.save()
@@ -641,7 +642,7 @@ def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_t
 def generate_fitness_pdf_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1", watermark_text="UMS 15 CESR", lang="en", language=None):
     """
     Generates a high-quality PDF binary stream with AI prediction, recommendations, progression,
-    and an official '15 CESR REGM' with IP address watermark.
+    and an official 'UNIT MANAGEMENT SYSTEM' with IP address watermark.
     Supports multilingual generation.
     
     Returns:
