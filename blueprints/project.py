@@ -587,9 +587,40 @@ def cost_by_head():
             cursor.close()
             connection.close()
 
+def init_bom_table():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS project_bill_of_materials (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                project_id INT NULL,
+                project_title VARCHAR(255) NOT NULL,
+                project_head VARCHAR(255) NOT NULL,
+                nomenclature VARCHAR(255) NOT NULL,
+                au VARCHAR(50),
+                qty INT DEFAULT 0,
+                rate DECIMAL(12, 2) DEFAULT 0.00,
+                total_cost DECIMAL(12, 2) DEFAULT 0.00,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        """)
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print("Error initializing project_bill_of_materials table:", e)
+
+# Auto-initialize BOM table
+try:
+    init_bom_table()
+except Exception as e:
+    pass
+
 @projects_bp.route('/create', methods=['POST'])
 def create_project():
-    data = request.get_json()
+    data = request.get_json() or {}
 
     project_name = (data.get("project_name") or "").strip()
     head = (data.get("head") or "").strip()
@@ -600,21 +631,21 @@ def create_project():
 
     # Server-side validation
     if not project_name or not head:
-        return jsonify({"status": "error", "message": "Project name and head are required"})
+        return jsonify({"status": "error", "message": "Project name and head are required"}), 400
 
     try:
         cost = float(cost)
         if cost < 0:
             raise ValueError
     except:
-        return jsonify({"status": "error", "message": "Invalid cost value"})
+        return jsonify({"status": "error", "message": "Invalid cost value"}), 400
 
     try:
         quantity = int(quantity)
         if quantity < 0:
             raise ValueError
     except:
-        return jsonify({"status": "error", "message": "Invalid quantity value"})
+        return jsonify({"status": "error", "message": "Invalid quantity value"}), 400
 
     try:
         connection = get_db_connection()
@@ -638,12 +669,140 @@ def create_project():
             "Active"
         ))
 
+        project_id = cursor.lastrowid
+
+        bom_items = data.get("bom_items") or []
+        if bom_items:
+            # Ensure table exists before insertion
+            init_bom_table()
+            bom_insert_query = """
+                INSERT INTO project_bill_of_materials
+                (project_id, project_title, project_head, nomenclature, au, qty, rate, total_cost)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            for b in bom_items:
+                nomen = (b.get("nomenclature") or "").strip()
+                au = (b.get("au") or "").strip()
+                try:
+                    b_qty = int(b.get("qty") or 0)
+                except (ValueError, TypeError):
+                    b_qty = 0
+                try:
+                    b_rate = float(b.get("rate") or 0.0)
+                except (ValueError, TypeError):
+                    b_rate = 0.0
+                try:
+                    b_total = float(b.get("total_cost") or (b_qty * b_rate))
+                except (ValueError, TypeError):
+                    b_total = b_qty * b_rate
+
+                if nomen:
+                    cursor.execute(bom_insert_query, (
+                        project_id,
+                        project_name,
+                        head,
+                        nomen,
+                        au,
+                        b_qty,
+                        b_rate,
+                        b_total
+                    ))
+
         connection.commit()
-        return jsonify({"status": "success"})
+        return jsonify({"status": "success", "project_id": project_id})
 
     except Exception as e:
+        print("Error creating project:", e)
         return jsonify({"status": "error", "message": "Database error"}), 500
 
     finally:
-        cursor.close()
-        connection.close()
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'connection' in locals() and connection:
+            connection.close()
+
+@projects_bp.route('/bom/<int:project_id>', methods=['GET'])
+def get_project_bom(project_id):
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM project_bill_of_materials WHERE project_id = %s", (project_id,))
+        items = cursor.fetchall()
+        return jsonify({"status": "success", "bom_items": items})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'connection' in locals() and connection:
+            connection.close()
+
+@projects_bp.route('/bom/<int:project_id>/save', methods=['POST'])
+def save_project_bom(project_id):
+    data = request.get_json() or {}
+    bom_items = data.get("bom_items") or []
+
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        # Get project details
+        cursor.execute("SELECT project_name, head FROM projects WHERE project_id = %s", (project_id,))
+        prj = cursor.fetchone()
+        if not prj:
+            return jsonify({"status": "error", "message": "Project not found"}), 404
+
+        project_title = prj['project_name']
+        project_head = prj['head']
+
+        init_bom_table()
+
+        # Delete existing BOM items for this project before re-inserting
+        cursor.execute("DELETE FROM project_bill_of_materials WHERE project_id = %s", (project_id,))
+
+        if bom_items:
+            bom_insert_query = """
+                INSERT INTO project_bill_of_materials
+                (project_id, project_title, project_head, nomenclature, au, qty, rate, total_cost)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """
+            for b in bom_items:
+                nomen = (b.get("nomenclature") or "").strip()
+                au = (b.get("au") or "").strip()
+                try:
+                    b_qty = int(b.get("qty") or 0)
+                except (ValueError, TypeError):
+                    b_qty = 0
+                try:
+                    b_rate = float(b.get("rate") or 0.0)
+                except (ValueError, TypeError):
+                    b_rate = 0.0
+                try:
+                    b_total = float(b.get("total_cost") or (b_qty * b_rate))
+                except (ValueError, TypeError):
+                    b_total = b_qty * b_rate
+
+                if nomen:
+                    cursor.execute(bom_insert_query, (
+                        project_id,
+                        project_title,
+                        project_head,
+                        nomen,
+                        au,
+                        b_qty,
+                        b_rate,
+                        b_total
+                    ))
+
+        connection.commit()
+        return jsonify({"status": "success", "message": "BOM items saved successfully"})
+    except Exception as e:
+        print("Error saving project BOM:", e)
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if 'cursor' in locals() and cursor:
+            cursor.close()
+        if 'connection' in locals() and connection:
+            connection.close()
+
+
