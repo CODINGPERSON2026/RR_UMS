@@ -1,29 +1,12 @@
 <style>
-  #orRequestTableBody td:nth-child(8),
-  #smSuggestionTableBody td:nth-child(4) {
-    max-width: 400px;
+  #allPointsTableBody td:nth-child(4) {
+    max-width: 450px;
     white-space: normal;
     word-break: break-word;
   }
 
-  #orRequestTableBody tr:hover,
-  #smSuggestionTableBody tr:hover {
+  #allPointsTableBody tr:hover {
     background-color: #e3f2fd !important;
-  }
-
-  .view-roll-tab .nav-link {
-    color: #495057;
-    font-size: 0.95rem;
-    padding: 10px 20px;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.2s ease;
-  }
-
-  .view-roll-tab .nav-link.active {
-    color: #0d6efd;
-    background-color: #f8f9fa;
-    border-bottom: 3px solid #0d6efd;
-    font-weight: 700;
   }
 </style>
 
@@ -34,81 +17,55 @@
       
       <!-- HEADER -->
       <div class="modal-header bg-primary text-white py-3">
-        <h5 class="modal-title fw-bold fs-4">
-          <i class="fa fa-list-alt me-2"></i>Roll Call Points View
-        </h5>
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa fa-list-alt fs-4"></i>
+          <div>
+            <h5 class="modal-title fw-bold mb-0">Roll Call Points View</h5>
+            <small style="opacity: 0.88; font-size: 0.82rem;">All Pending Roll Call Points</small>
+          </div>
+        </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
       <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
         <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fa fa-user-shield me-1"></i> UPDATED BY SM
+          <i class="fa fa-list-check me-1"></i> ROLL CALL POINTS <span class="badge bg-white text-primary ms-1" id="allPointsCountBadge">0</span>
         </span>
       </div>
 
-      <!-- SEPARATE TABS FOR OR REQUEST & SM SUGGESTION -->
-      <ul class="nav nav-tabs px-4 pt-3 bg-white border-bottom view-roll-tab" id="viewRollCallTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active fw-bold" id="orRequestTabBtn" data-bs-toggle="tab" data-bs-target="#orRequestTabPane" type="button" role="tab">
-            <i class="fa fa-users me-1"></i> OR Request Points
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link fw-bold" id="smSuggestionTabBtn" data-bs-toggle="tab" data-bs-target="#smSuggestionTabPane" type="button" role="tab">
-            <i class="fa fa-user-shield me-1"></i> SM Suggestion Points
-          </button>
-        </li>
-      </ul>
+      <!-- MODAL BODY -->
+      <div class="modal-body bg-light p-4">
 
-      <!-- TAB CONTENT -->
-      <div class="tab-content modal-body bg-light p-4">
-
-        <!-- TAB 1: OR REQUEST POINTS TABLE -->
-        <div class="tab-pane fade show active" id="orRequestTabPane" role="tabpanel">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle table-striped mb-0">
-              <thead class="bg-dark text-white shadow-sm" style="position: sticky; top: 0; z-index: 10;">
-                <tr class="text-uppercase fw-semibold">
-                  <th class="text-center">#</th>
-                  <th>Army No</th>
-                  <th>Rank</th>
-                  <th>Name</th>
-                  <th>Company</th>
-                  <th>Category</th>
-                  <th>Title</th>
-                  <th style="min-width:320px;">Description</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="orRequestTableBody">
-                <tr>
-                  <td colspan="9" class="text-center text-muted py-5">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
+        <!-- SEARCH BAR TOOLBAR -->
+        <div class="d-flex align-items-center justify-content-between gap-3 mb-3 p-3 bg-white rounded-3 shadow-sm border">
+          <div class="fw-bold text-dark d-flex align-items-center gap-2">
+            <i class="fa fa-layer-group text-primary"></i>
+            <span>All Roll Call Points</span>
+          </div>
+          <div class="search-box position-relative" style="min-width: 280px; flex-grow: 1; max-width: 450px;">
+            <input type="text" id="allPointsSearchInput" class="form-control form-control-sm ps-4" placeholder="Search Army No, Name, Title, Description..." onkeyup="filterAllPointsSearch()">
+            <i class="fa fa-search position-absolute text-muted" style="left: 10px; top: 50%; transform: translateY(-50%); font-size: 0.8rem;"></i>
           </div>
         </div>
 
-        <!-- TAB 2: SM SUGGESTION POINTS TABLE -->
-        <div class="tab-pane fade" id="smSuggestionTabPane" role="tabpanel">
-          <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle table-striped mb-0">
-              <thead class="bg-dark text-white shadow-sm" style="position: sticky; top: 0; z-index: 10;">
-                <tr class="text-uppercase fw-semibold">
-                  <th class="text-center">#</th>
-                  <th>Category</th>
-                  <th>Suggestion Title</th>
-                  <th style="min-width:380px;">Suggestion Description</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="smSuggestionTableBody">
-                <tr>
-                  <td colspan="5" class="text-center text-muted py-5">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <!-- TABLE -->
+        <div class="table-responsive bg-white rounded-3 shadow-sm border">
+          <table class="table table-bordered table-hover align-middle table-striped mb-0">
+            <thead class="bg-dark text-white shadow-sm" style="position: sticky; top: 0; z-index: 10;">
+              <tr class="text-uppercase fw-semibold" style="font-size: 0.84rem;">
+                <th class="text-center" style="width: 50px;">#</th>
+                <th style="width: 260px;">Personnel Info</th>
+                <th>Point Title</th>
+                <th style="min-width: 350px;">Description</th>
+                <th style="width: 120px;">Date</th>
+              </tr>
+            </thead>
+            <tbody id="allPointsTableBody">
+              <tr>
+                <td colspan="5" class="text-center text-muted py-5">Loading roll call points...</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
       </div>
@@ -117,82 +74,86 @@
 </div>
 
 <script>
+  let allRollCallCache = [];
+
+  function filterAllPointsSearch() {
+    renderCombinedTable();
+  }
+
+  function renderCombinedTable() {
+    const tbody = document.getElementById('allPointsTableBody');
+    if (!tbody) return;
+
+    const searchTerm = (document.getElementById('allPointsSearchInput')?.value || '').toLowerCase().trim();
+
+    let filtered = allRollCallCache.filter(row => {
+      if (searchTerm) {
+        const text = [
+          row.army_number,
+          row.name,
+          row.rank,
+          row.company,
+          row.point_title,
+          row.point_description
+        ].filter(Boolean).join(' ').toLowerCase();
+        return text.includes(searchTerm);
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-5">No roll call points found</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map((row, index) => {
+      const isSM = (row.category === 'SM_SUGGESTION');
+
+      const personnelInfo = isSM
+        ? '<div class="text-muted small"><i class="fa fa-user-shield me-1 text-warning"></i> <strong>SM Suggestion</strong></div>'
+        : `<div>
+            <span class="fw-bold text-dark">${row.name || '-'}</span>
+            <div class="small text-muted">${row.rank || '-'} &bull; ${row.army_number || '-'} &bull; <span class="badge bg-secondary">${row.company || '-'}</span></div>
+           </div>`;
+
+      const formattedDate = row.created_at ? new Date(row.created_at).toLocaleDateString() : '-';
+
+      return `
+        <tr>
+          <td class="text-center fw-bold text-secondary">${index + 1}</td>
+          <td>${personnelInfo}</td>
+          <td class="fw-bold text-dark">${row.point_title || '-'}</td>
+          <td>${row.point_description || '-'}</td>
+          <td class="small text-muted">${formattedDate}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
   (function() {
     const modal = document.getElementById('centerRollCallModal');
-    const orTabBtn = document.getElementById('orRequestTabBtn');
-    const smTabBtn = document.getElementById('smSuggestionTabBtn');
-    const orBody = document.getElementById('orRequestTableBody');
-    const smBody = document.getElementById('smSuggestionTableBody');
 
-    function loadOrRequests() {
-      orBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">Loading...</td></tr>';
-      fetch('/roll_call/pending?category=OR_REQUEST')
+    function fetchAllRollCallData() {
+      const tbody = document.getElementById('allPointsTableBody');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="fa fa-spinner fa-spin me-2"></i> Loading all roll call points...</td></tr>';
+      
+      fetch('/roll_call/pending')
         .then(res => res.json())
         .then(res => {
-          orBody.innerHTML = '';
-          if (!res.data || res.data.length === 0) {
-            orBody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-5">No OR request records found</td></tr>';
-            return;
-          }
-          res.data.forEach((row, index) => {
-            orBody.innerHTML += `
-              <tr>
-                <td class="text-center">${index + 1}</td>
-                <td class="fw-bold">${row.army_number || '-'}</td>
-                <td>${row.rank || '-'}</td>
-                <td><strong>${row.name || '-'}</strong></td>
-                <td>${row.company || '-'}</td>
-                <td><span class="badge bg-secondary">${row.category}</span></td>
-                <td class="fw-bold">${row.point_title || '-'}</td>
-                <td>${row.point_description || '-'}</td>
-                <td>${row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</td>
-              </tr>`;
-          });
+          allRollCallCache = res.data || [];
+
+          const badgeEl = document.getElementById('allPointsCountBadge');
+          if (badgeEl) badgeEl.textContent = allRollCallCache.length;
+
+          renderCombinedTable();
         })
         .catch(() => {
-          orBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger py-4">Failed to load records</td></tr>';
+          if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Failed to load roll call points</td></tr>';
         });
-    }
-
-    function loadSmSuggestions() {
-      smBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Loading...</td></tr>';
-      fetch('/roll_call/pending?category=SM_SUGGESTION')
-        .then(res => res.json())
-        .then(res => {
-          smBody.innerHTML = '';
-          if (!res.data || res.data.length === 0) {
-            smBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-5">No SM suggestion records found</td></tr>';
-            return;
-          }
-          res.data.forEach((row, index) => {
-            smBody.innerHTML += `
-              <tr>
-                <td class="text-center">${index + 1}</td>
-                <td><span class="badge bg-info text-dark">${row.category}</span></td>
-                <td class="fw-bold text-primary">${row.point_title || '-'}</td>
-                <td>${row.point_description || '-'}</td>
-                <td>${row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</td>
-              </tr>`;
-          });
-        })
-        .catch(() => {
-          smBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Failed to load records</td></tr>';
-        });
-    }
-
-    function loadAllViewData() {
-      loadOrRequests();
-      loadSmSuggestions();
     }
 
     if (modal) {
-      modal.addEventListener('show.bs.modal', loadAllViewData);
-    }
-    if (orTabBtn) {
-      orTabBtn.addEventListener('click', loadOrRequests);
-    }
-    if (smTabBtn) {
-      smTabBtn.addEventListener('click', loadSmSuggestions);
+      modal.addEventListener('show.bs.modal', fetchAllRollCallData);
     }
   })();
 </script>

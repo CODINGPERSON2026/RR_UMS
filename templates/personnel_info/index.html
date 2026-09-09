@@ -839,32 +839,42 @@
                     </select>
                   </div>
 
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label">Position / Appointment</label>
-                    <select class="form-select" id="position">
-                      <option value="">Choose section first</option>
-                    </select>
-                  </div>
-
                   <script>
-                    // Canonical Company -> Section -> Position hierarchy master
-                    const companyHierarchy = {
-                      "HQ company": {
-                        "QM": ["Ration NCO", "Fresh NCO", "Clothing NCO", "MES NCO", "SKT"],
-                        "RHQ": ["O1", "O2", "O3", "TRG Clerk", "Clerk", "Warrant Clerk", "Part One Clerk", "Dispatcher Clerk", "A-Sigma Clerk", "PA"],
-                        "RP": ["Adm NCO", "Strict Orderly", "Runner", "RP NCO", "Guest Room NCO"],
-                        "TM": ["TM"],
-                        "MT": ["MT"],
-                        "LRW": ["LRW"],
-                        "CHQ": ["Buddy", "Office", "Mess Hav", "All Tradesmen", "JCO Mess Cdr"],
-                        "GENERAL DUTY": ["CHM", "CQMH", "RHM", "GD"]
-                      },
-                      "COMN Company": {
-                        "COMMUNICATION / TECHNICAL": ["Multimedia", "IT", "System", "Radio RR", "MCCS Exchange", "Communication Clerk", "Strip Clerk", "ICN", "NFS", "Server"]
-                      },
-                      "3 Company": {
-                        "TECHNICAL / CORPS HQ": ["VC", "Corps HQ", "System", "Branch"]
-                      }
+                    const companySections = {
+                      "COMN Company": [
+                        "SIGCEN",
+                        "FAULT REPAIR",
+                        "IT",
+                        "MCCS",
+                        "CHQ",
+                        "COMN"
+                      ],
+                      "3 Company": [
+                        "DET",
+                        "System",
+                        "CHQ",
+                        "MT"
+                      ],
+                      "HQ company": [
+                        "RHQ",
+                        "CHQ",
+                        "LRW",
+                        "QY",
+                        "RPNA",
+                        "MT",
+                        "QRT",
+                        "TM"
+                      ],
+                      "HQ Company": [
+                        "RHQ",
+                        "CHQ",
+                        "LRW",
+                        "QY",
+                        "RPNA",
+                        "MT",
+                        "QRT",
+                        "TM"
+                      ]
                     };
 
                     function getNormalizedHierarchyCompany(coy) {
@@ -878,38 +888,20 @@
 
                     const companySelect = document.getElementById('company');
                     const sectionSelect = document.getElementById('section');
-                    const positionSelect = document.getElementById('position');
 
                     if (companySelect && sectionSelect) {
                       companySelect.addEventListener('change', function () {
                         const selectedCompany = getNormalizedHierarchyCompany(this.value);
                         sectionSelect.innerHTML = '<option value="">Select Section</option>';
-                        if (positionSelect) positionSelect.innerHTML = '<option value="">Choose section first</option>';
 
-                        const sectionsObj = companyHierarchy[selectedCompany] || {};
-                        Object.keys(sectionsObj).forEach(sec => {
+                        const sections = companySections[selectedCompany] || [];
+                        sections.forEach(sec => {
                           const option = document.createElement('option');
                           option.value = sec;
                           option.textContent = sec;
                           sectionSelect.appendChild(option);
                         });
                       });
-
-                      if (positionSelect) {
-                        sectionSelect.addEventListener('change', function () {
-                          const selectedCompany = getNormalizedHierarchyCompany(companySelect.value);
-                          const selectedSection = this.value;
-                          positionSelect.innerHTML = '<option value="">Select Position</option>';
-
-                          const positions = (companyHierarchy[selectedCompany] && companyHierarchy[selectedCompany][selectedSection]) || [];
-                          positions.forEach(pos => {
-                            const option = document.createElement('option');
-                            option.value = pos;
-                            option.textContent = pos;
-                            positionSelect.appendChild(option);
-                          });
-                        });
-                      }
                     }
                   </script>
 
@@ -1368,35 +1360,65 @@
                         </td>
                         <td>
                           <select class="form-select form-select-sm unit-input" name="unitDuty[]">
-                            <option value="">-- SELECT DOMAIN --</option>
-                            <option value="TM">TM</option>
-                            <option value="MULTI MEDIA">MULTI MEDIA</option>
-                            <option value="CODING">CODING</option>
-                            <option value="ACCOUNT">ACCOUNT</option>
-                            <option value="PROJECTS">PROJECTS</option>
-                            <option value="SYSTEM">SYSTEM</option>
-                            <option value="IT">IT</option>
-                            <option value="EXCHANGE">EXCHANGE</option>
-                            <option value="NFS">NFS</option>
-                            <option value="RR">RR</option>
-                            <option value="ICN AND BTS">ICN AND BTS</option>
-                            <option value="PA">PA</option>
-                            <option value="RP">RP</option>
-                            <option value="RUNNER">RUNNER</option>
+                            <option value="">-- SELECT DUTY / DOMAIN --</option>
+                            <option value="A-SIGMA CLERK">A-SIGMA CLERK</option>
+                            <option value="ADM NCO">ADM NCO</option>
+                            <option value="ALL TRADESMEN">ALL TRADESMEN</option>
+                            <option value="BRANCH">BRANCH</option>
                             <option value="BUDDY">BUDDY</option>
-                            <option value="CLK">CLK</option>
-                            <option value="ONCO">ONCO</option>
-                            <option value="DUTY EFS">DUTY EFS</option>
-                            <option value="LINE MAN ">LINE MAN CQ</option>
-                            <option value="RT JCO">RT JCO</option>
-                            <option value="ORH">ORH</option>
-                            <option value="MESS CDR">MESS CDR</option>
-                            <option value="TRG CLK">TRG CLK</option>
                             <option value="CHM">CHM</option>
-                            <option value="RHM">RHM</option>
-                            <option value="STOREMAN">STOREMAN</option>
-                            <option value="NODE">NODE</option>
-                            <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
+                            <option value="CLERK">CLERK</option>
+                            <option value="COMMUNICATION CLERK">COMMUNICATION CLERK</option>
+                            <option value="CQMH">CQMH</option>
+                            <option value="DET 2IC">DET 2IC</option>
+                            <option value="DET COMMANDER">DET COMMANDER</option>
+                            <option value="DISPATCHER CLERK">DISPATCHER CLERK</option>
+                            <option value="DRIVER">DRIVER</option>
+                            <option value="FAULT REPAIR NCO">FAULT REPAIR NCO</option>
+                            <option value="GUEST ROOM NCO">GUEST ROOM NCO</option>
+                            <option value="HARDWARE TECH">HARDWARE TECH</option>
+                            <option value="ICN">ICN</option>
+                            <option value="JCO MESS CDR">JCO MESS CDR</option>
+                            <option value="LINE NCO">LINE NCO</option>
+                            <option value="LRW NCO">LRW NCO</option>
+                            <option value="LRW OPERATOR">LRW OPERATOR</option>
+                            <option value="MCCS EXCHANGE">MCCS EXCHANGE</option>
+                            <option value="MESS HAV">MESS HAV</option>
+                            <option value="MT NCO">MT NCO</option>
+                            <option value="MULTIMEDIA">MULTIMEDIA</option>
+                            <option value="NCO CHQ">NCO CHQ</option>
+                            <option value="NCO COMN">NCO COMN</option>
+                            <option value="NCO IT">NCO IT</option>
+                            <option value="NCO MCCS">NCO MCCS</option>
+                            <option value="NCO SIGCEN">NCO SIGCEN</option>
+                            <option value="NETWORK NCO">NETWORK NCO</option>
+                            <option value="NFS">NFS</option>
+                            <option value="O1">O1</option>
+                            <option value="O2">O2</option>
+                            <option value="O3">O3</option>
+                            <option value="OFFICE">OFFICE</option>
+                            <option value="OPERATOR">OPERATOR</option>
+                            <option value="PA">PA</option>
+                            <option value="PART ONE CLERK">PART ONE CLERK</option>
+                            <option value="QRT COMMANDER">QRT COMMANDER</option>
+                            <option value="QRT MEMBER">QRT MEMBER</option>
+                            <option value="QY NCO">QY NCO</option>
+                            <option value="RADIO OPERATOR">RADIO OPERATOR</option>
+                            <option value="RADIO RR">RADIO RR</option>
+                            <option value="RP NCO">RP NCO</option>
+                            <option value="RUNNER">RUNNER</option>
+                            <option value="SERVER">SERVER</option>
+                            <option value="STOREKEEPER">STOREKEEPER</option>
+                            <option value="STRICT ORDERLY">STRICT ORDERLY</option>
+                            <option value="STRIP CLERK">STRIP CLERK</option>
+                            <option value="SYSTEM ADMIN">SYSTEM ADMIN</option>
+                            <option value="SYSTEM OPERATOR">SYSTEM OPERATOR</option>
+                            <option value="TECH MECHANIC">TECH MECHANIC</option>
+                            <option value="TM NCO">TM NCO</option>
+                            <option value="TM OPERATOR">TM OPERATOR</option>
+                            <option value="TRG CLK">TRG CLK</option>
+                            <option value="VEHICLE MECHANIC">VEHICLE MECHANIC</option>
+                            <option value="WARRANT CLERK">WARRANT CLERK</option>
                           </select>
                         </td>
                       </tr>
@@ -1982,7 +2004,7 @@
                 </div>
 
                 <h5 class="mt-4 mb-3" style="color: var(--primary-color)">
-                  <i class="fas fa-mobile-alt"></i> Mobile Phone Details
+                  <i class="fas fa-mobile-alt"></i> NOK Mobile Phone Details
                 </h5>
                 <div class="dynamic-table">
                   <table class="table table-bordered" id="mobileTable">
