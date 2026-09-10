@@ -561,11 +561,11 @@
             </div>
           </div>
           <textarea id="ciOverlayTA" class="ci-ov-ta"
-                    placeholder="Enter detailed interview remarks (minimum 30 words required)…"
+                    placeholder="Enter detailed interview remarks (minimum 20 characters required)…"
                     oninput="ciUpdateWordCount()"></textarea>
           <div class="d-flex justify-content-between align-items-center mt-2 px-1">
             <small id="ciWordCountMsg" class="fw-bold text-danger" style="font-size:0.8rem;">
-              <i class="fas fa-exclamation-circle me-1"></i>Minimum 30 words required (<span id="ciWordCount">0</span>/30 words)
+              <i class="fas fa-exclamation-circle me-1"></i>Minimum 20 characters required (<span id="ciWordCount">0</span>/20 characters)
             </small>
           </div>
           <div class="ci-ov-acts">
@@ -919,7 +919,7 @@
 
   var ciActiveArmyNumber = null;
 
-  /* ── Live Word Counter ── */
+  /* ── Live Character Counter ── */
   window.ciUpdateWordCount = function () {
     var ta    = document.getElementById('ciOverlayTA');
     var cntEl = document.getElementById('ciWordCount');
@@ -928,22 +928,21 @@
     if (!ta) return;
 
     var text  = (ta.value || '').trim();
-    var words = text ? text.split(/\s+/).filter(Boolean) : [];
-    var count = words.length;
+    var count = text.length;
 
     if (cntEl) cntEl.textContent = count;
 
-    if (count >= 30) {
+    if (count >= 20) {
       if (msgEl) {
         msgEl.className = 'fw-bold text-success';
-        msgEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Minimum 30 words requirement met (' + count + ' words)';
+        msgEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Minimum 20 characters requirement met (' + count + ' characters)';
       }
       if (btn) btn.disabled = false;
     } else {
-      var remaining = 30 - count;
+      var remaining = 20 - count;
       if (msgEl) {
         msgEl.className = 'fw-bold text-danger';
-        msgEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Minimum 30 words required (' + count + '/30 words — need ' + remaining + ' more)';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Minimum 20 characters required (' + count + '/20 characters — need ' + remaining + ' more)';
       }
       if (btn) btn.disabled = true;
     }
@@ -976,10 +975,9 @@
   window.ciSubmitDone = async function () {
     if (!ciActiveCiId && !ciActiveArmyNumber) return;
     var remarks  = (document.getElementById('ciOverlayTA').value || '').trim();
-    var words    = remarks ? remarks.split(/\s+/).filter(Boolean) : [];
 
-    if (words.length < 30) {
-      ciFireToast('Remarks must be at least 30 words minimum! Current count: ' + words.length + ' words.', true);
+    if (remarks.length < 20) {
+      ciFireToast('Remarks must be at least 20 characters minimum! Current length: ' + remarks.length + ' characters.', true);
       ciUpdateWordCount();
       return;
     }

@@ -1179,6 +1179,15 @@
       </a>
       {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDING OFFICER']) %}
+      <a class="nav-link {% if '/fitness' in request.path %}active{% endif %}" href="http://127.0.0.1:4000/fitness/"
+        data-tiptext="AI Fitness Analysis">
+        <span class="nav-icon"><i class="fas fa-heartbeat"></i></span>
+        <span class="nav-label-text">AI Fitness Analysis</span>
+        <span class="nav-tooltip">AI Fitness Analysis</span>
+      </a>
+      {% endif %}
+
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'NCO FAULT REPAIR', 'JCO', 'O CENTRE NCO', 'ONCO', 'NCO CHQ', 'NCO IT', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'JCO CHQ', 'JCO TM'] %}
       <a class="nav-link {% if '/personnel_information' in request.path %}active{% endif %}"

@@ -385,12 +385,14 @@ def init_company_interview_table():
     try:
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS company_interview (
-                id               INT AUTO_INCREMENT PRIMARY KEY,
-                army_number      VARCHAR(100) NOT NULL UNIQUE,
-                interview_status TINYINT      NOT NULL DEFAULT 0,
-                interview_done_on DATE         DEFAULT NULL,
-                remarks          TEXT         DEFAULT NULL,
-                created_at       TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+                id                   INT AUTO_INCREMENT PRIMARY KEY,
+                army_number          VARCHAR(100) NOT NULL UNIQUE,
+                interview_status     TINYINT      NOT NULL DEFAULT 0,
+                interview_done_on    DATE         DEFAULT NULL,
+                remarks              TEXT         DEFAULT NULL,
+                created_at           TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+                co_interview_status  TINYINT      NOT NULL DEFAULT 0,
+                co_interview_done_on DATE         DEFAULT NULL,
                 CONSTRAINT fk_ci_army
                     FOREIGN KEY (army_number)
                     REFERENCES personnel(army_number)
@@ -398,6 +400,18 @@ def init_company_interview_table():
             )
         """)
         conn.commit()
+
+        try:
+            cursor.execute("ALTER TABLE company_interview ADD COLUMN co_interview_status TINYINT NOT NULL DEFAULT 0")
+            conn.commit()
+        except Exception:
+            pass
+
+        try:
+            cursor.execute("ALTER TABLE company_interview ADD COLUMN co_interview_done_on DATE DEFAULT NULL")
+            conn.commit()
+        except Exception:
+            pass
         return jsonify({"status": "success", "message": "company_interview table ready"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -615,9 +629,9 @@ def mark_company_interview_done():
     if not army_number and not ci_id:
         return jsonify({"status": "error", "message": "army_number or ci_id is required"}), 400
 
-    word_count = len(remarks.split()) if remarks else 0
-    if word_count < 30:
-        return jsonify({"status": "error", "message": f"Remarks must be at least 30 words minimum (currently {word_count} words)"}), 400
+    char_count = len(remarks) if remarks else 0
+    if char_count < 20:
+        return jsonify({"status": "error", "message": f"Remarks must be at least 20 characters minimum (currently {char_count} characters)"}), 400
 
     conn   = get_db_connection()
     cursor = conn.cursor()
@@ -644,6 +658,257 @@ def mark_company_interview_done():
         conn.commit()
 
         return jsonify({"status": "success", "message": "Interview marked as done"})
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# --------------------------------------------------------------------------
+# CO INTERVIEW ENDPOINTS (co_interview_status & co_interview_done_on)
+# --------------------------------------------------------------------------
+
+@inteview_bp.route('/co_interview_pending', methods=['GET'])
+def get_co_interview_pending():
+    """
+    Returns personnel whose CO interview is pending:
+    - co_interview_status = 0 (or no record in company_interview)
+    - OR co_interview_status = 1 AND co_interview_done_on is older than 3 months.
+    CO, 2IC, ADJUTANT roles see all companies.
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    req_coy = request.args.get('company', '').strip()
+    user_coy = user.get('company', '').strip()
+    role = user.get('role', '').strip().upper()
+
+    coy_to_check = req_coy if req_coy else user_coy
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        is_admin_view = (coy_to_check.upper() in ['ADMIN', 'ALL']) or (role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'])
+
+        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']:
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.`rank`,
+                    p.name,
+                    p.company,
+                    ci.id                               AS ci_id,
+                    COALESCE(ci.co_interview_status, 0) AS co_interview_status,
+                    ci.co_interview_done_on,
+                    ci.remarks
+                FROM personnel p
+                LEFT JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE (
+                    ci.id IS NULL
+                    OR ci.co_interview_status = 0
+                    OR (ci.co_interview_status = 1 AND ci.co_interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 6 MONTH))
+                )
+                AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
+                ORDER BY p.`rank`, p.name
+            """, (coy_to_check,))
+            pending_rows = cursor.fetchall()
+
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.`rank`,
+                    p.name,
+                    p.company,
+                    ci.id                               AS ci_id,
+                    ci.co_interview_status,
+                    ci.co_interview_done_on,
+                    ci.remarks
+                FROM personnel p
+                JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE ci.co_interview_status = 1
+                  AND ci.co_interview_done_on > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+                  AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
+                ORDER BY ci.co_interview_done_on DESC, p.`rank`, p.name
+            """, (coy_to_check,))
+            completed_rows = cursor.fetchall()
+        else:
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.`rank`,
+                    p.name,
+                    p.company,
+                    ci.id                               AS ci_id,
+                    COALESCE(ci.co_interview_status, 0) AS co_interview_status,
+                    ci.co_interview_done_on,
+                    ci.remarks
+                FROM personnel p
+                LEFT JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE (
+                    ci.id IS NULL
+                    OR ci.co_interview_status = 0
+                    OR (ci.co_interview_status = 1 AND ci.co_interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 6 MONTH))
+                )
+                ORDER BY p.company, p.`rank`, p.name
+            """)
+            pending_rows = cursor.fetchall()
+
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.`rank`,
+                    p.name,
+                    p.company,
+                    ci.id                               AS ci_id,
+                    ci.co_interview_status,
+                    ci.co_interview_done_on,
+                    ci.remarks
+                FROM personnel p
+                JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE ci.co_interview_status = 1
+                  AND ci.co_interview_done_on > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+                ORDER BY ci.co_interview_done_on DESC, p.company, p.`rank`, p.name
+            """)
+            completed_rows = cursor.fetchall()
+
+        for r in pending_rows + completed_rows:
+            if r.get('co_interview_done_on'):
+                try:
+                    if hasattr(r['co_interview_done_on'], 'strftime'):
+                        r['co_interview_done_on'] = r['co_interview_done_on'].strftime('%d %b %Y')
+                    else:
+                        r['co_interview_done_on'] = str(r['co_interview_done_on'])
+                except Exception:
+                    r['co_interview_done_on'] = str(r['co_interview_done_on'])
+
+        return jsonify({
+            "status":    "success",
+            "count":     len(pending_rows),
+            "pending":   pending_rows,
+            "completed": completed_rows,
+            "is_admin":  is_admin_view
+        })
+
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@inteview_bp.route('/co_interview_count', methods=['GET'])
+def get_co_interview_count():
+    """Lightweight count-only endpoint for CO Interview card."""
+    user = require_login()
+    if not user:
+        return jsonify({"count": 0, "pending": 0, "total": 0})
+
+    req_coy = request.args.get('company', '').strip()
+    user_coy = user.get('company', '').strip()
+    role = user.get('role', '').strip().upper()
+
+    coy_to_check = req_coy if req_coy else user_coy
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM personnel p
+                LEFT JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE (
+                    ci.id IS NULL
+                    OR ci.co_interview_status = 0
+                    OR (ci.co_interview_status = 1 AND ci.co_interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 6 MONTH))
+                )
+                AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
+            """, (coy_to_check,))
+            pending = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM personnel WHERE LOWER(TRIM(company)) = LOWER(TRIM(%s))", (coy_to_check,))
+            total = cursor.fetchone()[0]
+        else:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM personnel p
+                LEFT JOIN company_interview ci ON ci.army_number = p.army_number
+                WHERE (
+                    ci.id IS NULL
+                    OR ci.co_interview_status = 0
+                    OR (ci.co_interview_status = 1 AND ci.co_interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 6 MONTH))
+                )
+            """)
+            pending = cursor.fetchone()[0]
+
+            cursor.execute("SELECT COUNT(*) FROM personnel")
+            total = cursor.fetchone()[0]
+
+        return jsonify({"status": "success", "count": pending, "pending": pending, "total": total})
+
+    except Exception as e:
+        return jsonify({"status": "error", "count": 0, "pending": 0, "total": 0}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@inteview_bp.route('/co_interview_done', methods=['POST'])
+def mark_co_interview_done():
+    """
+    Mark a CO interview record as done for a soldier.
+    Expects JSON: { "army_number": "<string>", "ci_id": <int (optional)>, "remarks": "<string>" }
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+
+    data        = request.get_json() or {}
+    army_number = data.get('army_number', '').strip()
+    ci_id       = data.get('ci_id')
+    remarks     = data.get('remarks', '').strip()
+
+    if not army_number and not ci_id:
+        return jsonify({"status": "error", "message": "army_number or ci_id is required"}), 400
+
+    char_count = len(remarks) if remarks else 0
+    if char_count < 20:
+        return jsonify({"status": "error", "message": f"Remarks must be at least 20 characters minimum (currently {char_count} characters)"}), 400
+
+    conn   = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        if ci_id:
+            cursor.execute("""
+                UPDATE company_interview
+                SET co_interview_status  = 1,
+                    co_interview_done_on = CURDATE(),
+                    remarks              = %s
+                WHERE id = %s
+            """, (remarks, ci_id))
+        else:
+            cursor.execute("""
+                INSERT INTO company_interview (army_number, co_interview_status, co_interview_done_on, remarks)
+                VALUES (%s, 1, CURDATE(), %s)
+                ON DUPLICATE KEY UPDATE
+                    co_interview_status  = 1,
+                    co_interview_done_on = CURDATE(),
+                    remarks              = VALUES(remarks)
+            """, (army_number, remarks))
+
+        conn.commit()
+
+        return jsonify({"status": "success", "message": "CO Interview marked as done"})
 
     except Exception as e:
         conn.rollback()
