@@ -103,7 +103,7 @@ def get_regiment_banner_uri():
 
         # Check navbar config for dynamic overrides
         navbar_cfg_file = os.path.join(static_dir, "uploads", "navbar", "config.json")
-        header_text = "UNIT MANAGEMENT SYSTEM"
+        header_text = "15 CORPS UNIT MANAGEMENT SYSTEM"
         left_logo_file = os.path.join(static_dir, "image_for_login_page", "rt.jpg")
         right_logo_file = os.path.join(static_dir, "image_for_login_page", "chinar.jpg")
 
@@ -215,7 +215,7 @@ def get_regiment_banner_uri():
                 meta_font = ImageFont.load_default()
 
             sub_text = "PERSONAL FITNESS REPORT"
-            meta_text = "UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL"
+            meta_text = "15 CORPS UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL"
 
             # Draw Title
             t_box = draw_b.textbbox((0, 0), header_text, font=title_font)
@@ -271,7 +271,7 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
 
     # Section 1: Header / Cover
     header = {
-        "title": "UNIT MANAGEMENT SYSTEM",
+        "title": "15 CORPS UNIT MANAGEMENT SYSTEM",
         "report_title": "PERSONAL FITNESS REPORT",
         "report_id": report_id,
         "date": timestamp_str,
@@ -380,42 +380,70 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
     exercises_list = rec_ex.get("exercises", [])
     if not exercises_list:
         exercises_list = [
-            {"exercise": "5 km Endurance Run", "sets": 1, "reps": "1 run", "duration": "25-30 mins", "frequency": "3 days / week"},
-            {"exercise": "Push-ups", "sets": 3, "reps": "20-25 reps", "duration": "10 mins", "frequency": "4 days / week"},
-            {"exercise": "Sit-ups", "sets": 3, "reps": "25-30 reps", "duration": "10 mins", "frequency": "4 days / week"},
-            {"exercise": "Chin-ups", "sets": 3, "reps": "6-10 reps", "duration": "8 mins", "frequency": "3 days / week"},
-            {"exercise": "Core Plank", "sets": 3, "reps": "1 rep", "duration": "45-60 sec plank", "frequency": "Daily"}
+            {"exercise": "5 km Endurance Run", "sets": 1, "reps": "Continuous 5 km", "duration": "25-30 mins", "frequency": "3 days / week", "rest": "5 mins walk", "intensity": "Moderate - High", "progression": "Target steady sub-25 min pace."},
+            {"exercise": "Military Push-ups", "sets": 3, "reps": "20-25 reps", "duration": "10 mins", "frequency": "4 days / week", "rest": "60 sec", "intensity": "Moderate - High", "progression": "Add 2 reps weekly."},
+            {"exercise": "Military Sit-ups", "sets": 3, "reps": "25-30 reps", "duration": "10 mins", "frequency": "4 days / week", "rest": "60 sec", "intensity": "Moderate", "progression": "Target 40 reps in 2 mins."},
+            {"exercise": "Strict Chin-ups", "sets": 3, "reps": "6-10 reps", "duration": "8 mins", "frequency": "3 days / week", "rest": "90 sec", "intensity": "High", "progression": "Target 10+ consecutive reps."},
+            {"exercise": "Core Rigidity Plank", "sets": 3, "reps": "60 sec hold", "duration": "8 mins", "frequency": "Daily", "rest": "45 sec", "intensity": "Moderate", "progression": "Increase hold time by 5s weekly."}
         ]
     exercise_plan = {
-        "title": rec_ex.get("plan_name", "Tactical Operational Conditioning"),
+        "title": rec_ex.get("title") or rec_ex.get("plan_name", "Tactical Operational Conditioning"),
         "focus_area": rec_ex.get("focus_area", "Cardiorespiratory Stamina & Muscular Endurance"),
-        "exercises": exercises_list
+        "exercises": exercises_list,
+        "weekly_structure": rec_ex.get("weekly_structure", [])
     }
 
-    # Section 9: Personalized Nutrition Recommendations
+    # Section 9: Personalized Nutrition Recommendations (Mess Menu Constrained)
     rec_diet = recommendations.get("diet", {}) if isinstance(recommendations, dict) else {}
     nutrition = {
+        "mess_category": rec_diet.get("mess_category", "OR MESS"),
+        "day_of_week": rec_diet.get("day_of_week", datetime.now().strftime('%A')),
         "target_calories": rec_diet.get("target_calories", 2500),
         "hydration_liters": rec_diet.get("hydration_liters", 3.5),
         "strategy": rec_diet.get("strategy", "High Protein Balanced Active Military Diet"),
         "macros": rec_diet.get("macros", {
             "protein_grams": 130, "protein_pct": 25,
             "carb_grams": 300, "carb_pct": 55,
-            "fat_grams": 55, "fat_pct": 20
+            "fat_grams": 55, "fat_pct": 20,
+            "fiber_grams": 35
         }),
+        "daily_targets": rec_diet.get("daily_targets", {
+            "calories": rec_diet.get("target_calories", 2500),
+            "protein": 130,
+            "carbs": 300,
+            "fat": 55,
+            "fiber": 35,
+            "hydration": rec_diet.get("hydration_liters", 3.5)
+        }),
+        "estimated_intake": rec_diet.get("estimated_intake", {
+            "calories": rec_diet.get("target_calories", 2500),
+            "protein": 125,
+            "carbs": 295,
+            "fat": 52,
+            "fiber": 34
+        }),
+        "mess_nutrition_plan": rec_diet.get("mess_nutrition_plan", {}),
+        "weekly_schedule": rec_diet.get("weekly_schedule", {}),
+        "weekly_schedule_list": rec_diet.get("weekly_schedule_list", []),
+        "roadmap_30d": rec_diet.get("roadmap_30d", []),
+        "optional_diet_plan": rec_diet.get("optional_diet_plan", [
+            {"item": "Hydration Fluid", "recommendation": "Minimum 3.5 Liters of clean water daily, paced across training sessions."},
+            {"item": "Seasonal Fresh Fruit", "recommendation": "1 whole seasonal fruit (orange/guava/apple) during mid-morning if available."},
+            {"item": "Operational Electrolytes", "recommendation": "Lemon water with a pinch of black salt during high-heat field drills."}
+        ]),
+        "sample_menu": rec_diet.get("sample_menu", []),
         "recommended_items": rec_diet.get("recommended_items") or [
-            "Lean poultry, boiled eggs & paneer for muscle protein synthesis",
-            "Whole lentils, dal & sprouted beans for sustained amino acids",
-            "Whole grains (oats, brown rice, whole wheat roti) for glycogen replenishment",
-            "Seasonal fresh fruits & leafy vegetables for electrolytes and micronutrients",
-            "Consistent hydration with minimum 3.0 to 3.5 Liters of clean water daily"
+            "Authorized mess dal, lentils, and lean poultry for muscle repair",
+            "Complex carbohydrate portions (chapati, rice) calibrated to physical exertion",
+            "Seasonal vegetables and fresh salads from unit rations for vital micronutrients",
+            "Consistent daily hydration of minimum 3.5 Liters of clean water"
         ],
         "limit_items": rec_diet.get("limit_items") or [
-            "Deep-fried mess snacks, pakoras, and processed canteen confectionery",
+            "Excessive portions of calorie-dense fried snacks (pakoras, puris) beyond recommendation",
             "Refined sugar, sugary tea/coffee, and carbonated beverages",
             "Excessive table salt, pickles, and high-sodium processed rations",
-            "Irregular meal timings or skipping breakfast prior to morning PT",
-            "Heavy meals consumed less than 2 hours before lights out"
+            "Skipping scheduled breakfast prior to morning physical training",
+            "Consuming heavy meals less than 2 hours before lights out"
         ],
         "guidelines": rec_diet.get("dietary_guidelines") or [
             "Meal Timing Discipline: Ensure dinner is finished at least 2 hours before sleep; consume recovery protein within 45 minutes after intensive PT.",

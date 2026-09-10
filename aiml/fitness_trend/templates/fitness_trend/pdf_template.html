@@ -239,6 +239,10 @@
         top: 1320px;
     }
 
+    .preview-watermark-page-3 {
+        top: 2260px;
+    }
+
     .preview-watermark-box {
         transform: rotate(-35deg);
         text-align: center;
@@ -291,6 +295,13 @@
             <div class="preview-watermark-time">DATE &amp; TIME: {{ watermark_datetime or '' }}</div>
         </div>
     </div>
+    <div class="preview-watermark-page preview-watermark-page-3">
+        <div class="preview-watermark-box">
+            <div class="preview-watermark-title">{{ watermark_text or 'UMS 15 CESR' }}</div>
+            <div class="preview-watermark-ip">IP ADDRESS: {{ client_ip or '127.0.0.1' }}</div>
+            <div class="preview-watermark-time">DATE &amp; TIME: {{ watermark_datetime or '' }}</div>
+        </div>
+    </div>
 </div>
 <script>
 // Ensure overlay covers full document height so watermarks stay anchored to content
@@ -304,13 +315,25 @@ window.addEventListener('load', function() {
 </script>
 {% endif %}
 
-<!-- Header (Clean centered military typography matching reference PDF) -->
+<!-- Header (Clean centered military typography with official insignias) -->
 <table class="header-table">
     <tr>
-        <td style="text-align: center;">
-            <div class="unit-title">{{ labels.unit_title or 'UNIT MANAGEMENT SYSTEM' }}</div>
+        <td style="width: 17%; text-align: left; vertical-align: middle;">
+            {% if rt_logo_path %}
+            <img src="{{ rt_logo_path }}" width="90" height="90" style="width: 90px; height: 90px;" alt="15 CESR Crest" />
+            {% endif %}
+        </td>
+        <td style="width: 66%; text-align: center; vertical-align: middle;">
+            <div class="unit-title">{{ labels.unit_title or '15 CORPS UNIT MANAGEMENT SYSTEM' }}</div>
             <div class="report-title">{{ labels.report_title or 'Personal Fitness Report' }}</div>
             <div class="meta-sub">{{ (labels.report_generated or 'Report Generated') | replace(':', '') }}: {{ (report.header.date if report and report.header else generated_at) or generated_at }}{% if report and report.header and report.header.report_id %} | {{ (labels.report_id or 'Report ID') | replace(':', '') }}: {{ report.header.report_id }}{% endif %} | {{ (labels.model_version or 'Model Version') | replace(':', '') }}: {{ model_version or 'v1' }} | {{ labels.confidential or 'CONFIDENTIAL' }}</div>
+        </td>
+        <td style="width: 17%; text-align: right; vertical-align: middle;">
+            {% if chinar_logo_path %}
+            <img src="{{ chinar_logo_path }}" width="90" height="90" style="width: 90px; height: 90px;" alt="Chinar Corps Insignia" />
+            {% elif rt_logo_path %}
+            <img src="{{ rt_logo_path }}" width="90" height="90" style="width: 90px; height: 90px;" alt="15 CESR Crest" />
+            {% endif %}
         </td>
     </tr>
 </table>
@@ -346,9 +369,9 @@ window.addEventListener('load', function() {
     </table>
 </div>
 
-<!-- Section 2: Current Fitness Analysis -->
+<!-- Section 2: Fitness Analysis -->
 <div class="pdf-section">
-    <div class="section-heading">{{ labels.sec2_title or (labels.sec3_title | replace('3.', '2.')) or '2. Current Fitness Analysis' }}</div>
+    <div class="section-heading">{{ labels.sec2_title or '2. Fitness Analysis' }}</div>
     <table class="data-table">
         <tr>
             <th style="width: 25%;">{{ labels.height_weight or 'Height / Actual Weight:' }}</th>
@@ -508,11 +531,12 @@ window.addEventListener('load', function() {
     <table class="data-table">
         <thead>
             <tr>
-                <th style="width: 35%;">{{ labels.exercise_drill or 'Exercise / Drill' }}</th>
-                <th style="width: 10%;">{{ labels.sets or 'Sets' }}</th>
-                <th style="width: 20%;">{{ labels.reps_volume or 'Reps / Volume' }}</th>
-                <th style="width: 15%;">{{ labels.duration or 'Duration' }}</th>
-                <th style="width: 20%;">{{ labels.frequency or 'Frequency' }}</th>
+                <th style="width: 32%;">{{ labels.exercise_drill or 'Exercise / Drill' }}</th>
+                <th style="width: 8%;">{{ labels.sets or 'Sets' }}</th>
+                <th style="width: 18%;">{{ labels.reps_volume or 'Reps / Volume' }}</th>
+                <th style="width: 14%;">{{ labels.duration or 'Duration' }}</th>
+                <th style="width: 14%;">{{ labels.frequency or 'Frequency' }}</th>
+                <th style="width: 14%;">Rest / Notes</th>
             </tr>
         </thead>
         <tbody>
@@ -523,90 +547,163 @@ window.addEventListener('load', function() {
                 <td>{{ item.reps }}</td>
                 <td>{{ item.duration }}</td>
                 <td>{{ item.frequency }}</td>
+                <td>{{ item.rest or item.notes or '60 sec' }}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
-<!-- Section 8: Personalized Nutrition Recommendations -->
+<!-- Section 8: Personalized Nutrition Recommendations (Mess Menu Constrained) -->
 <div class="pdf-section">
     <div class="section-heading">{{ labels.sec8_title or (labels.sec9_title | replace('9.', '8.')) or '8. Personalized Nutrition Recommendations' }}</div>
-    <div style="font-size: 8pt; color: #475569; margin-bottom: 3px;">
+    
+    <!-- Mess Information Banner -->
+    <table style="width: 100%; margin-bottom: 4px; background: #1e3a8a; border-radius: 3px; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 4px 8px; color: #ffffff; font-size: 7.5pt; font-weight: bold;">
+                MESS CATEGORY: <span style="color: #fde047;">{{ (report.nutrition.mess_category if report and report.nutrition else recommendations.diet.mess_category) or 'OR MESS' }}</span> (Rank: {{ (report.profile.rank if report and report.profile else soldier.rank) or soldier.rank }})
+            </td>
+        </tr>
+    </table>
+
+    <div style="font-size: 7.5pt; color: #475569; margin-bottom: 3px;">
         <strong>{{ labels.diet_strategy or 'Diet Strategy:' }}</strong> {{ (report.nutrition.strategy if report and report.nutrition else recommendations.diet.strategy) or recommendations.diet.strategy }}
     </div>
-    <table class="data-table">
-        <tr>
-            <th style="width: 25%;">{{ labels.daily_energy or 'Daily Energy Target:' }}</th>
-            <td style="width: 25%;"><strong>{{ (report.nutrition.target_calories if report and report.nutrition else recommendations.diet.target_calories) or recommendations.diet.target_calories }} {{ labels.kcal_day or 'kcal / Day' }}</strong></td>
-            <th style="width: 25%;">{{ labels.daily_hydration or 'Daily Hydration Target:' }}</th>
-            <td style="width: 25%;"><strong>{{ (report.nutrition.hydration_liters if report and report.nutrition else recommendations.diet.hydration_liters) or recommendations.diet.hydration_liters }} {{ labels.liters_day or 'Liters / Day' }}</strong></td>
-        </tr>
-        <tr>
-            <th>{{ labels.protein_target or 'Protein Target:' }}</th>
-            <td>{{ (report.nutrition.macros.protein_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_grams) or recommendations.diet.macros.protein_grams }}g ({{ (report.nutrition.macros.protein_pct if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_pct) or recommendations.diet.macros.protein_pct }}%)</td>
-            <th>{{ labels.carbs_fats or 'Carbs / Fats:' }}</th>
-            <td>
-                {{ (report.nutrition.macros.carb_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.carb_grams) or recommendations.diet.macros.carb_grams }}g / {{ (report.nutrition.macros.fat_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.fat_grams) or recommendations.diet.macros.fat_grams }}g
-            </td>
-        </tr>
-    </table>
-    <!-- Nutritional DO'S and DON'TS -->
-    <table style="width: 100%; margin-top: 5px; margin-bottom: 4px; page-break-inside: avoid;">
-        <tr>
-            <td style="width: 50%; vertical-align: top; padding-right: 4px;">
-                <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 3px; padding: 4px 6px;">
-                    <strong style="color: #065f46; font-size: 8pt;">{{ labels.recommended_nutrition or "✔ DO'S (Recommended Protocol):" }}</strong>
-                    <ul style="margin: 2px 0 2px 10px; padding: 0;">
-                        {% for item in ((report.nutrition.recommended_items if report and report.nutrition else recommendations.diet.recommended_items) or [
-                            'Lean poultry, boiled eggs & paneer for muscle protein synthesis',
-                            'Whole lentils, dal & sprouted beans for sustained amino acids',
-                            'Whole grains (oats, brown rice, whole wheat roti) for glycogen replenishment',
-                            'Seasonal fresh fruits & leafy vegetables for electrolytes and micronutrients',
-                            'Consistent hydration with minimum 3.0 to 3.5 Liters of clean water daily'
-                        ]) %}
-                        <li style="font-size: 7.5pt; margin-bottom: 1.5px; color: #1e293b;">{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </td>
-            <td style="width: 50%; vertical-align: top; padding-left: 4px;">
-                <div style="background-color: #fff1f2; border: 1px solid #fecdd3; border-radius: 3px; padding: 4px 6px;">
-                    <strong style="color: #9f1239; font-size: 8pt;">{{ labels.limit_nutrition or "✖ DON'TS (Items & Habits to Avoid):" }}</strong>
-                    <ul style="margin: 2px 0 2px 10px; padding: 0;">
-                        {% for item in ((report.nutrition.limit_items if report and report.nutrition else recommendations.diet.limit_items) or [
-                            'Deep-fried mess snacks, pakoras, and processed canteen confectionery',
-                            'Refined sugar, sugary tea/coffee, and carbonated beverages',
-                            'Excessive table salt, pickles, and high-sodium processed rations',
-                            'Irregular meal timings or skipping breakfast prior to morning PT',
-                            'Heavy meals consumed less than 2 hours before lights out'
-                        ]) %}
-                        <li style="font-size: 7.5pt; margin-bottom: 1.5px; color: #1e293b;">{{ item }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </td>
-        </tr>
+
+    <!-- Daily Target vs Estimated Recommended Intake -->
+    <table class="data-table" style="margin-bottom: 4px;">
+        <thead>
+            <tr style="background: #f8fafc;">
+                <th style="width: 25%;">Nutritional Target</th>
+                <th style="width: 15%; text-align: center;">Calories</th>
+                <th style="width: 15%; text-align: center;">Protein</th>
+                <th style="width: 15%; text-align: center;">Carbohydrates</th>
+                <th style="width: 15%; text-align: center;">Fat</th>
+                <th style="width: 15%; text-align: center;">Fiber</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Daily Target</strong></td>
+                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.calories if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.calories) or (report.nutrition.target_calories if report and report.nutrition else recommendations.diet.target_calories) }} kcal</td>
+                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.protein if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.protein) or (report.nutrition.macros.protein_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_grams) }}g</td>
+                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.carbs if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.carbs) or (report.nutrition.macros.carb_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.carb_grams) }}g</td>
+                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.fat if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.fat) or (report.nutrition.macros.fat_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.fat_grams) }}g</td>
+                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.fiber if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.fiber) or 35 }}g</td>
+            </tr>
+            <tr style="background: #f8fafc;">
+                <td><strong>Estimated Intake</strong></td>
+                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.calories if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.calories) or (report.nutrition.target_calories if report and report.nutrition else recommendations.diet.target_calories) }} kcal</td>
+                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.protein if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.protein) or (report.nutrition.macros.protein_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_grams) }}g</td>
+                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.carbs if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.carbs) or (report.nutrition.macros.carb_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.carb_grams) }}g</td>
+                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.fat if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.fat) or (report.nutrition.macros.fat_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.fat_grams) }}g</td>
+                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.fiber if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.fiber) or 34 }}g</td>
+            </tr>
+        </tbody>
     </table>
 
-    <!-- Tactical Nutritional Guidelines -->
-    <div class="callout-box" style="margin-top: 3px; margin-bottom: 3px; padding: 4px 7px;">
-        <strong style="color: #1e3a8a; font-size: 8pt;">{{ labels.dietary_guidelines_title or 'Operational Nutrition & Hydration Discipline:' }}</strong>
-        <div style="font-size: 7.5pt; line-height: 1.35; color: #334155; margin-top: 2px;">
-            {% for g in ((report.nutrition.guidelines if report and report.nutrition else recommendations.diet.dietary_guidelines) or [
-                'Meal Timing Discipline: Ensure dinner is finished at least 2 hours before sleep; consume recovery protein within 45 minutes after intensive PT.',
-                'Operational Hydration: Consume 500 ml of clean water 30 minutes prior to outdoor drills; maintain continuous fluid replenishment in hot terrain.',
-                'Mess Selection Strategy: Prioritize roasted, boiled, or grilled mess items over deep-fried curries; incorporate fresh salads and curd daily.'
-            ]) %}
-            • {{ g }}<br>
+    <!-- 30-Day Tactical Nutrition Progression Roadmap (4-Week Cycle) -->
+    <table class="data-table" style="margin-top: 4px; margin-bottom: 4px;">
+        <thead>
+            <tr style="background: #e0e7ff;">
+                <th colspan="4" style="color: #1e3a8a; font-weight: bold; font-size: 7.5pt; text-align: left; padding: 3px 6px;">
+                    30-DAY TACTICAL NUTRITION ROADMAP (4-WEEK PROGRESSION CYCLE)
+                </th>
+            </tr>
+            <tr style="background: #f1f5f9;">
+                <th style="width: 20%;">Cycle Phase</th>
+                <th style="width: 26%;">Phase Name</th>
+                <th style="width: 28%;">Tactical Mess Focus</th>
+                <th style="width: 26%;">30-Day Milestone Target</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rm in ((report.nutrition.roadmap_30d if report and report.nutrition and report.nutrition.roadmap_30d else recommendations.diet.roadmap_30d) or []) %}
+            <tr>
+                <td><strong>{{ rm.week }}</strong></td>
+                <td style="color: #1e3a8a; font-weight: bold;">{{ rm.phase }}</td>
+                <td style="font-size: 7pt;">{{ rm.mess_strategy or rm.focus }}</td>
+                <td style="font-size: 7pt; color: #047857;">{{ rm.milestone }}</td>
+            </tr>
             {% endfor %}
-        </div>
-    </div>
+        </tbody>
+    </table>
 </div>
 
+<!-- Clean page break: Move Full Month Unit Mess Nutrition Schedule completely to Page 3 -->
+<div style="page-break-after: always;"></div>
+
+<!-- Page 3: Full Month Unit Mess Nutrition Schedule -->
+{% set weekly_list = (report.nutrition.weekly_schedule_list if report and report.nutrition and report.nutrition.weekly_schedule_list else recommendations.diet.weekly_schedule_list) or [] %}
+{% set mess_cat = ((report.nutrition.mess_category if report and report.nutrition else recommendations.diet.mess_category) or '') | upper %}
+{% set s_rank = ((report.profile.rank if report and report.profile else soldier.rank) or '') | upper %}
+{% set s_armyno = ((report.profile.army_number if report and report.profile else soldier.army_number) or '') | upper %}
+{% set is_jc = ('JCO' in mess_cat) or ('JC' in s_armyno) or ('SUBEDAR' in s_rank) or ('SUB' in s_rank) or ('HONY' in s_rank) or ('HONORARY' in s_rank) %}
+{% if weekly_list %}
+<div class="pdf-section">
+    <div class="section-heading section-heading-first">{{ labels.sec8_title or '8. Personalized Nutrition Recommendations' }} &ndash; FULL MONTH UNIT MESS SCHEDULE</div>
+    <table class="data-table" style="margin-top: 6px; margin-bottom: 8px;">
+        <thead>
+            <tr style="background: #1e3a8a;">
+                <th colspan="{% if is_jc %}4{% else %}5{% endif %}" style="color: #ffffff; font-weight: bold; font-size: 8pt; text-align: left; padding: 5px 8px; letter-spacing: 0.5px;">
+                    FULL MONTH UNIT MESS NUTRITION SCHEDULE (DAY 1 MONDAY &ndash; DAY 7 SUNDAY RECURRING CYCLE)
+                </th>
+            </tr>
+            <tr style="background: #f1f5f9;">
+                <th style="width: {% if is_jc %}15%{% else %}14%{% endif %}; font-size: 8pt; padding: 5px 6px;">Day &amp; Rotation</th>
+                <th style="width: {% if is_jc %}27%{% else %}22%{% endif %}; font-size: 8pt; padding: 5px 6px;">Breakfast (Portion)</th>
+                {% if not is_jc %}
+                <th style="width: 18%; font-size: 8pt; padding: 5px 6px;">Tea / Refreshment</th>
+                {% endif %}
+                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 8pt; padding: 5px 6px;">Lunch (Grams)</th>
+                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 8pt; padding: 5px 6px;">Dinner (Grams)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d_info in weekly_list %}
+            <tr>
+                <td style="padding: 6px 6px;">
+                    <strong style="color: #1e3a8a;">Day {{ loop.index }}</strong><br>
+                    <span style="font-weight: bold; font-size: 8pt;">{{ d_info.day }}</span>
+                </td>
+                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                    {% for it in d_info.meals.get('Breakfast', []) %}
+                        <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </td>
+                {% if not is_jc %}
+                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                    {% set tea_items = d_info.meals.get('Tea', []) %}
+                    {% if tea_items %}
+                        {% for it in tea_items %}
+                            <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <span style="color: #94a3b8;">--</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                    {% for it in d_info.meals.get('Lunch', []) %}
+                        <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </td>
+                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                    {% for it in d_info.meals.get('Dinner', []) %}
+                        <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
 <!-- Official Confidential Footer -->
-<div style="border-top: 1px solid #cbd5e1; padding-top: 3px; margin-top: 6px; font-size: 7pt; color: #64748b; text-align: center;">
-    {{ (report.footer.regiment if report and report.footer else (labels.regiment_name or 'UNIT MANAGEMENT SYSTEM')) or labels.regiment_name or 'UNIT MANAGEMENT SYSTEM' }} • {{ labels.report_id or 'Report ID:' }} {{ (report.footer.report_id if report and report.footer else report.report_id) or report.report_id or '' }} • IP: {{ (report.footer.client_ip if report and report.footer else client_ip) or client_ip }} • {{ (report.footer.timestamp if report and report.footer else generated_at) or generated_at }} • {{ labels.confidential or 'CONFIDENTIAL' }}
+<div style="border-top: 1px solid #cbd5e1; padding-top: 4px; margin-top: 12px; font-size: 7pt; color: #64748b; text-align: center;">
+    {{ (report.footer.regiment if report and report.footer else (labels.regiment_name or '15 CORPS UNIT MANAGEMENT SYSTEM')) or labels.regiment_name or '15 CORPS UNIT MANAGEMENT SYSTEM' }} • {{ labels.report_id or 'Report ID:' }} {{ (report.footer.report_id if report and report.footer else report.report_id) or report.report_id or '' }} • IP: {{ (report.footer.client_ip if report and report.footer else client_ip) or client_ip }} • {{ (report.footer.timestamp if report and report.footer else generated_at) or generated_at }} • {{ labels.confidential or 'CONFIDENTIAL' }}
 </div>
 
 </body>

@@ -57,11 +57,51 @@
     </div>
 
     <!-- Structured Meal Menu Table -->
-    <div class="p-3 border rounded" style="background: var(--fit-bg-soft);">
-      <h6 class="fw-bold text-dark mb-3"><i class="fas fa-calendar-day me-1"></i> Suggested Daily Unit Mess Meal Schedule</h6>
+    <div class="p-3 border rounded mb-4" style="background: var(--fit-bg-soft);">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+        <div>
+          <h6 class="fw-bold text-dark mb-1">
+            <i class="fas fa-calendar-alt text-primary me-1"></i> 30-Day Unit Mess Nutrition Schedule
+          </h6>
+          <div class="small text-muted">Weekly Cycle (Monday &ndash; Sunday) &bull; Calibrated Serving Portions</div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-success px-3 py-1.5" id="recMessBadge">OR MESS</span>
+          <span class="badge bg-primary px-3 py-1.5">30-Day Plan</span>
+        </div>
+      </div>
+
+      <!-- Simple Table of Full Week Nutrition Schedule -->
+      <div class="table-responsive" id="recMenuTableContainer">
+        <!-- Populated by JS: Full Week Plan Table -->
+      </div>
+    </div>
+
+    <!-- 30-Day Tactical Nutrition Progression Roadmap -->
+    <div class="p-3 border rounded mb-4" style="background: #f8fafc;" id="recRoadmapSection">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-bold text-dark mb-0">
+          <i class="fas fa-route text-success me-1"></i> 30-Day Nutrition Progression Roadmap (4-Week Cycle)
+        </h6>
+        <span class="badge bg-secondary">30-Day Target</span>
+      </div>
+      <div class="row g-2 pt-2" id="recRoadmapGrid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- Optional Supplementary Diet Plan -->
+    <div class="p-3 border rounded mb-4 d-none" id="recOptionalDietCont" style="background: #fdfbf7; border-color: #f6d365 !important;">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h6 class="fw-bold text-dark mb-0">
+          <i class="fas fa-apple-alt text-warning me-2"></i> Optional Supplementary Diet Plan (Outside Mess)
+        </h6>
+        <span class="badge bg-secondary">Optional Supplement</span>
+      </div>
+      <div class="small text-muted mb-2">Supplementary conditioning items for voluntary optimization outside mandatory mess hours.</div>
       <div class="table-responsive">
         <table class="table table-sm table-borderless mb-0">
-          <tbody id="recMenuTableBody">
+          <tbody id="recOptionalDietBody">
             <!-- Populated by JS -->
           </tbody>
         </table>

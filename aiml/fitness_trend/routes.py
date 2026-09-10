@@ -42,12 +42,14 @@ from .prediction.predictor import get_model_info
 from .reports.fitness_report import generate_fitness_pdf_report, generate_fitness_html_report
 
 from .data.reports_db import ensure_ai_fitness_reports_table
+from .data.mess_menu_db import ensure_mess_menus_table
 
-# Ensure database table exists on module startup
+# Ensure database tables exist on module startup
 try:
     ensure_ai_fitness_reports_table()
+    ensure_mess_menus_table()
 except Exception as _table_err:
-    logger.warning(f"Could not initialize ai_fitness_reports table on load: {_table_err}")
+    logger.warning(f"Could not initialize database tables on load: {_table_err}")
 
 # Allowed executive roles for reports dashboard and management
 AUTHORIZED_FITNESS_ROLES = ["CO", "2IC", "ADJUTANT", "COMMANDING OFFICER"]
@@ -143,7 +145,8 @@ def api_analyze_fitness():
         return jsonify({'success': False, 'error': 'Missing required parameter "army_number".'}), 400
         
     try:
-        result = analyze_personnel_fitness(army_number, goal=goal)
+        report_date = data.get("report_date") or data.get("date") or request.args.get("date")
+        result = analyze_personnel_fitness(army_number, goal=goal, report_date=report_date)
         if not result.get('success'):
             return jsonify(result), 404
 
@@ -182,7 +185,8 @@ def api_analyze_fitness_by_get(army_number):
         return jsonify({'success': False, 'error': 'Unauthorized'}), 401
 
     goal = request.args.get("goal", "Overall Fitness").strip()
-    result = analyze_personnel_fitness(army_number, goal=goal, regenerate=False)
+    report_date = request.args.get("date") or request.args.get("report_date")
+    result = analyze_personnel_fitness(army_number, goal=goal, regenerate=False, report_date=report_date)
     if not result.get('success'):
         return jsonify(result), 404
     return jsonify(result)
@@ -237,11 +241,12 @@ def preview_fitness_report(army_number):
         
     goal = request.args.get("goal", "Overall Fitness")
     lang = request.args.get("lang", "en").lower().strip()
+    report_date = request.args.get("date") or request.args.get("report_date")
     from .translation import is_supported_language
     if not is_supported_language(lang):
         lang = "en"
 
-    result = analyze_personnel_fitness(army_number, goal=goal)
+    result = analyze_personnel_fitness(army_number, goal=goal, report_date=report_date)
     
     if not result.get('success'):
         return render_template(
@@ -334,7 +339,8 @@ def export_fitness_pdf_api():
         }), 400
 
     # 3. Analyze fitness
-    result = analyze_personnel_fitness(target_army_no, goal=goal)
+    report_date = data.get("report_date") or data.get("date") or request.args.get("date")
+    result = analyze_personnel_fitness(target_army_no, goal=goal, report_date=report_date)
     if not result.get("success"):
         return jsonify({
             "success": False,
@@ -393,8 +399,9 @@ def download_fitness_pdf(army_number):
         
     goal = request.args.get("goal", "Overall Fitness")
     lang = request.args.get("lang", "en").lower().strip()
+    report_date = request.args.get("date") or request.args.get("report_date")
     
-    result = analyze_personnel_fitness(army_number, goal=goal)
+    result = analyze_personnel_fitness(army_number, goal=goal, report_date=report_date)
     
     if not result.get('success'):
         return jsonify({'error': result.get('error', 'Soldier record not found.')}), 404
@@ -527,6 +534,114 @@ def api_get_reports():
         per_page=per_page
     )
     return jsonify(data)
+ 
+ 
+@fitness_trend_bp.route("/api/reports/export-pdf", methods=["GET"])
+def api_export_directory_pdf():
+    """
+    Exports the filtered 15 CESR Unit Management System AI Fitness & Operational Readiness Directory
+    into an official downloadable PDF report.
+    Strict role-based access: CO, 2IC, Adjutant.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return redirect("/admin_login")
+
+    if not check_fitness_executive_access(user_payload):
+        return jsonify({
+            'success': False,
+            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
+        }), 403
+
+    search_query = request.args.get("search", "").strip()
+    company = request.args.get("company", "").strip()
+    status = request.args.get("status", "").strip()
+    from_date = request.args.get("from_date", "").strip() or None
+    to_date = request.args.get("to_date", "").strip() or None
+
+    data = get_all_reports_paginated(
+        search_query=search_query,
+        company=company,
+        status=status,
+        from_date=from_date,
+        to_date=to_date,
+        sort_by="generated_at",
+        sort_order="desc",
+        page=1,
+        per_page=500
+    )
+    rows = data.get("data", []) if data.get("success") else []
+    total_count = data.get("total", len(rows))
+
+    filter_labels = []
+    if status:
+        st_l = status.lower().strip()
+        if st_l in ('fit', 'fit only'):
+            filter_labels.append("Fit Only (Combat Ready)")
+        elif st_l in ('unfit', 'unfit only'):
+            filter_labels.append("Unfit Only (Needs Imp / At Risk)")
+        else:
+            filter_labels.append(status)
+    if company and company.lower() != 'all':
+        filter_labels.append(f"Company: {company}")
+    if search_query:
+        filter_labels.append(f"Search: '{search_query}'")
+    filter_label_str = " | ".join(filter_labels) if filter_labels else "All Fitness Statuses"
+
+    from .reports.fitness_report import get_certificate_logos, overlay_watermark_on_pdf
+    rt_logo_path, chinar_logo_path = get_certificate_logos()
+
+    raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
+    client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
+    timestamp_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
+
+    template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+    from jinja2 import Environment, FileSystemLoader
+    env = Environment(loader=FileSystemLoader(template_dir))
+    template = env.get_template("fitness_trend/directory_pdf_template.html")
+
+    rendered_html = template.render(
+        rows=rows,
+        total_count=total_count,
+        filter_label=filter_label_str,
+        company=company or 'All Sub-Units',
+        rt_logo_path=rt_logo_path,
+        chinar_logo_path=chinar_logo_path,
+        generated_at=timestamp_str,
+        client_ip=client_ip
+    )
+
+    from xhtml2pdf import pisa
+    raw_pdf_stream = io.BytesIO()
+    pisa_status = pisa.CreatePDF(
+        io.StringIO(rendered_html),
+        dest=raw_pdf_stream,
+        encoding="utf-8"
+    )
+
+    if pisa_status.err:
+        logger.error(f"Pisa Directory PDF compilation error: {pisa_status.err}")
+        return jsonify({"success": False, "error": "PDF compilation failed"}), 500
+
+    raw_pdf_stream.seek(0)
+    watermarked_pdf = overlay_watermark_on_pdf(
+        raw_pdf_stream,
+        client_ip=client_ip,
+        watermark_text="UMS 15 CESR"
+    )
+
+    as_attachment = request.args.get("download", "1").lower() in ("1", "true", "yes")
+    date_tag = datetime.now().strftime("%Y%m%d_%H%M")
+    filename = f"15_CESR_Fitness_Directory_{date_tag}.pdf"
+
+    response = make_response(send_file(
+        watermarked_pdf,
+        mimetype="application/pdf",
+        as_attachment=as_attachment,
+        download_name=filename
+    ))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    return response
 
 
 @fitness_trend_bp.route("/api/reports/stats", methods=["GET"])

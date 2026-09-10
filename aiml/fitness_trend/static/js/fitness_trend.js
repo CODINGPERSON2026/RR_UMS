@@ -667,7 +667,18 @@ class FitnessTrendApp {
     document.getElementById('anaBmiCat').textContent = s.bmi_category || 'N/A';
     document.getElementById('anaBmiCat').style.color = s.bmi_color || '#3b82f6';
     
-    document.getElementById('anaWeightStatus').textContent = cleanWeightStatus;
+    const rawStatus = (s.weight_status || 'N/A').trim();
+    const baseStatus = rawStatus.replace(/\s*\([+\-\d.]+%\)/g, '').trim();
+    let diffPct = '';
+    if (s.weight_deviation_percent !== null && s.weight_deviation_percent !== undefined) {
+      const pctVal = Number(s.weight_deviation_percent);
+      if (!isNaN(pctVal) && Math.abs(pctVal) > 0.05) {
+        diffPct = ` (${pctVal > 0 ? '+' : ''}${pctVal.toFixed(1)}%)`;
+      }
+    }
+    const cleanWeightStatus = baseStatus !== 'N/A' ? `${baseStatus}${diffPct}` : 'N/A';
+    const anaStatusEl = document.getElementById('anaWeightStatus');
+    if (anaStatusEl) anaStatusEl.textContent = cleanWeightStatus;
     
     const diffKg = s.weight_difference_kg !== null && s.weight_difference_kg !== undefined
       ? `${s.weight_difference_kg > 0 ? '+' : ''}${s.weight_difference_kg} kg`
@@ -856,59 +867,309 @@ class FitnessTrendApp {
     }
 
     // Diet
-    const diet = rec.diet;
-    document.getElementById('recTargetCals').textContent = `${diet.target_calories} kcal`;
-    document.getElementById('recDietStrategy').textContent = diet.strategy;
-    document.getElementById('recProteinGrams').textContent = `${diet.macros.protein_grams}g (${diet.macros.protein_pct}%)`;
-    document.getElementById('recCarbGrams').textContent = `${diet.macros.carb_grams}g (${diet.macros.carb_pct}%)`;
-    document.getElementById('recFatGrams').textContent = `${diet.macros.fat_grams}g (${diet.macros.fat_pct}%)`;
-    document.getElementById('recHydration').textContent = `${diet.hydration_liters} Liters / Day`;
-    
-    // Meal Schedule Table
-    const menuTbody = document.getElementById('recMenuTableBody');
-    if (menuTbody && diet.sample_menu) {
-      menuTbody.innerHTML = diet.sample_menu.map(m => `
-        <tr>
-          <td class="fw-bold text-nowrap text-primary" style="width: 25%;">${m.meal}</td>
-          <td>${m.items}</td>
-        </tr>
-      `).join('');
+    try {
+      const diet = rec.diet || {};
+      this.currentDiet = diet;
+      const targetCalsEl = document.getElementById('recTargetCals');
+      if (targetCalsEl) targetCalsEl.textContent = `${diet.target_calories || 2400} kcal`;
+      const strategyEl = document.getElementById('recDietStrategy');
+      if (strategyEl) strategyEl.textContent = diet.strategy || 'Balanced military nutrition plan.';
+      const macros = diet.macros || {};
+      const protEl = document.getElementById('recProteinGrams');
+      if (protEl) protEl.textContent = `${macros.protein_grams || 110}g (${macros.protein_pct || 20}%)`;
+      const carbEl = document.getElementById('recCarbGrams');
+      if (carbEl) carbEl.textContent = `${macros.carb_grams || 320}g (${macros.carb_pct || 55}%)`;
+      const fatEl = document.getElementById('recFatGrams');
+      if (fatEl) fatEl.textContent = `${macros.fat_grams || 65}g (${macros.fat_pct || 25}%)`;
+      const hydEl = document.getElementById('recHydration');
+      if (hydEl) hydEl.textContent = `${diet.hydration_liters || 3.5} Liters / Day`;
+
+      // Mess Category Badge
+      const messBadge = document.getElementById('recMessBadge');
+      if (messBadge) {
+        const messCat = diet.mess_category || 'OR MESS';
+        messBadge.textContent = messCat;
+        messBadge.className = `badge ${messCat === 'JCO MESS' ? 'bg-warning text-dark' : 'bg-success'} px-3 py-1.5`;
+      }
+
+      // Default to Full Week Plan
+      this.switchMessDay('full');
+
+      // Render 30-Day Tactical Nutrition Roadmap
+      const roadmapGrid = document.getElementById('recRoadmapGrid');
+      if (roadmapGrid && Array.isArray(diet.roadmap_30d)) {
+        roadmapGrid.innerHTML = diet.roadmap_30d.map(w => `
+          <div class="col-md-6 col-lg-3">
+            <div class="p-2.5 border rounded bg-white h-100 shadow-sm" style="font-size: 0.8rem;">
+              <div class="fw-bold text-primary mb-1">${this.escapeHtml(w.week)}: ${this.escapeHtml(w.phase)}</div>
+              <div class="small text-dark mb-1"><strong>Focus:</strong> ${this.escapeHtml(w.focus)}</div>
+              <div class="small text-success mb-1"><strong>Strategy:</strong> ${this.escapeHtml(w.mess_strategy || '')}</div>
+              <div class="small text-muted"><strong>Target:</strong> ${this.escapeHtml(w.milestone || '')}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Optional Supplementary Diet Plan
+      const optDietCont = document.getElementById('recOptionalDietCont');
+      const optDietBody = document.getElementById('recOptionalDietBody');
+      if (optDietCont && optDietBody) {
+        if (Array.isArray(diet.optional_diet_plan) && diet.optional_diet_plan.length > 0) {
+          optDietBody.innerHTML = diet.optional_diet_plan.map(it => `
+            <tr>
+              <td class="fw-bold text-nowrap text-secondary" style="width: 25%;">${this.escapeHtml(it.item || '')}</td>
+              <td class="text-dark">${this.escapeHtml(it.recommendation || '')}</td>
+            </tr>
+          `).join('');
+          optDietCont.classList.remove('d-none');
+        } else {
+          optDietCont.classList.add('d-none');
+        }
+      }
+    } catch (dietErr) {
+      console.error('Error rendering diet card section:', dietErr);
     }
 
     // Exercise Plan
-    const ex = rec.exercise;
-    document.getElementById('recExerciseTitle').textContent = ex.title;
-    document.getElementById('recExerciseFocus').textContent = ex.focus_area;
-    
-    const exTbody = document.getElementById('recExerciseTableBody');
-    if (exTbody && ex.exercises) {
-      exTbody.innerHTML = ex.exercises.map(item => `
+    try {
+      const ex = rec.exercise || rec.workout || {};
+      const exTitleEl = document.getElementById('recExerciseTitle');
+      if (exTitleEl) exTitleEl.textContent = ex.title || 'Structured Tactical Physical Training Regimen';
+      const exFocusEl = document.getElementById('recExerciseFocus');
+      if (exFocusEl) exFocusEl.textContent = ex.focus_area || 'Cardiovascular endurance, core stamina, and tactical mobility.';
+      
+      const exTbody = document.getElementById('recExerciseTableBody');
+      if (exTbody && Array.isArray(ex.exercises)) {
+        exTbody.innerHTML = ex.exercises.map(item => `
+          <tr>
+            <td class="fw-bold">
+              ${this.escapeHtml(item.exercise || '')}
+              ${item.progression_note ? `<div class="small text-muted fst-italic mt-0.5"><i class="fas fa-level-up-alt text-primary me-1"></i>${this.escapeHtml(item.progression_note)}</div>` : ''}
+            </td>
+            <td>${this.escapeHtml(String(item.sets || '--'))}</td>
+            <td>${this.escapeHtml(String(item.reps || '--'))}</td>
+            <td>${this.escapeHtml(String(item.duration || '--'))}</td>
+            <td>${this.escapeHtml(String(item.frequency || '--'))}</td>
+            <td><span class="badge ${item.intensity === 'High' ? 'bg-danger' : (item.intensity === 'Moderate' ? 'bg-primary' : 'bg-info')}">${this.escapeHtml(item.intensity || 'Moderate')}</span></td>
+          </tr>
+        `).join('');
+      }
+
+      // Blocked exercises if any
+      const blockedCont = document.getElementById('recBlockedExercisesCont');
+      if (blockedCont) {
+        if (Array.isArray(ex.blocked_exercises) && ex.blocked_exercises.length > 0) {
+          blockedCont.innerHTML = `
+            <div class="alert alert-warning mt-3 mb-0">
+              <h6 class="fw-bold"><i class="fas fa-ban me-1"></i> Contraindicated Exercises Blocked by Safety Engine:</h6>
+              <ul class="mb-0 small ps-3">
+                ${ex.blocked_exercises.map(b => `<li><strong>${this.escapeHtml(b.exercise || '')}:</strong> ${this.escapeHtml(b.reason || '')}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+          blockedCont.classList.remove('d-none');
+        } else {
+          blockedCont.classList.add('d-none');
+        }
+      }
+    } catch (exErr) {
+      console.error('Error rendering exercise section:', exErr);
+    }
+  }
+
+  getFallbackWeekSchedule(messCat) {
+    const isJco = (messCat || '').toUpperCase().includes('JCO');
+    if (isJco) {
+      return {
+        'Monday': { meals: { 'Breakfast': [{ food_item: 'Paratha', portion: '2 pcs (~180 g)' }, { food_item: 'Curd / Dahi', portion: '100 g' }, { food_item: 'Boiled Egg', portion: '2 eggs' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Tadka', portion: '150 g' }, { food_item: 'Mix Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken Curry / Paneer', portion: '140 g' }] } },
+        'Tuesday': { meals: { 'Breakfast': [{ food_item: 'Idli / Dosa', portion: '180 g' }, { food_item: 'Sambar', portion: '120 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Jeera Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Rajma', portion: '150 g' }, { food_item: 'Seasonal Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Mutton / Paneer Lababdar', portion: '140 g' }] } },
+        'Wednesday': { meals: { 'Breakfast': [{ food_item: 'Poha / Upma', portion: '180 g' }, { food_item: 'Boiled Chana', portion: '60 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Makhani', portion: '150 g' }, { food_item: 'Bhindi Fry', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Fish / Soyabean Curry', portion: '140 g' }] } },
+        'Thursday': { meals: { 'Breakfast': [{ food_item: 'Puri Sabji', portion: '4 pcs (~160 g)' }, { food_item: 'Halwa', portion: '50 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Arhar', portion: '150 g' }, { food_item: 'Aloo Matar', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken Do Pyaza / Paneer', portion: '140 g' }] } },
+        'Friday': { meals: { 'Breakfast': [{ food_item: 'Bread Omelet / Cutlet', portion: '2 pcs (~160 g)' }, { food_item: 'Fruit', portion: '100 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Mix Dal', portion: '150 g' }, { food_item: 'Seasonal Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Egg Curry / Malai Kofta', portion: '140 g' }] } },
+        'Saturday': { meals: { 'Breakfast': [{ food_item: 'Stuffed Paratha', portion: '2 pcs (~180 g)' }, { food_item: 'Curd / Dahi', portion: '100 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Veg Pulao', portion: '180 g' }, { food_item: 'Chapati', portion: '2 pcs (~60 g)' }, { food_item: 'Kadhi', portion: '150 g' }, { food_item: 'Aloo Jeera', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken / Paneer Butter Masala', portion: '140 g' }] } },
+        'Sunday': { meals: { 'Breakfast': [{ food_item: 'Chole Bhature', portion: '2 pcs (~220 g)' }, { food_item: 'Sweet Lassi / Tea', portion: '180 ml' }], 'Lunch': [{ food_item: 'Dum Biryani', portion: '240 g' }, { food_item: 'Raita', portion: '100 g' }, { food_item: 'Salad', portion: '60 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Makhani', portion: '150 g' }, { food_item: 'Shahi Paneer / Mutton', portion: '150 g' }] } }
+      };
+    }
+    return {
+      'Monday': { meals: { 'Breakfast': [{ food_item: 'Poori', portion: '4 pcs (~120 g)' }, { food_item: 'Aloo Bhaji', portion: '150 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Tea': [{ food_item: 'Namkeen / Biscuits', portion: '30 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Green Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken / Paneer', portion: '120 g' }] } },
+      'Tuesday': { meals: { 'Breakfast': [{ food_item: 'Idli / Dosa', portion: '180 g' }, { food_item: 'Sambar', portion: '120 g' }, { food_item: 'Boiled Egg', portion: '2 eggs' }], 'Tea': [{ food_item: 'Roasted Chana', portion: '35 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Rajma', portion: '150 g' }, { food_item: 'Bhindi', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Egg Curry / Paneer', portion: '120 g' }] } },
+      'Wednesday': { meals: { 'Breakfast': [{ food_item: 'Poha / Upma', portion: '180 g' }, { food_item: 'Boiled Egg', portion: '1 egg' }, { food_item: 'Tea', portion: '150 ml' }], 'Tea': [{ food_item: 'Bread Pakoda / Samosa', portion: '50 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Makhani', portion: '150 g' }, { food_item: 'Mix Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Fish / Soyabean Curry', portion: '120 g' }] } },
+      'Thursday': { meals: { 'Breakfast': [{ food_item: 'Stuffed Paratha', portion: '2 pcs (~180 g)' }, { food_item: 'Dahi / Curd', portion: '100 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Tea': [{ food_item: 'Biscuits / Mathri', portion: '35 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Arhar', portion: '150 g' }, { food_item: 'Aloo Gobi', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken / Paneer Bhurji', portion: '120 g' }] } },
+      'Friday': { meals: { 'Breakfast': [{ food_item: 'Bread Omelet / Cutlet', portion: '2 pcs (~140 g)' }, { food_item: 'Banana', portion: '1 pc (~100 g)' }, { food_item: 'Tea', portion: '150 ml' }], 'Tea': [{ food_item: 'Roasted Peanuts / Chana', portion: '35 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Chana Dal', portion: '150 g' }, { food_item: 'Seasonal Veg', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Egg Curry / Kofta', portion: '120 g' }] } },
+      'Saturday': { meals: { 'Breakfast': [{ food_item: 'Daliya / Khichdi', portion: '180 g' }, { food_item: 'Boiled Egg', portion: '1 egg' }, { food_item: 'Tea', portion: '150 ml' }], 'Tea': [{ food_item: 'Poha / Snacks', portion: '40 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Kadhi Pakoda', portion: '150 g' }, { food_item: 'Aloo Baingan', portion: '140 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal', portion: '150 g' }, { food_item: 'Chicken / Paneer Butter Masala', portion: '120 g' }] } },
+      'Sunday': { meals: { 'Breakfast': [{ food_item: 'Chole Bhature', portion: '2 pcs (~200 g)' }, { food_item: 'Tea / Milk', portion: '150 ml' }], 'Tea': [{ food_item: 'Pakoda / Samosa', portion: '50 g' }, { food_item: 'Tea', portion: '150 ml' }], 'Lunch': [{ food_item: 'Special Biryani', portion: '220 g' }, { food_item: 'Raita / Curd', portion: '100 g' }, { food_item: 'Salad', portion: '60 g' }], 'Dinner': [{ food_item: 'Rice', portion: '150 g' }, { food_item: 'Chapati', portion: '3 pcs (~90 g)' }, { food_item: 'Dal Makhani', portion: '150 g' }, { food_item: 'Sweet / Kheer', portion: '60 g' }] } }
+    };
+  }
+
+  switchMessDay(dayName) {
+    try {
+      const diet = this.currentDiet || {};
+      let weekly = diet.weekly_schedule || {};
+      const messCat = diet.mess_category || 'OR MESS';
+      const activeDay = diet.day_of_week || 'Monday';
+
+      // Fallback if weekly_schedule is missing or empty
+      if (!weekly || Object.keys(weekly).length === 0) {
+        if (Array.isArray(diet.weekly_schedule_list) && diet.weekly_schedule_list.length > 0) {
+          weekly = {};
+          diet.weekly_schedule_list.forEach(d => {
+            if (d && d.day) weekly[d.day] = d;
+          });
+        } else {
+          weekly = this.getFallbackWeekSchedule(messCat);
+        }
+      }
+
+      // Update pill buttons active state
+      document.querySelectorAll('.rec-day-pill').forEach(btn => {
+        const bDay = (btn.getAttribute('data-day') || '').toLowerCase();
+        if (bDay === (dayName || '').toLowerCase()) {
+          btn.classList.add('active', 'btn-primary');
+          btn.classList.remove('btn-outline-primary');
+        } else {
+          btn.classList.remove('active', 'btn-primary');
+          btn.classList.add('btn-outline-primary');
+        }
+      });
+
+      const container = document.getElementById('recMenuTableContainer');
+      if (!container) return;
+
+      if ((dayName || '').toLowerCase() === 'full') {
+        container.innerHTML = this.renderFullWeekTable(weekly, activeDay, messCat, this.currentSoldier || {});
+      } else {
+        const dayData = weekly[dayName] || weekly['Monday'] || {};
+        container.innerHTML = this.renderSingleDayTable(dayName, dayData);
+      }
+    } catch (e) {
+      console.error('Error switching mess day:', e);
+    }
+  }
+
+  renderFullWeekTable(weeklySchedule, activeDay = '', messCat = 'OR MESS', soldier = {}) {
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const fallback = this.getFallbackWeekSchedule(messCat);
+    const weekly = (weeklySchedule && Object.keys(weeklySchedule).length > 0) ? weeklySchedule : fallback;
+
+    const currentSol = soldier && soldier.rank ? soldier : (this.currentSoldier || {});
+    const sRank = (currentSol.rank || '').toUpperCase();
+    const sArmyNo = (currentSol.army_number || '').toUpperCase();
+    const isJc = (messCat || '').toUpperCase().includes('JCO') ||
+                 sArmyNo.includes('JC') ||
+                 ['SUBEDAR', 'SUB', 'NB SUB', 'HONY', 'HONORARY'].some(r => sRank.includes(r));
+
+    const rows = days.map((dName, idx) => {
+      const dData = weekly[dName] || fallback[dName] || {};
+      const isToday = (activeDay && dName.toLowerCase() === activeDay.toLowerCase());
+      const meals = dData.meals || {};
+
+      const formatMealCell = (mKey) => {
+        const items = meals[mKey] || [];
+        if (!Array.isArray(items) || items.length === 0) {
+          return '<span class="text-muted small fst-italic">--</span>';
+        }
+        return items.map(it => {
+          let name = '';
+          let portion = '';
+          if (typeof it === 'string') {
+            const parts = it.split(':');
+            name = parts[0] ? parts[0].trim() : it;
+            portion = parts[1] ? parts[1].trim() : '';
+          } else {
+            name = it.food_item || it.item || 'Item';
+            portion = it.portion || it.quantity || '';
+          }
+          return `
+            <div class="d-flex align-items-center justify-content-between gap-1 py-1 mb-1 border-bottom" style="border-bottom-style: dashed !important; font-size: 0.82rem;">
+              <span class="fw-bold text-dark">${this.escapeHtml(name)}</span>
+              <span class="badge bg-white text-primary border border-primary-subtle fw-bold font-monospace shadow-xs px-2 py-0.5" style="font-size: 0.76rem; white-space: nowrap;">
+                ${this.escapeHtml(portion)}
+              </span>
+            </div>
+          `;
+        }).join('');
+      };
+
+      return `
         <tr>
-          <td class="fw-bold">${item.exercise}</td>
-          <td>${item.sets}</td>
-          <td>${item.reps}</td>
-          <td>${item.duration}</td>
-          <td>${item.frequency}</td>
-          <td><span class="badge ${item.intensity === 'High' ? 'bg-danger' : (item.intensity === 'Moderate' ? 'bg-primary' : 'bg-info')}">${item.intensity}</span></td>
+          <td class="ps-3 align-top py-2.5">
+            <div class="fw-bold text-dark" style="font-size: 0.95rem;">${dName}</div>
+            <div class="small text-muted font-monospace" style="font-size: 0.75rem;">Day ${idx + 1} of Cycle</div>
+          </td>
+          <td class="align-top py-2.5">${formatMealCell('Breakfast')}</td>
+          ${!isJc ? `<td class="align-top py-2.5">${formatMealCell('Tea')}</td>` : ''}
+          <td class="align-top py-2.5">${formatMealCell('Lunch')}</td>
+          <td class="align-top pe-3 py-2.5">${formatMealCell('Dinner')}</td>
         </tr>
-      `).join('');
+      `;
+    }).join('');
+
+    return `
+      <div class="border rounded bg-white shadow-sm overflow-hidden">
+        <table class="table table-sm table-bordered table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr style="font-size: 0.84rem;">
+              <th style="width: ${isJc ? '15%' : '14%'};" class="ps-3 text-uppercase text-muted py-2"><i class="fas fa-calendar-day me-1"></i> Day &amp; Rotation</th>
+              <th style="width: ${isJc ? '27%' : '22%'};" class="text-uppercase text-primary py-2"><i class="fas fa-sun text-warning me-1"></i> Breakfast (Portion)</th>
+              ${!isJc ? `<th style="width: 18%;" class="text-uppercase text-secondary py-2"><i class="fas fa-mug-hot text-secondary me-1"></i> Tea / Refreshment</th>` : ''}
+              <th style="width: ${isJc ? '29%' : '23%'};" class="text-uppercase text-success py-2"><i class="fas fa-drumstick-bite text-success me-1"></i> Lunch (Grams)</th>
+              <th style="width: ${isJc ? '29%' : '23%'}; color: #4f46e5;" class="pe-3 text-uppercase py-2"><i class="fas fa-moon me-1" style="color: #4f46e5;"></i> Dinner (Grams)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  renderSingleDayTable(dayName, dayData) {
+    const meals = dayData.meals || {};
+    const order = ['Breakfast', 'Tea', 'Lunch', 'Dinner'];
+    const mealKeys = Object.keys(meals).sort((a, b) => {
+      const idxA = order.indexOf(a);
+      const idxB = order.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
+
+    let rowsHtml = '';
+    if (mealKeys.length > 0) {
+      rowsHtml = mealKeys.map(k => {
+        const items = meals[k] || [];
+        const itemsHtml = items.map(it => {
+          const name = typeof it === 'string' ? it : (it.food_item || it.item || 'Item');
+          const portion = typeof it === 'string' ? '' : (it.portion || it.quantity || '');
+          return `
+            <div class="d-inline-flex align-items-center gap-2 p-2 border rounded bg-light me-2 mb-2">
+              <span class="fw-bold text-dark">${this.escapeHtml(name)}</span>
+              ${portion ? `<span class="badge bg-primary font-monospace">${this.escapeHtml(portion)}</span>` : ''}
+            </div>
+          `;
+        }).join('');
+        return `
+          <tr>
+            <td class="fw-bold text-primary ps-3 align-middle" style="width: 20%; font-size: 0.9rem;">${this.escapeHtml(k)} (${this.escapeHtml(dayName)})</td>
+            <td class="pe-3 align-middle">${itemsHtml}</td>
+          </tr>
+        `;
+      }).join('');
+    } else {
+      rowsHtml = `<tr><td colspan="2" class="text-center text-muted py-3">No meal data available for ${this.escapeHtml(dayName)}.</td></tr>`;
     }
 
-    // Blocked exercises if any
-    const blockedCont = document.getElementById('recBlockedExercisesCont');
-    if (ex.blocked_exercises && ex.blocked_exercises.length > 0) {
-      blockedCont.innerHTML = `
-        <div class="alert alert-warning mt-3 mb-0">
-          <h6 class="fw-bold"><i class="fas fa-ban me-1"></i> Contraindicated Exercises Blocked by Safety Engine:</h6>
-          <ul class="mb-0 small ps-3">
-            ${ex.blocked_exercises.map(b => `<li><strong>${b.exercise}:</strong> ${b.reason}</li>`).join('')}
-          </ul>
-        </div>
-      `;
-      blockedCont.classList.remove('d-none');
-    } else {
-      blockedCont.classList.add('d-none');
-    }
+    return `
+      <div class="border rounded bg-white shadow-sm overflow-hidden p-2">
+        <table class="table table-sm table-hover mb-0 align-middle">
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
   renderProgressionCard(prog) {
@@ -1169,4 +1430,11 @@ class FitnessTrendApp {
 
 document.addEventListener('DOMContentLoaded', () => {
   window.fitnessApp = new FitnessTrendApp();
+  window.FitnessTrendDashboard = {
+    switchMessDay: (day) => {
+      if (window.fitnessApp) {
+        window.fitnessApp.switchMessDay(day);
+      }
+    }
+  };
 });

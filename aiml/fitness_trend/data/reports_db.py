@@ -148,6 +148,49 @@ def get_saved_report_by_id(report_id):
             conn.close()
 
 
+def touch_fitness_report_timestamp(army_number=None, report_id=None):
+    """
+    Updates the generated_at and updated_at timestamps to CURRENT_TIMESTAMP
+    whenever the fitness report / fitness progress of an individual is viewed.
+    
+    Args:
+        army_number (str, optional): Soldier's army number.
+        report_id (int, optional): Report primary key id.
+    Returns:
+        bool: True on success, False otherwise.
+    """
+    if not army_number and not report_id:
+        return False
+
+    conn = get_db_connection()
+    if not conn:
+        return False
+
+    try:
+        cursor = conn.cursor()
+        if report_id:
+            cursor.execute(
+                "UPDATE ai_fitness_reports SET generated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = %s",
+                (int(report_id),)
+            )
+        else:
+            clean_army_no = str(army_number).strip()
+            cursor.execute(
+                "UPDATE ai_fitness_reports SET generated_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE army_number = %s",
+                (clean_army_no,)
+            )
+        conn.commit()
+        logger.info(f"Touched/updated view timestamp for soldier {army_number or report_id}.")
+        return True
+    except Error as e:
+        logger.error(f"Error updating fitness report timestamp for {army_number or report_id}: {e}")
+        return False
+    finally:
+        if conn and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+
 def insert_or_update_ai_fitness_report(report_data):
     """
     Inserts a new AI fitness report or updates existing report for army_number.
@@ -314,12 +357,25 @@ def fetch_reports_paginated(search_query="", company="", status="", from_date=No
         params.extend([sq, sq])
 
     if company and company.strip() and company.strip().lower() != 'all':
-        where_clauses.append("company = %s")
-        params.append(company.strip())
+        comp_val = company.strip()
+        comp_lower = comp_val.lower()
+        if comp_lower in ('comn company', 'comn'):
+            where_clauses.append("(company = 'COMN Company' OR company = 'COMN')")
+        elif comp_lower in ('hq company', 'hq'):
+            where_clauses.append("(company = 'HQ company' OR company = 'HQ' OR company = 'HQ Company')")
+        elif comp_lower in ('3 company', '3'):
+            where_clauses.append("(company = '3 Company' OR company = '3' OR company = 'ADMN')")
+        else:
+            where_clauses.append("company = %s")
+            params.append(comp_val)
 
     if status and status.strip() and status.strip().lower() != 'all':
         st_lower = status.strip().lower()
-        if 'healthy' in st_lower or 'good' in st_lower:
+        if st_lower in ('fit', 'fit only', 'fit_only'):
+            where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%combat%' OR LOWER(fitness_status) LIKE '%ready%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR LOWER(fitness_status) = 'fit' OR fitness_score >= 70)")
+        elif st_lower in ('unfit', 'unfit only', 'unfit_only'):
+            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR (fitness_score IS NOT NULL AND fitness_score < 70))")
+        elif 'healthy' in st_lower or 'good' in st_lower:
             where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70)")
         elif 'improvement' in st_lower or 'overweight' in st_lower or 'moderate' in st_lower or 'average' in st_lower or 'satisfactory' in st_lower:
             where_clauses.append("(LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70))")
@@ -461,14 +517,17 @@ def fetch_dynamic_report_stats():
         cursor.execute(stats_sql)
         row = cursor.fetchone() or {}
 
-        # Fetch distinct companies
+        # Distinct companies strictly restricted to the 3 designated unit companies
+        VALID_COMPANIES = ['3 Company', 'COMN Company', 'HQ company']
         cursor.execute("""
             SELECT DISTINCT company FROM ai_fitness_reports
             WHERE company IS NOT NULL AND company != ''
             ORDER BY company ASC
         """)
         c_rows = cursor.fetchall() or []
-        companies = [c['company'] for c in c_rows if c.get('company')]
+        raw_comps = [c['company'] for c in c_rows if c.get('company')]
+        # Retain only the 3 valid companies, excluding admn and comn
+        companies = [c for c in VALID_COMPANIES if c in raw_comps] or VALID_COMPANIES
 
         total = int(row.get('total_reports') or 0)
         healthy = int(row.get('healthy') or 0)
@@ -483,8 +542,13 @@ def fetch_dynamic_report_stats():
         if remainder > 0 and healthy == 0 and needs_imp == 0:
             healthy = remainder
 
+        fit_count = healthy
+        unfit_count = needs_imp + at_risk
+
         stats_dict = {
             'total_reports': total,
+            'fit_count': fit_count,
+            'unfit_count': unfit_count,
             'healthy_count': healthy,
             'healthy': healthy,
             'needs_improvement_count': needs_imp,
@@ -575,7 +639,8 @@ def _deserialize_report_row(row):
     if d.get('fitness_score') is not None:
         d['fitness_score'] = float(d['fitness_score'])
     if d.get('generated_at') and isinstance(d['generated_at'], datetime):
-        d['generated_at_str'] = d['generated_at'].strftime('%d %b %Y, %H:%M')
+        d['generated_at_str'] = d['generated_at'].strftime('%d %b %Y, %I:%M %p')
+        d['date_time_12hr'] = d['generated_at'].strftime('%d %b %Y, %I:%M %p')
     return d
 
 
@@ -593,13 +658,35 @@ def _format_report_summary(row):
     if d.get('fitness_score') is not None:
         d['fitness_score'] = float(d['fitness_score'])
 
-    gen_at = d.get('generated_at')
+    gen_at = d.get('generated_at') or d.get('updated_at')
     if gen_at and isinstance(gen_at, datetime):
-        d['generated_at_str'] = gen_at.strftime('%d %b %Y, %H:%M')
+        d['generated_at_str'] = gen_at.strftime('%d %b %Y, %I:%M %p')
+        d['date_time_12hr'] = gen_at.strftime('%d %b %Y, %I:%M %p')
     elif gen_at:
-        d['generated_at_str'] = str(gen_at)
+        try:
+            if isinstance(gen_at, str):
+                parsed_dt = None
+                for fmt in ('%Y-%m-%d %H:%M:%S', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d'):
+                    try:
+                        parsed_dt = datetime.strptime(gen_at.split('.')[0], fmt)
+                        break
+                    except ValueError:
+                        pass
+                if parsed_dt:
+                    d['generated_at_str'] = parsed_dt.strftime('%d %b %Y, %I:%M %p')
+                    d['date_time_12hr'] = parsed_dt.strftime('%d %b %Y, %I:%M %p')
+                else:
+                    d['generated_at_str'] = str(gen_at)
+                    d['date_time_12hr'] = str(gen_at)
+            else:
+                d['generated_at_str'] = str(gen_at)
+                d['date_time_12hr'] = str(gen_at)
+        except Exception:
+            d['generated_at_str'] = str(gen_at)
+            d['date_time_12hr'] = str(gen_at)
     else:
         d['generated_at_str'] = 'N/A'
+        d['date_time_12hr'] = 'N/A'
 
     # Graceful fallbacks
     d['army_number'] = d.get('army_number') or 'N/A'

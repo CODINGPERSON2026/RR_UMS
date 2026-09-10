@@ -137,21 +137,18 @@
         <label for="filterCompanySelect"><i class="fas fa-building me-1"></i> Sub-Unit / Company</label>
         <select id="filterCompanySelect" class="filter-select">
           <option value="">All Companies</option>
-          <option value="COMN">COMN Company</option>
-          <option value="ADMN">ADMN Company</option>
-          <option value="TECH">TECH Company</option>
-          <option value="SPT">SPT Company</option>
-          <option value="HQ">HQ Company</option>
+          <option value="3 Company">3 Company</option>
+          <option value="COMN Company">COMN Company</option>
+          <option value="HQ company">HQ company</option>
         </select>
       </div>
 
       <div class="filter-group">
         <label for="filterStatusSelect"><i class="fas fa-filter me-1"></i> Fitness Status</label>
         <select id="filterStatusSelect" class="filter-select">
-          <option value="">All Statuses</option>
-          <option value="Healthy">Healthy / Combat Ready</option>
-          <option value="Needs Improvement">Needs Improvement</option>
-          <option value="At Risk">At Risk</option>
+          <option value="">All Fitness Statuses</option>
+          <option value="Fit">Fit Only</option>
+          <option value="Unfit">Unfit Only</option>
         </select>
       </div>
 
@@ -304,5 +301,5 @@
 
 {% block extra_js %}
 <!-- Dashboard Controller Script -->
-<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_reports_dashboard.js') }}?v=3.0"></script>
+<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_reports_dashboard.js') }}?v=6.0"></script>
 {% endblock %}

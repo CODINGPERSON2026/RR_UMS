@@ -1936,7 +1936,7 @@ def get_report_labels(target_lang='en', for_pdf=False):
     Returns localized UI and PDF report labels for all 13 supported languages.
     """
     base_labels = {
-        'unit_title': 'UNIT MANAGEMENT SYSTEM',
+        'unit_title': '15 CORPS UNIT MANAGEMENT SYSTEM',
         'report_title': 'Personal Fitness Report',
         'report_generated': 'Report Generated',
         'model_version': 'Model Version',
@@ -1998,12 +1998,12 @@ def get_report_labels(target_lang='en', for_pdf=False):
         'official_preview_title': 'Official Individual Fitness Report Preview',
         'download_pdf': 'Download PDF Document',
         'export_pdf': 'Export PDF',
-        'regiment_name': 'UNIT MANAGEMENT SYSTEM',
-        'military_record_sub': 'UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL',
+        'regiment_name': '15 CORPS UNIT MANAGEMENT SYSTEM',
+        'military_record_sub': '15 CORPS UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL',
         'report_header_title': 'Personal Fitness Report',
         'report_id': 'Report ID:',
         'sec1_title': '1. Personal & Fitness Profile',
-        'sec2_title': '2. Current Fitness Analysis',
+        'sec2_title': '2. Fitness Analysis',
         'sec3_title': '3. AI Fitness Assessment',
         'sec4_title': '4. AI Fitness Prediction',
         'sec5_title': '5. Fitness Progression',
@@ -2238,7 +2238,7 @@ def translate_16section_report(report_dict, target_lang='en', for_pdf=False):
             t['exercise_plan']['focus_area'] = _tr(t['exercise_plan']['focus_area'])
         if t['exercise_plan'].get('exercises'):
             for ex in t['exercise_plan']['exercises']:
-                for k in ['exercise', 'reps', 'duration', 'frequency']:
+                for k in ['exercise', 'reps', 'duration', 'frequency', 'rest', 'progression_note']:
                     if ex.get(k):
                         ex[k] = _tr(ex[k])
 
@@ -2252,6 +2252,11 @@ def translate_16section_report(report_dict, target_lang='en', for_pdf=False):
             t['nutrition']['limit_items'] = [_tr(x) for x in t['nutrition']['limit_items']]
         if t['nutrition'].get('guidelines'):
             t['nutrition']['guidelines'] = [_tr(x) for x in t['nutrition']['guidelines']]
+        if t['nutrition'].get('optional_diet_plan') and isinstance(t['nutrition']['optional_diet_plan'], dict):
+            if t['nutrition']['optional_diet_plan'].get('title'):
+                t['nutrition']['optional_diet_plan']['title'] = _tr(t['nutrition']['optional_diet_plan']['title'])
+            if t['nutrition']['optional_diet_plan'].get('description'):
+                t['nutrition']['optional_diet_plan']['description'] = _tr(t['nutrition']['optional_diet_plan']['description'])
 
     # 10. Areas for Improvement
     if t.get('improvement_areas'):

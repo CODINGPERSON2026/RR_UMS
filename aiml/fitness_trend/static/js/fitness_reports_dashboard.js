@@ -720,6 +720,7 @@
   function renderModalRecs(recs, s = {}) {
     if (!el.tabContentRecs) return;
     const d = recs.diet || {};
+    state.currentDiet = d;
     const macros = d.macros || {};
     const ex = recs.exercise || recs.workout || {};
     const med = recs.medical_notice || {};
@@ -734,47 +735,27 @@
     // Diet info
     const targetCals = d.target_calories || d.calories_target || 2400;
     const strategy = d.strategy || 'Maintenance Calorie Plan tailored for sustained military operational stamina and SHAPE-1 preservation.';
+    const messCat = d.mess_category || (['SUBEDAR', 'SUBEDAR MAJOR', 'NAIB SUBEDAR', 'NB SUB', 'SUB', 'SUB MAJ'].some(r => (s.rank || '').toUpperCase().includes(r)) ? 'JCO MESS' : 'OR MESS');
+    const dayOfWeek = d.day_of_week || '';
+    const estIntake = d.estimated_intake || {};
+    const optionalDiet = d.optional_diet_plan || null;
     const proteinVal = macros.protein_grams ? `${macros.protein_grams}g (${macros.protein_pct || 20}%)` : (d.protein_g ? `${d.protein_g} (20%)` : '120g (20%)');
     const carbVal = macros.carb_grams ? `${macros.carb_grams}g (${macros.carb_pct || 55}%)` : (d.carbs_g ? `${d.carbs_g} (55%)` : '300g (55%)');
     const fatVal = macros.fat_grams ? `${macros.fat_grams}g (${macros.fat_pct || 25}%)` : (d.fat_g ? `${d.fat_g} (25%)` : '60g (25%)');
     const hydrationVal = d.hydration_liters ? `${d.hydration_liters} Liters / Day` : '3.5 Liters / Day';
 
-    // Sample Menu rows
-    let menuRowsHtml = '';
-    if (Array.isArray(d.sample_menu) && d.sample_menu.length > 0) {
-      menuRowsHtml = d.sample_menu.map(m => `
-        <tr>
-          <td class="fw-bold text-nowrap text-primary" style="width: 25%; font-size: 0.88rem;">${escapeHtml(m.meal || '')}</td>
-          <td style="font-size: 0.88rem;">${escapeHtml(m.items || '')}</td>
-        </tr>
-      `).join('');
-    } else if (d.meal_plan && typeof d.meal_plan === 'object') {
-      menuRowsHtml = Object.entries(d.meal_plan).map(([k, v]) => `
-        <tr>
-          <td class="fw-bold text-capitalize text-nowrap text-primary" style="width: 25%; font-size: 0.88rem;">${escapeHtml(k)}</td>
-          <td style="font-size: 0.88rem;">${escapeHtml(v)}</td>
-        </tr>
-      `).join('');
-    } else {
-      menuRowsHtml = `
-        <tr><td class="fw-bold text-nowrap text-primary" style="width: 25%;">Early Morning (06:00)</td><td>Warm water with lemon/jeera + 5 soaked almonds + 1 walnut</td></tr>
-        <tr><td class="fw-bold text-nowrap text-primary">Breakfast (08:00)</td><td>3 boiled egg whites + 1 whole egg + 2 multigrain rotis/oats + milk/tea</td></tr>
-        <tr><td class="fw-bold text-nowrap text-primary">Mid-Morning (11:00)</td><td>1 seasonal fruit (apple/orange/guava) or 1 glass fresh buttermilk (chaas)</td></tr>
-        <tr><td class="fw-bold text-nowrap text-primary">Lunch (13:00)</td><td>Fresh salad + 2 dry chapatis + 1 bowl yellow dal + green vegetables + curd</td></tr>
-        <tr><td class="fw-bold text-nowrap text-primary">Pre-PT / Evening (16:30)</td><td>Handful roasted chana / 1 boiled egg + black coffee or lemon water</td></tr>
-        <tr><td class="fw-bold text-nowrap text-primary">Dinner (20:00)</td><td>2 chapatis + lean protein (paneer/chicken/dal) + green sabzi + vegetable soup</td></tr>
-      `;
-    }
+    // Sample Menu rows fallback
+    const sampleMenu = d.sample_menu || [];
 
     // Exercise table
     const exTitle = ex.title || 'Structured Tactical Regimen';
     const exFocus = ex.focus_area || ex.focus || 'Cardiovascular endurance, core strength, and tactical obstacle mobility.';
     let exercisesList = Array.isArray(ex.exercises) && ex.exercises.length > 0 ? ex.exercises : [
-      { exercise: '5km Tactical Interval Run', sets: '1', reps: '5km', duration: '28-30 min', frequency: '3 days/week', intensity: 'Moderate' },
-      { exercise: 'Push-ups & Chin-ups Complex', sets: '4', reps: '20-25 / 8-10 reps', duration: '15 min', frequency: '4 days/week', intensity: 'High' },
-      { exercise: 'Core Conditioning (Planks & Sit-ups)', sets: '3', reps: '60s hold / 30 reps', duration: '12 min', frequency: '4 days/week', intensity: 'Moderate' },
-      { exercise: 'Military Obstacle Course Traverse', sets: '2', reps: '1 circuit', duration: '20 min', frequency: '2 days/week', intensity: 'High' },
-      { exercise: 'Tactical Mobility & Stretching', sets: '1', reps: 'Full Body', duration: '15 min', frequency: 'Daily (Post-PT)', intensity: 'Low' }
+      { exercise: '5km Tactical Interval Run', sets: '1', reps: '5km', duration: '28-30 min', frequency: '3 days/week', intensity: 'Moderate', rest: '90s rest' },
+      { exercise: 'Push-ups & Chin-ups Complex', sets: '4', reps: '20-25 / 8-10 reps', duration: '15 min', frequency: '4 days/week', intensity: 'High', rest: '60s rest' },
+      { exercise: 'Core Conditioning (Planks & Sit-ups)', sets: '3', reps: '60s hold / 30 reps', duration: '12 min', frequency: '4 days/week', intensity: 'Moderate', rest: '45s rest' },
+      { exercise: 'Military Obstacle Course Traverse', sets: '2', reps: '1 circuit', duration: '20 min', frequency: '2 days/week', intensity: 'High', rest: '90s rest' },
+      { exercise: 'Tactical Mobility & Stretching', sets: '1', reps: 'Full Body', duration: '15 min', frequency: 'Daily (Post-PT)', intensity: 'Low', rest: '30s rest' }
     ];
 
     const exRowsHtml = exercisesList.map(item => {
@@ -783,12 +764,16 @@
       else if (item.intensity === 'Low' || item.intensity === 'Recovery') badgeClass = 'bg-info text-dark';
       return `
         <tr>
-          <td class="fw-bold ps-3">${escapeHtml(item.exercise || '')}</td>
+          <td class="fw-bold ps-3">
+            ${escapeHtml(item.exercise || '')}
+            ${item.progression_note ? `<div class="small text-muted fst-italic mt-0.5"><i class="fas fa-level-up-alt text-primary me-1"></i>${escapeHtml(item.progression_note)}</div>` : ''}
+          </td>
           <td>${escapeHtml(String(item.sets || '--'))}</td>
           <td>${escapeHtml(String(item.reps || '--'))}</td>
           <td>${escapeHtml(String(item.duration || '--'))}</td>
           <td>${escapeHtml(String(item.frequency || '--'))}</td>
-          <td class="pe-3"><span class="badge ${badgeClass}">${escapeHtml(item.intensity || 'Moderate')}</span></td>
+          <td><span class="badge ${badgeClass}">${escapeHtml(item.intensity || 'Moderate')}</span></td>
+          <td class="pe-3 small text-muted text-nowrap">${escapeHtml(item.rest || '60s rest')}</td>
         </tr>
       `;
     }).join('');
@@ -812,7 +797,12 @@
           <h5 class="fw-bold text-dark mb-0">
             <i class="fas fa-heartbeat text-danger me-2"></i> Personalized Diet &amp; Tactical Exercise Recommendations
           </h5>
-          <span class="badge bg-primary px-3 py-1.5" style="border-radius: 999px;">AI Tailored</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge ${messCat === 'JCO MESS' ? 'bg-warning text-dark' : 'bg-success'} px-3 py-1.5" style="border-radius: 999px;">
+              <i class="fas fa-concierge-bell me-1"></i> ${escapeHtml(messCat)} ${dayOfWeek ? `&bull; ${escapeHtml(dayOfWeek)}` : ''}
+            </span>
+            <span class="badge bg-primary px-3 py-1.5" style="border-radius: 999px;">AI Tailored</span>
+          </div>
         </div>
 
         <!-- Medical Safety Banner -->
@@ -837,6 +827,23 @@
             <div class="small text-muted fw-bold text-uppercase mb-1" style="font-size: 0.73rem; letter-spacing: 0.5px;">CALORIC STRATEGY</div>
             <div class="fw-bold text-dark" style="font-size: 0.95rem;">${escapeHtml(strategy)}</div>
           </div>
+
+          ${estIntake && estIntake.total_calories ? `
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <div class="p-2 px-3 border rounded bg-white small d-flex justify-content-between">
+                <span class="text-muted">Target Calories: <strong>${targetCals} kcal</strong></span>
+                <span class="text-muted">Est. Mess Intake: <strong class="text-primary">${estIntake.total_calories} kcal</strong></span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="p-2 px-3 border rounded bg-white small d-flex justify-content-between">
+                <span class="text-muted">Target Protein: <strong>${macros.protein_grams || 105}g</strong></span>
+                <span class="text-muted">Est. Mess Protein: <strong class="text-success">${estIntake.total_protein_g || 0}g</strong></span>
+              </div>
+            </div>
+          </div>
+          ` : ''}
 
           <div class="row g-3 mb-4 text-center">
             <div class="col-md-3 col-6">
@@ -869,17 +876,67 @@
             </div>
           </div>
 
-          <!-- Structured Meal Menu Table -->
-          <div class="p-3 border rounded" style="background: #f8fafc;">
-            <h6 class="fw-bold text-dark mb-3"><i class="fas fa-calendar-day me-1"></i> Suggested Daily Unit Mess Meal Schedule</h6>
+          <!-- Structured Meal Menu Table with 30-Day Weekly Schedule -->
+          <div class="p-3 border rounded mb-3" style="background: #f8fafc;">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+              <div>
+                <h6 class="fw-bold text-dark mb-1"><i class="fas fa-calendar-alt text-primary me-1"></i> Official ${escapeHtml(messCat)} 30-Day Nutrition Schedule</h6>
+                <div class="small text-muted">Weekly Cycle (Monday &ndash; Sunday) &bull; Calibrated Serving Portions</div>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge ${messCat === 'JCO MESS' ? 'bg-warning text-dark' : 'bg-success'} px-3 py-1.5">${escapeHtml(messCat)}</span>
+                <span class="badge bg-primary px-3 py-1.5">30-Day Plan</span>
+              </div>
+            </div>
+
+            <!-- Simple Table of Full Week Nutrition Schedule -->
+            <div class="table-responsive" id="dashMessMenuContainer">
+              <!-- Populated by switchMessDay -->
+            </div>
+          </div>
+
+          ${Array.isArray(d.roadmap_30d) && d.roadmap_30d.length > 0 ? `
+          <div class="p-3 border rounded mb-3" style="background: #f8fafc;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold text-dark mb-0"><i class="fas fa-route text-success me-1"></i> 30-Day Nutrition Progression Roadmap (4-Week Cycle)</h6>
+              <span class="badge bg-secondary">30-Day Target</span>
+            </div>
+            <div class="row g-2 pt-2">
+              ${d.roadmap_30d.map(w => `
+                <div class="col-md-6 col-lg-3">
+                  <div class="p-2.5 border rounded bg-white h-100 shadow-sm" style="font-size: 0.8rem;">
+                    <div class="fw-bold text-primary mb-1">${escapeHtml(w.week)}: ${escapeHtml(w.phase)}</div>
+                    <div class="small text-dark mb-1"><strong>Focus:</strong> ${escapeHtml(w.focus)}</div>
+                    <div class="small text-success mb-1"><strong>Strategy:</strong> ${escapeHtml(w.mess_strategy || '')}</div>
+                    <div class="small text-muted"><strong>Target:</strong> ${escapeHtml(w.milestone)}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          ` : ''}
+
+          ${optionalDiet && optionalDiet.items && optionalDiet.items.length > 0 ? `
+          <div class="p-3 border rounded mb-4" style="background: #fdfbf7; border-color: #f6d365 !important;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h6 class="fw-bold text-dark mb-0"><i class="fas fa-apple-alt text-warning me-2"></i> ${escapeHtml(optionalDiet.title || 'Optional Supplementary Diet Plan')}</h6>
+              <span class="badge bg-secondary">Optional Supplement</span>
+            </div>
+            <p class="small text-muted mb-2">${escapeHtml(optionalDiet.description || 'Supplementary conditioning plan for voluntary optimization outside mandatory mess hours.')}</p>
             <div class="table-responsive">
-              <table class="table table-sm table-borderless mb-0 align-middle">
+              <table class="table table-sm table-borderless mb-0">
                 <tbody>
-                  ${menuRowsHtml}
+                  ${(optionalDiet.items || []).map(it => `
+                    <tr>
+                      <td class="fw-bold text-nowrap text-secondary" style="width: 28%;">${escapeHtml(it.time || '')}</td>
+                      <td class="text-dark"><strong>${escapeHtml(it.item || '')}</strong> &mdash; ${escapeHtml(it.quantity || '')} <span class="text-muted small">(${escapeHtml(it.purpose || '')})</span></td>
+                    </tr>
+                  `).join('')}
                 </tbody>
               </table>
             </div>
           </div>
+          ` : ''}
         </div>
 
         <hr class="my-4">
@@ -903,7 +960,8 @@
                   <th>Reps / Volume</th>
                   <th>Duration</th>
                   <th>Frequency</th>
-                  <th class="pe-3">Intensity</th>
+                  <th>Intensity</th>
+                  <th class="pe-3">Rest Interval</th>
                 </tr>
               </thead>
               <tbody>
@@ -916,6 +974,9 @@
         </div>
       </div>
     `;
+
+    // Default to Full Week Plan
+    switchMessDay('full');
   }
 
   function renderModalProgression(prog, s = {}, pred = {}) {
@@ -1082,13 +1143,149 @@
       .replace(/'/g, '&#039;');
   }
 
+  function exportDirectoryPdf() {
+    const params = new URLSearchParams({
+      search: state.search,
+      company: state.company,
+      status: state.status,
+      from_date: state.fromDate,
+      to_date: state.toDate,
+      download: '1'
+    });
+    window.open(`/fitness/api/reports/export-pdf?${params.toString()}`, '_blank');
+  }
+
+  function switchMessDay(dayName) {
+    if (!state.currentDiet) return;
+    const weeklySched = state.currentDiet.weekly_schedule || {};
+    const activeDay = state.currentDiet.day_of_week || 'Monday';
+
+    // Update active pill button
+    const container = document.getElementById('dashMessDayTabs');
+    if (container) {
+      container.querySelectorAll('.dash-mess-day-pill').forEach(btn => {
+        if ((btn.getAttribute('data-day') || '').toLowerCase() === (dayName || '').toLowerCase()) {
+          btn.classList.add('btn-primary', 'active');
+          btn.classList.remove('btn-outline-primary');
+        } else {
+          btn.classList.remove('btn-primary', 'active');
+          btn.classList.add('btn-outline-primary');
+        }
+      });
+    }
+
+    const targetContainer = document.getElementById('dashMessMenuContainer');
+    if (!targetContainer) return;
+
+    if ((dayName || '').toLowerCase() === 'full') {
+      const sol = currentSoldierData || {};
+      const rep = currentReportData || {};
+      const isJc = (sol.rank && ['SUBEDAR', 'SUB', 'NB SUB', 'HONY', 'HONORARY'].some(r => sol.rank.toUpperCase().includes(r))) ||
+                   (sol.army_number && sol.army_number.toUpperCase().includes('JC')) ||
+                   (rep.nutrition && (rep.nutrition.mess_category || '').toUpperCase().includes('JCO'));
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const rows = days.map((dName, idx) => {
+        const dData = weeklySched[dName] || {};
+        const isToday = (activeDay && dName.toLowerCase() === activeDay.toLowerCase());
+        const meals = dData.meals || {};
+        const getMealText = (mKey) => {
+          const items = meals[mKey] || [];
+          if (!Array.isArray(items) || items.length === 0) {
+            return '<span class="text-muted small fst-italic">--</span>';
+          }
+          return items.map(it => {
+            const name = typeof it === 'string' ? it : (it.food_item || it.item || 'Item');
+            const portion = typeof it === 'string' ? '' : (it.portion || it.quantity || '');
+            return `
+              <div class="d-flex align-items-center justify-content-between gap-1 py-1 mb-1 border-bottom" style="border-bottom-style: dashed !important; font-size: 0.81rem;">
+                <span class="fw-bold text-dark">${escapeHtml(name)}</span>
+                <span class="badge bg-white text-primary border border-primary-subtle fw-bold font-monospace shadow-xs px-2 py-0.5" style="font-size: 0.76rem; white-space: nowrap;">
+                  ${escapeHtml(portion)}
+                </span>
+              </div>
+            `;
+          }).join('');
+        };
+
+        return `
+          <tr>
+            <td class="ps-3 align-top">
+              <div class="fw-bold text-dark">${dName}</div>
+              <div class="small text-muted font-monospace" style="font-size: 0.75rem;">Day ${idx + 1}</div>
+            </td>
+            <td class="align-top" style="font-size: 0.82rem;">${getMealText('Breakfast')}</td>
+            ${!isJc ? `<td class="align-top" style="font-size: 0.82rem;">${getMealText('Tea')}</td>` : ''}
+            <td class="align-top" style="font-size: 0.82rem;">${getMealText('Lunch')}</td>
+            <td class="align-top pe-3" style="font-size: 0.82rem;">${getMealText('Dinner')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      targetContainer.innerHTML = `
+        <table class="table table-sm table-bordered table-hover mb-0 align-middle shadow-sm" style="background: #ffffff;">
+          <thead class="table-light">
+            <tr style="font-size: 0.82rem;">
+              <th style="width: ${isJc ? '15%' : '14%'};" class="ps-3 text-uppercase text-muted">Day</th>
+              <th style="width: ${isJc ? '27%' : '22%'};" class="text-uppercase text-primary"><i class="fas fa-sun text-warning me-1"></i> Breakfast</th>
+              ${!isJc ? `<th style="width: 18%;" class="text-uppercase text-secondary"><i class="fas fa-mug-hot text-secondary me-1"></i> Tea</th>` : ''}
+              <th style="width: ${isJc ? '29%' : '23%'};" class="text-uppercase text-success"><i class="fas fa-drumstick-bite text-success me-1"></i> Lunch</th>
+              <th style="width: ${isJc ? '29%' : '23%'}; color: #4f46e5;" class="pe-3 text-uppercase"><i class="fas fa-moon me-1" style="color: #4f46e5;"></i> Dinner</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    } else {
+      const dData = weeklySched[dayName] || weeklySched['Monday'] || {};
+      const meals = dData.meals || {};
+      const order = ['Breakfast', 'Tea', 'Lunch', 'Dinner'];
+      const mealKeys = Object.keys(meals).sort((a, b) => {
+        const idxA = order.indexOf(a);
+        const idxB = order.indexOf(b);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.localeCompare(b);
+      });
+
+      let rowsHtml = '';
+      if (mealKeys.length > 0) {
+        rowsHtml = mealKeys.map(k => {
+          const items = (meals[k] || []).map(it => `${escapeHtml(it.food_item)}: ${escapeHtml(it.portion)}`).join(' + ');
+          return `
+            <tr>
+              <td class="fw-bold text-nowrap text-primary ps-3" style="width: 22%; font-size: 0.88rem;">${k} (${dayName})</td>
+              <td class="pe-3" style="font-size: 0.88rem;">${items}</td>
+            </tr>
+          `;
+        }).join('');
+      } else if (Array.isArray(dData.sample_menu) && dData.sample_menu.length > 0) {
+        rowsHtml = dData.sample_menu.map(m => `
+          <tr>
+            <td class="fw-bold text-nowrap text-primary ps-3" style="width: 22%; font-size: 0.88rem;">${escapeHtml(m.meal)}</td>
+            <td class="pe-3" style="font-size: 0.88rem;">${escapeHtml(m.items)}</td>
+          </tr>
+        `).join('');
+      }
+
+      targetContainer.innerHTML = `
+        <table class="table table-sm table-hover table-borderless mb-0 align-middle" style="background: #ffffff;">
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      `;
+    }
+  }
+
   // Public Interface for Inline HTML Onclick Handlers
   window.FitnessReportsDashboard = {
     viewReport,
     downloadReportPdf,
     regenerateReport,
     filterByStatus,
-    goToPage
+    goToPage,
+    exportDirectoryPdf,
+    switchMessDay
   };
 
 })();

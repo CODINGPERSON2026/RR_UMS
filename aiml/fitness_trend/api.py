@@ -11,11 +11,13 @@ from .data.db_loader import (
     fetch_all_personnel_fitness_data,
     fetch_total_weight_info_count
 )
+from datetime import datetime
 from .data.reports_db import (
     ensure_ai_fitness_reports_table,
     get_saved_report_by_army_number,
     get_saved_report_by_id,
     insert_or_update_ai_fitness_report,
+    touch_fitness_report_timestamp,
     fetch_reports_paginated,
     fetch_dynamic_report_stats
 )
@@ -28,7 +30,7 @@ from .training.train import train_and_persist_models
 logger = logging.getLogger("fitness_trend.api")
 
 
-def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=False, language="en"):
+def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=False, language="en", report_date=None):
     """
     Executes or loads complete end-to-end fitness evaluation for a soldier.
     
@@ -59,6 +61,10 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         saved = get_saved_report_by_army_number(clean_army_no)
         if saved and saved.get('prediction_result') and saved.get('recommendations') and saved.get('progression_prediction'):
             logger.info(f"Loaded existing AI fitness report ID {saved.get('id')} from database for {clean_army_no}.")
+            touch_fitness_report_timestamp(clean_army_no)
+            now_12hr = datetime.now().strftime('%d %b %Y, %I:%M %p')
+            saved['generated_at_str'] = now_12hr
+            saved['date_time_12hr'] = now_12hr
             soldier_features = _reconstruct_soldier_features(saved)
             prediction = _ensure_complete_prediction(saved['prediction_result'], soldier_features)
             progression = _ensure_complete_progression(saved['progression_prediction'], soldier_features, prediction)
@@ -71,7 +77,8 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
                 'progression': progression,
                 'report_id': saved.get('id'),
                 'cached': True,
-                'generated_at': saved.get('generated_at_str')
+                'generated_at': now_12hr,
+                'date_time_12hr': now_12hr
             }
 
     # 2. Fetch fresh DB records for soldier
@@ -95,7 +102,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
     prediction = _ensure_complete_prediction(prediction, features)
     
     # 5. Recommendations
-    recommendations = generate_full_recommendations(features, goal=goal)
+    recommendations = generate_full_recommendations(features, goal=goal, report_date=report_date)
     
     # 6. Progression Trajectory
     progression = generate_fitness_progression_trajectory(
@@ -129,6 +136,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         'model_version': prediction.get('model_version', 'v1')
     }
     report_id = insert_or_update_ai_fitness_report(report_payload)
+    now_12hr = datetime.now().strftime('%d %b %Y, %I:%M %p')
 
     return {
         'success': True,
@@ -137,15 +145,17 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         'recommendations': recommendations,
         'progression': progression,
         'report_id': report_id,
-        'cached': False
+        'cached': False,
+        'generated_at': now_12hr,
+        'date_time_12hr': now_12hr
     }
 
 
-def regenerate_personnel_fitness_report(army_number, goal="Overall Fitness", language="en"):
+def regenerate_personnel_fitness_report(army_number, goal="Overall Fitness", language="en", report_date=None):
     """
     Explicitly forces recalculation and updates the ai_fitness_reports table.
     """
-    return analyze_personnel_fitness(army_number, goal=goal, regenerate=True, language=language)
+    return analyze_personnel_fitness(army_number, goal=goal, regenerate=True, language=language, report_date=report_date)
 
 
 def get_saved_fitness_report_by_id(report_id):
@@ -333,14 +343,15 @@ def _ensure_complete_recommendations(recs, soldier_features):
         return fresh_recs
 
     diet = recs.get('diet')
-    if not isinstance(diet, dict) or not diet.get('macros') or not diet.get('sample_menu'):
+    if not isinstance(diet, dict) or not diet.get('macros') or not diet.get('sample_menu') or not diet.get('mess_category'):
         recs['diet'] = fresh_recs['diet']
     elif not diet.get('strategy'):
         diet['strategy'] = fresh_recs['diet'].get('strategy', '')
 
     if not recs.get('medical_notice'):
         recs['medical_notice'] = fresh_recs['medical_notice']
-    if not recs.get('exercise') or not recs['exercise'].get('exercises'):
+    ex = recs.get('exercise')
+    if not ex or not ex.get('exercises') or not any('rest' in x for x in ex.get('exercises', [])):
         recs['exercise'] = fresh_recs['exercise']
 
     return recs

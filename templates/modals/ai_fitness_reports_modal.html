@@ -141,13 +141,15 @@
 
             <select id="fitnessCompanyFilterUniqueScope" class="form-select form-select-sm" style="width: 170px;">
               <option value="">All Companies</option>
+              <option value="3 Company">3 Company</option>
+              <option value="COMN Company">COMN Company</option>
+              <option value="HQ company">HQ company</option>
             </select>
 
-            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 190px;">
+            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 175px;">
               <option value="">All Fitness Statuses</option>
-              <option value="Healthy">Healthy / Combat Ready</option>
-              <option value="Needs Improvement">Needs Improvement</option>
-              <option value="At Risk">At Risk</option>
+              <option value="Fit">Fit Only</option>
+              <option value="Unfit">Unfit Only</option>
             </select>
 
             <div class="modal-count-pill">
@@ -167,8 +169,8 @@
 
       <!-- SUB-BANNER STRIP (Detachment Style) -->
       <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fa fa-heartbeat me-1"></i> AI FITNESS &amp; OPERATIONAL READINESS DIRECTORY
+        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fas fa-shield-alt me-1 text-warning"></i> 15 CORPS UNIT MANAGEMENT SYSTEM &bull; AI FITNESS &amp; OPERATIONAL READINESS DIRECTORY
         </span>
       </div>
 
@@ -195,7 +197,8 @@
                 <th style="min-width: 180px;">Height / Weight (BMI)</th>
                 <th style="white-space: nowrap;" class="text-center">Fitness Status</th>
                 <th style="width: 80px;" class="text-center">Score</th>
-                <th style="white-space: nowrap;" class="text-center">Action</th>
+                <th style="white-space: nowrap; min-width: 165px;" class="text-center"><i class="far fa-calendar-alt text-primary me-1"></i>Date</th>
+                <th style="white-space: nowrap; width: 130px;" class="text-center"><i class="fas fa-file-pdf text-danger me-1"></i>Report / PDF</th>
               </tr>
             </thead>
             <tbody id="fitnessTableBodyUniqueScope"></tbody>
@@ -305,6 +308,7 @@ const FitnessModalController = (function() {
       statusSelect.addEventListener('change', function(e) {
         state.status = e.target.value;
         state.page = 1;
+        updateQuickFilterButtons(state.status);
         loadModalData();
       });
     }
@@ -319,6 +323,13 @@ const FitnessModalController = (function() {
         });
       }
     });
+
+    const subModalEl = document.getElementById('fitnessSoldierDetailModal');
+    if (subModalEl) {
+      subModalEl.addEventListener('hidden.bs.modal', function() {
+        loadModalData();
+      });
+    }
 
     // Initial stats fetch to populate dashboard badges
     loadModalStats();
@@ -357,13 +368,17 @@ const FitnessModalController = (function() {
         const coTotal = document.getElementById('co-fit-total');
         if (coTotal) coTotal.textContent = s.total_reports || 0;
 
-        // Populate company filter if empty
+        // Populate company filter if empty, strictly enforcing the 3 companies
         const compSelect = document.getElementById('fitnessCompanyFilterUniqueScope');
-        if (compSelect && compSelect.options.length <= 1 && s.companies && s.companies.length) {
-          s.companies.forEach(c => {
+        const ALLOWED_COMPANIES = ['3 Company', 'COMN Company', 'HQ company'];
+        if (compSelect) {
+          const currentVal = compSelect.value;
+          compSelect.innerHTML = '<option value="">All Companies</option>';
+          ALLOWED_COMPANIES.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c;
             opt.textContent = c;
+            if (c === currentVal) opt.selected = true;
             compSelect.appendChild(opt);
           });
         }
@@ -420,12 +435,37 @@ const FitnessModalController = (function() {
     }
   }
 
+  function formatDateTime12Hr(dateVal) {
+    if (!dateVal || dateVal === 'N/A') return 'N/A';
+    const str = String(dateVal).trim();
+    // If already formatted like "10 Sep 2026, 02:08 PM", preserve it
+    if (/^\d{1,2}\s+[A-Za-z]{3}\s+\d{4},\s+\d{1,2}:\d{2}\s+(AM|PM)$/i.test(str)) {
+      return str;
+    }
+    let d = new Date(str.replace(/-/g, '/'));
+    if (isNaN(d.getTime())) {
+      d = new Date(str);
+      if (isNaN(d.getTime())) return str;
+    }
+    const day = String(d.getDate()).padStart(2, '0');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const hoursStr = String(hours).padStart(2, '0');
+    return `${day} ${month} ${year}, ${hoursStr}:${minutes} ${ampm}`;
+  }
+
   function renderTableRows(rows, page, perPage) {
     const tbody = document.getElementById('fitnessTableBodyUniqueScope');
     if (!tbody) return;
 
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No personnel fitness reports found matching criteria.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-muted">No personnel fitness reports found matching criteria.</td></tr>`;
       return;
     }
 
@@ -497,6 +537,8 @@ const FitnessModalController = (function() {
         statusBadge = '<span class="badge bg-secondary text-white px-2 py-1"><i class="fas fa-clock me-1"></i>Pending</span>';
       }
 
+      const dateDisplay = formatDateTime12Hr(r.date_time_12hr || r.generated_at_str || r.generated_at || r.updated_at);
+
       html += `
         <tr>
           <td class="text-center font-monospace">${sNo}</td>
@@ -520,6 +562,11 @@ const FitnessModalController = (function() {
           <td class="text-center">${statusBadge}</td>
           <td class="text-center">
             <span class="badge rounded-pill bg-primary px-2 py-1">${score}</span>
+          </td>
+          <td class="text-center text-nowrap" style="white-space: nowrap; min-width: 165px;">
+            <span class="small fw-semibold text-secondary">
+              <i class="far fa-clock text-primary me-1"></i>${escapeHtml(dateDisplay)}
+            </span>
           </td>
           <td class="text-nowrap text-center">
             <div class="d-flex align-items-center justify-content-center gap-1">
@@ -561,6 +608,43 @@ const FitnessModalController = (function() {
   function goToPage(p) {
     state.page = p;
     loadModalData();
+  }
+
+  function applyQuickStatusFilter(val) {
+    state.status = val;
+    state.page = 1;
+    const selectEl = document.getElementById('fitnessStatusFilterUniqueScope');
+    if (selectEl) {
+      selectEl.value = val;
+    }
+    updateQuickFilterButtons(val);
+    loadModalData();
+  }
+
+  function updateQuickFilterButtons(val) {
+    const btnAll = document.getElementById('quickFilterAll');
+    const btnFit = document.getElementById('quickFilterFit');
+    const btnUnfit = document.getElementById('quickFilterUnfit');
+
+    if (btnAll) {
+      btnAll.className = val === '' ? 'btn btn-sm btn-primary active px-2.5 py-1 fw-bold' : 'btn btn-sm btn-outline-primary px-2.5 py-1 fw-bold';
+    }
+    if (btnFit) {
+      btnFit.className = (val === 'Fit' || val === 'Healthy') ? 'btn btn-sm btn-success active px-2.5 py-1 fw-bold' : 'btn btn-sm btn-outline-success px-2.5 py-1 fw-bold';
+    }
+    if (btnUnfit) {
+      btnUnfit.className = (val === 'Unfit' || val === 'At Risk' || val === 'Needs Improvement') ? 'btn btn-sm btn-danger active px-2.5 py-1 fw-bold' : 'btn btn-sm btn-outline-danger px-2.5 py-1 fw-bold';
+    }
+  }
+
+  function exportDirectoryPdf() {
+    const params = new URLSearchParams({
+      search: state.search,
+      company: state.company,
+      status: state.status,
+      download: '1'
+    });
+    window.open(`/fitness/api/reports/export-pdf?${params.toString()}`, '_blank');
   }
 
   async function viewSoldierReport(armyNo) {
@@ -629,6 +713,8 @@ const FitnessModalController = (function() {
       if (!data.success) throw new Error(data.error || 'Failed to analyze soldier');
 
       renderSoldierSubModal(data);
+      // Immediately refresh the report table list in background so the Date column updates
+      loadModalData();
     } catch (e) {
       if (bodyEl) {
         bodyEl.innerHTML = `
@@ -679,6 +765,36 @@ const FitnessModalController = (function() {
       setTimeout(renderSubModalAnalysisCharts, 80);
     } else if (stageKey === 'progression') {
       setTimeout(renderSubModalProgressionChart, 80);
+    }
+  }
+
+  let currentSubModalDiet = null;
+
+  function switchModalMessDay(dayName) {
+    if (!currentSubModalDiet) return;
+    const weekly = currentSubModalDiet.weekly_schedule || {};
+    const dayData = weekly[dayName] || weekly['Monday'] || {};
+
+    document.querySelectorAll('.submodal-day-pill').forEach(btn => {
+      const bDay = btn.getAttribute('data-day');
+      if (bDay && bDay.toLowerCase() === dayName.toLowerCase()) {
+        btn.classList.add('active', 'btn-primary');
+        btn.classList.remove('btn-outline-primary');
+      } else {
+        btn.classList.remove('active', 'btn-primary');
+        btn.classList.add('btn-outline-primary');
+      }
+    });
+
+    const tbody = document.getElementById('subModalMenuTableBody');
+    const sampleMenu = dayData.sample_menu || currentSubModalDiet.sample_menu || [];
+    if (tbody && sampleMenu) {
+      tbody.innerHTML = sampleMenu.map(m => `
+        <tr>
+          <td class="fw-bold text-nowrap text-primary" style="width: 28%;">${escapeHtml(m.meal)}</td>
+          <td class="text-dark">${escapeHtml(m.items)}</td>
+        </tr>
+      `).join('');
     }
   }
 
@@ -836,10 +952,16 @@ const FitnessModalController = (function() {
 
     // Recommendations Stage Values
     const diet = rec.diet || {};
-    const targetCals = diet.target_calories || 2500;
+    currentSubModalDiet = diet;
+    const messCat = diet.mess_category || (['SUBEDAR', 'SUBEDAR MAJOR', 'NAIB SUBEDAR', 'NB SUB', 'SUB', 'SUB MAJ'].some(r => (rank || '').toUpperCase().includes(r)) ? 'JCO MESS' : 'OR MESS');
+    const dayOfWeek = diet.day_of_week || '';
+    const targetCals = diet.target_calories || (diet.daily_targets ? diet.daily_targets.calories : 2500);
     const dietStrategy = diet.strategy || 'Maintenance Calorie Intake optimized for physical conditioning and SHAPE-1 preservation.';
     const hydrationLiters = diet.hydration_liters || 3.5;
     const macros = diet.macros || { protein_grams: 105, protein_pct: 17, carb_grams: 380, carb_pct: 60, fat_grams: 65, fat_pct: 23 };
+    const estIntake = diet.estimated_intake || {};
+    const optionalDiet = diet.optional_diet_plan || null;
+    const roadmap30d = diet.roadmap_30d || [];
 
     const sampleMenu = diet.sample_menu || [
       { meal: 'Early Morning (06:00)', items: '500ml water + 5 soaked almonds + 2 dates' },
@@ -850,31 +972,28 @@ const FitnessModalController = (function() {
       { meal: 'Dinner (20:00)', items: '2 chapatis + 1 cup dal or lean protein + green vegetable + vegetable soup' }
     ];
 
-    const menuRowsHtml = sampleMenu.map(m => `
-      <tr>
-        <td class="fw-bold text-nowrap text-primary" style="width: 28%;">${escapeHtml(m.meal)}</td>
-        <td class="text-dark">${escapeHtml(m.items)}</td>
-      </tr>
-    `).join('');
-
     const exercise = rec.exercise || {};
     const exTitle = exercise.title || 'Tactical Endurance & Physical Mastery Routine';
     const exFocus = exercise.focus_area || 'Cardiovascular capacity, 5km pacing, horizontal rope endurance, and calisthenics.';
     const exercises = exercise.exercises || [
-      { exercise: '5km Interval Progression Run', sets: 6, reps: '500m cycle', duration: '35 mins', frequency: '3 days/week', intensity: 'High' },
-      { exercise: 'Horizontal Rope Traverse & Hanging Pulls', sets: 4, reps: '15-20 meters', duration: '15 mins', frequency: '3 days/week', intensity: 'Moderate' },
-      { exercise: 'Burpees to Sprint Accelerations', sets: 5, reps: '10 burpees + 20m', duration: '12 mins', frequency: '3 days/week', intensity: 'High' },
-      { exercise: 'Plank Hold & Core Stabilization', sets: 3, reps: '60 sec', duration: '10 mins', frequency: '4 days/week', intensity: 'Moderate' }
+      { exercise: '5km Interval Progression Run', sets: 6, reps: '500m cycle', duration: '35 mins', frequency: '3 days/week', intensity: 'High', rest: '90s rest' },
+      { exercise: 'Horizontal Rope Traverse & Hanging Pulls', sets: 4, reps: '15-20 meters', duration: '15 mins', frequency: '3 days/week', intensity: 'Moderate', rest: '60s rest' },
+      { exercise: 'Burpees to Sprint Accelerations', sets: 5, reps: '10 burpees + 20m', duration: '12 mins', frequency: '3 days/week', intensity: 'High', rest: '60s rest' },
+      { exercise: 'Plank Hold & Core Stabilization', sets: 3, reps: '60 sec', duration: '10 mins', frequency: '4 days/week', intensity: 'Moderate', rest: '45s rest' }
     ];
 
     const workoutRowsHtml = exercises.map(item => `
       <tr>
-        <td class="fw-bold text-dark">${escapeHtml(item.exercise)}</td>
+        <td class="fw-bold text-dark">
+          ${escapeHtml(item.exercise)}
+          ${item.progression_note ? `<div class="small text-muted fst-italic mt-1"><i class="fas fa-level-up-alt text-primary me-1"></i>${escapeHtml(item.progression_note)}</div>` : ''}
+        </td>
         <td>${item.sets || 3}</td>
         <td>${escapeHtml(item.reps || '10-12')}</td>
         <td>${escapeHtml(item.duration || '15 mins')}</td>
         <td>${escapeHtml(item.frequency || '3 days/wk')}</td>
         <td><span class="badge ${item.intensity === 'High' ? 'bg-danger' : (item.intensity === 'Moderate' ? 'bg-primary' : 'bg-info')}">${escapeHtml(item.intensity || 'Moderate')}</span></td>
+        <td class="small text-muted text-nowrap">${escapeHtml(item.rest || '60s rest')}</td>
       </tr>
     `).join('');
 
@@ -1216,21 +1335,95 @@ const FitnessModalController = (function() {
           <div class="mb-5">
             <div class="d-flex align-items-center justify-content-between mb-3">
               <h6 class="fw-bold text-primary mb-0"><i class="fas fa-utensils me-2"></i> Targeted Nutrition &amp; Macronutrient Plan</h6>
-              <span class="badge bg-primary px-3 py-2 fs-6">${targetCals} kcal / Day</span>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge ${messCat === 'JCO MESS' ? 'bg-warning text-dark' : 'bg-success'} px-3 py-2 fs-6">
+                  <i class="fas fa-concierge-bell me-1"></i> ${escapeHtml(messCat)} ${dayOfWeek ? `&bull; ${escapeHtml(dayOfWeek)}` : ''}
+                </span>
+                <span class="badge bg-primary px-3 py-2 fs-6">${targetCals} kcal / Day</span>
+              </div>
             </div>
             <div class="p-3 border rounded mb-3" style="background: var(--fit-bg-soft, #f8fafc);">
               <div class="small text-muted fw-bold text-uppercase mb-1">Caloric Strategy</div>
               <div class="fw-bold text-dark">${escapeHtml(dietStrategy)}</div>
             </div>
 
+            ${estIntake && estIntake.total_calories ? `
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <div class="p-2 px-3 border rounded bg-white small d-flex justify-content-between">
+                  <span class="text-muted">Target Calories: <strong>${targetCals} kcal</strong></span>
+                  <span class="text-muted">Est. Mess Intake: <strong class="text-primary">${estIntake.total_calories} kcal</strong></span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="p-2 px-3 border rounded bg-white small d-flex justify-content-between">
+                  <span class="text-muted">Target Protein: <strong>${macros.protein_grams || 105}g</strong></span>
+                  <span class="text-muted">Est. Mess Protein: <strong class="text-success">${estIntake.total_protein_g || 0}g</strong></span>
+                </div>
+              </div>
+            </div>
+            ` : ''}
+
             <div class="p-3 border rounded mb-4" style="background: var(--fit-bg-soft, #f8fafc);">
-              <h6 class="fw-bold text-dark mb-3"><i class="fas fa-calendar-day me-1"></i> Suggested Daily Unit Mess Meal Schedule</h6>
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                  <h6 class="fw-bold text-dark mb-1"><i class="fas fa-calendar-alt text-primary me-1"></i> Official ${escapeHtml(messCat)} 30-Day Nutrition Schedule</h6>
+                  <div class="small text-muted">Weekly Cycle (Monday &ndash; Sunday) &bull; Calibrated Serving Portions</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge ${messCat === 'JCO MESS' ? 'bg-warning text-dark' : 'bg-success'} px-3 py-1.5">${escapeHtml(messCat)}</span>
+                  <span class="badge bg-primary px-3 py-1.5">30-Day Plan</span>
+                </div>
+              </div>
+
+              <!-- Simple Table of Full Week Nutrition Schedule -->
+              <div class="table-responsive" id="subModalMenuTableContainer">
+                <!-- Populated by switchModalMessDay -->
+              </div>
+            </div>
+
+            ${roadmap30d && roadmap30d.length > 0 ? `
+            <div class="p-3 border rounded mb-4" style="background: #f8fafc;">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold text-dark mb-0"><i class="fas fa-route text-success me-1"></i> 30-Day Nutrition Progression Roadmap (4-Week Cycle)</h6>
+                <span class="badge bg-secondary">30-Day Target</span>
+              </div>
+              <div class="row g-2 pt-2">
+                ${roadmap30d.map(w => `
+                  <div class="col-md-6 col-lg-3">
+                    <div class="p-2.5 border rounded bg-white h-100 shadow-sm" style="font-size: 0.8rem;">
+                      <div class="fw-bold text-primary mb-1">${escapeHtml(w.week)}: ${escapeHtml(w.phase)}</div>
+                      <div class="small text-dark mb-1"><strong>Focus:</strong> ${escapeHtml(w.focus)}</div>
+                      <div class="small text-success mb-1"><strong>Strategy:</strong> ${escapeHtml(w.mess_strategy || '')}</div>
+                      <div class="small text-muted"><strong>Target:</strong> ${escapeHtml(w.milestone)}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            ` : ''}
+
+            ${optionalDiet && optionalDiet.items && optionalDiet.items.length > 0 ? `
+            <div class="p-3 border rounded mb-4" style="background: #fdfbf7; border-color: #f6d365 !important;">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <h6 class="fw-bold text-dark mb-0"><i class="fas fa-apple-alt text-warning me-2"></i> ${escapeHtml(optionalDiet.title || 'Optional Supplementary Diet Plan')}</h6>
+                <span class="badge bg-secondary">Optional Supplement</span>
+              </div>
+              <p class="small text-muted mb-2">${escapeHtml(optionalDiet.description || 'Supplementary conditioning plan for voluntary optimization outside mandatory mess hours.')}</p>
               <div class="table-responsive">
                 <table class="table table-sm table-borderless mb-0">
-                  <tbody>${menuRowsHtml}</tbody>
+                  <tbody>
+                    ${(optionalDiet.items || []).map(it => `
+                      <tr>
+                        <td class="fw-bold text-nowrap text-secondary" style="width: 28%;">${escapeHtml(it.time || '')}</td>
+                        <td class="text-dark"><strong>${escapeHtml(it.item || '')}</strong> &mdash; ${escapeHtml(it.quantity || '')} <span class="text-muted small">(${escapeHtml(it.purpose || '')})</span></td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
                 </table>
               </div>
             </div>
+            ` : ''}
           </div>
 
           <hr class="my-4">
@@ -1252,6 +1445,7 @@ const FitnessModalController = (function() {
                     <th>Duration</th>
                     <th>Frequency</th>
                     <th>Intensity</th>
+                    <th>Rest Interval</th>
                   </tr>
                 </thead>
                 <tbody>${workoutRowsHtml}</tbody>
@@ -1284,6 +1478,9 @@ const FitnessModalController = (function() {
         </div>
       </div>
     `;
+
+    // Initialize Full Week Plan in Stage 4
+    switchModalMessDay('full');
   }
 
   function renderSubModalAnalysisCharts() {
@@ -1463,6 +1660,124 @@ const FitnessModalController = (function() {
     }
   }
 
+  function switchModalMessDay(dayName) {
+    if (!currentSubModalDiet) return;
+    const weekly = currentSubModalDiet.weekly_schedule || {};
+    const activeDay = currentSubModalDiet.day_of_week || 'Monday';
+
+    // Update buttons active class
+    document.querySelectorAll('.submodal-day-pill').forEach(btn => {
+      const bDay = (btn.getAttribute('data-day') || '').toLowerCase();
+      if (bDay === (dayName || '').toLowerCase()) {
+        btn.classList.add('active', 'btn-primary');
+        btn.classList.remove('btn-outline-primary');
+      } else {
+        btn.classList.remove('active', 'btn-primary');
+        btn.classList.add('btn-outline-primary');
+      }
+    });
+
+    const container = document.getElementById('subModalMenuTableContainer');
+    if (!container) return;
+
+    if ((dayName || '').toLowerCase() === 'full') {
+      const isJc = (currentSoldier && currentSoldier.rank && ['SUBEDAR', 'SUB', 'NB SUB', 'HONY', 'HONORARY'].some(r => currentSoldier.rank.toUpperCase().includes(r))) ||
+                   (currentSoldier && currentSoldier.army_number && currentSoldier.army_number.toUpperCase().includes('JC')) ||
+                   ((currentReport && currentReport.nutrition && currentReport.nutrition.mess_category) || '').toUpperCase().includes('JCO');
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const rows = days.map((dName, idx) => {
+        const dData = weekly[dName] || {};
+        const isToday = (activeDay && dName.toLowerCase() === activeDay.toLowerCase());
+        const meals = dData.meals || {};
+        const getMealText = (mKey) => {
+          const items = meals[mKey] || [];
+          if (!Array.isArray(items) || items.length === 0) {
+            return '<span class="text-muted small fst-italic">--</span>';
+          }
+          return items.map(it => {
+            const name = typeof it === 'string' ? it : (it.food_item || it.item || 'Item');
+            const portion = typeof it === 'string' ? '' : (it.portion || it.quantity || '');
+            return `
+              <div class="d-flex align-items-center justify-content-between gap-1 py-1 mb-1 border-bottom" style="border-bottom-style: dashed !important; font-size: 0.81rem;">
+                <span class="fw-bold text-dark">${escapeHtml(name)}</span>
+                <span class="badge bg-white text-primary border border-primary-subtle fw-bold font-monospace shadow-xs px-2 py-0.5" style="font-size: 0.76rem; white-space: nowrap;">
+                  ${escapeHtml(portion)}
+                </span>
+              </div>
+            `;
+          }).join('');
+        };
+
+        return `
+          <tr>
+            <td class="ps-3 align-top">
+              <div class="fw-bold text-dark">${dName}</div>
+              <div class="small text-muted font-monospace" style="font-size: 0.75rem;">Day ${idx + 1}</div>
+            </td>
+            <td class="align-top" style="font-size: 0.82rem;">${getMealText('Breakfast')}</td>
+            ${!isJc ? `<td class="align-top" style="font-size: 0.82rem;">${getMealText('Tea')}</td>` : ''}
+            <td class="align-top" style="font-size: 0.82rem;">${getMealText('Lunch')}</td>
+            <td class="align-top pe-3" style="font-size: 0.82rem;">${getMealText('Dinner')}</td>
+          </tr>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <table class="table table-sm table-bordered table-hover mb-0 align-middle shadow-sm" style="background: #ffffff;">
+          <thead class="table-light">
+            <tr style="font-size: 0.82rem;">
+              <th style="width: ${isJc ? '15%' : '14%'};" class="ps-3 text-uppercase text-muted">Day</th>
+              <th style="width: ${isJc ? '27%' : '22%'};" class="text-uppercase text-primary"><i class="fas fa-sun text-warning me-1"></i> Breakfast</th>
+              ${!isJc ? `<th style="width: 18%;" class="text-uppercase text-secondary"><i class="fas fa-mug-hot text-secondary me-1"></i> Tea</th>` : ''}
+              <th style="width: ${isJc ? '29%' : '23%'};" class="text-uppercase text-success"><i class="fas fa-drumstick-bite text-success me-1"></i> Lunch</th>
+              <th style="width: ${isJc ? '29%' : '23%'}; color: #4f46e5;" class="pe-3 text-uppercase"><i class="fas fa-moon me-1" style="color: #4f46e5;"></i> Dinner</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    } else {
+      const dData = weekly[dayName] || weekly['Monday'] || {};
+      const meals = dData.meals || {};
+      const order = ['Breakfast', 'Tea', 'Lunch', 'Dinner'];
+      const mealKeys = Object.keys(meals).sort((a, b) => {
+        const idxA = order.indexOf(a);
+        const idxB = order.indexOf(b);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.localeCompare(b);
+      });
+
+      let rowsHtml = '';
+      if (mealKeys.length > 0) {
+        rowsHtml = mealKeys.map(k => {
+          const items = (meals[k] || []).map(it => `${escapeHtml(it.food_item)}: ${escapeHtml(it.portion)}`).join(' + ');
+          return `
+            <tr>
+              <td class="fw-bold text-nowrap text-primary ps-3" style="width: 22%; font-size: 0.88rem;">${k} (${dayName})</td>
+              <td class="pe-3" style="font-size: 0.88rem;">${items}</td>
+            </tr>
+          `;
+        }).join('');
+      } else if (Array.isArray(dData.sample_menu) && dData.sample_menu.length > 0) {
+        rowsHtml = dData.sample_menu.map(m => `
+          <tr>
+            <td class="fw-bold text-nowrap text-primary ps-3" style="width: 22%; font-size: 0.88rem;">${escapeHtml(m.meal)}</td>
+            <td class="pe-3" style="font-size: 0.88rem;">${escapeHtml(m.items)}</td>
+          </tr>
+        `).join('');
+      }
+
+      container.innerHTML = `
+        <table class="table table-sm table-hover table-borderless mb-0 align-middle" style="background: #ffffff;">
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      `;
+    }
+  }
+
   function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -1477,7 +1792,10 @@ const FitnessModalController = (function() {
     goToPage,
     viewSoldierReport,
     switchSubStage,
-    loadSubModalIframe
+    switchModalMessDay,
+    loadSubModalIframe,
+    applyQuickStatusFilter,
+    exportDirectoryPdf
   };
 })();
 

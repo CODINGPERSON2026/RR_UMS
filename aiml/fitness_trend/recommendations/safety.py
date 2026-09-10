@@ -39,7 +39,16 @@ def filter_unsafe_exercises(candidate_exercises, soldier_features):
     """
     contraindicated = set(soldier_features.get('contraindicated_exercises', []))
     contra_cats = set(soldier_features.get('contraindicated_categories', []))
-    is_lmc = bool(soldier_features.get('is_low_medical_category'))
+    is_lmc = bool(soldier_features.get('is_low_medical_category')) or bool(soldier_features.get('has_medical_restriction'))
+
+    if not contra_cats:
+        med_info = f"{soldier_features.get('medical_category', '')} {soldier_features.get('restrictions', '')} {soldier_features.get('medical_restrictions', '')}".lower()
+        if any(k in med_info for k in ['knee', 'leg', 'ankle', 'foot', 'patella']):
+            contra_cats.add('knee_lower_limb')
+        if any(k in med_info for k in ['spine', 'back', 'disc', 'lumbar']):
+            contra_cats.add('spine_back')
+        if any(k in med_info for k in ['shoulder', 'cervical', 'elbow']):
+            contra_cats.add('shoulder_neck')
     
     safe_list = []
     blocked_list = []
@@ -57,17 +66,20 @@ def filter_unsafe_exercises(candidate_exercises, soldier_features):
             continue
             
         # Check anatomical category constraints
-        if 'spine_back' in contra_cats and ex_type in ['heavy_lifting', 'spinal_loading', 'high_impact_jump', 'deep_bend']:
+        if 'spine_back' in contra_cats and (ex_type in ['heavy_lifting', 'spinal_loading', 'high_impact_jump', 'deep_bend'] or any(w in ex_name.lower() for w in ['deadlift', 'overhead press', 'sit-up'])):
             blocked_list.append({
                 'exercise': ex_name,
                 'reason': 'Contraindicated due to spine/back restriction (avoids axial spinal loading).'
             })
             continue
             
-        if 'knee_lower_limb' in contra_cats and ex_type in ['deep_squat', 'high_impact_plyo', 'sprint_incline']:
+        if 'knee_lower_limb' in contra_cats and (
+            ex_type in ['deep_squat', 'high_impact_plyo', 'sprint_incline', 'endurance_run', 'high_intensity_shuttle', 'tactical_march']
+            or any(w in ex_name.lower() for w in ['5km', 'box jump', 'shuttle', 'jump', 'sprint'])
+        ):
             blocked_list.append({
                 'exercise': ex_name,
-                'reason': 'Contraindicated due to knee/lower limb condition (avoids high knee shear stress).'
+                'reason': 'Contraindicated due to knee/lower limb condition (avoids high knee shear stress and impact).'
             })
             continue
             

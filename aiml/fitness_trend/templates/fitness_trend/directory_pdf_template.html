@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>15 CESR Unit Management System - AI Fitness Directory</title>
+<style>
+    @page {
+        size: a4 landscape;
+        margin: 0.8cm 0.8cm 0.8cm 0.8cm;
+    }
+
+    body {
+        font-family: Helvetica, Arial, sans-serif;
+        color: #0f172a;
+        font-size: 8pt;
+        line-height: 1.25;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header-table {
+        width: 100%;
+        border-bottom: 2.5px solid #1e3a8a;
+        padding-bottom: 6px;
+        margin-bottom: 8px;
+    }
+
+    .unit-title {
+        font-size: 15pt;
+        font-weight: bold;
+        color: #1e3a8a;
+        text-align: center;
+        letter-spacing: 0.5px;
+        margin: 0;
+        padding: 0;
+    }
+
+    .report-title {
+        font-size: 10.5pt;
+        font-weight: bold;
+        color: #0284c7;
+        text-align: center;
+        margin-top: 3px;
+        margin-bottom: 0;
+        padding: 0;
+        letter-spacing: 0.3px;
+    }
+
+    .meta-sub {
+        font-size: 7.5pt;
+        color: #475569;
+        text-align: center;
+        margin-top: 4px;
+        margin-bottom: 0;
+        padding: 0;
+        font-weight: 600;
+    }
+
+    .filter-badge-strip {
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 4px;
+        padding: 4px 8px;
+        margin-bottom: 8px;
+        font-size: 7.5pt;
+        color: #334155;
+    }
+
+    .directory-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 8px;
+    }
+
+    .directory-table th {
+        background-color: #1e3a8a;
+        color: #ffffff;
+        font-weight: bold;
+        font-size: 7.5pt;
+        text-transform: uppercase;
+        padding: 5px 6px;
+        border: 1px solid #1e3a8a;
+        text-align: left;
+    }
+
+    .directory-table td {
+        border: 1px solid #e2e8f0;
+        padding: 4.5px 6px;
+        font-size: 7.5pt;
+        vertical-align: middle;
+    }
+
+    .directory-table tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    .badge-fit {
+        background-color: #16a34a;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 3px;
+        display: inline-block;
+        font-size: 7pt;
+    }
+
+    .badge-unfit {
+        background-color: #dc2626;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 3px;
+        display: inline-block;
+        font-size: 7pt;
+    }
+
+    .badge-warning {
+        background-color: #d97706;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 3px;
+        display: inline-block;
+        font-size: 7pt;
+    }
+
+    .badge-pending {
+        background-color: #64748b;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 3px;
+        display: inline-block;
+        font-size: 7pt;
+    }
+
+    .score-badge {
+        font-weight: bold;
+        color: #1e3a8a;
+    }
+
+    .footer-summary {
+        margin-top: 10px;
+        border-top: 1px solid #cbd5e1;
+        padding-top: 6px;
+        font-size: 7.5pt;
+        color: #64748b;
+        width: 100%;
+    }
+
+    .sign-block {
+        margin-top: 18px;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<!-- Header: 15 CESR Unit Management System on the top of the headings -->
+<table class="header-table">
+    <tr>
+        <td style="width: 10%; text-align: left; vertical-align: middle;">
+            {% if rt_logo_path %}
+            <img src="{{ rt_logo_path }}" style="width: 50px; height: 50px;" alt="15 CESR Logo" />
+            {% endif %}
+        </td>
+        <td style="width: 80%; text-align: center; vertical-align: middle;">
+            <div class="unit-title">15 CORPS UNIT MANAGEMENT SYSTEM</div>
+            <div class="report-title">AI FITNESS &amp; OPERATIONAL READINESS DIRECTORY</div>
+            <div class="meta-sub">
+                ACTIVE FILTER: <strong>{{ filter_label or 'All Records' }}</strong> &bull; 
+                COMPANY: <strong>{{ company or 'All Sub-Units' }}</strong> &bull; 
+                TOTAL EVALUATED: <strong>{{ total_count }}</strong> &bull; 
+                DATE: <strong>{{ generated_at }}</strong> &bull; 
+                CONFIDENTIAL
+            </div>
+        </td>
+        <td style="width: 10%; text-align: right; vertical-align: middle;">
+            {% if chinar_logo_path %}
+            <img src="{{ chinar_logo_path }}" style="width: 50px; height: 50px;" alt="15 Corps Logo" />
+            {% endif %}
+        </td>
+    </tr>
+</table>
+
+<!-- Directory Table -->
+<table class="directory-table">
+    <thead>
+        <tr>
+            <th style="width: 32px; text-align: center;">S.No</th>
+            <th style="width: 85px;">Army Number</th>
+            <th style="width: 65px;">Rank</th>
+            <th style="width: 150px;">Name</th>
+            <th style="width: 75px;">Company</th>
+            <th style="width: 50px; text-align: center;">Age</th>
+            <th style="width: 130px;">Height / Weight (BMI)</th>
+            <th style="width: 90px; text-align: center;">Fitness Status</th>
+            <th style="width: 55px; text-align: center;">Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if rows and rows|length > 0 %}
+            {% for r in rows %}
+            <tr>
+                <td style="text-align: center; font-weight: bold; color: #475569;">{{ loop.index }}</td>
+                <td style="font-weight: bold; color: #1e3a8a;">{{ r.army_number or 'N/A' }}</td>
+                <td>{{ r.rank or 'N/A' }}</td>
+                <td style="font-weight: 600; text-transform: uppercase;">{{ r.name or 'N/A' }}</td>
+                <td>{{ r.company or 'N/A' }}</td>
+                <td style="text-align: center;">{{ r.age ~ ' yrs' if r.age else '--' }}</td>
+                <td>
+                    {{ (r.height_cm|round|int ~ ' cm') if r.height_cm else '--' }} / 
+                    {{ (r.actual_weight_kg|round(1) ~ ' kg') if r.actual_weight_kg else '--' }}
+                    {% if r.bmi %}
+                        (BMI: {{ r.bmi|round(1) }})
+                    {% endif %}
+                </td>
+                <td style="text-align: center;">
+                    {% set st = (r.fitness_status or '')|lower %}
+                    {% set sc = r.fitness_score %}
+                    {% if 'healthy' in st or 'combat' in st or 'ready' in st or 'good' in st or (sc and sc >= 70 and 'risk' not in st and 'improv' not in st) %}
+                        <span class="badge-fit">Fit / Combat Ready</span>
+                    {% elif 'risk' in st or 'poor' in st or 'fail' in st or (sc and sc < 50) %}
+                        <span class="badge-unfit">Unfit / At Risk</span>
+                    {% elif 'improv' in st or 'overweight' in st or 'moderate' in st or (sc and sc >= 50 and sc < 70) %}
+                        <span class="badge-warning">Needs Imp</span>
+                    {% else %}
+                        <span class="badge-pending">Pending</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: center;" class="score-badge">
+                    {{ (r.fitness_score|round|int ~ '%') if r.fitness_score is not none else '--' }}
+                </td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="9" style="text-align: center; padding: 20px; color: #64748b;">
+                    No personnel records found matching the specified filter criteria.
+                </td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<!-- Footer Summary & Officer Block -->
+<table class="footer-summary">
+    <tr>
+        <td style="width: 60%; vertical-align: top;">
+            <strong>15 CORPS UNIT MANAGEMENT SYSTEM &bull; OFFICIAL MILITARY RECORD</strong><br />
+            System Generated on: {{ generated_at }} | IP: {{ client_ip }} | Active Filter: {{ filter_label or 'All Records' }}<br />
+            Total Listed: <strong>{{ rows|length }}</strong> of <strong>{{ total_count }}</strong> personnel records
+        </td>
+        <td style="width: 40%; text-align: right; vertical-align: top;">
+            <div style="font-weight: bold; color: #0f172a; margin-top: 8px;">Officer Commanding</div>
+            <div style="color: #475569; font-size: 7pt;">15 Corps Engineering Signal Regiment (15 CESR)</div>
+            <div style="color: #64748b; font-size: 6.5pt;">Operational Readiness Command &bull; Indian Army</div>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
