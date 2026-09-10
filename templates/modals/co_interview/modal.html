@@ -1,0 +1,991 @@
+<!-- CO INTERVIEW MODAL -->
+
+<style>
+  :root {
+    --coi-900: #0c2340;
+    --coi-800: #123361;
+    --coi-700: #1a4882;
+    --coi-600: #2260a8;
+    --coi-500: #2b79d0;
+    --coi-400: #5597e0;
+    --coi-300: #93bdf0;
+    --coi-200: #c8ddf8;
+    --coi-100: #e8f2fe;
+    --coi-50 : #f5f9ff;
+    --coi-ink    : #0f1e35;
+    --coi-ink2   : #2d4260;
+    --coi-muted  : #6b85a6;
+    --coi-border : #cddaee;
+    --coi-surface: #ffffff;
+    --coi-bg     : #f3f7fd;
+    --coi-shadow : rgba(18,51,97,0.14);
+  }
+
+  #coInterviewModal .modal-dialog {
+    max-width: 1400px;
+    width: 94vw;
+    margin: 1.5rem auto 1rem auto;
+  }
+
+  #coInterviewModal .modal-content {
+    border: none;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px var(--coi-border), 0 32px 80px rgba(12,35,64,0.22);
+  }
+
+  /* ── HEADER ── */
+  #coInterviewModal .modal-header {
+    background: linear-gradient(135deg, var(--coi-900) 0%, var(--coi-700) 100%);
+    border: none;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #coInterviewModal .modal-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 0% 100%, rgba(43,121,208,.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 0%,  rgba(85,151,224,.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .coi-hdr {
+    padding: 12px 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+  .coi-hdr-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .coi-hdr-text { flex: 1; min-width: 0; }
+  .coi-hdr-title {
+    font-size: 1.05rem; font-weight: 700; color: #fff;
+    letter-spacing: -.2px; line-height: 1.2; margin: 0 0 1px;
+  }
+  .coi-hdr-sub {
+    font-size: 0.7rem; color: var(--coi-300);
+    letter-spacing: .5px; text-transform: uppercase; font-weight: 500; margin: 0;
+  }
+  .coi-hdr-badge {
+    background: rgba(255,255,255,0.13);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 4px 12px;
+    display: flex; align-items: center; gap: 6px;
+    color: #fff; font-size: 0.78rem; font-weight: 600; flex-shrink: 0;
+  }
+  .coi-hdr-badge .coi-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #facc15;
+    animation: coi-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes coi-pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50%     { opacity:.4; transform:scale(.65); }
+  }
+  .coi-btn-close {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; cursor: pointer; font-size: 13px; flex-shrink: 0;
+    transition: background .15s; position: relative; z-index: 1;
+  }
+  .coi-btn-close:hover { background: rgba(255,255,255,0.22); }
+
+  /* ── SEARCH ── */
+  .coi-search-strip {
+    padding: 12px 20px;
+    background: var(--coi-bg);
+    border-bottom: 1px solid var(--coi-border);
+  }
+  .coi-search-rel { position: relative; }
+  .coi-search-icon-pos {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--coi-muted); font-size: 12px; pointer-events: none;
+  }
+  .coi-search-input {
+    width: 100%; border: 1px solid var(--coi-border); border-radius: 10px;
+    padding: 8px 13px 8px 34px; font-size: 0.86rem;
+    background: #ffffff; color: var(--coi-ink); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .coi-search-input:focus {
+    border-color: var(--coi-500);
+    box-shadow: 0 0 0 3px rgba(43,121,208,.11);
+  }
+
+  /* ── BODY ── */
+  #coInterviewModal .modal-body {
+    padding: 0; background: var(--coi-bg);
+    max-height: 58vh; overflow-y: auto;
+  }
+
+  .coi-state-block {
+    padding: 52px 24px; text-align: center; color: var(--coi-muted);
+  }
+  .coi-ld { display:inline-flex; gap:6px; margin-bottom:12px; }
+  .coi-ld span {
+    width:9px; height:9px; border-radius:50%;
+    background: var(--coi-500);
+    animation: coi-bounce 1.2s ease-in-out infinite;
+  }
+  .coi-ld span:nth-child(2) { animation-delay:.2s; }
+  .coi-ld span:nth-child(3) { animation-delay:.4s; }
+  @keyframes coi-bounce {
+    0%,80%,100% { transform:scale(.6); opacity:.4; }
+    40%          { transform:scale(1.2); opacity:1; }
+  }
+
+  /* ── TABLE ── */
+  .coi-tbl-wrap { padding: 14px 18px 18px; }
+  .coi-tbl {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 5px;
+  }
+  .coi-tbl thead th {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: .7px;
+    text-transform: uppercase; color: var(--coi-muted);
+    padding: 7px 14px; border-bottom: none;
+    text-align: left !important;
+  }
+  .coi-tbl tbody tr {
+    background: #ffffff;
+    border-radius: 11px;
+    box-shadow: 0 1px 4px rgba(18,51,97,.06);
+    transition: box-shadow .15s, transform .15s;
+  }
+  .coi-tbl tbody tr:hover {
+    box-shadow: 0 4px 16px rgba(18,51,97,.12);
+    transform: translateY(-1px);
+  }
+  .coi-tbl tbody td {
+    padding: 12px 14px; font-size: .88rem;
+    color: var(--coi-ink); vertical-align: middle; border: none;
+    text-align: left !important;
+  }
+  .coi-tbl tbody td:first-child { border-radius: 11px 0 0 11px; }
+  .coi-tbl tbody td:last-child  { border-radius: 0 11px 11px 0; }
+
+  .coi-sno { font-size:.76rem; font-weight:700; color:var(--coi-muted); width:30px; text-align: left !important; }
+  .coi-army {
+    display: inline-block;
+    background: var(--coi-100); color: var(--coi-800);
+    border-radius: 20px; padding: 3px 11px;
+    font-size: .79rem; font-weight: 700;
+    letter-spacing: .4px; font-family: 'Courier New', monospace;
+  }
+  .coi-rank {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(43,121,208,.1); color: var(--coi-700);
+    border-radius: 6px; padding: 3px 9px;
+    font-size: .77rem; font-weight: 700;
+  }
+  .coi-name { font-weight: 600; text-align: left !important; }
+
+  .coi-done-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 15px; border-radius: 8px;
+    font-size: .79rem; font-weight: 700;
+    cursor: pointer; border: none;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(22,163,74,.22);
+    transition: transform .15s, box-shadow .15s;
+    white-space: nowrap;
+  }
+  .coi-done-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,.33); }
+  .coi-done-btn:active { transform: scale(.97); }
+  .coi-done-btn:disabled { opacity:.55; cursor:not-allowed; transform:none!important; }
+
+  .coi-remarks-scroll {
+    max-width: 520px;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 6px 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: #334155;
+    font-style: italic;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+  }
+  .coi-remarks-scroll::-webkit-scrollbar { height: 5px; }
+  .coi-remarks-scroll::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+  .coi-remarks-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+  .coi-remarks-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+  /* ── FOOTER ── */
+  #coInterviewModal .modal-footer {
+    padding: 12px 22px;
+    background: var(--coi-bg);
+    border-top: 1px solid var(--coi-border);
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  .coi-coy-breakdown-strip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 18px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--coi-border);
+  }
+
+  .coi-coy-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    user-select: none;
+  }
+
+  .coi-coy-pill:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    color: #0f172a;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  }
+
+  .coi-coy-pill.active {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff !important;
+    border-color: #1e3a8a;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+  }
+
+  .coi-coy-pill .coi-coy-count {
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    border-radius: 12px;
+    padding: 1px 8px;
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .coi-coy-pill.active .coi-coy-count {
+    background: #ffffff !important;
+    color: #1e3a8a !important;
+  }
+  .coi-foot-info { font-size: .79rem; color: var(--coi-muted); font-weight: 500; }
+  .coi-foot-info strong { color: var(--coi-ink2); }
+  .coi-foot-close {
+    padding: 7px 18px; border-radius: 9px;
+    border: 1px solid var(--coi-border);
+    background: #ffffff; color: var(--coi-ink2);
+    font-size: .84rem; font-weight: 600;
+    cursor: pointer; transition: background .15s;
+  }
+  .coi-foot-close:hover { background: var(--coi-100); }
+
+  /* ── REMARKS OVERLAY ── */
+  .coi-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 1060;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 22px;
+  }
+  .coi-overlay.coi-show { display: flex; }
+
+  .coi-overlay-card {
+    background: #ffffff !important;
+    border-radius: 20px;
+    padding: 30px;
+    width: min(480px, 92vw);
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    box-shadow: 0 25px 65px rgba(15, 23, 42, 0.35);
+    animation: coi-popIn .25s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes coi-popIn {
+    from { transform: scale(.92); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+
+  .coi-ov-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .coi-ov-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #dcfce7;
+    color: #15803d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .coi-ov-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .coi-ov-sub {
+    font-size: 0.84rem;
+    color: #64748b;
+  }
+  .coi-ov-sub strong {
+    color: #15803d;
+    font-weight: 600;
+  }
+
+  .coi-ov-ta {
+    width: 100%;
+    min-height: 110px;
+    resize: vertical;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    font-family: inherit;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+  }
+  .coi-ov-ta:focus {
+    border-color: #22c55e;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+  }
+
+  .coi-ov-acts {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: flex-end;
+  }
+  .coi-ov-cancel {
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .coi-ov-cancel:hover { background: #f1f5f9; border-color: #94a3b8; }
+  .coi-ov-confirm {
+    padding: 9px 22px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .coi-ov-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.4);
+  }
+  .coi-ov-confirm:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .coi-toast {
+    position: fixed; bottom: 26px; right: 26px; z-index: 208000;
+    background: #16a34a; color: #fff; border-radius: 12px;
+    padding: 11px 20px; font-size: .87rem; font-weight: 600;
+    box-shadow: 0 8px 28px rgba(22,163,74,.35);
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0; transform: translateY(14px);
+    transition: opacity .3s, transform .3s; pointer-events: none;
+  }
+  .coi-toast.coi-toast-on { opacity:1; transform:translateY(0); }
+</style>
+
+
+<!-- ══════ MODAL ══════ -->
+<div class="modal fade" id="coInterviewModal" tabindex="-1"
+     aria-labelledby="coiModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content" style="position: relative;">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="coi-hdr">
+          <div class="coi-hdr-icon">🎖️</div>
+          <div class="coi-hdr-text">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h5 class="coi-hdr-title" id="coiModalLabel">CO Interview</h5>
+              <span id="coi-updated-by-badge" class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY CO
+              </span>
+            </div>
+            <p class="coi-hdr-sub">Pending CO Interview Register</p>
+          </div>
+          <div class="coi-hdr-badge">
+            <span class="coi-dot"></span>
+            <span id="coi-badge-count">—</span>&nbsp;Pending
+          </div>
+          <button class="coi-btn-close" data-bs-dismiss="modal" title="Close">✕</button>
+        </div>
+      </div>
+
+      <!-- Combined Toolbar Strip -->
+      <div class="coi-search-strip d-flex align-items-center justify-content-between gap-3 flex-wrap py-2 px-3">
+        <!-- Search Box -->
+        <div class="coi-search-rel" style="width: 280px; max-width: 100%; flex-shrink: 0;">
+          <i class="fas fa-search coi-search-icon-pos"></i>
+          <input id="coiSearchBox" class="coi-search-input"
+                 type="text" placeholder="Search name, army no, rank…"
+                 oninput="coiFilterRows()">
+        </div>
+
+        <!-- Center Tabs -->
+        <div class="d-flex align-items-center gap-2">
+          <button id="coiTabPendingBtn" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm" onclick="coiSwitchTab('pending')">
+            <i class="fas fa-clock me-1"></i> CO Interview Pending <span class="badge bg-white text-primary rounded-pill ms-1" id="coiBadgePending">0</span>
+          </button>
+          <button id="coiTabDoneBtn" class="btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold" onclick="coiSwitchTab('done')">
+            <i class="fas fa-check-circle me-1"></i> CO Interview Done <span class="badge bg-secondary rounded-pill ms-1" id="coiBadgeDone">0</span>
+          </button>
+        </div>
+
+        <!-- Right Company Filter -->
+        <div class="d-flex align-items-center gap-2">
+          <label for="coiCompanyFilter" class="mb-0 fw-bold text-secondary" style="font-size:0.8rem; white-space:nowrap;">
+            <i class="fas fa-building me-1"></i>Company:
+          </label>
+          <select id="coiCompanyFilter" class="form-select form-select-sm shadow-sm"
+                  style="border-radius: 10px; font-size: 0.85rem; border-color: var(--coi-border); min-width: 150px;"
+                  onchange="coiFilterRows()">
+            <option value="">All Companies</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Company Pending Breakdown Bar -->
+      <div id="coiCompanyBreakdownStrip" class="coi-coy-breakdown-strip" style="display: none;"></div>
+
+      <!-- Body -->
+      <div class="modal-body" id="coiBody">
+        <div class="coi-state-block" id="coiLoader">
+          <div class="coi-ld"><span></span><span></span><span></span></div>
+          <div style="font-size:.9rem;font-weight:600;">Loading CO interview records…</div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer d-flex justify-content-between align-items-center flex-wrap" style="gap:10px;">
+        <span class="coi-foot-info" style="font-size:0.85rem; color:#475569;">
+          Showing <strong id="coiPageStart">0</strong>–<strong id="coiPageEnd">0</strong> of
+          <strong id="coi-tot">0</strong> <span id="coiFootLabel">pending CO interviews</span>
+        </span>
+
+        <div class="d-flex align-items-center gap-2" id="coiPaginationControls">
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="coiPrevBtn" onclick="coiChangePage(-1)" disabled>
+            <i class="fas fa-chevron-left me-1"></i> Prev
+          </button>
+          <span style="font-size:0.82rem; font-weight:600; color:#334155;">
+            Page <span id="coiCurrentPageNum">1</span> of <span id="coiTotalPagesNum">1</span>
+          </span>
+          <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="coiNextBtn" onclick="coiChangePage(1)" disabled>
+            Next <i class="fas fa-chevron-right ms-1"></i>
+          </button>
+        </div>
+
+        <button class="coi-foot-close" data-bs-dismiss="modal">Close</button>
+      </div>
+
+      <!-- ══════ REMARKS OVERLAY ══════ -->
+      <div class="coi-overlay" id="coiOverlay" onclick="if(event.target===this) coiCancelOverlay()">
+        <div class="coi-overlay-card">
+          <div class="coi-ov-header">
+            <div class="coi-ov-icon">✓</div>
+            <div>
+              <div class="coi-ov-title">Mark CO Interview Done</div>
+              <div class="coi-ov-sub" id="coiOverlaySub">Adding remarks for soldier</div>
+            </div>
+          </div>
+          <textarea id="coiOverlayTA" class="coi-ov-ta"
+                    placeholder="Enter detailed CO interview remarks (minimum 20 characters required)…"
+                    oninput="coiUpdateWordCount()"></textarea>
+          <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+            <small id="coiWordCountMsg" class="fw-bold text-danger" style="font-size:0.8rem;">
+              <i class="fas fa-exclamation-circle me-1"></i>Minimum 20 characters required (<span id="coiWordCount">0</span>/20 characters)
+            </small>
+          </div>
+          <div class="coi-ov-acts">
+            <button class="coi-ov-cancel" onclick="coiCancelOverlay()">Cancel</button>
+            <button class="coi-ov-confirm" id="coiOverlayConfirm" onclick="coiSubmitDone()" disabled>
+              ✓&nbsp;Confirm CO Interview Done
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TOAST ══════ -->
+<div class="coi-toast" id="coiToast">
+  <span>✓</span><span id="coiToastTxt">CO Interview marked as done!</span>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var coiPendingRows   = [];
+  var coiCompletedRows = [];
+  var coiFiltered      = [];
+  var coiCurrentTab    = 'pending';
+  var coiIsAdmin       = true;
+  var coiPageSize      = 20;
+  var coiCurrentPage   = 1;
+  var coiActiveCiId    = null;
+  var coiActiveRow     = null;
+  var coiActiveArmyNumber = null;
+
+  /* ── Open modal → load data ── */
+  var coiModal = document.getElementById('coInterviewModal');
+  if (coiModal) {
+    coiModal.addEventListener('show.bs.modal', coiLoad);
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var ov = document.getElementById('coiOverlay');
+      if (ov && ov.classList.contains('coi-show')) {
+        coiCancelOverlay();
+      }
+    }
+  });
+
+  async function coiLoad() {
+    var body = document.getElementById('coiBody');
+    body.innerHTML = '<div class="coi-state-block"><div class="coi-ld"><span></span><span></span><span></span></div><div style="font-size:.9rem;font-weight:600;margin-top:4px">Loading CO interview records…</div></div>';
+
+    try {
+      var res  = await fetch('/interview_update/co_interview_pending');
+      var data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || 'Server error');
+
+      coiPendingRows   = data.pending || [];
+      coiCompletedRows = data.completed || [];
+      coiIsAdmin       = !!data.is_admin;
+
+      coiPopulateCompanyDropdown();
+
+      var bPending = document.getElementById('coiBadgePending');
+      var bDone    = document.getElementById('coiBadgeDone');
+      if (bPending) bPending.textContent = coiPendingRows.length;
+      if (bDone)    bDone.textContent    = coiCompletedRows.length;
+
+      /* Update card badge */
+      var cardEl = document.getElementById('co-interview-count');
+      if (cardEl) cardEl.textContent = coiPendingRows.length;
+
+      coiSwitchTab('pending');
+
+    } catch (e) {
+      body.innerHTML = '<div class="coi-state-block"><div style="font-size:2rem;margin-bottom:8px">⚠️</div><div style="font-weight:600">Could not load data</div><div style="font-size:.8rem;margin-top:4px">' + e.message + '</div></div>';
+    }
+  }
+
+  function coiPopulateCompanyDropdown() {
+    var select = document.getElementById('coiCompanyFilter');
+    if (!select) return;
+
+    var currentVal = (select.value || '').toLowerCase().trim();
+    var companiesMap = new Map();
+
+    coiPendingRows.concat(coiCompletedRows).forEach(function(r) {
+      if (r.company && String(r.company).trim()) {
+        var raw = String(r.company).trim();
+        var key = raw.toLowerCase();
+
+        var display = raw.split(/\s+/).map(function(word) {
+          if (word === word.toLowerCase()) {
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          }
+          return word;
+        }).join(' ');
+
+        if (!companiesMap.has(key)) {
+          companiesMap.set(key, display);
+        } else if (raw !== raw.toLowerCase()) {
+          companiesMap.set(key, display);
+        }
+      }
+    });
+
+    var sortedKeys = Array.from(companiesMap.keys()).sort();
+
+    select.innerHTML = '<option value="">All Companies</option>' +
+      sortedKeys.map(function(k) {
+        return '<option value="' + esc(k) + '">' + esc(companiesMap.get(k)) + '</option>';
+      }).join('');
+
+    if (currentVal && companiesMap.has(currentVal)) {
+      select.value = currentVal;
+    } else {
+      select.value = '';
+    }
+  }
+
+  window.coiSwitchTab = function (tab) {
+    coiCurrentTab  = tab;
+    coiCurrentPage = 1;
+
+    var pBtn = document.getElementById('coiTabPendingBtn');
+    var dBtn = document.getElementById('coiTabDoneBtn');
+
+    if (tab === 'pending') {
+      if (pBtn) pBtn.className = 'btn btn-sm btn-primary rounded-pill px-4 fw-bold shadow-sm';
+      if (dBtn) dBtn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold';
+      var bP = document.getElementById('coiBadgePending');
+      var bD = document.getElementById('coiBadgeDone');
+      if (bP) bP.className = 'badge bg-white text-primary rounded-pill ms-1';
+      if (bD) bD.className = 'badge bg-secondary rounded-pill ms-1';
+    } else {
+      if (pBtn) pBtn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-4 fw-bold';
+      if (dBtn) dBtn.className = 'btn btn-sm btn-success rounded-pill px-4 fw-bold shadow-sm';
+      var bP = document.getElementById('coiBadgePending');
+      var bD = document.getElementById('coiBadgeDone');
+      if (bP) bP.className = 'badge bg-secondary rounded-pill ms-1';
+      if (bD) bD.className = 'badge bg-white text-success rounded-pill ms-1';
+    }
+
+    coiFilterAndPaginate();
+  };
+
+  window.coiFilterAndPaginate = function () {
+    var q        = (document.getElementById('coiSearchBox').value || '').toLowerCase().trim();
+    var coySelect = document.getElementById('coiCompanyFilter');
+    var coyVal   = (coySelect ? coySelect.value : '').toLowerCase().trim();
+    var source   = coiCurrentTab === 'pending' ? coiPendingRows : coiCompletedRows;
+
+    coiFiltered = source.filter(function (r) {
+      var rCoy = (r.company || '').toLowerCase().trim();
+      var matchesCoy = !coyVal || rCoy === coyVal;
+
+      if (!matchesCoy) return false;
+      if (!q) return true;
+
+      var str = (r.army_number + ' ' + r.rank + ' ' + r.name + ' ' + (r.company || '') + ' ' + (r.remarks || '')).toLowerCase();
+      return str.includes(q);
+    });
+
+    var totalPages = Math.ceil(coiFiltered.length / coiPageSize) || 1;
+    if (coiCurrentPage < 1) coiCurrentPage = 1;
+    if (coiCurrentPage > totalPages) coiCurrentPage = totalPages;
+
+    var start = (coiCurrentPage - 1) * coiPageSize;
+    var end   = start + coiPageSize;
+    var pageSlice = coiFiltered.slice(start, end);
+
+    coiRenderTable(pageSlice, start, coiFiltered.length, totalPages);
+    coiRenderCompanyBreakdown();
+  };
+
+  function coiRenderCompanyBreakdown() {
+    var strip = document.getElementById('coiCompanyBreakdownStrip');
+    if (!strip) return;
+
+    if (coiCurrentTab !== 'pending') {
+      strip.style.display = 'none';
+      return;
+    }
+
+    strip.style.display = 'flex';
+
+    var coyMap = new Map();
+    var totalPending = coiPendingRows.length;
+
+    coiPendingRows.forEach(function(r) {
+      if (r.company && String(r.company).trim()) {
+        var raw = String(r.company).trim();
+        var key = raw.toLowerCase();
+
+        var display = raw.split(/\s+/).map(function(w) {
+          return w.charAt(0).toUpperCase() + w.slice(1);
+        }).join(' ');
+
+        if (!coyMap.has(key)) {
+          coyMap.set(key, { display: display, count: 1 });
+        } else {
+          coyMap.get(key).count++;
+        }
+      }
+    });
+
+    var select = document.getElementById('coiCompanyFilter');
+    var activeVal = (select ? select.value : '').toLowerCase().trim();
+
+    var html = '<button type="button" class="coi-coy-pill ' + (!activeVal ? 'active' : '') + '" onclick="coiSelectCompanyPill(\'\')">' +
+      '<span>All Companies</span>' +
+      '<span class="coi-coy-count">' + totalPending + '</span>' +
+      '</button>';
+
+    var sortedKeys = Array.from(coyMap.keys()).sort();
+    sortedKeys.forEach(function(k) {
+      var item = coyMap.get(k);
+      var isActive = (activeVal === k);
+      html += '<button type="button" class="coi-coy-pill ' + (isActive ? 'active' : '') + '" onclick="coiSelectCompanyPill(\'' + esc(k) + '\')">' +
+        '<span>🏢 ' + esc(item.display) + '</span>' +
+        '<span class="coi-coy-count">' + item.count + '</span>' +
+        '</button>';
+    });
+
+    strip.innerHTML = html;
+  }
+
+  window.coiSelectCompanyPill = function(coyKey) {
+    var select = document.getElementById('coiCompanyFilter');
+    if (select) {
+      var foundOpt = Array.from(select.options).find(function(opt) {
+        return opt.value.toLowerCase().trim() === coyKey.toLowerCase().trim();
+      });
+      select.value = foundOpt ? foundOpt.value : coyKey;
+    }
+    coiFilterRows();
+  };
+
+  window.coiChangePage = function (delta) {
+    coiCurrentPage += delta;
+    coiFilterAndPaginate();
+  };
+
+  window.coiFilterRows = function () {
+    coiCurrentPage = 1;
+    coiFilterAndPaginate();
+  };
+
+  function coiRenderTable(pageRows, startIndex, totalFilteredCount, totalPages) {
+    var body      = document.getElementById('coiBody');
+    var badge     = document.getElementById('coi-badge-count');
+    var tot       = document.getElementById('coi-tot');
+    var startEl   = document.getElementById('coiPageStart');
+    var endEl     = document.getElementById('coiPageEnd');
+    var pageNum   = document.getElementById('coiCurrentPageNum');
+    var totalPagesEl = document.getElementById('coiTotalPagesNum');
+    var prevBtn   = document.getElementById('coiPrevBtn');
+    var nextBtn   = document.getElementById('coiNextBtn');
+    var footLabel = document.getElementById('coiFootLabel');
+
+    var dataset = coiCurrentTab === 'pending' ? coiPendingRows : coiCompletedRows;
+    if (badge) badge.textContent = dataset.length;
+    if (tot)   tot.textContent   = totalFilteredCount;
+    if (footLabel) footLabel.textContent = coiCurrentTab === 'pending' ? 'pending CO interviews' : 'completed CO interviews';
+
+    if (totalFilteredCount === 0) {
+      if (startEl) startEl.textContent = 0;
+      if (endEl)   endEl.textContent   = 0;
+    } else {
+      if (startEl) startEl.textContent = startIndex + 1;
+      if (endEl)   endEl.textContent   = Math.min(startIndex + pageRows.length, totalFilteredCount);
+    }
+
+    if (pageNum) pageNum.textContent = totalPages === 0 ? 0 : coiCurrentPage;
+    if (totalPagesEl) totalPagesEl.textContent = totalPages;
+
+    if (prevBtn) prevBtn.disabled = coiCurrentPage <= 1;
+    if (nextBtn) nextBtn.disabled = coiCurrentPage >= totalPages;
+
+    var cardEl = document.getElementById('co-interview-count');
+    if (cardEl && coiCurrentTab === 'pending') cardEl.textContent = dataset.length;
+
+    if (totalFilteredCount === 0) {
+      body.innerHTML = coiCurrentTab === 'pending'
+        ? '<div class="coi-state-block"><div style="font-size:2.5rem;margin-bottom:10px">🎉</div><div style="font-weight:700;font-size:1rem;margin-bottom:5px">All CO interviews complete!</div><div style="font-size:.84rem">No pending CO interviews found.</div></div>'
+        : '<div class="coi-state-block"><div style="font-size:2.5rem;margin-bottom:10px">📋</div><div style="font-weight:700;font-size:1rem;margin-bottom:5px">No completed CO interviews yet!</div><div style="font-size:.84rem">Completed CO interview records will appear here.</div></div>';
+      return;
+    }
+
+    var html = pageRows.map(function (r, i) {
+      var rowNum = startIndex + i + 1;
+      if (coiCurrentTab === 'pending') {
+        var actionCell = '<td><button class="coi-done-btn" data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '" data-name="' + esc(r.name) + '" onclick="coiOpenOverlay(this)">✓ CO Interview Done</button></td>';
+
+        return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
+          '<td class="coi-sno">' + rowNum + '</td>' +
+          '<td><span class="coi-army">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="coi-rank">' + esc(r.rank) + '</span></td>' +
+          '<td class="coi-name text-start text-uppercase" style="text-align:left !important;">' + esc(String(r.name || '').toUpperCase()) + '</td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
+          actionCell +
+        '</tr>';
+      } else {
+        return '<tr data-ci-id="' + (r.ci_id || '') + '" data-army-number="' + esc(r.army_number) + '">' +
+          '<td class="coi-sno">' + rowNum + '</td>' +
+          '<td><span class="coi-army">' + esc(r.army_number) + '</span></td>' +
+          '<td><span class="coi-rank">' + esc(r.rank) + '</span></td>' +
+          '<td class="coi-name text-start text-uppercase" style="text-align:left !important;">' + esc(String(r.name || '').toUpperCase()) + '</td>' +
+          '<td><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.8rem;font-weight:600;">' + esc(r.company || '—') + '</span></td>' +
+          '<td><span class="badge bg-success-subtle text-success border px-2 py-1" style="font-size:0.78rem;font-weight:600;"><i class="fas fa-calendar-check me-1"></i>' + esc(r.co_interview_done_on || 'Done') + '</span></td>' +
+          '<td class="text-start" style="max-width:520px;">' +
+            (r.remarks
+              ? '<div class="coi-remarks-scroll" title="' + esc(r.remarks) + '"><i class="fas fa-quote-left text-muted me-1" style="font-size:0.7rem;"></i>' + esc(r.remarks) + '</div>'
+              : '<span style="color:#94a3b8">—</span>') +
+          '</td>' +
+        '</tr>';
+      }
+    }).join('');
+
+    var headers = coiCurrentTab === 'pending'
+      ? '<thead><tr><th class="coi-sno" style="text-align:left !important;">#</th><th style="text-align:left !important;">Army Number</th><th style="text-align:left !important;">Rank</th><th style="text-align:left !important;">Name</th><th style="text-align:left !important;">Company</th><th style="text-align:left !important;">Action</th></tr></thead>'
+      : '<thead><tr><th class="coi-sno" style="text-align:left !important;">#</th><th style="text-align:left !important;">Army Number</th><th style="text-align:left !important;">Rank</th><th style="text-align:left !important;">Name</th><th style="text-align:left !important;">Company</th><th style="text-align:left !important;">CO Interview Done On</th><th style="text-align:left !important;">Remarks</th></tr></thead>';
+
+    body.innerHTML =
+      '<div class="coi-tbl-wrap">' +
+        '<table class="coi-tbl" id="coiTable">' +
+          headers +
+          '<tbody id="coiTbody">' + html + '</tbody>' +
+        '</table>' +
+      '</div>';
+  }
+
+  window.coiUpdateWordCount = function () {
+    var ta    = document.getElementById('coiOverlayTA');
+    var cntEl = document.getElementById('coiWordCount');
+    var msgEl = document.getElementById('coiWordCountMsg');
+    var btn   = document.getElementById('coiOverlayConfirm');
+    if (!ta) return;
+
+    var text  = (ta.value || '').trim();
+    var count = text.length;
+
+    if (cntEl) cntEl.textContent = count;
+
+    if (count >= 20) {
+      if (msgEl) {
+        msgEl.className = 'fw-bold text-success';
+        msgEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Minimum 20 characters requirement met (' + count + ' characters)';
+      }
+      if (btn) btn.disabled = false;
+    } else {
+      var remaining = 20 - count;
+      if (msgEl) {
+        msgEl.className = 'fw-bold text-danger';
+        msgEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Minimum 20 characters required (' + count + '/20 characters — need ' + remaining + ' more)';
+      }
+      if (btn) btn.disabled = true;
+    }
+  };
+
+  window.coiOpenOverlay = function (btn) {
+    coiActiveCiId         = btn.dataset.ciId || null;
+    coiActiveArmyNumber   = btn.dataset.armyNumber || null;
+    coiActiveRow          = btn.closest('tr');
+    var name             = btn.dataset.name || 'this individual';
+    var sub              = document.getElementById('coiOverlaySub');
+    if (sub) sub.innerHTML = 'Adding CO remarks for <strong>' + name + '</strong>';
+    var ta = document.getElementById('coiOverlayTA');
+    if (ta) ta.value = '';
+    coiUpdateWordCount();
+    document.getElementById('coiOverlay').classList.add('coi-show');
+    setTimeout(function() { if (ta) ta.focus(); }, 100);
+  };
+
+  window.coiCancelOverlay = function () {
+    document.getElementById('coiOverlay').classList.remove('coi-show');
+    coiActiveCiId         = null;
+    coiActiveArmyNumber   = null;
+    coiActiveRow          = null;
+  };
+
+  window.coiSubmitDone = async function () {
+    if (!coiActiveCiId && !coiActiveArmyNumber) return;
+    var remarks  = (document.getElementById('coiOverlayTA').value || '').trim();
+
+    if (remarks.length < 20) {
+      coiFireToast('Remarks must be at least 20 characters minimum! Current length: ' + remarks.length + ' characters.', true);
+      coiUpdateWordCount();
+      return;
+    }
+
+    var confirm  = document.getElementById('coiOverlayConfirm');
+    if (confirm) { confirm.disabled = true; confirm.textContent = 'Saving…'; }
+
+    try {
+      var payload = { remarks: remarks };
+      if (coiActiveCiId) payload.ci_id = parseInt(coiActiveCiId);
+      if (coiActiveArmyNumber) payload.army_number = coiActiveArmyNumber;
+
+      var res  = await fetch('/interview_update/co_interview_done', {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(payload)
+      });
+      var data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || 'Server error');
+
+      coiCancelOverlay();
+      coiFireToast('CO Interview marked as done!');
+      await coiLoad();
+
+    } catch (e) {
+      coiFireToast('Error: ' + e.message, true);
+    } finally {
+      if (confirm) { confirm.disabled = false; confirm.textContent = '✓ Confirm CO Interview Done'; }
+    }
+  };
+
+  function coiFireToast(msg, isError) {
+    var t = document.getElementById('coiToast');
+    var m = document.getElementById('coiToastTxt');
+    if (!t) return;
+    t.style.background = isError ? '#dc2626' : '#16a34a';
+    if (m) m.textContent = msg;
+    t.classList.add('coi-toast-on');
+    setTimeout(function () { t.classList.remove('coi-toast-on'); }, 3500);
+  }
+
+  function esc(str) {
+    if (str == null) return '—';
+    var d = document.createElement('div');
+    d.textContent = String(str);
+    return d.innerHTML;
+  }
+
+})();
+</script>

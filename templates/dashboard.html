@@ -430,6 +430,7 @@
 
       {% if role in ['CO','2IC','ADJUTANT','OC'] %}
         {% include 'modals/alarm/agniveer_test_alarms.html' %}
+        {% include 'modals/alarm/sensitive_alarm.html' %}
       {% endif %}
     </div>
 
@@ -724,9 +725,20 @@
       {# ── COMPANY INTERVIEW CARD ── #}
       {% if role in ['CO','2IC','ADJUTANT','OC','Subedar Major','S/JCO','NCO COMN','NCO CHQ','NCO IT','NCO MW','NCO SIGCEN','NCO MCCS','NCO RHQ','NCO LRW','NCO QM','NCO MT','NCO TM','NCO RPNA','JCO COMN','JCO CHQ','JCO IT','JCO MW','JCO SIGCEN','JCO MCCS','JCO RHQ','JCO TM','JCO MT','JCO LRW','JCO QM','ONCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
-        <span class="sc-label">Interview</span>
+        <span class="sc-label">OC Interview</span>
         <div class="sc-right">
           <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-sub">Pending</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {# ── CO INTERVIEW CARD ── #}
+      {% if role in ['CO','2IC','ADJUTANT','COMMANDING OFFICER'] or (role and role|upper in ['CO','2IC','ADJUTANT','COMMANDING OFFICER']) %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
+        <span class="sc-label">CO Interview</span>
+        <div class="sc-right">
+          <span class="sc-val" id="co-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub">Pending</span>
         </div>
       </div>
@@ -782,6 +794,7 @@
     {% include 'modals/messenger/modal.html' %}
     {% include 'modals/Sanctioned_leaves/sanction_leave_modal.html' %}
     {% include 'modals/company_interview/modal.html' %}
+    {% include 'modals/co_interview/modal.html' %}
 
     {% if role in ['O CENTRE NCO'] %}
     <div class="modal fade" id="tradeModal" tabindex="-1">
@@ -1059,6 +1072,18 @@
       if (!r.ok) throw new Error("HTTP " + r.status);
       var d = await r.json();
       safeSet(id, d[key] != null ? d[key] : "0");
+      if (id === "sensitive-count" && d.alarm_count != null) {
+        var alarmBadge = document.getElementById("sensitive-alarm-badge");
+        if (alarmBadge) {
+          if (d.alarm_count > 0) {
+            alarmBadge.style.display = "inline-block";
+            var cntEl = document.getElementById("sensitive-alarm-count");
+            if (cntEl) cntEl.textContent = d.alarm_count;
+          } else {
+            alarmBadge.style.display = "none";
+          }
+        }
+      }
     } catch (e) {
       console.error("Error fetching " + id + ":", e);
       safeSet(id, "—");
@@ -1126,6 +1151,7 @@
       { id: "count-dues-out",          endpoint: "/dues/count-dues-out",                    key: "count_dues_out" },
       { id: "board-count",             endpoint: "/api/dashboard/boards",                   key: "count" },
       { id: "company-interview-count", endpoint: "/interview_update/company_interview_count", key: "count" },
+      { id: "co-interview-count",      endpoint: "/interview_update/co_interview_count",      key: "count" },
     ];
 
     var promises = [];

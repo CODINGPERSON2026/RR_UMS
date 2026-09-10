@@ -167,9 +167,14 @@ def get_sensitive_list():
 
         rows = cursor.fetchall()
 
+        now = datetime.now()
         result = []
+        alarm_count = 0
+        recent_30_count = 0
+
         for r in rows:
             army_number = r[0]
+            marked_on_dt = r[1]
 
             cursor.execute("""
                 SELECT reason, added_by, added_by_role, added_on
@@ -178,6 +183,20 @@ def get_sensitive_list():
                 ORDER BY added_on ASC
             """, (army_number,))
             logs = cursor.fetchall()
+
+            # Determine latest remark or marking date
+            latest_date = marked_on_dt
+            if logs and logs[-1][3]:
+                latest_date = logs[-1][3]
+
+            days_since = (now - latest_date).days if latest_date else 0
+            months_since = round(days_since / 30.0, 1)
+            is_alarm = days_since >= 90  # 3 months (90 days) threshold
+
+            if is_alarm:
+                alarm_count += 1
+            if days_since <= 30:
+                recent_30_count += 1
 
             reason_logs = [{
                 "reason": l[0],
@@ -188,14 +207,30 @@ def get_sensitive_list():
 
             result.append({
                 "army_number": army_number,
-                "marked_on": r[1].strftime("%Y-%m-%d %H:%M:%S") if r[1] else "",
+                "marked_on": marked_on_dt.strftime("%Y-%m-%d %H:%M:%S") if marked_on_dt else "",
                 "name": r[2],
                 "rank": r[3],
                 "company": r[4] or "N/A",
-                "reason_logs": reason_logs
+                "reason_logs": reason_logs,
+                "last_remark_date": latest_date.strftime("%d %b %Y, %H:%M") if latest_date else "",
+                "days_since_last_remark": days_since,
+                "months_since_last_remark": months_since,
+                "is_alarm": is_alarm
             })
 
-        return jsonify({"success": True, "data": result})
+        total_count = len(result)
+        up_to_date_count = total_count - alarm_count
+
+        return jsonify({
+            "success": True,
+            "data": result,
+            "metrics": {
+                "total_count": total_count,
+                "alarm_count": alarm_count,
+                "recent_30_count": recent_30_count,
+                "up_to_date_count": up_to_date_count
+            }
+        })
 
     finally:
         cursor.close()

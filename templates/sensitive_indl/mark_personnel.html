@@ -69,33 +69,47 @@
     }
     .btn-back-link:hover { background: rgba(255,255,255,0.22); color: white; }
 
-    /* ── Metrics Cards ── */
+    /* ── Metrics Cards (Full Width Grid) ── */
     .sp-metrics-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-        margin-bottom: 1.5rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+        width: 100%;
     }
+    @media (max-width: 992px) {
+        .sp-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+        .sp-metrics-grid { grid-template-columns: 1fr; }
+    }
+
     .sp-metric-card {
         background: var(--card-bg-solid, var(--card-background, #ffffff));
         border: 1px solid var(--border-color, #e2e8f0);
-        border-radius: 14px;
-        padding: 1.1rem 1.3rem;
+        border-radius: 12px;
+        padding: 0.65rem 1rem;
         display: flex;
         align-items: center;
-        gap: 1rem;
-        box-shadow: 0 2px 12px var(--shadow, rgba(0,0,0,0.04));
+        gap: 0.85rem;
+        width: 100%;
+        box-shadow: 0 2px 8px var(--shadow, rgba(0,0,0,0.03));
+        transition: all 0.15s ease;
+    }
+    .sp-metric-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px var(--shadow, rgba(0,0,0,0.06));
     }
     .sp-metric-icon {
-        width: 44px; height: 44px; border-radius: 12px;
+        width: 36px; height: 36px; border-radius: 10px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 1.15rem; flex-shrink: 0;
+        font-size: 0.95rem; flex-shrink: 0;
     }
     .sp-metric-icon.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
     .sp-metric-icon.amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
     .sp-metric-icon.green { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-    .sp-metric-val { font-size: 1.35rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
-    .sp-metric-lbl { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .sp-metric-val { font-size: 1.15rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+    .sp-metric-lbl { font-size: 0.72rem; font-weight: 600; color: var(--text-secondary); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.03em; }
 
     /* ── Main List Card ── */
     .card {
@@ -155,7 +169,7 @@
     .table tbody td { vertical-align: middle; padding: 0.85rem 1.25rem; border-color: var(--border-color, #f0f2f7); color: var(--text-primary); }
     .table tbody tr:hover { background: var(--nav-link-hover-bg, #f7f8fc); }
 
-    .action-btn { padding: 0.4rem 0.75rem; font-size: 0.82rem; border-radius: 8px; margin: 0 3px; border: none; cursor: pointer; transition: all 0.15s; }
+    .action-btn { width: 28px; height: 28px; padding: 0; font-size: 0.75rem; border-radius: 6px; margin: 0 2px; border: none; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; }
     .btn-view   { background: var(--nav-link-active-bg, rgba(59,130,246,0.12)); color: var(--primary-color, #3b82f6); }
     .btn-view:hover   { background: var(--primary-color, #3b82f6); color: white; }
     .btn-remark { background: rgba(245, 158, 11, 0.12); color: #d4900a; }
@@ -275,33 +289,46 @@
     {% include 'navbar/navbar.html' %}
 
     <div class="container-fluid container-main">
-        <!-- ── Page Header ── -->
-        <div class="sp-page-header mb-2">
-            <div class="sp-header-title">
-                <div class="sp-header-icon">
-                    <i class="fa-solid fa-user-shield"></i>
-                </div>
-                <div>
-                    <h4>Sensitive Personnel Register</h4>
-                    <p>Security Classification, Reason Log &amp; Monitoring System</p>
-                </div>
-            </div>
-            <div class="sp-header-actions">
-                <button type="button" class="btn-mark-trigger" data-bs-toggle="modal" data-bs-target="#addSensitiveModal" id="toggleAddPanel">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>Mark New Personnel as Sensitive</span>
-                </button>
-                <a href="javascript:history.back()" class="btn-back-link">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Go Back</span>
-                </a>
-            </div>
-        </div>
-
-        <div class="text-center py-2 mb-3 rounded-3" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.15);">
+        <!-- ── Minimal Top Navigation Row ── -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <a href="/" class="btn btn-sm btn-outline-secondary fw-semibold rounded-pill px-3 py-1" style="font-size:0.85rem;">
+                <i class="fa-solid fa-house me-1"></i> Back to Home
+            </a>
             <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
                 <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY OC
             </span>
+        </div>
+
+        <!-- ── Metrics Grid (Full Width 4 Cards) ── -->
+        <div class="sp-metrics-grid">
+            <div class="sp-metric-card" id="filterCardTotal" style="cursor: pointer;" title="Show All Records">
+                <div class="sp-metric-icon blue"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <div class="sp-metric-val" id="metricTotal">0</div>
+                    <div class="sp-metric-lbl">Total Sensitive</div>
+                </div>
+            </div>
+            <div class="sp-metric-card" id="filterCardAlarm" style="cursor: pointer; border-color: rgba(239, 68, 68, 0.3);" title="Click to filter 3-Month Inactivity Alarms">
+                <div class="sp-metric-icon" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                <div>
+                    <div class="sp-metric-val text-danger" id="metricAlarms">0</div>
+                    <div class="sp-metric-lbl text-danger">3-Month Alarms</div>
+                </div>
+            </div>
+            <div class="sp-metric-card" id="filterCardRecent" style="cursor: pointer;" title="Click to filter Recent Updates (<30 Days)">
+                <div class="sp-metric-icon amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                <div>
+                    <div class="sp-metric-val text-warning" id="metricRecent">0</div>
+                    <div class="sp-metric-lbl">Recent (&lt;30 Days)</div>
+                </div>
+            </div>
+            <div class="sp-metric-card" id="filterCardUpToDate" style="cursor: pointer;" title="Click to filter Up-to-Date Records">
+                <div class="sp-metric-icon green"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                    <div class="sp-metric-val text-success" id="metricUpToDate">0</div>
+                    <div class="sp-metric-lbl">Up To Date</div>
+                </div>
+            </div>
         </div>
 
         <!-- ── Classified Personnel List ── -->
@@ -311,8 +338,8 @@
                     <i class="fa-solid fa-shield-virus text-warning"></i>
                     <span>Classified Personnel Roster</span>
                 </div>
-                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold d-md-none" data-bs-toggle="modal" data-bs-target="#addSensitiveModal">
-                    <i class="fa-solid fa-plus me-1"></i> Mark
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#addSensitiveModal" id="toggleAddPanel">
+                    <i class="fa-solid fa-plus-circle me-1"></i> Mark New Personnel as Sensitive
                 </button>
             </div>
 
@@ -323,6 +350,12 @@
                     <input type="text" id="mainSearchInput" class="form-control form-control-sm"
                            placeholder="Search by name, rank, army number, or company...">
                 </div>
+                <select id="filterAlarmStatus" class="filter-select">
+                    <option value="all">All Statuses</option>
+                    <option value="alarms">⚠️ 3-Month Alarms Only</option>
+                    <option value="recent">⚡ Recent (&lt;30 Days)</option>
+                    <option value="uptodate">✓ Up to Date Only</option>
+                </select>
                 <select id="filterCount" class="filter-select">
                     <option value="5">Show 5</option>
                     <option value="10" selected>Show 10</option>
@@ -338,10 +371,10 @@
                         <thead>
                             <tr>
                                 <th>Army No.</th>
-                                <th>Rank</th>
                                 <th style="text-align: left; text-transform: uppercase;">Name</th>
                                 <th>Company</th>
-                                <th>Remarks</th>
+                                <th>Last Remark Date</th>
+                                <th>Alarm Status</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -465,6 +498,7 @@
                 </div>
             </div>
             <div class="modal-section">
+                <div id="viewAlarmBanner" class="mb-3" style="display:none;"></div>
                 <div class="modal-section-title">
                     <i class="fa-solid fa-comments text-primary"></i>
                     Classification Remarks Log Thread
@@ -732,34 +766,59 @@ function refreshSensitiveList() {
 
             if (!res.success || !res.data || res.data.length === 0) {
                 document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('metricTotal').textContent = '0';
+                document.getElementById('metricAlarms').textContent = '0';
+                if (document.getElementById('metricRecent')) document.getElementById('metricRecent').textContent = '0';
+                document.getElementById('metricUpToDate').textContent = '0';
                 return;
+            }
+
+            // Update Metrics Cards
+            if (res.metrics) {
+                document.getElementById('metricTotal').textContent    = res.metrics.total_count || 0;
+                document.getElementById('metricAlarms').textContent   = res.metrics.alarm_count || 0;
+                if (document.getElementById('metricRecent')) document.getElementById('metricRecent').textContent = res.metrics.recent_30_count || 0;
+                document.getElementById('metricUpToDate').textContent = res.metrics.up_to_date_count || 0;
             }
 
             res.data.forEach(s => {
                 const row = document.createElement('tr');
                 row.className = 'sensitive-row';
+                if (s.is_alarm) row.classList.add('alarm-row');
+                row.dataset.daysSince = s.days_since_last_remark;
+
                 const safeLogsJson = JSON.stringify(s.reason_logs || []).replace(/'/g, '&#39;');
                 const logsCount    = (s.reason_logs || []).length;
                 const initials     = getInitials(s.name || '?');
                 const avatarBg     = nameToColor(s.name || '');
 
+                const lastRemarkText = s.last_remark_date || 'N/A';
+                const isAlarm        = s.is_alarm;
+
+                const alarmBadgeHtml = isAlarm
+                    ? `<span class="badge bg-danger shadow-sm px-2 py-1" style="font-size:0.75rem;"><i class="fa-solid fa-triangle-exclamation me-1"></i> No remarks (${s.months_since_last_remark} mos)</span>`
+                    : `<span class="badge text-success bg-success-subtle border border-success px-2 py-1" style="font-size:0.75rem;"><i class="fa-solid fa-circle-check me-1"></i> Up to Date</span>`;
+
+                row.dataset.isAlarm = isAlarm ? 'true' : 'false';
+
                 row.innerHTML = `
                     <td><code class="text-primary fw-semibold px-2 py-1 bg-light border rounded" style="font-size:0.83rem;">${escapeHtml(s.army_number)}</code></td>
-                    <td><span class="badge rounded-pill" style="background:var(--nav-link-active-bg, rgba(59,130,246,0.12));color:var(--primary-color, #3b82f6);font-size:0.75rem;font-weight:700;">${escapeHtml(s.rank)}</span></td>
-                    <td style="text-align: left;">
-                        <strong style="font-size:0.88rem; font-weight:700;">${(escapeHtml(s.name) || '').toUpperCase()}</strong>
+                    <td style="text-align: left; vertical-align: middle;">
+                        <div style="line-height: 1.2;">
+                            <sup style="font-size: 0.68rem; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.05em; top: -0.2em; display: inline-block; margin-bottom: 1px;">${escapeHtml(s.rank)}</sup>
+                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary);">${(escapeHtml(s.name) || '').toUpperCase()}</div>
+                        </div>
                     </td>
                     <td><span class="badge bg-light text-dark border" style="font-size:0.78rem;">${escapeHtml(s.company || 'N/A')}</span></td>
-                    <td>
-                        ${logsCount > 0
-                            ? `<span class="badge rounded-pill bg-primary" style="font-size:0.75rem;"><i class="fa-solid fa-comments me-1"></i>${logsCount} remark${logsCount > 1 ? 's' : ''}</span>`
-                            : `<span class="badge rounded-pill bg-light text-muted border" style="font-size:0.72rem;">None</span>`}
-                    </td>
+                    <td><span style="font-size:0.82rem; font-weight:600; color:var(--text-primary);"><i class="fa-regular fa-clock me-1 text-muted"></i>${escapeHtml(lastRemarkText)}</span></td>
+                    <td>${alarmBadgeHtml}</td>
                     <td class="text-center">
                         <button class="btn action-btn btn-view" title="View Thread & Details"
                             data-army="${escapeHtml(s.army_number)}" data-rank="${escapeHtml(s.rank)}"
                             data-name="${escapeHtml(s.name)}" data-company="${escapeHtml(s.company || 'N/A')}"
-                            data-marked="${escapeHtml(s.marked_on)}" data-logs='${safeLogsJson}'>
+                            data-marked="${escapeHtml(s.marked_on)}" data-alarm="${isAlarm}"
+                            data-lastremark="${escapeHtml(lastRemarkText)}" data-days="${s.days_since_last_remark}"
+                            data-months="${s.months_since_last_remark}" data-logs='${safeLogsJson}'>
                             <i class="fa-solid fa-eye"></i>
                         </button>
                         <button class="btn action-btn btn-remark" title="Add Remark"
@@ -791,7 +850,11 @@ function attachListeners() {
             openViewModal(
                 this.dataset.army, this.dataset.name,
                 this.dataset.rank, this.dataset.company,
-                this.dataset.marked, logs
+                this.dataset.marked, logs,
+                this.dataset.alarm === 'true',
+                this.dataset.lastremark,
+                this.dataset.days,
+                this.dataset.months
             );
         });
     });
@@ -804,7 +867,7 @@ function attachListeners() {
 }
 
 // ── Open View Modal ────────────────────────────────────────────────────────
-function openViewModal(armyNumber, name, rank, company, markedOn, logs) {
+function openViewModal(armyNumber, name, rank, company, markedOn, logs, isAlarm, lastRemark, daysSince, monthsSince) {
     const avatarEl = document.getElementById('viewAvatarBig');
     avatarEl.textContent  = getInitials(name);
     avatarEl.style.background = nameToColor(name);
@@ -813,6 +876,26 @@ function openViewModal(armyNumber, name, rank, company, markedOn, logs) {
     document.getElementById('viewArmyNumber').textContent = armyNumber;
     document.getElementById('viewCompany').textContent    = company;
     document.getElementById('viewMarkedOn').textContent   = markedOn;
+    
+    // Render 3-Month Alarm Banner inside View Modal
+    const alarmBanner = document.getElementById('viewAlarmBanner');
+    if (alarmBanner) {
+        if (isAlarm) {
+            alarmBanner.style.display = 'block';
+            alarmBanner.innerHTML = `
+                <div class="alert alert-danger d-flex align-items-center gap-3 shadow-sm mb-0 p-3" style="border-radius:12px; border:1px solid #f87171; background: rgba(239, 68, 68, 0.08);">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x text-danger flex-shrink-0"></i>
+                    <div>
+                        <strong class="d-block text-danger" style="font-size:0.95rem;">⚠️ 3-Month Inactivity Alarm Active</strong>
+                        <span style="font-size:0.85rem; color:var(--text-primary);">No classification remarks have been logged for this personnel in the last <strong>${daysSince} days (~${monthsSince} months)</strong>. Last remark date: <strong>${lastRemark}</strong>. Please review and log an updated remark below.</span>
+                    </div>
+                </div>`;
+        } else {
+            alarmBanner.style.display = 'none';
+            alarmBanner.innerHTML = '';
+        }
+    }
+
     renderReasonThread(logs);
     new bootstrap.Modal(document.getElementById('viewModal')).show();
 }
@@ -871,8 +954,23 @@ function removePersonnel(armyNumber, name) {
 // ── Search & Filter Roster ─────────────────────────────────────────────────
 function applySearch() {
     const q = document.getElementById('mainSearchInput').value.toLowerCase().trim();
+    const statusFilter = document.getElementById('filterAlarmStatus').value;
+
     document.querySelectorAll('.sensitive-row').forEach(row => {
-        row.style.display = (!q || row.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        const matchesQuery = (!q || row.textContent.toLowerCase().includes(q));
+        const isAlarm = row.dataset.isAlarm === 'true';
+        const daysSince = parseInt(row.dataset.daysSince || '999', 10);
+
+        let matchesStatus = true;
+        if (statusFilter === 'alarms') {
+            matchesStatus = isAlarm;
+        } else if (statusFilter === 'recent') {
+            matchesStatus = (daysSince <= 30);
+        } else if (statusFilter === 'uptodate') {
+            matchesStatus = !isAlarm;
+        }
+
+        row.style.display = (matchesQuery && matchesStatus) ? '' : 'none';
     });
     applyFilter();
 }
@@ -888,8 +986,29 @@ function applyFilter() {
 }
 
 document.getElementById('mainSearchInput').addEventListener('input', applySearch);
+document.getElementById('filterAlarmStatus').addEventListener('change', applySearch);
 document.getElementById('filterCount').addEventListener('change', () => {
     document.querySelectorAll('.sensitive-row').forEach(r => r.style.display = '');
+    applySearch();
+});
+
+// Metric Cards Click Handlers
+document.getElementById('filterCardTotal').addEventListener('click', () => {
+    document.getElementById('filterAlarmStatus').value = 'all';
+    applySearch();
+});
+document.getElementById('filterCardAlarm').addEventListener('click', () => {
+    document.getElementById('filterAlarmStatus').value = 'alarms';
+    applySearch();
+});
+if (document.getElementById('filterCardRecent')) {
+    document.getElementById('filterCardRecent').addEventListener('click', () => {
+        document.getElementById('filterAlarmStatus').value = 'recent';
+        applySearch();
+    });
+}
+document.getElementById('filterCardUpToDate').addEventListener('click', () => {
+    document.getElementById('filterAlarmStatus').value = 'uptodate';
     applySearch();
 });
 

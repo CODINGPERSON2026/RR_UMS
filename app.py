@@ -179,12 +179,14 @@ def ensure_company_interview_table():
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS company_interview (
-                id                INT AUTO_INCREMENT PRIMARY KEY,
-                army_number       VARCHAR(100) NOT NULL,
-                interview_status  TINYINT      NOT NULL DEFAULT 0,
-                interview_done_on DATE         DEFAULT NULL,
-                remarks           TEXT         DEFAULT NULL,
-                created_at        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+                id                   INT AUTO_INCREMENT PRIMARY KEY,
+                army_number          VARCHAR(100) NOT NULL,
+                interview_status     TINYINT      NOT NULL DEFAULT 0,
+                interview_done_on    DATE         DEFAULT NULL,
+                remarks              TEXT         DEFAULT NULL,
+                created_at           TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
+                co_interview_status  TINYINT      NOT NULL DEFAULT 0,
+                co_interview_done_on DATE         DEFAULT NULL,
                 CONSTRAINT fk_ci_army
                     FOREIGN KEY (army_number)
                     REFERENCES personnel(army_number)
@@ -192,6 +194,20 @@ def ensure_company_interview_table():
             )
         """)
         conn.commit()
+
+        # Safely alter table to add columns if table was created earlier without them
+        try:
+            cursor.execute("ALTER TABLE company_interview ADD COLUMN co_interview_status TINYINT NOT NULL DEFAULT 0")
+            conn.commit()
+        except Exception:
+            pass
+
+        try:
+            cursor.execute("ALTER TABLE company_interview ADD COLUMN co_interview_done_on DATE DEFAULT NULL")
+            conn.commit()
+        except Exception:
+            pass
+
         cursor.close()
         conn.close()
         _company_interview_table_ready = True
@@ -343,21 +359,20 @@ def mt():
     
 @app.route('/personal_info')
 def personal_info():
-    return render_template('personalInfoView.html')
+    return redirect('/personnel_information')
 
 @app.route('/personal/create', methods=['GET', 'POST'])
 def create_personal():
-    if request.method == 'POST':
-        data = request.form.to_dict()
-    return render_template('personalInfoView.html', form_view='create')
+    return redirect('/personnel_information')
 
 @app.route('/personal/update')
 def update_personal():
-    return render_template('personalInfoView.html', form_view='update')
+    return redirect('/personnel_information/update')
 
 @app.route('/personal/view')
 def view_personal():
-    return render_template('personalInfoView.html', form_view='view')
+    return redirect('/personnel_information')
+
 
 
 @app.route('/search_personnel', methods=['GET', 'POST'])
@@ -2169,17 +2184,36 @@ WHERE company = %s
         )
         assigned_alarm_rows = cursor.fetchall()
 
-        # 6️⃣ Sensitive Personnel Count
-        cursor.execute(
-            '''
-            SELECT COUNT(*) AS count
-            FROM sensitive_marking sm
-            LEFT JOIN personnel p ON sm.army_number = p.army_number
-            ''' + (f" WHERE p.company = %s" if company != "Admin" else ""),
-            (company,) if company != "Admin" else ()
-        )
-        sensitive_result = cursor.fetchone()
-        sensitive_count = sensitive_result['count'] if sensitive_result else 0
+        # 6️⃣ Sensitive Personnel Count & 3-Month Inactivity Alarm Count
+        if company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
+            cursor.execute("""
+                SELECT s.army_number, s.marked_on
+                FROM sensitive_marking s
+                JOIN personnel p ON s.army_number = p.army_number
+            """)
+        else:
+            cursor.execute("""
+                SELECT s.army_number, s.marked_on
+                FROM sensitive_marking s
+                JOIN personnel p ON s.army_number = p.army_number
+                WHERE LOWER(p.company) = LOWER(%s)
+            """, (company,))
+        sens_rows = cursor.fetchall()
+        sensitive_count = len(sens_rows)
+        sensitive_alarm_count = 0
+        now_dt = datetime.now()
+        for sr in sens_rows:
+            army_no = sr['army_number']
+            marked_on = sr['marked_on']
+            cursor.execute("""
+                SELECT MAX(added_on) AS last_date
+                FROM sensitive_reason_log
+                WHERE army_number = %s
+            """, (army_no,))
+            last_res = cursor.fetchone()
+            latest_date = last_res['last_date'] if (last_res and last_res['last_date']) else marked_on
+            if latest_date and (now_dt - latest_date).days >= 90:
+                sensitive_alarm_count += 1
         
         # 7️⃣ Boards Count
         cursor.execute("SELECT COUNT(*) AS count FROM boards")
@@ -2317,6 +2351,7 @@ WHERE company = %s
             "boards_count": boards_count, 
             "assigned_alarm": assigned_alarm_rows,
             "sensitive_count": sensitive_count,
+            "sensitive_alarm_count": sensitive_alarm_count,
             "attachment_count": td_attachments,
             "courses_count": courses_count,
             "loan_count": loan_count,
@@ -4307,27 +4342,46 @@ def get_sensitive_count():
     if not user:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
-    company = user['company']
+    company = user.get('company')
+    role = user.get('role', '')
     
     try:
-        query = """
-            SELECT COUNT(*) AS count
-            FROM sensitive_marking sm
-            LEFT JOIN personnel p ON sm.army_number = p.army_number
-            WHERE 1=1
-        """
-        params = []
-        if company != "Admin":
-            query += " AND p.company = %s"
-            params.append(company)
+        if company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
+            cursor.execute("""
+                SELECT s.army_number, s.marked_on
+                FROM sensitive_marking s
+                JOIN personnel p ON s.army_number = p.army_number
+            """)
+        else:
+            cursor.execute("""
+                SELECT s.army_number, s.marked_on
+                FROM sensitive_marking s
+                JOIN personnel p ON s.army_number = p.army_number
+                WHERE LOWER(p.company) = LOWER(%s)
+            """, (company,))
         
-        cursor.execute(query, params)
-        result = cursor.fetchone()
-        count = result['count'] if result else 0
-        
+        rows = cursor.fetchall()
+        count = len(rows)
+        alarm_count = 0
+        now = datetime.now()
+
+        for r in rows:
+            army_no = r['army_number']
+            marked_on = r['marked_on']
+            cursor.execute("""
+                SELECT MAX(added_on) AS last_date
+                FROM sensitive_reason_log
+                WHERE army_number = %s
+            """, (army_no,))
+            last_res = cursor.fetchone()
+            latest_date = last_res['last_date'] if (last_res and last_res['last_date']) else marked_on
+            if latest_date and (now - latest_date).days >= 90:
+                alarm_count += 1
+
         return jsonify({
             "status": "success",
-            "count": count
+            "count": count,
+            "alarm_count": alarm_count
         }), 200
         
     except Exception as e:

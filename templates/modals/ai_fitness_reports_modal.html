@@ -209,26 +209,22 @@
       <!-- Table Body inside Dialog -->
       <div class="modal-body p-0">
         <div class="table-responsive" id="fitnessModalTableWrapper" style="max-height: 520px; overflow-x: auto !important; overflow-y: auto !important; width: 100%;">
-          <table class="table table-hover table-striped align-middle mb-0 text-nowrap" style="font-size: 0.86rem; min-width: 1350px; width: 100%;">
+          <table class="table table-hover table-striped align-middle mb-0 text-nowrap" style="font-size: 0.86rem; min-width: 900px; width: 100%;">
             <thead class="table-dark text-nowrap" style="position: sticky; top: 0; z-index: 10;">
               <tr>
                 <th class="text-center" style="width: 50px;">S.No</th>
-                <th>Army Number</th>
                 <th>Name</th>
                 <th>Rank</th>
-                <th>Company</th>
                 <th>Age</th>
-                <th>Height</th>
                 <th>Weight</th>
                 <th>Fitness Status</th>
                 <th class="text-center">Score</th>
-                <th class="text-center">Generated At</th>
-                <th class="text-center" style="min-width: 220px;">Actions</th>
+                <th class="text-center" style="min-width: 180px;">Actions</th>
               </tr>
             </thead>
             <tbody id="fitnessModalTableBody">
               <tr>
-                <td colspan="12" class="text-center py-5 text-muted">
+                <td colspan="8" class="text-center py-5 text-muted">
                   <div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading reports...
                 </td>
               </tr>
@@ -474,7 +470,7 @@ const FitnessModalController = (function() {
   async function loadModalData() {
     const tbody = document.getElementById('fitnessModalTableBody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading reports...</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div> Loading reports...</td></tr>`;
     }
 
     const params = new URLSearchParams({
@@ -502,7 +498,7 @@ const FitnessModalController = (function() {
       }
     } catch (err) {
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Failed to load: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> Failed to load: ${err.message}</td></tr>`;
       }
     }
   }
@@ -512,7 +508,7 @@ const FitnessModalController = (function() {
     if (!tbody) return;
 
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="12" class="text-center py-4 text-muted">No generated AI fitness reports match the criteria.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No generated AI fitness reports match the criteria.</td></tr>`;
       return;
     }
 
@@ -526,7 +522,6 @@ const FitnessModalController = (function() {
       const rank = r.rank || 'N/A';
       const company = r.company || 'N/A';
       const age = r.age !== null && r.age !== undefined ? r.age : 'N/A';
-      const height = r.height_cm ? `${Number(r.height_cm).toFixed(1)} cm` : 'N/A';
       const weight = r.actual_weight_kg ? `${Number(r.actual_weight_kg).toFixed(1)} kg` : 'N/A';
       
       const statusRaw = r.fitness_status || 'Unknown';
@@ -541,16 +536,12 @@ const FitnessModalController = (function() {
       html += `
         <tr>
           <td class="text-center font-monospace">${sNo}</td>
-          <td class="fw-bold text-primary font-monospace">${escapeHtml(armyNo)}</td>
           <td class="fw-semibold">${escapeHtml(name)}</td>
           <td>${escapeHtml(rank)}</td>
-          <td>${escapeHtml(company)}</td>
           <td>${age}</td>
-          <td>${height}</td>
           <td>${weight}</td>
           <td><span class="${badgeClass}">${escapeHtml(statusRaw)}</span></td>
           <td class="text-center fw-bold">${score}</td>
-          <td class="text-center small text-muted">${escapeHtml(r.generated_at_str || 'N/A')}</td>
           <td class="text-nowrap text-center">
             <button class="btn btn-sm btn-primary py-1 px-3 fw-semibold shadow-sm" title="View Full Report" onclick="FitnessModalController.viewSoldierReport('${escapeHtml(armyNo)}')">
               <i class="fas fa-id-card me-1"></i> View Report
