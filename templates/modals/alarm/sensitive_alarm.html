@@ -1,0 +1,31 @@
+<!-- Sensitive Personnel Alarm Badge -->
+<span id="sensitiveAlarmAlert" class="alert-gradient d-none" style="cursor:pointer; background: linear-gradient(135deg, #ea580c, #dc2626) !important;">
+    ⚠️ Sensitive Person Not Updated
+</span>
+
+<script>
+    async function loadSensitiveTopAlarm() {
+        try {
+            const res = await fetch('/api/dashboard/sensitive');
+            if (!res.ok) return;
+            const data = await res.json();
+            const alarmEl = document.getElementById("sensitiveAlarmAlert");
+            if (alarmEl && data.alarm_count && data.alarm_count > 0) {
+                alarmEl.classList.remove("d-none");
+                alarmEl.classList.add("alert-pulse");
+                alarmEl.innerText = `⚠️ ${data.alarm_count} Sensitive Person${data.alarm_count > 1 ? 's' : ''} Not Updated`;
+            } else if (alarmEl) {
+                alarmEl.classList.add("d-none");
+                alarmEl.classList.remove("alert-pulse");
+            }
+        } catch (e) {
+            console.error("Error loading sensitive top alarm:", e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSensitiveTopAlarm);
+
+    document.getElementById("sensitiveAlarmAlert")?.addEventListener("click", function () {
+        window.location.href = '/sensitive/mark_personnel';
+    });
+</script>

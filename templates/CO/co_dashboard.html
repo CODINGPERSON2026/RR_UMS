@@ -1352,6 +1352,9 @@ STATUS COLORS
       {% include 'modals/alarm/leave_alarm.html' %}
       {% include 'modals/alarm/agniveer_test_alarms.html' %}
       {% include 'modals/alarm/event_alarm.html' %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC'] %}
+      {% include 'modals/alarm/sensitive_alarm.html' %}
+      {% endif %}
     </div>
 
     <!-- ACTION BAR -->
@@ -1497,12 +1500,22 @@ STATUS COLORS
       </div>
       {% endif %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
-        <span class="sc-label">Interview</span>
+        <span class="sc-label">OC Interview</span>
         <div class="sc-right">
           <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub">Pending</span>
         </div>
       </div>
+
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
+        <span class="sc-label">CO Interview</span>
+        <div class="sc-right">
+          <span class="sc-val" id="co-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-sub">Pending</span>
+        </div>
+      </div>
+      {% endif %}
       
     </div>
 
@@ -1662,6 +1675,7 @@ STATUS COLORS
     {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
     {% include 'modals/today_schedule/ts.html' %}
     {% include 'modals/company_interview/modal.html' %}
+    {% include 'modals/co_interview/modal.html' %}
 
     <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
@@ -1672,7 +1686,7 @@ STATUS COLORS
           </div>
           <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
             <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-              <i class="fa fa-user-shield me-1"></i> UPDATED BY C O NCO
+              <i class="fa fa-user-shield me-1"></i> UPDATED BY CENTRE ONCO
             </span>
           </div>
           <div class="modal-body">
@@ -1923,6 +1937,17 @@ STATUS COLORS
     }
   }
 
+  /* ── load CO interview count ── */
+  async function loadCoInterviewCount() {
+    try {
+      var r = await fetch("/interview_update/co_interview_count");
+      var d = await r.json();
+      safeSet("co-interview-count", d.pending != null ? d.pending : (d.count != null ? d.count : 0));
+    } catch (e) {
+      safeSet("co-interview-count", "0");
+    }
+  }
+
   /* ── main dashboard data ── */
   async function loadDashboard() {
     try {
@@ -1938,6 +1963,16 @@ STATUS COLORS
       safeSet("total-count", iv.total_count);
       safeSet("locationCount", data.detachments);
       safeSet("sensitive-count", data.sensitive_count);
+      var sensBadge = document.getElementById("sensitive-alarm-badge");
+      if (sensBadge) {
+        if (data.sensitive_alarm_count > 0) {
+          sensBadge.style.display = "inline-block";
+          var cntEl = document.getElementById("sensitive-alarm-count");
+          if (cntEl) cntEl.textContent = data.sensitive_alarm_count;
+        } else {
+          sensBadge.style.display = "none";
+        }
+      }
       safeSet("board-count", data.boards_count);
       safeSet("active-loan-count", data.loan_count);
       safeSet("get_projects_count", data.projects);
@@ -1950,7 +1985,7 @@ STATUS COLORS
         .then(r => r.json())
         .then(d => { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
         .catch(() => {});
-      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents(), loadCompanyInterviewCount()]);
+      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents(), loadCompanyInterviewCount(), loadCoInterviewCount()]);
       hidePageLoader();
       showActionBar();
       showStatsGrid();
