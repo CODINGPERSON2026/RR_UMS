@@ -20,15 +20,15 @@
             position: relative;
         }
 
-        /* 3x3 Inch Photo on Right Side */
+        /* Photo on Right Side (Compact size & adjusted position for full header/hair display) */
         .photo-card-right {
-            width: 3in;
-            height: 3in;
+            width: 2.2in;
+            height: 2.5in;
             float: right;
-            margin: 10px 0 25px 35px;
-            border-radius: 14px;
+            margin: 10px 0 25px 30px;
+            border-radius: 12px;
             border: 3px solid #1e5631;
-            box-shadow: 0 10px 25px rgba(30, 86, 49, 0.18);
+            box-shadow: 0 8px 22px rgba(30, 86, 49, 0.18);
             overflow: hidden;
             background: #f4faf6;
             position: relative;
@@ -36,7 +36,7 @@
         }
 
         .photo-card-right:hover {
-            box-shadow: 0 14px 30px rgba(30, 86, 49, 0.28);
+            box-shadow: 0 12px 28px rgba(30, 86, 49, 0.28);
             transform: translateY(-2px);
         }
 
@@ -44,8 +44,9 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: top center;
             display: block;
-            border-radius: 10px;
+            border-radius: 9px;
             transition: transform 0.4s ease;
         }
 
@@ -55,19 +56,19 @@
 
         .photo-badge {
             position: absolute;
-            bottom: 8px;
-            left: 8px;
-            right: 8px;
+            bottom: 6px;
+            left: 6px;
+            right: 6px;
             background: rgba(30, 86, 49, 0.92);
             color: #fff;
-            font-size: 0.68rem;
+            font-size: 0.62rem;
             font-weight: 600;
-            padding: 5px 6px;
-            border-radius: 8px;
+            padding: 4px 5px;
+            border-radius: 6px;
             backdrop-filter: blur(4px);
-            letter-spacing: 0.4px;
+            letter-spacing: 0.3px;
             text-align: center;
-            line-height: 1.3;
+            line-height: 1.25;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             text-transform: uppercase;
         }
@@ -433,8 +434,8 @@
 
     <div class="history-container clearfix">
 
-        <!-- 3x3 Inch Photo on Right Side -->
-        <div class="photo-card-right" title="Commanding Officer 15 CESR (3x3 inch)">
+        <!-- Commanding Officer Photo on Right Side -->
+        <div class="photo-card-right" title="Commanding Officer 15 CESR">
             <img src="{{ url_for('static', filename='photos/sgxgyjgsxgug.JPG') }}" alt="Commanding Officer 15 CESR" id="cesr-photo" onerror="this.src='{{ url_for('static', filename='photos/signal.jpg') }}'" />
             <div class="photo-badge">COMMANDING OFFICER 15 CESR<br><span style="font-weight: 400; font-size: 0.62rem; opacity: 0.95;">SINCE 21 AUG 2025</span></div>
         </div>
