@@ -218,12 +218,10 @@
                 <td style="text-align: center;">
                     {% set st = (r.fitness_status or '')|lower %}
                     {% set sc = r.fitness_score %}
-                    {% if 'healthy' in st or 'combat' in st or 'ready' in st or 'good' in st or (sc and sc >= 70 and 'risk' not in st and 'improv' not in st) %}
+                    {% if 'healthy' in st or 'combat' in st or 'ready' in st or 'good' in st or (sc and sc >= 70 and 'risk' not in st and 'improv' not in st and 'unfit' not in st) %}
                         <span class="badge-fit">Fit / Combat Ready</span>
-                    {% elif 'risk' in st or 'poor' in st or 'fail' in st or (sc and sc < 50) %}
-                        <span class="badge-unfit">Unfit / At Risk</span>
-                    {% elif 'improv' in st or 'overweight' in st or 'moderate' in st or (sc and sc >= 50 and sc < 70) %}
-                        <span class="badge-warning">Needs Imp</span>
+                    {% elif 'risk' in st or 'poor' in st or 'fail' in st or 'improv' in st or 'overweight' in st or 'moderate' in st or 'unfit' in st or (sc and sc < 70) %}
+                        <span class="badge-unfit">Unfit</span>
                     {% else %}
                         <span class="badge-pending">Pending</span>
                     {% endif %}

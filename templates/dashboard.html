@@ -1524,7 +1524,7 @@
           const healthyEl = document.getElementById('dash-fit-healthy');
           const needsEl = document.getElementById('dash-fit-needs-imp');
           const riskEl = document.getElementById('dash-fit-at-risk');
-          if (totalEl) totalEl.textContent = s.total_reports || 0;
+          if (totalEl) totalEl.textContent = s.unfit_count || 0;
           if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
           if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
           if (riskEl) riskEl.textContent = s.at_risk_count || 0;

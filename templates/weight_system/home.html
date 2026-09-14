@@ -1202,12 +1202,15 @@
                     <option value="All">15 CESR</option>
                 </select>
                 <script>
-                    // Pass company from template to JavaScript
+                    // Pass company and role from template to JavaScript
                     window.userCompanyFromTemplate = {{ company|tojson|safe if company else 'null' }};
+                    window.userRoleFromTemplate = {{ (role or (current_user.role if current_user else ''))|tojson|safe }};
                 </script>
             </div>
         </div>
         
+        {% set user_role_norm = (role or (current_user.role if current_user else ''))|upper|trim %}
+        {% if user_role_norm not in ['CO', '2IC', 'ADJUTANT'] %}
         <div class="ai-fitness-header-action">
             <a href="/fitness/" class="ai-fitness-header-btn" id="aiFitnessHeaderBtn" title="Go to AI Fitness Prediction & Report">
                 <i class="fas fa-brain"></i>
@@ -1215,7 +1218,20 @@
                 <i class="fas fa-arrow-right"></i>
             </a>
         </div>
+        {% endif %}
     </div>
+
+    <script>
+        (function() {
+            const role = ((window.userRoleFromTemplate || '') + '').trim().toUpperCase();
+            if (['CO', '2IC', 'ADJUTANT'].includes(role)) {
+                const btn = document.getElementById('aiFitnessHeaderBtn');
+                if (btn && btn.closest('.ai-fitness-header-action')) {
+                    btn.closest('.ai-fitness-header-action').remove();
+                }
+            }
+        })();
+    </script>
 
     
 
@@ -2498,13 +2514,14 @@ function renderPersonDetails(data, statusClass) {
             <div class="reason-box"><p>${escapeHtml(restrictions)}</p></div>
         </div>` : ""}
 
+        ${(!['CO', '2IC', 'ADJUTANT'].includes(((window.userRoleFromTemplate || '') + '').trim().toUpperCase())) ? `
         <div class="person-details-section text-center pt-3" style="border-top: 1px solid var(--border-color, #e2e8f0); margin-top: 20px;">
             <a href="/fitness/?army_number=${encodeURIComponent(data.army_number)}" 
                class="btn btn-primary w-100 py-2" 
                style="display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; font-size: 0.95rem; border-radius: 12px; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; border: none; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4); text-decoration: none;">
                 <i class="fas fa-brain"></i> Generate AI Fitness Prediction &amp; Report
             </a>
-        </div>
+        </div>` : ""}
     `;
 }
 

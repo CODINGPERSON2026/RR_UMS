@@ -111,14 +111,29 @@ def api_get_hierarchy():
     })
 
 
+def clean_soldier_name_for_search(raw_name: str) -> str:
+    """Helper to strip common military rank prefixes if user types rank into name input."""
+    if not raw_name:
+        return ""
+    import re
+    cleaned = re.sub(r'^(SEP|HAV|NK|L/NK|L\s*NK|CHM|CQMH|RHM|NB\s*SUB|SUB|SUB\s*MAJ|CFN|RECT|SIGMAN|SIGMN|SM|LT|CAPT|MAJ)\.?\s+', '', raw_name.strip(), flags=re.IGNORECASE)
+    return cleaned.strip()
+
+
 @company_rec_bp.route("/api/ai/company-recommendation/lookup-personnel", methods=["GET"])
 def api_lookup_personnel():
     """
-    Lookup personnel details by Army Number to auto-fill AI recommendation form.
+    Lookup personnel details by Army Number or Name to auto-fill AI recommendation form.
+    Searches both `personnel` (and its `units_served`) and `dues_in` (new joinees).
     """
     army_no = request.args.get("army_number", "").strip()
-    if not army_no:
-        return jsonify({"success": False, "message": "Army number required"}), 400
+    name = request.args.get("name", "").strip()
+    query = request.args.get("query", "").strip()
+    search_term = army_no or name or query
+    clean_name = clean_soldier_name_for_search(name or search_term)
+
+    if not search_term:
+        return jsonify({"success": False, "message": "Army number or Name required"}), 400
 
     conn = get_db_connection()
     if not conn:
@@ -126,14 +141,207 @@ def api_lookup_personnel():
 
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
-            SELECT id, army_number, name, `rank`, trade, 
-                   date_of_enrollment, company, section, prior_station
-            FROM personnel 
-            WHERE army_number = %s 
-            LIMIT 1
-        """, (army_no,))
-        row = cursor.fetchone()
+        row = None
+        matched_source = None
+
+        # 1. Search in personnel table
+        if army_no:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, 
+                       date_of_enrollment, company, section, prior_station, worked_unit_tenure
+                FROM personnel 
+                WHERE UPPER(TRIM(army_number)) = UPPER(%s) 
+                LIMIT 1
+            """, (army_no,))
+            row = cursor.fetchone()
+        elif name:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, 
+                       date_of_enrollment, company, section, prior_station, worked_unit_tenure
+                FROM personnel 
+                WHERE UPPER(TRIM(name)) = UPPER(%s) 
+                   OR UPPER(TRIM(name)) = UPPER(%s)
+                   OR UPPER(name) LIKE UPPER(%s)
+                   OR UPPER(name) LIKE UPPER(%s)
+                ORDER BY CASE 
+                    WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 1 
+                    WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 2 
+                    WHEN UPPER(name) LIKE UPPER(%s) THEN 3
+                    ELSE 4 END, id ASC
+                LIMIT 1
+            """, (name, clean_name, f"%{name}%", f"%{clean_name}%", name, clean_name, f"{clean_name}%"))
+            row = cursor.fetchone()
+        else:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, 
+                       date_of_enrollment, company, section, prior_station, worked_unit_tenure
+                FROM personnel 
+                WHERE UPPER(TRIM(army_number)) = UPPER(%s) 
+                   OR UPPER(TRIM(name)) = UPPER(%s) 
+                   OR UPPER(TRIM(name)) = UPPER(%s)
+                   OR UPPER(name) LIKE UPPER(%s)
+                   OR UPPER(name) LIKE UPPER(%s)
+                ORDER BY CASE 
+                    WHEN UPPER(TRIM(army_number)) = UPPER(%s) THEN 1 
+                    WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 2 
+                    WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 3 
+                    ELSE 4 END, id ASC
+                LIMIT 1
+            """, (search_term, search_term, clean_name, f"%{search_term}%", f"%{clean_name}%", search_term, search_term, clean_name))
+            row = cursor.fetchone()
+
+        units_list = []
+        if row:
+            matched_source = "personnel"
+            # Query units_served
+            cursor.execute("""
+                SELECT id, unit, from_date, to_date, duty_performed
+                FROM units_served
+                WHERE personnel_id = %s OR UPPER(TRIM(army_number)) = UPPER(%s)
+                ORDER BY sr_no ASC, id ASC
+            """, (row["id"], row["army_number"]))
+            unit_rows = cursor.fetchall() or []
+            for u in unit_rows:
+                f_date = ""
+                if u.get("from_date"):
+                    try:
+                        f_date = u["from_date"].strftime("%d-%m-%Y") if hasattr(u["from_date"], "strftime") else str(u["from_date"])
+                    except Exception:
+                        f_date = str(u["from_date"])
+                t_date = ""
+                if u.get("to_date"):
+                    try:
+                        t_date = u["to_date"].strftime("%d-%m-%Y") if hasattr(u["to_date"], "strftime") else str(u["to_date"])
+                    except Exception:
+                        t_date = str(u["to_date"])
+                units_list.append({
+                    "unit": (u.get("unit") or "").strip(),
+                    "from_date": f_date,
+                    "to_date": t_date,
+                    "duty_performed": (u.get("duty_performed") or "").strip()
+                })
+
+            # If units_served has no records, check dues_in for this soldier
+            if not units_list:
+                cursor.execute("""
+                    SELECT unit, date_of_move, trade FROM dues_in
+                    WHERE UPPER(TRIM(army_number)) = UPPER(%s) 
+                       OR UPPER(TRIM(name)) = UPPER(%s)
+                       OR UPPER(TRIM(name)) = UPPER(%s)
+                    LIMIT 1
+                """, (row["army_number"], row["name"], clean_soldier_name_for_search(row["name"])))
+                d = cursor.fetchone()
+                if d and d.get("unit"):
+                    m_date = ""
+                    if d.get("date_of_move"):
+                        try:
+                            m_date = d["date_of_move"].strftime("%d-%m-%Y") if hasattr(d["date_of_move"], "strftime") else str(d["date_of_move"])
+                        except Exception:
+                            m_date = str(d["date_of_move"])
+                    units_list.append({
+                        "unit": d["unit"].strip(),
+                        "from_date": "",
+                        "to_date": m_date,
+                        "duty_performed": (row.get("trade") or d.get("trade") or "GENERAL").strip()
+                    })
+
+            # If still empty, check worked_unit_tenure
+            if not units_list and row.get("worked_unit_tenure"):
+                wut = str(row["worked_unit_tenure"]).strip()
+                if wut and wut.upper() not in ["-", "NONE", "NULL", ""]:
+                    import re
+                    parts = [p.strip() for p in re.split(r'[,;]+', wut) if p.strip()]
+                    for p in parts:
+                        units_list.append({
+                            "unit": p,
+                            "from_date": "",
+                            "to_date": "",
+                            "duty_performed": (row.get("trade") or "GENERAL").strip()
+                        })
+
+            # If still empty, check prior_station
+            if not units_list and row.get("prior_station"):
+                ps = str(row["prior_station"]).strip()
+                if ps.upper() not in ["NO", "NONE", "NULL", "YES", ""]:
+                    units_list.append({
+                        "unit": ps,
+                        "from_date": "",
+                        "to_date": "",
+                        "duty_performed": (row.get("trade") or "GENERAL").strip()
+                    })
+
+        # 2. If not found in personnel, search in dues_in (new joinees entering unit)
+        if not row:
+            if army_no:
+                cursor.execute("""
+                    SELECT army_number, name, `rank`, trade, unit, date_of_move
+                    FROM dues_in
+                    WHERE UPPER(TRIM(army_number)) = UPPER(%s)
+                    LIMIT 1
+                """, (army_no,))
+                d_row = cursor.fetchone()
+            elif name:
+                cursor.execute("""
+                    SELECT army_number, name, `rank`, trade, unit, date_of_move
+                    FROM dues_in
+                    WHERE UPPER(TRIM(name)) = UPPER(%s) 
+                       OR UPPER(TRIM(name)) = UPPER(%s)
+                       OR UPPER(name) LIKE UPPER(%s)
+                       OR UPPER(name) LIKE UPPER(%s)
+                    ORDER BY CASE 
+                        WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 1 
+                        WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 2 
+                        ELSE 3 END, id ASC
+                    LIMIT 1
+                """, (name, clean_name, f"%{name}%", f"%{clean_name}%", name, clean_name))
+                d_row = cursor.fetchone()
+            else:
+                cursor.execute("""
+                    SELECT army_number, name, `rank`, trade, unit, date_of_move
+                    FROM dues_in
+                    WHERE UPPER(TRIM(army_number)) = UPPER(%s)
+                       OR UPPER(TRIM(name)) = UPPER(%s)
+                       OR UPPER(TRIM(name)) = UPPER(%s)
+                       OR UPPER(name) LIKE UPPER(%s)
+                       OR UPPER(name) LIKE UPPER(%s)
+                    ORDER BY CASE 
+                        WHEN UPPER(TRIM(army_number)) = UPPER(%s) THEN 1 
+                        WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 2 
+                        WHEN UPPER(TRIM(name)) = UPPER(%s) THEN 3 
+                        ELSE 4 END, id ASC
+                    LIMIT 1
+                """, (search_term, search_term, clean_name, f"%{search_term}%", f"%{clean_name}%", search_term, search_term, clean_name))
+                d_row = cursor.fetchone()
+
+            if d_row:
+                matched_source = "dues_in"
+                m_date = ""
+                if d_row.get("date_of_move"):
+                    try:
+                        m_date = d_row["date_of_move"].strftime("%d-%m-%Y") if hasattr(d_row["date_of_move"], "strftime") else str(d_row["date_of_move"])
+                    except Exception:
+                        m_date = str(d_row["date_of_move"])
+
+                if d_row.get("unit"):
+                    units_list.append({
+                        "unit": d_row["unit"].strip(),
+                        "from_date": "",
+                        "to_date": m_date,
+                        "duty_performed": (d_row.get("trade") or "GENERAL").strip()
+                    })
+
+                row = {
+                    "id": None,
+                    "army_number": d_row["army_number"],
+                    "name": d_row["name"],
+                    "rank": d_row["rank"],
+                    "trade": d_row.get("trade") or "",
+                    "date_of_enrollment": "",
+                    "company": "",
+                    "section": "",
+                    "prior_station": d_row.get("unit") or ""
+                }
+
         cursor.close()
         conn.close()
 
@@ -148,16 +356,20 @@ def api_lookup_personnel():
             return jsonify({
                 "success": True,
                 "found": True,
+                "source": matched_source,
                 "data": {
-                    "id": row["id"],
-                    "army_number": row["army_number"],
-                    "name": row["name"],
-                    "rank": row["rank"],
-                    "trade": row.get("trade") or "",  # Returned for display only
+                    "id": row.get("id"),
+                    "army_number": row.get("army_number") or "",
+                    "name": row.get("name") or "",
+                    "rank": row.get("rank") or "",
+                    "trade": row.get("trade") or "",
                     "date_of_enrollment": enroll_str,
-                    "company": row["company"],
-                    "section": row["section"],
-                    "prior_station": row.get("prior_station") or ""
+                    "company": row.get("company") or "",
+                    "section": row.get("section") or "",
+                    "prior_station": row.get("prior_station") or "",
+                    "worked_unit_tenure": row.get("worked_unit_tenure") or "",
+                    "units_served": units_list,
+                    "is_fresh": len(units_list) == 0
                 }
             })
         else:
@@ -168,7 +380,191 @@ def api_lookup_personnel():
             })
     except Exception as e:
         if conn:
-            conn.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@company_rec_bp.route("/api/ai/company-recommendation/search-personnel", methods=["GET"])
+def api_search_personnel():
+    """
+    Search personnel from both `personnel` and `dues_in` for live dropdown suggestions.
+    Query params: q (search text, e.g. "amr" or "amit"), limit (default 20)
+    """
+    q = request.args.get("q", "").strip()
+    limit = int(request.args.get("limit", 20))
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "error": "Database connection failed"}), 500
+
+    try:
+        cursor = conn.cursor(dictionary=True)
+        results = []
+        seen_army_nos = set()
+        clean_q = clean_soldier_name_for_search(q)
+
+        # 1. Search in personnel table
+        if q:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, company, section, 
+                       date_of_enrollment, prior_station, worked_unit_tenure
+                FROM personnel
+                WHERE UPPER(name) LIKE UPPER(%s) 
+                   OR UPPER(name) LIKE UPPER(%s)
+                   OR UPPER(army_number) LIKE UPPER(%s)
+                ORDER BY CASE 
+                    WHEN UPPER(name) = UPPER(%s) THEN 1
+                    WHEN UPPER(name) LIKE UPPER(%s) THEN 2
+                    WHEN UPPER(army_number) = UPPER(%s) THEN 3
+                    ELSE 4 END, name ASC
+                LIMIT %s
+            """, (f"%{q}%", f"%{clean_q}%", f"%{q}%", q, f"{clean_q}%", q, limit))
+        else:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, company, section, 
+                       date_of_enrollment, prior_station, worked_unit_tenure
+                FROM personnel
+                ORDER BY id DESC
+                LIMIT %s
+            """, (limit,))
+        p_rows = cursor.fetchall() or []
+
+        for r in p_rows:
+            ano = (r.get("army_number") or "").strip().upper()
+            if ano:
+                seen_army_nos.add(ano)
+
+            # Query units_served for this soldier
+            cursor.execute("""
+                SELECT unit, from_date, to_date, duty_performed
+                FROM units_served
+                WHERE personnel_id = %s OR UPPER(TRIM(army_number)) = UPPER(%s)
+                ORDER BY sr_no ASC, id ASC
+            """, (r["id"], ano))
+            u_rows = cursor.fetchall() or []
+            units = []
+            for u in u_rows:
+                f_d = u["from_date"].strftime("%d-%m-%Y") if u.get("from_date") and hasattr(u["from_date"], "strftime") else str(u.get("from_date") or "")
+                t_d = u["to_date"].strftime("%d-%m-%Y") if u.get("to_date") and hasattr(u["to_date"], "strftime") else str(u.get("to_date") or "")
+                units.append({
+                    "unit": (u.get("unit") or "").strip(),
+                    "from_date": f_d,
+                    "to_date": t_d,
+                    "duty_performed": (u.get("duty_performed") or r.get("trade") or "GENERAL").strip()
+                })
+
+            if not units and r.get("worked_unit_tenure"):
+                wut = str(r["worked_unit_tenure"]).strip()
+                if wut and wut.upper() not in ["-", "NONE", "NULL", ""]:
+                    import re
+                    parts = [p.strip() for p in re.split(r'[,;]+', wut) if p.strip()]
+                    for p in parts:
+                        units.append({
+                            "unit": p,
+                            "from_date": "",
+                            "to_date": "",
+                            "duty_performed": (r.get("trade") or "GENERAL").strip()
+                        })
+
+            enroll_str = ""
+            if r.get("date_of_enrollment"):
+                try:
+                    enroll_str = r["date_of_enrollment"].strftime("%d-%m-%Y") if hasattr(r["date_of_enrollment"], "strftime") else str(r["date_of_enrollment"])
+                except Exception:
+                    enroll_str = str(r["date_of_enrollment"])
+
+            prev_u = units[0]["unit"] if units else (r.get("prior_station") if r.get("prior_station") not in ["No", "Yes", "None", None] else "")
+
+            results.append({
+                "id": r["id"],
+                "army_number": r["army_number"] or "",
+                "name": r["name"] or "",
+                "rank": r["rank"] or "",
+                "trade": r.get("trade") or "",
+                "company": r.get("company") or "",
+                "section": r.get("section") or "",
+                "date_of_enrollment": enroll_str,
+                "prior_station": r.get("prior_station") or "",
+                "source": "personnel",
+                "previous_unit": prev_u,
+                "units_served": units,
+                "is_fresh": len(units) == 0
+            })
+
+        # 2. Search dues_in table
+        remaining_limit = max(5, limit - len(results))
+        if q:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, unit, date_of_move
+                FROM dues_in
+                WHERE UPPER(name) LIKE UPPER(%s) 
+                   OR UPPER(name) LIKE UPPER(%s)
+                   OR UPPER(army_number) LIKE UPPER(%s)
+                ORDER BY CASE 
+                    WHEN UPPER(name) = UPPER(%s) THEN 1
+                    WHEN UPPER(name) LIKE UPPER(%s) THEN 2
+                    WHEN UPPER(army_number) = UPPER(%s) THEN 3
+                    ELSE 4 END, name ASC
+                LIMIT %s
+            """, (f"%{q}%", f"%{clean_q}%", f"%{q}%", q, f"{clean_q}%", q, remaining_limit))
+        else:
+            cursor.execute("""
+                SELECT id, army_number, name, `rank`, trade, unit, date_of_move
+                FROM dues_in
+                ORDER BY id DESC
+                LIMIT %s
+            """, (remaining_limit,))
+        d_rows = cursor.fetchall() or []
+
+        for d in d_rows:
+            ano = (d.get("army_number") or "").strip().upper()
+            if ano and ano in seen_army_nos:
+                continue
+            seen_army_nos.add(ano)
+
+            m_d = d["date_of_move"].strftime("%d-%m-%Y") if d.get("date_of_move") and hasattr(d["date_of_move"], "strftime") else str(d.get("date_of_move") or "")
+            d_units = []
+            if d.get("unit"):
+                d_units.append({
+                    "unit": d["unit"].strip(),
+                    "from_date": "",
+                    "to_date": m_d,
+                    "duty_performed": (d.get("trade") or "GENERAL").strip()
+                })
+
+            results.append({
+                "id": None,
+                "army_number": d["army_number"] or "",
+                "name": d["name"] or "",
+                "rank": d["rank"] or "",
+                "trade": d.get("trade") or "",
+                "company": "",
+                "section": "",
+                "date_of_enrollment": "",
+                "prior_station": d.get("unit") or "",
+                "source": "dues_in",
+                "previous_unit": d.get("unit") or "",
+                "units_served": d_units,
+                "is_fresh": len(d_units) == 0
+            })
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "count": len(results),
+            "data": results
+        })
+    except Exception as e:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
         return jsonify({"success": False, "error": str(e)}), 500
 
 

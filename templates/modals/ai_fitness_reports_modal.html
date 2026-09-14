@@ -146,13 +146,11 @@
               <option value="HQ company">HQ company</option>
             </select>
 
-            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 175px;">
-              <option value="">All Fitness Statuses</option>
-              <option value="Fit">Fit Only</option>
-              <option value="Unfit">Unfit Only</option>
+            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 140px; font-weight: 600;">
+              <option value="Unfit" selected>Unfit Only</option>
             </select>
 
-            <div class="modal-count-pill">
+            <div class="modal-count-pill" title="Total Unfit Personnel Count">
               <span class="count-label">Total Count</span>
               <span id="fitnessTotalCountUniqueScope" class="badge rounded-pill fitCountBadgeUnique count-number">0</span>
             </div>
@@ -262,7 +260,7 @@ const FitnessModalController = (function() {
   const state = {
     search: '',
     company: '',
-    status: '',
+    status: 'Unfit',
     page: 1,
     perPage: 15,
     totalPages: 1,
@@ -277,6 +275,9 @@ const FitnessModalController = (function() {
     const modalEl = document.getElementById('aiFitnessReportsModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function() {
+        state.status = 'Unfit';
+        const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
+        if (statusSelect) statusSelect.value = 'Unfit';
         loadModalStats();
         loadModalData();
       });
@@ -306,9 +307,8 @@ const FitnessModalController = (function() {
     const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
     if (statusSelect) {
       statusSelect.addEventListener('change', function(e) {
-        state.status = e.target.value;
+        state.status = e.target.value || 'Unfit';
         state.page = 1;
-        updateQuickFilterButtons(state.status);
         loadModalData();
       });
     }
@@ -338,6 +338,9 @@ const FitnessModalController = (function() {
   function openModal() {
     const modalEl = document.getElementById('aiFitnessReportsModal');
     if (!modalEl) return;
+    state.status = 'Unfit';
+    const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
+    if (statusSelect) statusSelect.value = 'Unfit';
     if (!modalInstance && window.bootstrap) {
       modalInstance = new bootstrap.Modal(modalEl);
     }
@@ -358,15 +361,15 @@ const FitnessModalController = (function() {
       if (data && data.success && data.stats) {
         const s = data.stats;
         
-        // Update header count badge
+        // Update header count badge with unfit count
         const modalTotalBadge = document.getElementById('fitnessTotalCountUniqueScope');
-        if (modalTotalBadge) modalTotalBadge.textContent = s.total_reports || 0;
+        if (modalTotalBadge) modalTotalBadge.textContent = s.unfit_count || 0;
 
-        // Update dashboard badges
+        // Update dashboard badges with unfit count
         const dashTotal = document.getElementById('dash-fit-total');
-        if (dashTotal) dashTotal.textContent = s.total_reports || 0;
+        if (dashTotal) dashTotal.textContent = s.unfit_count || 0;
         const coTotal = document.getElementById('co-fit-total');
-        if (coTotal) coTotal.textContent = s.total_reports || 0;
+        if (coTotal) coTotal.textContent = s.unfit_count || 0;
 
         // Populate company filter if empty, strictly enforcing the 3 companies
         const compSelect = document.getElementById('fitnessCompanyFilterUniqueScope');
@@ -398,6 +401,10 @@ const FitnessModalController = (function() {
     if (table) table.classList.add('d-none');
     if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
+    if (!state.status) {
+      state.status = 'Unfit';
+    }
+
     const params = new URLSearchParams({
       search: state.search,
       company: state.company,
@@ -415,6 +422,12 @@ const FitnessModalController = (function() {
       renderTableRows(data.data, data.page, data.per_page);
       renderPagination(data.page, data.pages, data.total);
       
+      // Update header count badge with current active unfit count
+      const modalTotalBadge = document.getElementById('fitnessTotalCountUniqueScope');
+      if (modalTotalBadge && data.total !== undefined) {
+        modalTotalBadge.textContent = data.total;
+      }
+
       const counter = document.getElementById('fitnessModalCounter');
       if (counter) {
         const start = data.total > 0 ? (data.page - 1) * data.per_page + 1 : 0;
@@ -473,6 +486,12 @@ const FitnessModalController = (function() {
     let html = '';
 
     rows.forEach((r, i) => {
+      const armyNoUpper = (r.army_number || '').toUpperCase();
+      const nameUpper = (r.name || '').toUpperCase();
+      if (armyNoUpper.startsWith('TEST') || armyNoUpper.startsWith('JK010101') || nameUpper.includes('TEST')) {
+        return;
+      }
+
       const sNo = startIdx + i + 1;
       const armyNo = r.army_number || 'N/A';
       const name = (r.name || '').toUpperCase();
@@ -493,6 +512,12 @@ const FitnessModalController = (function() {
       let statusBadge = '';
 
       if (
+        sLower.includes('untested') ||
+        sLower.includes('not tested') ||
+        sLower.includes('insufficient')
+      ) {
+        statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-question-circle me-1"></i>Not Tested</span>';
+      } else if (
         sLower.includes('healthy') ||
         sLower.includes('ready') ||
         sLower.includes('good') ||
@@ -500,21 +525,19 @@ const FitnessModalController = (function() {
         sLower.includes('optimal') ||
         sLower.includes('combat') ||
         (sLower === 'normal') ||
-        (scoreVal !== null && scoreVal >= 70 && !sLower.includes('risk') && !sLower.includes('improve'))
+        (scoreVal !== null && scoreVal >= 70 && !sLower.includes('risk') && !sLower.includes('unfit') && !sLower.includes('improve'))
       ) {
         statusBadge = '<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Healthy</span>';
       } else if (
+        sLower.includes('unfit') ||
+        sLower.includes('improve') ||
+        sLower.includes('needs imp') ||
         sLower.includes('risk') ||
         sLower.includes('poor') ||
         sLower.includes('critical') ||
         sLower.includes('danger') ||
         sLower.includes('fail') ||
         sLower.includes('lmc') ||
-        (scoreVal !== null && scoreVal < 50)
-      ) {
-        statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-radiation me-1"></i>At Risk</span>';
-      } else if (
-        sLower.includes('improve') ||
         sLower.includes('moderate') ||
         sLower.includes('average') ||
         sLower.includes('satisfactory') ||
@@ -522,19 +545,17 @@ const FitnessModalController = (function() {
         sLower.includes('fair') ||
         sLower.includes('overweight') ||
         sLower.includes('underweight') ||
-        (scoreVal !== null && scoreVal >= 50 && scoreVal < 70)
+        (scoreVal !== null && scoreVal < 70)
       ) {
-        statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-exclamation-triangle me-1"></i>Needs Imp</span>';
+        statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times-circle me-1"></i>Unfit</span>';
       } else if (scoreVal !== null) {
         if (scoreVal >= 70) {
           statusBadge = '<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Healthy</span>';
-        } else if (scoreVal >= 50) {
-          statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-exclamation-triangle me-1"></i>Needs Imp</span>';
         } else {
-          statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-radiation me-1"></i>At Risk</span>';
+          statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times-circle me-1"></i>Unfit</span>';
         }
       } else {
-        statusBadge = '<span class="badge bg-secondary text-white px-2 py-1"><i class="fas fa-clock me-1"></i>Pending</span>';
+        statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-question-circle me-1"></i>Not Tested</span>';
       }
 
       const dateDisplay = formatDateTime12Hr(r.date_time_12hr || r.generated_at_str || r.generated_at || r.updated_at);
@@ -769,34 +790,6 @@ const FitnessModalController = (function() {
   }
 
   let currentSubModalDiet = null;
-
-  function switchModalMessDay(dayName) {
-    if (!currentSubModalDiet) return;
-    const weekly = currentSubModalDiet.weekly_schedule || {};
-    const dayData = weekly[dayName] || weekly['Monday'] || {};
-
-    document.querySelectorAll('.submodal-day-pill').forEach(btn => {
-      const bDay = btn.getAttribute('data-day');
-      if (bDay && bDay.toLowerCase() === dayName.toLowerCase()) {
-        btn.classList.add('active', 'btn-primary');
-        btn.classList.remove('btn-outline-primary');
-      } else {
-        btn.classList.remove('active', 'btn-primary');
-        btn.classList.add('btn-outline-primary');
-      }
-    });
-
-    const tbody = document.getElementById('subModalMenuTableBody');
-    const sampleMenu = dayData.sample_menu || currentSubModalDiet.sample_menu || [];
-    if (tbody && sampleMenu) {
-      tbody.innerHTML = sampleMenu.map(m => `
-        <tr>
-          <td class="fw-bold text-nowrap text-primary" style="width: 28%;">${escapeHtml(m.meal)}</td>
-          <td class="text-dark">${escapeHtml(m.items)}</td>
-        </tr>
-      `).join('');
-    }
-  }
 
   function renderSoldierSubModal(data) {
     currentSubModalData = data;
@@ -1681,9 +1674,11 @@ const FitnessModalController = (function() {
     if (!container) return;
 
     if ((dayName || '').toLowerCase() === 'full') {
-      const isJc = (currentSoldier && currentSoldier.rank && ['SUBEDAR', 'SUB', 'NB SUB', 'HONY', 'HONORARY'].some(r => currentSoldier.rank.toUpperCase().includes(r))) ||
-                   (currentSoldier && currentSoldier.army_number && currentSoldier.army_number.toUpperCase().includes('JC')) ||
-                   ((currentReport && currentReport.nutrition && currentReport.nutrition.mess_category) || '').toUpperCase().includes('JCO');
+      const currentSoldier = (currentSubModalData && currentSubModalData.soldier) || {};
+      const currentReport = (currentSubModalData && (currentSubModalData.report || currentSubModalData.recommendations || currentSubModalData.prediction)) || {};
+      const isJc = (currentSoldier && currentSoldier.rank && ['SUBEDAR', 'SUB', 'NB SUB', 'HONY', 'HONORARY'].some(r => String(currentSoldier.rank).toUpperCase().includes(r))) ||
+                   (currentSoldier && currentSoldier.army_number && String(currentSoldier.army_number).toUpperCase().includes('JC')) ||
+                   (currentReport && currentReport.nutrition && String(currentReport.nutrition.mess_category || '').toUpperCase().includes('JCO'));
 
       const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
       const rows = days.map((dName, idx) => {

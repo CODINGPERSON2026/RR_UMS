@@ -508,7 +508,7 @@ def api_get_reports():
 
     search_query = request.args.get("search", "").strip()
     company = request.args.get("company", "").strip()
-    status = request.args.get("status", "").strip()
+    status = request.args.get("status", "").strip() or "Unfit"
     from_date = request.args.get("from_date", "").strip() or None
     to_date = request.args.get("to_date", "").strip() or None
     sort_by = request.args.get("sort_by", "generated_at").strip()
@@ -555,7 +555,7 @@ def api_export_directory_pdf():
 
     search_query = request.args.get("search", "").strip()
     company = request.args.get("company", "").strip()
-    status = request.args.get("status", "").strip()
+    status = request.args.get("status", "").strip() or "Unfit"
     from_date = request.args.get("from_date", "").strip() or None
     to_date = request.args.get("to_date", "").strip() or None
 

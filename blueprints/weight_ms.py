@@ -353,7 +353,7 @@ def dashboard():
     
     if not user:
         return redirect(url_for('admin_login'))
-    return render_template('weight_system/home.html')
+    return render_template('weight_system/home.html', user=user, role=user.get('role'))
 
 @weight_ms.route('/api/status-summary')
 def api_status_summary():

@@ -2643,7 +2643,7 @@ STATUS COLORS
           var healthyEl = document.getElementById('co-fit-healthy');
           var needsEl = document.getElementById('co-fit-needs-imp');
           var riskEl = document.getElementById('co-fit-at-risk');
-          if (totalEl) totalEl.textContent = s.total_reports || 0;
+          if (totalEl) totalEl.textContent = s.unfit_count || 0;
           if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
           if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
           if (riskEl) riskEl.textContent = s.at_risk_count || 0;

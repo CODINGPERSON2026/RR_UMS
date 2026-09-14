@@ -1,7 +1,7 @@
 <!-- ==================== AI NEW JOINEE RECOMMENDATION MODAL ==================== -->
 <style>
   #aiRecModal .modal-dialog {
-    max-width: 760px;
+    max-width: 840px;
     margin: 1.75rem auto;
   }
   #aiRecModal .modal-content {
@@ -122,18 +122,39 @@
     pointer-events: none;
   }
 
-  /* Larger date inputs */
+  /* Date inputs: clean typography, padding, and zero overlapping checkmarks */
   .ai-u-from, .ai-u-to {
-    font-size: 0.92rem !important;
-    font-weight: 600 !important;
+    font-size: 0.86rem !important;
+    font-weight: 700 !important;
     padding: 0.42rem 0.55rem !important;
-    letter-spacing: 0.3px !important;
-    min-width: 120px !important;
+    letter-spacing: 0.45px !important;
+    min-width: 110px !important;
+    height: 36px !important;
   }
   .ai-u-from::placeholder, .ai-u-to::placeholder {
-    font-size: 0.82rem !important;
+    font-size: 0.8rem !important;
     font-weight: 400 !important;
     color: #94a3b8 !important;
+  }
+  /* Suppress overlapping Bootstrap SVG validation icons inside date inputs */
+  #aiRecModal .ai-date-easy.is-valid,
+  #aiRecModal .ai-u-from.is-valid,
+  #aiRecModal .ai-u-to.is-valid,
+  #aiRecModal .ai-date-easy.is-invalid,
+  #aiRecModal .ai-u-from.is-invalid,
+  #aiRecModal .ai-u-to.is-invalid {
+    background-image: none !important;
+    padding-right: 0.55rem !important;
+  }
+  #aiRecModal .ai-date-easy.is-valid,
+  #aiRecModal .ai-u-from.is-valid,
+  #aiRecModal .ai-u-to.is-valid {
+    border-color: #10b981 !important;
+  }
+  #aiRecModal .ai-date-easy.is-invalid,
+  #aiRecModal .ai-u-from.is-invalid,
+  #aiRecModal .ai-u-to.is-invalid {
+    border-color: #ef4444 !important;
   }
 
   /* Previous dates dropdown */
@@ -285,8 +306,22 @@
     position: relative;
   }
 
-
-
+  /* Yellow match highlighting for autofilled personnel details & search matches */
+  .ai-match-highlight {
+    background-color: #fef08a !important; /* Soft yellow highlight */
+    color: #713f12 !important; /* Rich contrast yellow-brown text */
+    border-color: #eab308 !important; /* Yellow border */
+    box-shadow: 0 0 0 0.18rem rgba(234, 179, 8, 0.25) !important;
+    font-weight: 700 !important;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+  .ai-yellow-mark {
+    background-color: #fef08a !important;
+    color: #713f12 !important;
+    font-weight: 700 !important;
+    padding: 1px 4px !important;
+    border-radius: 4px !important;
+  }
 
   #aiTrade, #aiRankOtherInput, #aiPriorStation, .ai-u-name, .ai-duty-other-input {
     text-transform: uppercase;
@@ -581,12 +616,190 @@
   #aiRecResultContainer .progress-bar {
     transition: width 0.75s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
   }
+
+  /* ====================================================================
+     AI FITNESS MODULE MATCHING SEARCH INPUT & FLOATING DROPDOWN
+     ==================================================================== */
+  #aiRecModal .search-input-group {
+    position: relative;
+    z-index: 1001;
+  }
+
+  #aiRecModal .input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  #aiRecModal .search-leading-icon {
+    position: absolute;
+    left: 11px;
+    color: #2563eb;
+    font-size: 0.88rem;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  #aiRecModal .search-field-custom {
+    padding-left: 32px !important;
+    padding-right: 28px !important;
+    height: 38px !important;
+    border-radius: 8px !important;
+    border: 1.5px solid #cbd5e1 !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.3px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  #aiRecModal .search-field-custom:focus {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18) !important;
+    background: #ffffff !important;
+  }
+
+  #aiRecModal .clear-search-btn {
+    position: absolute;
+    right: 7px;
+    background: rgba(100, 116, 139, 0.16);
+    border: none;
+    color: #64748b;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: all 0.2s ease;
+    z-index: 3;
+    padding: 0;
+  }
+
+  #aiRecModal .ai-u-name {
+    height: 36px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    padding: 0.4rem 0.65rem !important;
+    border-radius: 7px !important;
+  }
+
+  #aiRecModal .ai-duty-select-btn {
+    height: 36px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    padding: 0.4rem 0.65rem !important;
+    border-radius: 7px !important;
+  }
+
+  #aiRecModal .clear-search-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    transform: scale(1.12);
+  }
+
+  /* Floating Dropdown */
+  #aiRecModal .search-results-dropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    min-width: 420px;
+    max-width: 500px;
+    background: #ffffff;
+    border: 1.5px solid rgba(59, 130, 246, 0.45);
+    border-radius: 12px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.22), 0 6px 16px rgba(0, 0, 0, 0.08);
+    z-index: 999999 !important;
+    max-height: 320px;
+    overflow-y: auto;
+    backdrop-filter: blur(16px);
+    animation: aiDropdownSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes aiDropdownSlideIn {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  #aiRecModal .search-results-dropdown::-webkit-scrollbar {
+    width: 6px;
+  }
+  #aiRecModal .search-results-dropdown::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 4px;
+  }
+
+  #aiRecModal .search-item {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #ffffff;
+  }
+
+  #aiRecModal .search-item:last-child {
+    border-bottom: none;
+  }
+
+  #aiRecModal .search-item:hover,
+  #aiRecModal .search-item.active-item {
+    background: rgba(59, 130, 246, 0.09) !important;
+    border-left: 4px solid #2563eb !important;
+    padding-left: 12px;
+  }
+
+  #aiRecModal .search-soldier-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.22) 0%, rgba(139, 92, 246, 0.22) 100%);
+    color: #2563eb;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 5px rgba(59, 130, 246, 0.12);
+  }
+
+  #aiRecModal .search-soldier-army-no {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    color: #1d4ed8;
+    background: rgba(59, 130, 246, 0.12);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.76rem;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  #aiRecModal .search-highlight,
+  #aiRecModal mark.search-highlight {
+    background-color: #ffea00 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
+    box-shadow: 0 0 0 1.5px #ffd600 !important;
+    display: inline !important;
+    line-height: 1.2 !important;
+  }
 </style>
 
 
 
 <div class="modal fade" id="aiRecModal" tabindex="-1" aria-labelledby="aiRecModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 780px;">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 840px;">
     <div class="modal-content">
       <!-- Modal Header with Navigation Tabs -->
       <div class="modal-header ai-modal-header d-flex flex-column align-items-stretch pb-2">
@@ -641,7 +854,7 @@
             </div>
 
             <!-- Main Form Sync Notice -->
-            <div id="aiMainFormSyncNotice" class="p-2 mb-2.5 rounded border d-flex justify-content-between align-items-center" style="display: none; background: #eff6ff; border-color: #bfdbfe !important;">
+            <div id="aiMainFormSyncNotice" class="p-2 mb-2.5 rounded border d-none justify-content-between align-items-center" style="display: none !important; background: #eff6ff; border-color: #bfdbfe !important;">
               <div style="font-size: 0.8rem; color: #1e40af;">
                 <i class="fas fa-id-card me-1.5 text-primary"></i>
                 Profile: <strong id="aiIdentityArmyNo" class="font-monospace text-primary">--</strong> • <strong id="aiIdentityName" class="text-dark">--</strong>
@@ -650,32 +863,43 @@
             </div>
 
             <!-- Soldier Identity Fields (Army No, Name, Rank, Trade) -->
-            <div class="row g-2 mb-3 p-2.5 rounded bg-white border">
-              <div class="col-md-3">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.8rem;">
+            <div class="row g-2 mb-3 p-3 rounded bg-white border" style="overflow: visible !important; position: relative !important;">
+              <div class="col-md-3" style="position: relative;">
+                <label class="form-label fw-semibold mb-1.5" style="font-size: 0.8rem;">
                   <i class="fas fa-id-badge text-primary me-1"></i>Army Number
                 </label>
-                <div class="input-group input-group-sm">
-                  <input type="text" id="aiArmyNumber" class="form-control form-control-sm font-monospace text-uppercase fw-bold" placeholder="e.g. 15678901A" oninput="this.value = this.value.toUpperCase(); onAiArmyNumberChange(this.value);" />
-                  <button class="btn btn-outline-secondary px-2" type="button" onclick="lookupPersonnelByArmyNo()" title="Lookup details from database">
-                    <i class="fas fa-search"></i>
-                  </button>
+                <div class="search-input-group">
+                  <div class="input-icon-wrapper">
+                    <i class="fas fa-search search-leading-icon"></i>
+                    <input type="text" id="aiArmyNumber" class="form-control search-field-custom font-monospace text-uppercase fw-bold" placeholder="e.g. 15678901A" oninput="this.value = this.value.toUpperCase(); onAiArmyNumberChange(this.value);" onkeydown="if(event.key === 'Enter'){ event.preventDefault(); lookupPersonnelByArmyNo(); }" autocomplete="off" />
+                    <button type="button" id="clearAiArmyBtn" class="clear-search-btn d-none" onclick="clearAiArmyNumber(event)" title="Clear Army Number">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
                 </div>
-                <small class="text-muted d-block" style="font-size: 0.69rem;" id="aiArmyNoLookupStatus"></small>
               </div>
 
-              <div class="col-md-3">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.8rem;">
+              <div class="col-md-4" style="position: relative;">
+                <label class="form-label fw-semibold mb-1.5" style="font-size: 0.8rem;">
                   <i class="fas fa-user text-primary me-1"></i>Soldier Name
                 </label>
-                <input type="text" id="aiPersonnelName" class="form-control form-control-sm text-uppercase fw-semibold" placeholder="e.g. SEP AMIT KUMAR" />
+                <div class="search-input-group">
+                  <div class="input-icon-wrapper">
+                    <i class="fas fa-search search-leading-icon"></i>
+                    <input type="text" id="aiPersonnelName" class="form-control search-field-custom text-uppercase fw-semibold" placeholder="Search name (e.g. AMR)..." oninput="this.value = this.value.toUpperCase(); onAiPersonnelNameChange(this.value);" onfocus="onAiPersonnelNameFocus();" onkeydown="handleAiNameSearchKeydown(event);" autocomplete="off" />
+                    <button type="button" id="clearAiNameBtn" class="clear-search-btn d-none" onclick="clearAiPersonnelName(event)" title="Clear Soldier Name">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div id="aiNameSearchResultsDropdown" class="search-results-dropdown d-none"></div>
+                </div>
               </div>
 
-              <div class="col-md-3">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.8rem;">
+              <div class="col-md-2">
+                <label class="form-label fw-semibold mb-1.5" style="font-size: 0.8rem;">
                   <i class="fas fa-medal text-warning me-1"></i>Rank
                 </label>
-                <select id="aiRank" class="form-select form-select-sm fw-semibold text-dark" onchange="onAiRankSelectChange(this)">
+                <select id="aiRank" class="form-select form-select-sm fw-semibold text-dark" style="height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.84rem; padding: 0.38rem 0.5rem;" onchange="this.classList.remove('ai-match-highlight'); onAiRankSelectChange(this)">
                   <option value="">Select Rank</option>
                   <option value="Agniveer">Agniveer</option>
                   <option value="Signal Man" selected>Signal Man</option>
@@ -697,15 +921,15 @@
                   <option value="Other">Other Rank...</option>
                 </select>
                 <div id="aiRankOtherWrap" style="display: none;" class="mt-1">
-                  <input type="text" id="aiRankOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom rank" />
+                  <input type="text" id="aiRankOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom rank" oninput="this.classList.remove('ai-match-highlight'); onAiParameterModified();" />
                 </div>
               </div>
 
               <div class="col-md-3">
-                <label class="form-label fw-semibold mb-1" style="font-size: 0.8rem;">
+                <label class="form-label fw-semibold mb-1.5" style="font-size: 0.8rem;">
                   <i class="fas fa-wrench text-info me-1"></i>Trade
                 </label>
-                <select id="aiTrade" class="form-select form-select-sm fw-semibold text-dark" onchange="onAiTradeSelectChange(this)">
+                <select id="aiTrade" class="form-select form-select-sm fw-semibold text-dark" style="height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.84rem; padding: 0.38rem 0.65rem;" onchange="this.classList.remove('ai-match-highlight'); onAiTradeSelectChange(this)">
                   <option value="">Select Trade</option>
                   <option value="GENERAL DUTY" selected>GENERAL DUTY</option>
                   <option value="CLK SD">CLK SD</option>
@@ -730,7 +954,7 @@
                   <option value="Other">Other Trade...</option>
                 </select>
                 <div id="aiTradeOtherWrap" style="display: none;" class="mt-1">
-                  <input type="text" id="aiTradeOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom trade" />
+                  <input type="text" id="aiTradeOtherInput" class="form-control form-control-sm text-uppercase" placeholder="Specify custom trade" oninput="this.classList.remove('ai-match-highlight'); onAiParameterModified();" />
                 </div>
               </div>
             </div>
@@ -754,9 +978,9 @@
                   <table class="table table-sm table-bordered align-middle mb-2" style="font-size: 0.8rem; background: #fff;" id="aiUnitsTable">
                     <thead class="table-light">
                       <tr class="fw-bold" style="font-weight: 700; color: #1e293b;">
-                        <th class="fw-bold" style="min-width: 130px; font-weight: 700 !important;">Unit Name</th>
-                        <th class="fw-bold" style="min-width: 140px; font-weight: 700 !important;">From Date</th>
-                        <th class="fw-bold" style="min-width: 140px; font-weight: 700 !important;">To Date</th>
+                        <th class="fw-bold" style="min-width: 140px; font-weight: 700 !important;">Unit Name</th>
+                        <th class="fw-bold" style="min-width: 160px; font-weight: 700 !important;">From Date</th>
+                        <th class="fw-bold" style="min-width: 160px; font-weight: 700 !important;">To Date</th>
                         <th class="fw-bold" style="min-width: 220px; font-weight: 700 !important;">Duty / Domain (Select Options)</th>
                         <th style="width: 36px;"></th>
                       </tr>
@@ -764,12 +988,12 @@
                     <tbody id="aiUnitsTableBody">
                       <tr>
                         <td>
-                          <input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" />
+                          <input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited(this);" style="height: 36px; font-size: 0.86rem; font-weight: 600; padding: 0.4rem 0.65rem;" />
                         </td>
                         <td>
                           <div class="input-group input-group-sm flex-nowrap">
-                            <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
-                            <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                            <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited(this);" style="font-size: 0.86rem; font-weight: 700; letter-spacing: 0.5px; height: 36px; padding: 0.4rem 0.5rem;" />
+                            <button class="btn btn-outline-secondary px-2.5 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar" style="height: 36px;">
                               <i class="far fa-calendar-alt text-success"></i>
                               <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
                             </button>
@@ -777,8 +1001,8 @@
                         </td>
                         <td>
                           <div class="input-group input-group-sm flex-nowrap">
-                            <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
-                            <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+                            <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited(this);" style="font-size: 0.86rem; font-weight: 700; letter-spacing: 0.5px; height: 36px; padding: 0.4rem 0.5rem;" />
+                            <button class="btn btn-outline-secondary px-2.5 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar" style="height: 36px;">
                               <i class="far fa-calendar-alt text-success"></i>
                               <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
                             </button>
@@ -2130,65 +2354,789 @@
   }
 
   let aiLookupDebounceTimer = null;
-  function onAiArmyNumberChange(val) {
-    clearTimeout(aiLookupDebounceTimer);
-    if (!val || val.length < 3) return;
-    aiLookupDebounceTimer = setTimeout(() => {
-      lookupPersonnelByArmyNo(val);
-    }, 500);
+  let aiNameLookupDebounceTimer = null;
+  let currentLookupAbortController = null;
+  let currentNameLookupAbortController = null;
+  let lastMatchedArmyNo = null;
+  let lastMatchedName = null;
+  let isPersonnelAutofilled = false;
+
+  let aiSearchActiveIndex = -1;
+  let aiSearchCurrentQuery = '';
+  let aiSearchAbortController = null;
+
+  function escapeAiHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
-  async function lookupPersonnelByArmyNo(customArmyNo) {
-    const armyNo = (customArmyNo || document.getElementById('aiArmyNumber')?.value || '').trim();
-    if (!armyNo) return;
-    const statusEl = document.getElementById('aiArmyNoLookupStatus');
-    if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-primary"></i> Looking up soldier...';
+  function getAiSoldierInitials(name) {
+    if (!name) return 'SO';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
 
-    // 1. Check if main form already has this Army Number
-    const mainArmyNo = (document.getElementById('armyNumber')?.value || '').trim();
-    if (mainArmyNo && mainArmyNo.toUpperCase() === armyNo.toUpperCase()) {
-      const mainName = (document.getElementById('name')?.value || '').trim();
-      const mainTrade = (document.getElementById('trade')?.value || '').trim();
-      const mainRank = (document.getElementById('rank')?.value || '').trim();
-      const mainEnroll = (document.getElementById('dateOfEnrollment')?.value || '').trim();
-      if (mainName && document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = mainName.toUpperCase();
-      if (mainTrade) {
-        const mapped = mapMainTradeToAiTrade(mainTrade);
-        setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mainTrade);
+  function highlightAiSearchMatch(text, query) {
+    if (!text) return '';
+    const textStr = String(text);
+    const effectiveQuery = (query || '').trim();
+    if (!effectiveQuery) return escapeAiHtml(textStr);
+
+    const escapedQuery = effectiveQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    const parts = textStr.split(regex);
+    if (parts.length <= 1) return escapeAiHtml(textStr);
+
+    return parts.map(part => {
+      if (part.toLowerCase() === effectiveQuery.toLowerCase()) {
+        return `<span class="search-highlight">${escapeAiHtml(part)}</span>`;
       }
-      if (mainRank) {
-        const mapped = mapMainRankToAiRank(mainRank);
-        setSelectValueCaseInsensitive(document.getElementById('aiRank'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiRank'), mainRank);
+      return escapeAiHtml(part);
+    }).join('');
+  }
+
+  function onAiArmyNumberChange(val) {
+    clearTimeout(aiLookupDebounceTimer);
+    const cleanVal = (val || '').trim().toUpperCase();
+
+    const clearArmyBtn = document.getElementById('clearAiArmyBtn');
+    if (clearArmyBtn) {
+      if (cleanVal) clearArmyBtn.classList.remove('d-none');
+      else clearArmyBtn.classList.add('d-none');
+    }
+
+    // If Army Number was changed and no longer matches the previously matched record,
+    // clear the previously autofilled fields so stale data is never retained.
+    if (lastMatchedArmyNo && cleanVal !== lastMatchedArmyNo) {
+      clearAiAutofilledFields(true, false);
+      lastMatchedArmyNo = null;
+    }
+
+    if (!cleanVal) {
+      clearAiAutofilledFields(false, false);
+      lastMatchedArmyNo = null;
+      if (currentLookupAbortController) {
+        currentLookupAbortController.abort();
+        currentLookupAbortController = null;
       }
-      if (mainEnroll && document.getElementById('aiDateOfEnrollment')) document.getElementById('aiDateOfEnrollment').value = isoToDmy(mainEnroll);
-      if (statusEl) statusEl.innerHTML = '<span class="text-success fw-semibold"><i class="fas fa-check-circle"></i> Auto-filled from Main Form</span>';
+      const statusEl = document.getElementById('aiArmyNoLookupStatus');
+      if (statusEl) statusEl.innerHTML = '';
       return;
     }
 
-    // 2. Fetch from Database
+    // Debounce database query (350ms)
+    aiLookupDebounceTimer = setTimeout(() => {
+      lookupPersonnelByArmyNo(cleanVal);
+    }, 350);
+  }
+
+  function onAiPersonnelNameChange(val) {
+    clearTimeout(aiNameLookupDebounceTimer);
+    const cleanVal = (val || '').trim().toUpperCase();
+
+    const clearNameBtn = document.getElementById('clearAiNameBtn');
+    if (clearNameBtn) {
+      if (cleanVal) clearNameBtn.classList.remove('d-none');
+      else clearNameBtn.classList.add('d-none');
+    }
+
+    // If Name was changed and no longer matches previously matched record,
+    // clear other autofilled fields so stale data is never retained.
+    if (lastMatchedName && cleanVal !== lastMatchedName) {
+      clearAiAutofilledFields(false, true);
+      lastMatchedName = null;
+    }
+
+    if (!cleanVal) {
+      clearAiAutofilledFields(false, false);
+      lastMatchedName = null;
+      const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+      if (dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+      }
+      if (aiSearchAbortController) {
+        aiSearchAbortController.abort();
+        aiSearchAbortController = null;
+      }
+      if (currentNameLookupAbortController) {
+        currentNameLookupAbortController.abort();
+        currentNameLookupAbortController = null;
+      }
+      const statusEl = document.getElementById('aiNameLookupStatus');
+      if (statusEl) statusEl.innerHTML = '';
+      return;
+    }
+
+    // Debounce search query (200ms) matching AI fitness module
+    aiNameLookupDebounceTimer = setTimeout(() => {
+      searchAiPersonnelDropdown(cleanVal);
+    }, 200);
+  }
+
+  async function searchAiPersonnelDropdown(query) {
+    aiSearchCurrentQuery = (query || '').trim().toUpperCase();
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    const statusEl = document.getElementById('aiNameLookupStatus');
+
+    if (!aiSearchCurrentQuery) {
+      if (dropdown) dropdown.classList.add('d-none');
+      if (statusEl) statusEl.innerHTML = '';
+      return;
+    }
+
+    if (statusEl) {
+      statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-warning"></i> Searching personnel database...';
+    }
+
+    if (aiSearchAbortController) {
+      aiSearchAbortController.abort();
+    }
+    aiSearchAbortController = new AbortController();
+
     try {
-      const res = await fetch(`/api/ai/company-recommendation/lookup-personnel?army_number=${encodeURIComponent(armyNo)}`);
+      const res = await fetch(`/api/ai/company-recommendation/search-personnel?q=${encodeURIComponent(aiSearchCurrentQuery)}&limit=15`, {
+        signal: aiSearchAbortController.signal
+      });
       const data = await res.json();
-      if (data.success && data.found && data.data) {
-        const p = data.data;
-        if (document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = (p.name || '').toUpperCase();
-        if (p.trade) {
-          const mapped = mapMainTradeToAiTrade(p.trade);
-          setSelectValueCaseInsensitive(document.getElementById('aiTrade'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiTrade'), p.trade);
-        }
-        if (p.rank) {
-          const mapped = mapMainRankToAiRank(p.rank);
-          setSelectValueCaseInsensitive(document.getElementById('aiRank'), mapped) || setSelectValueCaseInsensitive(document.getElementById('aiRank'), p.rank);
-        }
-        if (p.date_of_enrollment && document.getElementById('aiDateOfEnrollment')) {
-          document.getElementById('aiDateOfEnrollment').value = isoToDmy(p.date_of_enrollment);
-        }
-        if (statusEl) statusEl.innerHTML = `<span class="text-success fw-semibold"><i class="fas fa-check-circle"></i> Found in Database: ${p.name || ''} (${p.rank || ''})</span>`;
+
+      if (aiSearchCurrentQuery !== query.trim().toUpperCase()) return;
+
+      if (data.success && Array.isArray(data.data)) {
+        renderAiNameSearchResults(data.data, aiSearchCurrentQuery);
       } else {
-        if (statusEl) statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> New soldier profile</span>';
+        renderAiNameSearchResults([], aiSearchCurrentQuery);
       }
     } catch (e) {
-      if (statusEl) statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Enter details manually</span>';
+      if (e.name === 'AbortError') return;
+      console.error('Personnel search error:', e);
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Enter details manually</span>';
+      }
+    }
+  }
+
+  function renderAiNameSearchResults(soldiers, query) {
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    const statusEl = document.getElementById('aiNameLookupStatus');
+    if (!dropdown) return;
+
+    dropdown.innerHTML = '';
+    aiSearchActiveIndex = -1;
+
+    if (!soldiers || soldiers.length === 0) {
+      dropdown.innerHTML = `
+        <div class="p-3 text-muted text-center small font-monospace">
+          <i class="fas fa-search text-warning me-1"></i> No personnel found matching "${escapeAiHtml(query)}".
+          <div class="mt-1 text-secondary" style="font-size: 0.72rem;">You can enter details manually below.</div>
+        </div>
+      `;
+      dropdown.classList.remove('d-none');
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Personnel not found — enter details manually</span>';
+      }
+      return;
+    }
+
+    if (statusEl) {
+      statusEl.innerHTML = `<span class="text-primary fw-semibold" style="font-size: 0.72rem;"><i class="fas fa-list-ul me-1"></i>Found ${soldiers.length} match${soldiers.length > 1 ? 'es' : ''} — select from dropdown</span>`;
+    }
+
+    soldiers.forEach((s, idx) => {
+      const item = document.createElement('div');
+      item.className = 'search-item';
+      item.setAttribute('data-index', idx);
+
+      const initials = getAiSoldierInitials(s.name);
+      const highlightedName = highlightAiSearchMatch(s.name, query);
+      const highlightedArmyNo = highlightAiSearchMatch(s.army_number, query);
+      const highlightedRank = escapeAiHtml(s.rank || 'Soldier');
+      const company = escapeAiHtml(s.company || 'Unit HQ');
+      const trade = escapeAiHtml(s.trade || 'GD');
+
+      const unitsCount = (s.units_served && Array.isArray(s.units_served)) ? s.units_served.length : 0;
+      let unitBadgeHtml = '';
+      if (unitsCount > 0) {
+        const firstUnit = escapeAiHtml(s.units_served[0].unit || 'Unit');
+        const moreTxt = unitsCount > 1 ? ` +${unitsCount - 1}` : '';
+        unitBadgeHtml = `<span class="badge bg-primary text-white px-1.5 py-0.5" style="font-size: 0.68rem;" title="${unitsCount} units served"><i class="fas fa-history me-1"></i>${firstUnit}${moreTxt}</span>`;
+      } else if (s.prior_station && !['NO', 'NONE', 'NULL', 'YES', ''].includes(s.prior_station.toUpperCase())) {
+        unitBadgeHtml = `<span class="badge bg-primary text-white px-1.5 py-0.5" style="font-size: 0.68rem;"><i class="fas fa-history me-1"></i>${escapeAiHtml(s.prior_station)}</span>`;
+      } else {
+        unitBadgeHtml = `<span class="badge bg-secondary text-white px-1.5 py-0.5" style="font-size: 0.68rem;"><i class="fas fa-user-plus me-1"></i>Fresh Joinee</span>`;
+      }
+
+      item.innerHTML = `
+        <div class="d-flex align-items-center gap-2.5 flex-grow-1 min-w-0">
+          <div class="search-soldier-avatar flex-shrink-0">${initials}</div>
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-bold text-truncate text-dark" style="font-size: 0.86rem; line-height: 1.3;">
+              ${highlightedName} <span class="badge bg-secondary text-white ms-1 fw-semibold" style="font-size: 0.68rem; vertical-align: middle;">${highlightedRank}</span>
+            </div>
+            <div class="small text-muted d-flex align-items-center flex-wrap gap-1.5 mt-0.5" style="font-size: 0.74rem; line-height: 1.3;">
+              <span class="search-soldier-army-no">${highlightedArmyNo}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-semibold text-secondary"><i class="fas fa-building me-0.5 text-muted"></i>${company}</span>
+              <span class="text-muted opacity-50">&bull;</span>
+              <span class="fw-medium text-secondary">${trade}</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-end flex-shrink-0 ms-2">
+          ${unitBadgeHtml}
+          <div class="small text-muted mt-0.5" style="font-size: 0.68rem;"><i class="fas fa-database text-warning me-0.5"></i>${s.source === 'dues_in' ? 'Incoming' : 'Personnel'}</div>
+        </div>
+      `;
+
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectAiPersonnelSearchResult(s);
+      });
+
+      dropdown.appendChild(item);
+    });
+
+    dropdown.classList.remove('d-none');
+  }
+
+  function selectAiPersonnelSearchResult(soldier) {
+    if (!soldier) return;
+    const nameInput = document.getElementById('aiPersonnelName');
+    if (nameInput) {
+      nameInput.value = (soldier.name || '').toUpperCase();
+      nameInput.classList.add('ai-match-highlight');
+    }
+    const clearNameBtn = document.getElementById('clearAiNameBtn');
+    if (clearNameBtn) clearNameBtn.classList.remove('d-none');
+
+    const clearArmyBtn = document.getElementById('clearAiArmyBtn');
+    if (clearArmyBtn && soldier.army_number) clearArmyBtn.classList.remove('d-none');
+
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    if (dropdown) {
+      dropdown.classList.add('d-none');
+      dropdown.innerHTML = '';
+    }
+    aiSearchActiveIndex = -1;
+
+    // Populate all other fields from matched soldier
+    populateAiModalFromPersonnel(soldier, 'name');
+  }
+
+  function handleAiNameSearchKeydown(e) {
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    if (!dropdown || dropdown.classList.contains('d-none')) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        lookupPersonnelByName();
+      }
+      return;
+    }
+
+    const items = dropdown.querySelectorAll('.search-item');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      aiSearchActiveIndex = (aiSearchActiveIndex + 1) % items.length;
+      updateActiveAiSearchItem(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      aiSearchActiveIndex = (aiSearchActiveIndex - 1 + items.length) % items.length;
+      updateActiveAiSearchItem(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (aiSearchActiveIndex >= 0 && items[aiSearchActiveIndex]) {
+        items[aiSearchActiveIndex].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      } else if (items.length > 0) {
+        items[0].dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+      }
+    } else if (e.key === 'Escape') {
+      dropdown.classList.add('d-none');
+      aiSearchActiveIndex = -1;
+    }
+  }
+
+  function updateActiveAiSearchItem(items) {
+    items.forEach((it, idx) => {
+      if (idx === aiSearchActiveIndex) {
+        it.classList.add('active-item');
+        it.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } else {
+        it.classList.remove('active-item');
+      }
+    });
+  }
+
+  function onAiPersonnelNameFocus() {
+    const nameInput = document.getElementById('aiPersonnelName');
+    const val = (nameInput ? nameInput.value : '').trim();
+    if (val.length >= 1) {
+      searchAiPersonnelDropdown(val);
+    }
+  }
+
+  function clearAiPersonnelName(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const nameInput = document.getElementById('aiPersonnelName');
+    if (nameInput) {
+      nameInput.value = '';
+      nameInput.classList.remove('ai-match-highlight');
+      nameInput.focus();
+    }
+    const clearBtn = document.getElementById('clearAiNameBtn');
+    if (clearBtn) clearBtn.classList.add('d-none');
+
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    if (dropdown) {
+      dropdown.classList.add('d-none');
+      dropdown.innerHTML = '';
+    }
+    aiSearchActiveIndex = -1;
+
+    clearAiAutofilledFields(true, false);
+    lastMatchedName = null;
+    const statusEl = document.getElementById('aiNameLookupStatus');
+    if (statusEl) statusEl.innerHTML = '';
+  }
+
+  function clearAiArmyNumber(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const armyInput = document.getElementById('aiArmyNumber');
+    if (armyInput) {
+      armyInput.value = '';
+      armyInput.classList.remove('ai-match-highlight');
+      armyInput.focus();
+    }
+    const clearBtn = document.getElementById('clearAiArmyBtn');
+    if (clearBtn) clearBtn.classList.add('d-none');
+
+    clearAiAutofilledFields(false, true);
+    lastMatchedArmyNo = null;
+    const statusEl = document.getElementById('aiArmyNoLookupStatus');
+    if (statusEl) statusEl.innerHTML = '';
+  }
+
+  // Close search dropdown when clicked outside
+  document.addEventListener('click', (e) => {
+    const nameInput = document.getElementById('aiPersonnelName');
+    const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+    if (dropdown && !dropdown.classList.contains('d-none')) {
+      if (nameInput && !nameInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('d-none');
+        aiSearchActiveIndex = -1;
+      }
+    }
+  });
+
+  function showAiSyncNotice(armyNo, nameAndCompany) {
+    const syncNotice = document.getElementById('aiMainFormSyncNotice');
+    if (!syncNotice) return;
+    const identityArmyNo = document.getElementById('aiIdentityArmyNo');
+    const identityName = document.getElementById('aiIdentityName');
+    if (identityArmyNo) identityArmyNo.textContent = armyNo || '--';
+    if (identityName) identityName.innerHTML = nameAndCompany || '--';
+    syncNotice.classList.remove('d-none');
+    syncNotice.classList.add('d-flex');
+    syncNotice.style.setProperty('display', 'flex', 'important');
+  }
+
+  function hideAiSyncNotice() {
+    const syncNotice = document.getElementById('aiMainFormSyncNotice');
+    if (!syncNotice) return;
+    const identityArmyNo = document.getElementById('aiIdentityArmyNo');
+    const identityName = document.getElementById('aiIdentityName');
+    if (identityArmyNo) identityArmyNo.textContent = '--';
+    if (identityName) identityName.textContent = '--';
+    syncNotice.classList.remove('d-flex');
+    syncNotice.classList.add('d-none');
+    syncNotice.style.setProperty('display', 'none', 'important');
+  }
+
+  function clearAiAutofilledFields(keepArmyNo = false, keepName = false) {
+    if (!keepArmyNo) {
+      const armyNoEl = document.getElementById('aiArmyNumber');
+      if (armyNoEl) {
+        armyNoEl.value = '';
+        armyNoEl.classList.remove('ai-match-highlight');
+      }
+      const clearArmyBtn = document.getElementById('clearAiArmyBtn');
+      if (clearArmyBtn) clearArmyBtn.classList.add('d-none');
+
+      const armyStatus = document.getElementById('aiArmyNoLookupStatus');
+      if (armyStatus) armyStatus.innerHTML = '';
+      lastMatchedArmyNo = null;
+    } else {
+      const armyNoEl = document.getElementById('aiArmyNumber');
+      if (armyNoEl) armyNoEl.classList.remove('ai-match-highlight');
+    }
+
+    if (!keepName) {
+      const nameEl = document.getElementById('aiPersonnelName');
+      if (nameEl) {
+        nameEl.value = '';
+        nameEl.classList.remove('ai-match-highlight');
+      }
+      const clearNameBtn = document.getElementById('clearAiNameBtn');
+      if (clearNameBtn) clearNameBtn.classList.add('d-none');
+
+      const dropdown = document.getElementById('aiNameSearchResultsDropdown');
+      if (dropdown) {
+        dropdown.classList.add('d-none');
+        dropdown.innerHTML = '';
+      }
+      aiSearchActiveIndex = -1;
+
+      const nameStatus = document.getElementById('aiNameLookupStatus');
+      if (nameStatus) nameStatus.innerHTML = '';
+      lastMatchedName = null;
+    } else {
+      const nameEl = document.getElementById('aiPersonnelName');
+      if (nameEl) nameEl.classList.remove('ai-match-highlight');
+    }
+
+    // Reset Trade
+    const tradeSelect = document.getElementById('aiTrade');
+    const tradeOtherWrap = document.getElementById('aiTradeOtherWrap');
+    const tradeOtherInput = document.getElementById('aiTradeOtherInput');
+    if (tradeSelect) {
+      tradeSelect.selectedIndex = 0;
+      tradeSelect.classList.remove('ai-match-highlight');
+    }
+    if (tradeOtherWrap) tradeOtherWrap.style.display = 'none';
+    if (tradeOtherInput) {
+      tradeOtherInput.value = '';
+      tradeOtherInput.classList.remove('ai-match-highlight');
+    }
+
+    // Reset Rank
+    const rankSelect = document.getElementById('aiRank');
+    const rankOtherWrap = document.getElementById('aiRankOtherWrap');
+    const rankOtherInput = document.getElementById('aiRankOtherInput');
+    if (rankSelect) {
+      rankSelect.selectedIndex = 0;
+      rankSelect.classList.remove('ai-match-highlight');
+    }
+    if (rankOtherWrap) rankOtherWrap.style.display = 'none';
+    if (rankOtherInput) {
+      rankOtherInput.value = '';
+      rankOtherInput.classList.remove('ai-match-highlight');
+    }
+
+    // Reset Date of Enrollment if present
+    const dateEnroll = document.getElementById('aiDateOfEnrollment');
+    if (dateEnroll) {
+      dateEnroll.value = '';
+      dateEnroll.classList.remove('ai-match-highlight');
+    }
+
+    // Reset Prior Station if present
+    const priorStationEl = document.getElementById('aiPriorStation');
+    if (priorStationEl) {
+      priorStationEl.value = '';
+      priorStationEl.classList.remove('ai-match-highlight');
+    }
+
+    const parentCompanyEl = document.getElementById('company');
+    if (parentCompanyEl) parentCompanyEl.classList.remove('ai-match-highlight');
+
+    // Reset units table to 1 clean default row
+    const tbody = document.getElementById('aiUnitsTableBody');
+    if (tbody) {
+      tbody.innerHTML = '';
+      addAiUnitRow('');
+    }
+
+    const freshChk = document.getElementById('aiFreshJoineeCheckbox');
+    if (freshChk) {
+      freshChk.checked = false;
+      freshChk.classList.remove('ai-match-highlight');
+      toggleAiFreshJoinee(false);
+    }
+
+    if (!keepArmyNo && !keepName) {
+      hideAiSyncNotice();
+    }
+
+    isPersonnelAutofilled = false;
+    if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+  }
+
+  function populateAiModalFromPersonnel(p, triggerSource = 'army_number') {
+    if (!p) return;
+    lastMatchedArmyNo = (p.army_number || '').toUpperCase();
+    lastMatchedName = (p.name || '').toUpperCase();
+    isPersonnelAutofilled = true;
+
+    // 1. Army Number (highlight in yellow)
+    const armyNoInput = document.getElementById('aiArmyNumber');
+    if (armyNoInput) {
+      armyNoInput.value = (p.army_number || '').toUpperCase();
+      armyNoInput.classList.add('ai-match-highlight');
+    }
+
+    // 2. Soldier Name (highlight in yellow)
+    const nameInput = document.getElementById('aiPersonnelName');
+    if (nameInput) {
+      nameInput.value = (p.name || '').toUpperCase();
+      nameInput.classList.add('ai-match-highlight');
+    }
+
+    // 3. Trade (highlight in yellow)
+    const tradeSelect = document.getElementById('aiTrade');
+    const tradeOtherWrap = document.getElementById('aiTradeOtherWrap');
+    const tradeOtherInput = document.getElementById('aiTradeOtherInput');
+    if (tradeSelect && p.trade) {
+      const mappedTrade = mapMainTradeToAiTrade(p.trade);
+      const matched = setSelectValueCaseInsensitive(tradeSelect, mappedTrade) || setSelectValueCaseInsensitive(tradeSelect, p.trade);
+      if (matched) {
+        tradeSelect.classList.add('ai-match-highlight');
+        if (tradeOtherWrap) tradeOtherWrap.style.display = 'none';
+      } else {
+        tradeSelect.value = 'Other';
+        tradeSelect.classList.add('ai-match-highlight');
+        if (tradeOtherWrap) tradeOtherWrap.style.display = 'block';
+        if (tradeOtherInput) {
+          tradeOtherInput.value = p.trade.toUpperCase();
+          tradeOtherInput.classList.add('ai-match-highlight');
+        }
+      }
+    }
+
+    // 4. Rank (highlight in yellow)
+    const rankSelect = document.getElementById('aiRank');
+    const rankOtherWrap = document.getElementById('aiRankOtherWrap');
+    const rankOtherInput = document.getElementById('aiRankOtherInput');
+    if (rankSelect && p.rank) {
+      const mappedRank = mapMainRankToAiRank(p.rank);
+      const matched = setSelectValueCaseInsensitive(rankSelect, mappedRank) || setSelectValueCaseInsensitive(rankSelect, p.rank);
+      if (matched) {
+        rankSelect.classList.add('ai-match-highlight');
+        if (rankOtherWrap) rankOtherWrap.style.display = 'none';
+      } else {
+        rankSelect.value = 'Other';
+        rankSelect.classList.add('ai-match-highlight');
+        if (rankOtherWrap) rankOtherWrap.style.display = 'block';
+        if (rankOtherInput) {
+          rankOtherInput.value = p.rank.toUpperCase();
+          rankOtherInput.classList.add('ai-match-highlight');
+        }
+      }
+    }
+
+    // 5. Date of enrollment (if element exists)
+    if (p.date_of_enrollment && document.getElementById('aiDateOfEnrollment')) {
+      document.getElementById('aiDateOfEnrollment').value = isoToDmy(p.date_of_enrollment);
+      document.getElementById('aiDateOfEnrollment').classList.add('ai-match-highlight');
+    }
+
+    // 6. Previous Unit Served (highlight in yellow) - ALWAYS FILLED FROM MATCHED DATA
+    const tbody = document.getElementById('aiUnitsTableBody');
+    const freshChk = document.getElementById('aiFreshJoineeCheckbox');
+    const units = (p.units_served && Array.isArray(p.units_served) && p.units_served.length > 0) ? p.units_served : [];
+
+    if (tbody) {
+      tbody.innerHTML = '';
+      if (units.length > 0) {
+        units.forEach(u => {
+          const rawDuty = (u.duty_performed && String(u.duty_performed).trim()) 
+            ? String(u.duty_performed).trim() 
+            : ((p.trade && String(p.trade).trim()) ? String(p.trade).trim() : 'GD');
+          addAiUnitRow(rawDuty);
+          const lastRow = tbody.lastElementChild;
+          if (lastRow) {
+            const nameEl = lastRow.querySelector('.ai-u-name');
+            const fromEl = lastRow.querySelector('.ai-u-from');
+            const toEl = lastRow.querySelector('.ai-u-to');
+            const dutyBtn = lastRow.querySelector('.ai-duty-select-btn');
+
+            if (nameEl) {
+              nameEl.value = (u.unit || '').toUpperCase();
+              nameEl.classList.add('ai-match-highlight');
+              nameEl.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (fromEl) {
+              fromEl.value = u.from_date || '';
+              if (u.from_date) {
+                fromEl.classList.add('ai-match-highlight');
+                fromEl.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            }
+            if (toEl) {
+              toEl.value = u.to_date || '';
+              if (u.to_date) {
+                toEl.classList.add('ai-match-highlight');
+                toEl.dispatchEvent(new Event('input', { bubbles: true }));
+              }
+            }
+            if (dutyBtn) {
+              dutyBtn.classList.add('ai-match-highlight');
+              dutyBtn.style.setProperty('background-color', '#fef08a', 'important');
+              dutyBtn.style.setProperty('color', '#713f12', 'important');
+              dutyBtn.style.setProperty('border-color', '#eab308', 'important');
+            }
+            updateAiRowDutySummary(lastRow);
+          }
+        });
+
+        if (freshChk) {
+          freshChk.checked = false;
+          freshChk.classList.remove('ai-match-highlight');
+          toggleAiFreshJoinee(false);
+        }
+      } else if (p.prior_station && !['NO', 'NONE', 'NULL', 'YES', ''].includes(p.prior_station.toUpperCase())) {
+        const stationDuty = (p.trade && String(p.trade).trim()) ? String(p.trade).trim() : 'GD';
+        addAiUnitRow(stationDuty);
+        const lastRow = tbody.lastElementChild;
+        if (lastRow) {
+          const nameEl = lastRow.querySelector('.ai-u-name');
+          if (nameEl) {
+            nameEl.value = p.prior_station.toUpperCase();
+            nameEl.classList.add('ai-match-highlight');
+            nameEl.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          const dutyBtn = lastRow.querySelector('.ai-duty-select-btn');
+          if (dutyBtn) {
+            dutyBtn.classList.add('ai-match-highlight');
+            dutyBtn.style.setProperty('background-color', '#fef08a', 'important');
+            dutyBtn.style.setProperty('color', '#713f12', 'important');
+            dutyBtn.style.setProperty('border-color', '#eab308', 'important');
+          }
+          updateAiRowDutySummary(lastRow);
+        }
+        if (freshChk) {
+          freshChk.checked = false;
+          toggleAiFreshJoinee(false);
+        }
+      } else {
+        // Zero previous postings in database: automatically mark as Fresh Joinee so form is immediately valid!
+        if (freshChk) {
+          freshChk.checked = true;
+          freshChk.classList.add('ai-match-highlight');
+          toggleAiFreshJoinee(true);
+        }
+        const defaultDuty = (p.trade && String(p.trade).trim()) ? String(p.trade).trim() : 'GD';
+        addAiUnitRow(defaultDuty);
+      }
+    }
+
+    // 7. Company - wherever existing UI contains/displays company information
+    const companyName = p.company || '';
+    const parentCompany = document.getElementById('company');
+    if (parentCompany && companyName) {
+      parentCompany.value = companyName;
+      parentCompany.classList.add('ai-match-highlight');
+    }
+
+    // 8. Profile sync notice
+    showAiSyncNotice(p.army_number, `${p.name || ''} • <mark class="ai-yellow-mark"><i class="fas fa-building me-1"></i>${companyName || 'N/A'}</mark>`);
+
+    if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+  }
+
+  async function lookupPersonnelByArmyNo(customArmyNo) {
+    clearTimeout(aiLookupDebounceTimer);
+    const armyNo = (customArmyNo || document.getElementById('aiArmyNumber')?.value || '').trim().toUpperCase();
+    if (!armyNo) {
+      clearAiAutofilledFields(false, false);
+      lastMatchedArmyNo = null;
+      return;
+    }
+
+    const statusEl = document.getElementById('aiArmyNoLookupStatus');
+    if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-warning"></i> Searching personnel database...';
+
+    if (currentLookupAbortController) {
+      currentLookupAbortController.abort();
+    }
+    currentLookupAbortController = new AbortController();
+
+    try {
+      const res = await fetch(`/api/ai/company-recommendation/lookup-personnel?army_number=${encodeURIComponent(armyNo)}`, {
+        signal: currentLookupAbortController.signal
+      });
+      const data = await res.json();
+
+      if (data.success && data.found && data.data) {
+        populateAiModalFromPersonnel(data.data, 'army_number');
+      } else {
+        // No match found in database
+        if (lastMatchedArmyNo) {
+          clearAiAutofilledFields(true, false);
+          lastMatchedArmyNo = null;
+        } else {
+          const armyNoInput = document.getElementById('aiArmyNumber');
+          if (armyNoInput) armyNoInput.classList.remove('ai-match-highlight');
+        }
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Personnel not found in database — enter details manually</span>';
+        }
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Enter details manually</span>';
+      }
+    }
+  }
+
+  async function lookupPersonnelByName(customName) {
+    clearTimeout(aiNameLookupDebounceTimer);
+    const name = (customName || document.getElementById('aiPersonnelName')?.value || '').trim().toUpperCase();
+    if (!name) {
+      clearAiAutofilledFields(false, false);
+      lastMatchedName = null;
+      return;
+    }
+
+    const statusEl = document.getElementById('aiNameLookupStatus');
+    if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin text-warning"></i> Searching personnel database...';
+
+    if (currentNameLookupAbortController) {
+      currentNameLookupAbortController.abort();
+    }
+    currentNameLookupAbortController = new AbortController();
+
+    try {
+      const res = await fetch(`/api/ai/company-recommendation/lookup-personnel?name=${encodeURIComponent(name)}`, {
+        signal: currentNameLookupAbortController.signal
+      });
+      const data = await res.json();
+
+      if (data.success && data.found && data.data) {
+        populateAiModalFromPersonnel(data.data, 'name');
+      } else {
+        // No match found in database
+        if (lastMatchedName) {
+          clearAiAutofilledFields(false, true);
+          lastMatchedName = null;
+        } else {
+          const nameInput = document.getElementById('aiPersonnelName');
+          if (nameInput) nameInput.classList.remove('ai-match-highlight');
+        }
+        if (statusEl) {
+          statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Personnel not found in database — enter details manually</span>';
+        }
+        if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      if (statusEl) {
+        statusEl.innerHTML = '<span class="text-muted"><i class="fas fa-info-circle"></i> Enter details manually</span>';
+      }
     }
   }
 
@@ -2200,38 +3148,50 @@
       setTimeout(() => { ic.style.transform = 'none'; }, 400);
     });
 
-    // 2. Reset Live Tab Inputs
-    const armyNoEl = document.getElementById('aiArmyNumber');
-    if (armyNoEl) armyNoEl.value = '';
-    const nameEl = document.getElementById('aiPersonnelName');
-    if (nameEl) nameEl.value = '';
-    const tradeEl = document.getElementById('aiTrade');
-    if (tradeEl) tradeEl.value = '';
-    const rankEl = document.getElementById('aiRank');
-    if (rankEl) rankEl.value = '';
-    const enrollEl = document.getElementById('aiDateOfEnrollment');
-    if (enrollEl) enrollEl.value = '';
-    const stationEl = document.getElementById('aiPriorStation');
-    if (stationEl) stationEl.value = '';
+    // 2. Completely reset Live Tab Inputs & clear highlights & hide profile banner
+    clearAiAutofilledFields(false, false);
+    lastMatchedArmyNo = null;
+    lastMatchedName = null;
+    hideAiSyncNotice();
 
-    const syncNotice = document.getElementById('aiMainFormSyncNotice');
-    if (syncNotice) syncNotice.style.display = 'none';
+    // Clear Army No & Name inputs completely
+    const armyNoInput = document.getElementById('aiArmyNumber');
+    if (armyNoInput) {
+      armyNoInput.value = '';
+      armyNoInput.classList.remove('ai-match-highlight');
+    }
+    const nameInput = document.getElementById('aiPersonnelName');
+    if (nameInput) {
+      nameInput.value = '';
+      nameInput.classList.remove('ai-match-highlight');
+    }
+
+    // Hide search clear buttons and status text
+    const clearArmyBtn = document.getElementById('clearAiArmyBtn');
+    if (clearArmyBtn) clearArmyBtn.classList.add('d-none');
+    const clearNameBtn = document.getElementById('clearAiNameBtn');
+    if (clearNameBtn) clearNameBtn.classList.add('d-none');
+    const armyStatus = document.getElementById('aiArmyNoLookupStatus');
+    if (armyStatus) armyStatus.innerHTML = '';
+    const nameStatus = document.getElementById('aiNameLookupStatus');
+    if (nameStatus) nameStatus.innerHTML = '';
+
+    const nameDropdown = document.getElementById('aiNameSearchResultsDropdown');
+    if (nameDropdown) {
+      nameDropdown.classList.add('d-none');
+      nameDropdown.innerHTML = '';
+    }
+    aiSearchActiveIndex = -1;
 
     // 3. Reset Fresh Joinee Checkbox
     const freshChk = document.getElementById('aiFreshJoineeCheckbox');
     if (freshChk) {
       freshChk.checked = false;
+      freshChk.classList.remove('ai-match-highlight');
       toggleAiFreshJoinee(false);
     }
 
-    // 4. Reset Units Table to 1 clean default row
-    const tbody = document.getElementById('aiUnitsTableBody');
-    if (tbody) {
-      tbody.innerHTML = '';
-      addAiUnitRow('GENERAL');
-    }
-
-    // 5. Hide Results Container & reset calculation state
+    // 4. Hide Results Container & reset calculation state
     lastAiRecommendationResult = null;
     const resultContainer = document.getElementById('aiRecResultContainer');
     if (resultContainer) {
@@ -2239,17 +3199,14 @@
       resultContainer.classList.remove('ai-results-reveal');
     }
 
-    // 6. Reset Calculate Button
+    // 5. Reset Calculate Button
     const calcBtn = document.getElementById('btnCalculateAiRec');
     if (calcBtn) {
       calcBtn.disabled = true;
       calcBtn.innerHTML = '<i class="fas fa-bolt text-warning"></i> Calculate AI Recommendation';
     }
 
-    // 7. Check if main personnel form has values and re-sync
-    syncAiModalFromMainForm();
-
-    // 8. Refresh badge counts & retraining status
+    // 6. Refresh badge counts & retraining status
     updateHistoryBadge();
     fetchRetrainStatus();
     if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
@@ -2272,15 +3229,10 @@
       if (document.getElementById('aiArmyNumber')) document.getElementById('aiArmyNumber').value = mainArmyNo;
       if (document.getElementById('aiPersonnelName')) document.getElementById('aiPersonnelName').value = mainName;
 
-      const syncNotice = document.getElementById('aiMainFormSyncNotice');
-      const identityArmyNo = document.getElementById('aiIdentityArmyNo');
-      const identityName = document.getElementById('aiIdentityName');
       if (mainName || mainArmyNo) {
-        if (identityArmyNo) identityArmyNo.textContent = mainArmyNo || 'N/A';
-        if (identityName) identityName.textContent = mainName || 'N/A';
-        if (syncNotice) syncNotice.style.display = 'flex';
+        showAiSyncNotice(mainArmyNo || 'N/A', mainName || 'N/A');
       } else {
-        if (syncNotice) syncNotice.style.display = 'none';
+        hideAiSyncNotice();
       }
 
       // 3. Trade Dropdown
@@ -2365,7 +3317,7 @@
             toggleAiFreshJoinee(false);
           }
         } else {
-          addAiUnitRow('GENERAL');
+          addAiUnitRow('');
         }
       }
 
@@ -3151,14 +4103,123 @@
     }
   ];
 
+  function normalizeMilitaryDutyToTreeTrades(val) {
+    if (!val) return ['GD'];
+    const s = String(val).trim().toUpperCase();
+    if (!s || s === 'NONE' || s === 'NULL' || s === 'NO' || s === 'N/A' || s === 'GENERAL') {
+      return ['GD'];
+    }
+    const matches = [];
+
+    // Tradesmen & Artisans & Cooks & Mess
+    if (s.includes('ARTISH') || s.includes('ARTSN') || s.includes('ARTISAN') || 
+        s.includes('WELDER') || s.includes('TRADES') || s.includes('HK') || 
+        s.includes('WM') || s.includes('H/K') || s.includes('W/M') || 
+        s.includes('CC') || s.includes('STWD') || s.includes('CARPENTER') || 
+        s.includes('PAINTER') || s.includes('TAILOR') || s.includes('BOOT') ||
+        s.includes('AEBV') || s.includes('ATBV') || s.includes('AT(BV)')) {
+      matches.push('All Tradesmen');
+    }
+    if (s.includes('CHEF') || s.includes('MESS HAV') || s.includes('MESS KEEPER')) {
+      if (!matches.includes('Mess Hav')) matches.push('Mess Hav');
+    }
+    if (s.includes('MESS CDR') || s.includes('JCO MESS')) {
+      if (!matches.includes('JCO Mess Cdr')) matches.push('JCO Mess Cdr');
+    }
+    if (s.includes('BUDDY')) {
+      matches.push('Buddy');
+    }
+    if (s.includes('OFFICE')) {
+      matches.push('Office');
+    }
+
+    // Signals / Communication / Technical
+    if (s.includes('RADIO') || s === 'RR' || s.includes('RRF')) matches.push('Radio');
+    if (s.includes('DVR') || s.includes('DRIVER') || s.includes('MT') || s.includes('DMV')) matches.push('MT');
+    if (s.includes('EXCHANGE') || s.includes('MCCS') || s.includes('EXCH')) matches.push('MCCS Exchange');
+    if (s.includes('LINE') || s.includes('LMN') || s === 'TM') matches.push('TM');
+    if (s.includes('TTC') || s.includes('TECH') || s.includes('SA') || s.includes('JE SYS') || s.includes('DTMN')) {
+      matches.push('IT');
+      matches.push('System');
+    }
+    if (s.includes('EFS') || s.includes('SYS') || s.includes('MECH') || s.includes('NODE')) matches.push('System');
+    if (s.includes('ICN') || s.includes('BTS')) matches.push('ICN');
+    if (s.includes('NFS')) matches.push('NFS');
+    if (s.includes('VC')) matches.push('VC');
+    if (s.includes('SERVER')) matches.push('Server');
+    if (s.includes('MULTI MEDIA') || s.includes('MULTIMEDIA')) matches.push('Multimedia');
+    if (s.includes('LRW')) matches.push('LRW');
+    if (s.includes('CORPS') || s.includes('HQ') || s.includes('BDE') || s.includes('BRANCH')) matches.push('Corps HQ');
+
+    // Clerical / RHQ
+    if (s.includes('ASIGMA') || s.includes('A-SIGMA')) matches.push('A-Sigma Clerk');
+    if (s.includes('TRG CLK') || s.includes('TRG')) matches.push('TRG Clerk');
+    if (s.includes('COMMUNICATION CLERK') || s.includes('COMN CLK')) matches.push('Communication Clerk');
+    if (s.includes('STRIP') || s.includes('STRIP CLERK')) matches.push('Strip Clerk');
+    if (s.includes('DISPATCHER')) matches.push('Dispatcher Clerk');
+    if (s.includes('WARRANT')) matches.push('Warrant Clerk');
+    if (s.includes('PA TO') || s === 'PA') matches.push('PA');
+    if (s.includes('CLK') || s.includes('CLERK') || s.includes('OCC') || s.includes('SD') || s.includes('ORH')) {
+      if (!matches.includes('Clerk')) matches.push('Clerk');
+    }
+
+    // Logistics / QM
+    if (s.includes('SKT') || s.includes('STORE') || s.includes('STOREMAN')) matches.push('SKT');
+    if (s.includes('FRESH')) matches.push('Fresh NCO');
+    if (s.includes('CLOTHING')) matches.push('Clothing NCO');
+    if (s.includes('MES')) matches.push('MES NCO');
+    if (s.includes('QM') || s.includes('RATION')) matches.push('Ration NCO');
+
+    // RP & Adm
+    if (s.includes('RP') || s.includes('ORDERLY') || s.includes('ADM') || s.includes('RUNNER')) matches.push('Adm NCO');
+
+    // General Duty & Appointments
+    if (s.includes('CHM')) matches.push('CHM');
+    if (s.includes('CQMH')) matches.push('CQMH');
+    if (s.includes('RHM')) matches.push('RHM');
+    if (s.includes('GD') || s.includes('GENERAL') || s.includes('GEN') || s.includes('SEC') || s.includes('QRT') || s.includes('SPORTSMAN')) {
+      matches.push('GD');
+    }
+
+    // If nothing matched, fallback cleanly based on broad type:
+    if (matches.length === 0) {
+      if (s.includes('ART') || s.includes('TRADE')) matches.push('All Tradesmen');
+      else matches.push('GD');
+    }
+
+    return matches;
+  }
+
   function buildDutyCheckboxesHtml(selectedVal = '') {
     let selValues = [];
     if (Array.isArray(selectedVal)) {
-      selValues = selectedVal.map(v => String(v).trim());
+      selValues = selectedVal.map(v => String(v).trim()).filter(Boolean);
     } else if (typeof selectedVal === 'string' && selectedVal.trim()) {
       selValues = selectedVal.split(/[,;|]+/).map(v => v.trim()).filter(Boolean);
     }
-    const selSet = new Set(selValues.map(v => v.toUpperCase()));
+
+    let selSet = new Set();
+
+    // If duty was explicitly provided (e.g. from DB or soldier trade), expand and match to tree
+    if (selValues.length > 0) {
+      const expanded = [...selValues];
+      selValues.forEach(v => {
+        normalizeMilitaryDutyToTreeTrades(v).forEach(m => {
+          if (!expanded.includes(m)) expanded.push(m);
+        });
+      });
+
+      // Check if any expanded value actually matches a trade in the tree:
+      const allTreeTrades = new Set();
+      AI_MILITARY_TREE_DATA.forEach(c => c.sections.forEach(s => s.trades.forEach(t => allTreeTrades.add(t.toUpperCase()))));
+      
+      const hasTreeMatch = expanded.some(v => allTreeTrades.has(v.toUpperCase()));
+      if (!hasTreeMatch) {
+        expanded.push('GD');
+      }
+
+      selSet = new Set(expanded.map(v => v.toUpperCase()));
+    }
 
     let treeHtml = '';
     AI_MILITARY_TREE_DATA.forEach((coyItem, coyIdx) => {
@@ -3486,8 +4547,15 @@
   function onAiDutyCheckboxChanged(chk) {
     const row = _getRowFromElement(chk);
     if (!row) return;
+    const btn = row.querySelector('.ai-duty-select-btn');
+    if (btn) {
+      btn.classList.remove('ai-match-highlight');
+      btn.style.removeProperty('background-color');
+      btn.style.removeProperty('color');
+      btn.style.removeProperty('border-color');
+    }
     updateAiRowDutySummary(row);
-    onAiUnitInputEdited();
+    onAiUnitInputEdited(chk);
   }
 
   function selectAllRowAiDutyCheckboxes(btn) {
@@ -3552,10 +4620,25 @@
         let secHasMatch = coyName.includes(q) || secName.includes(q);
 
         secGroup.querySelectorAll('.ai-row-trade-label').forEach(lbl => {
-          const tradeName = (lbl.querySelector('.ai-row-trade-name')?.textContent || '').toLowerCase();
+          const tradeNameEl = lbl.querySelector('.ai-row-trade-name');
+          if (tradeNameEl && !tradeNameEl.hasAttribute('data-raw-name')) {
+            tradeNameEl.setAttribute('data-raw-name', tradeNameEl.textContent);
+          }
+          const rawText = tradeNameEl ? tradeNameEl.getAttribute('data-raw-name') : (lbl.textContent || '');
+          const tradeName = rawText.toLowerCase();
           const match = tradeName.includes(q) || secName.includes(q) || coyName.includes(q);
           lbl.style.display = match ? 'flex' : 'none';
-          if (match) secHasMatch = true;
+          if (match) {
+            secHasMatch = true;
+            if (q && tradeNameEl && tradeName.includes(q)) {
+              const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+              tradeNameEl.innerHTML = rawText.replace(regex, '<mark class="ai-yellow-mark">$1</mark>');
+            } else if (tradeNameEl) {
+              tradeNameEl.textContent = rawText;
+            }
+          } else if (tradeNameEl) {
+            tradeNameEl.textContent = rawText;
+          }
         });
 
         secGroup.style.display = (secHasMatch || !q) ? 'block' : 'none';
@@ -3697,9 +4780,11 @@
       summaryEl.textContent = labelText;
       summaryEl.className = 'ai-duty-summary-text text-truncate fw-bold text-dark';
       if (selectBtn) {
-        selectBtn.style.background = '#ecfdf5';
-        selectBtn.style.borderColor = '#10b981';
-        selectBtn.style.color = '#047857';
+        if (!selectBtn.classList.contains('ai-match-highlight')) {
+          selectBtn.style.background = '#ecfdf5';
+          selectBtn.style.borderColor = '#10b981';
+          selectBtn.style.color = '#047857';
+        }
         selectBtn.classList.add('ai-duty-btn-has-selection');
       }
     }
@@ -3758,11 +4843,11 @@
     const { treeHtml, summaryText } = buildDutyCheckboxesHtml(initialDuty);
 
     tr.innerHTML = `
-      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited();" /></td>
+      <td><input type="text" class="form-control form-control-sm ai-u-name" placeholder="e.g. 17 REGM" oninput="this.value = this.value.toUpperCase(); onAiUnitInputEdited(this);" style="height: 36px; font-size: 0.86rem; font-weight: 600; padding: 0.4rem 0.65rem;" /></td>
       <td>
         <div class="input-group input-group-sm flex-nowrap">
-          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
-          <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+          <input type="text" class="form-control form-control-sm ai-u-from ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited(this);" style="font-size: 0.86rem; font-weight: 700; letter-spacing: 0.5px; height: 36px; padding: 0.4rem 0.5rem;" />
+          <button class="btn btn-outline-secondary px-2.5 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar" style="height: 36px;">
             <i class="far fa-calendar-alt text-success"></i>
             <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
           </button>
@@ -3770,8 +4855,8 @@
       </td>
       <td>
         <div class="input-group input-group-sm flex-nowrap">
-          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited();" style="font-size: 0.78rem; letter-spacing: 0.5px;" />
-          <button class="btn btn-outline-secondary px-2 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar">
+          <input type="text" class="form-control form-control-sm ai-u-to ai-date-easy text-center font-monospace" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatEasyDateInput(this); onAiUnitInputEdited(this);" style="font-size: 0.86rem; font-weight: 700; letter-spacing: 0.5px; height: 36px; padding: 0.4rem 0.5rem;" />
+          <button class="btn btn-outline-secondary px-2.5 py-0 d-flex align-items-center justify-content-center bg-light" type="button" onclick="openEasyCalendar(this)" title="Pick from Calendar" style="height: 36px;">
             <i class="far fa-calendar-alt text-success"></i>
             <input type="date" class="ai-native-date-hidden" style="position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;" onchange="onNativeDatePicked(this)" />
           </button>
@@ -3809,6 +4894,16 @@
     `;
 
     tbody.appendChild(tr);
+
+    // Safeguard: Ensure at least one checkbox is checked ONLY if initialDuty was explicitly provided
+    if (initialDuty && String(initialDuty).trim()) {
+      const checkedBoxes = tr.querySelectorAll('.ai-duty-chk:checked');
+      if (checkedBoxes.length === 0) {
+        const gdChk = tr.querySelector('.ai-duty-chk[value="GD"]');
+        if (gdChk) gdChk.checked = true;
+      }
+    }
+
     updateAiRowDutySummary(tr);
     onAiParameterModified();
   }
@@ -3911,7 +5006,10 @@
     onAiParameterModified(true);
   }
 
-  function onAiUnitInputEdited() {
+  function onAiUnitInputEdited(targetInput) {
+    if (targetInput && targetInput.classList) {
+      targetInput.classList.remove('ai-match-highlight');
+    }
     const freshCheck = document.getElementById('aiFreshJoineeCheckbox');
     if (freshCheck && freshCheck.checked) {
       freshCheck.checked = false;
@@ -4931,7 +6029,7 @@
   function openAiRecommendationModal() {
     const tbody = document.getElementById('aiUnitsTableBody');
     if (tbody && tbody.children.length === 0) {
-      addAiUnitRow('GENERAL');
+      addAiUnitRow('');
     }
     const modalEl = document.getElementById('aiRecModal');
     if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
@@ -4944,14 +6042,14 @@
   document.addEventListener('DOMContentLoaded', function() {
     const tbody = document.getElementById('aiUnitsTableBody');
     if (tbody && tbody.children.length === 0) {
-      addAiUnitRow('GENERAL');
+      addAiUnitRow('');
     }
     const aiModal = document.getElementById('aiRecModal');
     if (aiModal) {
       aiModal.addEventListener('shown.bs.modal', function() {
         const body = document.getElementById('aiUnitsTableBody');
         if (body && body.children.length === 0) {
-          addAiUnitRow('GENERAL');
+          addAiUnitRow('');
         }
       });
       aiModal.addEventListener('hidden.bs.modal', function() {

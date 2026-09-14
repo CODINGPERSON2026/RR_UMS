@@ -4027,7 +4027,7 @@ def get_dashboard_fitness_reports_count():
     try:
         from aiml.fitness_trend.api import get_reports_statistics
         stats_data = get_reports_statistics()
-        count = stats_data.get('stats', {}).get('total_reports', 0) if stats_data else 0
+        count = stats_data.get('stats', {}).get('unfit_count', 0) if stats_data else 0
         return jsonify({"status": "success", "count": count}), 200
     except Exception as e:
         return jsonify({"status": "error", "count": 0, "message": str(e)}), 200

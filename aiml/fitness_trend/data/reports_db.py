@@ -351,6 +351,9 @@ def fetch_reports_paginated(search_query="", company="", status="", from_date=No
     where_clauses = ["1=1"]
     params = []
 
+    # Exclude dummy/test records from military fitness directory
+    where_clauses.append("(army_number NOT LIKE 'TEST%' AND army_number NOT LIKE 'jk010101%' AND (name IS NULL OR name NOT LIKE '%TEST%'))")
+
     if search_query:
         sq = f"%{search_query.strip()}%"
         where_clauses.append("(army_number LIKE %s OR name LIKE %s)")
@@ -369,12 +372,17 @@ def fetch_reports_paginated(search_query="", company="", status="", from_date=No
             where_clauses.append("company = %s")
             params.append(comp_val)
 
-    if status and status.strip() and status.strip().lower() != 'all':
-        st_lower = status.strip().lower()
+    effective_status = status.strip() if (status and str(status).strip()) else 'Unfit'
+    if effective_status and effective_status.lower() != 'all':
+        st_lower = effective_status.lower()
         if st_lower in ('fit', 'fit only', 'fit_only'):
             where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%combat%' OR LOWER(fitness_status) LIKE '%ready%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR LOWER(fitness_status) = 'fit' OR fitness_score >= 70)")
         elif st_lower in ('unfit', 'unfit only', 'unfit_only'):
             where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR (fitness_score IS NOT NULL AND fitness_score < 70))")
+        elif st_lower in ('not tested', 'untested', 'not_tested'):
+            where_clauses.append("(fitness_status IS NULL OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR LOWER(fitness_status) LIKE '%insufficient%' OR fitness_score IS NULL)")
+        elif st_lower in ('unfit_and_untested', 'unfit & untested', 'unfit not tested', 'unfit and not tested'):
+            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR (fitness_score IS NOT NULL AND fitness_score < 70) OR fitness_score IS NULL)")
         elif 'healthy' in st_lower or 'good' in st_lower:
             where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70)")
         elif 'improvement' in st_lower or 'overweight' in st_lower or 'moderate' in st_lower or 'average' in st_lower or 'satisfactory' in st_lower:
@@ -509,10 +517,13 @@ def fetch_dynamic_report_stats():
                 SUM(CASE WHEN LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70 THEN 1 ELSE 0 END) AS healthy,
                 SUM(CASE WHEN (LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70)) AND NOT (LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%at-risk%') THEN 1 ELSE 0 END) AS needs_improvement,
                 SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%poor%' OR (fitness_score IS NOT NULL AND fitness_score < 50) THEN 1 ELSE 0 END) AS at_risk,
+                SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR (fitness_score IS NOT NULL AND fitness_score < 70) THEN 1 ELSE 0 END) AS unfit,
+                SUM(CASE WHEN fitness_status IS NULL OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR LOWER(fitness_status) LIKE '%insufficient%' OR fitness_score IS NULL THEN 1 ELSE 0 END) AS not_tested,
                 AVG(fitness_score) AS avg_score,
                 SUM(CASE WHEN DATE(generated_at) = CURDATE() THEN 1 ELSE 0 END) AS today_count,
                 SUM(CASE WHEN MONTH(generated_at) = MONTH(CURDATE()) AND YEAR(generated_at) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month_count
             FROM ai_fitness_reports
+            WHERE (army_number NOT LIKE 'TEST%' AND army_number NOT LIKE 'jk010101%' AND (name IS NULL OR name NOT LIKE '%TEST%'))
         """
         cursor.execute(stats_sql)
         row = cursor.fetchone() or {}
@@ -522,6 +533,7 @@ def fetch_dynamic_report_stats():
         cursor.execute("""
             SELECT DISTINCT company FROM ai_fitness_reports
             WHERE company IS NOT NULL AND company != ''
+              AND (army_number NOT LIKE 'TEST%' AND army_number NOT LIKE 'jk010101%' AND (name IS NULL OR name NOT LIKE '%TEST%'))
             ORDER BY company ASC
         """)
         c_rows = cursor.fetchall() or []
@@ -533,6 +545,7 @@ def fetch_dynamic_report_stats():
         healthy = int(row.get('healthy') or 0)
         needs_imp = int(row.get('needs_improvement') or 0)
         at_risk = int(row.get('at_risk') or 0)
+        unfit_count = int(row.get('unfit') or (needs_imp + at_risk))
         avg_score = round(float(row.get('avg_score') or 0.0), 1)
         today_cnt = int(row.get('today_count') or 0)
         month_cnt = int(row.get('month_count') or 0)
@@ -543,12 +556,14 @@ def fetch_dynamic_report_stats():
             healthy = remainder
 
         fit_count = healthy
-        unfit_count = needs_imp + at_risk
+
+        not_tested_count = int(row.get('not_tested') or 0)
 
         stats_dict = {
             'total_reports': total,
             'fit_count': fit_count,
             'unfit_count': unfit_count,
+            'not_tested_count': not_tested_count,
             'healthy_count': healthy,
             'healthy': healthy,
             'needs_improvement_count': needs_imp,
@@ -692,8 +707,17 @@ def _format_report_summary(row):
     d['army_number'] = d.get('army_number') or 'N/A'
     d['name'] = d.get('name') or 'N/A'
     d['rank'] = d.get('rank') or 'N/A'
-    d['company'] = d.get('company') or 'N/A'
-    d['fitness_status'] = d.get('fitness_status') or 'N/A'
+    raw_fit_st = str(d.get('fitness_status') or 'N/A').strip()
+    low_st = raw_fit_st.lower()
+    sc = d.get('fitness_score')
+    if 'untested' in low_st or 'not tested' in low_st or 'insufficient' in low_st:
+        d['fitness_status'] = 'Not Tested'
+    elif 'healthy' in low_st or 'combat' in low_st or 'ready' in low_st or 'good' in low_st or (sc is not None and sc >= 70 and 'risk' not in low_st and 'unfit' not in low_st and 'improv' not in low_st):
+        d['fitness_status'] = 'Healthy'
+    elif 'improve' in low_st or 'needs imp' in low_st or 'risk' in low_st or 'unfit' in low_st or (sc is not None and sc < 70):
+        d['fitness_status'] = 'Unfit'
+    else:
+        d['fitness_status'] = raw_fit_st or 'N/A'
     d['report_generated'] = bool(d.get('report_generated', True))
 
     return d
