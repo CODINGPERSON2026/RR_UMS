@@ -575,8 +575,8 @@
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
-      <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" title="AI Individual Fitness Reports & Operational Readiness">
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER']) %}
+      <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();" title="AI Individual Fitness Reports & Operational Readiness">
         <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
         <div class="sc-right">
           <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1513,7 +1513,7 @@
       })
       .catch(() => {});
 
-    {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+    {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER']) %}
     // Fetch live aggregate stats for executive AI Fitness Reports card
     fetch('/fitness/api/reports/stats')
       .then(r => r.ok ? r.json() : null)
