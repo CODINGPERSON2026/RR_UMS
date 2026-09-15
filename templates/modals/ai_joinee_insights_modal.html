@@ -674,17 +674,20 @@
       if (refreshIcon) refreshIcon.classList.remove('fa-spin');
       if (loadingState) loadingState.classList.add('d-none');
 
-      if (json.success && json.data && json.data.length > 0) {
+      if (json.success) {
+        // Always set role/permissions from the response, even if data is empty
         currentInsightsUserRole = json.user_role || '';
         canUserAddRemarks = !!json.can_add_remarks;
         canUserAssignCompany = !!json.can_assign_company;
         isUserReadOnly = !!json.is_read_only || (currentInsightsUserRole === 'CO' || currentInsightsUserRole === 'COMMANDING OFFICER');
 
-        // Update column header according to role (Hide completely for CO)
+        // Update column header according to role
         const colHeader = document.getElementById('insightsRemarksColHeader');
         if (colHeader) {
           if (isUserReadOnly) {
-            colHeader.style.display = 'none';
+            // CO: Show as read-only Decision Status column
+            colHeader.style.display = '';
+            colHeader.innerHTML = '<i class="fas fa-flag-checkered me-1.5" style="color: #6b7280;"></i>Decision Status';
           } else if (canUserAssignCompany) {
             colHeader.style.display = '';
             colHeader.innerHTML = '<i class="fas fa-user-check me-1.5" style="color: #4f46e5;"></i>Action / Assign';
@@ -694,16 +697,31 @@
           }
         }
 
-        renderInsightsTable(json.data, searchVal);
-        renderInsightsPagination(json.page, json.total_pages, json.total_count, json.page_size);
-        updateInsightsRankFilterOptions(json.available_ranks, rankVal);
+        if (json.data && json.data.length > 0) {
+          renderInsightsTable(json.data, searchVal);
+          renderInsightsPagination(json.page, json.total_pages, json.total_count, json.page_size);
+          updateInsightsRankFilterOptions(json.available_ranks, rankVal);
 
-        if (tableWrap) {
-          tableWrap.classList.remove('d-none');
-          tableWrap.scrollTop = 0;
-          tableWrap.scrollLeft = 0;
+          if (tableWrap) {
+            tableWrap.classList.remove('d-none');
+            tableWrap.scrollTop = 0;
+            tableWrap.scrollLeft = 0;
+          }
+        } else {
+          // No data returned — show empty state with total count info
+          const emptyTitle = document.querySelector('#insightsEmptyState h6');
+          const emptyDesc = document.querySelector('#insightsEmptyState p');
+          if (emptyTitle) emptyTitle.textContent = json.total_count === 0
+            ? 'No AI Recommendations Yet'
+            : 'No Results Match Filters';
+          if (emptyDesc) emptyDesc.textContent = json.total_count === 0
+            ? 'Recommendations will appear here after personnel are evaluated by the AI New Joinee Recommendation system.'
+            : 'Try adjusting the search or filters to find records.';
+          if (emptyState) emptyState.classList.remove('d-none');
         }
       } else {
+        // API returned an error
+        console.error('AI Insights API error:', json.error || json.message);
         if (emptyState) emptyState.classList.remove('d-none');
       }
     } catch (err) {
@@ -793,6 +811,18 @@
               actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-outline-secondary py-1 px-2.5 fw-semibold" onclick="openRemarksDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-plus-circle me-1 text-success"></i> Add Remarks</button></td>`;
             }
           }
+        }
+      } else {
+        // CO Role: Read-only — show decision status badge (keeps table column count consistent)
+        if (decisionType === 'accepted') {
+          const placedCoy = r.final_company || recCompany;
+          actionCellHtml = `<td class="text-center"><span class="badge bg-success py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;"><i class="fas fa-check-double me-1"></i> Assigned (${placedCoy})</span></td>`;
+        } else if (decisionType === 'rejected') {
+          actionCellHtml = `<td class="text-center"><span class="badge bg-danger py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;"><i class="fas fa-times-circle me-1"></i> Rejected</span></td>`;
+        } else if (remarksText) {
+          actionCellHtml = `<td class="text-center"><span class="badge bg-warning text-dark py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;" title="${remarksText}"><i class="fas fa-comment me-1"></i> Awaiting Decision</span></td>`;
+        } else {
+          actionCellHtml = `<td class="text-center"><span class="badge bg-secondary py-1.5 px-2.5 fw-semibold" style="font-size: 0.72rem;"><i class="fas fa-clock me-1"></i> Pending</span></td>`;
         }
       }
 

@@ -245,6 +245,39 @@ class TestRestApiEndpoints(unittest.TestCase):
         pos_probs = [item["probability"] for item in rec.get("position_probabilities", [])]
         self.assertAlmostEqual(sum(pos_probs), 1.0, delta=0.05)
 
+    def test_api_insights_count_and_save_history(self):
+        """Verify saving a recommendation and getting insights count."""
+        save_payload = {
+            "army_number": "TEST9999",
+            "name": "TEST JOINEE SOLDIER",
+            "rank": "Signal Man",
+            "trade": "GENERAL DUTY",
+            "recommended_company": "HQ COY",
+            "confidence_score": "88.5%",
+            "recommendation_percentage": 88.5,
+            "recommended_position": "GD",
+            "position_confidence": "85.0%",
+            "units_history": [
+                {"unit": "1 SIGNAL REGT", "from_date": "2020-01-01", "to_date": "2023-01-01", "duty_performed": "GD"}
+            ]
+        }
+        with self.app.test_request_context():
+            from flask import session
+            session['role'] = 'CO'
+            session['username'] = 'TestCO'
+
+        res_save = self.client.post('/api/ai/company-recommendation/save-history', json=save_payload)
+        self.assertEqual(res_save.status_code, 200)
+        data_save = res_save.get_json()
+        self.assertTrue(data_save.get("success"))
+
+        res_count = self.client.get('/api/ai/company-recommendation/insights-count')
+        self.assertEqual(res_count.status_code, 200)
+        data_count = res_count.get_json()
+        self.assertTrue(data_count.get("success"))
+        self.assertGreaterEqual(data_count.get("total_count", 0), 1)
+
 
 if __name__ == '__main__':
     unittest.main()
+
