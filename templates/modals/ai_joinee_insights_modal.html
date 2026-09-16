@@ -888,14 +888,14 @@
         vrMatchPctEl.textContent = `${pct}%`;
       }
       
-      const posVal = String(d.position_confidence || '80.0%').trim();
-      document.getElementById('vrPosConf').textContent = posVal.includes('%') ? `${posVal} Conf.` : `${posVal}% Conf.`;
+      const posVal = String(d.position_confidence || '').trim();
+      document.getElementById('vrPosConf').textContent = posVal ? (posVal.includes('%') ? `${posVal} Conf.` : `${posVal}% Conf.`) : '';
       document.getElementById('vrConfidenceBadge').textContent = d.confidence_type === 'rule_based_fresh_joinee' ? 'Rule-Based (Fresh Joinee)' : 'ML Supervised';
 
       // 2. Company Distribution Probabilities
       const probContainer = document.getElementById('vrProbContainer');
       probContainer.innerHTML = '';
-      const probs = d.probabilities || { 'HQ Coy': 0.6, 'Comn Coy': 0.3, '3 Coy': 0.1 };
+      const probs = d.probabilities || {};
       Object.entries(probs).forEach(([coy, prob]) => {
         const coyPct = (prob * 100).toFixed(1);
         let barColor = coy === d.recommended_company ? 'bg-success' : 'bg-primary';
@@ -1116,8 +1116,8 @@
       document.getElementById('detailConfidenceScore').textContent = `Confidence: ${d.confidence_score}`;
       document.getElementById('detailRecommendedPos').textContent = d.recommended_position;
       document.getElementById('detailRecommendedSec').textContent = d.recommended_section || 'GENERAL';
-      const detailPosVal = String(d.position_confidence || '80.0%').trim();
-      document.getElementById('detailPosConfidence').textContent = detailPosVal.includes('%') ? `${detailPosVal} Conf.` : `${detailPosVal}% Conf.`;
+      const detailPosVal = String(d.position_confidence || '').trim();
+      document.getElementById('detailPosConfidence').textContent = detailPosVal ? (detailPosVal.includes('%') ? `${detailPosVal} Conf.` : `${detailPosVal}% Conf.`) : '';
 
       // Populate Probability Bars
       const probContainer = document.getElementById('detailProbBarsContainer');

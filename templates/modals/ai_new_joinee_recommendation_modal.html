@@ -900,9 +900,9 @@
                   <i class="fas fa-medal text-warning me-1"></i>Rank
                 </label>
                 <select id="aiRank" class="form-select form-select-sm fw-semibold text-dark" style="height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.84rem; padding: 0.38rem 0.5rem;" onchange="this.classList.remove('ai-match-highlight'); onAiRankSelectChange(this)">
-                  <option value="">Select Rank</option>
+                  <option value="" selected>Select Rank</option>
                   <option value="Agniveer">Agniveer</option>
-                  <option value="Signal Man" selected>Signal Man</option>
+                  <option value="Signal Man">Signal Man</option>
                   <option value="CFN">CFN</option>
                   <option value="L NK">L NK</option>
                   <option value="NK">NK</option>
@@ -1525,7 +1525,7 @@
                 </span>
                 <div class="d-flex gap-1.5 align-items-center">
                   <span class="badge bg-dark-subtle text-white px-2 py-0.5" id="aiModeBadge" style="font-size: 0.68rem; border-radius: 4px; display: none;">User Selected Section</span>
-                  <span class="badge bg-white text-success px-2.5 py-1 fw-bold" id="aiConfidenceBadge" style="font-size: 0.74rem; border-radius: 6px;">85.0% Match</span>
+                  <span class="badge bg-white text-success px-2.5 py-1 fw-bold" id="aiConfidenceBadge" style="font-size: 0.74rem; border-radius: 6px;">-</span>
                 </div>
               </div>
               <div class="row g-2 align-items-center">
@@ -5142,7 +5142,7 @@
     // Auto-fallback rank if blank
     if (!rank) {
       const mainRank = (document.getElementById('rank')?.value || '').trim();
-      rank = mainRank || 'Signal Man';
+      rank = mainRank || '';
       if (document.getElementById('aiRank')) document.getElementById('aiRank').value = rank;
     }
 
@@ -5273,8 +5273,8 @@
     const payload = {
       army_number: armyNumberVal,
       name: soldierNameVal,
-      rank: rankVal || 'Signal Man',
-      trade: tradeVal || 'GENERAL DUTY',
+      rank: rankVal || '',
+      trade: tradeVal || '',
       units_history: units,
       is_fresh_joinee: isFresh || units.length === 0,
       selected_domains: selectedDomainsList
@@ -5312,8 +5312,8 @@
         const rec = data.data;
         rec.army_number = armyNumberVal;
         rec.name = soldierNameVal;
-        rec.rank = rankVal || rec.rank || 'Signal Man';
-        rec.trade = tradeVal || rec.trade || 'GENERAL DUTY';
+        rec.rank = rankVal || rec.rank || '';
+        rec.trade = tradeVal || rec.trade || '';
         rec.units = units;
         rec.applied = false;
 

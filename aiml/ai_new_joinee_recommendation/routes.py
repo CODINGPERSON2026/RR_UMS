@@ -68,7 +68,7 @@ def ensure_recommendations_table(cursor, conn=None):
                 trade VARCHAR(200) DEFAULT NULL,
                 recommended_company VARCHAR(100) DEFAULT NULL,
                 confidence_score VARCHAR(50) DEFAULT NULL,
-                recommendation_percentage FLOAT DEFAULT 85.0,
+                recommendation_percentage FLOAT DEFAULT NULL,
                 recommended_position VARCHAR(200) DEFAULT NULL,
                 position_confidence VARCHAR(50) DEFAULT NULL,
                 confidence_type VARCHAR(100) DEFAULT 'ml',
@@ -102,7 +102,7 @@ def ensure_recommendations_table(cursor, conn=None):
             ("trade", "VARCHAR(200) DEFAULT NULL"),
             ("recommended_company", "VARCHAR(100) DEFAULT NULL"),
             ("confidence_score", "VARCHAR(50) DEFAULT NULL"),
-            ("recommendation_percentage", "FLOAT DEFAULT 85.0"),
+            ("recommendation_percentage", "FLOAT DEFAULT NULL"),
             ("recommended_position", "VARCHAR(200) DEFAULT NULL"),
             ("position_confidence", "VARCHAR(50) DEFAULT NULL"),
             ("confidence_type", "VARCHAR(100) DEFAULT 'ml'"),
@@ -236,8 +236,8 @@ def sync_dues_in_recommendations(cursor=None, conn=None) -> int:
             if (army_no and army_no in existing_army_nos) or (name_upper and name_upper in existing_names):
                 continue
 
-            rank = str(d.get("rank") or "Signal Man").strip()
-            trade = str(d.get("trade") or "GENERAL DUTY").strip()
+            rank = str(d.get("rank")).strip() if d.get("rank") is not None else None
+            trade = str(d.get("trade")).strip() if d.get("trade") is not None else None
             unit = str(d.get("unit") or "").strip()
             date_of_move = d.get("date_of_move")
             move_str = ""
@@ -253,7 +253,7 @@ def sync_dues_in_recommendations(cursor=None, conn=None) -> int:
                     "unit": unit,
                     "from_date": "",
                     "to_date": move_str,
-                    "duty_performed": trade or "GENERAL"
+                    "duty_performed": trade or ""
                 })
 
             # Generate placement recommendation via recommendation engine
@@ -262,17 +262,17 @@ def sync_dues_in_recommendations(cursor=None, conn=None) -> int:
                 is_fresh_joinee=(len(units_history) == 0),
                 army_number=army_no,
                 name=name,
-                rank=rank,
+                rank=rank or "",
                 prior_station=unit
             )
 
             rec_coy = normalize_company_name(rec.get("recommended_company"))
-            conf_score = str(rec.get("confidence_score") or "85.0%")
-            rec_pct = float(rec.get("recommendation_percentage") or 85.0)
+            conf_score = str(rec["confidence_score"]) if rec.get("confidence_score") is not None else None
+            rec_pct = float(rec["recommendation_percentage"]) if rec.get("recommendation_percentage") is not None else None
             rec_pos = rec.get("recommended_position") or ""
-            pos_conf = str(rec.get("position_confidence") or "80.0%")
+            pos_conf = str(rec["position_confidence"]) if rec.get("position_confidence") is not None else None
             conf_type = rec.get("confidence_type") or "ml"
-            model_ver = rec.get("model_version") or "company_position_model_v2"
+            model_ver = rec.get("model_version") or ""
 
             prob_json = json.dumps(rec.get("probabilities") or {})
             reasons_json = json.dumps(rec.get("match_reasons") or [])
@@ -857,7 +857,7 @@ def api_predict_recommendation():
     """
     try:
         data = request.get_json() or {}
-        rank = data.get("rank", "Signal Man")
+        rank = data.get("rank") or ""
         date_of_enrollment = data.get("date_of_enrollment") or data.get("enrollment_date")
         prior_station = data.get("prior_station", "")
         units_history = data.get("units_history") or data.get("units") or []
@@ -991,12 +991,12 @@ def api_save_recommendation():
         personnel_id = data.get("personnel_id")
 
         rec_coy = normalize_company_name(data.get("recommended_company"))
-        conf_score = str(data.get("confidence_score") or "85.0%")
-        rec_pct = float(data.get("recommendation_percentage") or 85.0)
+        conf_score = str(data["confidence_score"]) if data.get("confidence_score") is not None else None
+        rec_pct = float(data["recommendation_percentage"]) if data.get("recommendation_percentage") is not None else None
         rec_pos = data.get("recommended_position") or ""
-        pos_conf = str(data.get("position_confidence") or "80.0%")
+        pos_conf = str(data["position_confidence"]) if data.get("position_confidence") is not None else None
         conf_type = data.get("confidence_type") or "ml"
-        model_ver = data.get("model_version") or "company_position_model_v2"
+        model_ver = data.get("model_version") or ""
 
         prob_json = json.dumps(data.get("probabilities") or {})
         reasons_json = json.dumps(data.get("match_reasons") or [])
@@ -1241,10 +1241,10 @@ def api_get_insights_list():
                 "previous_units_formatted": prev_units_str,
                 "recommended_company": canonical_coy,
                 "recommended_section": rec_sec,
-                "confidence_score": r.get("confidence_score") or "85.0%",
-                "recommendation_percentage": float(r.get("recommendation_percentage") or 85.0),
+                "confidence_score": r.get("confidence_score") or "",
+                "recommendation_percentage": float(r["recommendation_percentage"]) if r.get("recommendation_percentage") is not None else 0.0,
                 "recommended_position": rec_pos,
-                "position_confidence": r.get("position_confidence") or "80.0%",
+                "position_confidence": r.get("position_confidence") or "",
                 "final_company": r.get("final_company"),
                 "final_position": r.get("final_position"),
                 "decision_type": r.get("decision_type") or "pending",
@@ -1346,11 +1346,11 @@ def api_get_insight_detail(rec_id: int):
                 "rank": row.get("rank"),
                 "trade": row.get("trade") or "N/A",
                 "recommended_company": canonical_coy,
-                "confidence_score": row.get("confidence_score") or "85.0%",
-                "recommendation_percentage": float(row.get("recommendation_percentage") or 85.0),
+                "confidence_score": row.get("confidence_score") or "",
+                "recommendation_percentage": float(row["recommendation_percentage"]) if row.get("recommendation_percentage") is not None else 0.0,
                 "recommended_section": rec_sec,
                 "recommended_position": rec_pos,
-                "position_confidence": row.get("position_confidence") or "80.0%",
+                "position_confidence": row.get("position_confidence") or "",
                 "confidence_type": row.get("confidence_type") or "ml",
                 "probabilities": probs,
                 "match_reasons": reasons or domain_xai.get("why_recommended", []),

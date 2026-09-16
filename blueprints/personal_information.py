@@ -1015,12 +1015,13 @@ def create_personnel():
         accepted_ai = data.get('accepted_ai_recommendation')
         if accepted_ai and isinstance(accepted_ai, dict):
             try:
-                top_coy = accepted_ai.get('recommended_company', 'HQ Coy')
-                top_pos = accepted_ai.get('recommended_position', 'GD')
-                pct = float(accepted_ai.get('recommendation_percentage', 85.0))
-                conf_score = str(accepted_ai.get('confidence_score', f"{pct:.1f}%"))
-                pos_conf = str(accepted_ai.get('position_confidence', '80.0%'))
-                conf_type = accepted_ai.get('confidence_type', 'ml')
+                top_coy = accepted_ai.get('recommended_company') or None
+                top_pos = accepted_ai.get('recommended_position') or None
+                pct_raw = accepted_ai.get('recommendation_percentage')
+                pct = float(pct_raw) if pct_raw is not None else None
+                conf_score = str(accepted_ai['confidence_score']) if accepted_ai.get('confidence_score') is not None else (f"{pct:.1f}%" if pct is not None else None)
+                pos_conf = str(accepted_ai['position_confidence']) if accepted_ai.get('position_confidence') is not None else None
+                conf_type = accepted_ai.get('confidence_type') or "ml"
                 probs_json = json.dumps(accepted_ai.get('probabilities', {}))
                 reasons_json = json.dumps(accepted_ai.get('match_reasons', []))
                 shap_json = json.dumps(accepted_ai.get('shap_explanation', {}))

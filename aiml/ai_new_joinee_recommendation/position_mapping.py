@@ -259,7 +259,7 @@ def get_full_hierarchy_dict() -> Dict[str, Dict[str, List[str]]]:
 # =============================================================================
 
 def get_fresh_joinee_recommendation(
-    rank: str = "Signal Man",
+    rank: str = "",
     service_years: float = 0.5,
     prior_station: str = "",
     selected_section: Optional[str] = None,
@@ -272,7 +272,7 @@ def get_fresh_joinee_recommendation(
     based on induction policy, rank seniority profile, and pattern compatibility.
     Evaluates candidate sets without sequence bias.
     """
-    rank_clean = (rank or "Agniveer").strip().upper()
+    rank_clean = (rank or "").strip().upper()
     is_user_sec = bool(selected_section and str(selected_section).strip())
     target_trades_upper = set(str(t).strip().upper() for t in (target_trades or []) if t)
     target_sections_upper = set(str(s).strip().upper() for s in (target_sections or []) if s)
@@ -421,9 +421,12 @@ def get_fresh_joinee_recommendation(
         })
     pos_probs.sort(key=lambda x: x["probability"], reverse=True)
 
+    top_coy_pct_val = round(company_probabilities[0]["probability"] * 100.0, 1) if company_probabilities else 0.0
+    top_pos_pct_val = round(pos_probs[0]["probability"] * 100.0, 1) if pos_probs else 0.0
+
     # Top-N recommendations
     top_n_recommendations = [
-        {"rank": 1, "company": top_coy, "section": top_sec, "position": top_pos, "score": "85.0%"}
+        {"rank": 1, "company": top_coy, "section": top_sec, "position": top_pos, "score": f"{top_coy_pct_val}%"}
     ]
     for idx, p_item in enumerate(pos_probs[1:4], start=2):
         top_n_recommendations.append({
@@ -443,9 +446,9 @@ def get_fresh_joinee_recommendation(
         "section_score": 0.75,
         "recommended_position": top_pos,
         "position_score": 0.53,
-        "confidence_score": "85.0%",
-        "recommendation_percentage": 85.0,
-        "position_confidence": "80.0%",
+        "confidence_score": f"{top_coy_pct_val}%",
+        "recommendation_percentage": top_coy_pct_val,
+        "position_confidence": f"{top_pos_pct_val}%",
         "confidence_type": "rule_based_fresh_joinee",
         "method": "Rule-based military establishment mapping",
         "trade_excluded": True,

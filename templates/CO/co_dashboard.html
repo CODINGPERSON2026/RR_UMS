@@ -154,6 +154,51 @@
   }
 
   /* =========================================================
+   GRAPH SKELETON LOADER
+========================================================= */
+  .graph-skeleton-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    background: var(--card-background, #ffffff);
+    display: none;
+    opacity: 0;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 20px 15px 12px 15px;
+    border-radius: 8px;
+    transition: opacity 0.2s ease;
+  }
+
+  .skeleton-bars {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: 12px;
+  }
+
+  .skeleton-bar {
+    flex: 1;
+    max-width: 40px;
+    border-radius: 6px 6px 0 0;
+    background: linear-gradient(
+      90deg,
+      rgba(226, 232, 240, 0.6) 0%,
+      rgba(241, 245, 249, 0.95) 50%,
+      rgba(226, 232, 240, 0.6) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeletonShimmer 1.3s infinite linear;
+  }
+
+  @keyframes skeletonShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* =========================================================
    MODAL OVERRIDES
 ========================================================= */
   .modal-fullscreen .modal-dialog {
@@ -1556,7 +1601,20 @@ STATUS COLORS
                       <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
                     </div>
                   </div>
-                  <div class="chart-canvas-wrap"><canvas id="rankChart"></canvas></div>
+                  <div class="chart-canvas-wrap" style="position: relative;">
+                    <div id="rankChartSkeleton" class="graph-skeleton-overlay">
+                      <div class="skeleton-bars">
+                        <div class="skeleton-bar" style="height: 55%;"></div>
+                        <div class="skeleton-bar" style="height: 80%;"></div>
+                        <div class="skeleton-bar" style="height: 40%;"></div>
+                        <div class="skeleton-bar" style="height: 75%;"></div>
+                        <div class="skeleton-bar" style="height: 60%;"></div>
+                        <div class="skeleton-bar" style="height: 90%;"></div>
+                        <div class="skeleton-bar" style="height: 65%;"></div>
+                      </div>
+                    </div>
+                    <canvas id="rankChart"></canvas>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1643,39 +1701,41 @@ STATUS COLORS
       </div>
     </div>
 
-    <!-- ALL OTHER MODALS (unchanged) -->
-    {% include 'modals/Projects/modal.html' %}
-    {% include 'modals/calender/calender.html' %}
-    {% include 'modals/detachmentModal/detachment.html' %}
-    {% include 'modals/personnelModal/personal_modal.html' %}
-    {% include 'modals/personnelModal/duty_search_modal.html' %}
-    {% include 'modals/salesmodal/salesModal.html' %}
-    {% include 'modals/leaverequest/leave_request.html' %}
-    {% include 'modals/interview_pending/modal.html' %}
-    {% include 'modals/count_parade/modal.html' %}
-    {% include 'modals/attachment-modal/modal.html' %}
-    {% include 'modals/loan/loans.html' %}
-    {% include 'modals/roll_call/modal.html' %}
-    {% include 'modals/roll_call/view_roll_call.html' %}
-    {% include 'modals/course/courses.html' %}
-    {% include 'modals/interview_pending/jco-update-modal.html' %}
-    {% include 'modals/success-modal/modal.html' %}
-    {% include 'task_manager/update_task_by_jco.html' %}
-    {% include 'modals/adduser/user.html' %}
-    {% include 'modals/oncourses/modal.html' %}
-    {% include 'modals/leaverequest/co-rejected-view.html' %}
-    {% include 'modals/alarm/agniveer_test_alarms.html' %}
-    {% include 'modals/agniveer/modal.html' %}
-    {% include 'modals/agniveer/on_leave.html' %}
-    {% include 'modals/messenger/modal.html' %}
-    {% include 'modals/ollama/ollama.html' %}
-    {% include 'modals/ADD-DUES-IN/modal.html' %}
-    {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
-    {% include 'modals/ADD-DUES-OUT/modal.html' %}
-    {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
-    {% include 'modals/today_schedule/ts.html' %}
-    {% include 'modals/company_interview/modal.html' %}
-    {% include 'modals/co_interview/modal.html' %}
+    <!-- ALL POPUP MODALS (Deferred parsing for instant initial page rendering) -->
+    <template id="deferredModalContainer">
+      {% include 'modals/Projects/modal.html' %}
+      {% include 'modals/calender/calender.html' %}
+      {% include 'modals/detachmentModal/detachment.html' %}
+      {% include 'modals/personnelModal/personal_modal.html' %}
+      {% include 'modals/personnelModal/duty_search_modal.html' %}
+      {% include 'modals/salesmodal/salesModal.html' %}
+      {% include 'modals/leaverequest/leave_request.html' %}
+      {% include 'modals/interview_pending/modal.html' %}
+      {% include 'modals/count_parade/modal.html' %}
+      {% include 'modals/attachment-modal/modal.html' %}
+      {% include 'modals/loan/loans.html' %}
+      {% include 'modals/roll_call/modal.html' %}
+      {% include 'modals/roll_call/view_roll_call.html' %}
+      {% include 'modals/course/courses.html' %}
+      {% include 'modals/interview_pending/jco-update-modal.html' %}
+      {% include 'modals/success-modal/modal.html' %}
+      {% include 'task_manager/update_task_by_jco.html' %}
+      {% include 'modals/adduser/user.html' %}
+      {% include 'modals/oncourses/modal.html' %}
+      {% include 'modals/leaverequest/co-rejected-view.html' %}
+      {% include 'modals/alarm/agniveer_test_alarms.html' %}
+      {% include 'modals/agniveer/modal.html' %}
+      {% include 'modals/agniveer/on_leave.html' %}
+      {% include 'modals/messenger/modal.html' %}
+      {% include 'modals/ollama/ollama.html' %}
+      {% include 'modals/ADD-DUES-IN/modal.html' %}
+      {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
+      {% include 'modals/ADD-DUES-OUT/modal.html' %}
+      {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
+      {% include 'modals/today_schedule/ts.html' %}
+      {% include 'modals/company_interview/modal.html' %}
+      {% include 'modals/co_interview/modal.html' %}
+    </template>
 
     <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
       <div class="modal-dialog modal-lg">
@@ -1902,11 +1962,13 @@ STATUS COLORS
         list.innerHTML = '<li class="list-group-item text-muted text-center">No events today</li>';
         return;
       }
+      var html = "";
       d.rows.forEach(function (ev) {
-        list.innerHTML +=
+        html +=
           '<li class="list-group-item"><strong>' + escapeHtml(ev.event_name) +
           '</strong><br><small class="text-muted">' + escapeHtml(ev.venue) + "</small></li>";
       });
+      list.innerHTML = html;
     } catch (e) { console.warn("Events load failed:", e); }
   }
 
@@ -2064,6 +2126,32 @@ STATUS COLORS
     initializeScheduleSlider();
     /* dashboard data */
     loadDashboard();
+
+    /* ── Deferred Modals Unpacker for Instant Initial Page Render ── */
+    var _modalsUnpacked = false;
+    window.unpackDeferredModals = function () {
+      if (_modalsUnpacked) return;
+      _modalsUnpacked = true;
+      var tmpl = document.getElementById("deferredModalContainer");
+      if (tmpl && tmpl.content) {
+        document.body.appendChild(tmpl.content.cloneNode(true));
+        tmpl.remove();
+      }
+    };
+
+    // Safety click listener: unpack instantly if any modal trigger is clicked
+    document.addEventListener("click", function (e) {
+      if (e.target && e.target.closest && e.target.closest('[data-bs-toggle="modal"], [data-bs-target], [onclick*="Modal"], [onclick*="modal"]')) {
+        window.unpackDeferredModals();
+      }
+    }, { capture: true });
+
+    // Unpack during idle time after main dashboard metrics render
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(window.unpackDeferredModals, { timeout: 800 });
+    } else {
+      setTimeout(window.unpackDeferredModals, 300);
+    }
   });
 </script>
 
@@ -2111,6 +2199,23 @@ STATUS COLORS
 ===================================================== -->
 <script>
   var rankCI = null, detCI = null, fitCI = null, unfitCI = null, bharosaCI = null;
+
+  /* Memory-Safe Chart Cleanup Helper */
+  function destroyChart(chartInstance, canvasId) {
+    if (chartInstance) {
+      try {
+        chartInstance.destroy();
+      } catch (e) {}
+    }
+    var canvas = document.getElementById(canvasId);
+    if (canvas) {
+      var ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    return null;
+  }
 
   var donutDatalabelsPlugin = {
     id: "donutDatalabels",
@@ -2243,6 +2348,15 @@ STATUS COLORS
 
   async function loadRankChart(company) {
     company = company || "ALL";
+    var skel = document.getElementById("rankChartSkeleton");
+    var skelTimer = setTimeout(function () {
+      if (skel) {
+        skel.style.display = "flex";
+        skel.style.opacity = "1";
+        skel.style.visibility = "visible";
+      }
+    }, 60);
+
     try {
       var res = await fetch("/get_posted_strength?company=" + encodeURIComponent(company));
       var result = await res.json();
@@ -2250,6 +2364,7 @@ STATUS COLORS
       var labels = result.data.map(function (r) { return r.rank; });
       var values = result.data.map(function (r) { return r.count; });
       document.getElementById("rankTotalCount").textContent = "Total: " + result.total;
+
       var vp = {
         id: "vp",
         afterDatasetsDraw: function (chart) {
@@ -2266,8 +2381,16 @@ STATUS COLORS
           });
         },
       };
+
+      clearTimeout(skelTimer);
+      if (skel) {
+        skel.style.display = "none";
+        skel.style.opacity = "0";
+        skel.style.visibility = "hidden";
+      }
+
       var ctx = document.getElementById("rankChart").getContext("2d");
-      if (rankCI) rankCI.destroy();
+      rankCI = destroyChart(rankCI, "rankChart");
       rankCI = new Chart(ctx, {
         type: "bar",
         data: {
@@ -2282,7 +2405,7 @@ STATUS COLORS
         plugins: [vp],
         options: {
           responsive: true, maintainAspectRatio: false,
-          animation: { duration: 700, easing: "easeOutQuart" },
+          animation: { duration: 400, easing: "easeOutQuart" },
           plugins: { legend: { display: false } },
           scales: {
             y: {
@@ -2297,7 +2420,16 @@ STATUS COLORS
           },
         },
       });
-    } catch (e) { console.error("rankChart:", e); }
+    } catch (e) {
+      console.error("rankChart:", e);
+    } finally {
+      clearTimeout(skelTimer);
+      if (skel) {
+        skel.style.display = "none";
+        skel.style.opacity = "0";
+        skel.style.visibility = "hidden";
+      }
+    }
   }
 
   async function loadDetachmentChart(company) {
@@ -2310,7 +2442,7 @@ STATUS COLORS
       var values = result.data.map(function (r) { return r.count; });
       document.getElementById("detachmentTotal").textContent = "Total: " + result.total;
       var ctx = document.getElementById("detachmentChart").getContext("2d");
-      if (detCI) detCI.destroy();
+      detCI = destroyChart(detCI, "detachmentChart");
       detCI = new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -2359,7 +2491,7 @@ STATUS COLORS
       var labels = result.data.map(function (d) { return mn[d.month - 1] + " " + d.year; });
       var values = result.data.map(function (d) { return d.unfit_count; });
       var ctx = document.getElementById("unfitTrendChart").getContext("2d");
-      if (unfitCI) unfitCI.destroy();
+      unfitCI = destroyChart(unfitCI, "unfitTrendChart");
 
       var lineDatalabelsPlugin = {
         id: 'lineDatalabels',
@@ -2444,7 +2576,7 @@ STATUS COLORS
         },
       };
       var ctx = document.getElementById("fitUnfitChart").getContext("2d");
-      if (fitCI) fitCI.destroy();
+      fitCI = destroyChart(fitCI, "fitUnfitChart");
       fitCI = new Chart(ctx, {
         type: "bar",
         data: {
@@ -2505,15 +2637,15 @@ STATUS COLORS
       if (happyEl) happyEl.textContent = happy + "%";
       if (unhappyEl) unhappyEl.textContent = unhappy + "%";
 
-      // Dynamically render the Unhappy Personnel list table
+      // Dynamically render the Unhappy Personnel list table without DOM memory leaks
       var tbody = document.getElementById("bharosaUnhappyTableBody");
       if (tbody) {
-        tbody.innerHTML = "";
         if (unhappyList.length === 0) {
           tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No unhappy feedback received</td></tr>';
         } else {
+          var html = "";
           unhappyList.forEach(function (item, idx) {
-            tbody.innerHTML += `
+            html += `
               <tr style="border-bottom: 1px solid rgba(0,0,0,0.05);">
                 <td style="padding: 3px 4px; font-weight: 600; text-align: left;">${idx + 1}</td>
                 <td style="padding: 3px 4px; font-weight: 700; color: var(--text-secondary, #6b7280); text-align: left;">${item.rank}</td>
@@ -2526,11 +2658,12 @@ STATUS COLORS
               </tr>
             `;
           });
+          tbody.innerHTML = html;
         }
       }
 
       var ctx = document.getElementById("bharosaChart").getContext("2d");
-      if (bharosaCI) bharosaCI.destroy();
+      bharosaCI = destroyChart(bharosaCI, "bharosaChart");
       bharosaCI = new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -2604,23 +2737,27 @@ STATUS COLORS
       loadBharosaChart(this.value);
     });
 
-    // Re-render charts when the data-theme attribute on <html> changes
+    // Re-render charts ONLY when the data-theme attribute on <html> actually changes by user interaction
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         if (mutation.attributeName === "data-theme") {
-          var currentCompany = document.getElementById("companyFilter")?.value || "ALL";
-          loadRankChart(currentCompany);
-          loadDetachmentChart(currentCompany);
-          loadUnfitTrend(currentCompany);
-          loadFitUnfitChart(currentCompany);
-          loadBharosaChart(currentCompany);
+          var oldVal = mutation.oldValue;
+          var newVal = htmlEl.getAttribute("data-theme");
+          if (oldVal !== null && oldVal !== newVal) {
+            var currentCompany = document.getElementById("companyFilter")?.value || "ALL";
+            loadRankChart(currentCompany);
+            loadDetachmentChart(currentCompany);
+            loadUnfitTrend(currentCompany);
+            loadFitUnfitChart(currentCompany);
+            loadBharosaChart(currentCompany);
+          }
         }
       });
     });
     
     var htmlEl = document.documentElement;
     if (htmlEl) {
-      observer.observe(htmlEl, { attributes: true });
+      observer.observe(htmlEl, { attributes: true, attributeFilter: ["data-theme"], attributeOldValue: true });
     }
 
     /* Auto-scroll sliders and master timer removed as per user request */

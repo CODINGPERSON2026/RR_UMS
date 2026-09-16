@@ -6626,9 +6626,6 @@ def create_schedule():
         if conn:
             conn.close()
 if __name__ == '__main__':
-    # Use Waitress production server with multi-threading (16 threads) for concurrent handling of 40-70 users
-    print("Starting production Waitress server with 16 worker threads...")
-    print("Access locally in browser at: http://localhost:4000 or http://127.0.0.1:4000")
-    serve(app, host='0.0.0.0', port=4000, threads=16)
+    app.run(port=9000,debug=True)
 
 

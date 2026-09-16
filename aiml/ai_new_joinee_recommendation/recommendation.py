@@ -215,7 +215,7 @@ def recommend_placement(
     name: str = "",
     selected_domains: Optional[List[Dict[str, Any]]] = None,
     # Backwards compatibility parameters:
-    rank: str = "Signal Man",
+    rank: str = "",
     date_of_enrollment: Any = None,
     prior_station: str = "",
     selected_section: Optional[str] = None,
