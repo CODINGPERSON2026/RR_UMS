@@ -2700,7 +2700,8 @@ def get_co_all_dashboard_data(date_str):
         total_officer_strength = sum(row['total_officer_strength'] or 0 for row in leave_data)
         total_leave_percentage = round((total_on_leave / total_strength * 100), 2) if total_strength > 0 else 0
         officer_on_leave = sum(row['officer_on_leave'] or 0 for row in leave_data)
-        officer_leave_percentage = round((officer_on_leave / total_officer_strength * 100), 2) if total_strength > 0 else 0
+        officer_leave_percentage = round((officer_on_leave / total_officer_strength * 100), 2) if total_officer_strength > 0 else 0
+
         total_jco_strength = sum(row['total_jco_strength'] or 0 for row in leave_data)
         jco_on_leave = sum(row['jco_on_leave'] or 0 for row in leave_data)
 
@@ -6555,4 +6556,9 @@ def create_schedule():
         if conn:
             conn.close()
 if __name__ == '__main__':
-    app.run(port=4000,debug=True)
+    # Use Waitress production server with multi-threading (16 threads) for concurrent handling of 40-70 users
+    print("Starting production Waitress server with 16 worker threads...")
+    print("Access locally in browser at: http://localhost:4000 or http://127.0.0.1:4000")
+    serve(app, host='0.0.0.0', port=4000, threads=16)
+
+

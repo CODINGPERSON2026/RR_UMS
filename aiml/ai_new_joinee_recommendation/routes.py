@@ -93,21 +93,35 @@ def ensure_recommendations_table(cursor, conn=None):
         if conn:
             conn.commit()
 
-        # Idempotently ensure missing audit and metrics columns exist in existing database tables
+        # Idempotently ensure missing audit, feature, and metric columns exist in existing database tables
         cols_to_check = [
-            ("updated_by", "VARCHAR(200) DEFAULT NULL"),
-            ("updated_by_role", "VARCHAR(100) DEFAULT NULL"),
-            ("updated_by_user_id", "VARCHAR(100) DEFAULT NULL"),
+            ("personnel_id", "INT DEFAULT NULL"),
+            ("army_number", "VARCHAR(50) DEFAULT NULL"),
+            ("name", "VARCHAR(200) DEFAULT NULL"),
+            ("`rank`", "VARCHAR(100) DEFAULT NULL"),
+            ("trade", "VARCHAR(200) DEFAULT NULL"),
+            ("recommended_company", "VARCHAR(100) DEFAULT NULL"),
+            ("confidence_score", "VARCHAR(50) DEFAULT NULL"),
             ("recommendation_percentage", "FLOAT DEFAULT 85.0"),
+            ("recommended_position", "VARCHAR(200) DEFAULT NULL"),
             ("position_confidence", "VARCHAR(50) DEFAULT NULL"),
-            ("units_history_json", "LONGTEXT DEFAULT NULL"),
+            ("confidence_type", "VARCHAR(100) DEFAULT 'ml'"),
+            ("model_version", "VARCHAR(100) DEFAULT NULL"),
             ("probabilities_json", "LONGTEXT DEFAULT NULL"),
             ("match_reasons_json", "LONGTEXT DEFAULT NULL"),
             ("shap_json", "LONGTEXT DEFAULT NULL"),
+            ("units_history_json", "LONGTEXT DEFAULT NULL"),
+            ("final_company", "VARCHAR(100) DEFAULT NULL"),
+            ("final_position", "VARCHAR(200) DEFAULT NULL"),
             ("decision_type", "VARCHAR(50) DEFAULT 'pending'"),
             ("decision_remarks", "TEXT DEFAULT NULL"),
             ("decided_by", "VARCHAR(200) DEFAULT NULL"),
             ("decided_at", "DATETIME DEFAULT NULL"),
+            ("updated_by", "VARCHAR(200) DEFAULT NULL"),
+            ("updated_by_role", "VARCHAR(100) DEFAULT NULL"),
+            ("updated_by_user_id", "VARCHAR(100) DEFAULT NULL"),
+            ("created_at", "DATETIME DEFAULT NOW()"),
+            ("updated_at", "DATETIME DEFAULT NOW()"),
         ]
         for col_name, col_def in cols_to_check:
             try:
@@ -1025,7 +1039,7 @@ def api_save_recommendation():
                 UPDATE ai_new_joinee_recommendations SET
                     personnel_id = %s, army_number = %s, name = %s, `rank` = %s, trade = %s,
                     recommended_company = %s, confidence_score = %s, recommendation_percentage = %s,
-                    recommended_position = %s, position_confidence = %s, confidence_type = %s,
+                    recommended_position = %s, position_confidence = %s, confidence_type = %s, model_version = %s,
                     probabilities_json = %s, match_reasons_json = %s, shap_json = %s, units_history_json = %s,
                     decision_type = 'pending', updated_at = NOW()
                 WHERE id = %s
@@ -1033,7 +1047,7 @@ def api_save_recommendation():
             cursor.execute(update_sql, (
                 personnel_id, army_number, name, rank, trade,
                 rec_coy, conf_score, rec_pct,
-                rec_pos, pos_conf, conf_type,
+                rec_pos, pos_conf, conf_type, model_ver,
                 prob_json, reasons_json, shap_json, units_json,
                 existing_id
             ))
@@ -1047,11 +1061,11 @@ def api_save_recommendation():
                 INSERT INTO ai_new_joinee_recommendations (
                     personnel_id, army_number, name, `rank`, trade,
                     recommended_company, confidence_score, recommendation_percentage,
-                    recommended_position, position_confidence, confidence_type,
+                    recommended_position, position_confidence, confidence_type, model_version,
                     probabilities_json, match_reasons_json, shap_json, units_history_json,
                     decision_type, created_at, updated_at
                 ) VALUES (
-                    %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
                     %s, %s, %s,
                     %s, %s, %s, %s,
                     %s, %s, %s, %s,
@@ -1061,7 +1075,7 @@ def api_save_recommendation():
             cursor.execute(insert_sql, (
                 personnel_id, army_number, name, rank, trade,
                 rec_coy, conf_score, rec_pct,
-                rec_pos, pos_conf, conf_type,
+                rec_pos, pos_conf, conf_type, model_ver,
                 prob_json, reasons_json, shap_json, units_json
             ))
             conn.commit()
@@ -1285,6 +1299,7 @@ def api_get_insight_detail(rec_id: int):
             return jsonify({"success": False, "error": "Database unavailable"}), 500
 
         cursor = conn.cursor(dictionary=True)
+        ensure_recommendations_table(cursor, conn)
         cursor.execute("SELECT * FROM ai_new_joinee_recommendations WHERE id = %s", (rec_id,))
         row = cursor.fetchone()
 
@@ -1409,6 +1424,7 @@ def api_record_decision():
             return jsonify({"success": False, "error": "Database unavailable"}), 500
 
         cursor = conn.cursor(dictionary=True)
+        ensure_recommendations_table(cursor, conn)
         cursor.execute("SELECT * FROM ai_new_joinee_recommendations WHERE id = %s", (rec_id,))
         existing = cursor.fetchone()
         if not existing:

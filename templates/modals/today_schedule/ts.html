@@ -143,42 +143,53 @@
     // =========================================================
     
     let schedules = [];
-    
-    
+    window._todaySchedulesPromise = null;
+
     // =========================================================
-    // FETCH TODAY SCHEDULES
+    // FETCH TODAY SCHEDULES (Deduplicated single network request)
     // =========================================================
-    
-    async function fetchSchedules() {
-    
+
+    async function fetchSchedules(forceRefresh = false) {
+
         try {
-    
-            const response = await fetch("/api/today/schedules");
-    
-            schedules = await response.json();
-    
+
+            if (!window._todaySchedulesPromise || forceRefresh) {
+                window._todaySchedulesPromise = fetch("/api/today/schedules")
+                    .then(res => res.json())
+                    .catch(err => {
+                        window._todaySchedulesPromise = null;
+                        return [];
+                    });
+            }
+
+            schedules = await window._todaySchedulesPromise;
+
             // =============================================
             // UPDATE SMALL CARD
             // =============================================
-    
+
             loadNextEvent();
-    
+
             // =============================================
             // UPDATE MODAL LIST
             // =============================================
-    
+
             renderSchedule();
-    
+
+            return schedules;
+
         }
-    
+
         catch (error) {
-    
+
             console.error(
                 "Schedule fetch error:",
                 error
             );
+            return [];
         }
     }
+
     
     
     // =========================================================
@@ -382,7 +393,7 @@
     
             setInterval(() => {
     
-                fetchSchedules();
+                fetchSchedules(true);
     
             }, 60000);
         }

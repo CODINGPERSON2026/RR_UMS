@@ -15,7 +15,41 @@ def round_to_nearest_even(n):
             rounded -= 1
     return rounded
 
+def fetch_all_ideal_weights(cursor):
+    """
+    Fetches all ideal weight rules in a SINGLE SQL query and builds an in-memory lookup dictionary.
+    Structure: { height_cm: [(lower_age, upper_age, ideal_weight_kg), ...] }
+    """
+    cursor.execute("SELECT height_cm, age_range, ideal_weight_kg FROM ideal_weights")
+    rows = cursor.fetchall()
+    ideal_map = {}
+    for r in rows:
+        h = r['height_cm']
+        if h not in ideal_map:
+            ideal_map[h] = []
+        try:
+            lower_age, upper_age = map(int, r['age_range'].split('-'))
+            ideal_map[h].append((lower_age, upper_age, float(r['ideal_weight_kg'])))
+        except Exception:
+            continue
+    return ideal_map
+
+
+def lookup_ideal_weight_from_map(ideal_map, age, height_cm):
+    """In-memory 0ms lookup function."""
+    if height_cm is None or age is None:
+        return None
+    entries = ideal_map.get(height_cm, [])
+    for lower_age, upper_age, weight in entries:
+        if lower_age <= age <= upper_age:
+            return weight
+    return None
+
+
 def get_ideal_weight(age, height_cm, cursor):
+    """Legacy helper for single-user lookups."""
+    if cursor is None or height_cm is None:
+        return None
     cursor.execute("SELECT age_range, ideal_weight_kg FROM ideal_weights WHERE height_cm = %s", (height_cm,))
     rows = cursor.fetchall()
     for row in rows:
@@ -25,80 +59,89 @@ def get_ideal_weight(age, height_cm, cursor):
             lower_age, upper_age = map(int, age_range.split('-'))
             if lower_age <= age <= upper_age:
                 return float(ideal_weight)
-        except:
+        except Exception:
             continue
     return None
 
+
 def compute_authorization(company=None):
     connection = get_db_connection()
+    if not connection:
+        return []
     cursor = connection.cursor(dictionary=True)
 
-    if company and company != "All":
-        cursor.execute("SELECT army_number, name,`rank`,company, age, height, actual_weight,status_type FROM weight_info WHERE company = %s", (company,))
-    else:
-        cursor.execute("SELECT army_number, name,`rank`, company, age, height, actual_weight,status_type FROM weight_info")
-    
-    soldiers = cursor.fetchall()
-    
-    results = []
+    try:
+        # 1. Fetch lookup rules ONCE in single query
+        ideal_map = fetch_all_ideal_weights(cursor)
 
-    for s in soldiers:
-        age = s['age']
-        height_cm = round_to_nearest_even(s['height'])
-        actual_weight = s['actual_weight']
-        name = s['name']
-        company = s['company']
-        army_number = s['army_number']
-        rank = s['rank']
-        status_type = s['status_type']
-
-        ideal_weight = get_ideal_weight(age, height_cm, cursor)
-
-        if ideal_weight is None:
-            status = "No ideal weight found"
-            lower = upper = None
-            weight_deviation_percent = None
-            weight_deviation_kg = None
+        # 2. Fetch personnel
+        if company and company != "All":
+            cursor.execute("SELECT army_number, name, `rank`, company, age, height, actual_weight, status_type FROM weight_info WHERE company = %s", (company,))
         else:
-            lower = round(ideal_weight * 0.88, 2)
-            upper = round(ideal_weight * 1.12, 2)
+            cursor.execute("SELECT army_number, name, `rank`, company, age, height, actual_weight, status_type FROM weight_info")
+        
+        soldiers = cursor.fetchall()
+        
+        results = []
 
-            if lower <= actual_weight <= upper:
-                status = "Fit"
-                weight_deviation_kg = 0
-                weight_deviation_percent = 0
+        for s in soldiers:
+            age = s['age']
+            height_cm = round_to_nearest_even(s['height'])
+            actual_weight = s['actual_weight']
+            name = s['name']
+            comp = s['company']
+            army_number = s['army_number']
+            rank = s['rank']
+            status_type = s['status_type']
+
+            ideal_weight = lookup_ideal_weight_from_map(ideal_map, age, height_cm)
+
+            if ideal_weight is None:
+                status = "No ideal weight found"
+                lower = upper = None
+                weight_deviation_percent = None
+                weight_deviation_kg = None
             else:
-                status = "UnFit"
-                if actual_weight < lower:
-                    deviation = lower - actual_weight
-                    weight_deviation_kg = round(deviation, 1)
-                    weight_deviation_percent = round((deviation / lower) * 100, 1)
-                else:  # actual_weight > upper
-                    
-                    deviation = actual_weight - upper
-                    weight_deviation_kg = round(deviation, 1)
-                    weight_deviation_percent = round((deviation / upper) * 100, 1)
-                
-        results.append({
-            'army_number': army_number,
-            "name": name,
-            'rank':rank,
-            "company": company,
-            "age": age,
-            "height_cm": height_cm,
-            "actual_weight": actual_weight,
-            "ideal_weight": ideal_weight,
-            "lower_limit": lower,
-            "upper_limit": upper,
-            "status": status,
-            "weight_deviation_percent": weight_deviation_percent,
-            "weight_deviation_kg": weight_deviation_kg,
-            "status_type" : status_type
-        })
+                lower = round(ideal_weight * 0.88, 2)
+                upper = round(ideal_weight * 1.12, 2)
 
-    cursor.close()
-    connection.close()
-    return results
+                if lower <= actual_weight <= upper:
+                    status = "Fit"
+                    weight_deviation_kg = 0
+                    weight_deviation_percent = 0
+                else:
+                    status = "UnFit"
+                    if actual_weight < lower:
+                        deviation = lower - actual_weight
+                        weight_deviation_kg = round(deviation, 1)
+                        weight_deviation_percent = round((deviation / lower) * 100, 1)
+                    else:  # actual_weight > upper
+                        deviation = actual_weight - upper
+                        weight_deviation_kg = round(deviation, 1)
+                        weight_deviation_percent = round((deviation / upper) * 100, 1)
+                    
+            results.append({
+                'army_number': army_number,
+                "name": name,
+                'rank': rank,
+                "company": comp,
+                "age": age,
+                "height_cm": height_cm,
+                "actual_weight": actual_weight,
+                "ideal_weight": ideal_weight,
+                "lower_limit": lower,
+                "upper_limit": upper,
+                "status": status,
+                "weight_deviation_percent": weight_deviation_percent,
+                "weight_deviation_kg": weight_deviation_kg,
+                "status_type": status_type
+            })
+
+        return results
+    finally:
+        cursor.close()
+        connection.close()
+
 # --- Validation functions ---
 def validate_alpha(value, field_name):
     """Validate that value contains only letters and spaces"""
@@ -745,58 +788,52 @@ COMPANIES = [
 #         """, (year, month, company, unFit))
 
 def auto_save_monthly_unfit():
-
     now = datetime.now()
-
     year = now.year
     month = now.month
 
     conn = get_db_connection()
+    if not conn:
+        return
     cursor = conn.cursor(dictionary=True)
 
-    for company in COMPANIES:
-
-        # Check if already saved
+    try:
+        # Quick check: if records exist for all companies this month, return early
         cursor.execute("""
-            SELECT id
+            SELECT COUNT(DISTINCT unit) as cnt
             FROM monthly_medical_status
-            WHERE year=%s
-            AND month=%s
-            AND unit=%s
-        """, (year, month, company))
+            WHERE year=%s AND month=%s
+        """, (year, month))
+        saved = cursor.fetchone()
+        if saved and saved.get('cnt', 0) >= len(COMPANIES):
+            return
 
-        if cursor.fetchone():
-            continue
+        for company in COMPANIES:
+            cursor.execute("""
+                SELECT id
+                FROM monthly_medical_status
+                WHERE year=%s AND month=%s AND unit=%s
+            """, (year, month, company))
 
-        # Compute official count
-        data = compute_authorization(company)
+            if cursor.fetchone():
+                continue
 
-        unFit = sum(
-            1 for d in data
-            if d['status'] == "UnFit"
-        )
+            data = compute_authorization(company)
+            unFit = sum(1 for d in data if d['status'] == "UnFit")
 
+            cursor.execute("""
+                INSERT INTO monthly_medical_status (
+                    year, month, unit, unfit_count
+                )
+                VALUES (%s, %s, %s, %s)
+            """, (year, month, company, unFit))
 
-        cursor.execute("""
-            INSERT INTO monthly_medical_status (
-                year,
-                month,
-                unit,
-                unfit_count
-            )
-            VALUES (%s, %s, %s, %s)
-        """, (
-            year,
-            month,
-            company,
-            unFit
-        ))
-
-    # ✅ ADD HERE
-    conn.commit()
-
-    cursor.close()
-    conn.close()
+        conn.commit()
+    except Exception as e:
+        print(f"[auto_save_monthly_unfit Error] {e}")
+    finally:
+        cursor.close()
+        conn.close()
 def _to_json_serializable(val):
     """Convert DB values (e.g. Decimal) to JSON-serializable Python types."""
     if val is None:

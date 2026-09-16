@@ -1719,8 +1719,10 @@ STATUS COLORS
     if (!slider) return;
 
     try {
-      const response = await fetch("/api/today/schedules");
-      const data = await response.json();
+      const data = typeof fetchSchedules === "function"
+        ? await fetchSchedules()
+        : await (await fetch("/api/today/schedules")).json();
+
 
       if (!data.length) {
         slider.innerHTML = `
@@ -1950,6 +1952,27 @@ STATUS COLORS
 
   /* ── main dashboard data ── */
   async function loadDashboard() {
+    // 1. Instantly reveal UI layout so the user sees the page in ~0.1 seconds
+    hidePageLoader();
+    showActionBar();
+    showStatsGrid();
+    showChartCards();
+
+    // 2. Load secondary badges and counters in background asynchronously without blocking UI
+    Promise.all([
+      loadRejected(),
+      loadLeaveRequests_CO(),
+      loadEvents(),
+      loadCompanyInterviewCount(),
+      loadCoInterviewCount()
+    ]).catch(function (err) { console.warn("Background badges load warning:", err); });
+
+    fetch('/api/ai/company-recommendation/insights-count')
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
+      .catch(function () {});
+
+    // 3. Fetch primary dashboard stats asynchronously to populate metric cards
     try {
       var res = await fetch("/api/dashboard_summary");
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -1981,23 +2004,11 @@ STATUS COLORS
       safeSet("onleave_leave", data.agniveer_on_leave);
       safeSet("dues_in_count", data.dues_in);
       safeSet("dues_out_count", data.dues_out);
-      fetch('/api/ai/company-recommendation/insights-count')
-        .then(r => r.json())
-        .then(d => { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
-        .catch(() => {});
-      await Promise.all([loadRejected(), loadLeaveRequests_CO(), loadEvents(), loadCompanyInterviewCount(), loadCoInterviewCount()]);
-      hidePageLoader();
-      showActionBar();
-      showStatsGrid();
-      setTimeout(showChartCards, 120);
     } catch (e) {
       console.error("Dashboard load error:", e);
-      hidePageLoader();
-      showActionBar();
-      showStatsGrid();
-      setTimeout(showChartCards, 120);
     }
   }
+
 
   /* ── DOMContentLoaded bootstrap ── */
   document.addEventListener("DOMContentLoaded", function () {
