@@ -325,6 +325,110 @@ class FitnessTrendApp {
     if (retrainBtn) {
       retrainBtn.addEventListener('click', () => this.triggerModelRetrain());
     }
+
+    // Calculate All Individuals Fitness button handler
+    const btnCalcAll = document.getElementById('btnCalculateAllFitness');
+    if (btnCalcAll) {
+      btnCalcAll.addEventListener('click', () => {
+        this.triggerCalculateAllFitness();
+      });
+    }
+
+    // View Unfit Table button handler from completion modal
+    const btnViewUnfit = document.getElementById('btnViewUnfitTableFromModal');
+    if (btnViewUnfit) {
+      btnViewUnfit.addEventListener('click', () => {
+        const calcModalEl = document.getElementById('calculateAllFitnessModal');
+        if (calcModalEl) {
+          const bsModal = bootstrap.Modal.getInstance(calcModalEl) || new bootstrap.Modal(calcModalEl);
+          if (bsModal) bsModal.hide();
+        }
+        setTimeout(() => {
+          if (typeof openAiFitnessReportsModal === 'function') {
+            openAiFitnessReportsModal();
+          } else if (window.FitnessModalController && typeof window.FitnessModalController.openModal === 'function') {
+            window.FitnessModalController.openModal();
+          } else {
+            const fitModalEl = document.getElementById('aiFitnessReportsModal');
+            if (fitModalEl) {
+              const fitModal = bootstrap.Modal.getInstance(fitModalEl) || new bootstrap.Modal(fitModalEl);
+              fitModal.show();
+            }
+          }
+        }, 300);
+      });
+    }
+  }
+
+  async triggerCalculateAllFitness() {
+    const modalEl = document.getElementById('calculateAllFitnessModal');
+    if (!modalEl) return;
+
+    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    bsModal.show();
+
+    const loadingState = document.getElementById('calcAllLoadingState');
+    const successState = document.getElementById('calcAllSuccessState');
+    const errorState = document.getElementById('calcAllErrorState');
+    const viewUnfitBtn = document.getElementById('btnViewUnfitTableFromModal');
+
+    if (loadingState) loadingState.classList.remove('d-none');
+    if (successState) successState.classList.add('d-none');
+    if (errorState) errorState.classList.add('d-none');
+    if (viewUnfitBtn) viewUnfitBtn.classList.add('d-none');
+
+    try {
+      const res = await fetch('/fitness/api/calculate-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goal: this.currentGoal || 'Overall Fitness',
+          lang: this.currentLang || 'en'
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to calculate fitness for all personnel.');
+      }
+
+      const totalCountEl = document.getElementById('calcAllTotalCount');
+      const unfitCountEl = document.getElementById('calcAllUnfitCount');
+      const fitCountEl = document.getElementById('calcAllFitCount');
+      const successMsgEl = document.getElementById('calcAllSuccessMessage');
+
+      if (totalCountEl) totalCountEl.textContent = data.total_processed || 0;
+      if (unfitCountEl) unfitCountEl.textContent = data.unfit_count || 0;
+      if (fitCountEl) fitCountEl.textContent = data.fit_count || 0;
+      if (successMsgEl) {
+        successMsgEl.textContent = `Successfully processed ${data.total_processed} individuals and updated ums.ai_fitness_reports table.`;
+      }
+
+      if (loadingState) loadingState.classList.add('d-none');
+      if (successState) successState.classList.remove('d-none');
+      if (viewUnfitBtn) viewUnfitBtn.classList.remove('d-none');
+
+      // Update dashboard cards / badge counts if present
+      const dashTotal = document.getElementById('dash-fit-total');
+      if (dashTotal) dashTotal.textContent = data.unfit_count || 0;
+      const coTotal = document.getElementById('co-fit-total');
+      if (coTotal) coTotal.textContent = data.unfit_count || 0;
+
+      // Also refresh the executive reports modal data if initialized
+      if (window.FitnessModalController && typeof window.FitnessModalController.loadModalData === 'function') {
+        window.FitnessModalController.loadModalStats();
+        window.FitnessModalController.loadModalData();
+      }
+
+    } catch (err) {
+      console.error('Calculate all fitness error:', err);
+      if (loadingState) loadingState.classList.add('d-none');
+      if (errorState) {
+        errorState.classList.remove('d-none');
+        const errMsgEl = document.getElementById('calcAllErrorMessage');
+        if (errMsgEl) errMsgEl.textContent = err.message || 'Error occurred while calculating fitness.';
+      }
+    }
   }
 
   updateTotalCounts(count) {

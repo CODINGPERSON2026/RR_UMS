@@ -71,6 +71,13 @@ def root_fitness_api_export_directory_pdf():
     return api_export_directory_pdf()
 
 
+@app.route("/api/fitness/calculate-all", methods=["POST"])
+@app.route("/fitness/api/calculate-all", methods=["POST"])
+def root_fitness_api_calculate_all():
+    from aiml.fitness_trend.routes import api_calculate_all_fitness
+    return api_calculate_all_fitness()
+
+
 @app.route("/api/analyze/<army_number>", methods=["GET"])
 def root_fitness_api_analyze_soldier(army_number):
     from aiml.fitness_trend.routes import api_analyze_fitness_by_get

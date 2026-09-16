@@ -14,13 +14,24 @@
   {% set header = "Unit Management System" %}
   {% include 'navbar/navbar.html' %}
 
-  <!-- Sub-Header Bar & Retrain Button -->
+  <!-- Sub-Header Bar & Executive Action Toolbar -->
   <div class="d-flex align-items-center justify-content-between my-3 px-1 flex-wrap gap-2">
-    <div class="fitness-header-badge d-flex align-items-center flex-wrap gap-2">
-      <span><i class="fas fa-microchip me-1"></i> AI/ML Operational Readiness &bull; Grounded in BPET, PPT &amp; Body Composition Standards</span>
-      <span class="badge bg-primary text-white rounded-pill px-3 py-1 shadow-sm border border-light font-monospace" id="headerTotalPersonnelBadge" style="font-size: 0.82rem;">
-        <i class="fas fa-users me-1"></i> Total Personnel: <strong id="totalPersonnelCount">{{ total_count if total_count is not none and total_count > 0 else '--' }}</strong>
-      </span>
+    <!-- Left: Operational Readiness Badge -->
+    <div class="fitness-header-badge d-inline-flex align-items-center gap-2">
+      <i class="fas fa-microchip text-primary"></i>
+      <span>AI/ML Operational Readiness &bull; BPET, PPT &amp; Body Composition</span>
+    </div>
+
+    <!-- Right: Total Personnel Badge + Calculate All Individuals Fitness Button -->
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <div class="fitness-total-badge d-inline-flex align-items-center px-3 py-1.5 rounded-pill shadow-sm border" id="headerTotalPersonnelBadge" style="background: var(--fit-card-bg); font-size: 0.82rem; font-weight: 700; font-family: monospace;">
+        <i class="fas fa-users text-primary me-1.5"></i>
+        <span>Total Personnel: <strong id="totalPersonnelCount" class="text-primary">{{ total_count if total_count is not none and total_count > 0 else '--' }}</strong></span>
+      </div>
+      <button type="button" id="btnCalculateAllFitness" class="btn btn-primary fw-bold shadow-sm d-inline-flex align-items-center gap-2 px-3 py-1.5" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; font-size: 0.82rem; letter-spacing: 0.3px; white-space: nowrap; transition: all 0.25s ease;" title="Calculate AI Fitness for all individuals and sync with executive reports table">
+        <i class="fas fa-calculator text-warning"></i>
+        <span>Calculate All Individuals Fitness</span>
+      </button>
     </div>
   </div>
 
@@ -86,7 +97,7 @@
       </div>
 
       <!-- Quick Action / PDF Preview & Generate -->
-      <div class="col-xl-4 col-lg-4 col-md-8">
+      <div class="col-xl-3 col-lg-3 col-md-8">
         <label class="form-label small fw-bold text-muted text-uppercase mb-1">
           <i class="fas fa-file-invoice text-primary me-1"></i> Report Actions
         </label>
@@ -250,7 +261,102 @@
     </div>
   </div>
 </div>
+<!-- Calculate All Individuals Fitness Progress & Results Modal -->
+<div class="modal fade" id="calculateAllFitnessModal" tabindex="-1" aria-labelledby="calculateAllFitnessModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 580px;">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+      <div class="modal-header text-white px-4 py-3" style="background: linear-gradient(135deg, #1e3a8a, #2563eb);">
+        <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="calculateAllFitnessModalLabel">
+          <i class="fas fa-calculator text-warning"></i> Unit-Wide AI Fitness Calculation
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closeCalcAllModalBtn"></button>
+      </div>
+
+      <div class="modal-body p-4 text-center">
+        <!-- LOADING VIEW -->
+        <div id="calcAllLoadingState">
+          <div class="my-3">
+            <div class="spinner-border text-primary" style="width: 3.5rem; height: 3.5rem; border-width: 0.3em;" role="status">
+              <span class="visually-hidden">Calculating...</span>
+            </div>
+          </div>
+          <h5 class="fw-bold text-dark mt-3 mb-1">Evaluating Unit Readiness...</h5>
+          <p class="text-muted small mb-3">
+            Evaluating BPET, PPT, Body Mass Index, and Nutritional Standards across all <strong>{{ total_count if total_count else '479' }}</strong> personnel.
+          </p>
+          <div class="progress mb-2" style="height: 10px; border-radius: 6px; background-color: #e2e8f0;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" id="calcAllProgressBar" style="width: 100%;"></div>
+          </div>
+          <div class="small text-primary font-monospace fw-semibold" id="calcAllStatusText">
+            <i class="fas fa-database me-1"></i> Adding/updating records into ums.ai_fitness_reports table...
+          </div>
+        </div>
+
+        <!-- SUCCESS VIEW -->
+        <div id="calcAllSuccessState" class="d-none text-start">
+          <div class="d-flex align-items-center gap-3 p-3 rounded-3 mb-3" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+            <div class="d-flex align-items-center justify-content-center rounded-circle bg-success text-white" style="width: 46px; height: 46px; min-width: 46px;">
+              <i class="fas fa-check fa-lg"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-success mb-0">Calculation Completed &amp; Saved!</h6>
+              <div class="small text-muted" id="calcAllSuccessMessage">All personnel records added into ums.ai_fitness_reports table.</div>
+            </div>
+          </div>
+
+          <!-- SUMMARY COUNTS CARDS -->
+          <div class="row g-2 mb-3 text-center">
+            <div class="col-4">
+              <div class="p-2 rounded-3 border bg-light">
+                <span class="text-muted small d-block">Total Evaluated</span>
+                <strong class="fs-5 text-dark" id="calcAllTotalCount">0</strong>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-3 border" style="background: #fef2f2; border-color: #fecaca !important;">
+                <span class="text-danger small fw-bold d-block"><i class="fas fa-exclamation-circle me-1"></i>Unfit Personnel</span>
+                <strong class="fs-5 text-danger" id="calcAllUnfitCount">0</strong>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 rounded-3 border" style="background: #f0fdf4; border-color: #bbf7d0 !important;">
+                <span class="text-success small fw-bold d-block"><i class="fas fa-check-circle me-1"></i>Fit / Ready</span>
+                <strong class="fs-5 text-success" id="calcAllFitCount">0</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXECUTIVE ROUTING NOTICE -->
+          <div class="alert alert-warning py-2 px-3 rounded-3 mb-0 small d-flex align-items-start gap-2" style="border-left: 4px solid #f59e0b;">
+            <i class="fas fa-shield-alt text-warning mt-1"></i>
+            <div>
+              <strong>Executive Command Filter:</strong> Only individuals whose fitness is <strong>Unfit</strong> are fetched to the <strong>CO, 2IC, and Adjutant</strong> roles table.
+            </div>
+          </div>
+        </div>
+
+        <!-- ERROR VIEW -->
+        <div id="calcAllErrorState" class="d-none text-center">
+          <div class="text-danger mb-2"><i class="fas fa-exclamation-triangle fa-3x"></i></div>
+          <h6 class="fw-bold text-danger">Calculation Error</h6>
+          <p class="small text-muted mb-0" id="calcAllErrorMessage"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-between align-items-center">
+        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger btn-sm px-3 fw-bold d-none shadow-sm d-flex align-items-center gap-2" id="btnViewUnfitTableFromModal">
+          <i class="fas fa-table"></i>
+          <span>View Unfit Table (CO/2IC/Adjutant)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Included CO / 2IC / Adjutant Roles AI Fitness Reports Modal -->
+{% include 'modals/ai_fitness_reports_modal.html' %}
 
 <!-- Fitness Trend Module JS Controller -->
-<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_trend.js') }}?v=12.0"></script>
+<script src="{{ url_for('fitness_trend_bp.static', filename='js/fitness_trend.js') }}?v=13.0"></script>
 {% endblock %}
