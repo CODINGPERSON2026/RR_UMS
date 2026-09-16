@@ -277,6 +277,7 @@ def delete_attachment(army_number):
 
         # Commit only if both queries succeed
         conn.commit()
+        _assigned_attachment_alarm_cache["data"] = None
         return jsonify({"message": "Attachment marked inactive and TD record deleted successfully"})
 
     except Exception as e:

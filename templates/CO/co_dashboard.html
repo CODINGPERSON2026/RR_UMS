@@ -2485,12 +2485,12 @@ STATUS COLORS
 
 
 
-  async function loadBharosaChart(company) {
+  function loadBharosaChart(company) {
     if (!document.getElementById("bharosaChart")) return;
     company = company || "ALL";
     try {
-      var happy = 100;
-      var unhappy = 0;
+      var happy = 95;
+      var unhappy = 5;
       var unhappyList = [
         { rank: "Hav", name: "Gurpreet Singh", reason: "Delay in leave approval" },
         { rank: "Sep", name: "Amit Sharma", reason: "Field area network issues" },
@@ -2498,22 +2498,7 @@ STATUS COLORS
         { rank: "Nk", name: "Rajesh Kumar", reason: "Family quarters allocation delay" },
         { rank: "Sep", name: "Rohit Verma", reason: "Barracks ventilation maintenance" }
       ];
-      
-      try {
-        var res = await fetch("/api/bharosa_stats?company=" + encodeURIComponent(company));
-        if (res.ok) {
-          var result = await res.json();
-          if (result && result.status === "success") {
-            happy = result.happy || 95;
-            unhappy = result.unhappy || 5;
-            if (result.unhappy_list) {
-              unhappyList = result.unhappy_list;
-            }
-          }
-        }
-      } catch (apiError) {
-        // Fallback to 95 and 5
-      }
+
 
       var happyEl = document.getElementById("bharosaHappyCount");
       var unhappyEl = document.getElementById("bharosaUnhappyCount");
