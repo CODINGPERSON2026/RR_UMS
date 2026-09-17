@@ -31,6 +31,7 @@ except ImportError:
 
 from .api import (
     analyze_personnel_fitness,
+    calculate_all_individuals_fitness,
     search_personnel_records,
     trigger_retraining,
     get_all_reports_paginated,
@@ -52,7 +53,7 @@ except Exception as _table_err:
     logger.warning(f"Could not initialize database tables on load: {_table_err}")
 
 # Allowed executive roles for reports dashboard and management
-AUTHORIZED_FITNESS_ROLES = ["CO", "2IC", "ADJUTANT", "COMMANDING OFFICER"]
+AUTHORIZED_FITNESS_ROLES = ["CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN"]
 
 
 def check_fitness_executive_access(user_payload):
@@ -508,7 +509,15 @@ def api_get_reports():
 
     search_query = request.args.get("search", "").strip()
     company = request.args.get("company", "").strip()
-    status = request.args.get("status", "").strip() or "Unfit"
+    raw_status = request.args.get("status", "").strip()
+    # For CO, 2IC, Adjutant roles table: defaults strictly to Unfit
+    if raw_status:
+        status = raw_status
+    elif not search_query:
+        status = "Unfit"
+    else:
+        status = ""
+
     from_date = request.args.get("from_date", "").strip() or None
     to_date = request.args.get("to_date", "").strip() or None
     sort_by = request.args.get("sort_by", "generated_at").strip()
@@ -534,8 +543,31 @@ def api_get_reports():
         per_page=per_page
     )
     return jsonify(data)
- 
- 
+
+
+@fitness_trend_bp.route("/api/calculate-all", methods=["POST"])
+def api_calculate_all_fitness():
+    """
+    Triggers batch calculation of fitness for all unit individuals,
+    persists evaluations into `ums.ai_fitness_reports`,
+    and returns fit vs unfit counts for CO, 2IC, and Adjutant oversight.
+    """
+    user_payload = require_login()
+    if not user_payload:
+        return jsonify({'success': False, 'error': 'Unauthorized. Please login.'}), 401
+
+    try:
+        data = request.get_json(silent=True) or {}
+        goal = data.get("goal", "Overall Fitness")
+        lang = data.get("lang", "English")
+
+        result = calculate_all_individuals_fitness(goal=goal, language=lang)
+        return jsonify(result)
+    except Exception as e:
+        logger.error(f"Error in api_calculate_all_fitness: {e}", exc_info=True)
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @fitness_trend_bp.route("/api/reports/export-pdf", methods=["GET"])
 def api_export_directory_pdf():
     """
@@ -648,17 +680,11 @@ def api_export_directory_pdf():
 def api_get_reports_stats():
     """
     Returns dynamic aggregate counts (Total Reports, Healthy, Needs Improvement, At Risk).
-    Strict role-based access: CO, 2IC, Adjutant.
+    Accessible to authenticated users for dashboard badge population.
     """
     user_payload = require_login()
     if not user_payload:
         return jsonify({'success': False, 'error': 'Unauthorized'}), 401
-
-    if not check_fitness_executive_access(user_payload):
-        return jsonify({
-            'success': False,
-            'error': 'Forbidden: Access restricted strictly to Commanding Officer (CO), 2IC, or Adjutant.'
-        }), 403
 
     stats = get_reports_statistics()
     return jsonify(stats)

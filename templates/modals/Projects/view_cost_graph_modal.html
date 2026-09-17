@@ -1,5 +1,5 @@
 <!-- ==================== STATISTICS MODAL (prjStatsModal) ==================== -->
-<div class="modal fade" id="prjStatsModal" tabindex="-1" aria-labelledby="prjStatsModalLabel" aria-hidden="true">
+<div class="modal fade" id="prjStatsModal" tabindex="-1" data-bs-focus="false" aria-labelledby="prjStatsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
       
@@ -227,11 +227,12 @@ function openStatisticsModal() {
     if (!statsModalEl) return;
 
     const dashboardModal = bootstrap.Modal.getInstance(dashboardModalEl) || 
-                           new bootstrap.Modal(dashboardModalEl);
+                           bootstrap.Modal.getOrCreateInstance(dashboardModalEl, { focus: false });
 
-    const statsModal = new bootstrap.Modal(statsModalEl, {
+    const statsModal = bootstrap.Modal.getOrCreateInstance(statsModalEl, {
         backdrop: true,
-        keyboard: true
+        keyboard: true,
+        focus: false
     });
 
     // Hide dashboard when stats modal opens

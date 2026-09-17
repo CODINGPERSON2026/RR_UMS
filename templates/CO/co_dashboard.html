@@ -1465,13 +1465,13 @@ STATUS COLORS
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope">
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope" style="cursor: pointer;">
         <span class="sc-label">TD / Attachment</span>
         <div class="sc-right">
           <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      <div class="sc" id="viewDetailsBtn">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
         <span class="sc-label">Detachment</span>
         <div class="sc-right">
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1882,9 +1882,15 @@ STATUS COLORS
 </script>
 <script>
   document.addEventListener("hidden.bs.modal", function () {
-    document.querySelectorAll(".modal-backdrop").forEach(function (b) { b.remove(); });
-    document.body.classList.remove("modal-open");
-    document.body.style.overflow = "";
+    const openModals = document.querySelectorAll(".modal.show");
+    if (openModals.length > 0) {
+      document.body.classList.add("modal-open");
+      document.body.style.overflow = "hidden";
+    } else {
+      document.querySelectorAll(".modal-backdrop").forEach(function (b) { b.remove(); });
+      document.body.classList.remove("modal-open");
+      document.body.style.overflow = "";
+    }
   });
 </script>
 
@@ -2127,6 +2133,24 @@ STATUS COLORS
     /* dashboard data */
     loadDashboard();
 
+    /* ── DOMContentLoaded override for late-loaded script tags inside templates ── */
+    var _origDocAddEvt = document.addEventListener;
+    document.addEventListener = function (type, listener, options) {
+      if (type === "DOMContentLoaded" && document.readyState !== "loading") {
+        try { listener.call(document, new Event("DOMContentLoaded")); } catch (err) { console.error(err); }
+      } else {
+        _origDocAddEvt.call(document, type, listener, options);
+      }
+    };
+    var _origWinAddEvt = window.addEventListener;
+    window.addEventListener = function (type, listener, options) {
+      if (type === "DOMContentLoaded" && document.readyState !== "loading") {
+        try { listener.call(window, new Event("DOMContentLoaded")); } catch (err) { console.error(err); }
+      } else {
+        _origWinAddEvt.call(window, type, listener, options);
+      }
+    };
+
     /* ── Deferred Modals Unpacker for Instant Initial Page Render ── */
     var _modalsUnpacked = false;
     window.unpackDeferredModals = function () {
@@ -2134,14 +2158,30 @@ STATUS COLORS
       _modalsUnpacked = true;
       var tmpl = document.getElementById("deferredModalContainer");
       if (tmpl && tmpl.content) {
-        document.body.appendChild(tmpl.content.cloneNode(true));
+        var wrapper = document.createElement("div");
+        wrapper.id = "deferredModalsWrapper";
+        wrapper.appendChild(tmpl.content.cloneNode(true));
+        document.body.appendChild(wrapper);
         tmpl.remove();
+
+        // Re-create script tags so cloned script elements execute in the main document context
+        var oldScripts = Array.from(wrapper.querySelectorAll("script"));
+        oldScripts.forEach(function (oldScript) {
+          var newScript = document.createElement("script");
+          Array.from(oldScript.attributes).forEach(function (attr) {
+            newScript.setAttribute(attr.name, attr.value);
+          });
+          newScript.textContent = oldScript.textContent;
+          if (oldScript.parentNode) {
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+          }
+        });
       }
     };
 
     // Safety click listener: unpack instantly if any modal trigger is clicked
     document.addEventListener("click", function (e) {
-      if (e.target && e.target.closest && e.target.closest('[data-bs-toggle="modal"], [data-bs-target], [onclick*="Modal"], [onclick*="modal"]')) {
+      if (e.target && e.target.closest && e.target.closest('[data-bs-toggle="modal"], [data-bs-target], [onclick*="Modal"], [onclick*="modal"], #viewDetailsBtn, .sc')) {
         window.unpackDeferredModals();
       }
     }, { capture: true });

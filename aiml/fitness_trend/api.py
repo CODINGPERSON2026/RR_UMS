@@ -17,12 +17,13 @@ from .data.reports_db import (
     get_saved_report_by_army_number,
     get_saved_report_by_id,
     insert_or_update_ai_fitness_report,
+    bulk_insert_or_update_ai_fitness_reports,
     touch_fitness_report_timestamp,
     fetch_reports_paginated,
     fetch_dynamic_report_stats
 )
 from .features.feature_engineering import generate_features_for_soldier
-from .prediction.predictor import predict_soldier_fitness, get_model_info
+from .prediction.predictor import predict_soldier_fitness, get_model_info, load_cached_models
 from .recommendations.recommendation_engine import generate_full_recommendations
 from .progression.progression import generate_fitness_progression_trajectory
 from .training.train import train_and_persist_models
@@ -163,6 +164,145 @@ def get_saved_fitness_report_by_id(report_id):
     Fetches a saved AI fitness report directly by primary key.
     """
     return get_saved_report_by_id(report_id)
+
+
+def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"):
+    """
+    Evaluates fitness for all individuals in the unit (all personnel in weight_info),
+    persists/updates their evaluation in `ums.ai_fitness_reports`, and computes
+    a breakdown of fit vs unfit personnel for CO, 2IC, and Adjutant oversight.
+    
+    Returns:
+        dict: {
+            'success': bool,
+            'total_processed': int,
+            'unfit_count': int,
+            'fit_count': int,
+            'unfit_personnel': list,
+            'saved': dict,
+            'message': str
+        }
+    """
+    logger.info("Initiating batch fitness calculation for all individuals...")
+    ensure_ai_fitness_reports_table()
+
+    # 1. Preload models & cached menus
+    load_cached_models()
+
+    # 2. Fetch all personnel joined data
+    p_rows, w_rows, s_rows, ideal_weights = fetch_all_personnel_fitness_data()
+    if not w_rows:
+        return {
+            'success': False,
+            'error': 'No personnel found in weight_info table.',
+            'total_processed': 0,
+            'unfit_count': 0,
+            'fit_count': 0,
+            'unfit_personnel': []
+        }
+
+    # Index personnel and sports by normalized army_number
+    p_map = {str(p.get('army_number', '')).strip(): p for p in p_rows}
+    s_map = {}
+    for s in s_rows:
+        ano = str(s.get('army_number', '')).strip()
+        s_map.setdefault(ano, []).append(s)
+
+    reports_payload_list = []
+    unfit_personnel = []
+    unfit_count = 0
+    fit_count = 0
+
+    for w_row in w_rows:
+        ano = str(w_row.get('army_number', '')).strip()
+        if not ano:
+            continue
+
+        p_row = p_map.get(ano)
+        sports = s_map.get(ano, [])
+
+        # Feature Engineering
+        features = generate_features_for_soldier(p_row, w_row, sports, ideal_weights)
+
+        # AI Prediction
+        prediction = predict_soldier_fitness(features)
+        prediction = _ensure_complete_prediction(prediction, features)
+
+        # Recommendations & Progression
+        recommendations = generate_full_recommendations(features, goal=goal)
+        progression = generate_fitness_progression_trajectory(
+            features,
+            predicted_score=prediction.get('fitness_score'),
+            goal=goal
+        )
+
+        score = prediction.get('fitness_score')
+        status_label = prediction.get('category_label', '')
+        st_lower = str(status_label).lower()
+
+        # Determine Unfit vs Fit
+        is_unfit = False
+        if score is None or score < 70:
+            is_unfit = True
+        elif any(k in st_lower for k in ('risk', 'unfit', 'poor', 'fail', 'lmc', 'improvement', 'needs imp', 'overweight', 'underweight')):
+            is_unfit = True
+
+        if is_unfit:
+            unfit_count += 1
+            unfit_personnel.append({
+                'army_number': ano,
+                'name': features.get('name', 'Soldier'),
+                'rank': features.get('rank', 'Soldier'),
+                'company': features.get('company', 'Unit HQ'),
+                'score': score,
+                'fitness_status': status_label,
+                'bmi': features.get('bmi'),
+                'actual_weight_kg': features.get('actual_weight_kg'),
+                'ideal_weight_kg': features.get('ideal_weight_kg')
+            })
+        else:
+            fit_count += 1
+
+        report_payload = {
+            'personnel_id': features.get('personnel_id'),
+            'army_number': ano,
+            'name': features.get('name'),
+            'rank': features.get('rank'),
+            'company': features.get('company'),
+            'age': features.get('age'),
+            'height_cm': features.get('height_cm'),
+            'actual_weight_kg': features.get('actual_weight_kg'),
+            'ideal_weight_kg': features.get('ideal_weight_kg'),
+            'bmi': features.get('bmi'),
+            'fitness_score': score,
+            'fitness_status': status_label,
+            'prediction_result': prediction,
+            'recommendations': recommendations,
+            'diet_recommendations': recommendations.get('diet'),
+            'exercise_recommendations': recommendations.get('exercise'),
+            'progression_prediction': progression,
+            'report_language': language or 'English',
+            'report_generated': True,
+            'model_name': prediction.get('algorithm', 'GradientBoostingClassifier'),
+            'model_version': prediction.get('model_version', 'v1')
+        }
+        reports_payload_list.append(report_payload)
+
+    # 3. Bulk persist to ums.ai_fitness_reports
+    save_result = bulk_insert_or_update_ai_fitness_reports(reports_payload_list)
+
+    msg = f"Successfully calculated fitness for {len(reports_payload_list)} individuals. Added/updated in ums.ai_fitness_reports. Unfit individuals: {unfit_count}, Fit individuals: {fit_count}."
+    logger.info(msg)
+
+    return {
+        'success': True,
+        'total_processed': len(reports_payload_list),
+        'unfit_count': unfit_count,
+        'fit_count': fit_count,
+        'unfit_personnel': unfit_personnel,
+        'saved': save_result,
+        'message': msg
+    }
 
 
 def get_all_reports_paginated(search_query="", company="", status="", from_date=None, to_date=None,

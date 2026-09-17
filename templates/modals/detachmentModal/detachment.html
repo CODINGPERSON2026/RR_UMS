@@ -272,20 +272,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ================= OPEN MODAL ================= */
 
-  document
-    .getElementById("viewDetailsBtn")
-    .addEventListener("click", async function () {
+  async function openDetachmentModalData() {
+    await loadDetachmentsUniqueScope();
+    loadDetPersonnelUniqueScope();
+  }
 
+  const viewDetailsBtnElem = document.getElementById("viewDetailsBtn");
+  if (viewDetailsBtnElem) {
+    viewDetailsBtnElem.addEventListener("click", async function () {
       const detModalBootstrapUniqueScope =
+        bootstrap.Modal.getInstance(detModalElementUniqueScope) ||
         new bootstrap.Modal(detModalElementUniqueScope);
 
       detModalBootstrapUniqueScope.show();
-
-      await loadDetachmentsUniqueScope();
-
-      loadDetPersonnelUniqueScope();
-
+      await openDetachmentModalData();
     });
+  }
+
+  if (detModalElementUniqueScope) {
+    detModalElementUniqueScope.addEventListener("show.bs.modal", async function () {
+      await openDetachmentModalData();
+    });
+  }
 
   /* ================= FILTER EVENTS ================= */
 

@@ -548,7 +548,7 @@
 </style>
 
 <!-- Projects Dashboard Modal -->
-<div class="modal fade" id="projDash_modal" tabindex="-1">
+<div class="modal fade" id="projDash_modal" tabindex="-1" data-bs-focus="false">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content overflow-hidden">
       
@@ -704,7 +704,7 @@
 </div>
 
 <!-- ================= EDIT PROJECT MODAL ================= -->
-<div class="modal fade" id="modalPrjEditModal" tabindex="-1" style="z-index: 1060;" aria-hidden="true">
+<div class="modal fade" id="modalPrjEditModal" tabindex="-1" data-bs-focus="false" style="z-index: 1060;" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-primary text-white">
@@ -790,7 +790,7 @@
 {%include 'modals/projects/view_cost_graph_modal.html'%}
 
 <!-- ================= VIEW BOM MODAL ================= -->
-<div class="modal fade" id="viewBOMModal" tabindex="-1" style="z-index: 1070;">
+<div class="modal fade" id="viewBOMModal" tabindex="-1" data-bs-focus="false" style="z-index: 1070;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-2xl border-0" style="border-radius: 20px; overflow: hidden; background: #f8fafc;">
             <div class="modal-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);">
@@ -1177,6 +1177,11 @@
     if (e.target === e.currentTarget) closeProjectPopup();
   });
 
+  // Reset popup overlay when projDash_modal is closed
+  document.getElementById('projDash_modal')?.addEventListener('hidden.bs.modal', () => {
+    closeProjectPopup();
+  });
+
   async function openModalEditProject(id) {
     const p = id ? allProjectsData.find(item => item.id == id || item.project_id == id) : selectedProjectData;
     if (!p) return;
@@ -1212,7 +1217,7 @@
     const modalEl = document.getElementById('modalPrjEditModal');
     let modalObj = bootstrap.Modal.getInstance(modalEl);
     if (!modalObj) {
-      modalObj = new bootstrap.Modal(modalEl);
+      modalObj = new bootstrap.Modal(modalEl, { focus: false });
     }
     modalObj.show();
   }
@@ -1303,7 +1308,7 @@
           alert("BOM Modal structure missing.");
           return;
       }
-      const bomModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      const bomModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: false });
       bomModal.show();
 
       try {

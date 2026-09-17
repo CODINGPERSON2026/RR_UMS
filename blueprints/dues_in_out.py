@@ -31,13 +31,6 @@ def add_dues_in():
         cursor.close()
         conn.close()
 
-        # Trigger auto-generation of AI recommendation for newly added joinee
-        try:
-            from aiml.ai_new_joinee_recommendation.routes import sync_dues_in_recommendations
-            sync_dues_in_recommendations()
-        except Exception as sync_err:
-            print(f"Notice: Auto sync AI recommendation on dues_in add: {sync_err}")
-
         return jsonify({"success": True})
 
     except Exception as e:

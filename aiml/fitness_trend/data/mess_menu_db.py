@@ -305,11 +305,19 @@ def classify_mess_by_rank(rank_str):
         }
 
 
+_TABLE_ENSURED = False
+_MENU_CACHE = {}
+
+
 def ensure_mess_menus_table():
     """
     Ensures that the `ai_mess_menus` table exists in the database
     and is seeded with the complete OR and JCO mess schedules.
     """
+    global _TABLE_ENSURED
+    if _TABLE_ENSURED:
+        return True
+
     conn = get_db_connection()
     if not conn:
         logger.error("Could not connect to database to verify/seed ai_mess_menus table.")
@@ -367,8 +375,9 @@ def ensure_mess_menus_table():
 
             cursor.executemany(insert_sql, insert_rows)
             conn.commit()
-            logger.info(f"Successfully seeded {len(insert_rows)} mess menu records into ai_mess_menus.")
+            logger.info(f"Seeded {len(insert_rows)} menu entries into ai_mess_menus.")
 
+        _TABLE_ENSURED = True
         return True
     except Error as e:
         logger.error(f"Error initializing/seeding ai_mess_menus table: {e}")
@@ -388,6 +397,12 @@ def get_mess_menu(mess_type, day_of_week=None):
     Returns:
         dict: { meal_type: [list of item dicts] }
     """
+    m_type = 'JCO' if str(mess_type).upper() == 'JCO' else 'OR'
+    clean_day = str(day_of_week).strip().capitalize() if day_of_week else None
+    cache_key = (m_type, clean_day)
+    if cache_key in _MENU_CACHE:
+        return _MENU_CACHE[cache_key]
+
     ensure_mess_menus_table()
 
     conn = get_db_connection()
@@ -416,6 +431,7 @@ def get_mess_menu(mess_type, day_of_week=None):
                     'is_protein_rich': n['protein_rich'],
                     'is_calorie_dense': n['dense']
                 })
+        _MENU_CACHE[cache_key] = res
         return res
 
     try:
@@ -465,7 +481,7 @@ def get_mess_menu(mess_type, day_of_week=None):
                 'is_protein_rich': bool(r['is_protein_rich']),
                 'is_calorie_dense': bool(r['is_calorie_dense'])
             })
-            
+        _MENU_CACHE[cache_key] = result
         return result
     except Error as e:
         logger.error(f"Error querying ai_mess_menus: {e}")

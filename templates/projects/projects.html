@@ -636,7 +636,7 @@
 </div>
 
 <!-- ================= VIEW BOM MODAL ================= -->
-<div class="modal fade" id="viewBOMModal" tabindex="-1">
+<div class="modal fade" id="viewBOMModal" tabindex="-1" data-bs-focus="false" style="z-index: 1070;">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-2xl border-0" style="border-radius: 20px; overflow: hidden; background: #f8fafc;">
             <div class="modal-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);">
@@ -1164,7 +1164,9 @@ async function viewProjectBOM(projectId, projectName) {
         `;
     }
 
-    const bomModal = new bootstrap.Modal(document.getElementById('viewBOMModal'));
+    const modalEl = document.getElementById('viewBOMModal');
+    if (!modalEl) return;
+    const bomModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: false });
     bomModal.show();
 
     try {

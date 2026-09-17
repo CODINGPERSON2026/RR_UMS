@@ -55,6 +55,45 @@
   letter-spacing: 0.6px;
 }
 
+.fitness-total-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--fit-card-bg);
+  color: var(--fit-text-main);
+  border: 1px solid var(--fit-card-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+#btnCalculateAllFitness {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 6px 16px;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+  transition: all 0.22s ease-in-out;
+  white-space: nowrap;
+}
+
+#btnCalculateAllFitness:hover {
+  background: linear-gradient(135deg, #172554 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+  transform: translateY(-1px);
+}
+
+#btnCalculateAllFitness:active {
+  transform: translateY(0);
+}
+
 /* ====================================================================
    SEARCH INPUT & COMMAND-STYLE DROPDOWN
    ==================================================================== */

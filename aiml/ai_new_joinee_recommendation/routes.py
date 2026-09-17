@@ -1133,9 +1133,7 @@ def api_get_insights_list():
             return jsonify({"success": False, "error": "Database unavailable"}), 500
 
         cursor = conn.cursor(dictionary=True)
-
-        # Auto-sync new joinees from dues_in table into recommendations table
-        sync_dues_in_recommendations(cursor, conn)
+        ensure_recommendations_table(cursor, conn)
 
         where_clauses = ["1=1"]
         params = []
@@ -1626,8 +1624,7 @@ def api_insights_count():
             return jsonify({"success": True, "count": 0, "pending_count": 0})
 
         cursor = conn.cursor(dictionary=True)
-        # Auto-sync new joinees from dues_in table into recommendations table
-        sync_dues_in_recommendations(cursor, conn)
+        ensure_recommendations_table(cursor, conn)
 
         cursor.execute("SELECT COUNT(*) as total, SUM(CASE WHEN decision_type = 'pending' THEN 1 ELSE 0 END) as pending FROM ai_new_joinee_recommendations")
         row = cursor.fetchone()

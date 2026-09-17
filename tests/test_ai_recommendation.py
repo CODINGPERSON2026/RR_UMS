@@ -261,10 +261,9 @@ class TestRestApiEndpoints(unittest.TestCase):
                 {"unit": "1 SIGNAL REGT", "from_date": "2020-01-01", "to_date": "2023-01-01", "duty_performed": "GD"}
             ]
         }
-        with self.app.test_request_context():
-            from flask import session
-            session['role'] = 'CO'
-            session['username'] = 'TestCO'
+        with self.client.session_transaction() as sess:
+            sess['role'] = 'CO'
+            sess['user'] = 'TestCO'
 
         res_save = self.client.post('/api/ai/company-recommendation/save-history', json=save_payload)
         self.assertEqual(res_save.status_code, 200)

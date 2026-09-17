@@ -6070,11 +6070,17 @@
         }
       });
       aiModal.addEventListener('hidden.bs.modal', function() {
-        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
-        document.body.classList.remove('modal-open');
-        document.body.style.removeProperty('overflow');
-        document.body.style.removeProperty('padding-right');
-        document.body.style.removeProperty('pointer-events');
+        const openModals = document.querySelectorAll('.modal.show');
+        if (openModals.length > 0) {
+          document.body.classList.add('modal-open');
+          document.body.style.overflow = 'hidden';
+        } else {
+          document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+          document.body.classList.remove('modal-open');
+          document.body.style.removeProperty('overflow');
+          document.body.style.removeProperty('padding-right');
+          document.body.style.removeProperty('pointer-events');
+        }
       });
     }
     updateHistoryBadge();

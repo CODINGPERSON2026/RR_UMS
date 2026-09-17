@@ -1511,12 +1511,13 @@
                     const result = await response.json();
 
                     if (!response.ok || !result.success) {
+                        const fmtDate = formatDateForDisplay(date);
                         document.getElementById('fullPageTableBody').innerHTML = `
                             <tr><td colspan="18" style="text-align:center;padding:40px;color:#999;font-size:16px;">
-                                📭 No Data Available for ${date}
+                                📭 No Data Available for ${fmtDate}
                             </td></tr>`;
                         document.getElementById('fullPageTableContainer').style.display = 'block';
-                        showFullPageStatus('No data found for this date', 'warning');
+                        showFullPageStatus(`No data found for ${fmtDate}`, 'warning');
                         return;
                     }
 
@@ -1576,20 +1577,68 @@
             }
         }
 
-        // ── CO Dashboard ──────────────────────────────────────────────────────────
-        function _noDataRow(colspan, msg = '📭 No Data Available') {
-            return `<tr><td colspan="${colspan}" style="text-align:center;padding:40px;color:#999;font-size:14px;">${msg}</td></tr>`;
+        // ── Helper to format date for display (e.g. 2026-09-17 -> 17-09-2026) ────
+        function formatDateForDisplay(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3 && parts[0].length === 4) {
+                return `${parts[2]}-${parts[1]}-${parts[0]}`;
+            }
+            return dateStr;
         }
 
-        function _resetAllTables(msg = 'Select a date to view data') {
-            document.querySelector('#coLeaveTable tbody').innerHTML =
-                `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">${msg}</td></tr>`;
-            document.querySelector('#coOfficerLeaveTable tbody').innerHTML =
-                `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">${msg}</td></tr>`;
-            document.querySelector('#coJcoLeaveTable tbody').innerHTML =
-                `<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">${msg}</td></tr>`;
-            document.querySelector('#coManpowerTable tbody').innerHTML =
-                `<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">${msg}</td></tr>`;
+        // ── CO Dashboard ──────────────────────────────────────────────────────────
+        function _noDataRow(colspan, dateStr = null, customMsg = null) {
+            const formatted = dateStr ? formatDateForDisplay(dateStr) : '';
+            const text = customMsg ? customMsg : (formatted ? `📭 No Data Available for ${formatted}` : '📭 No Data Available');
+            return `<tr><td colspan="${colspan}" style="text-align:center;padding:35px 20px;color:#64748b;font-size:14px;font-weight:600;"><i class="fas fa-inbox me-2 text-warning fs-5"></i>${text}</td></tr>`;
+        }
+
+        function _resetAllTables(dateStr = null, customMsg = null) {
+            const formatted = dateStr ? formatDateForDisplay(dateStr) : '';
+            const text = customMsg ? customMsg : (formatted ? `📭 No Data Available for ${formatted}` : 'Select a date to view data');
+            document.querySelector('#coLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
+            document.querySelector('#coOfficerLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
+            document.querySelector('#coJcoLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
+            document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(5, null, text);
+        }
+
+        // ── Render empty state overlay on Chart canvas when no data found ──────────
+        function renderEmptyChart(canvasId, dateStr) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return null;
+            const formattedDate = dateStr ? formatDateForDisplay(dateStr) : '';
+            const text = formattedDate ? `No Data Available for ${formattedDate}` : 'No Data Available';
+
+            return new Chart(ctx, {
+                type: 'bar',
+                data: { labels: [], datasets: [] },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                },
+                plugins: [{
+                    id: 'emptyStatePlugin',
+                    afterDraw(chart) {
+                        const { ctx, width, height } = chart;
+                        ctx.save();
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.font = '600 14px system-ui, -apple-system, sans-serif';
+                        ctx.fillStyle = '#94a3b8';
+                        ctx.fillText('📭 ' + text, width / 2, height / 2);
+                        ctx.restore();
+                    }
+                }]
+            });
         }
 
         // ── Chart: bar color based on percentage threshold ──────────────────────
@@ -1631,10 +1680,12 @@
                 const response = await fetch(`${API_BASE_URL}/api/co-dashboard/all-data/${selectedDate}`);
                 const result = await response.json();
 
-                if (!response.ok || !result.success) {
-                    document.querySelector('#coLeaveTable tbody').innerHTML = _noDataRow(4);
-                    document.querySelector('#coOfficerLeaveTable tbody').innerHTML = _noDataRow(3);
-                    document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(5);
+                if (!response.ok || !result.success || !result.data) {
+                    _resetAllTables(selectedDate);
+                    if (coLeaveChartInstance) { coLeaveChartInstance.destroy(); coLeaveChartInstance = null; }
+                    coLeaveChartInstance = renderEmptyChart('coLeaveChart', selectedDate);
+                    if (coManpowerChartInstance) { coManpowerChartInstance.destroy(); coManpowerChartInstance = null; }
+                    coManpowerChartInstance = renderEmptyChart('coManpowerChart', selectedDate);
                     document.getElementById('totalAuth').textContent = '0';
                     document.getElementById('presentUnit').textContent = '0';
                     document.getElementById('totalOut').textContent = '0';
@@ -1653,8 +1704,9 @@
                 leaveTbody.innerHTML = '';
 
                 if (!coData.leave_status?.by_company?.length) {
-                    leaveTbody.innerHTML = _noDataRow(4);
+                    leaveTbody.innerHTML = _noDataRow(4, selectedDate);
                     if (coLeaveChartInstance) { coLeaveChartInstance.destroy(); coLeaveChartInstance = null; }
+                    coLeaveChartInstance = renderEmptyChart('coLeaveChart', selectedDate);
                 } else {
                     const leaveLabels = [], leaveData = [], leaveBgColors = [];
 
@@ -1694,7 +1746,7 @@
                 officerLeaveTbody.innerHTML = '';
 
                 if (!coData.leave_status?.by_company?.length) {
-                    officerLeaveTbody.innerHTML = _noDataRow(4);
+                    officerLeaveTbody.innerHTML = _noDataRow(4, selectedDate);
                 } else {
                     coData.leave_status.by_company.forEach((row) => {
                         const pct = row.officer_leave_percentage || 0;
@@ -1725,7 +1777,7 @@
                 jcoLeaveTbody.innerHTML = '';
 
                 if (!coData.leave_status?.by_company?.length) {
-                    jcoLeaveTbody.innerHTML = _noDataRow(4);
+                    jcoLeaveTbody.innerHTML = _noDataRow(4, selectedDate);
                 } else {
                     coData.leave_status.by_company.forEach((row) => {
                         const pct = row.jco_leave_percentage || 0;
@@ -1756,8 +1808,9 @@
                 manpowerTbody.innerHTML = '';
 
                 if (!coData.manpower?.by_company?.length) {
-                    manpowerTbody.innerHTML = _noDataRow(5);
+                    manpowerTbody.innerHTML = _noDataRow(5, selectedDate);
                     if (coManpowerChartInstance) { coManpowerChartInstance.destroy(); coManpowerChartInstance = null; }
+                    coManpowerChartInstance = renderEmptyChart('coManpowerChart', selectedDate);
                 } else {
                     const mpLabels = [], totalData = [], officersData = [], jcosData = [], orData = [];
 
@@ -1794,10 +1847,13 @@
 
             } catch (error) {
                 console.error('Error loading CO dashboard data:', error);
-                document.querySelector('#coLeaveTable tbody').innerHTML = _noDataRow(4, '⚠️ Error loading data');
-                document.querySelector('#coOfficerLeaveTable tbody').innerHTML = _noDataRow(4, '⚠️ Error loading data');
-                document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(5, '⚠️ Error loading data');
+                _resetAllTables(selectedDate, '⚠️ Error loading data');
+                if (coLeaveChartInstance) { coLeaveChartInstance.destroy(); coLeaveChartInstance = null; }
+                coLeaveChartInstance = renderEmptyChart('coLeaveChart', selectedDate);
+                if (coManpowerChartInstance) { coManpowerChartInstance.destroy(); coManpowerChartInstance = null; }
+                coManpowerChartInstance = renderEmptyChart('coManpowerChart', selectedDate);
             }
+        }
         }
 
         function updateLeaveChart(labels, percentages, bgColors) {
@@ -1926,14 +1982,18 @@
 
                     if (response.ok && result.success && result.data) {
                         const coData = result.data;
-                        document.getElementById('totalAuth').textContent = coData.parade_summary.total_posted_str;
-                        document.getElementById('presentUnit').textContent = coData.parade_summary.present_unit;
-                        document.getElementById('totalOut').textContent = coData.parade_summary.total_out;
+                        document.getElementById('totalAuth').textContent = coData.parade_summary.total_posted_str || 0;
+                        document.getElementById('presentUnit').textContent = coData.parade_summary.present_unit || 0;
+                        document.getElementById('totalOut').textContent = coData.parade_summary.total_out || 0;
                         currentDate = date;
                         await loadCODashboardData(date);
                         showStatus(`CO Dashboard loaded for ${formattedDate}`, 'success');
                     } else {
-                        _resetAllTables('📭 No Data Available');
+                        _resetAllTables(date);
+                        if (coLeaveChartInstance) { coLeaveChartInstance.destroy(); coLeaveChartInstance = null; }
+                        coLeaveChartInstance = renderEmptyChart('coLeaveChart', date);
+                        if (coManpowerChartInstance) { coManpowerChartInstance.destroy(); coManpowerChartInstance = null; }
+                        coManpowerChartInstance = renderEmptyChart('coManpowerChart', date);
                         document.getElementById('totalAuth').textContent = '0';
                         document.getElementById('presentUnit').textContent = '0';
                         document.getElementById('totalOut').textContent = '0';
@@ -1966,12 +2026,12 @@
                         initData();
                         document.getElementById('searchDate').classList.add('future-date');
                         isDataModified = false;
-                        _resetAllTables('Select a date to view data');
+                        _resetAllTables(date, 'Cannot access data for future dates');
 
                     } else {
                         initData();
                         isDataModified = false;
-                        _resetAllTables('Select a date to view data');
+                        _resetAllTables(date);
                         document.getElementById('totalAuth').textContent = '0';
                         document.getElementById('presentUnit').textContent = '0';
                         document.getElementById('totalOut').textContent = '0';
@@ -1982,10 +2042,7 @@
             } catch (error) {
                 console.error('Error loading data:', error);
                 showStatus(`Failed to load data: ${error.message}`, 'error');
-                document.querySelector('#coLeaveTable tbody').innerHTML = _noDataRow(4, '⚠️ Error loading data');
-                document.querySelector('#coOfficerLeaveTable tbody').innerHTML = _noDataRow(3, '⚠️ Error loading data');
-                document.querySelector('#coJcoLeaveTable tbody').innerHTML = _noDataRow(4, '⚠️ Error loading data');
-                document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(5, '⚠️ Error loading data');
+                _resetAllTables(date, '⚠️ Error loading data');
                 document.getElementById('totalAuth').textContent = '0';
                 document.getElementById('presentUnit').textContent = '0';
                 document.getElementById('totalOut').textContent = '0';

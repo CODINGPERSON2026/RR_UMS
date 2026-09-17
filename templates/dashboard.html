@@ -932,9 +932,15 @@
 <script>
   /* ---- Clean up stray modal backdrops ---- */
   document.addEventListener("hidden.bs.modal", function () {
-    document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
-    document.body.classList.remove("modal-open");
-    document.body.style.overflow = "";
+    const openModals = document.querySelectorAll(".modal.show");
+    if (openModals.length > 0) {
+      document.body.classList.add("modal-open");
+      document.body.style.overflow = "hidden";
+    } else {
+      document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.overflow = "";
+    }
   });
 </script>
 
@@ -1513,25 +1519,7 @@
       })
       .catch(() => {});
 
-    {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER']) %}
-    // Fetch live aggregate stats for executive AI Fitness Reports card
-    fetch('/fitness/api/reports/stats')
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        if (d && d.success && d.stats) {
-          const s = d.stats;
-          const totalEl = document.getElementById('dash-fit-total');
-          const healthyEl = document.getElementById('dash-fit-healthy');
-          const needsEl = document.getElementById('dash-fit-needs-imp');
-          const riskEl = document.getElementById('dash-fit-at-risk');
-          if (totalEl) totalEl.textContent = s.unfit_count || 0;
-          if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
-          if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
-          if (riskEl) riskEl.textContent = s.at_risk_count || 0;
-        }
-      })
-      .catch(() => {});
-    {% endif %}
+  
   });
 
   window.addEventListener('themechange', function() {
