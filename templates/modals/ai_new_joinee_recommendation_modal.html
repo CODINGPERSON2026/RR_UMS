@@ -3361,9 +3361,6 @@
     const modalEl = document.getElementById('aiRecModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
-<<<<<<< Updated upstream
-        if (typeof initSectionTradeTree === 'function') initSectionTradeTree();
-=======
         const histContent = document.getElementById('aiTabHistoryContent');
         const modalDiag = document.getElementById('aiRecModalDialog');
         if (modalDiag && (!histContent || histContent.style.display === 'none')) {
@@ -3371,8 +3368,7 @@
           modalDiag.style.maxWidth = '840px';
           modalDiag.style.width = '';
         }
-        initSectionTradeTree();
->>>>>>> Stashed changes
+        if (typeof initSectionTradeTree === 'function') initSectionTradeTree();
         syncAiModalFromMainForm();
         if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
       });

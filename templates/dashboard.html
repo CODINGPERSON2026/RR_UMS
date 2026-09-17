@@ -1521,10 +1521,6 @@
         }
       })
       .catch(() => {});
-
-<<<<<<< Updated upstream
-  
-=======
     {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
     // Fetch live aggregate stats for executive AI Fitness Reports card
     fetch('/fitness/api/reports/stats')
@@ -1544,7 +1540,6 @@
       })
       .catch(() => {});
     {% endif %}
->>>>>>> Stashed changes
   });
 
   window.addEventListener('themechange', function() {

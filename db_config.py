@@ -10,12 +10,12 @@ load_dotenv()
 DB_CONFIG = {
     'host': os.getenv('DB_HOST') or os.getenv('host') or 'localhost',
     'user': os.getenv('DB_USER') or 'root',
-    'password': os.getenv('DB_PASSWORD') or 'qaz123QAZ!@#',
+    'password': os.getenv('DB_PASSWORD') or 'yawar@123',
     'database': os.getenv('DB_NAME') or 'hrms',
     'port': int(os.getenv('DB_PORT') or 3306)
 }
 
-# Connection pool size optimized for ~40-70 active users (mysql.connector supports up to 32 per pool)
+
 POOL_SIZE = int(os.getenv('DB_POOL_SIZE') or 32)
 
 _db_pool = None
