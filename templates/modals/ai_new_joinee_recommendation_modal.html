@@ -3,6 +3,11 @@
   #aiRecModal .modal-dialog {
     max-width: 840px;
     margin: 1.75rem auto;
+    transition: max-width 0.25s ease-in-out, width 0.25s ease-in-out;
+  }
+  #aiRecModal .modal-dialog.ai-dialog-history {
+    max-width: 1240px;
+    width: 95vw;
   }
   #aiRecModal .modal-content {
     border-radius: 18px;
@@ -275,8 +280,8 @@
   .ai-result-dialog-box {
     background: #ffffff;
     border-radius: 16px;
-    max-width: 860px;
-    width: 100%;
+    max-width: 1050px;
+    width: 95%;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
     overflow: hidden;
     animation: popUpModal 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -799,7 +804,7 @@
 
 
 <div class="modal fade" id="aiRecModal" tabindex="-1" aria-labelledby="aiRecModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 840px;">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" id="aiRecModalDialog" style="max-width: 840px;">
     <div class="modal-content">
       <!-- Modal Header with Navigation Tabs -->
       <div class="modal-header ai-modal-header d-flex flex-column align-items-stretch pb-2">
@@ -1752,7 +1757,7 @@
           </div>
 
           <!-- History Table -->
-          <div id="historyListContainer" style="max-height: 380px; overflow-y: auto; overflow-x: auto; border-radius: 8px; border: 1.5px solid #cbd5e1;">
+          <div id="historyListContainer" style="max-height: 580px; min-height: 360px; overflow-y: auto; overflow-x: auto; border-radius: 10px; border: 1.5px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); background: #ffffff;">
             <!-- Dynamically populated from localStorage as table rows -->
           </div>
         </div>
@@ -2870,6 +2875,7 @@
       hideAiSyncNotice();
     }
 
+    window.aiPersonnelServedCompany = null;
     isPersonnelAutofilled = false;
     if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
   }
@@ -2941,6 +2947,7 @@
       document.getElementById('aiDateOfEnrollment').value = isoToDmy(p.date_of_enrollment);
       document.getElementById('aiDateOfEnrollment').classList.add('ai-match-highlight');
     }
+    window.aiPersonnelServedCompany = (p.company && String(p.company).trim()) ? String(p.company).trim() : null;
 
     // 6. Previous Unit Served (highlight in yellow) - ALWAYS FILLED FROM MATCHED DATA
     const tbody = document.getElementById('aiUnitsTableBody');
@@ -3354,7 +3361,18 @@
     const modalEl = document.getElementById('aiRecModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
+<<<<<<< Updated upstream
         if (typeof initSectionTradeTree === 'function') initSectionTradeTree();
+=======
+        const histContent = document.getElementById('aiTabHistoryContent');
+        const modalDiag = document.getElementById('aiRecModalDialog');
+        if (modalDiag && (!histContent || histContent.style.display === 'none')) {
+          modalDiag.classList.remove('ai-dialog-history');
+          modalDiag.style.maxWidth = '840px';
+          modalDiag.style.width = '';
+        }
+        initSectionTradeTree();
+>>>>>>> Stashed changes
         syncAiModalFromMainForm();
         if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
       });
@@ -3378,6 +3396,7 @@
     const btnLive = document.getElementById('tabBtnLive');
     const btnHistory = document.getElementById('tabBtnHistory');
     const btnRetrain = document.getElementById('tabBtnRetrain');
+    const modalDiag = document.getElementById('aiRecModalDialog');
 
     if (tabKey === 'live') {
       liveContent.style.display = 'block';
@@ -3387,6 +3406,12 @@
       btnLive.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
       btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
       btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+
+      if (modalDiag) {
+        modalDiag.classList.remove('ai-dialog-history');
+        modalDiag.style.maxWidth = '840px';
+        modalDiag.style.width = '';
+      }
     } else if (tabKey === 'history') {
       liveContent.style.display = 'none';
       historyContent.style.display = 'block';
@@ -3395,7 +3420,20 @@
       btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
       btnHistory.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
       btnRetrain.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
+
+      if (modalDiag) {
+        modalDiag.classList.add('ai-dialog-history');
+        modalDiag.style.maxWidth = '1240px';
+        modalDiag.style.width = '95vw';
+      }
+
       renderRecommendationHistory();
+
+      // Ensure scroll container starts from leftmost position so # and Army No are fully visible
+      const hList = document.getElementById('historyListContainer');
+      if (hList) {
+        hList.scrollLeft = 0;
+      }
     } else if (tabKey === 'retrain') {
       liveContent.style.display = 'none';
       historyContent.style.display = 'none';
@@ -3404,6 +3442,13 @@
       btnLive.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
       btnHistory.className = 'btn btn-sm btn-outline-light py-1 px-3 fw-bold ai-tab-btn';
       btnRetrain.className = 'btn btn-sm btn-light py-1 px-3 fw-bold ai-tab-btn';
+
+      if (modalDiag) {
+        modalDiag.classList.remove('ai-dialog-history');
+        modalDiag.style.maxWidth = '840px';
+        modalDiag.style.width = '';
+      }
+
       fetchRetrainStatus();
     }
 
@@ -3533,20 +3578,20 @@
 
     // Build table HTML
     let tableHtml = `
-      <table class="table table-hover align-middle mb-0" style="font-size: 0.8rem; min-width: 900px; border-collapse: separate; border-spacing: 0;">
-        <thead style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
-          <tr style="font-size: 0.75rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.3px; color: #e2e8f0;">
-            <th class="px-2 py-2 text-center" style="width: 40px;">#</th>
-            <th class="px-2 py-2" style="width: 130px;"><i class="fas fa-id-card me-1 text-indigo" style="color:#818cf8;"></i>Army No</th>
-            <th class="px-2 py-2" style="width: 150px;"><i class="fas fa-user me-1" style="color:#94a3b8;"></i>Name</th>
-            <th class="px-2 py-2 text-center" style="width: 80px;"><i class="fas fa-medal me-1" style="color:#fbbf24;"></i>Rank</th>
-            <th class="px-2 py-2 text-center" style="width: 110px;"><i class="fas fa-building me-1" style="color:#34d399;"></i>Company</th>
-            <th class="px-2 py-2 text-center" style="width: 120px;"><i class="fas fa-layer-group me-1" style="color:#a78bfa;"></i>Section</th>
-            <th class="px-2 py-2 text-center" style="width: 130px;"><i class="fas fa-map-marker-alt me-1" style="color:#f472b6;"></i>Position</th>
-            <th class="px-2 py-2 text-center" style="width: 80px;"><i class="fas fa-percentage me-1" style="color:#6ee7b7;"></i>Conf.</th>
-            <th class="px-2 py-2 text-center" style="width: 110px;"><i class="fas fa-info-circle me-1" style="color:#93c5fd;"></i>Status</th>
-            <th class="px-2 py-2 text-center" style="width: 130px;"><i class="fas fa-calendar me-1" style="color:#fca5a5;"></i>Date</th>
-            <th class="px-2 py-2 text-center" style="width: 100px;">Action</th>
+      <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem; width: 100%; min-width: 1160px; border-collapse: separate; border-spacing: 0;">
+        <thead style="position: sticky; top: 0; z-index: 5; background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);">
+          <tr style="font-size: 0.78rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.4px; color: #f8fafc;">
+            <th class="px-2.5 py-3 text-center" style="width: 50px;">#</th>
+            <th class="px-3 py-3 text-start" style="width: 135px;"><i class="fas fa-id-card me-1 text-info"></i>Army No</th>
+            <th class="px-3 py-3 text-start" style="width: 190px;"><i class="fas fa-user me-1 text-light"></i>Name</th>
+            <th class="px-2.5 py-3 text-center" style="width: 95px;"><i class="fas fa-medal me-1 text-warning"></i>Rank</th>
+            <th class="px-2.5 py-3 text-center" style="width: 115px;"><i class="fas fa-building me-1 text-success"></i>Company</th>
+            <th class="px-2.5 py-3 text-center" style="width: 175px;"><i class="fas fa-layer-group me-1" style="color:#a78bfa;"></i>Section</th>
+            <th class="px-2.5 py-3 text-center" style="width: 120px;"><i class="fas fa-map-marker-alt me-1" style="color:#f472b6;"></i>Position</th>
+            <th class="px-2.5 py-3 text-center" style="width: 90px;"><i class="fas fa-percentage me-1 text-success"></i>Conf.</th>
+            <th class="px-2.5 py-3 text-center" style="width: 110px;"><i class="fas fa-info-circle me-1 text-info"></i>Status</th>
+            <th class="px-2.5 py-3 text-center" style="width: 145px;"><i class="fas fa-calendar me-1" style="color:#fca5a5;"></i>Date</th>
+            <th class="px-2.5 py-3 text-center" style="width: 120px;">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -3569,18 +3614,18 @@
       const units = item.units || item.units_history || [];
 
       // Company badge color
-      let coyBadgeStyle = 'background:#3b82f6;color:#fff;';
-      if (recCoy.includes('Comn') || recCoy.includes('COMN')) coyBadgeStyle = 'background:#10b981;color:#fff;';
-      else if (recCoy.includes('3')) coyBadgeStyle = 'background:#8b5cf6;color:#fff;';
+      let coyBadgeStyle = 'background:#2563eb;color:#fff;';
+      if (recCoy.includes('Comn') || recCoy.includes('COMN')) coyBadgeStyle = 'background:#059669;color:#fff;';
+      else if (recCoy.includes('3')) coyBadgeStyle = 'background:#7c3aed;color:#fff;';
 
       // Status badge
       let statusBadge;
       if (item.is_updated) {
-        statusBadge = `<span class="badge fw-bold px-2 py-1" style="background:#3b82f6;font-size:0.7rem;border-radius:6px;"><i class="fas fa-sync-alt me-1"></i>Updated</span>`;
+        statusBadge = `<span class="badge fw-bold px-2.5 py-1 text-white" style="background:#2563eb;font-size:0.75rem;border-radius:6px;"><i class="fas fa-sync-alt me-1"></i>Updated</span>`;
       } else if (item.applied) {
-        statusBadge = `<span class="badge fw-bold px-2 py-1" style="background:#10b981;font-size:0.7rem;border-radius:6px;"><i class="fas fa-check me-1"></i>Applied</span>`;
+        statusBadge = `<span class="badge fw-bold px-2.5 py-1 text-white" style="background:#16a34a;font-size:0.75rem;border-radius:6px;"><i class="fas fa-check me-1"></i>Applied</span>`;
       } else {
-        statusBadge = `<span class="badge fw-bold px-2 py-1" style="background:#64748b;font-size:0.7rem;border-radius:6px;">Calculated</span>`;
+        statusBadge = `<span class="badge fw-bold px-2.5 py-1 text-white" style="background:#64748b;font-size:0.75rem;border-radius:6px;">Calculated</span>`;
       }
 
       const dateLabel = item.is_updated && item.updated_date
@@ -3589,26 +3634,28 @@
 
       // Row styling: updated rows have a blue left border and light blue bg
       const rowStyle = item.is_updated
-        ? 'background:#eff6ff; border-left: 3px solid #3b82f6;'
+        ? 'background:#eff6ff; border-left: 3.5px solid #2563eb;'
         : '';
 
       tableHtml += `
-        <tr style="${rowStyle}">
-          <td class="text-center text-muted fw-bold px-2">${sNo}</td>
-          <td class="fw-bold font-monospace text-primary px-2" style="font-size:0.79rem;">${armyNo}</td>
-          <td class="fw-bold text-dark px-2">${name}</td>
-          <td class="text-center px-2"><span class="badge bg-light text-dark border" style="font-size:0.72rem;">${rank}</span></td>
-          <td class="text-center px-2"><span class="badge fw-bold px-2 py-1" style="${coyBadgeStyle} font-size:0.72rem; border-radius:6px;">${recCoy}</span></td>
-          <td class="text-center text-secondary fw-semibold px-2" style="font-size:0.78rem;">${recSec}</td>
-          <td class="text-center fw-bold px-2" style="color:#4f46e5; font-size:0.78rem;">${recPos}</td>
-          <td class="text-center fw-bold px-2" style="color:#059669;">${confStr}</td>
-          <td class="text-center px-2">${statusBadge}</td>
-          <td class="text-center text-muted px-2" style="font-size:0.72rem;">${dateLabel}</td>
-          <td class="text-center px-2">
-            <button type="button" class="btn btn-sm py-0.5 px-2 fw-semibold" 
-              style="font-size:0.72rem; border-radius:5px; border:1px solid #6366f1; color:#4f46e5; background:#eef2ff;"
+        <tr style="${rowStyle}; transition: background 0.15s ease;">
+          <td class="text-center text-muted fw-bold px-2.5 py-2.5" style="font-size:0.84rem;">${sNo}</td>
+          <td class="fw-bold font-monospace text-primary px-3 py-2.5 text-start text-nowrap" style="font-size:0.86rem; letter-spacing:0.5px;">${armyNo}</td>
+          <td class="fw-bold text-dark px-3 py-2.5 text-start text-nowrap" style="font-size:0.86rem;">${name}</td>
+          <td class="text-center px-2.5 py-2.5"><span class="badge bg-light text-dark border px-2 py-1" style="font-size:0.78rem; font-weight:600;">${rank}</span></td>
+          <td class="text-center px-2.5 py-2.5"><span class="badge fw-bold px-2.5 py-1" style="${coyBadgeStyle} font-size:0.78rem; border-radius:6px;">${recCoy}</span></td>
+          <td class="text-center text-secondary fw-semibold px-2.5 py-2.5" style="font-size:0.82rem;">${recSec}</td>
+          <td class="text-center fw-bold px-2.5 py-2.5" style="color:#4338ca; font-size:0.82rem;">${recPos}</td>
+          <td class="text-center fw-bold px-2.5 py-2.5" style="color:#059669; font-size:0.86rem;">${confStr}</td>
+          <td class="text-center px-2.5 py-2.5">${statusBadge}</td>
+          <td class="text-center text-muted px-2.5 py-2.5 text-nowrap" style="font-size:0.78rem; font-weight:500;">${dateLabel}</td>
+          <td class="text-center px-2.5 py-2.5 text-nowrap">
+            <button type="button" class="btn btn-sm py-1 px-2.5 fw-semibold d-inline-flex align-items-center gap-1.5" 
+              style="font-size:0.76rem; border-radius:6px; border:1px solid #6366f1; color:#4338ca; background:#eef2ff; transition:all 0.15s ease;"
+              onmouseover="this.style.background='#6366f1';this.style.color='#ffffff';"
+              onmouseout="this.style.background='#eef2ff';this.style.color='#4338ca';"
               onclick="openHistoryResultDialog('${itemId}')" title="View full recommendation results & explainability dialog">
-              <i class="fas fa-eye me-1"></i>View Result
+              <i class="fas fa-eye"></i> View Result
             </button>
           </td>
         </tr>
@@ -4572,6 +4619,12 @@
       btn.style.removeProperty('border-color');
     }
     updateAiRowDutySummary(row);
+    if (typeof getActiveSelectedCompanyFromDuties === 'function') {
+      const activeCoy = getActiveSelectedCompanyFromDuties();
+      if (activeCoy) {
+        window.aiPersonnelServedCompany = activeCoy;
+      }
+    }
     onAiUnitInputEdited(chk);
   }
 
@@ -4583,6 +4636,12 @@
     container.querySelectorAll('.ai-row-sec-chk').forEach(c => { c.checked = true; c.indeterminate = false; });
     container.querySelectorAll('.ai-duty-chk').forEach(c => c.checked = true);
     updateAiRowDutySummary(row);
+    if (typeof getActiveSelectedCompanyFromDuties === 'function') {
+      const activeCoy = getActiveSelectedCompanyFromDuties();
+      if (activeCoy) {
+        window.aiPersonnelServedCompany = activeCoy;
+      }
+    }
     onAiUnitInputEdited();
   }
 
@@ -4594,6 +4653,12 @@
     container.querySelectorAll('.ai-row-sec-chk').forEach(c => { c.checked = false; c.indeterminate = false; });
     container.querySelectorAll('.ai-duty-chk').forEach(c => c.checked = false);
     updateAiRowDutySummary(row);
+    if (typeof getActiveSelectedCompanyFromDuties === 'function') {
+      const activeCoy = getActiveSelectedCompanyFromDuties();
+      if (activeCoy) {
+        window.aiPersonnelServedCompany = activeCoy;
+      }
+    }
     onAiUnitInputEdited();
   }
 
@@ -4849,6 +4914,44 @@
     });
 
     return selected;
+  }
+
+  function getSelectedDomainsList() {
+    const list = [];
+    const rows = document.querySelectorAll('#aiUnitsTableBody tr');
+    rows.forEach(r => {
+      const items = getAiRowSelectedDomainObjects(r);
+      if (items && items.length) {
+        list.push(...items);
+      }
+    });
+    return list;
+  }
+
+  function getActiveSelectedCompanyFromDuties() {
+    const list = getSelectedDomainsList();
+    if (!list || list.length === 0) return null;
+    const coyCounts = { 'HQ COY': 0, 'COMN COY': 0, '3 COY': 0 };
+    list.forEach(d => {
+      const c = (d.company || '').toUpperCase().trim();
+      if (c.includes('3')) coyCounts['3 COY'] += 3;
+      else if (c.includes('COMN')) coyCounts['COMN COY'] += 3;
+      else if (c.includes('HQ')) coyCounts['HQ COY'] += 3;
+
+      const s = (d.section || '').toUpperCase().trim();
+      if (s.includes('TECHNICAL / CORPS HQ') || s.includes('CORPS HQ')) coyCounts['3 COY'] += 2;
+      else if (s.includes('COMMUNICATION / TECHNICAL')) coyCounts['COMN COY'] += 2;
+      else if (['QM', 'RHQ', 'RP', 'TM', 'MT', 'LRW', 'CHQ', 'GENERAL'].some(h => s.includes(h))) coyCounts['HQ COY'] += 2;
+    });
+    let bestCoy = null;
+    let maxCnt = 0;
+    for (const [k, v] of Object.entries(coyCounts)) {
+      if (v > maxCnt) {
+        maxCnt = v;
+        bestCoy = k;
+      }
+    }
+    return bestCoy;
   }
 
   function addAiUnitRow(initialDuty = '') {
@@ -5260,6 +5363,15 @@
     const armyNumberVal = (document.getElementById('aiArmyNumber')?.value || document.getElementById('armyNumber')?.value || '').trim();
     const soldierNameVal = (document.getElementById('aiPersonnelName')?.value || document.getElementById('name')?.value || '').trim();
     const selectedDomainsList = typeof getSelectedDomainsList === 'function' ? getSelectedDomainsList() : [];
+    const activeSelectedCoy = typeof getActiveSelectedCompanyFromDuties === 'function' ? getActiveSelectedCompanyFromDuties() : null;
+    if (activeSelectedCoy) {
+      window.aiPersonnelServedCompany = activeSelectedCoy;
+    }
+
+    // Attach company to units history
+    units.forEach(u => {
+      u.company = activeSelectedCoy || window.aiPersonnelServedCompany || '';
+    });
 
     let tradeVal = (document.getElementById('aiTrade')?.value || '').trim();
     if (tradeVal === 'Other') {
@@ -5277,7 +5389,8 @@
       trade: tradeVal || '',
       units_history: units,
       is_fresh_joinee: isFresh || units.length === 0,
-      selected_domains: selectedDomainsList
+      selected_domains: selectedDomainsList,
+      company: activeSelectedCoy || window.aiPersonnelServedCompany || ''
     };
 
     const btn = document.getElementById('btnCalculateAiRec');

@@ -265,7 +265,9 @@ def get_fresh_joinee_recommendation(
     selected_section: Optional[str] = None,
     target_sections: Optional[List[str]] = None,
     target_trades: Optional[List[str]] = None,
-    section_trades_map: Optional[Dict[str, List[str]]] = None
+    section_trades_map: Optional[Dict[str, List[str]]] = None,
+    company: Optional[str] = None,
+    **kwargs
 ) -> Dict[str, Any]:
     """
     Generate 3-stage hierarchical recommendation for Fresh Joinees (0 previous postings)
@@ -277,7 +279,21 @@ def get_fresh_joinee_recommendation(
     target_trades_upper = set(str(t).strip().upper() for t in (target_trades or []) if t)
     target_sections_upper = set(str(s).strip().upper() for s in (target_sections or []) if s)
 
-    if is_user_sec:
+    forced_coy = normalize_company_name(company) if (company and normalize_company_name(company) in VALID_COMPANIES) else None
+
+    if forced_coy:
+        top_coy = forced_coy
+        # Choose appropriate section within the served company
+        coy_sections = UNIT_15_CESR_STRUCTURE.get(top_coy, {})
+        if is_user_sec and str(selected_section).strip() in coy_sections:
+            top_sec = str(selected_section).strip()
+        else:
+            top_sec = list(coy_sections.keys())[0] if coy_sections else "GENERAL DUTY"
+        valid_positions = get_positions_for_section(top_coy, top_sec)
+        top_pos = valid_positions[0] if valid_positions else "GD"
+        matched_reason = f"Served Company Continuity: Personnel previously served in {top_coy}. Regimental policy mandates placement within the same company."
+        sec_compatibility = 85.0
+    elif is_user_sec:
         sec_clean = str(selected_section).strip()
         top_coy = get_company_for_section(sec_clean)
         top_sec = sec_clean
@@ -367,6 +383,12 @@ def get_fresh_joinee_recommendation(
         coy_prob_raw = {"3 COY": 0.603, "HQ COY": 0.215, "COMN COY": 0.182}
     elif top_coy == "COMN COY":
         coy_prob_raw = {"COMN COY": 0.603, "HQ COY": 0.215, "3 COY": 0.182}
+
+    if forced_coy:
+        coy_prob_raw = {
+            top_coy: 0.98,
+            **{c: 0.01 for c in VALID_COMPANIES if c != top_coy}
+        }
 
     sum_coy = sum(coy_prob_raw.values()) or 1.0
     company_probabilities = [

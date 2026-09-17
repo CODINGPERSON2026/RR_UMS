@@ -437,8 +437,9 @@
     <!-- ===== ACTION BAR ===== -->
     <div class="action-bar" id="actionBar">
 
-      <!-- AI New Joinee Posting Recommendation Button — hidden for CO/2IC/ADJUTANT (they use AI Joinee Insights instead) -->
-      {% if role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] %}
+      <!-- AI New Joinee Posting Recommendation Button — visible only to predicting roles (1coyonco, 2coyonco) -->
+      {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
       <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();" title="AI New Joinee Posting Recommendation &amp; Hierarchical Allocation">
         AI NEW JOINEE RECOMMENDATION
       </button>
@@ -575,7 +576,7 @@
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER']) %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
       <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();" title="AI Individual Fitness Reports & Operational Readiness">
         <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
         <div class="sc-right">
@@ -650,7 +651,7 @@
       </div>
       {%endif%}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal" id="loanDetailGraph">
         <span class="sc-label">Active Loans</span>
         <div class="sc-right">
@@ -1521,7 +1522,29 @@
       })
       .catch(() => {});
 
+<<<<<<< Updated upstream
   
+=======
+    {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+    // Fetch live aggregate stats for executive AI Fitness Reports card
+    fetch('/fitness/api/reports/stats')
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        if (d && d.success && d.stats) {
+          const s = d.stats;
+          const totalEl = document.getElementById('dash-fit-total');
+          const healthyEl = document.getElementById('dash-fit-healthy');
+          const needsEl = document.getElementById('dash-fit-needs-imp');
+          const riskEl = document.getElementById('dash-fit-at-risk');
+          if (totalEl) totalEl.textContent = s.unfit_count || 0;
+          if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
+          if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
+          if (riskEl) riskEl.textContent = s.at_risk_count || 0;
+        }
+      })
+      .catch(() => {});
+    {% endif %}
+>>>>>>> Stashed changes
   });
 
   window.addEventListener('themechange', function() {
@@ -1529,10 +1552,14 @@
   });
 </script>
 
+{% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
-{% include 'modals/ai_new_joinee_recommendation_modal.html' %}
-{% if role in ['CO', '2IC', 'ADJUTANT'] %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% endif %}
+
+{% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+{% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}
 
 {% endblock %}

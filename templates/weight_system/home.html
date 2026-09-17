@@ -1209,8 +1209,8 @@
             </div>
         </div>
         
-        {% set user_role_norm = (role or (current_user.role if current_user else ''))|upper|trim %}
-        {% if user_role_norm not in ['CO', '2IC', 'ADJUTANT'] %}
+        {% set r_clean = (role or (current_user.role if current_user else ''))|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+        {% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or ((role or (current_user.role if current_user else ''))|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
         <div class="ai-fitness-header-action">
             <a href="/fitness/" class="ai-fitness-header-btn" id="aiFitnessHeaderBtn" title="Go to AI Fitness Prediction & Report">
                 <i class="fas fa-brain"></i>
@@ -1223,8 +1223,9 @@
 
     <script>
         (function() {
-            const role = ((window.userRoleFromTemplate || '') + '').trim().toUpperCase();
-            if (['CO', '2IC', 'ADJUTANT'].includes(role)) {
+            const role = ((window.userRoleFromTemplate || '') + '').trim().toLowerCase().replace(/[\s_\-]/g, '');
+            const isPredictRole = ['1coyonco', '2coyonco', 'onco', 'coyonco'].includes(role);
+            if (!isPredictRole) {
                 const btn = document.getElementById('aiFitnessHeaderBtn');
                 if (btn && btn.closest('.ai-fitness-header-action')) {
                     btn.closest('.ai-fitness-header-action').remove();
@@ -2514,7 +2515,10 @@ function renderPersonDetails(data, statusClass) {
             <div class="reason-box"><p>${escapeHtml(restrictions)}</p></div>
         </div>` : ""}
 
-        ${(!['CO', '2IC', 'ADJUTANT'].includes(((window.userRoleFromTemplate || '') + '').trim().toUpperCase())) ? `
+        ${((function() {
+            const r = ((window.userRoleFromTemplate || '') + '').trim().toLowerCase().replace(/[\s_\-]/g, '');
+            return ['1coyonco', '2coyonco', 'onco', 'coyonco'].includes(r);
+        })()) ? `
         <div class="person-details-section text-center pt-3" style="border-top: 1px solid var(--border-color, #e2e8f0); margin-top: 20px;">
             <a href="/fitness/?army_number=${encodeURIComponent(data.army_number)}" 
                class="btn btn-primary w-100 py-2" 

@@ -194,7 +194,8 @@ def generate_domain_and_contrastive_explainability(
     section: str = "",
     position: str = "",
     company_probabilities: Optional[Dict[str, float]] = None,
-    rank: str = ""
+    rank: str = "",
+    served_company: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Generates explainable AI specifically for user-selected Duty / Domain options:
@@ -304,6 +305,9 @@ def generate_domain_and_contrastive_explainability(
     why_recommended = []
     top_score_pct = round(company_probabilities.get(coy_norm, 0.65) * 100.0, 1)
 
+    if served_company:
+        why_recommended.append(f"Served Company Continuity: Personnel previously served within {served_company}. In accordance with regimental continuity directives, personnel with prior service in {served_company} must continue under the same company ({top_score_pct}% Enforced Match).")
+
     if coy_norm == "HQ COY":
         why_recommended.append(f"Rank profile and historical postings demonstrate highest compatibility with Headquarters & Logistics operations ({top_score_pct}% Match).")
         why_recommended.append(f"Duty experience in quartermaster, administrative, and regimental tasks aligns with Section '{section or 'RHQ'}' and appointment '{position or 'GD'}'.")
@@ -325,7 +329,9 @@ def generate_domain_and_contrastive_explainability(
         alt_pct = round(company_probabilities.get(alt, 0.20) * 100.0, 1)
         contrast_reason = ""
 
-        if coy_norm == "HQ COY":
+        if served_company:
+            contrast_reason = f"{alt} was not selected because personnel previously served in {served_company}. Company continuity policy prohibits reassignment to a different company."
+        elif coy_norm == "HQ COY":
             if alt == "COMN COY":
                 contrast_reason = f"COMN COY ({alt_pct}% probability) was not recommended because candidate's duty history reflects logistical and administrative leadership rather than continuous frontline field signal line maintenance."
             elif alt == "3 COY":

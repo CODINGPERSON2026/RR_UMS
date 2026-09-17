@@ -9,6 +9,7 @@ Evaluates candidate sets without sequence bias and generates military-grade expl
 
 import os
 import sys
+import re
 import json
 import joblib
 import numpy as np
@@ -23,6 +24,7 @@ if ROOT_DIR not in sys.path:
 from aiml.ai_new_joinee_recommendation.position_mapping import (
     VALID_COMPANIES,
     VALID_DB_COMPANIES,
+    COMPANY_ALIASES,
     UNIT_15_CESR_STRUCTURE,
     normalize_company_name,
     to_db_company_name,
@@ -208,6 +210,210 @@ def compute_position_domain_pattern_score(
     return score
 
 
+def extract_company_from_str(val: Any) -> Optional[str]:
+    """
+    Safely extract canonical company ('HQ COY', 'COMN COY', '3 COY') from any string.
+    Returns canonical company if matched, otherwise None.
+    Avoids false positives with external units like 'HQ 3 EW BDE'.
+    """
+    if not val or not isinstance(val, str):
+        return None
+    s = val.strip()
+    if not s:
+        return None
+
+    # Check direct aliases dictionary
+    s_lower = s.lower()
+    if s_lower in COMPANY_ALIASES:
+        return COMPANY_ALIASES[s_lower]
+
+    s_upper = s.upper()
+
+    # 1. 3 COY checks (e.g. '3 COY', '3 Company', '3RD COY', '3_COY', '15 CESR (3 COY)', 'COY 3')
+    if re.search(r'\b(3\s*COY|3\s*COMPANY|3RD\s*COY|3RD\s*COMPANY|THIRD\s*COY|THIRD\s*COMPANY|COY\s*3|COMPANY\s*3|3_COY|3-COY)\b', s_upper):
+        return "3 COY"
+    if s_upper in ["3 COY", "3 COMPANY", "3_COY", "3", "3 COY."]:
+        return "3 COY"
+
+    # 2. COMN COY checks (e.g. 'COMN COY', 'Communication Coy', 'COMN COMPANY', 'COMN', '15 CESR COMN')
+    if re.search(r'\b(COMN\s*COY|COMN\s*COMPANY|COMMUNICATION\s*COY|COMMUNICATION\s*COMPANY|COMMUNICATIONS\s*COY|COMM\s*COY|COMM\s*COMPANY|COMN_COY|COMN-COY)\b', s_upper):
+        return "COMN COY"
+    if s_upper in ["COMN COY", "COMN COMPANY", "COMN", "COMMUNICATION COY", "COMMUNICATION COMPANY", "COMN COY."]:
+        return "COMN COY"
+
+    # 3. HQ COY checks (e.g. 'HQ COY', 'HQ Company', 'HEADQUARTER COY', 'HEADQUARTERS COMPANY', 'RHQ')
+    if re.search(r'\b(HQ\s*COY|HQ\s*COMPANY|HEADQUARTERS?\s*COY|HEADQUARTERS?\s*COMPANY|HQ_COY|HQ-COY)\b', s_upper):
+        return "HQ COY"
+    if s_upper in ["HQ COY", "HQ COMPANY", "HQ_COY", "HQ COY.", "RHQ"]:
+        return "HQ COY"
+
+    return None
+
+
+def detect_served_company(
+    units_history: Optional[List[Dict[str, Any]]] = None,
+    army_number: str = "",
+    name: str = "",
+    explicit_company: Optional[str] = None,
+    selected_domains: Optional[List[Dict[str, Any]]] = None
+) -> Optional[str]:
+    """
+    Detect if personnel has previously served within one of Unit 15 CESR's companies
+    ('HQ COY', 'COMN COY', '3 COY').
+    Evaluates:
+    1. Explicit company parameter passed by caller
+    2. Input units_history / units list (unit name, company field, duty performed)
+    3. Input selected_domains / domains list
+    4. Database lookup:
+       - personnel table (company column)
+       - units_served table (unit, duty_performed)
+       - ai_new_joinee_recommendations table (final_company, recommended_company)
+    Returns canonical company ('HQ COY', 'COMN COY', '3 COY') or None.
+    """
+    # 1. PRIORITY 1: Active user selection in selected_domains (User explicitly selecting duties in modal)
+    if selected_domains:
+        coy_counts = {"HQ COY": 0, "COMN COY": 0, "3 COY": 0}
+        for sd in selected_domains:
+            if isinstance(sd, dict):
+                c = extract_company_from_str(sd.get("company") or sd.get("coy"))
+                if c in VALID_COMPANIES:
+                    coy_counts[c] += 4
+                
+                sec = str(sd.get("section") or "").upper()
+                if "TECHNICAL / CORPS HQ" in sec or "CORPS HQ" in sec:
+                    coy_counts["3 COY"] += 3
+                elif "COMMUNICATION / TECHNICAL" in sec:
+                    coy_counts["COMN COY"] += 3
+                elif any(hq_sec in sec for hq_sec in ["QM", "RHQ", "RP", "TM", "MT", "LRW", "CHQ", "GENERAL"]):
+                    coy_counts["HQ COY"] += 3
+                
+                trade = str(sd.get("trade") or sd.get("appointment") or sd.get("duty") or "").upper()
+                if trade in ["VC", "CORPS HQ", "BRANCH"]:
+                    coy_counts["3 COY"] += 3
+                elif trade in ["MULTIMEDIA", "RADIO RR", "MCCS EXCHANGE", "COMMUNICATION CLERK", "STRIP CLERK", "ICN", "NFS"]:
+                    coy_counts["COMN COY"] += 3
+            elif isinstance(sd, str):
+                c = extract_company_from_str(sd)
+                if c in VALID_COMPANIES:
+                    coy_counts[c] += 2
+        
+        best_coy = max(coy_counts, key=coy_counts.get)
+        if coy_counts[best_coy] > 0:
+            return best_coy
+
+    # 2. PRIORITY 2: Check units_history (duty_performed string or company specified per unit)
+    if units_history:
+        for u in reversed(units_history):
+            if not isinstance(u, dict):
+                continue
+            # Direct company field in unit row
+            c = extract_company_from_str(u.get("company") or u.get("coy"))
+            if c in VALID_COMPANIES:
+                return c
+            
+            # Check duty_performed string
+            duty_str = str(u.get("duty_performed") or u.get("duty") or "").strip()
+            if duty_str:
+                coy_counts = {"HQ COY": 0, "COMN COY": 0, "3 COY": 0}
+                duty_upper = duty_str.upper()
+                
+                # Check 3 COY mentions
+                if re.search(r'\b(3\s*COY|3\s*COMPANY|3RD\s*COY|TECHNICAL\s*/\s*CORPS\s*HQ)\b', duty_upper):
+                    coy_counts["3 COY"] += 4
+                if " 3 COY" in duty_upper or "3 COY " in duty_upper or duty_upper.endswith(" 3 COY") or "VC" in duty_upper.split():
+                    coy_counts["3 COY"] += 3
+                    
+                # Check COMN COY mentions
+                if re.search(r'\b(COMN\s*COY|COMN\s*COMPANY|COMMUNICATION\s*COY|COMMUNICATION\s*/\s*TECHNICAL)\b', duty_upper):
+                    coy_counts["COMN COY"] += 4
+                    
+                # Check HQ COY mentions (ensure not confused with CORPS HQ)
+                if re.search(r'\b(HQ\s*COY|HQ\s*COMPANY|HEADQUARTERS?\s*COY)\b', duty_upper):
+                    coy_counts["HQ COY"] += 4
+                
+                best_duty_coy = max(coy_counts, key=coy_counts.get)
+                if coy_counts[best_duty_coy] > 0:
+                    return best_duty_coy
+
+            # Check unit name (e.g. 15 CESR 3 COY)
+            c = extract_company_from_str(u.get("unit") or u.get("unit_name"))
+            if c in VALID_COMPANIES:
+                return c
+
+    # 3. PRIORITY 3: Explicit company parameter passed by caller
+    if explicit_company:
+        c = extract_company_from_str(explicit_company)
+        if c in VALID_COMPANIES:
+            return c
+
+    # 4. Database lookup for prior company service
+    army_clean = str(army_number or "").strip()
+    name_clean = str(name or "").strip()
+
+    if army_clean or name_clean:
+        try:
+            from db_config import get_db_connection
+            conn = get_db_connection()
+            if conn:
+                cursor = conn.cursor(dictionary=True)
+
+                # A. Check personnel table
+                if army_clean:
+                    cursor.execute(
+                        "SELECT company FROM personnel WHERE UPPER(TRIM(army_number)) = UPPER(%s) LIMIT 1",
+                        (army_clean,)
+                    )
+                else:
+                    cursor.execute(
+                        "SELECT company FROM personnel WHERE UPPER(TRIM(name)) = UPPER(%s) LIMIT 1",
+                        (name_clean,)
+                    )
+                p_row = cursor.fetchone()
+                if p_row and p_row.get("company"):
+                    c = extract_company_from_str(p_row["company"])
+                    if c in VALID_COMPANIES:
+                        cursor.close()
+                        conn.close()
+                        return c
+
+                # B. Check units_served table
+                if army_clean:
+                    cursor.execute(
+                        "SELECT unit, duty_performed FROM units_served WHERE UPPER(TRIM(army_number)) = UPPER(%s) ORDER BY id DESC",
+                        (army_clean,)
+                    )
+                    us_rows = cursor.fetchall() or []
+                    for r in us_rows:
+                        c = extract_company_from_str(r.get("unit")) or extract_company_from_str(r.get("duty_performed"))
+                        if c in VALID_COMPANIES:
+                            cursor.close()
+                            conn.close()
+                            return c
+
+                # C. Check previous accepted/decided placement in ai_new_joinee_recommendations
+                if army_clean:
+                    cursor.execute(
+                        "SELECT final_company, recommended_company, decision_type FROM ai_new_joinee_recommendations WHERE UPPER(TRIM(army_number)) = UPPER(%s) ORDER BY id DESC LIMIT 1",
+                        (army_clean,)
+                    )
+                    rec_row = cursor.fetchone()
+                    if rec_row:
+                        target = rec_row.get("final_company") or (rec_row.get("recommended_company") if rec_row.get("decision_type") == "accepted" else None)
+                        if target:
+                            c = extract_company_from_str(target)
+                            if c in VALID_COMPANIES:
+                                cursor.close()
+                                conn.close()
+                                return c
+
+                cursor.close()
+                conn.close()
+        except Exception:
+            pass
+
+    return None
+
+
 def recommend_placement(
     units_history: Optional[List[Dict[str, Any]]] = None,
     is_fresh_joinee: bool = False,
@@ -222,15 +428,27 @@ def recommend_placement(
     target_sections: Optional[List[str]] = None,
     target_trades: Optional[List[str]] = None,
     section_trades_map: Optional[Dict[str, List[str]]] = None,
+    company: Optional[str] = None,
+    served_company: Optional[str] = None,
     **kwargs
 ) -> Dict[str, Any]:
     """
     Generate real-time hierarchical AI recommendation (Company -> Section -> Appointment).
     Learns posting patterns from Previous Unit Served, Previous Duty, and Domain Profile.
     Evaluates candidate sets without sequence bias and guarantees valid hierarchy.
+    Enforces Same Company Policy: If someone has served within one company, they MUST remain under that same company.
     """
     valid_units = [u for u in (units_history or []) if (u.get("unit") or u.get("unit_name"))]
     is_fresh = bool(is_fresh_joinee or len(valid_units) == 0)
+
+    # Detect if personnel previously served within one company
+    detected_coy = detect_served_company(
+        units_history=units_history,
+        army_number=army_number,
+        name=name,
+        explicit_company=company or served_company,
+        selected_domains=selected_domains
+    )
 
     # 1. FRESH JOINEE RULE-BASED HANDLING
     if is_fresh:
@@ -241,7 +459,8 @@ def recommend_placement(
             selected_section=selected_section,
             target_sections=target_sections,
             target_trades=target_trades,
-            section_trades_map=section_trades_map
+            section_trades_map=section_trades_map,
+            company=detected_coy
         )
 
     # 2. NORMAL JOINEE PATTERN INFERENCE PIPELINE
@@ -256,7 +475,8 @@ def recommend_placement(
                 selected_section=selected_section,
                 target_sections=target_sections,
                 target_trades=target_trades,
-                section_trades_map=section_trades_map
+                section_trades_map=section_trades_map,
+                company=detected_coy
             )
             res["confidence_type"] = "rule_based_fallback"
             res["method"] = "Rule-based fallback"
@@ -299,10 +519,21 @@ def recommend_placement(
         for c in prob_dict:
             prob_dict[c] = round(prob_dict[c] / sum_p, 4)
 
-        top_company = max(prob_dict, key=lambda c: (prob_dict[c], c))
-        top_coy_prob = prob_dict.get(top_company, 0.60)
-        top_coy_score = round(top_coy_prob, 3)
-        top_pct = round(top_coy_prob * 100.0, 1)
+        # MANDATORY POLICY: If someone has served within one company, they must be under the same company
+        if detected_coy and detected_coy in VALID_COMPANIES:
+            top_company = detected_coy
+            prob_dict = {
+                detected_coy: 0.98,
+                **{c: 0.01 for c in VALID_COMPANIES if c != detected_coy}
+            }
+            top_coy_prob = 0.98
+            top_coy_score = 0.98
+            top_pct = 98.0
+        else:
+            top_company = max(prob_dict, key=lambda c: (prob_dict[c], c))
+            top_coy_prob = prob_dict.get(top_company, 0.60)
+            top_coy_score = round(top_coy_prob, 3)
+            top_pct = round(top_coy_prob * 100.0, 1)
 
         company_probabilities = [
             {
@@ -389,7 +620,10 @@ def recommend_placement(
                         "is_primary": (c == top_company and s == top_sec and p == top_pos)
                     })
 
-        alternative_allocations.sort(key=lambda x: -x["composite_score"])
+        if detected_coy:
+            alternative_allocations.sort(key=lambda x: (x["company"] != detected_coy, -x["composite_score"]))
+        else:
+            alternative_allocations.sort(key=lambda x: -x["composite_score"])
         top_alternatives = alternative_allocations[:8]
 
         # 5. TreeSHAP Explainability Forces
@@ -413,10 +647,15 @@ def recommend_placement(
             section=top_sec,
             position=top_pos,
             company_probabilities=prob_dict,
-            rank=rank
+            rank=rank,
+            served_company=detected_coy
         )
 
         match_reasons = domain_xai.get("why_recommended", [])
+        if detected_coy:
+            continuity_reason = f"Served Company Continuity: Personnel previously served within {detected_coy}. Regimental policy mandates placement within the same company ({detected_coy}) to preserve unit cohesion and avoid cross-company transfers."
+            if continuity_reason not in match_reasons:
+                match_reasons.insert(0, continuity_reason)
 
         return {
             "recommended_company": top_company,
@@ -452,7 +691,9 @@ def recommend_placement(
             "method": "Multi-stage pattern learning",
             "model_version": _CACHED_METADATA.get("model_version", "previous_unit_pattern_model_v4") if _CACHED_METADATA else "v4",
             "total_tenure_days": feats_dict.get("total_tenure_days", 0),
-            "units_count": len(valid_units)
+            "units_count": len(valid_units),
+            "served_company": detected_coy,
+            "is_served_company_enforced": bool(detected_coy)
         }
 
     except Exception as e:

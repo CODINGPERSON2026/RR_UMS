@@ -1,6 +1,6 @@
 {
   "model_version": "previous_unit_pattern_model_v4",
-  "training_timestamp": "2026-09-01 16:04:31",
+  "training_timestamp": "2026-09-17 14:17:37",
   "training_samples": 1400,
   "test_samples": 600,
   "selected_model": "Random Forest",

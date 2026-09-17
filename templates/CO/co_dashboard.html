@@ -2814,10 +2814,15 @@ STATUS COLORS
   });
 </script>
 
-{% include 'modals/ai_joinee_insights_modal.html' %}
-{% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+<script>window.isCoDashboard = true;</script>
+{% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% endif %}
+
+{% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+{% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}
 
 {% endblock %}

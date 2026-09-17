@@ -50,7 +50,47 @@ company_rec_bp = Blueprint(
 
 # Allowed executive roles for recommendations
 AUTHORIZED_DECISION_ROLES = ["CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN"]
-AUTHORIZED_VIEW_ROLES = ["CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN", "OC", "SUBEDAR MAJOR", "S/JCO", "PROJECT OFFICER", "PROJECT JCO"]
+AUTHORIZED_VIEW_ROLES = ["CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN"]
+
+# Rank synonym mapping for normalization & queries
+RANK_SYNONYM_MAP = {
+    "COL": ["COL", "COLONEL", "COL."],
+    "COLONEL": ["COL", "COLONEL", "COL."],
+    "LT COL": ["LT COL", "LT. COL", "LIEUTENANT COLONEL", "LT-COL"],
+    "LIEUTENANT COLONEL": ["LT COL", "LT. COL", "LIEUTENANT COLONEL", "LT-COL"],
+    "MAJ": ["MAJ", "MAJOR", "MAJ."],
+    "MAJOR": ["MAJ", "MAJOR", "MAJ."],
+    "CAPT": ["CAPT", "CAPTAIN", "CAPT."],
+    "CAPTAIN": ["CAPT", "CAPTAIN", "CAPT."],
+    "LT": ["LT", "LIEUTENANT", "LT."],
+    "LIEUTENANT": ["LT", "LIEUTENANT", "LT."],
+    "SUB MAJ": ["SUB MAJ", "SUB. MAJ", "SUBEDAR MAJOR", "SUB/MAJ", "SUB-MAJ"],
+    "SUBEDAR MAJOR": ["SUB MAJ", "SUB. MAJ", "SUBEDAR MAJOR", "SUB/MAJ", "SUB-MAJ"],
+    "SUB": ["SUB", "SUBEDAR", "SUB."],
+    "SUBEDAR": ["SUB", "SUBEDAR", "SUB."],
+    "NB SUB": ["NB SUB", "NB. SUB", "NAIB SUBEDAR", "NB/SUB", "NB-SUB", "NAIB-SUBEDAR"],
+    "NAIB SUBEDAR": ["NB SUB", "NB. SUB", "NAIB SUBEDAR", "NB/SUB", "NB-SUB", "NAIB-SUBEDAR"],
+    "RHM": ["RHM", "REGIMENTAL HAVILDAR MAJOR"],
+    "BHM": ["BHM", "BATTERY HAVILDAR MAJOR", "BATTALION HAVILDAR MAJOR"],
+    "CHM": ["CHM", "COMPANY HAVILDAR MAJOR"],
+    "CQMH": ["CQMH", "COMPANY QUARTERMASTER HAVILDAR"],
+    "HAV": ["HAV", "HAVILDAR", "HAV."],
+    "HAVILDAR": ["HAV", "HAVILDAR", "HAV."],
+    "L HAV": ["L HAV", "L/HAV", "LHAV", "LOC HAV", "L-HAV", "L/ HAV"],
+    "LOC HAV": ["L HAV", "L/HAV", "LHAV", "LOC HAV", "L-HAV", "L/ HAV"],
+    "LHAV": ["L HAV", "L/HAV", "LHAV", "LOC HAV", "L-HAV", "L/ HAV"],
+    "NK": ["NK", "NAIK", "NK."],
+    "NAIK": ["NK", "NAIK", "NK."],
+    "L NK": ["L NK", "L/NK", "LNK", "LOC NK", "L-NK", "L/ NK"],
+    "LOC NK": ["L NK", "L/NK", "LNK", "LOC NK", "L-NK", "L/ NK"],
+    "LNK": ["L NK", "L/NK", "LNK", "LOC NK", "L-NK", "L/ NK"],
+    "CFN": ["CFN", "CRAFTSMAN", "CFN."],
+    "CRAFTSMAN": ["CFN", "CRAFTSMAN", "CFN."],
+    "SIGNAL MAN": ["SIGNAL MAN", "SIGNALMAN", "SIGMN", "SIG MAN", "SIGMN."],
+    "SIGMN": ["SIGNAL MAN", "SIGNALMAN", "SIGMN", "SIG MAN", "SIGMN."],
+    "AGNIVEER": ["AGNIVEER", "AGV", "AGV."],
+    "AGV": ["AGNIVEER", "AGV", "AGV."],
+}
 
 _TABLE_ENSURED = False
 
@@ -191,6 +231,15 @@ def check_view_authorization(user: Optional[Dict[str, Any]] = None) -> bool:
     if role in AUTHORIZED_VIEW_ROLES:
         return True
     return check_executive_authorization(auth_user)
+
+
+def check_predict_authorization(user: Optional[Dict[str, Any]] = None) -> bool:
+    """Check if authenticated user can run AI New Joinee prediction (1coyonco, 2coyonco)."""
+    auth_user = get_current_authenticated_user(user)
+    if not auth_user:
+        return False
+    role = str(auth_user.get("role", "")).strip().lower().replace(" ", "").replace("_", "").replace("-", "")
+    return role in ["1coyonco", "2coyonco", "onco", "coyonco", "admin", "co", "2ic", "adjutant", "commandingofficer"]
 
 
 def sync_dues_in_recommendations(cursor=None, conn=None) -> int:
@@ -856,6 +905,10 @@ def api_predict_recommendation():
     STRICTLY TRADE-FREE: Trade is not accepted or used as a prediction feature.
     """
     try:
+        auth_user = get_current_authenticated_user()
+        if not check_predict_authorization(auth_user):
+            return jsonify({"success": False, "error": "Access Denied: Prediction functionality is restricted to authorized roles (1coyonco / 2coyonco)."}), 403
+
         data = request.get_json() or {}
         rank = data.get("rank") or ""
         date_of_enrollment = data.get("date_of_enrollment") or data.get("enrollment_date")
@@ -948,6 +1001,8 @@ def api_predict_recommendation():
             elif isinstance(data.get("section"), str) and data.get("section").strip() and len(target_sections) <= 1:
                 selected_section = data.get("section").strip()
 
+        company = data.get("company") or data.get("served_company")
+
         rec = recommend_placement(
             units_history=units_history,
             is_fresh_joinee=is_fresh_joinee,
@@ -960,7 +1015,8 @@ def api_predict_recommendation():
             selected_section=selected_section,
             target_sections=target_sections,
             target_trades=target_trades,
-            section_trades_map=section_trades_map
+            section_trades_map=section_trades_map,
+            company=company
         )
 
         return jsonify({
@@ -1149,8 +1205,14 @@ def api_get_insights_list():
             params.extend([canon, to_db_company_name(canon)])
 
         if rank_filter and rank_filter != "ALL":
-            where_clauses.append("`rank` = %s")
-            params.append(rank_filter)
+            clean_rf = rank_filter.strip().upper()
+            synonyms = RANK_SYNONYM_MAP.get(clean_rf, [clean_rf])
+            syn_set = set(synonyms)
+            syn_set.add(clean_rf)
+            unique_synonyms = list(syn_set)
+            placeholders = ", ".join(["%s"] * len(unique_synonyms))
+            where_clauses.append(f"TRIM(UPPER(`rank`)) IN ({placeholders})")
+            params.extend(unique_synonyms)
 
         if decision_filter and decision_filter != "ALL":
             where_clauses.append("decision_type = %s")
@@ -1163,10 +1225,58 @@ def api_get_insights_list():
         cursor.execute(count_sql, tuple(params))
         total_count = cursor.fetchone()["total"]
 
-        # Fetch ranks for filter dropdown
-        cursor.execute("SELECT DISTINCT `rank` FROM ai_new_joinee_recommendations WHERE `rank` IS NOT NULL ORDER BY `rank`")
-        rank_rows = cursor.fetchall()
-        available_ranks = [r["rank"] for r in rank_rows if r.get("rank")]
+        # Fetch comprehensive ranks for filter dropdown
+        STANDARD_RANKS = [
+            "Col",
+            "Lt Col",
+            "Maj",
+            "Capt",
+            "Lt",
+            "Subedar Major",
+            "Sub Maj",
+            "Subedar",
+            "Sub",
+            "Naib Subedar",
+            "Nb Sub",
+            "RHM",
+            "BHM",
+            "CHM",
+            "CQMH",
+            "HAV",
+            "L HAV",
+            "LOC HAV",
+            "NK",
+            "L NK",
+            "LOC NK",
+            "CFN",
+            "Signal Man",
+            "Sigmn",
+            "Agniveer"
+        ]
+
+        db_ranks = set()
+        for tbl in ["ai_new_joinee_recommendations", "dues_in", "personnel"]:
+            try:
+                cursor.execute(f"SELECT DISTINCT `{tbl}`.`rank` FROM `{tbl}` WHERE `{tbl}`.`rank` IS NOT NULL AND TRIM(`{tbl}`.`rank`) != ''")
+                for row in cursor.fetchall():
+                    val = (row.get("rank") or "").strip()
+                    if val:
+                        db_ranks.add(val)
+            except Exception:
+                pass
+
+        available_ranks = []
+        seen = set()
+        for rk in STANDARD_RANKS:
+            key = rk.upper().strip()
+            if key not in seen:
+                available_ranks.append(rk)
+                seen.add(key)
+        for rk in sorted(db_ranks):
+            key = rk.upper().strip()
+            if key not in seen:
+                available_ranks.append(rk)
+                seen.add(key)
 
         ALLOWED_SORT_COLS = {
             "percentage": "recommendation_percentage",
@@ -1257,9 +1367,7 @@ def api_get_insights_list():
 
         total_pages = max(1, (total_count + page_size - 1) // page_size)
         user_role = str(user.get("role", "")).strip().upper()
-        is_co = user_role in ["CO", "COMMANDING OFFICER"]
-        is_adjutant = (user_role == "ADJUTANT")
-        is_2ic = user_role in ["2IC", "ADMIN", "SUPER ADMIN"]
+        can_assign = user_role in ["CO", "COMMANDING OFFICER", "2IC", "ADMIN", "SUPER ADMIN", "ADJUTANT"]
 
         return jsonify({
             "success": True,
@@ -1270,9 +1378,9 @@ def api_get_insights_list():
             "total_pages": total_pages,
             "available_ranks": available_ranks,
             "user_role": user_role,
-            "can_add_remarks": (is_adjutant or is_2ic),
-            "can_assign_company": is_2ic,
-            "is_read_only": is_co
+            "can_add_remarks": True,
+            "can_assign_company": can_assign,
+            "is_read_only": not can_assign
         })
 
     except Exception as e:
@@ -1396,11 +1504,12 @@ def api_record_decision():
         return jsonify({"success": False, "error": "Authentication required"}), 401
 
     user_role = str(user.get("role", "")).strip().upper()
+    allowed_assignment_roles = ["CO", "COMMANDING OFFICER", "2IC", "ADMIN", "SUPER ADMIN", "ADJUTANT"]
 
-    if user_role in ["CO", "COMMANDING OFFICER"]:
+    if user_role not in allowed_assignment_roles:
         return jsonify({
             "success": False,
-            "error": "Access Denied: Role CO has read-only access. You cannot modify recommendation records."
+            "error": "Access Denied: You do not have executive assignment authority."
         }), 403
 
     if not check_executive_authorization(user):
@@ -1462,13 +1571,13 @@ def api_record_decision():
                 "decided_by": decided_by_str
             })
 
-        # 2IC / ADMIN: full assignment
-        if user_role not in ["2IC", "ADMIN", "SUPER ADMIN"]:
+        # Executive roles (CO, 2IC, Adjutant, Admin): full assignment and re-assignment
+        if user_role not in allowed_assignment_roles:
             cursor.close()
             conn.close()
             return jsonify({
                 "success": False,
-                "error": "Access Denied: Only 2IC is authorized to assign companies and finalize postings."
+                "error": "Access Denied: Unauthorized to assign or update company placement."
             }), 403
 
         if action in ["accept", "accepted"]:
@@ -1514,22 +1623,37 @@ def api_record_decision():
         ))
         conn.commit()
 
-        # If accepted, sync company & section to personnel record
-        if decision_type == "accepted" and existing.get("personnel_id"):
+        # If accepted/updated, sync company & section to personnel record and dues_in
+        if decision_type == "accepted":
             db_coy_val = to_db_company_name(final_coy_val)
             pos_sec = get_section_for_position(final_coy_val, final_pos_val)
-            cursor.execute(
-                "UPDATE personnel SET company = %s, section = %s WHERE id = %s",
-                (db_coy_val, pos_sec, existing["personnel_id"])
-            )
+            if existing.get("personnel_id"):
+                cursor.execute(
+                    "UPDATE personnel SET company = %s, section = %s WHERE id = %s",
+                    (db_coy_val, pos_sec, existing["personnel_id"])
+                )
+            elif existing.get("army_number"):
+                cursor.execute(
+                    "UPDATE personnel SET company = %s, section = %s WHERE army_number = %s",
+                    (db_coy_val, pos_sec, existing["army_number"])
+                )
+            if existing.get("army_number"):
+                try:
+                    cursor.execute(
+                        "UPDATE dues_in SET company = %s WHERE army_number = %s",
+                        (db_coy_val, existing["army_number"])
+                    )
+                except Exception:
+                    pass
             conn.commit()
 
         cursor.close()
         conn.close()
 
+        action_msg = "updated and assigned" if action in ["update", "updated"] else "assigned"
         return jsonify({
             "success": True,
-            "message": f"Recommendation successfully {decision_type} by 2IC",
+            "message": f"Recommendation successfully {action_msg} to {final_coy_val} ({final_pos_val}) by {user_role}",
             "decision_type": decision_type,
             "decided_by": decided_by_str,
             "final_company": final_coy_val,

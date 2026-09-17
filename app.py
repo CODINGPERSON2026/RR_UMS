@@ -9,7 +9,7 @@ from functools import wraps
 
 app = Flask(__name__)
 
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.secret_key = os.urandom(24)
 
 app.register_blueprint(personnel_info)
@@ -76,6 +76,13 @@ def root_fitness_api_export_directory_pdf():
 def root_fitness_api_calculate_all():
     from aiml.fitness_trend.routes import api_calculate_all_fitness
     return api_calculate_all_fitness()
+
+
+@app.route("/api/fitness/calculate-all/abort", methods=["POST", "GET"])
+@app.route("/fitness/api/calculate-all/abort", methods=["POST", "GET"])
+def root_fitness_api_calculate_all_abort():
+    from aiml.fitness_trend.routes import api_abort_calculate_all_fitness
+    return api_abort_calculate_all_fitness()
 
 
 @app.route("/api/analyze/<army_number>", methods=["GET"])

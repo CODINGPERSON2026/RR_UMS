@@ -84,6 +84,31 @@
               <label class="input-group-text bg-light text-muted" style="font-size: 0.76rem;"><i class="fas fa-medal me-1"></i> Rank</label>
               <select id="insightsRankFilter" class="form-select form-select-sm" onchange="onInsightsFilterChange()">
                 <option value="ALL">All Ranks</option>
+                <option value="Col">Col</option>
+                <option value="Lt Col">Lt Col</option>
+                <option value="Maj">Maj</option>
+                <option value="Capt">Capt</option>
+                <option value="Lt">Lt</option>
+                <option value="Subedar Major">Subedar Major</option>
+                <option value="Sub Maj">Sub Maj</option>
+                <option value="Subedar">Subedar</option>
+                <option value="Sub">Sub</option>
+                <option value="Naib Subedar">Naib Subedar</option>
+                <option value="Nb Sub">Nb Sub</option>
+                <option value="RHM">RHM</option>
+                <option value="BHM">BHM</option>
+                <option value="CHM">CHM</option>
+                <option value="CQMH">CQMH</option>
+                <option value="HAV">HAV</option>
+                <option value="L HAV">L HAV</option>
+                <option value="LOC HAV">LOC HAV</option>
+                <option value="NK">NK</option>
+                <option value="L NK">L NK</option>
+                <option value="LOC NK">LOC NK</option>
+                <option value="CFN">CFN</option>
+                <option value="Signal Man">Signal Man</option>
+                <option value="Sigmn">Sigmn</option>
+                <option value="Agniveer">Agniveer</option>
               </select>
             </div>
           </div>
@@ -132,7 +157,7 @@
 
         <!-- Insights Table with Dedicated Up-Down & Left-Right Scrollbars -->
         <div id="insightsTableWrapper" class="d-none shadow-sm" style="height: 55vh; min-height: 400px; max-height: 580px; overflow-x: auto !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #ffffff; position: relative;">
-          <table class="table table-hover align-middle mb-0" style="font-size: 0.82rem; min-width: 1450px; width: 100%; border-collapse: separate; border-spacing: 0;">
+          <table class="table table-hover align-middle mb-0" id="insightsMainTable" style="font-size: 0.82rem; width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead class="sticky-top shadow-sm" style="position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 50%, #e0e7ff 100%) !important; border-bottom: 2.5px solid #a855f7;">
               <tr style="font-weight: 800 !important; text-transform: uppercase; font-size: 0.77rem; letter-spacing: 0.4px;">
                 <th scope="col" class="py-3 px-2 text-center" style="width: 60px; color: #7e22ce !important; background: #ede9fe;">
@@ -581,7 +606,19 @@
     }
   };
 
+  function checkIsCoDashboard() {
+    return window.isCoDashboard === true ||
+           document.getElementById('card-ai-insights') !== null ||
+           currentInsightsUserRole === 'CO' ||
+           currentInsightsUserRole === 'COMMANDING OFFICER';
+  }
+
   function openAiInsightsModal() {
+    const isCoDash = checkIsCoDashboard();
+    const colHeader = document.getElementById('insightsRemarksColHeader');
+    if (colHeader && isCoDash) {
+      colHeader.style.display = 'none';
+    }
     const modalEl = document.getElementById('aiJoineeInsightsModal');
     if (modalEl && typeof bootstrap !== 'undefined') {
       const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
@@ -675,32 +712,38 @@
       if (loadingState) loadingState.classList.add('d-none');
 
       if (json.success) {
-        // Always set role/permissions from the response, even if data is empty
         currentInsightsUserRole = json.user_role || '';
-        canUserAddRemarks = !!json.can_add_remarks;
-        canUserAssignCompany = !!json.can_assign_company;
-        isUserReadOnly = !!json.is_read_only || (currentInsightsUserRole === 'CO' || currentInsightsUserRole === 'COMMANDING OFFICER');
+        canUserAddRemarks = true;
+        canUserAssignCompany = true;
+        isUserReadOnly = false;
 
-        // Update column header according to role
+        // Update column header according to role and dashboard (CO dashboard has no Action / Assign column)
+        const isCoDash = checkIsCoDashboard();
         const colHeader = document.getElementById('insightsRemarksColHeader');
         if (colHeader) {
-          if (isUserReadOnly) {
-            // CO: Show as read-only Decision Status column
-            colHeader.style.display = '';
-            colHeader.innerHTML = '<i class="fas fa-flag-checkered me-1.5" style="color: #6b7280;"></i>Decision Status';
-          } else if (canUserAssignCompany) {
-            colHeader.style.display = '';
-            colHeader.innerHTML = '<i class="fas fa-user-check me-1.5" style="color: #4f46e5;"></i>Action / Assign';
+          if (isCoDash) {
+            colHeader.style.display = 'none';
           } else {
             colHeader.style.display = '';
-            colHeader.innerHTML = '<i class="fas fa-comment-dots me-1.5" style="color: #f43f5e;"></i>Add Remarks';
+            if (canUserAssignCompany) {
+              colHeader.innerHTML = '<i class="fas fa-user-check me-1.5" style="color: #4f46e5;"></i>Action / Assign';
+            } else {
+              colHeader.innerHTML = '<i class="fas fa-comment-dots me-1.5" style="color: #f43f5e;"></i>Add Remarks';
+            }
           }
+        }
+        const mainTable = document.getElementById('insightsMainTable');
+        if (mainTable) {
+          mainTable.style.minWidth = isCoDash ? '100%' : '1250px';
+        }
+
+        if (json.available_ranks && Array.isArray(json.available_ranks)) {
+          updateInsightsRankFilterOptions(json.available_ranks, rankVal);
         }
 
         if (json.data && json.data.length > 0) {
           renderInsightsTable(json.data, searchVal);
           renderInsightsPagination(json.page, json.total_pages, json.total_count, json.page_size);
-          updateInsightsRankFilterOptions(json.available_ranks, rankVal);
 
           if (tableWrap) {
             tableWrap.classList.remove('d-none');
@@ -782,14 +825,25 @@
       }
 
       let actionCellHtml = '';
-      if (!isUserReadOnly) {
+      const isCoDash = checkIsCoDashboard();
+
+      if (!isCoDash) {
         if (canUserAssignCompany) {
-          // Role 2IC / Admin: Assignment Execution
           if (decisionType === 'accepted') {
             const placedCoy = r.final_company || recCompany;
-            actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-success py-1 px-2.5 fw-bold text-white shadow-sm" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Placement Confirmed: ${placedCoy}"><i class="fas fa-check-circle me-1"></i> Assigned (${placedCoy})</button></td>`;
+            actionCellHtml = `<td class="text-center">
+              <button class="btn btn-sm btn-success py-1 px-2.5 fw-bold text-white shadow-sm d-inline-flex align-items-center gap-1.5" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Placement Confirmed: ${placedCoy}. Click to re-assign or update placement.">
+                <i class="fas fa-check-circle"></i> Assigned (${placedCoy})
+                <span class="badge bg-white text-dark py-0.5 px-1 ms-1" style="font-size: 0.65rem; border-radius: 4px;"><i class="fas fa-sync-alt text-primary me-0.5"></i> Update</span>
+              </button>
+            </td>`;
           } else if (decisionType === 'rejected') {
-            actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-outline-danger py-1 px-2.5 fw-bold shadow-sm" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-times-circle me-1"></i> Rejected</button></td>`;
+            actionCellHtml = `<td class="text-center">
+              <button class="btn btn-sm btn-outline-danger py-1 px-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Rejected. Click to re-evaluate and assign.">
+                <i class="fas fa-times-circle"></i> Rejected
+                <span class="badge bg-danger text-white py-0.5 px-1 ms-1" style="font-size: 0.65rem; border-radius: 4px;"><i class="fas fa-edit me-0.5"></i> Assign</span>
+              </button>
+            </td>`;
           } else {
             // Pending Assignment
             if (remarksText) {
@@ -798,8 +852,7 @@
               actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-primary py-1 px-2.5 fw-bold text-white shadow-sm" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-user-check me-1"></i> Action / Assign</button></td>`;
             }
           }
-        } else {
-          // Role ADJUTANT: Operational Remarks Only
+        } else if (canUserAddRemarks) {
           if (decisionType === 'accepted') {
             actionCellHtml = `<td class="text-center"><span class="badge bg-success py-1.5 px-2.5 fw-bold" style="font-size: 0.76rem;"><i class="fas fa-check-circle me-1"></i> Assigned</span></td>`;
           } else if (decisionType === 'rejected') {
@@ -811,18 +864,6 @@
               actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-outline-secondary py-1 px-2.5 fw-semibold" onclick="openRemarksDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-plus-circle me-1 text-success"></i> Add Remarks</button></td>`;
             }
           }
-        }
-      } else {
-        // CO Role: Read-only — show decision status badge (keeps table column count consistent)
-        if (decisionType === 'accepted') {
-          const placedCoy = r.final_company || recCompany;
-          actionCellHtml = `<td class="text-center"><span class="badge bg-success py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;"><i class="fas fa-check-double me-1"></i> Assigned (${placedCoy})</span></td>`;
-        } else if (decisionType === 'rejected') {
-          actionCellHtml = `<td class="text-center"><span class="badge bg-danger py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;"><i class="fas fa-times-circle me-1"></i> Rejected</span></td>`;
-        } else if (remarksText) {
-          actionCellHtml = `<td class="text-center"><span class="badge bg-warning text-dark py-1.5 px-2.5 fw-bold" style="font-size: 0.72rem;" title="${remarksText}"><i class="fas fa-comment me-1"></i> Awaiting Decision</span></td>`;
-        } else {
-          actionCellHtml = `<td class="text-center"><span class="badge bg-secondary py-1.5 px-2.5 fw-semibold" style="font-size: 0.72rem;"><i class="fas fa-clock me-1"></i> Pending</span></td>`;
         }
       }
 
@@ -1065,17 +1106,38 @@
 
   function updateInsightsRankFilterOptions(ranks, currentRank) {
     const select = document.getElementById('insightsRankFilter');
-    if (!select || !ranks) return;
+    if (!select || !ranks || !Array.isArray(ranks) || ranks.length === 0) return;
 
-    const existingVal = currentRank || select.value;
-    select.innerHTML = '<option value="ALL">All Ranks</option>';
-    ranks.forEach(rk => {
-      const opt = document.createElement('option');
-      opt.value = rk;
-      opt.textContent = rk;
-      if (rk === existingVal) opt.selected = true;
-      select.appendChild(opt);
-    });
+    const existingVal = (currentRank || select.value || 'ALL').trim();
+    const existingOptions = Array.from(select.options).map(o => o.value.trim());
+    const neededOptions = ['ALL', ...ranks.map(r => r.trim())];
+
+    const isSame = existingOptions.length === neededOptions.length &&
+                   existingOptions.every((v, idx) => v.toUpperCase() === neededOptions[idx].toUpperCase());
+
+    if (!isSame) {
+      select.innerHTML = '<option value="ALL">All Ranks</option>';
+      ranks.forEach(rk => {
+        const opt = document.createElement('option');
+        opt.value = rk;
+        opt.textContent = rk;
+        select.appendChild(opt);
+      });
+    }
+
+    if (existingVal && existingVal !== 'ALL') {
+      let found = false;
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value.toUpperCase() === existingVal.toUpperCase()) {
+          select.selectedIndex = i;
+          found = true;
+          break;
+        }
+      }
+      if (!found) select.value = 'ALL';
+    } else {
+      select.value = 'ALL';
+    }
   }
 
   async function openInsightDetail(recId) {
@@ -1227,64 +1289,43 @@
       }
 
       // Configure Section 6 Controls based on User Role (CO: read-only, Adjutant: remarks-only, 2IC: full assignment)
+      // Configure Section 6 Controls (CO / 2IC / Adjutant / Admin: Full Assignment and Re-assignment)
       const scopeBanner = document.getElementById('detailRoleScopeBanner');
       const remarksTextarea = document.getElementById('detailDecisionRemarks');
       const btnsContainer = document.getElementById('detailActionButtonsContainer');
 
-      if (isUserReadOnly) {
-        // Role CO: Read-Only
-        if (scopeBanner) scopeBanner.innerHTML = `
-          <div class="alert alert-secondary py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
-            <i class="fas fa-lock text-muted"></i>
-            <div><strong>Read-Only Access (Role: Commanding Officer):</strong> You have oversight access to all AI recommendations, explainability forces, and audit logs.</div>
-          </div>
-        `;
-        if (coySelect) coySelect.disabled = true;
-        if (secSelect) secSelect.disabled = true;
-        if (posSelect) posSelect.disabled = true;
-        if (remarksTextarea) remarksTextarea.disabled = true;
-        if (btnsContainer) btnsContainer.innerHTML = '';
-      } else if (!canUserAssignCompany && canUserAddRemarks) {
-        // Role Adjutant: Remarks only
+      if (d.decision_type === 'accepted') {
         if (scopeBanner) scopeBanner.innerHTML = `
           <div class="alert alert-info py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-            <i class="fas fa-info-circle text-primary"></i>
-            <div><strong>Adjutant Review Authority:</strong> You can add or update operational remarks. Final company assignment is performed by 2IC.</div>
+            <i class="fas fa-check-circle text-success fs-6"></i>
+            <div><strong>Placement Currently Assigned to ${targetCoy}:</strong> You can re-assign or update the company, section, position, and remarks below at any time.</div>
           </div>
-        `;
-        if (coySelect) coySelect.disabled = true;
-        if (secSelect) secSelect.disabled = true;
-        if (posSelect) posSelect.disabled = true;
-        if (remarksTextarea) remarksTextarea.disabled = false;
-        if (btnsContainer) btnsContainer.innerHTML = `
-          <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold" onclick="submitDecision('remarks')">
-            <i class="fas fa-save me-1"></i> Save Remarks
-          </button>
         `;
       } else {
-        // Role 2IC / ADMIN: Full Assignment
         if (scopeBanner) scopeBanner.innerHTML = `
           <div class="alert alert-success py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
-            <i class="fas fa-user-shield text-success"></i>
-            <div><strong>2IC Executive Authority:</strong> You are authorized to approve, adjust, and execute company & section assignment for this personnel.</div>
+            <i class="fas fa-user-shield text-success fs-6"></i>
+            <div><strong>Executive Authority:</strong> You are authorized to approve, adjust, and execute company &amp; section assignment for this personnel.</div>
           </div>
         `;
-        if (coySelect) coySelect.disabled = false;
-        if (secSelect) secSelect.disabled = false;
-        if (posSelect) posSelect.disabled = false;
-        if (remarksTextarea) remarksTextarea.disabled = false;
-        if (btnsContainer) btnsContainer.innerHTML = `
-          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="submitDecision('reject')">
-            <i class="fas fa-times-circle me-1"></i> Reject
-          </button>
-          <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 fw-bold" onclick="submitDecision('update')">
-            <i class="fas fa-edit me-1"></i> Update Placement
-          </button>
-          <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitDecision('accept')">
-            <i class="fas fa-check-circle me-1"></i> Accept &amp; Assign Placement
-          </button>
-        `;
       }
+
+      if (coySelect) coySelect.disabled = false;
+      if (secSelect) secSelect.disabled = false;
+      if (posSelect) posSelect.disabled = false;
+      if (remarksTextarea) remarksTextarea.disabled = false;
+
+      if (btnsContainer) btnsContainer.innerHTML = `
+        <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="submitDecision('reject')">
+          <i class="fas fa-times-circle me-1"></i> Reject
+        </button>
+        <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold shadow-sm" onclick="submitDecision('update')">
+          <i class="fas fa-sync-alt me-1"></i> Update / Re-Assign
+        </button>
+        <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitDecision('accept')">
+          <i class="fas fa-check-circle me-1"></i> Confirm &amp; Assign Placement
+        </button>
+      `;
 
       const detailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('aiInsightDetailModal'));
       detailModal.show();

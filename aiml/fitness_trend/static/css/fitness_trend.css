@@ -70,28 +70,488 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
+/* ====================================================================
+   CALCULATE ALL INDIVIDUALS FITNESS - EXECUTIVE COMMAND ACTION
+   ==================================================================== */
+.calc-all-fitness-btn,
 #btnCalculateAllFitness {
-  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-  padding: 6px 16px;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
-  transition: all 0.22s ease-in-out;
-  white-space: nowrap;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #091a42 0%, #1e3a8a 45%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  border: 1.5px solid rgba(147, 197, 253, 0.45) !important;
+  border-radius: 9999px !important;
+  padding: 0.45rem 1.15rem 0.45rem 0.55rem !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.25px !important;
+  white-space: nowrap !important;
+  box-shadow: 0 4px 16px rgba(30, 64, 175, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  overflow: hidden !important;
 }
 
+.calc-all-fitness-btn::before,
+#btnCalculateAllFitness::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.32), transparent);
+  transform: skewX(-25deg);
+  transition: 0.75s;
+}
+
+.calc-all-fitness-btn:hover::before,
+#btnCalculateAllFitness:hover::before {
+  left: 140%;
+}
+
+.calc-all-fitness-btn:hover,
 #btnCalculateAllFitness:hover {
-  background: linear-gradient(135deg, #172554 0%, #1d4ed8 100%);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5), 0 0 16px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 
+.calc-all-fitness-btn:active,
 #btnCalculateAllFitness:active {
-  transform: translateY(0);
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
+}
+
+.calc-btn-icon-pulse {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fbbf24;
+  font-size: 0.88rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.calc-all-fitness-btn:hover .calc-btn-icon-pulse,
+#btnCalculateAllFitness:hover .calc-btn-icon-pulse {
+  background: #fbbf24;
+  color: #0f172a;
+  transform: scale(1.12) rotate(-8deg);
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.7);
+}
+
+.calc-btn-text {
+  font-weight: 700;
+  letter-spacing: 0.25px;
+  color: #ffffff;
+}
+
+.calc-btn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #e0e7ff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.calc-all-fitness-btn:hover .calc-btn-chip,
+#btnCalculateAllFitness:hover .calc-btn-chip {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* ====================================================================
+   CALCULATE ALL FITNESS MODAL ENHANCEMENTS (MILITARY TACTICAL DECK)
+   ==================================================================== */
+#calculateAllFitnessModal .modal-content {
+  border-radius: 22px;
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.35);
+  overflow: hidden;
+  background: #ffffff;
+}
+
+#calculateAllFitnessModal .modal-header {
+  background: linear-gradient(135deg, #09122c 0%, #172554 45%, #1e3a8a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 1.15rem 1.6rem;
+}
+
+.calc-modal-header-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+  font-size: 1.1rem;
+}
+
+#calculateAllFitnessModal .modal-title {
+  font-size: 1.1rem;
+  letter-spacing: 0.3px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.calc-modal-header-sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  color: #93c5fd;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+#calculateAllFitnessModal .modal-body {
+  background: #ffffff;
+  padding: 1.6rem 1.6rem 1.4rem !important;
+}
+
+/* Hero Badge in Modal */
+.calc-hero-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 1.25rem 1rem;
+  margin-bottom: 1.15rem;
+}
+
+.calc-modal-avatar-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #93c5fd;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.18);
+  margin-bottom: 0.75rem;
+}
+
+.calc-roster-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.35rem 0.95rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Evaluation Pillar Grid */
+.calc-pillars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.calc-pillar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.7rem 0.95rem;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.calc-pillar-item:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateX(2px);
+}
+
+.calc-pillar-icon {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+.calc-pillar-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.calc-pillar-desc {
+  font-size: 0.74rem;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.calc-pillar-badge {
+  margin-left: auto;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.calc-safe-notice {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.78rem;
+  color: #166534;
+  text-align: left;
+}
+
+/* ====================================================================
+   BEAUTIFUL CYBER-MILITARY TACTICAL LOADER (NO PROGRESS BAR LINE)
+   ==================================================================== */
+.tactical-ai-loader-container {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0.5rem auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-ambient-glow {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.35) 0%, rgba(37, 99, 235, 0.12) 60%, transparent 80%);
+  filter: blur(10px);
+  animation: ambientBreath 3s ease-in-out infinite;
+}
+
+.loader-orbital-ring {
+  position: absolute;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: #38bdf8;
+  border-right-color: #2563eb;
+  border-bottom-color: rgba(99, 102, 241, 0.4);
+  animation: orbitSpin 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+}
+
+.orbiting-particle {
+  position: absolute;
+  top: 4px;
+  left: 20px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 12px #38bdf8, 0 0 20px #0284c7;
+}
+
+.loader-radar-ring {
+  position: absolute;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  animation: radarCounterSpin 6s linear infinite;
+}
+
+.loader-sonar-wave {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 99, 235, 0.65);
+  animation: sonarPulse 2.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.loader-sonar-wave.delay-1 {
+  animation-delay: 1.1s;
+}
+
+.loader-core {
+  position: relative;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #091a42 0%, #172554 50%, #1e3a8a 100%);
+  border: 2px solid rgba(147, 197, 253, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(30, 64, 175, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  z-index: 2;
+}
+
+.loader-core .core-icon {
+  font-size: 1.6rem;
+  color: #fbbf24;
+  text-shadow: 0 0 14px rgba(251, 191, 36, 0.8);
+  animation: coreIconPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes orbitSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes radarCounterSpin {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes sonarPulse {
+  0% {
+    width: 64px;
+    height: 64px;
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    width: 130px;
+    height: 130px;
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes ambientBreath {
+  0%, 100% { transform: scale(0.92); opacity: 0.6; }
+  50% { transform: scale(1.18); opacity: 1; }
+}
+
+@keyframes coreIconPulse {
+  0% { transform: scale(0.9); filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.4)); }
+  100% { transform: scale(1.1); filter: drop-shadow(0 0 14px rgba(251, 191, 36, 0.9)); }
+}
+
+/* High-Tech Terminal Status Capsule */
+.calc-live-terminal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: #0f172a;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  border-radius: 9999px;
+  padding: 0.48rem 1.15rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  max-width: 95%;
+}
+
+.terminal-beacon {
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: beaconBlink 1.4s ease-in-out infinite;
+}
+
+@keyframes beaconBlink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.terminal-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.terminal-divider {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.75rem;
+}
+
+.terminal-msg {
+  font-size: 0.78rem;
+  color: #e2e8f0;
+  font-family: monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Evaluation Module Pills */
+.eval-module-pill {
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #334155;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.eval-module-pill:hover {
+  border-color: #93c5fd;
+  background: #f8fafc;
+}
+
+/* Stat Cards for Success State */
+.calc-modal-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.95rem 0.65rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calc-modal-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+#calculateAllFitnessModal .modal-footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 0.9rem 1.6rem;
+  border-bottom-left-radius: 22px;
+  border-bottom-right-radius: 22px;
 }
 
 /* ====================================================================

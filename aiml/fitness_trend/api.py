@@ -166,24 +166,14 @@ def get_saved_fitness_report_by_id(report_id):
     return get_saved_report_by_id(report_id)
 
 
-def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"):
+def calculate_all_individuals_fitness(goal="Overall Fitness", language="English", task_id=None, is_aborted=None):
     """
     Evaluates fitness for all individuals in the unit (all personnel in weight_info),
     persists/updates their evaluation in `ums.ai_fitness_reports`, and computes
     a breakdown of fit vs unfit personnel for CO, 2IC, and Adjutant oversight.
-    
-    Returns:
-        dict: {
-            'success': bool,
-            'total_processed': int,
-            'unfit_count': int,
-            'fit_count': int,
-            'unfit_personnel': list,
-            'saved': dict,
-            'message': str
-        }
+    Supports atomic transactional rollback if aborted by user.
     """
-    logger.info("Initiating batch fitness calculation for all individuals...")
+    logger.info(f"Initiating batch fitness calculation for all individuals (task_id={task_id})...")
     ensure_ai_fitness_reports_table()
 
     # 1. Preload models & cached menus
@@ -208,12 +198,33 @@ def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"
         ano = str(s.get('army_number', '')).strip()
         s_map.setdefault(ano, []).append(s)
 
+    # Deduplicate weight_info rows by army_number so each soldier is only evaluated once
+    unique_w_map = {}
+    for w in w_rows:
+        ano = str(w.get('army_number', '')).strip()
+        if ano:
+            unique_w_map[ano] = w
+    w_rows = list(unique_w_map.values())
+
     reports_payload_list = []
     unfit_personnel = []
     unfit_count = 0
     fit_count = 0
 
-    for w_row in w_rows:
+    for idx, w_row in enumerate(w_rows):
+        # Abort check during evaluation loop
+        if is_aborted and is_aborted():
+            logger.warning(f"Calculation aborted by user at record {idx+1}/{len(w_rows)} (task_id={task_id}). Rolling back transaction.")
+            return {
+                'success': False,
+                'aborted': True,
+                'error': 'Calculation was aborted by user. Transaction rolled back: zero database changes were made.',
+                'total_processed': 0,
+                'unfit_count': 0,
+                'fit_count': 0,
+                'unfit_personnel': []
+            }
+
         ano = str(w_row.get('army_number', '')).strip()
         if not ano:
             continue
@@ -288,7 +299,20 @@ def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"
         }
         reports_payload_list.append(report_payload)
 
-    # 3. Bulk persist to ums.ai_fitness_reports
+    # Final abort check right before persistence
+    if is_aborted and is_aborted():
+        logger.warning(f"Calculation aborted by user before database persistence (task_id={task_id}). Rolling back transaction.")
+        return {
+            'success': False,
+            'aborted': True,
+            'error': 'Calculation was aborted by user. Transaction rolled back: zero database changes were made.',
+            'total_processed': 0,
+            'unfit_count': 0,
+            'fit_count': 0,
+            'unfit_personnel': []
+        }
+
+    # 3. Bulk persist to ums.ai_fitness_reports in a single ACID transaction
     save_result = bulk_insert_or_update_ai_fitness_reports(reports_payload_list)
 
     msg = f"Successfully calculated fitness for {len(reports_payload_list)} individuals. Added/updated in ums.ai_fitness_reports. Unfit individuals: {unfit_count}, Fit individuals: {fit_count}."

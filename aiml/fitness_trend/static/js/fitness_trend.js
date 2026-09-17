@@ -326,68 +326,273 @@ class FitnessTrendApp {
       retrainBtn.addEventListener('click', () => this.triggerModelRetrain());
     }
 
-    // Calculate All Individuals Fitness button handler
+    // Calculate All Individuals Fitness button handler -> Shows Confirmation Screen
     const btnCalcAll = document.getElementById('btnCalculateAllFitness');
     if (btnCalcAll) {
       btnCalcAll.addEventListener('click', () => {
-        this.triggerCalculateAllFitness();
+        this.openCalculateAllConfirmation();
       });
     }
 
-    // View Unfit Table button handler from completion modal
-    const btnViewUnfit = document.getElementById('btnViewUnfitTableFromModal');
-    if (btnViewUnfit) {
-      btnViewUnfit.addEventListener('click', () => {
-        const calcModalEl = document.getElementById('calculateAllFitnessModal');
-        if (calcModalEl) {
-          const bsModal = bootstrap.Modal.getInstance(calcModalEl) || new bootstrap.Modal(calcModalEl);
-          if (bsModal) bsModal.hide();
-        }
-        setTimeout(() => {
-          if (typeof openAiFitnessReportsModal === 'function') {
-            openAiFitnessReportsModal();
-          } else if (window.FitnessModalController && typeof window.FitnessModalController.openModal === 'function') {
-            window.FitnessModalController.openModal();
-          } else {
-            const fitModalEl = document.getElementById('aiFitnessReportsModal');
-            if (fitModalEl) {
-              const fitModal = bootstrap.Modal.getInstance(fitModalEl) || new bootstrap.Modal(fitModalEl);
-              fitModal.show();
-            }
+    // Confirm & Calculate All proceed button handler
+    const btnConfirmProceed = document.getElementById('btnConfirmProceedCalcAll');
+    if (btnConfirmProceed) {
+      btnConfirmProceed.addEventListener('click', () => {
+        this.executeCalculateAllFitness();
+      });
+    }
+
+    // Modal Cancel button handler
+    const btnCancelCalc = document.getElementById('btnCancelCalcAll');
+    if (btnCancelCalc) {
+      btnCancelCalc.addEventListener('click', (e) => {
+        if (this.isCalculating) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.abortCalculateAllFitness();
+        } else {
+          const calcModalEl = document.getElementById('calculateAllFitnessModal');
+          if (calcModalEl) {
+            const bsModal = bootstrap.Modal.getInstance(calcModalEl);
+            if (bsModal) bsModal.hide();
           }
-        }, 300);
+        }
+      });
+    }
+
+    // Modal top-right close button (X) handler
+    const closeCalcModalBtn = document.getElementById('closeCalcAllModalBtn');
+    if (closeCalcModalBtn) {
+      closeCalcModalBtn.addEventListener('click', (e) => {
+        if (this.isCalculating) {
+          e.preventDefault();
+          e.stopPropagation();
+          this.abortCalculateAllFitness();
+        }
       });
     }
   }
 
-  async triggerCalculateAllFitness() {
+  setCalcModalState(state) {
+    const views = {
+      confirm: document.getElementById('calcAllConfirmState'),
+      loading: document.getElementById('calcAllLoadingState'),
+      aborted: document.getElementById('calcAllAbortedState'),
+      success: document.getElementById('calcAllSuccessState'),
+      error: document.getElementById('calcAllErrorState')
+    };
+
+    Object.keys(views).forEach(key => {
+      const el = views[key];
+      if (el) {
+        if (key === state) {
+          el.classList.remove('d-none');
+          el.style.display = '';
+        } else {
+          el.classList.add('d-none');
+          el.style.display = 'none';
+        }
+      }
+    });
+
+    const modalTitle = document.getElementById('calculateAllFitnessModalLabel');
+    const btnConfirm = document.getElementById('btnConfirmProceedCalcAll');
+    const btnCancel = document.getElementById('btnCancelCalcAll');
+
+    if (state === 'confirm') {
+      if (modalTitle) modalTitle.textContent = 'Unit-Wide AI Fitness Assessment';
+      if (btnConfirm) {
+        btnConfirm.classList.remove('d-none');
+        btnConfirm.style.display = '';
+        btnConfirm.disabled = false;
+        btnConfirm.innerHTML = '<i class="fas fa-check"></i><span>Confirm &amp; Calculate All</span>';
+      }
+      if (btnCancel) {
+        btnCancel.className = 'btn btn-secondary btn-sm px-4 fw-semibold rounded-pill';
+        btnCancel.innerHTML = 'Cancel';
+        btnCancel.disabled = false;
+      }
+    } else if (state === 'loading') {
+      if (modalTitle) modalTitle.textContent = 'Unit-Wide AI Fitness Assessment';
+      if (btnConfirm) {
+        btnConfirm.classList.add('d-none');
+        btnConfirm.style.display = 'none';
+      }
+      if (btnCancel) {
+        btnCancel.className = 'btn btn-secondary btn-sm px-4 fw-semibold rounded-pill';
+        btnCancel.innerHTML = 'Cancel';
+        btnCancel.disabled = false;
+      }
+    } else if (state === 'aborted') {
+      if (modalTitle) modalTitle.textContent = 'Calculation Safely Aborted';
+      if (btnConfirm) {
+        btnConfirm.classList.add('d-none');
+        btnConfirm.style.display = 'none';
+      }
+      if (btnCancel) {
+        btnCancel.className = 'btn btn-secondary btn-sm px-4 fw-semibold rounded-pill';
+        btnCancel.innerHTML = 'Close';
+        btnCancel.disabled = false;
+      }
+    } else if (state === 'success') {
+      if (modalTitle) modalTitle.textContent = 'Batch Evaluation Completed & Saved';
+      if (btnConfirm) {
+        btnConfirm.classList.add('d-none');
+        btnConfirm.style.display = 'none';
+      }
+      if (btnCancel) {
+        btnCancel.className = 'btn btn-primary btn-sm px-4 fw-bold rounded-pill';
+        btnCancel.innerHTML = 'Close';
+        btnCancel.disabled = false;
+      }
+    } else if (state === 'error') {
+      if (modalTitle) modalTitle.textContent = 'Calculation Error';
+      if (btnConfirm) {
+        btnConfirm.classList.remove('d-none');
+        btnConfirm.style.display = '';
+        btnConfirm.disabled = false;
+        btnConfirm.innerHTML = '<i class="fas fa-redo me-1"></i><span>Try Again</span>';
+      }
+      if (btnCancel) {
+        btnCancel.className = 'btn btn-secondary btn-sm px-4 fw-semibold rounded-pill';
+        btnCancel.innerHTML = 'Close';
+        btnCancel.disabled = false;
+      }
+    }
+  }
+
+  openCalculateAllConfirmation() {
     const modalEl = document.getElementById('calculateAllFitnessModal');
     if (!modalEl) return;
 
+    this.isCalculating = false;
+    this.calcAbortController = null;
+    this.currentCalcTaskId = null;
+
+    this.setCalcModalState('confirm');
+
+    // Update dynamic personnel count in confirmation message if available
+    const confirmCountEl = document.getElementById('calcConfirmPersonnelCount');
+    const totalCountText = document.getElementById('totalPersonnelCount')?.textContent?.trim();
+    if (confirmCountEl && totalCountText && totalCountText !== '--') {
+      confirmCountEl.textContent = totalCountText;
+    }
+
     const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
     bsModal.show();
+  }
 
-    const loadingState = document.getElementById('calcAllLoadingState');
-    const successState = document.getElementById('calcAllSuccessState');
-    const errorState = document.getElementById('calcAllErrorState');
-    const viewUnfitBtn = document.getElementById('btnViewUnfitTableFromModal');
+  async abortCalculateAllFitness() {
+    this.isAborted = true;
+    this.isCalculating = false;
 
-    if (loadingState) loadingState.classList.remove('d-none');
-    if (successState) successState.classList.add('d-none');
-    if (errorState) errorState.classList.add('d-none');
-    if (viewUnfitBtn) viewUnfitBtn.classList.add('d-none');
+    if (this._calcStatusTimer) {
+      clearInterval(this._calcStatusTimer);
+      this._calcStatusTimer = null;
+    }
+
+    // 1. Immediately switch UI to aborted view
+    this.setCalcModalState('aborted');
+
+    // 2. Abort ongoing client-side fetch request
+    if (this.calcAbortController) {
+      try {
+        this.calcAbortController.abort();
+      } catch (e) {
+        console.warn('AbortController abort warning:', e);
+      }
+    }
+
+    // 3. Dispatch abort signal to backend to cancel transaction and prevent persistence
+    const taskIdToAbort = this.currentCalcTaskId;
+    try {
+      fetch('/fitness/api/calculate-all/abort', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: taskIdToAbort || '' }),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+
+    try {
+      fetch('/api/fitness/calculate-all/abort', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ task_id: taskIdToAbort || '' }),
+        keepalive: true
+      }).catch(() => {});
+    } catch (e) {}
+  }
+
+  async executeCalculateAllFitness() {
+    if (this.isCalculating) {
+      console.warn("Calculation already in progress. Ignoring duplicate trigger.");
+      return;
+    }
+
+    this.isCalculating = true;
+    this.isAborted = false;
+    this.calcAbortController = new AbortController();
+    this.currentCalcTaskId = 'calc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+
+    const btnConfirm = document.getElementById('btnConfirmProceedCalcAll');
+    if (btnConfirm) btnConfirm.disabled = true;
+
+    this.setCalcModalState('loading');
+
+    const statusMsgs = [
+      "Cross-referencing BPET 5km speed & endurance standards...",
+      "Evaluating PPT calisthenics, functional pushups & sit-ups...",
+      "Computing Body Mass Index (BMI) & Indian Army SHAPE-1 status...",
+      "Running multi-model ML predictions across regiment roster...",
+      "Filtering results & synchronizing with Command Oversight table..."
+    ];
+    let msgIdx = 0;
+    const statusTextEl = document.getElementById('calcAllStatusText');
+    if (statusTextEl) statusTextEl.textContent = statusMsgs[0];
+    
+    if (this._calcStatusTimer) clearInterval(this._calcStatusTimer);
+    this._calcStatusTimer = setInterval(() => {
+      msgIdx = (msgIdx + 1) % statusMsgs.length;
+      if (statusTextEl && this.isCalculating) {
+        statusTextEl.textContent = statusMsgs[msgIdx];
+      }
+    }, 1300);
 
     try {
       const res = await fetch('/fitness/api/calculate-all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: this.calcAbortController.signal,
         body: JSON.stringify({
           goal: this.currentGoal || 'Overall Fitness',
-          lang: this.currentLang || 'en'
+          lang: this.currentLang || 'en',
+          task_id: this.currentCalcTaskId
         })
       });
 
+      if (this._calcStatusTimer) {
+        clearInterval(this._calcStatusTimer);
+        this._calcStatusTimer = null;
+      }
+
+      // Defensive check: only trigger abort if explicitly aborted by user
+      if (this.isAborted) {
+        console.log("Calculation was aborted by user.");
+        this.isCalculating = false;
+        this.setCalcModalState('aborted');
+        return;
+      }
+
       const data = await res.json();
+
+      if (this.isAborted || data.aborted) {
+        console.log("Calculation aborted signal detected.");
+        this.isCalculating = false;
+        this.setCalcModalState('aborted');
+        return;
+      }
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to calculate fitness for all personnel.');
       }
@@ -401,32 +606,47 @@ class FitnessTrendApp {
       if (unfitCountEl) unfitCountEl.textContent = data.unfit_count || 0;
       if (fitCountEl) fitCountEl.textContent = data.fit_count || 0;
       if (successMsgEl) {
-        successMsgEl.textContent = `Successfully processed ${data.total_processed} individuals and updated ums.ai_fitness_reports table.`;
+        successMsgEl.textContent = `Successfully evaluated ${data.total_processed} regiment personnel and updated ums.ai_fitness_reports table.`;
       }
 
-      if (loadingState) loadingState.classList.add('d-none');
-      if (successState) successState.classList.remove('d-none');
-      if (viewUnfitBtn) viewUnfitBtn.classList.remove('d-none');
+      this.isCalculating = false;
+      this.setCalcModalState('success');
 
-      // Update dashboard cards / badge counts if present
-      const dashTotal = document.getElementById('dash-fit-total');
-      if (dashTotal) dashTotal.textContent = data.unfit_count || 0;
-      const coTotal = document.getElementById('co-fit-total');
-      if (coTotal) coTotal.textContent = data.unfit_count || 0;
+      // Update dashboard counts and modal table safely in isolated block
+      try {
+        const dashTotal = document.getElementById('dash-fit-total');
+        if (dashTotal) dashTotal.textContent = data.unfit_count || 0;
+        const coTotal = document.getElementById('co-fit-total');
+        if (coTotal) coTotal.textContent = data.unfit_count || 0;
 
-      // Also refresh the executive reports modal data if initialized
-      if (window.FitnessModalController && typeof window.FitnessModalController.loadModalData === 'function') {
-        window.FitnessModalController.loadModalStats();
-        window.FitnessModalController.loadModalData();
+        if (window.FitnessModalController && typeof window.FitnessModalController.loadModalData === 'function') {
+          if (typeof window.FitnessModalController.loadModalStats === 'function') {
+            window.FitnessModalController.loadModalStats();
+          }
+          window.FitnessModalController.loadModalData();
+        }
+      } catch (uiSyncErr) {
+        console.warn('Post-calculation UI sync warning (non-fatal):', uiSyncErr);
       }
 
     } catch (err) {
+      if (this.isAborted || err.name === 'AbortError') {
+        this.isCalculating = false;
+        this.setCalcModalState('aborted');
+        return;
+      }
+
       console.error('Calculate all fitness error:', err);
-      if (loadingState) loadingState.classList.add('d-none');
-      if (errorState) {
-        errorState.classList.remove('d-none');
-        const errMsgEl = document.getElementById('calcAllErrorMessage');
-        if (errMsgEl) errMsgEl.textContent = err.message || 'Error occurred while calculating fitness.';
+      this.isCalculating = false;
+      this.setCalcModalState('error');
+
+      const errMsgEl = document.getElementById('calcAllErrorMessage');
+      if (errMsgEl) errMsgEl.textContent = err.message || 'Error occurred while calculating fitness.';
+    } finally {
+      this.isCalculating = false;
+      if (this._calcStatusTimer) {
+        clearInterval(this._calcStatusTimer);
+        this._calcStatusTimer = null;
       }
     }
   }
@@ -1539,6 +1759,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.fitnessApp) {
         window.fitnessApp.switchMessDay(day);
       }
-    }
+    },
+    openCalculateAllConfirmation: () => window.fitnessApp?.openCalculateAllConfirmation(),
+    executeCalculateAllFitness: () => window.fitnessApp?.executeCalculateAllFitness()
   };
+  window.FitnessDashboard = window.FitnessTrendDashboard;
 });

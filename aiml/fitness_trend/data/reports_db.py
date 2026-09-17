@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `ai_fitness_reports` (
     `model_version` VARCHAR(100) NULL,
     `generated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_army_number` (`army_number`),
+    UNIQUE KEY `uq_army_number` (`army_number`),
     INDEX `idx_personnel_id` (`personnel_id`),
     INDEX `idx_company` (`company`),
     INDEX `idx_fitness_status` (`fitness_status`),
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS `ai_fitness_reports` (
 
 def ensure_ai_fitness_reports_table():
     """
-    Ensures that the `ai_fitness_reports` table exists in the database.
-    Safe and idempotent.
+    Ensures that the `ai_fitness_reports` table exists in the database with UNIQUE KEY on `army_number`.
+    Automatically purges any existing duplicate rows and enforces idempotent persistence.
     """
     conn = get_db_connection()
     if not conn:
@@ -71,8 +71,22 @@ def ensure_ai_fitness_reports_table():
     try:
         cursor = conn.cursor()
         cursor.execute(CREATE_TABLE_SQL)
+        # Delete any historical duplicates keeping highest id
+        cursor.execute("""
+            DELETE r1 FROM ai_fitness_reports r1
+            INNER JOIN ai_fitness_reports r2
+            WHERE r1.id < r2.id AND r1.army_number = r2.army_number
+        """)
         conn.commit()
-        logger.info("Table `ai_fitness_reports` verified/initialized successfully.")
+
+        # Ensure UNIQUE constraint exists
+        try:
+            cursor.execute("ALTER TABLE ai_fitness_reports ADD UNIQUE KEY uq_army_number (army_number)")
+            conn.commit()
+        except Exception:
+            pass
+
+        logger.info("Table `ai_fitness_reports` verified/initialized with UNIQUE army_number successfully.")
         return True
     except Error as e:
         logger.error(f"Error creating `ai_fitness_reports` table: {e}")
@@ -343,19 +357,32 @@ def bulk_insert_or_update_ai_fitness_reports(reports_list):
         return {'total': 0, 'inserted': 0, 'updated': 0, 'error': 'Database connection failed'}
 
     try:
+        # Enforce strict single-transaction ACID boundaries
+        if hasattr(conn, 'autocommit'):
+            try:
+                conn.autocommit = False
+            except Exception:
+                pass
         cursor = conn.cursor(dictionary=True)
-        # Fetch all existing army numbers and ids
-        cursor.execute("SELECT id, army_number FROM ai_fitness_reports")
-        existing_rows = cursor.fetchall()
-        existing_map = {str(r['army_number']).strip(): r['id'] for r in existing_rows if r.get('army_number')}
 
-        insert_rows = []
-        update_rows = []
+        # 1. Clean up any historical duplicates before writing
+        cursor.execute("""
+            DELETE r1 FROM ai_fitness_reports r1
+            INNER JOIN ai_fitness_reports r2
+            WHERE r1.id < r2.id AND r1.army_number = r2.army_number
+        """)
 
+        # 2. In-memory deduplication: keep only the latest report per army_number
+        deduped_reports = {}
         for r in reports_list:
             if not r or not r.get('army_number'):
                 continue
             ano = str(r['army_number']).strip()
+            if ano:
+                deduped_reports[ano] = r
+
+        upsert_rows = []
+        for ano, r in deduped_reports.items():
             personnel_id = r.get('personnel_id')
             name = r.get('name')
             rank = r.get('rank')
@@ -380,27 +407,17 @@ def bulk_insert_or_update_ai_fitness_reports(reports_list):
             model_name = r.get('model_name', 'GradientBoostingClassifier')
             model_version = r.get('model_version', 'v1')
 
-            if ano in existing_map:
-                rep_id = existing_map[ano]
-                update_rows.append((
-                    personnel_id, name, rank, company, age, height_cm,
-                    actual_weight_kg, ideal_weight_kg, bmi, fitness_score,
-                    fitness_status, pred_res, recs, diet_recs, ex_recs,
-                    prog_res, report_language, report_generated, pdf_path,
-                    model_name, model_version, rep_id
-                ))
-            else:
-                insert_rows.append((
-                    personnel_id, ano, name, rank, company,
-                    age, height_cm, actual_weight_kg, ideal_weight_kg, bmi,
-                    fitness_score, fitness_status, pred_res,
-                    recs, diet_recs, ex_recs,
-                    prog_res, report_language, report_generated,
-                    pdf_path, model_name, model_version
-                ))
+            upsert_rows.append((
+                personnel_id, ano, name, rank, company,
+                age, height_cm, actual_weight_kg, ideal_weight_kg, bmi,
+                fitness_score, fitness_status, pred_res,
+                recs, diet_recs, ex_recs,
+                prog_res, report_language, report_generated,
+                pdf_path, model_name, model_version
+            ))
 
-        if insert_rows:
-            insert_sql = """
+        if upsert_rows:
+            upsert_sql = """
                 INSERT INTO ai_fitness_reports (
                     personnel_id, army_number, name, `rank`, company,
                     age, height_cm, actual_weight_kg, ideal_weight_kg, bmi,
@@ -415,45 +432,37 @@ def bulk_insert_or_update_ai_fitness_reports(reports_list):
                     %s, %s, %s,
                     %s, %s, %s,
                     %s, %s, %s, CURRENT_TIMESTAMP
-                )
-            """
-            cursor.executemany(insert_sql, insert_rows)
-
-        if update_rows:
-            update_sql = """
-                UPDATE ai_fitness_reports SET
-                    personnel_id = %s,
-                    name = %s,
-                    `rank` = %s,
-                    company = %s,
-                    age = %s,
-                    height_cm = %s,
-                    actual_weight_kg = %s,
-                    ideal_weight_kg = %s,
-                    bmi = %s,
-                    fitness_score = %s,
-                    fitness_status = %s,
-                    prediction_result = %s,
-                    recommendations = %s,
-                    diet_recommendations = %s,
-                    exercise_recommendations = %s,
-                    progression_prediction = %s,
-                    report_language = %s,
-                    report_generated = %s,
-                    pdf_path = %s,
-                    model_name = %s,
-                    model_version = %s,
+                ) ON DUPLICATE KEY UPDATE
+                    personnel_id = VALUES(personnel_id),
+                    name = VALUES(name),
+                    `rank` = VALUES(`rank`),
+                    company = VALUES(company),
+                    age = VALUES(age),
+                    height_cm = VALUES(height_cm),
+                    actual_weight_kg = VALUES(actual_weight_kg),
+                    ideal_weight_kg = VALUES(ideal_weight_kg),
+                    bmi = VALUES(bmi),
+                    fitness_score = VALUES(fitness_score),
+                    fitness_status = VALUES(fitness_status),
+                    prediction_result = VALUES(prediction_result),
+                    recommendations = VALUES(recommendations),
+                    diet_recommendations = VALUES(diet_recommendations),
+                    exercise_recommendations = VALUES(exercise_recommendations),
+                    progression_prediction = VALUES(progression_prediction),
+                    report_language = VALUES(report_language),
+                    report_generated = VALUES(report_generated),
+                    pdf_path = VALUES(pdf_path),
+                    model_name = VALUES(model_name),
+                    model_version = VALUES(model_version),
                     generated_at = CURRENT_TIMESTAMP
-                WHERE id = %s
             """
-            cursor.executemany(update_sql, update_rows)
+            cursor.executemany(upsert_sql, upsert_rows)
 
         conn.commit()
-        logger.info(f"Bulk saved AI fitness reports: {len(insert_rows)} inserted, {len(update_rows)} updated.")
+        logger.info(f"Bulk upserted {len(upsert_rows)} AI fitness reports with zero duplicates.")
         return {
-            'total': len(insert_rows) + len(update_rows),
-            'inserted': len(insert_rows),
-            'updated': len(update_rows)
+            'total': len(upsert_rows),
+            'upserted': len(upsert_rows)
         }
 
     except Error as e:

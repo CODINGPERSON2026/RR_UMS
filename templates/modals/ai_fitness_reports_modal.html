@@ -26,7 +26,6 @@
   #aiFitnessReportsModal #fitnessTableUniqueScope {
     table-layout: auto;
     width: 100%;
-    min-width: 1100px;
   }
 
   #aiFitnessReportsModal #fitnessTableUniqueScope th,
@@ -191,11 +190,8 @@
                 <th style="white-space: nowrap;">Rank</th>
                 <th style="min-width: 170px; text-align: left; text-transform: uppercase;">Name</th>
                 <th style="white-space: nowrap;">Company</th>
-                <th style="min-width: 95px; width: 95px; white-space: nowrap !important;" class="text-center">Age</th>
                 <th style="min-width: 180px;">Height / Weight (BMI)</th>
                 <th style="white-space: nowrap;" class="text-center">Fitness Status</th>
-                <th style="width: 80px;" class="text-center">Score</th>
-                <th style="white-space: nowrap; min-width: 165px;" class="text-center"><i class="far fa-calendar-alt text-primary me-1"></i>Date</th>
                 <th style="white-space: nowrap; width: 130px;" class="text-center"><i class="fas fa-file-pdf text-danger me-1"></i>Report / PDF</th>
               </tr>
             </thead>
@@ -478,7 +474,7 @@ const FitnessModalController = (function() {
     if (!tbody) return;
 
     if (!rows || rows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4 text-muted">No personnel fitness reports found matching criteria.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">No personnel fitness reports found matching criteria.</td></tr>`;
       return;
     }
 
@@ -575,20 +571,11 @@ const FitnessModalController = (function() {
           <td>
             <span class="fitCompanyBadgeUnique">${escapeHtml(company)}</span>
           </td>
-          <td class="text-center" style="white-space: nowrap !important; min-width: 95px;">${age}</td>
           <td class="fitBmiCellUnique">
             <div class="fw-semibold text-dark">${height} / ${weight}</div>
             ${bmi ? `<div class="small text-secondary fw-semibold">${escapeHtml(bmi.replace(/^\s*\(?\s*BMI:\s*/i, 'BMI: ').replace(/\)\s*$/, '').trim())}</div>` : ''}
           </td>
           <td class="text-center">${statusBadge}</td>
-          <td class="text-center">
-            <span class="badge rounded-pill bg-primary px-2 py-1">${score}</span>
-          </td>
-          <td class="text-center text-nowrap" style="white-space: nowrap; min-width: 165px;">
-            <span class="small fw-semibold text-secondary">
-              <i class="far fa-clock text-primary me-1"></i>${escapeHtml(dateDisplay)}
-            </span>
-          </td>
           <td class="text-nowrap text-center">
             <div class="d-flex align-items-center justify-content-center gap-1">
               <button class="btn btn-sm btn-outline-primary py-0.5 px-2" title="View Full Report" onclick="FitnessModalController.viewSoldierReport('${escapeHtml(armyNo)}')">

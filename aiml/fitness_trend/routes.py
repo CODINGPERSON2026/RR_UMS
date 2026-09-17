@@ -95,6 +95,12 @@ def fitness_dashboard_view():
         return redirect("/admin_login")
         
     role = user_payload.get('role', 'User')
+    role_norm = str(role).strip().lower().replace(" ", "").replace("_", "").replace("-", "")
+    allowed_predict_roles = ['1coyonco', '2coyonco', 'onco', 'coyonco', 'admin', 'co', '2ic', 'adjutant', 'commandingofficer']
+    if role_norm not in allowed_predict_roles:
+        flash("Access Denied: Prediction functionality is restricted to authorized roles (1coyonco, 2coyonco).", "error")
+        return redirect("/")
+
     current_user_name = user_payload.get('name') or user_payload.get('username') or 'Personnel'
     company = user_payload.get('company', 'Unit HQ')
     
@@ -136,6 +142,11 @@ def api_analyze_fitness():
     user_payload = require_login()
     if not user_payload:
         return jsonify({'success': False, 'error': 'Unauthorized. Please login.'}), 401
+
+    role = str(user_payload.get('role', '')).strip().lower().replace(" ", "").replace("_", "").replace("-", "")
+    allowed_roles = ['1coyonco', '2coyonco', 'onco', 'coyonco', 'admin', 'co', '2ic', 'adjutant', 'commandingofficer']
+    if role not in allowed_roles:
+        return jsonify({'success': False, 'error': 'Access Denied: Prediction functionality is restricted to authorized roles (1coyonco / 2coyonco).'}), 403
         
     data = request.get_json(silent=True) or {}
     army_number = data.get("army_number", "").strip()
@@ -545,27 +556,70 @@ def api_get_reports():
     return jsonify(data)
 
 
+# Global thread-safe event and task-specific abort dictionary
+import threading
+CALC_ABORT_EVENT = threading.Event()
+ACTIVE_CALC_TASKS = {}
+ACTIVE_CALC_LOCK = threading.Lock()
+
+
 @fitness_trend_bp.route("/api/calculate-all", methods=["POST"])
 def api_calculate_all_fitness():
     """
     Triggers batch calculation of fitness for all unit individuals,
     persists evaluations into `ums.ai_fitness_reports`,
     and returns fit vs unfit counts for CO, 2IC, and Adjutant oversight.
+    Guarantees atomic rollback if aborted by user.
     """
     user_payload = require_login()
     if not user_payload:
         return jsonify({'success': False, 'error': 'Unauthorized. Please login.'}), 401
 
-    try:
-        data = request.get_json(silent=True) or {}
-        goal = data.get("goal", "Overall Fitness")
-        lang = data.get("lang", "English")
+    data = request.get_json(silent=True) or {}
+    goal = data.get("goal", "Overall Fitness")
+    lang = data.get("lang", "English")
+    task_id = str(data.get("task_id") or "calc_default").strip()
 
-        result = calculate_all_individuals_fitness(goal=goal, language=lang)
+    task_abort_event = threading.Event()
+    with ACTIVE_CALC_LOCK:
+        ACTIVE_CALC_TASKS[task_id] = task_abort_event
+
+    CALC_ABORT_EVENT.clear()
+
+    try:
+        result = calculate_all_individuals_fitness(
+            goal=goal,
+            language=lang,
+            task_id=task_id,
+            is_aborted=lambda: task_abort_event.is_set() or CALC_ABORT_EVENT.is_set()
+        )
         return jsonify(result)
     except Exception as e:
-        logger.error(f"Error in api_calculate_all_fitness: {e}", exc_info=True)
+        logger.error(f"Error in api_calculate_all_fitness (task_id={task_id}): {e}", exc_info=True)
         return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        with ACTIVE_CALC_LOCK:
+            ACTIVE_CALC_TASKS.pop(task_id, None)
+
+
+@fitness_trend_bp.route("/api/calculate-all/abort", methods=["POST", "GET"])
+def api_abort_calculate_all_fitness():
+    """
+    Instantly aborts a running batch calculation task.
+    Signals the running evaluation to stop immediately, rolls back the transaction,
+    and makes zero database modifications.
+    """
+    data = request.get_json(silent=True) or {}
+    task_id = str(data.get("task_id") or "").strip()
+
+    with ACTIVE_CALC_LOCK:
+        if task_id and task_id in ACTIVE_CALC_TASKS:
+            ACTIVE_CALC_TASKS[task_id].set()
+            logger.info(f"Task {task_id} aborted by user.")
+
+    CALC_ABORT_EVENT.set()
+    logger.info("CALC_ABORT_EVENT set by user abort request. Stopping evaluation threads immediately.")
+    return jsonify({'success': True, 'aborted': True, 'message': 'Calculation aborted successfully.'})
 
 
 @fitness_trend_bp.route("/api/reports/export-pdf", methods=["GET"])
