@@ -3350,11 +3350,11 @@
 
   // Ensure modal always auto-syncs and evaluates button validity
   document.addEventListener('DOMContentLoaded', function() {
-    initSectionTradeTree();
+    if (typeof initSectionTradeTree === 'function') initSectionTradeTree();
     const modalEl = document.getElementById('aiRecModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
-        initSectionTradeTree();
+        if (typeof initSectionTradeTree === 'function') initSectionTradeTree();
         syncAiModalFromMainForm();
         if (typeof checkAiRecFormValidity === 'function') checkAiRecFormValidity();
       });

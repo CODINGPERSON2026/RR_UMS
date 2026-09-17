@@ -2167,13 +2167,19 @@ STATUS COLORS
         // Re-create script tags so cloned script elements execute in the main document context
         var oldScripts = Array.from(wrapper.querySelectorAll("script"));
         oldScripts.forEach(function (oldScript) {
-          var newScript = document.createElement("script");
-          Array.from(oldScript.attributes).forEach(function (attr) {
-            newScript.setAttribute(attr.name, attr.value);
-          });
-          newScript.textContent = oldScript.textContent;
-          if (oldScript.parentNode) {
-            oldScript.parentNode.replaceChild(newScript, oldScript);
+          try {
+            var newScript = document.createElement("script");
+            Array.from(oldScript.attributes).forEach(function (attr) {
+              newScript.setAttribute(attr.name, attr.value);
+            });
+            var code = oldScript.textContent || "";
+            // Convert let/const to var so scripts re-declare safely in global scope without SyntaxErrors
+            newScript.textContent = code.replace(/\b(let|const)\s+/g, "var ");
+            if (oldScript.parentNode) {
+              oldScript.parentNode.replaceChild(newScript, oldScript);
+            }
+          } catch (err) {
+            console.error("Deferred modal script unpacking error:", err);
           }
         });
       }
@@ -2200,37 +2206,18 @@ STATUS COLORS
      (no setInterval here — master timer drives it)
 ===================================================== -->
 <script>
-  function formatScheduleTime(timeStr) {
-    var parts = timeStr.split(":");
-    var h = parseInt(parts[0]);
-    var minute = parts[1];
-    var ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12 || 12;
-    return h + ":" + minute + " " + ampm;
-  }
-
-
   /* =========================================================
   TIME FORMAT
   ========================================================= */
 
   function formatScheduleTime(timeStr) {
-
     if (!timeStr) return "--";
-
-    const parts = timeStr.split(":");
-
-    let hour = parseInt(parts[0]);
-
-    const minute = parts[1];
-
-    const ampm = hour >= 12 ? "PM" : "AM";
-
-    hour = hour % 12;
-
-    if (hour === 0) hour = 12;
-
-    return `${hour}:${minute} ${ampm}`;
+    var parts = timeStr.split(":");
+    var hour = parseInt(parts[0]);
+    var minute = parts[1];
+    var ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return hour + ":" + minute + " " + ampm;
   }
 </script>
 

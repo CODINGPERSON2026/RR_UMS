@@ -141,10 +141,10 @@
   </div>
   
   <script>
-    let currentTaskId = null;
-    let taskModalInstance = null; // To control the main modal
+    var currentTaskId = null;
+    var taskModalInstance = null; // To control the main modal
   
-    const taskCard = document.getElementById('task-assigned');
+    var taskCard = document.getElementById('task-assigned');
     if(taskCard) {
       taskCard.addEventListener('click', () => {
         fetch('/task_manager/get_my_tasks')

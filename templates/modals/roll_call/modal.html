@@ -242,8 +242,8 @@
   
   <script>
   
-  const currentUser = "{{ role }}";
-  let mainModalEl = null;
+  var currentUser = "{{ role }}";
+  var mainModalEl = null;
   
   /* ── TOAST (top-right, general) ── */
   function showToast(msg, type="success") {
@@ -254,7 +254,7 @@
   }
   
   /* ── CENTER CARD TOAST (Approve / Reject) ── */
-  let centerToastTimer = null;
+  var centerToastTimer = null;
   
   function showCenterToast(status) {
     const el       = document.getElementById("centerToast");
@@ -325,8 +325,8 @@
   }
   
   /* ── DATA ── */
-  const smPoints = ["Training Improvement","Discipline","Infrastructure","Welfare","Operational"];
-  const orPoints = ["Leave","Equipment","Medical","Accommodation","Admin"];
+  var smPoints = ["Training Improvement","Discipline","Infrastructure","Welfare","Operational"];
+  var orPoints = ["Leave","Equipment","Medical","Accommodation","Admin"];
   
   /* ── ADD POINT FIELD ── */
   function addPointField(value="") {
@@ -364,7 +364,7 @@
   });
   
   /* ── ARMY CHECK ── */
-  let timer;
+  var timer;
   
   armyNumber.addEventListener("input", () => {
     clearTimeout(timer);

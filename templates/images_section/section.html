@@ -252,25 +252,27 @@
       update() {
           const items = document.querySelectorAll('.gallery-item');
           const dots = document.querySelectorAll('.indicator');
-  
+
+          if (!items || !items.length || !this.container) return;
+
           items.forEach((el,i) => {
               el.classList.remove('active','left','right');
-  
+
               if (i === this.index) el.classList.add('active');
               else if (i === this.index - 1) el.classList.add('left');
               else if (i === this.index + 1) el.classList.add('right');
           });
-  
+
           dots.forEach((d,i) => {
               d.classList.toggle('active', i === this.index);
           });
-  
-          const itemWidth = items[0].offsetWidth + 30;
+
+          const itemWidth = (items[0] ? items[0].offsetWidth : 0) + 30;
           const offset = (this.container.offsetWidth - itemWidth) / 2;
-  
+
           this.track.style.transform =
               `translateX(${-this.index * itemWidth + offset}px)`;
-  
+
           this.updateText();
       }
   

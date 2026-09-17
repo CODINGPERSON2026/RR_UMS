@@ -1673,12 +1673,12 @@ def leave_pending_details():
         conn.close()
 
 
-
-
+_HAS_DAILY_EVENTS_COMPANY = None
 
 
 @app.route('/api/today_event_alarm')
 def today_event_alarm():
+    global _HAS_DAILY_EVENTS_COMPANY
     user = require_login()  # Get logged-in user
     user_company = user['company']
 
@@ -1688,21 +1688,22 @@ def today_event_alarm():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # 🔹 Dynamically check if 'company' column exists to avoid SQL errors
-        cursor.execute("DESCRIBE daily_events")
-        columns = [col['Field'] for col in cursor.fetchall()]
-        has_company = 'company' in columns
+        if _HAS_DAILY_EVENTS_COMPANY is None:
+            try:
+                cursor.execute("DESCRIBE daily_events")
+                columns = [col['Field'] for col in cursor.fetchall()]
+                _HAS_DAILY_EVENTS_COMPANY = 'company' in columns
+            except Exception:
+                _HAS_DAILY_EVENTS_COMPANY = False
 
         query = "SELECT id, event_name, venue FROM daily_events WHERE event_date = CURDATE()"
         params = []
 
-        # Apply company filter only if column exists and user is not Admin
-        if has_company and user_company != "Admin":
+        if _HAS_DAILY_EVENTS_COMPANY and user_company != "Admin":
             query += " AND company = %s"
             params.append(user_company)
         
         cursor.execute(query, params)
-        
         rows = cursor.fetchall()
         return jsonify({"status": "success", "rows": rows})
 
@@ -4381,42 +4382,27 @@ def get_sensitive_count():
     role = user.get('role', '')
     
     try:
-        if company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
-            cursor.execute("""
-                SELECT s.army_number, s.marked_on
-                FROM sensitive_marking s
-                JOIN personnel p ON s.army_number = p.army_number
-            """)
-        else:
-            cursor.execute("""
-                SELECT s.army_number, s.marked_on
-                FROM sensitive_marking s
-                JOIN personnel p ON s.army_number = p.army_number
-                WHERE LOWER(p.company) = LOWER(%s)
-            """, (company,))
+        query = """
+            SELECT 
+                COUNT(s.army_number) AS total_count,
+                COALESCE(SUM(
+                    CASE WHEN DATEDIFF(NOW(), COALESCE((SELECT MAX(l.added_on) FROM sensitive_reason_log l WHERE l.army_number = s.army_number), s.marked_on)) >= 90 THEN 1 ELSE 0 END
+                ), 0) AS alarm_count
+            FROM sensitive_marking s
+            JOIN personnel p ON s.army_number = p.army_number
+        """
+        params = []
+        if not (company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]):
+            query += " WHERE p.company = %s"
+            params.append(company)
+
+        cursor.execute(query, params)
+        res = cursor.fetchone() or {}
         
-        rows = cursor.fetchall()
-        count = len(rows)
-        alarm_count = 0
-        now = datetime.now()
-
-        for r in rows:
-            army_no = r['army_number']
-            marked_on = r['marked_on']
-            cursor.execute("""
-                SELECT MAX(added_on) AS last_date
-                FROM sensitive_reason_log
-                WHERE army_number = %s
-            """, (army_no,))
-            last_res = cursor.fetchone()
-            latest_date = last_res['last_date'] if (last_res and last_res['last_date']) else marked_on
-            if latest_date and (now - latest_date).days >= 90:
-                alarm_count += 1
-
         return jsonify({
             "status": "success",
-            "count": count,
-            "alarm_count": alarm_count
+            "count": res.get("total_count", 0),
+            "alarm_count": int(res.get("alarm_count", 0))
         }), 200
         
     except Exception as e:
@@ -6026,7 +6012,7 @@ def get_posted_strength():
         params = []
 
         if company != "ALL":
-            query += " AND LOWER(company) = LOWER(%s)"
+            query += " AND company = %s"
             params.append(company)
 
         query += """
@@ -6112,7 +6098,7 @@ def get_detachment_stats_for_graph():
         params = []
 
         if company != "ALL":
-            query += " AND LOWER(p.company) = LOWER(%s)"
+            query += " AND p.company = %s"
             params.append(company)
 
         query += """

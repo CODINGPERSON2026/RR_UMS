@@ -92,19 +92,19 @@
 {% include 'modals/success-modal/modal.html' %}
 
 <script>
-let selectedPersonnel = new Set();
-const dropdown = document.getElementById('locationDropdown');
-const actionSelect = document.getElementById('actionType');
-const locationBox = document.getElementById('locationBox');
-const remarksBox = document.getElementById('remarksBox');
-const tdFields = document.getElementById('tdFields');
-const otherFields = document.getElementById('otherFields');
-const warningMessage = document.getElementById('warningMessage');
-const searchInput = document.getElementById('searchInput');
-const personnelTableBody = document.getElementById('personnelTableBody');
-const assignBtn = document.getElementById('assignBtn');
-const postingInputBox = document.getElementById('postingInputBox');
-const postingInput = document.getElementById('postingInput');
+var selectedPersonnel = window.selectedPersonnel || new Set();
+var dropdown = document.getElementById('locationDropdown');
+var actionSelect = document.getElementById('actionType');
+var locationBox = document.getElementById('locationBox');
+var remarksBox = document.getElementById('remarksBox');
+var tdFields = document.getElementById('tdFields');
+var otherFields = document.getElementById('otherFields');
+var warningMessage = document.getElementById('warningMessage');
+var searchInput = document.getElementById('searchInput');
+var personnelTableBody = document.getElementById('personnelTableBody');
+var assignBtn = document.getElementById('assignBtn');
+var postingInputBox = document.getElementById('postingInputBox');
+var postingInput = document.getElementById('postingInput');
 
 // ACTION CHANGE
 // ACTION CHANGE

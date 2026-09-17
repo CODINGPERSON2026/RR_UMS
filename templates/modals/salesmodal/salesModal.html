@@ -23,7 +23,7 @@
 </div>
 <script src="/static/Chart.umd.min.js"></script>
 <script>
-let chart;
+var salesModalChart;
 
 function renderChart(labels, liquor, grocery) {
     const data = {
@@ -40,7 +40,7 @@ function renderChart(labels, liquor, grocery) {
         ]
     };
 
-    if (chart) chart.destroy();
+    if (salesModalChart) salesModalChart.destroy();
 
     const barDatalabelsPlugin = {
         id: 'barDatalabels',
@@ -65,7 +65,7 @@ function renderChart(labels, liquor, grocery) {
         }
     };
 
-    chart = new Chart(document.getElementById('salesChart'), {
+    salesModalChart = new Chart(document.getElementById('salesChart'), {
         type: 'bar',
         data: data,
         plugins: [barDatalabelsPlugin],

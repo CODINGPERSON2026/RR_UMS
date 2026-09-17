@@ -1182,22 +1182,24 @@
     await Promise.allSettled(promises);
   }
 
-  /* ---- Reveal UI after data ---- */
+  /* ---- Reveal UI layout instantly (matching co_dashboard behavior) ---- */
   async function initializeDashboard() {
+    // 1. Instantly reveal UI layout so the page renders in ~0.1 seconds
+    hidePageLoader();
+    showActionBar();
+    showStatsGrid();
+    showChartCards();
+
+    // 2. Fetch dashboard data & badges asynchronously in background without blocking UI
     try {
-      await loadAllDashboardCards();
-      await Promise.allSettled([
+      loadAllDashboardCards();
+      Promise.allSettled([
         updateRejectedLeaveCount(),
         updateLeaveRequestBadge(),
         loadTodayEvents(),
       ]);
     } catch (e) {
       console.error("Dashboard init error:", e);
-    } finally {
-      hidePageLoader();
-      showActionBar();
-      showStatsGrid();
-      setTimeout(showChartCards, 120);
     }
   }
 

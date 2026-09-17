@@ -134,8 +134,8 @@
   </div>
   
   <script>
-  let selectedLeaveId = null;
-  let isLoadingRejectedLeaves = false;
+  var selectedLeaveId = null;
+  var isLoadingRejectedLeaves = false;
   
   // Function to load rejected leaves
   async function loadRejectedLeaves() {
@@ -186,7 +186,7 @@
   }
   
   // Attach listener only once
-  const coRejectedModalEl = document.getElementById("coRejectedModal");
+  var coRejectedModalEl = document.getElementById("coRejectedModal");
   if (!coRejectedModalEl.dataset.listenerAttached) {
     coRejectedModalEl.addEventListener("show.bs.modal", loadRejectedLeaves);
     coRejectedModalEl.dataset.listenerAttached = true;

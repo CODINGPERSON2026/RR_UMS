@@ -554,7 +554,7 @@
          SCRIPT
          ============================================================ -->
     <script>
-      let pendingInterviewId = null;
+      var pendingInterviewId = null;
     
       /* ── Update pending count UI ── */
       function updatePendingCount(count) {
@@ -717,7 +717,7 @@
       }
     
       /* ── Load completed list (lazy, once) ── */
-      let completedLoaded = false;
+      var completedLoaded = false;
     
       document.querySelector('[data-bs-target="#completedTab"]')?.addEventListener('shown.bs.tab', loadCompletedInterviews);
     
@@ -780,7 +780,7 @@
       }
     
       /* ── Load Assigned Kunba list (lazy, once) ── */
-      let assignedKunbaLoaded = false;
+      var assignedKunbaLoaded = false;
     
       document.querySelector('[data-bs-target="#assignedKunbaTab"]')?.addEventListener('shown.bs.tab', loadAssignedKunba);
     

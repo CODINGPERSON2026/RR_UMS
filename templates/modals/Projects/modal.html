@@ -823,9 +823,9 @@
 
 
 <script>
-  let allProjectsData = [];
-  let filteredProjectsData = [];
-  let selectedProjectData = null;
+  var allProjectsData = [];
+  var filteredProjectsData = [];
+  var selectedProjectData = null;
 
   function openBOMFromPopup() {
     if (selectedProjectData) {
@@ -1072,7 +1072,7 @@
     renderStageWiseStats();
   }
 
-  const ALL_STAGES_CONFIG = [
+  var ALL_STAGES_CONFIG = window.ALL_STAGES_CONFIG || [
     { key: 'PPP', label: 'PPP', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.08)', border: '#6366f1' },
     { key: 'AON', label: 'AON', color: '#7b1fa2', bg: 'rgba(123, 31, 162, 0.08)', border: '#7b1fa2' },
     { key: 'BIDDING', label: 'BIDDING', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.08)', border: '#0284c7' },

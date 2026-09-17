@@ -1,36 +1,35 @@
--- Select your database first
 USE hrms;
 
--- 1. Optimize Personnel & Rank Queries
-CREATE INDEX idx_personnel_company ON personnel(company);
-CREATE INDEX idx_personnel_rank ON personnel(`rank`);
-CREATE INDEX idx_personnel_det_status ON personnel(detachment_status);
+-- =========================================================================
+-- INDEXES FOR DASHBOARD.HTML METRIC CARDS & BADGES
+-- =========================================================================
 
--- 2. Optimize Detachment Graph & Alarm Queries
-CREATE INDEX idx_assigned_det_status ON assigned_det(det_status, army_number);
-CREATE INDEX idx_assigned_det_id ON assigned_det(det_id);
+-- 1. Optimize Dashboard Interview & JCO State Filtering Queries
+CREATE INDEX idx_personnel_comp_home_state ON personnel(company, home_state);
+CREATE INDEX idx_personnel_td_company ON personnel(td_status, company);
 
--- 3. Optimize Today Schedules Queries
-CREATE INDEX idx_schedules_date ON schedules(schedule_date);
+-- 2. Optimize Tasks Dashboard Queries
+CREATE INDEX idx_tasks_assigned_status ON tasks(assigned_to, task_status);
 
--- 4. Optimize Weight System Queries
-CREATE INDEX idx_weight_info_company ON weight_info(company);
+-- 3. Optimize Active Courses Date Range Queries
+CREATE INDEX idx_courses_dates_army ON candidate_on_courses(course_starting_date, course_end_date, army_number);
 
--- 5. Optimize Unfit Medical Trend Queries
-CREATE INDEX idx_monthly_medical_unit ON monthly_medical_status(unit, year, month);
+-- 4. Optimize Loans & Sensitive Reason Log Queries
+CREATE INDEX idx_loans_army_number ON loans(army_number);
+CREATE INDEX idx_sensitive_log_army_date ON sensitive_reason_log(army_number, added_on);
+CREATE INDEX idx_sensitive_marking_army ON sensitive_marking(army_number, marked_on);
 
--- 6. Optimize Sensitive Personnel Queries
-CREATE INDEX idx_sensitive_marking_army ON sensitive_marking(army_number);
+-- 5. Optimize Roll Call Points Status Queries
+CREATE INDEX idx_rollcall_status ON roll_call_points(status);
 
--- 7. Optimize Parade State Daily Dashboard Queries
-CREATE INDEX idx_parade_state_date_company ON parade_state_daily(report_date, company);
+-- 6. Optimize Projects Company Filter Queries
+CREATE INDEX idx_projects_company ON projects(company);
 
--- 1. Accelerates leave pending alarm queries
-CREATE INDEX idx_leave_status_updated ON leave_status_info(request_status, updated_at);
+-- 7. Optimize Today Events Alarm Queries
+CREATE INDEX idx_event_alarm_date ON today_event_alarm(event_date);
 
--- 2. Accelerates TD / attachment alarm queries
-CREATE INDEX idx_td_date ON td_table(td_date);
-CREATE INDEX idx_td_army_number ON td_table(army_number);
+-- 8. Optimize Graph APIs (get_posted_strength & get_detachment_stats_for_graph)
+CREATE INDEX idx_personnel_company_rank ON personnel(company, `rank`);
+CREATE INDEX idx_assigned_det_status_army ON assigned_det(det_status, army_number, det_id);
+CREATE INDEX idx_personnel_det_status_company ON personnel(detachment_status, company, army_number);
 
--- 3. Accelerates honours board queries
-CREATE INDEX idx_hb_army_number ON honours_board(army_number);
