@@ -172,16 +172,30 @@ def get_unread_count():
     user_id = user['user_id']
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT COUNT(*) as unread_count
-        FROM messages
-        WHERE receiver_id = %s AND status = 'sent'
-    """, (user_id,))
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return jsonify({"unread_count": result['unread_count']})
+    if not conn:
+        return jsonify({"unread_count": 0, "error": "Database connection error"}), 500
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT COUNT(*) as unread_count
+            FROM messages
+            WHERE receiver_id = %s AND status = 'sent'
+        """, (user_id,))
+        result = cursor.fetchone()
+        count = result['unread_count'] if result else 0
+        return jsonify({"unread_count": count})
+    except Exception as e:
+        return jsonify({"unread_count": 0, "error": str(e)}), 500
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 @chat_bp.route("/user/<int:user_id>", methods=["GET"])

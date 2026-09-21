@@ -427,41 +427,56 @@ def search_person():
             return jsonify([])
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        if not conn:
+            return jsonify({'error': 'Database connection error'}), 500
 
-        get_query = """
-                SELECT 
-                    name, 
-                    army_number, 
-                    `rank`, 
-                    trade, 
-                    company,
-                    detachment_status AS det_status,
-                    posting_status,
-                    onleave_status AS leave_status,
-                    oncourse_status AS course_status,
-                    td_status
-                FROM personnel
-                WHERE army_number = %s
-            """
-        current_role = user['role']
-        if current_role == 'Subedar Major':
-            cursor.execute(get_query,(query,))  # Added company filter
-        else:
-            get_query += 'AND company = %s'
-            cursor.execute(get_query,(query,user_company))
+        cursor = None
+        try:
+            cursor = conn.cursor(dictionary=True)
 
-        results = cursor.fetchall()
-        cursor.close()
-        conn.close()
+            get_query = """
+                    SELECT 
+                        name, 
+                        army_number, 
+                        `rank`, 
+                        trade, 
+                        company,
+                        detachment_status AS det_status,
+                        posting_status,
+                        onleave_status AS leave_status,
+                        oncourse_status AS course_status,
+                        td_status
+                    FROM personnel
+                    WHERE army_number = %s
+                """
+            current_role = user['role']
+            if current_role == 'Subedar Major':
+                cursor.execute(get_query,(query,))  # Added company filter
+            else:
+                get_query += 'AND company = %s'
+                cursor.execute(get_query,(query,user_company))
 
-        return jsonify(results)
+            results = cursor.fetchall()
+            return jsonify(results)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        finally:
+            if cursor:
+                try: cursor.close()
+                except Exception: pass
+            if conn:
+                try: conn.close()
+                except Exception: pass
     
     else: # GET for Domain Specialization
         if request.args.get('counts'):
             conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
+            if not conn:
+                return jsonify({"error": "Database connection error"}), 500
+
+            cursor = None
             try:
+                cursor = conn.cursor(dictionary=True)
                 query = """
                     SELECT 
                         TRIM(u.duty_performed) AS domain,
@@ -482,17 +497,24 @@ def search_person():
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
             finally:
-                cursor.close()
-                conn.close()
+                if cursor:
+                    try: cursor.close()
+                    except Exception: pass
+                if conn:
+                    try: conn.close()
+                    except Exception: pass
 
         trade = request.args.get('trade')
         if not trade:
             return jsonify([])
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        if not conn:
+            return jsonify({'error': 'Database connection error'}), 500
 
+        cursor = None
         try:
+            cursor = conn.cursor(dictionary=True)
             query = """
                 SELECT DISTINCT 
                     p.name, 
@@ -524,18 +546,34 @@ def search_person():
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         finally:
-            cursor.close()
-            conn.close()
+            if cursor:
+                try: cursor.close()
+                except Exception: pass
+            if conn:
+                try: conn.close()
+                except Exception: pass
 
 
 @app.route('/get_locations')
 def get_locations():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT det_id, det_name FROM dets")
-    locations = cursor.fetchall()
-    conn.close()
-    return jsonify(locations)
+    if not conn:
+        return jsonify({'error': 'Database connection error'}), 500
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT det_id, det_name FROM dets")
+        return jsonify(cursor.fetchall())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 @app.route('/get_dets')
 def get_dets():
@@ -2649,8 +2687,10 @@ def get_co_all_dashboard_data(date_str):
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
     
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection error'}), 500
+
+    cursor = None
     company_filter = ""
     params = [date_str]
     if role == 'OC':
@@ -2658,6 +2698,8 @@ def get_co_all_dashboard_data(date_str):
         params.append(user.get('company'))
     
     try:
+        cursor = conn.cursor(dictionary=True)
+
         cursor.execute(f"""
             SELECT 
                 SUM(grandTotal_posted_str) as total_posted_str,
@@ -2772,8 +2814,13 @@ def get_co_all_dashboard_data(date_str):
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 @app.route('/api/co-dashboard/parade-table/<date_str>', methods=['GET'])
 def get_co_aggregated_parade_table(date_str):
@@ -6486,10 +6533,15 @@ def get_calendar_events():
 
 @app.route("/api/today/schedules", methods=["GET"])
 def get_today_schedules():
-
+    conn = None
+    cursor = None
     try:
-
         conn = get_db_connection()
+        if not conn:
+            return jsonify({
+                "status": "error",
+                "message": "Database connection error"
+            }), 500
 
         cursor = conn.cursor(dictionary=True)
 
@@ -6532,9 +6584,13 @@ def get_today_schedules():
         }), 500
 
     finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
-        cursor.close()
-        conn.close()
 from flask import request, jsonify
 
 @app.route("/api/schedules", methods=["POST"])

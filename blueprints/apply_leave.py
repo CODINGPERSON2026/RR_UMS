@@ -498,18 +498,19 @@ def update_leave_status():
 
 @leave_bp.route("/get_leave_requests", methods=["GET"])
 def get_leave_requests():
-    
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
 
+    cursor = None
     user = require_login()
     current_user_role = user['role']
     current_user_company = user['company']
 
-
     request_status = f'Pending at {current_user_role}'
 
     try:
+        cursor = conn.cursor(dictionary=True)
         # =========================
         # CASE 1: NORMAL ROLES
         # =========================
@@ -528,8 +529,7 @@ def get_leave_requests():
                     l.remarks,
                     l.created_at
                 FROM leave_status_info l
-                LEFT JOIN personnel p 
-                    ON l.army_number = p.army_number
+                LEFT JOIN personnel p ON l.army_number = p.army_number
                 WHERE l.request_sent_to = %s 
                 AND l.request_status = %s
                 AND l.company = %s
@@ -541,40 +541,8 @@ def get_leave_requests():
                 request_status,
                 current_user_company
             ))
-        elif current_user_role == 'Subedar Major':
-            query = '''
-                SELECT 
-                    l.id,
-                    l.name,
-                    l.army_number,
-                    p.rank,
-                    l.company,
-                    l.leave_type,
-                    l.leave_days,
-                    l.request_status,
-                    l.remarks,
-                    l.created_at
-                FROM leave_status_info l
-                LEFT JOIN personnel p 
-                    ON l.army_number = p.army_number
-                WHERE l.request_sent_to = %s 
-                AND l.request_status = %s
-                ORDER BY l.created_at DESC
-            '''
 
-            cursor.execute(query, (
-                current_user_role,
-                request_status,
-                
-            ))
-
-
-        # =========================
-        # CASE 2: CO ROLE
-        # ========================
-
-        
-        elif current_user_role == '2IC' or current_user_role == 'CO':
+        elif current_user_role == '2IC' or current_user_role == 'CO' or current_user_role == 'Subedar Major':
 
             query = '''
                 SELECT 
@@ -601,8 +569,7 @@ def get_leave_requests():
                 request_status
             ))
 
-        rows = cursor.fetchall()
-
+        rows = cursor.fetchall() if cursor else []
 
         return jsonify({
             "status": "success",
@@ -616,8 +583,13 @@ def get_leave_requests():
         }), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 @leave_bp.route("/get_leave_request/<int:leave_id>", methods=["GET"])
@@ -1466,9 +1438,12 @@ def co_rejected_leaves():
         return jsonify({"message": "Unauthorized"}), 403
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify({"message": "Database connection error"}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor(dictionary=True)
         # Fetch leaves that were rejected
         cursor.execute("""
             SELECT 
@@ -1493,8 +1468,13 @@ def co_rejected_leaves():
         return jsonify({"message": "Server error"}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 # @leave_bp.route("/15CESR_leave_certificate/<army_number>")

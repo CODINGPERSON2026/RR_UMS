@@ -1307,12 +1307,19 @@ def api_get_insights_list():
             s_no = offset + idx + 1
             units_json = r.get("units_history_json")
             prev_units_str = "No Previous Unit"
+            units_list = []
+            if r.get("units_history_json"):
+                try:
+                    units_list = json.loads(r["units_history_json"])
+                except Exception:
+                    pass
+
+            prev_units_str = format_units_served_short(units_list) if 'format_units_served_short' in globals() else "No Previous Unit"
             try:
-                if units_json:
-                    u_list = json.loads(units_json)
-                    if isinstance(u_list, list) and len(u_list) > 0:
-                        unit_names = [u.get("unit") or u.get("unit_name") for u in u_list if (u.get("unit") or u.get("unit_name"))]
-                        prev_units_str = ", ".join(unit_names) if unit_names else f"{len(u_list)} Unit(s)"
+                if not prev_units_str or prev_units_str == "No Previous Unit":
+                    if units_list and isinstance(units_list, list):
+                        unit_names = [u.get("unit") or u.get("unit_name") for u in units_list if (u.get("unit") or u.get("unit_name"))]
+                        prev_units_str = ", ".join(unit_names) if unit_names else f"{len(units_list)} Unit(s)"
             except Exception:
                 pass
 
@@ -1332,11 +1339,14 @@ def api_get_insights_list():
             created_at_str = created_at_dt.strftime("%d-%m-%Y %H:%M") if created_at_dt else ""
             updated_at_str = updated_at_dt.strftime("%d-%m-%Y %H:%M") if updated_at_dt else ""
 
-            # Mark as re-calculated if updated_at is more than 30 seconds after created_at
             is_re_calculated = False
             if created_at_dt and updated_at_dt:
                 diff_seconds = (updated_at_dt - created_at_dt).total_seconds()
                 is_re_calculated = diff_seconds > 30
+
+            two_ic_was_updated = bool(r.get("two_ic_updated") or r.get("updated_by_role") == "2IC")
+            final_coy_val = normalize_company_name(r.get("final_company") or canonical_coy)
+            two_ic_msg = r.get("two_ic_message") or (f"2IC ({r.get('updated_by') or r.get('decided_by')}) updated & finalized allocation to {final_coy_val} on {updated_at_str}" if two_ic_was_updated else "")
 
             formatted_rows.append({
                 "id": r["id"],
@@ -1353,16 +1363,26 @@ def api_get_insights_list():
                 "recommendation_percentage": float(r["recommendation_percentage"]) if r.get("recommendation_percentage") is not None else 0.0,
                 "recommended_position": rec_pos,
                 "position_confidence": r.get("position_confidence") or "",
-                "final_company": r.get("final_company"),
-                "final_position": r.get("final_position"),
+                "final_company": final_coy_val,
+                "final_position": r.get("final_position") or rec_pos,
                 "decision_type": r.get("decision_type") or "pending",
                 "decision_remarks": r.get("decision_remarks") or "",
                 "decided_by": r.get("decided_by") or "",
                 "decided_at": r.get("decided_at").strftime("%d-%m-%Y %H:%M") if r.get("decided_at") else "",
+                "updated_by": r.get("updated_by") or "",
+                "updated_by_role": r.get("updated_by_role") or "",
                 "created_at": created_at_str,
                 "updated_at": updated_at_str,
                 "is_re_calculated": is_re_calculated,
-                "match_reasons": match_reasons
+                "match_reasons": match_reasons,
+                "adjutant_action": r.get("adjutant_action") or "",
+                "adjutant_company": r.get("adjutant_company") or "",
+                "adjutant_position": r.get("adjutant_position") or "",
+                "adjutant_remarks": r.get("adjutant_remarks") or "",
+                "adjutant_by": r.get("adjutant_by") or "",
+                "adjutant_at": r.get("adjutant_at").strftime("%d-%m-%Y %H:%M") if r.get("adjutant_at") else "",
+                "two_ic_updated": two_ic_was_updated,
+                "two_ic_message": two_ic_msg
             })
 
         total_pages = max(1, (total_count + page_size - 1) // page_size)
@@ -1427,6 +1447,10 @@ def api_get_insight_detail(rec_id: int):
         rec_pos = row.get("recommended_position") or "GD"
         rec_sec = get_section_for_position(canonical_coy, rec_pos)
 
+        final_coy = normalize_company_name(row.get("final_company") or canonical_coy)
+        final_pos = row.get("final_position") or rec_pos
+        final_sec = get_section_for_position(final_coy, final_pos)
+
         user_role = str(user.get("role", "")).strip().upper()
         is_co = user_role in ["CO", "COMMANDING OFFICER"]
         is_adjutant = (user_role == "ADJUTANT")
@@ -1441,6 +1465,9 @@ def api_get_insight_detail(rec_id: int):
             company_probabilities=probs,
             rank=row.get("rank") or ""
         )
+
+        two_ic_was_updated = bool(row.get("two_ic_updated") or row.get("updated_by_role") == "2IC" or row.get("decision_type") in ["accepted", "rejected"])
+        two_ic_msg = row.get("two_ic_message") or (f"Notice to Adjutant: 2IC ({row.get('updated_by') or row.get('decided_by') or '2IC'}) updated & finalized allocation to {final_coy} - {final_sec} ({final_pos}) on {row.get('updated_at').strftime('%d-%m-%Y %H:%M') if row.get('updated_at') else 'N/A'}." if two_ic_was_updated else "")
 
         return jsonify({
             "success": True,
@@ -1465,12 +1492,24 @@ def api_get_insight_detail(rec_id: int):
                 "why_recommended": domain_xai.get("why_recommended", []),
                 "why_not_others": domain_xai.get("why_not_others", []),
                 "units_history": units_history,
-                "final_company": row.get("final_company") or canonical_coy,
-                "final_position": row.get("final_position") or rec_pos,
+                "final_company": final_coy,
+                "final_position": final_pos,
+                "final_section": final_sec,
                 "decision_type": row.get("decision_type") or "pending",
                 "decision_remarks": row.get("decision_remarks") or "",
                 "decided_by": row.get("decided_by") or "",
                 "decided_at": row.get("decided_at").strftime("%d-%m-%Y %H:%M") if row.get("decided_at") else "",
+                "updated_by": row.get("updated_by") or "",
+                "updated_by_role": row.get("updated_by_role") or "",
+                "updated_at": row.get("updated_at").strftime("%d-%m-%Y %H:%M") if row.get("updated_at") else "",
+                "adjutant_action": row.get("adjutant_action") or "",
+                "adjutant_company": row.get("adjutant_company") or "",
+                "adjutant_position": row.get("adjutant_position") or "",
+                "adjutant_remarks": row.get("adjutant_remarks") or "",
+                "adjutant_by": row.get("adjutant_by") or "",
+                "adjutant_at": row.get("adjutant_at").strftime("%d-%m-%Y %H:%M") if row.get("adjutant_at") else "",
+                "two_ic_updated": two_ic_was_updated,
+                "two_ic_message": two_ic_msg,
                 "hierarchy": UNIT_15_CESR_STRUCTURE,
                 "available_companies": get_all_companies(),
                 "company_sections_map": {coy: get_sections_for_company(coy) for coy in get_all_companies()},
@@ -1478,7 +1517,6 @@ def api_get_insight_detail(rec_id: int):
                 "user_role": user_role,
                 "can_add_remarks": (is_adjutant or is_2ic),
                 "can_assign_company": is_2ic,
-                "is_read_only": is_co
             }
         })
     except Exception as e:
@@ -1491,13 +1529,11 @@ def api_get_insight_detail(rec_id: int):
 # =============================================================================
 
 @company_rec_bp.route("/api/ai/company-recommendation/decision", methods=["POST"])
-def api_record_decision():
+def api_save_recommendation_decision():
     """
-    Record executive decision or remarks on a recommendation.
-    Rules:
-    - CO: Strictly READ-ONLY.
-    - ADJUTANT: Can add / update remarks only.
-    - 2IC / ADMIN: Authorized to assign company, modify placement, and execute final assignment into personnel.
+    Save or update recommendation decision.
+    - ADJUTANT: Can Accept Recommendation or Update Recommendation with reason.
+    - 2IC / ADMIN: Authorized to update company, section, position, and execute final allocation into personnel.
     """
     user = get_current_authenticated_user()
     if not user:
@@ -1540,21 +1576,47 @@ def api_record_decision():
             return jsonify({"success": False, "error": "Record not found"}), 404
 
         user_id = str(user.get("user_id", user.get("id", "1")))
-        decided_by_str = f"{user_role} - {user_id}"
+        user_name = user.get("username") or user.get("name") or f"User {user_id}"
+        decided_by_str = f"2IC ({user_name})" if user_role in ["2IC", "ADMIN", "SUPER ADMIN"] else f"{user_role} ({user_name})"
 
-        # ADJUTANT: remarks only
-        if user_role == "ADJUTANT" or action == "remarks":
+        # =========================================================================
+        # ADJUTANT WORKFLOW: Accept Recommendation OR Update Recommendation with reason
+        # =========================================================================
+        if user_role == "ADJUTANT" or action.startswith("adjutant_"):
+            if action in ["adjutant_update", "update"] and not remarks:
+                cursor.close()
+                conn.close()
+                return jsonify({
+                    "success": False,
+                    "error": "Reason is required when Adjutant updates a recommendation."
+                }), 400
+
+            adj_action_type = "updated" if action in ["adjutant_update", "update"] else "accepted"
+            adj_coy = normalize_company_name(final_company or existing.get("recommended_company"))
+            adj_pos = final_position or existing.get("recommended_position")
+
             cursor.execute("""
                 UPDATE ai_new_joinee_recommendations
-                SET decision_remarks = %s,
+                SET adjutant_action = %s,
+                    adjutant_company = %s,
+                    adjutant_position = %s,
+                    adjutant_remarks = %s,
+                    adjutant_by = %s,
+                    adjutant_at = NOW(),
+                    decision_remarks = %s,
                     updated_by = %s,
                     updated_by_role = %s,
                     updated_by_user_id = %s,
                     updated_at = NOW()
                 WHERE id = %s
             """, (
+                adj_action_type,
+                adj_coy,
+                adj_pos,
                 remarks,
-                user.get("username", "Adjutant"),
+                user_name,
+                remarks,
+                user_name,
                 user_role,
                 user_id,
                 rec_id
@@ -1565,19 +1627,23 @@ def api_record_decision():
 
             return jsonify({
                 "success": True,
-                "message": "Adjutant remarks updated successfully",
+                "message": f"Adjutant successfully {adj_action_type} the recommendation.",
                 "decision_type": existing.get("decision_type", "pending"),
-                "decision_remarks": remarks,
-                "decided_by": decided_by_str
+                "adjutant_action": adj_action_type,
+                "adjutant_remarks": remarks,
+                "adjutant_by": user_name
             })
 
-        # Executive roles (CO, 2IC, Adjutant, Admin): full assignment and re-assignment
-        if user_role not in allowed_assignment_roles:
+        # =========================================================================
+        # 2IC / ADMIN WORKFLOW: Final Allocation & Company/Section/Position Update
+        # =========================================================================
+        allowed_allocation_roles = ["2IC", "ADMIN", "SUPER ADMIN"]
+        if user_role not in allowed_allocation_roles:
             cursor.close()
             conn.close()
             return jsonify({
                 "success": False,
-                "error": "Access Denied: Unauthorized to assign or update company placement."
+                "error": "Access Denied: Only 2IC is authorized to perform final allocation and update company placement."
             }), 403
 
         if action in ["accept", "accepted"]:
@@ -1596,6 +1662,10 @@ def api_record_decision():
         if not is_position_valid_for_company(final_coy_val, final_pos_val):
             final_pos_val = get_positions_for_company(final_coy_val)[0]
 
+        now_str = datetime.now().strftime("%d-%m-%Y %H:%M")
+        pos_sec = get_section_for_position(final_coy_val, final_pos_val)
+        two_ic_msg = f"Notice to Adjutant: 2IC ({user_name}) updated & finalized allocation to {final_coy_val} - {pos_sec} ({final_pos_val}) on {now_str}."
+
         update_sql = """
             UPDATE ai_new_joinee_recommendations
             SET decision_type = %s,
@@ -1607,7 +1677,9 @@ def api_record_decision():
                 updated_by = %s,
                 updated_by_role = %s,
                 updated_by_user_id = %s,
-                updated_at = NOW()
+                updated_at = NOW(),
+                two_ic_updated = 1,
+                two_ic_message = %s
             WHERE id = %s
         """
         cursor.execute(update_sql, (
@@ -1616,9 +1688,10 @@ def api_record_decision():
             final_coy_val,
             final_pos_val,
             decided_by_str,
-            user.get("username", "Officer"),
+            user_name,
             user_role,
             user_id,
+            two_ic_msg,
             rec_id
         ))
         conn.commit()

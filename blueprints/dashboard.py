@@ -206,9 +206,12 @@ def assigned_attachment_alarm():
         return jsonify({"error": 'Forbidden'}), 403
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify({"error": "Database connection error"}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT
                 t.id,
@@ -241,8 +244,12 @@ def assigned_attachment_alarm():
         return jsonify({"error": "Server error", "details": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 
@@ -255,9 +262,12 @@ def delete_attachment(army_number):
     company = user["company"]
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    if not conn:
+        return jsonify({"error": "Database connection error"}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor()
         # Soft delete in personnel
         cursor.execute("""
             UPDATE personnel
@@ -281,19 +291,29 @@ def delete_attachment(army_number):
         return jsonify({"message": "Attachment marked inactive and TD record deleted successfully"})
 
     except Exception as e:
-        conn.rollback()  # Rollback both queries if any fails
+        if conn:
+            try: conn.rollback()
+            except Exception: pass
         return jsonify({"error": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 @dashboard_bp.route("/get_honours_board", methods=["GET"])
 def get_honours_board():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
+
+    cursor = None
     try:
+        cursor = conn.cursor(dictionary=True)
         query = """
             SELECT 
                 hb.id,
@@ -322,8 +342,12 @@ def get_honours_board():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 @dashboard_bp.route("/delete_honours_entry/<int:entry_id>", methods=["DELETE", "POST"])
 def delete_honours_entry_stats(entry_id):
@@ -337,15 +361,26 @@ def delete_honours_entry_stats(entry_id):
         return jsonify({"status": "error", "message": "Access denied"}), 403
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
+
+    cursor = None
     try:
+        cursor = conn.cursor()
         cursor.execute("DELETE FROM honours_board WHERE id = %s", (entry_id,))
         conn.commit()
         return jsonify({"status": "success", "message": "Honour entry deleted successfully"})
     except Exception as e:
-        conn.rollback()
+        if conn:
+            try: conn.rollback()
+            except Exception: pass
         return jsonify({"status": "error", "message": str(e)}), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 

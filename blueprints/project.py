@@ -590,6 +590,9 @@ def cost_by_head():
 def init_bom_table():
     try:
         conn = get_db_connection()
+        if not conn:
+            print("[DB Warning] Could not connect to database to initialize project_bill_of_materials table.")
+            return
         cursor = conn.cursor()
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS project_bill_of_materials (
@@ -611,6 +614,7 @@ def init_bom_table():
         conn.close()
     except Exception as e:
         print("Error initializing project_bill_of_materials table:", e)
+
 
 # Auto-initialize BOM table
 try:

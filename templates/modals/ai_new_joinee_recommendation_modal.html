@@ -936,7 +936,6 @@
                 </label>
                 <select id="aiTrade" class="form-select form-select-sm fw-semibold text-dark" style="height: 38px; border-radius: 8px; border: 1.5px solid #cbd5e1; font-size: 0.84rem; padding: 0.38rem 0.65rem;" onchange="this.classList.remove('ai-match-highlight'); onAiTradeSelectChange(this)">
                   <option value="">Select Trade</option>
-                  <option value="GENERAL DUTY" selected>GENERAL DUTY</option>
                   <option value="CLK SD">CLK SD</option>
                   <option value="DVR MT">DVR MT</option>
                   <option value="TECH SA">TECH SA</option>
@@ -1663,23 +1662,7 @@
               </div>
             </div>
 
-            <!-- 5. SHAP FEATURE ATTRIBUTION & EXPLAINABILITY (NO TRADE) -->
-            <div class="ai-card-box mb-3">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <span class="fw-bold text-dark" style="font-size: 0.86rem;">
-                  <i class="fas fa-project-diagram text-success me-1"></i> SHAP Explainability &amp; Feature Attribution
-                </span>
-                <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.70rem;">
-                  TreeSHAP Model Values
-                </span>
-              </div>
-              <p class="text-muted mb-2" style="font-size: 0.76rem;">
-                Attribution breakdown of how personnel profile, previous postings, and duty patterns influenced the recommendation (Trade is 100% excluded):
-              </p>
-              <div id="shapBarsContainer" class="d-flex flex-column gap-2">
-                <!-- Dynamically Populated SHAP Bars -->
-              </div>
-            </div>
+            <!-- SHAP FEATURE ATTRIBUTION & EXPLAINABILITY (REMOVED) -->
 
             <!-- 6. DUTY / DOMAIN EXPLAINABILITY (SELECTED OPTIONS) -->
             <div class="ai-card-box mb-3" style="border-left: 4px solid #3b82f6 !important;">
@@ -5233,8 +5216,7 @@
         trade = selectedSpecs[0];
         if (document.getElementById('aiTrade')) document.getElementById('aiTrade').value = trade.toUpperCase();
       } else {
-        trade = 'GENERAL DUTY';
-        if (document.getElementById('aiTrade')) document.getElementById('aiTrade').value = 'GENERAL DUTY';
+        trade = '';
       }
     }
 
@@ -5705,42 +5687,10 @@
       });
     }
 
-    // 7. TreeSHAP Explainability Breakdown (NO TRADE)
+    // 7. TreeSHAP Explainability Breakdown (Removed)
     const shapContainer = document.getElementById('shapBarsContainer');
     if (shapContainer) {
       shapContainer.innerHTML = '';
-      const posForces = data.shap_explanation?.positive || [
-        `+ Service profile and posting tenure strongly align with ${topCoy} establishment`,
-        `+ Rank and seniority profile fit ${topCoy} operational structure`
-      ];
-      const negForces = data.shap_explanation?.negative || [];
-
-      posForces.forEach(pf => {
-        shapContainer.innerHTML += `
-          <div class="shap-feature-bar mb-2">
-            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-              <span class="fw-semibold text-dark"><i class="fas fa-check-circle text-success me-1"></i> ${pf}</span>
-              <span class="badge bg-success-subtle text-success border border-success-subtle">+ Positive Force</span>
-            </div>
-            <div class="progress" style="height: 4px; border-radius: 2px;">
-              <div class="progress-bar bg-success" style="width: 85%;"></div>
-            </div>
-          </div>
-        `;
-      });
-      negForces.forEach(nf => {
-        shapContainer.innerHTML += `
-          <div class="shap-feature-bar mb-2">
-            <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.78rem;">
-              <span class="fw-semibold text-danger"><i class="fas fa-minus-circle text-danger me-1"></i> ${nf}</span>
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">- Negative Force</span>
-            </div>
-            <div class="progress" style="height: 4px; border-radius: 2px;">
-              <div class="progress-bar bg-danger" style="width: 45%;"></div>
-            </div>
-          </div>
-        `;
-      });
     }
 
     // 8. Duty / Domain (Selected Options) Explainability Breakdown

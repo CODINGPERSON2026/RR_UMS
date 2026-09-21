@@ -566,9 +566,12 @@ def get_company_interview_count():
     coy_to_check = req_coy if req_coy else user_coy
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    if not conn:
+        return jsonify({"status": "error", "count": 0, "pending": 0, "total": 0}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor()
         if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT']:
             cursor.execute("""
                 SELECT COUNT(*)
@@ -607,8 +610,13 @@ def get_company_interview_count():
         return jsonify({"status": "error", "count": 0, "pending": 0, "total": 0}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 @inteview_bp.route('/company_interview_done', methods=['POST'])
@@ -817,9 +825,12 @@ def get_co_interview_count():
     coy_to_check = req_coy if req_coy else user_coy
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    if not conn:
+        return jsonify({"status": "error", "count": 0, "pending": 0, "total": 0}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor()
         if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']:
             cursor.execute("""
                 SELECT COUNT(*)
@@ -858,8 +869,13 @@ def get_co_interview_count():
         return jsonify({"status": "error", "count": 0, "pending": 0, "total": 0}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 @inteview_bp.route('/co_interview_done', methods=['POST'])

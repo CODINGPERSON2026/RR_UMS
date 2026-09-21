@@ -64,9 +64,12 @@ def get_pending_roll_call_points():
     category = request.args.get('category')
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
 
+    cursor = None
     try:
+        cursor = conn.cursor(dictionary=True)
         query = '''
             SELECT 
                 rcp.id,
@@ -103,11 +106,16 @@ def get_pending_roll_call_points():
         return jsonify({"status": "success", "data": rows}), 200
 
     except Exception as e:
-        return jsonify({"status": "error"}), 500
+        return jsonify({"status": "error", "details": str(e)}), 500
 
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
 
 
 
