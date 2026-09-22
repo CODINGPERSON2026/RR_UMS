@@ -1529,8 +1529,9 @@ STATUS COLORS
         </div>
       </div>
       {% endif %}
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
-      <div class="sc" style="cursor: pointer" onclick="openAiInsightsModal()" id="card-ai-insights" title="AI New Joinee Company Recommendation Insights">
+      {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
+      <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Joinee Company Recommendation Insights">
         <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -2814,8 +2815,9 @@ STATUS COLORS
   });
 </script>
 
-{% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
-<script>window.isCoDashboard = true;</script>
+{% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
+<script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %}false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
 {% endif %}

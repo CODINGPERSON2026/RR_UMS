@@ -21,11 +21,27 @@
   #insightsTableWrapper::-webkit-scrollbar-thumb:hover {
     background: #4f46e5 !important;
   }
+  .ai-green-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    box-shadow: 0 0 6px #10b981;
+    margin-right: 6px;
+    vertical-align: middle;
+    animation: pulse-green-dot 2s infinite;
+  }
+  @keyframes pulse-green-dot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
 
 </style>
 
 <!-- AI New Joinee Recommendation Insights Modal for CO / Adjutant / 2IC -->
-<div class="modal fade" id="aiJoineeInsightsModal" tabindex="-1" aria-labelledby="aiJoineeInsightsModalLabel" aria-hidden="true" data-bs-backdrop="static">
+<div class="modal fade" id="aiJoineeInsightsModal" aria-labelledby="aiJoineeInsightsModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-focus="false" data-focus="false">
   <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 96vw; width: 1480px; margin: 1.5rem auto;">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden; background: #f8fafc;">
       
@@ -40,7 +56,7 @@
               AI New Joinee Recommendation Insights (Unit 15 CESR)
             </h5>
             <p class="text-white-50 mb-0 small" style="font-size: 0.82rem;">
-              Executive allocation intelligence, SHAP explainability forces, and posting decisions for CO / Adjutant / 2IC.
+              Executive allocation intelligence and posting decisions for CO / Adjutant / 2IC.
             </p>
           </div>
         </div>
@@ -184,11 +200,8 @@
                 <th scope="col" class="py-3 px-2 text-center" style="width: 160px; color: #0369a1 !important; background: #ede9fe;">
                   <i class="fas fa-calendar-check me-1.5" style="color: #0284c7;"></i>Date / Status
                 </th>
-                <th scope="col" class="py-3 px-2 text-center" style="width: 140px; color: #4f46e5 !important; background: #ede9fe;">
+                <th scope="col" class="py-3 px-2 text-center" style="width: 150px; color: #4f46e5 !important; background: #ede9fe;">
                   <i class="fas fa-poll-h me-1.5" style="color: #6366f1;"></i>View Result
-                </th>
-                <th scope="col" class="py-3 px-2 text-center" id="insightsRemarksColHeader" style="width: 150px; color: #be123c !important; background: #ede9fe;">
-                  <i class="fas fa-comment-dots me-1.5" style="color: #f43f5e;"></i>Remarks / Action
                 </th>
               </tr>
             </thead>
@@ -237,7 +250,7 @@
 <!-- ========================================================================= -->
 <!-- NESTED VIEW RESULT DIALOG (RECOMMENDATION, PROBABILITIES, SHAP, REASONS) -->
 <!-- ========================================================================= -->
-<div class="modal fade" id="aiViewResultModal" tabindex="-1" aria-labelledby="aiViewResultModalLabel" aria-hidden="true" data-bs-backdrop="static" style="z-index: 1070;">
+<div class="modal fade" id="aiViewResultModal" aria-labelledby="aiViewResultModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-focus="false" data-focus="false" style="z-index: 1070;">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden; background: #f8fafc;">
       
@@ -256,7 +269,7 @@
             </div>
           </div>
         </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-bs-target="#aiViewResultModal" onclick="closeVrModalSafely()" aria-label="Close"></button>
       </div>
 
       <!-- Modal Body -->
@@ -306,7 +319,7 @@
         <!-- SHAP section removed -->
 
         <!-- 4. Duty / Domain (Selected Options) Explainability Impact -->
-        <div class="card border-0 shadow-sm rounded-3 bg-white" style="border-left: 4px solid #3b82f6 !important;">
+        <div class="card border-0 shadow-sm rounded-3 bg-white" id="vrDutyDomainCard" style="border-left: 4px solid #3b82f6 !important;">
           <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
             <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #2563eb;">
               <i class="fas fa-tasks text-primary me-1.5"></i> DUTY / DOMAIN (SELECTED OPTIONS) IMPACT
@@ -332,7 +345,7 @@
         </div>
 
         <!-- 6. Why NOT Other Companies? (Contrastive Explainability) -->
-        <div class="card border-0 shadow-sm rounded-3 bg-white" style="border-left: 4px solid #f59e0b !important;">
+        <div class="card border-0 shadow-sm rounded-3 bg-white mb-3" style="border-left: 4px solid #f59e0b !important;">
           <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
             <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #b45309;">
               <i class="fas fa-exchange-alt text-warning me-1.5"></i> WHY NOT OTHER COMPANIES?
@@ -344,14 +357,27 @@
           </div>
         </div>
 
+        <!-- 7. Adjutant Recommendation Review & Proposal Section -->
+        <div class="card border-0 shadow-sm rounded-3 bg-white" id="vrAdjutantSectionCard" style="border-left: 4px solid #4f46e5 !important;">
+          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);">
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #4338ca;">
+              <i class="fas fa-user-edit text-primary me-1.5"></i> ADJUTANT RECOMMENDATION &amp; REVIEW
+            </span>
+            <span class="badge" id="vrAdjutantBadge" style="background: #ede9fe; color: #6b21a8; font-size: 0.7rem; font-weight: 700;">Pending Review</span>
+          </div>
+          <div class="card-body p-3" id="vrAdjutantContainer">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
       </div>
 
       <!-- Modal Footer -->
-      <div class="modal-footer bg-white px-4 py-2.5 border-top d-flex justify-content-between">
-        <button type="button" class="btn btn-sm btn-outline-secondary px-3.5 py-1.5 fw-semibold" data-bs-dismiss="modal" style="border-radius: 8px;">
+      <div class="modal-footer bg-white px-4 py-2.5 border-top d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-sm btn-outline-secondary px-3.5 py-1.5 fw-semibold" data-bs-dismiss="modal" data-bs-target="#aiViewResultModal" onclick="closeVrModalSafely()" style="border-radius: 8px;">
           <i class="fas fa-times me-1.5"></i> Close
         </button>
-        <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold" id="vrBtnGoToAction" onclick="goFromViewResultToAction()" style="border-radius: 8px;">
+        <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold" id="vrBtnGoToAction" onclick="goFromViewResultToAction()" style="border-radius: 8px; display: none;">
           <i class="fas fa-tasks me-1.5"></i> Action / Add Remarks
         </button>
       </div>
@@ -363,7 +389,7 @@
 <!-- ========================================================================= -->
 <!-- ACTION DIALOG / MODAL (CO / ADJUTANT / 2IC DECISION OVERSIGHT) -->
 <!-- ========================================================================= -->
-<div class="modal fade" id="aiInsightDetailModal" tabindex="-1" aria-labelledby="aiInsightDetailModalLabel" aria-hidden="true" data-bs-backdrop="static" style="z-index: 1060;">
+<div class="modal fade" id="aiInsightDetailModal" aria-labelledby="aiInsightDetailModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-focus="false" data-focus="false" style="z-index: 1060;">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden; background: #ffffff;">
       
@@ -378,7 +404,7 @@
             <span class="text-white-50 small" id="detailModalSubtitle" style="font-size: 0.78rem;">Unit 15 CESR Placement Oversight &amp; Decision</span>
           </div>
         </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-bs-target="#aiInsightDetailModal" onclick="closeDetailModalSafely()" aria-label="Close"></button>
       </div>
 
       <!-- Detail Body -->
@@ -484,20 +510,7 @@
           </div>
         </div>
 
-        <!-- Section 5: SHAP Explainability Breakdown -->
-        <div class="card border-0 shadow-sm rounded-3 mb-3 bg-white" style="border-left: 5px solid #9333ea !important;">
-          <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center">
-            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #7e22ce;">
-              <i class="fas fa-layer-group me-1.5" style="color: #9333ea;"></i> SHAP EXPLANATION (TREE EXPLAINER)
-            </span>
-            <span class="badge px-2 py-0.5 fw-bold" style="font-size: 0.68rem; background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff;">Feature Contribution Forces</span>
-          </div>
-          <div class="card-body p-3 d-flex flex-column gap-2" id="detailShapContainer">
-            <!-- Populated via JS -->
-          </div>
-        </div>
-
-        <!-- Section 6: Executive Decision Oversight (Role-Based: CO / Adjutant / 2IC) -->
+        <!-- Section 5: Executive Decision Oversight (Role-Based: CO / Adjutant / 2IC) -->
         <div class="card shadow-sm rounded-3 bg-white" style="border: 1.5px solid #818cf8 !important;">
           <div class="card-header border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);">
             <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #3730a3;" id="detailSection6Title">
@@ -521,30 +534,38 @@
             <div class="row g-2 mb-3">
               <div class="col-md-4" id="detailCompanySelectWrapper">
                 <label class="form-label text-muted small fw-semibold mb-1">Assigned Company</label>
-                <select id="detailFinalCompanySelect" class="form-select form-select-sm" onchange="onDetailCompanyChange()">
-                  <option value="HQ COY">HQ COY</option>
-                  <option value="COMN COY">COMN COY</option>
-                  <option value="3 COY">3 COY</option>
-                </select>
+                <div>
+                  <select id="detailFinalCompanySelect" class="form-select form-select-sm" onchange="onDetailCompanyChange()">
+                    <option value="HQ COY">HQ COY</option>
+                    <option value="COMN COY">COMN COY</option>
+                    <option value="3 COY">3 COY</option>
+                  </select>
+                </div>
               </div>
 
               <div class="col-md-4" id="detailSectionSelectWrapper">
                 <label class="form-label text-muted small fw-semibold mb-1">Assigned Section</label>
-                <select id="detailFinalSectionSelect" class="form-select form-select-sm" onchange="onDetailSectionChange()">
-                  <!-- Dynamically populated based on company -->
-                </select>
+                <div>
+                  <select id="detailFinalSectionSelect" class="form-select form-select-sm" onchange="onDetailSectionChange()">
+                    <!-- Dynamically populated based on company -->
+                  </select>
+                </div>
               </div>
 
               <div class="col-md-4" id="detailPositionSelectWrapper">
                 <label class="form-label text-muted small fw-semibold mb-1">Assigned Position</label>
-                <select id="detailFinalPositionSelect" class="form-select form-select-sm">
-                  <!-- Dynamically populated based on section -->
-                </select>
+                <div>
+                  <select id="detailFinalPositionSelect" class="form-select form-select-sm">
+                    <!-- Dynamically populated based on section -->
+                  </select>
+                </div>
               </div>
 
               <div class="col-12" id="detailRemarksWrapper">
-                <label class="form-label text-muted small fw-semibold mb-1">Decision Remarks / Justification</label>
-                <textarea id="detailDecisionRemarks" class="form-control form-control-sm" rows="2" placeholder="Enter remarks regarding this posting decision..."></textarea>
+                <label class="form-label text-muted small fw-semibold mb-1" id="detailRemarksLabel">
+                  Remarks / Justification
+                </label>
+                <textarea id="detailDecisionRemarks" class="form-control form-control-sm" rows="3" placeholder="Enter remarks, justification, or administrative notes here..." style="position: relative; z-index: 105; pointer-events: auto !important; resize: vertical;" onclick="this.focus()" oninput="this.classList.remove('is-invalid')"></textarea>
               </div>
             </div>
 
@@ -602,22 +623,33 @@
 
   function checkIsCoDashboard() {
     const roleUpper = String(currentInsightsUserRole || '').trim().toUpperCase();
+    if (roleUpper === 'ADJUTANT' || roleUpper === '2IC' || roleUpper === 'ADMIN' || roleUpper === 'SUPER ADMIN') {
+      return false;
+    }
     return window.isCoDashboard === true ||
-           document.getElementById('card-ai-insights') !== null ||
            roleUpper === 'CO' ||
            roleUpper === 'COMMANDING OFFICER';
   }
 
   function openAiInsightsModal() {
-    const isCoDash = checkIsCoDashboard();
-    const colHeader = document.getElementById('insightsRemarksColHeader');
-    if (colHeader && isCoDash) {
-      colHeader.style.display = 'none';
-    }
     const modalEl = document.getElementById('aiJoineeInsightsModal');
-    if (modalEl && typeof bootstrap !== 'undefined') {
-      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-      modal.show();
+    if (modalEl) {
+      try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: false, backdrop: 'static' });
+          modal.show();
+        } else if (typeof $ !== 'undefined' && typeof $.fn.modal !== 'undefined') {
+          $('#aiJoineeInsightsModal').modal({ focus: false, backdrop: 'static' });
+          $('#aiJoineeInsightsModal').modal('show');
+        } else {
+          modalEl.classList.add('show');
+          modalEl.style.display = 'block';
+        }
+      } catch (e) {
+        console.warn('Modal open error, attempting fallback:', e);
+        modalEl.classList.add('show');
+        modalEl.style.display = 'block';
+      }
       fetchAiInsights(1);
     }
   }
@@ -708,28 +740,18 @@
 
       if (json.success) {
         currentInsightsUserRole = json.user_role || '';
-        canUserAddRemarks = true;
-        canUserAssignCompany = true;
-        isUserReadOnly = false;
+        const roleUpper = String(currentInsightsUserRole).trim().toUpperCase();
+        const isCO = checkIsCoDashboard() || roleUpper === 'CO' || roleUpper === 'COMMANDING OFFICER';
+        const isAdjutant = (roleUpper === 'ADJUTANT');
+        const is2IC = (roleUpper === '2IC' || roleUpper === 'ADMIN' || roleUpper === 'SUPER ADMIN');
 
-        // Update column header according to role and dashboard (CO dashboard has no Action / Assign column)
-        const isCoDash = checkIsCoDashboard();
-        const colHeader = document.getElementById('insightsRemarksColHeader');
-        if (colHeader) {
-          if (isCoDash) {
-            colHeader.style.display = 'none';
-          } else {
-            colHeader.style.display = '';
-            if (canUserAssignCompany) {
-              colHeader.innerHTML = '<i class="fas fa-user-check me-1.5" style="color: #4f46e5;"></i>Action / Assign';
-            } else {
-              colHeader.innerHTML = '<i class="fas fa-comment-dots me-1.5" style="color: #f43f5e;"></i>Add Remarks';
-            }
-          }
-        }
+        canUserAddRemarks = isAdjutant || is2IC;
+        canUserAssignCompany = is2IC; // Only 2IC / Admin can assign
+        isUserReadOnly = isCO;
+
         const mainTable = document.getElementById('insightsMainTable');
         if (mainTable) {
-          mainTable.style.minWidth = isCoDash ? '100%' : '1250px';
+          mainTable.style.minWidth = '1020px';
         }
 
         if (json.available_ranks && Array.isArray(json.available_ranks)) {
@@ -770,6 +792,16 @@
     }
   }
 
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function renderInsightsTable(rows, searchQuery = '') {
     const tbody = document.getElementById('insightsTableBody');
     if (!tbody) return;
@@ -786,11 +818,9 @@
       const recPos = r.recommended_position || 'GD';
       const recSec = r.recommended_section || '';
       const decisionType = (r.decision_type || 'pending').toLowerCase();
-      const remarksText = r.decision_remarks ? r.decision_remarks.trim() : '';
       const isReCal = r.is_re_calculated || false;
       const createdAt = r.created_at || '';
       const updatedAt = r.updated_at || '';
-      const dateDisplay = updatedAt || createdAt || '--';
 
       let coyBadgeClass = 'bg-primary text-white';
       if (recCompany.includes('Comn') || recCompany.includes('COMN')) coyBadgeClass = 'bg-success text-white';
@@ -808,58 +838,21 @@
           </div>`;
       } else {
         const decBadge = decisionType === 'accepted'
-          ? `<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.68rem;"><i class="fas fa-check-circle me-1"></i>Accepted</span>`
+          ? `<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.68rem;"><i class="fas fa-check-circle me-1"></i>Assigned</span>`
           : decisionType === 'rejected'
             ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.68rem;"><i class="fas fa-times-circle me-1"></i>Rejected</span>`
-            : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.68rem;"><i class="fas fa-clock me-1"></i>Pending</span>`;
+            : (r.adjutant_action === 'updated'
+                ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;"><i class="fas fa-user-edit me-1"></i>Adj: Proposed</span>`
+                : (r.adjutant_action === 'accepted'
+                    ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle" style="font-size: 0.68rem;"><i class="fas fa-check me-1"></i>Adj: Accepted</span>`
+                    : (r.adjutant_action === 'rejected'
+                        ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.68rem;"><i class="fas fa-times-circle me-1"></i>Adj: Rejected</span>`
+                        : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.68rem;"><i class="fas fa-clock me-1"></i>Pending</span>`)));
         dateStatusHtml = `
           <div class="d-flex flex-column align-items-center gap-1">
             ${decBadge}
             <span class="text-muted" style="font-size: 0.7rem; line-height: 1.3;">${createdAt}</span>
           </div>`;
-      }
-
-      let actionCellHtml = '';
-      const isCoDash = checkIsCoDashboard();
-
-      if (!isCoDash) {
-        if (canUserAssignCompany) {
-          if (decisionType === 'accepted') {
-            const placedCoy = r.final_company || recCompany;
-            actionCellHtml = `<td class="text-center">
-              <button class="btn btn-sm btn-success py-1 px-2.5 fw-bold text-white shadow-sm d-inline-flex align-items-center gap-1.5" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Placement Confirmed: ${placedCoy}. Click to re-assign or update placement.">
-                <i class="fas fa-check-circle"></i> Assigned (${placedCoy})
-                <span class="badge bg-white text-dark py-0.5 px-1 ms-1" style="font-size: 0.65rem; border-radius: 4px;"><i class="fas fa-sync-alt text-primary me-0.5"></i> Update</span>
-              </button>
-            </td>`;
-          } else if (decisionType === 'rejected') {
-            actionCellHtml = `<td class="text-center">
-              <button class="btn btn-sm btn-outline-danger py-1 px-2.5 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Rejected. Click to re-evaluate and assign.">
-                <i class="fas fa-times-circle"></i> Rejected
-                <span class="badge bg-danger text-white py-0.5 px-1 ms-1" style="font-size: 0.65rem; border-radius: 4px;"><i class="fas fa-edit me-0.5"></i> Assign</span>
-              </button>
-            </td>`;
-          } else {
-            // Pending Assignment
-            if (remarksText) {
-              actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-primary py-1 px-2.5 fw-bold text-white shadow-sm" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="Adjutant Remark: ${remarksText}"><i class="fas fa-user-check me-1"></i> Action / Assign <span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;"><i class="fas fa-comment"></i> Note</span></button></td>`;
-            } else {
-              actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-primary py-1 px-2.5 fw-bold text-white shadow-sm" onclick="openInsightDetail(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-user-check me-1"></i> Action / Assign</button></td>`;
-            }
-          }
-        } else if (canUserAddRemarks) {
-          if (decisionType === 'accepted') {
-            actionCellHtml = `<td class="text-center"><span class="badge bg-success py-1.5 px-2.5 fw-bold" style="font-size: 0.76rem;"><i class="fas fa-check-circle me-1"></i> Assigned</span></td>`;
-          } else if (decisionType === 'rejected') {
-            actionCellHtml = `<td class="text-center"><span class="badge bg-danger py-1.5 px-2.5 fw-bold" style="font-size: 0.76rem;"><i class="fas fa-times-circle me-1"></i> Rejected</span></td>`;
-          } else {
-            if (remarksText) {
-              actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-outline-primary py-1 px-2.5 fw-semibold shadow-sm" onclick="openRemarksDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;" title="${remarksText}"><i class="fas fa-edit me-1 text-primary"></i> Edit Remarks</button></td>`;
-            } else {
-              actionCellHtml = `<td class="text-center"><button class="btn btn-sm btn-outline-secondary py-1 px-2.5 fw-semibold" onclick="openRemarksDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;"><i class="fas fa-plus-circle me-1 text-success"></i> Add Remarks</button></td>`;
-            }
-          }
-        }
       }
 
       const rowBorderStyle = isReCal ? 'border-left: 3px solid #3b82f6 !important;' : '';
@@ -876,11 +869,10 @@
         <td class="text-center fw-bold text-indigo" style="color: #4f46e5;">${recPos}</td>
         <td class="text-center">${dateStatusHtml}</td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-primary py-1 px-2.5 fw-bold shadow-sm" onclick="openViewResultDialog(${r.id})" style="border-radius: 6px; font-size: 0.76rem;">
+          <button class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold shadow-sm" onclick="openViewResultDialog(${r.id})" style="border-radius: 6px; font-size: 0.78rem;">
             <i class="fas fa-poll-h me-1 text-primary"></i> View Result
           </button>
         </td>
-        ${actionCellHtml}
       `;
       tbody.appendChild(tr);
     });
@@ -954,9 +946,23 @@
         shapContainer.innerHTML = '';
       }
 
-      // 4. Duty / Domain (Selected Options) Impact Breakdown
+      // 4. Duty / Domain (Selected Options) Impact Breakdown (Hidden for Adjutant & 2IC)
+      const roleUpper = String(d.user_role || currentInsightsUserRole || '').trim().toUpperCase();
+      const isCO = checkIsCoDashboard() || roleUpper === 'CO' || roleUpper === 'COMMANDING OFFICER';
+      const is2IC = (roleUpper === '2IC' || roleUpper === 'ADMIN' || roleUpper === 'SUPER ADMIN');
+      const isAdjutant = (roleUpper === 'ADJUTANT' || roleUpper === 'ADJT' || roleUpper.includes('ADJ') || (!isCO && !is2IC));
+
+      const dutyCard = document.getElementById('vrDutyDomainCard');
+      if (dutyCard) {
+        if (isAdjutant || is2IC) {
+          dutyCard.style.display = 'none';
+        } else {
+          dutyCard.style.display = 'block';
+        }
+      }
+
       const dutyContainer = document.getElementById('vrDutyDomainContainer');
-      if (dutyContainer) {
+      if (dutyContainer && !isAdjutant && !is2IC) {
         dutyContainer.innerHTML = '';
         const domainXai = d.domain_explainability || [];
         if (domainXai.length === 0) {
@@ -1022,23 +1028,463 @@
         }
       }
 
-      // Action Button in View Result Dialog based on role (Hidden for CO, visible for Adjutant & 2IC)
-      const btnAction = document.getElementById('vrBtnGoToAction');
-      if (btnAction) {
-        if (checkIsCoDashboard()) {
-          btnAction.style.display = 'none';
-        } else {
-          btnAction.style.display = 'inline-block';
-          btnAction.innerHTML = '<i class="fas fa-user-check me-1.5"></i> Proceed to Assignment';
-        }
-      }
+      // Render Adjutant Recommendation / Review Section in View Result dialog
+      renderVrAdjutantSection(d);
 
-      const vrModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('aiViewResultModal'));
+      const vrModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('aiViewResultModal'), { focus: false, backdrop: 'static' });
       vrModal.show();
+      setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 1) {
+          backdrops[backdrops.length - 1].style.zIndex = '1065';
+        }
+      }, 50);
 
     } catch (err) {
       console.error('Error opening View Result dialog:', err);
       alert('Failed to load recommendation result.');
+    }
+  }
+
+  function renderVrAdjutantSection(d) {
+    const roleUpper = String(d.user_role || currentInsightsUserRole || '').trim().toUpperCase();
+    const isCO = checkIsCoDashboard() || roleUpper === 'CO' || roleUpper === 'COMMANDING OFFICER';
+    const isAdjutant = (roleUpper === 'ADJUTANT');
+    const is2IC = (roleUpper === '2IC' || roleUpper === 'ADMIN' || roleUpper === 'SUPER ADMIN');
+
+    const badgeEl = document.getElementById('vrAdjutantBadge');
+    const container = document.getElementById('vrAdjutantContainer');
+    const btnAction = document.getElementById('vrBtnGoToAction');
+    if (!container) return;
+
+    if (badgeEl) {
+      if (d.adjutant_action === 'updated') {
+        badgeEl.className = 'badge bg-primary text-white';
+        badgeEl.textContent = 'Adjutant Proposed Update';
+      } else if (d.adjutant_action === 'accepted') {
+        badgeEl.className = 'badge bg-success text-white';
+        badgeEl.textContent = 'Adjutant Accepted AI Rec';
+      } else if (d.adjutant_action === 'rejected') {
+        badgeEl.className = 'badge bg-danger text-white';
+        badgeEl.textContent = 'Adjutant Rejected AI Rec';
+      } else {
+        badgeEl.className = 'badge bg-warning text-dark';
+        badgeEl.textContent = 'Pending Adjutant Review';
+      }
+    }
+
+    if (btnAction) {
+      btnAction.style.display = 'none';
+    }
+
+    // Cache active recommendation in global state for dropdowns
+    window.currentActiveAiRec = {
+      company: getCanonicalCoy(d.recommended_company || 'HQ COY'),
+      section: String(d.recommended_section || '').trim(),
+      position: String(d.recommended_position || '').trim()
+    };
+
+    if (isCO) {
+      let coHtml = `
+        <div class="alert alert-secondary border-secondary border-1 rounded-3 p-3 mb-2" style="background: #f8fafc;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="fas fa-user-tie text-primary fs-5"></i>
+            <strong class="text-dark">Commanding Officer Oversight (View Only)</strong>
+          </div>
+          <div class="text-muted small mb-2">
+            Commanding Officer has view-only authority to inspect AI recommendations, scores, and decision history. Updations are handled by Adjutant and 2IC.
+          </div>
+      `;
+
+      if (d.adjutant_action) {
+        coHtml += `
+          <div class="p-2.5 rounded bg-white border border-primary-subtle mb-2 small">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <strong class="text-primary"><i class="fas fa-user-edit me-1"></i>Adjutant Proposed Placement:</strong>
+              <span class="badge ${d.adjutant_action === 'updated' ? 'bg-primary' : 'bg-success'} text-white text-uppercase" style="font-size: 0.65rem;">
+                ${d.adjutant_action === 'updated' ? 'Updated by Adjutant' : 'Accepted AI Rec'}
+              </span>
+            </div>
+            <div class="text-dark"><strong>${d.adjutant_company || d.recommended_company}</strong> &bull; <strong>${d.adjutant_section || d.recommended_section || 'GENERAL'}</strong> (${d.adjutant_position || d.recommended_position})</div>
+            <div class="text-muted" style="font-size: 0.72rem;">Reviewed By: ${d.adjutant_by || 'Adjutant'} &bull; ${d.adjutant_at || 'Recently'}</div>
+            ${d.adjutant_remarks ? `<div class="mt-1 p-2 rounded bg-light border text-secondary small"><i class="fas fa-comment-dots text-primary me-1"></i><strong>Remarks:</strong> "${escapeHtml(d.adjutant_remarks)}"</div>` : ''}
+          </div>
+        `;
+      } else {
+        coHtml += `
+          <div class="p-2 rounded bg-white border text-muted small mb-2">
+            <i class="fas fa-clock text-warning me-1"></i> Pending Adjutant Review
+          </div>
+        `;
+      }
+
+      if (d.two_ic_updated || d.updated_by_role === '2IC' || (d.decision_type && d.decision_type !== 'pending')) {
+        coHtml += `
+          <div class="p-2.5 rounded bg-white border border-success-subtle small">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <strong class="text-success"><i class="fas fa-user-shield me-1"></i>2IC Final Assignment:</strong>
+              <span class="badge ${d.decision_type === 'accepted' ? 'bg-success' : 'bg-danger'} text-white text-uppercase" style="font-size: 0.65rem;">
+                ${d.decision_type.toUpperCase()}
+              </span>
+            </div>
+            <div class="text-dark"><strong>${d.final_company || d.recommended_company}</strong> &bull; <strong>${d.final_section || d.recommended_section || 'GENERAL'}</strong> (${d.final_position || d.recommended_position})</div>
+            <div class="text-muted" style="font-size: 0.72rem;">Assigned By: ${d.updated_by || d.decided_by || '2IC'} &bull; ${d.updated_at || d.decided_at || 'Recently'}</div>
+            ${d.decision_remarks ? `<div class="mt-1 p-2 rounded bg-light border text-secondary small"><i class="fas fa-comment-dots text-success me-1"></i><strong>Remarks:</strong> "${escapeHtml(d.decision_remarks)}"</div>` : ''}
+          </div>
+        `;
+      }
+
+      coHtml += `</div>`;
+      container.innerHTML = coHtml;
+
+      if (btnAction) {
+        btnAction.style.display = 'none';
+      }
+    } else if (isAdjutant || !is2IC) {
+      const initialRemarks = d.adjutant_remarks || d.decision_remarks || '';
+
+      container.innerHTML = `
+        <div class="alert alert-info py-2 px-3 mb-3 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
+          <i class="fas fa-info-circle text-primary fs-5"></i>
+          <div>
+            <strong>Adjutant Advisory Role:</strong> You can accept the AI recommendation with remarks. <strong>Adjutant never assigns an individual.</strong> The 2IC will review and execute the final allocation.
+          </div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-12">
+            <label class="form-label text-muted small fw-semibold mb-1">
+              Remarks / Justification
+            </label>
+            <textarea id="vrAdjRemarks" class="form-control form-control-sm" rows="3" placeholder="Enter remarks, justification, or administrative notes here..." style="position: relative; z-index: 105; pointer-events: auto !important; resize: vertical;" onclick="this.focus()">${escapeHtml(initialRemarks)}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="closeVrModalSafely()">
+            <i class="fas fa-times-circle me-1"></i> Reject
+          </button>
+          <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitVrAdjutantDecision('adjutant_accept')">
+            <i class="fas fa-check-circle me-1"></i> Accept AI Recommendation
+          </button>
+        </div>
+      `;
+
+      const remarksEl = document.getElementById('vrAdjRemarks');
+      if (remarksEl) {
+        remarksEl.addEventListener('click', function(e) { e.stopPropagation(); this.focus(); });
+        remarksEl.addEventListener('keydown', function(e) { e.stopPropagation(); });
+      }
+
+    } else if (is2IC) {
+      let initialCoy = d.adjutant_company || d.recommended_company || 'HQ COY';
+      initialCoy = getCanonicalCoy(initialCoy);
+      const initialSec = d.adjutant_section || d.recommended_section || '';
+      const initialPos = d.adjutant_position || d.recommended_position || '';
+      const initialRemarks = d.decision_remarks || '';
+
+      let adjHtml = '';
+      if (d.adjutant_action) {
+        adjHtml = `
+          <div class="alert alert-success border-success border-1 rounded-3 p-3 mb-3" style="background: #f0fdf4;">
+            <div class="d-flex justify-content-between align-items-center mb-1.5">
+              <strong class="text-success-emphasis" style="font-size: 0.85rem;">
+                <i class="fas fa-user-edit me-1"></i> Adjutant Proposed: ${d.adjutant_company || d.recommended_company} - ${d.adjutant_section || d.recommended_section || 'GENERAL'} (${d.adjutant_position || d.recommended_position})
+              </strong>
+              <span class="badge ${d.adjutant_action === 'updated' ? 'bg-primary' : 'bg-success'} text-white text-uppercase" style="font-size: 0.68rem;">
+                ${d.adjutant_action === 'updated' ? 'Updated by Adjutant' : 'Accepted AI Rec'}
+              </span>
+            </div>
+            <div class="text-dark small mb-1.5">
+              <strong>Reviewed By:</strong> ${d.adjutant_by || 'Adjutant'} &bull; <strong>Time:</strong> ${d.adjutant_at || 'Recently'}
+            </div>
+            ${d.adjutant_remarks ? `
+            <div class="p-2 rounded bg-white border border-success-subtle text-secondary small fw-medium">
+              <i class="fas fa-comment-dots text-success me-1"></i><strong>Adjutant Reason:</strong> "${escapeHtml(d.adjutant_remarks)}"
+            </div>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        adjHtml = `
+          <div class="alert alert-warning border-warning border-1 rounded-3 p-2.5 mb-3 small d-flex align-items-center gap-2" style="background: #fffbeb;">
+            <i class="fas fa-clock text-warning fs-5"></i>
+            <div><strong>Pending Adjutant Review:</strong> Adjutant has not submitted a recommendation yet. You can review and finalize assignment.</div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        ${adjHtml}
+
+        <div class="alert alert-primary py-2 px-3 mb-3 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
+          <i class="fas fa-shield-alt text-primary fs-5"></i>
+          <div><strong>2IC Executive Assignment:</strong> Review and select company, section, and position for final unit placement.</div>
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-md-4">
+            <label class="form-label text-muted small fw-semibold mb-1">Recommended Company</label>
+            <div>
+              <select id="vr2icCompanySelect" class="form-select form-select-sm" onchange="onVr2icCompanyChange()">
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label text-muted small fw-semibold mb-1">Recommended Section</label>
+            <div>
+              <select id="vr2icSectionSelect" class="form-select form-select-sm" onchange="onVr2icSectionChange()">
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label text-muted small fw-semibold mb-1">Recommended Position</label>
+            <div>
+              <select id="vr2icPositionSelect" class="form-select form-select-sm">
+              </select>
+            </div>
+          </div>
+          <div class="col-12">
+            <label class="form-label text-muted small fw-semibold mb-1">
+              2IC Remarks / Justification
+            </label>
+            <textarea id="vr2icRemarks" class="form-control form-control-sm" rows="3" placeholder="Enter 2IC assignment justification or administrative remarks..." style="position: relative; z-index: 105; pointer-events: auto !important; resize: vertical;" onclick="this.focus()">${escapeHtml(initialRemarks)}</textarea>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="closeVrModalSafely()">
+            <i class="fas fa-times-circle me-1"></i> Reject
+          </button>
+          <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitVr2icDecision('accept')">
+            <i class="fas fa-check-circle me-1"></i> Confirm &amp; Assign Placement
+          </button>
+        </div>
+      `;
+
+      const coySelect = document.getElementById('vr2icCompanySelect');
+      populateCompanyDropdown(coySelect, initialCoy, d.recommended_company);
+      populateSectionDropdown(initialCoy, initialSec, initialPos, 'vr2icSectionSelect', 'vr2icPositionSelect');
+
+      const posSelect = document.getElementById('vr2icPositionSelect');
+      if (posSelect) {
+        posSelect.onchange = updateSelectRecDots;
+      }
+      updateSelectRecDots();
+
+      const remarksEl = document.getElementById('vr2icRemarks');
+      if (remarksEl) {
+        remarksEl.addEventListener('click', function(e) { e.stopPropagation(); this.focus(); });
+        remarksEl.addEventListener('keydown', function(e) { e.stopPropagation(); });
+      }
+    }
+  }
+
+  function onVrAdjCompanyChange() {
+    const coySelect = document.getElementById('vrAdjCompanySelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetSec = '';
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company)) {
+      targetSec = activeRec.section;
+      targetPos = activeRec.position;
+    }
+    populateSectionDropdown(coy, targetSec, targetPos, 'vrAdjSectionSelect', 'vrAdjPositionSelect');
+    updateSelectRecDots();
+  }
+
+  function onVrAdjSectionChange() {
+    const coySelect = document.getElementById('vrAdjCompanySelect');
+    const secSelect = document.getElementById('vrAdjSectionSelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const sec = secSelect ? secSelect.value : '';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company) &&
+        String(sec || '').trim().toUpperCase() === String(activeRec.section || '').trim().toUpperCase()) {
+      targetPos = activeRec.position;
+    }
+    populatePositionsDropdown(coy, sec, targetPos, 'vrAdjPositionSelect');
+    updateSelectRecDots();
+  }
+
+  function onVr2icCompanyChange() {
+    const coySelect = document.getElementById('vr2icCompanySelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetSec = '';
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company)) {
+      targetSec = activeRec.section;
+      targetPos = activeRec.position;
+    }
+    populateSectionDropdown(coy, targetSec, targetPos, 'vr2icSectionSelect', 'vr2icPositionSelect');
+    updateSelectRecDots();
+  }
+
+  function onVr2icSectionChange() {
+    const coySelect = document.getElementById('vr2icCompanySelect');
+    const secSelect = document.getElementById('vr2icSectionSelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const sec = secSelect ? secSelect.value : '';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company) &&
+        String(sec || '').trim().toUpperCase() === String(activeRec.section || '').trim().toUpperCase()) {
+      targetPos = activeRec.position;
+    }
+    populatePositionsDropdown(coy, sec, targetPos, 'vr2icPositionSelect');
+    updateSelectRecDots();
+  }
+
+  async function submitVr2icDecision(action) {
+    const recId = document.getElementById('vrRecId')?.value;
+    const coySelect = document.getElementById('vr2icCompanySelect');
+    const secSelect = document.getElementById('vr2icSectionSelect');
+    const posSelect = document.getElementById('vr2icPositionSelect');
+    const remarksEl = document.getElementById('vr2icRemarks');
+
+    if (!recId) {
+      alert('Missing recommendation ID');
+      return;
+    }
+
+    const activeRec = window.currentActiveAiRec || {};
+    let coy = coySelect?.value || activeRec.company || 'HQ COY';
+    let sec = secSelect?.value || activeRec.section || '';
+    let pos = posSelect?.value || activeRec.position || '';
+    let remarks = remarksEl?.value?.trim() || '';
+
+    if (action === 'reject') {
+      closeVrModalSafely();
+      return;
+    }
+    if (action === 'accept' && !remarks) {
+      remarks = `2IC confirmed and assigned placement to ${coy} - ${sec} (${pos}).`;
+      if (remarksEl) remarksEl.value = remarks;
+    }
+
+    const btns = document.querySelectorAll('#vrAdjutantContainer button');
+    btns.forEach(b => { b.disabled = true; });
+
+    try {
+      const res = await fetch('/api/ai/company-recommendation/decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: parseInt(recId, 10),
+          action: action,
+          final_company: coy,
+          final_section: sec,
+          final_position: pos,
+          decision_remarks: remarks
+        })
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        alert(json.message || '2IC decision recorded successfully.');
+        closeVrModalSafely();
+        fetchAiInsights(currentInsightsPage);
+      } else {
+        alert(json.error || 'Failed to record 2IC decision.');
+        btns.forEach(b => { b.disabled = false; });
+      }
+    } catch (err) {
+      console.error('Error recording 2IC decision:', err);
+      alert('Network error while saving decision.');
+      btns.forEach(b => { b.disabled = false; });
+    }
+  }
+
+  function populateVrAdjSectionDropdown(company, selectedSec, selectedPos) {
+    populateSectionDropdown(company, selectedSec, selectedPos, 'vrAdjSectionSelect', 'vrAdjPositionSelect');
+  }
+
+  function populateVrAdjPositionsDropdown(company, section, selectedPos) {
+    populatePositionsDropdown(company, section, selectedPos, 'vrAdjPositionSelect');
+  }
+
+  function setVrAdjReason(text) {
+    const cleanText = text.replace(/^[●🟢\s]+/, '').trim();
+    const remarksEl = document.getElementById('vrAdjRemarks');
+    if (remarksEl) {
+      remarksEl.value = cleanText;
+      remarksEl.classList.remove('is-invalid');
+      remarksEl.focus();
+    }
+  }
+
+  async function submitVrAdjutantDecision(action) {
+    const recId = document.getElementById('vrRecId')?.value;
+    const coySelect = document.getElementById('vrAdjCompanySelect');
+    const secSelect = document.getElementById('vrAdjSectionSelect');
+    const posSelect = document.getElementById('vrAdjPositionSelect');
+    const remarksEl = document.getElementById('vrAdjRemarks');
+
+    if (!recId) {
+      alert('Missing recommendation ID');
+      return;
+    }
+
+    const activeRec = window.currentActiveAiRec || {};
+    let coy = coySelect?.value || activeRec.company || 'HQ COY';
+    let sec = secSelect?.value || activeRec.section || '';
+    let pos = posSelect?.value || activeRec.position || '';
+    let remarks = remarksEl?.value?.trim() || '';
+
+    if (action === 'adjutant_reject' || action === 'reject') {
+      closeVrModalSafely();
+      return;
+    }
+    if (action === 'adjutant_accept') {
+      if (activeRec.company) coy = activeRec.company;
+      if (activeRec.section) sec = activeRec.section;
+      if (activeRec.position) pos = activeRec.position;
+      if (!remarks) {
+        remarks = 'Adjutant accepted AI recommendation.';
+        if (remarksEl) remarksEl.value = remarks;
+      }
+    } else if (action === 'adjutant_update') {
+      if (!remarks) {
+        remarks = `Adjutant recommended update to ${coy} - ${sec} (${pos}) based on unit requirements.`;
+        if (remarksEl) remarksEl.value = remarks;
+      }
+    }
+
+    if (remarksEl) remarksEl.classList.remove('is-invalid');
+
+    const btns = document.querySelectorAll('#vrAdjutantContainer button');
+    btns.forEach(b => { b.disabled = true; });
+
+    try {
+      const res = await fetch('/api/ai/company-recommendation/decision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: parseInt(recId, 10),
+          action: action,
+          final_company: coy,
+          final_section: sec,
+          final_position: pos,
+          decision_remarks: remarks
+        })
+      });
+
+      const json = await res.json();
+      if (json.success) {
+        alert(json.message || 'Adjutant recommendation recorded successfully.');
+        closeVrModalSafely();
+        fetchAiInsights(currentInsightsPage);
+      } else {
+        alert(json.error || 'Failed to record recommendation.');
+        btns.forEach(b => { b.disabled = false; });
+      }
+    } catch (err) {
+      console.error('Error recording Adjutant recommendation:', err);
+      alert('Network error while saving recommendation.');
+      btns.forEach(b => { b.disabled = false; });
     }
   }
 
@@ -1055,10 +1501,9 @@
 
   function goFromViewResultToAction() {
     const recId = document.getElementById('vrRecId')?.value;
-    const vrModal = bootstrap.Modal.getInstance(document.getElementById('aiViewResultModal'));
-    if (vrModal) vrModal.hide();
+    closeVrModalSafely();
     if (recId) {
-      setTimeout(() => openInsightDetail(recId), 300);
+      setTimeout(() => openInsightDetail(recId), 250);
     }
   }
 
@@ -1145,7 +1590,6 @@
       document.getElementById('detailTrade').textContent = d.trade || 'N/A';
       document.getElementById('detailEvaluatedAt').textContent = `Evaluated ID: #${d.id}`;
 
-      // Populate Recommendation
       document.getElementById('detailRecommendedCoy').textContent = d.recommended_company;
       document.getElementById('detailConfidenceBadge').textContent = d.confidence_type === 'rule_based_fresh_joinee' ? 'Rule-Based (Fresh)' : 'ML Supervised';
       document.getElementById('detailConfidenceScore').textContent = `Confidence: ${d.confidence_score}`;
@@ -1218,38 +1662,16 @@
         `;
       }
 
-      // Populate SHAP
+      // SHAP Explainability Breakdown (Removed)
       const shapContainer = document.getElementById('detailShapContainer');
-      shapContainer.innerHTML = '';
-      const shapPos = d.shap_explanation?.positive || [];
-      const shapNeg = d.shap_explanation?.negative || [];
-      shapPos.forEach(p => {
-        shapContainer.innerHTML += `
-          <div class="small text-success fw-semibold"><i class="fas fa-plus-circle me-1"></i> ${p}</div>
-        `;
-      });
-      shapNeg.forEach(n => {
-        shapContainer.innerHTML += `
-          <div class="small text-danger"><i class="fas fa-minus-circle me-1"></i> ${n}</div>
-        `;
-      });
-      if (shapPos.length === 0 && shapNeg.length === 0) {
-        shapContainer.innerHTML = '<div class="small text-muted">Feature contributions evaluated via historical tree structure.</div>';
+      if (shapContainer) {
+        shapContainer.innerHTML = '';
       }
 
-      // Populate Decision Controls & Role Scope
       // Populate Decision Controls & Role Scope
       const coySelect = document.getElementById('detailFinalCompanySelect');
       const secSelect = document.getElementById('detailFinalSectionSelect');
       const posSelect = document.getElementById('detailFinalPositionSelect');
-
-      let targetCoy = d.final_company || d.recommended_company || 'HQ COY';
-      if (targetCoy === 'HQ Coy') targetCoy = 'HQ COY';
-      if (targetCoy === 'Comn Coy') targetCoy = 'COMN COY';
-      if (targetCoy === '3 Coy') targetCoy = '3 COY';
-
-      coySelect.value = targetCoy;
-      populateSectionDropdown(targetCoy, d.final_section || d.recommended_section, d.final_position || d.recommended_position);
 
       document.getElementById('detailDecisionRemarks').value = d.decision_remarks || '';
       document.getElementById('detailDecisionTypeBadge').textContent = d.decision_type || 'pending';
@@ -1261,16 +1683,60 @@
         decInfo.innerHTML = `Pending executive decision.`;
       }
 
-      // Configure Section 6 Controls based on User Role (CO: read-only, Adjutant: remarks-only, 2IC: full assignment)
-      // Configure Section 6 Controls (CO / 2IC / Adjutant / Admin: Full Assignment and Re-assignment)
+      // Configure Section Controls based on User Role
       const scopeBanner = document.getElementById('detailRoleScopeBanner');
       const remarksTextarea = document.getElementById('detailDecisionRemarks');
       const btnsContainer = document.getElementById('detailActionButtonsContainer');
+      const sec6Title = document.getElementById('detailSection6Title');
+      const sec6Subtitle = document.getElementById('detailModalSubtitle');
+
+      const coyLabel = document.querySelector('#detailCompanySelectWrapper label');
+      const secLabel = document.querySelector('#detailSectionSelectWrapper label');
+      const posLabel = document.querySelector('#detailPositionSelectWrapper label');
+      const remLabel = document.querySelector('#detailRemarksWrapper label');
 
       const roleUpper = String(d.user_role || currentInsightsUserRole || '').trim().toUpperCase();
       const isCO = checkIsCoDashboard() || roleUpper === 'CO' || roleUpper === 'COMMANDING OFFICER';
       const isAdjutant = (roleUpper === 'ADJUTANT');
       const is2IC = (roleUpper === '2IC' || roleUpper === 'ADMIN' || roleUpper === 'SUPER ADMIN');
+
+      // Cache active recommendation in global state for dropdowns
+      window.currentActiveAiRec = {
+        company: getCanonicalCoy(d.recommended_company || 'HQ COY'),
+        section: String(d.recommended_section || '').trim(),
+        position: String(d.recommended_position || '').trim()
+      };
+
+      // Populate initial values based on role
+      let targetCoy = 'HQ COY';
+      let targetSec = '';
+      let targetPos = '';
+
+      if (is2IC || isCO) {
+        targetCoy = d.final_company || d.adjutant_company || d.recommended_company || 'HQ COY';
+        targetSec = d.final_section || d.adjutant_section || d.recommended_section || '';
+        targetPos = d.final_position || d.adjutant_position || d.recommended_position || '';
+      } else {
+        targetCoy = d.adjutant_company || d.recommended_company || 'HQ COY';
+        targetSec = d.adjutant_section || d.recommended_section || '';
+        targetPos = d.adjutant_position || d.recommended_position || '';
+      }
+
+      // Remarks: Load whichever remarks exist (decision_remarks or adjutant_remarks)
+      const existingRemarks = d.decision_remarks || d.adjutant_remarks || '';
+      if (remarksTextarea) remarksTextarea.value = existingRemarks;
+
+      targetCoy = getCanonicalCoy(targetCoy);
+
+      // Populate dropdowns
+      if (coySelect) {
+        coySelect.onchange = onDetailCompanyChange;
+        populateCompanyDropdown(coySelect, targetCoy, window.currentActiveAiRec.company);
+      }
+      if (secSelect) {
+        secSelect.onchange = onDetailSectionChange;
+      }
+      populateSectionDropdown(targetCoy, targetSec, targetPos, 'detailFinalSectionSelect', 'detailFinalPositionSelect');
 
       // Render 2IC Final Allocation Info (Visible to Adjutant, CO, and 2IC)
       const updateCardEl = document.getElementById('detail2ICUpdateInfo');
@@ -1287,7 +1753,7 @@
             <div class="alert alert-success border-success border-2 shadow-sm rounded-3 p-3 mb-3" style="background-color: #f0fdf4;">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <span class="fw-bold text-success-emphasis" style="font-size: 0.88rem;">
-                  <i class="fas fa-bell me-1.5 text-success"></i> Notice to Adjutant: 2IC Updated &amp; Finalized Allocation
+                  <i class="fas fa-bell me-1.5 text-success"></i> 2IC Finalized Allocation
                 </span>
                 <span class="badge ${d.decision_type === 'accepted' ? 'bg-success' : 'bg-danger'} text-white px-2.5 py-1 text-uppercase fw-bold" style="font-size: 0.72rem;">
                   ${d.decision_type.toUpperCase()}
@@ -1303,7 +1769,7 @@
                   <strong class="text-dark fs-6">${finalPos} (${finalSec})</strong>
                 </div>
                 <div class="col-md-6 mt-2">
-                  <span class="text-muted d-block" style="font-size: 0.72rem;">Updated &amp; Allocated By 2IC:</span>
+                  <span class="text-muted d-block" style="font-size: 0.72rem;">Allocated By 2IC:</span>
                   <strong class="text-primary"><i class="fas fa-user-shield me-1"></i>${updatedByName} [${updatedRole}]</strong>
                 </div>
                 <div class="col-md-6 mt-2">
@@ -1312,9 +1778,9 @@
                 </div>
                 ${d.decision_remarks ? `
                 <div class="col-12 mt-2 pt-2 border-top border-success-subtle">
-                  <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem;">2IC Remarks / Allocation Reason:</span>
+                  <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem;">2IC Remarks / Justification:</span>
                   <div class="p-2 rounded bg-white border border-success-subtle text-secondary small fw-medium">
-                    <i class="fas fa-comment-dots text-success me-1"></i>${d.decision_remarks}
+                    <i class="fas fa-comment-dots text-success me-1"></i>${escapeHtml(d.decision_remarks)}
                   </div>
                 </div>
                 ` : ''}
@@ -1323,94 +1789,176 @@
           `;
           updateCardEl.style.display = 'block';
         } else {
-          updateCardEl.innerHTML = `
-            <div class="alert alert-warning border-warning border-1 shadow-sm rounded-3 p-2.5 mb-3 small d-flex align-items-center gap-2" style="background-color: #fffbeb;">
-              <i class="fas fa-clock text-warning fs-6"></i>
-              <div><strong>Pending 2IC Allocation:</strong> 2IC has not yet finalized company allocation for this personnel.</div>
-            </div>
-          `;
-          updateCardEl.style.display = 'block';
+          updateCardEl.style.display = 'none';
         }
       }
 
-      // Configure Section 6 Controls based on User Role
+      // Configure Section Controls based on User Role
       if (isCO) {
+        // Commanding Officer: View Only Mode (Updation removed for CO)
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-eye me-1.5 text-primary"></i> PLACEMENT &amp; DECISION STATUS (CO VIEW ONLY)';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'Commanding Officer oversight mode — view results, matching rationale, and decision history';
+        if (coyLabel) coyLabel.textContent = 'Allocated / Recommended Company';
+        if (secLabel) secLabel.textContent = 'Allocated / Recommended Section';
+        if (posLabel) posLabel.textContent = 'Allocated / Recommended Position';
+        if (remLabel) remLabel.innerHTML = 'Recorded Remarks / Justification';
+
         if (scopeBanner) scopeBanner.innerHTML = `
-          <div class="alert alert-secondary py-2 px-3 mb-0 small d-flex align-items-center gap-2">
-            <i class="fas fa-eye text-secondary fs-6"></i>
-            <div><strong>CO View Only Mode:</strong> CO Dashboard is view-only. Action and allocation operations are performed by Adjutant / 2IC.</div>
+          <div class="alert alert-secondary py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
+            <i class="fas fa-lock text-muted fs-5"></i>
+            <div><strong>Commanding Officer Oversight (View Only):</strong> You have oversight access to view recommendations, reasoning, and decision history. Modifications can only be performed by Adjutant or 2IC.</div>
           </div>
         `;
+
         if (coySelect) coySelect.disabled = true;
         if (secSelect) secSelect.disabled = true;
         if (posSelect) posSelect.disabled = true;
-        if (remarksTextarea) remarksTextarea.disabled = true;
-        if (btnsContainer) btnsContainer.innerHTML = '';
-      } else if (isAdjutant) {
-        if (scopeBanner) scopeBanner.innerHTML = `
-          <div class="alert alert-info py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-            <i class="fas fa-user-edit text-primary fs-6"></i>
-            <div><strong>Adjutant Workflow:</strong> You can accept the AI recommendation or update company, section, &amp; position with a mandatory reason.</div>
-          </div>
-        `;
-        if (coySelect) coySelect.disabled = false;
-        if (secSelect) secSelect.disabled = false;
-        if (posSelect) posSelect.disabled = false;
-        if (remarksTextarea) remarksTextarea.disabled = false;
+        if (remarksTextarea) {
+          remarksTextarea.disabled = true;
+          remarksTextarea.readOnly = true;
+        }
 
         if (btnsContainer) btnsContainer.innerHTML = `
-          <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitDecision('adjutant_accept')">
-            <i class="fas fa-check-circle me-1"></i> Accept Recommendation
-          </button>
-          <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold shadow-sm" onclick="submitDecision('adjutant_update')">
-            <i class="fas fa-edit me-1"></i> Update Recommendation (with Reason)
+          <button type="button" class="btn btn-sm btn-outline-secondary px-4 py-1.5 fw-semibold" onclick="closeDetailModalSafely()">
+            <i class="fas fa-times me-1"></i> Close
           </button>
         `;
-      } else {
+
+      } else if (is2IC) {
+        // 2IC Executive Decision & Assignment Mode
+        const detailCoyWrapper = document.getElementById('detailCompanySelectWrapper');
+        const detailSecWrapper = document.getElementById('detailSectionSelectWrapper');
+        const detailPosWrapper = document.getElementById('detailPositionSelectWrapper');
+        if (detailCoyWrapper) detailCoyWrapper.style.display = 'block';
+        if (detailSecWrapper) detailSecWrapper.style.display = 'block';
+        if (detailPosWrapper) detailPosWrapper.style.display = 'block';
+
+        if (coySelect) {
+          coySelect.disabled = false;
+          coySelect.style.cursor = 'default';
+        }
+        if (secSelect) {
+          secSelect.disabled = false;
+          secSelect.style.cursor = 'default';
+        }
+        if (posSelect) {
+          posSelect.disabled = false;
+          posSelect.style.cursor = 'default';
+        }
+        if (remarksTextarea) {
+          remarksTextarea.disabled = false;
+          remarksTextarea.readOnly = false;
+        }
+
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-shield me-1.5 text-success"></i> 2IC EXECUTIVE DECISION &amp; ASSIGNMENT';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'Review Adjutant proposal and execute official company allocation';
+        if (coyLabel) coyLabel.textContent = 'Assigned Company';
+        if (secLabel) secLabel.textContent = 'Assigned Section';
+        if (posLabel) posLabel.textContent = 'Assigned Position';
+        if (remLabel) remLabel.textContent = '2IC Assignment Remarks / Justification';
+
+        let adjProposalHtml = '';
         if (d.adjutant_action) {
-          if (scopeBanner) scopeBanner.innerHTML = `
-            <div class="alert alert-info py-2 px-3 mb-2 small" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-              <i class="fas fa-info-circle me-1"></i><strong>Adjutant Input (${d.adjutant_action.toUpperCase()}):</strong> Adjutant (${d.adjutant_by}) proposed <strong>${d.adjutant_company || d.recommended_company} - ${d.adjutant_position || d.recommended_position}</strong>. Remarks/Reason: "${d.adjutant_remarks || 'None'}"
+          adjProposalHtml = `
+            <div class="card border-0 rounded-3 mb-2 shadow-sm" style="background: #f0fdf4; border-left: 4.5px solid #10b981 !important;">
+              <div class="card-body p-2.5">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-bold text-success-emphasis" style="font-size: 0.84rem;">
+                    <i class="fas fa-user-edit me-1"></i> Adjutant Proposed Placement: <strong>${d.adjutant_company || d.recommended_company}</strong> - <strong>${d.adjutant_section || d.recommended_section || 'GENERAL'}</strong> (<strong>${d.adjutant_position || d.recommended_position}</strong>)
+                  </span>
+                  <span class="badge ${d.adjutant_action === 'updated' ? 'bg-primary' : 'bg-success'} text-white text-uppercase" style="font-size: 0.68rem;">
+                    ${d.adjutant_action === 'updated' ? 'Updated by Adjutant' : 'Accepted AI Rec'}
+                  </span>
+                </div>
+                <div class="text-muted small mb-1" style="font-size: 0.72rem;">
+                  Reviewed By: <strong>${d.adjutant_by || 'Adjutant'}</strong> &bull; Time: <strong>${d.adjutant_at || 'Recently'}</strong>
+                </div>
+                ${d.adjutant_remarks ? `
+                  <div class="p-2 rounded bg-white border border-success-subtle text-secondary small fw-medium">
+                    <i class="fas fa-comment-dots text-success me-1"></i><strong>Adjutant Reason:</strong> "${escapeHtml(d.adjutant_remarks)}"
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            <div class="alert alert-success py-1.5 px-2.5 mb-0 small d-flex align-items-center gap-2" style="background: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
+              <i class="fas fa-shield-alt text-success fs-6"></i>
+              <div><strong>2IC Executive Assignment:</strong> Review Adjutant's proposal above, update company/section/position if required, and confirm final assignment.</div>
             </div>
           `;
         } else {
-          if (d.decision_type === 'accepted') {
-            if (scopeBanner) scopeBanner.innerHTML = `
-              <div class="alert alert-info py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-                <i class="fas fa-check-circle text-success fs-6"></i>
-                <div><strong>Placement Currently Assigned to ${targetCoy}:</strong> 2IC can select &amp; update company, section, position, and remarks below at any time.</div>
-              </div>
-            `;
-          } else {
-            if (scopeBanner) scopeBanner.innerHTML = `
-              <div class="alert alert-success py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
-                <i class="fas fa-user-shield text-success fs-6"></i>
-                <div><strong>2IC Executive Authority:</strong> 2IC can select &amp; update recommended company, section, &amp; position and execute final allocation.</div>
-              </div>
-            `;
-          }
+          adjProposalHtml = `
+            <div class="alert alert-warning py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #fffbeb; border-color: #fde68a; color: #92400e;">
+              <i class="fas fa-clock text-warning fs-6"></i>
+              <div><strong>Pending Adjutant Review:</strong> Adjutant has not reviewed this joinee yet. 2IC can still proceed to assign directly.</div>
+            </div>
+          `;
         }
 
-        if (coySelect) coySelect.disabled = false;
-        if (secSelect) secSelect.disabled = false;
-        if (posSelect) posSelect.disabled = false;
-        if (remarksTextarea) remarksTextarea.disabled = false;
+        if (scopeBanner) scopeBanner.innerHTML = adjProposalHtml;
 
         if (btnsContainer) btnsContainer.innerHTML = `
-          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="submitDecision('reject')">
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-semibold" onclick="closeDetailModalSafely()">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="closeDetailModalSafely()">
             <i class="fas fa-times-circle me-1"></i> Reject
           </button>
           <button type="button" class="btn btn-sm btn-primary px-3.5 py-1.5 fw-bold shadow-sm" onclick="submitDecision('update')">
-            <i class="fas fa-sync-alt me-1"></i> Update &amp; Re-Assign
+            <i class="fas fa-sync-alt me-1"></i> Update &amp; Assign Placement
           </button>
           <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitDecision('accept')">
             <i class="fas fa-check-circle me-1"></i> Confirm &amp; Assign Placement
           </button>
         `;
+
+      } else {
+        // Adjutant Advisory / Proposal Workflow (Default for Adjutant)
+        // Company, Section, and Position are hidden for Adjutant (shown for role 2IC only)
+        const detailCoyWrapper = document.getElementById('detailCompanySelectWrapper');
+        const detailSecWrapper = document.getElementById('detailSectionSelectWrapper');
+        const detailPosWrapper = document.getElementById('detailPositionSelectWrapper');
+        if (detailCoyWrapper) detailCoyWrapper.style.display = 'none';
+        if (detailSecWrapper) detailSecWrapper.style.display = 'none';
+        if (detailPosWrapper) detailPosWrapper.style.display = 'none';
+
+        // Only Remarks input field is editable for Adjutant
+        if (remarksTextarea) {
+          remarksTextarea.disabled = false;
+          remarksTextarea.readOnly = false;
+        }
+
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-edit me-1.5 text-primary"></i> ADJUTANT RECOMMENDATION &amp; REVIEW (FOR 2IC DECISION)';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'Adjutant reviews recommendation and adds remarks. Adjutant does not assign individuals.';
+        if (remLabel) remLabel.textContent = 'Adjutant Remarks / Justification';
+
+        if (scopeBanner) scopeBanner.innerHTML = `
+          <div class="alert alert-info py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
+            <i class="fas fa-info-circle text-primary fs-5"></i>
+            <div><strong>Adjutant Advisory Workflow:</strong> Review AI recommendation and provide remarks if needed. <strong>Adjutant never assigns an individual</strong>; your recommendation is forwarded to 2IC for final assignment.</div>
+          </div>
+        `;
+
+        if (btnsContainer) btnsContainer.innerHTML = `
+          <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-semibold" onclick="closeDetailModalSafely()">
+            <i class="fas fa-times me-1"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-danger px-3 py-1.5 fw-bold" onclick="closeDetailModalSafely()">
+            <i class="fas fa-times-circle me-1"></i> Reject
+          </button>
+          <button type="button" class="btn btn-sm btn-success px-3.5 py-1.5 fw-bold text-white shadow-sm" onclick="submitDecision('adjutant_accept')">
+            <i class="fas fa-check-circle me-1"></i> Accept AI Recommendation
+          </button>
+        `;
       }
 
-      const detailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('aiInsightDetailModal'));
+      const detailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('aiInsightDetailModal'), { focus: false, backdrop: 'static' });
       detailModal.show();
+      setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 1) {
+          backdrops[backdrops.length - 1].style.zIndex = '1058';
+        }
+      }, 50);
 
     } catch (err) {
       console.error('Error opening detail:', err);
@@ -1418,73 +1966,352 @@
     }
   }
 
+  function getCanonicalCoy(c) {
+    const s = String(c || '').trim().toUpperCase();
+    if (s.includes('COMN') || s.includes('COMMUNICATION')) return 'COMN COY';
+    if (s.includes('3') || s.includes('THREE')) return '3 COY';
+    return 'HQ COY';
+  }
+
+  function updateSelectRecDots() {
+    const activeRec = window.currentActiveAiRec || {};
+    const normRecCoy = getCanonicalCoy(activeRec.company || '');
+    const normRecSec = String(activeRec.section || '').trim().toUpperCase();
+    const normRecPos = String(activeRec.position || '').trim().toUpperCase();
+
+    function styleSelect(selectEl, isRec) {
+      if (!selectEl) return;
+      if (selectEl.disabled) {
+        selectEl.style.borderColor = '#10b981';
+        selectEl.style.color = '#047857';
+        selectEl.style.fontWeight = '700';
+        selectEl.style.backgroundColor = '#f0fdf4';
+        return;
+      }
+      if (isRec) {
+        selectEl.style.borderColor = '#10b981';
+        selectEl.style.color = '#047857';
+        selectEl.style.fontWeight = '700';
+        selectEl.style.backgroundColor = '#f0fdf4';
+      } else {
+        selectEl.style.borderColor = '#cbd5e1';
+        selectEl.style.color = '#1e293b';
+        selectEl.style.fontWeight = '400';
+        selectEl.style.backgroundColor = '#ffffff';
+      }
+    }
+
+    // Detail modal selects
+    const coySelect = document.getElementById('detailFinalCompanySelect');
+    const secSelect = document.getElementById('detailFinalSectionSelect');
+    const posSelect = document.getElementById('detailFinalPositionSelect');
+
+    if (coySelect) styleSelect(coySelect, getCanonicalCoy(coySelect.value) === normRecCoy);
+    if (secSelect) styleSelect(secSelect, String(secSelect.value || '').trim().toUpperCase() === normRecSec);
+    if (posSelect) styleSelect(posSelect, String(posSelect.value || '').trim().toUpperCase() === normRecPos);
+
+    // VR modal selects (2IC)
+    const vr2icCoySelect = document.getElementById('vr2icCompanySelect');
+    const vr2icSecSelect = document.getElementById('vr2icSectionSelect');
+    const vr2icPosSelect = document.getElementById('vr2icPositionSelect');
+
+    if (vr2icCoySelect) styleSelect(vr2icCoySelect, getCanonicalCoy(vr2icCoySelect.value) === normRecCoy);
+    if (vr2icSecSelect) styleSelect(vr2icSecSelect, String(vr2icSecSelect.value || '').trim().toUpperCase() === normRecSec);
+    if (vr2icPosSelect) styleSelect(vr2icPosSelect, String(vr2icPosSelect.value || '').trim().toUpperCase() === normRecPos);
+
+    const vrCoySelect = document.getElementById('vrAdjCompanySelect');
+    const vrSecSelect = document.getElementById('vrAdjSectionSelect');
+    const vrPosSelect = document.getElementById('vrAdjPositionSelect');
+
+    if (vrCoySelect) styleSelect(vrCoySelect, getCanonicalCoy(vrCoySelect.value) === normRecCoy);
+    if (vrSecSelect) styleSelect(vrSecSelect, String(vrSecSelect.value || '').trim().toUpperCase() === normRecSec);
+    if (vrPosSelect) styleSelect(vrPosSelect, String(vrPosSelect.value || '').trim().toUpperCase() === normRecPos);
+  }
+
+  function populateCompanyDropdown(selectEl, selectedCoy, recommendedCoy) {
+    if (!selectEl) return;
+    selectEl.innerHTML = '';
+    const companies = ['HQ COY', 'COMN COY', '3 COY'];
+    const canonicalSelected = getCanonicalCoy(selectedCoy || companies[0]);
+    const canonicalRec = getCanonicalCoy(recommendedCoy || '');
+
+    companies.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c;
+      const isRecommended = (getCanonicalCoy(c) === canonicalRec);
+      opt.textContent = c;
+      if (isRecommended) {
+        opt.style.color = '#047857';
+        opt.style.fontWeight = '700';
+        opt.style.backgroundColor = '#ecfdf5';
+      }
+      if (getCanonicalCoy(c) === canonicalSelected) {
+        opt.selected = true;
+      }
+      selectEl.appendChild(opt);
+    });
+    updateSelectRecDots();
+  }
+
   function onDetailCompanyChange() {
-    const coy = document.getElementById('detailFinalCompanySelect').value;
-    populateSectionDropdown(coy, '', '');
+    const coySelect = document.getElementById('detailFinalCompanySelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetSec = '';
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company)) {
+      targetSec = activeRec.section;
+      targetPos = activeRec.position;
+    }
+    populateSectionDropdown(coy, targetSec, targetPos, 'detailFinalSectionSelect', 'detailFinalPositionSelect');
+    updateSelectRecDots();
   }
 
   function onDetailSectionChange() {
-    const coy = document.getElementById('detailFinalCompanySelect').value;
-    const sec = document.getElementById('detailFinalSectionSelect').value;
-    populatePositionsDropdown(coy, sec, '');
+    const coySelect = document.getElementById('detailFinalCompanySelect');
+    const secSelect = document.getElementById('detailFinalSectionSelect');
+    const coy = coySelect ? coySelect.value : 'HQ COY';
+    const sec = secSelect ? secSelect.value : '';
+    const activeRec = window.currentActiveAiRec || {};
+    let targetPos = '';
+    if (getCanonicalCoy(coy) === getCanonicalCoy(activeRec.company) &&
+        String(sec || '').trim().toUpperCase() === String(activeRec.section || '').trim().toUpperCase()) {
+      targetPos = activeRec.position;
+    }
+    populatePositionsDropdown(coy, sec, targetPos, 'detailFinalPositionSelect');
+    updateSelectRecDots();
   }
 
-  function populateSectionDropdown(company, selectedSec, selectedPos) {
-    const secSelect = document.getElementById('detailFinalSectionSelect');
+  function populateSectionDropdown(company, selectedSec, selectedPos, targetSecSelectId = 'detailFinalSectionSelect', targetPosSelectId = 'detailFinalPositionSelect') {
+    const secSelect = document.getElementById(targetSecSelectId);
     if (!secSelect) return;
     secSelect.innerHTML = '';
 
-    const sectionsObj = masterHierarchyMap[company] || {};
-    const sectionNames = Object.keys(sectionsObj);
+    const canonicalCoy = getCanonicalCoy(company);
+    const sectionsObj = masterHierarchyMap[canonicalCoy] || {};
+    let sectionNames = Object.keys(sectionsObj);
+
+    const activeRec = window.currentActiveAiRec || {};
+    const isCoyRecommended = (canonicalCoy === getCanonicalCoy(activeRec.company));
+    const normRecSec = String(activeRec.section || '').trim().toUpperCase();
+
+    // If recommended section exists for this company but not in standard list, append it
+    if (isCoyRecommended && normRecSec && !sectionNames.some(s => s.trim().toUpperCase() === normRecSec)) {
+      sectionNames.push(activeRec.section);
+    }
+
+    const normSelectedSec = String(selectedSec || '').trim().toUpperCase();
+    let foundSelected = false;
 
     sectionNames.forEach(s => {
       const opt = document.createElement('option');
       opt.value = s;
+      const isRecommended = isCoyRecommended && (s.trim().toUpperCase() === normRecSec);
       opt.textContent = s;
-      if (s === selectedSec) opt.selected = true;
+      if (isRecommended) {
+        opt.style.color = '#047857';
+        opt.style.fontWeight = '700';
+        opt.style.backgroundColor = '#ecfdf5';
+      }
+      if (normSelectedSec && s.trim().toUpperCase() === normSelectedSec) {
+        opt.selected = true;
+        foundSelected = true;
+      }
       secSelect.appendChild(opt);
     });
 
+    if (!foundSelected && secSelect.options.length > 0) {
+      secSelect.selectedIndex = 0;
+    }
+
     const activeSec = secSelect.value || sectionNames[0] || '';
-    populatePositionsDropdown(company, activeSec, selectedPos);
+    populatePositionsDropdown(canonicalCoy, activeSec, selectedPos, targetPosSelectId);
+    updateSelectRecDots();
   }
 
-  function populatePositionsDropdown(company, section, selectedPos) {
-    const posSelect = document.getElementById('detailFinalPositionSelect');
+  function populatePositionsDropdown(company, section, selectedPos, targetPosSelectId = 'detailFinalPositionSelect') {
+    const posSelect = document.getElementById(targetPosSelectId);
     if (!posSelect) return;
     posSelect.innerHTML = '';
 
-    const positions = (masterHierarchyMap[company] && masterHierarchyMap[company][section]) || [];
+    const canonicalCoy = getCanonicalCoy(company);
+    const sectionsObj = masterHierarchyMap[canonicalCoy] || {};
+    let positions = [...(sectionsObj[section] || [])];
+
+    const activeRec = window.currentActiveAiRec || {};
+    const isCoyRecommended = (canonicalCoy === getCanonicalCoy(activeRec.company));
+    const normRecSec = String(activeRec.section || '').trim().toUpperCase();
+    const normRecPos = String(activeRec.position || '').trim().toUpperCase();
+    const isSecRecommended = isCoyRecommended && (String(section || '').trim().toUpperCase() === normRecSec);
+
+    // If recommended position exists for this section but not in list, prepend it
+    if (isSecRecommended && normRecPos && !positions.some(p => p.trim().toUpperCase() === normRecPos)) {
+      positions = [activeRec.position, ...positions];
+    }
+
+    const normSelectedPos = String(selectedPos || '').trim().toUpperCase();
+    let foundSelected = false;
+
     positions.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p;
+      const isRecommended = isSecRecommended && (p.trim().toUpperCase() === normRecPos);
       opt.textContent = p;
-      if (p === selectedPos) opt.selected = true;
+      if (isRecommended) {
+        opt.style.color = '#047857';
+        opt.style.fontWeight = '700';
+        opt.style.backgroundColor = '#ecfdf5';
+      }
+      if (normSelectedPos && p.trim().toUpperCase() === normSelectedPos) {
+        opt.selected = true;
+        foundSelected = true;
+      }
       posSelect.appendChild(opt);
     });
+
+    if (!foundSelected && posSelect.options.length > 0) {
+      posSelect.selectedIndex = 0;
+    }
+
+    posSelect.onchange = updateSelectRecDots;
+    updateSelectRecDots();
+  }
+
+  function setDetailReason(text) {
+    const cleanText = text.replace(/^[●🟢\s]+/, '').trim();
+    const remarksEl = document.getElementById('detailDecisionRemarks');
+    if (remarksEl) {
+      remarksEl.value = cleanText;
+      remarksEl.classList.remove('is-invalid');
+      remarksEl.focus();
+    }
+  }
+
+  function closeDetailModalSafely() {
+    const modalEl = document.getElementById('aiInsightDetailModal');
+    if (modalEl) {
+      try {
+        const inst = bootstrap.Modal.getInstance(modalEl);
+        if (inst) {
+          inst._isTransitioning = false;
+          inst.hide();
+        }
+      } catch(e) {
+        console.warn('Error hiding detail modal:', e);
+      }
+      modalEl.classList.remove('show');
+      modalEl.style.display = 'none';
+      modalEl.setAttribute('aria-hidden', 'true');
+      modalEl.removeAttribute('aria-modal');
+    }
+
+    const parentModal = document.getElementById('aiJoineeInsightsModal');
+    const isParentOpen = parentModal && (parentModal.classList.contains('show') || parentModal.style.display === 'block');
+
+    if (isParentOpen) {
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      if (backdrops.length > 1) {
+        for (let i = 1; i < backdrops.length; i++) {
+          backdrops[i].remove();
+        }
+      }
+      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+    }
+  }
+
+  function closeVrModalSafely() {
+    const modalEl = document.getElementById('aiViewResultModal');
+    if (modalEl) {
+      try {
+        const inst = bootstrap.Modal.getInstance(modalEl);
+        if (inst) {
+          inst._isTransitioning = false;
+          inst.hide();
+        }
+      } catch(e) {
+        console.warn('Error hiding vrModal:', e);
+      }
+      modalEl.classList.remove('show');
+      modalEl.style.display = 'none';
+      modalEl.setAttribute('aria-hidden', 'true');
+      modalEl.removeAttribute('aria-modal');
+    }
+
+    const parentModal = document.getElementById('aiJoineeInsightsModal');
+    const isParentOpen = parentModal && (parentModal.classList.contains('show') || parentModal.style.display === 'block');
+
+    if (isParentOpen) {
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      if (backdrops.length > 1) {
+        for (let i = 1; i < backdrops.length; i++) {
+          backdrops[i].remove();
+        }
+      }
+      document.body.classList.add('modal-open');
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+    }
   }
 
   async function submitDecision(action) {
     const recId = document.getElementById('detailRecId')?.value;
-    const finalCoy = document.getElementById('detailFinalCompanySelect')?.value;
-    const finalSec = document.getElementById('detailFinalSectionSelect')?.value;
-    const finalPos = document.getElementById('detailFinalPositionSelect')?.value;
-    const remarks = document.getElementById('detailDecisionRemarks')?.value?.trim();
+    const coySelect = document.getElementById('detailFinalCompanySelect');
+    const secSelect = document.getElementById('detailFinalSectionSelect');
+    const posSelect = document.getElementById('detailFinalPositionSelect');
+    const remarksEl = document.getElementById('detailDecisionRemarks');
 
     if (!recId) {
       alert('Missing recommendation ID');
       return;
     }
 
-    if (action === 'adjutant_update' && !remarks) {
-      alert('Reason is required when Adjutant updates a recommendation. Please enter a reason in the remarks field.');
-      const remarksEl = document.getElementById('detailDecisionRemarks');
-      if (remarksEl) {
-        remarksEl.focus();
-        remarksEl.classList.add('is-invalid');
-      }
+    const activeRec = window.currentActiveAiRec || {};
+    let finalCoy = coySelect?.value || 'HQ COY';
+    let finalSec = secSelect?.value || '';
+    let finalPos = posSelect?.value || '';
+    let remarks = remarksEl?.value?.trim() || '';
+
+    // If accepting AI recommendation, ensure we sync to the AI recommended placement
+    if (action === 'reject' || action === 'adjutant_reject') {
+      closeDetailModalSafely();
       return;
     }
+    if (action === 'adjutant_accept') {
+      if (activeRec.company) finalCoy = activeRec.company;
+      if (activeRec.section) finalSec = activeRec.section;
+      if (activeRec.position) finalPos = activeRec.position;
+      if (!remarks) {
+        remarks = 'Adjutant accepted AI recommendation.';
+        if (remarksEl) remarksEl.value = remarks;
+      }
+    } else if (action === 'adjutant_update') {
+      if (!remarks) {
+        remarks = `Adjutant recommended update to ${finalCoy} - ${finalSec} (${finalPos}) based on operational requirements.`;
+        if (remarksEl) remarksEl.value = remarks;
+      }
+    } else if (action === 'accept' && !remarks) {
+      remarks = '2IC confirmed and assigned placement.';
+      if (remarksEl) remarksEl.value = remarks;
+    } else if (action === 'update' && !remarks) {
+      remarks = `2IC updated and assigned placement to ${finalCoy} - ${finalSec} (${finalPos}).`;
+      if (remarksEl) remarksEl.value = remarks;
+    }
+
+    if (remarksEl) remarksEl.classList.remove('is-invalid');
+
+    // UI Loading state on clicked buttons
+    const btns = document.querySelectorAll('#detailActionButtonsContainer button');
+    btns.forEach(b => { b.disabled = true; });
 
     try {
       const res = await fetch('/api/ai/company-recommendation/decision', {
@@ -1502,16 +2329,114 @@
 
       const json = await res.json();
       if (json.success) {
-        alert(json.message || `Decision recorded: ${json.decision_type || 'Success'}`);
-        const detailModal = bootstrap.Modal.getInstance(document.getElementById('aiInsightDetailModal'));
-        if (detailModal) detailModal.hide();
+        alert(json.message || `Decision recorded successfully.`);
+        closeDetailModalSafely();
         fetchAiInsights(currentInsightsPage);
       } else {
         alert(json.error || 'Failed to save decision');
+        btns.forEach(b => { b.disabled = false; });
       }
     } catch (err) {
       console.error('Error saving decision:', err);
       alert('Network error while saving decision.');
+      btns.forEach(b => { b.disabled = false; });
     }
+  }
+
+  // Expose global functions to window
+  window.openAiInsightsModal = openAiInsightsModal;
+  window.openViewResultDialog = openViewResultDialog;
+  window.openInsightDetail = openInsightDetail;
+  window.onDetailCompanyChange = onDetailCompanyChange;
+  window.onDetailSectionChange = onDetailSectionChange;
+  window.populateCompanyDropdown = populateCompanyDropdown;
+  window.populateSectionDropdown = populateSectionDropdown;
+  window.populatePositionsDropdown = populatePositionsDropdown;
+  window.submitDecision = submitDecision;
+  window.submitInsightDecision = submitDecision;
+  window.setDetailReason = setDetailReason;
+  window.setVrAdjReason = setVrAdjReason;
+  window.onVrAdjCompanyChange = onVrAdjCompanyChange;
+  window.onVrAdjSectionChange = onVrAdjSectionChange;
+  window.onVr2icCompanyChange = onVr2icCompanyChange;
+  window.onVr2icSectionChange = onVr2icSectionChange;
+  window.submitVr2icDecision = submitVr2icDecision;
+  window.populateVrAdjSectionDropdown = populateVrAdjSectionDropdown;
+  window.populateVrAdjPositionsDropdown = populateVrAdjPositionsDropdown;
+  window.submitVrAdjutantDecision = submitVrAdjutantDecision;
+  window.closeDetailModalSafely = closeDetailModalSafely;
+  window.closeVrModalSafely = closeVrModalSafely;
+
+  function initAiInsightsModalEvents() {
+    // Disable Bootstrap / jQuery modal focus enforcement so child modals can receive input focus freely
+    try {
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        if (bootstrap.Modal.prototype && bootstrap.Modal.prototype._initializeFocusTrap) {
+          bootstrap.Modal.prototype._initializeFocusTrap = function() {
+            return {
+              activate: function() {},
+              deactivate: function() {}
+            };
+          };
+        }
+      }
+      if (window.$ && $.fn && $.fn.modal && $.fn.modal.Constructor) {
+        $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+        $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+      }
+    } catch(e) {
+      console.warn('Focus trap disable warning:', e);
+    }
+
+    const modalEl = document.getElementById('aiJoineeInsightsModal');
+    if (modalEl) {
+      modalEl.addEventListener('shown.bs.modal', function () {
+        fetchAiInsights(1);
+      });
+    }
+
+    const vrModalEl = document.getElementById('aiViewResultModal');
+    if (vrModalEl) {
+      vrModalEl.addEventListener('click', function(e) {
+        if (e.target === vrModalEl) {
+          closeVrModalSafely();
+        }
+      });
+    }
+
+    const detailModalEl = document.getElementById('aiInsightDetailModal');
+    if (detailModalEl) {
+      detailModalEl.addEventListener('click', function(e) {
+        if (e.target === detailModalEl) {
+          closeDetailModalSafely();
+        }
+      });
+    }
+
+    // Support ESC key specifically for nested modals
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        const vr = document.getElementById('aiViewResultModal');
+        if (vr && (vr.classList.contains('show') || vr.style.display === 'block')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeVrModalSafely();
+          return;
+        }
+        const dt = document.getElementById('aiInsightDetailModal');
+        if (dt && (dt.classList.contains('show') || dt.style.display === 'block')) {
+          e.preventDefault();
+          e.stopPropagation();
+          closeDetailModalSafely();
+          return;
+        }
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAiInsightsModalEvents);
+  } else {
+    initAiInsightsModalEvents();
   }
 </script>

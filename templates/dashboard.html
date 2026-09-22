@@ -651,14 +651,15 @@
       </div>
       {%endif%}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+      {% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal" id="loanDetailGraph">
         <span class="sc-label">Active Loans</span>
         <div class="sc-right">
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      <div class="sc" style="cursor: pointer" onclick="openAiInsightsModal()" id="card-ai-insights-dash" title="AI New Joinee Company Recommendation Insights">
+      <div class="sc" style="cursor: pointer" id="card-ai-insights-dash" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Joinee Company Recommendation Insights">
         <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count-dash"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1547,7 +1548,8 @@
   });
 </script>
 
-{% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+{% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
 {% endif %}

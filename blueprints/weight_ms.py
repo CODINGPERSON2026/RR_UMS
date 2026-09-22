@@ -2,18 +2,23 @@ from imports import *
 
 weight_ms = Blueprint('weight', __name__, url_prefix='/weight_system')
 
-# --- Helper functions ---
 def round_to_nearest_even(n):
     """
-    Rounds a number to the nearest even integer.
+    Rounds a number to the nearest even integer. Returns None if n is None or non-numeric.
     """
+    if n is None:
+        return None
+    try:
+        n = float(n)
+    except (ValueError, TypeError):
+        return None
     rounded = round(n)
     if rounded % 2 != 0:
         if n > rounded:
             rounded += 1
         else:
             rounded -= 1
-    return rounded
+    return int(rounded)
 
 def fetch_all_ideal_weights(cursor):
     """
@@ -86,18 +91,24 @@ def compute_authorization(company=None):
 
         for s in soldiers:
             age = s['age']
-            height_cm = round_to_nearest_even(s['height'])
-            actual_weight = s['actual_weight']
+            height_cm = round_to_nearest_even(s.get('height'))
+            actual_weight = s.get('actual_weight')
+            if actual_weight is not None:
+                try:
+                    actual_weight = float(actual_weight)
+                except (ValueError, TypeError):
+                    actual_weight = None
+
             name = s['name']
             comp = s['company']
             army_number = s['army_number']
             rank = s['rank']
             status_type = s['status_type']
 
-            ideal_weight = lookup_ideal_weight_from_map(ideal_map, age, height_cm)
+            ideal_weight = lookup_ideal_weight_from_map(ideal_map, age, height_cm) if height_cm is not None else None
 
-            if ideal_weight is None:
-                status = "No ideal weight found"
+            if ideal_weight is None or actual_weight is None:
+                status = "No ideal weight found" if ideal_weight is None else "No weight recorded"
                 lower = upper = None
                 weight_deviation_percent = None
                 weight_deviation_kg = None
@@ -487,13 +498,18 @@ def api_status_data():
         results = []
         for user in users:
             age = user['age']
-            height_cm = round_to_nearest_even(user['height_cm'])
-            actual_weight = user['actual_weight']
+            height_cm = round_to_nearest_even(user.get('height_cm'))
+            actual_weight = user.get('actual_weight')
+            if actual_weight is not None:
+                try:
+                    actual_weight = float(actual_weight)
+                except (ValueError, TypeError):
+                    actual_weight = None
             
-            ideal_weight = get_ideal_weight(age, height_cm, cursor)
+            ideal_weight = get_ideal_weight(age, height_cm, cursor) if height_cm is not None else None
             
-            if ideal_weight is None:
-                status = "No ideal weight found"
+            if ideal_weight is None or actual_weight is None:
+                status = "No ideal weight found" if ideal_weight is None else "No weight recorded"
                 lower = upper = None
                 weight_deviation_percent = None
                 weight_deviation_kg = None
@@ -886,8 +902,8 @@ def api_person_details(army_number):
         if ideal_weight is not None:
             ideal_weight = float(ideal_weight)
         
-        if ideal_weight is None:
-            status = "No ideal weight found"
+        if ideal_weight is None or actual_weight is None:
+            status = "No ideal weight found" if ideal_weight is None else "No weight recorded"
             lower = upper = None
             weight_deviation_percent = None
             weight_deviation_kg = None

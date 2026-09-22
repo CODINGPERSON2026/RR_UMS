@@ -219,7 +219,7 @@
               const div = document.createElement('div');
               div.className = 'gallery-item';
   
-              div.innerHTML = `<img src="/static/uploads/gallery/${item.image}" loading="lazy">`;
+              div.innerHTML = `<img src="/static/uploads/gallery/${item.image}" onerror="this.onerror=null; this.src='/static/photos/default.jpeg';" loading="lazy">`;
   
               div.addEventListener('mouseenter', () => this.pauseAuto());
               div.addEventListener('mouseleave', () => this.resumeAuto());
