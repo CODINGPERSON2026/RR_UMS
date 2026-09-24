@@ -167,15 +167,17 @@
 
   /* ── PRINT ── */
   @media print {
+    @page { size: A4 portrait; margin: 10mm 8mm; }
     * { color: #000 !important; background: #fff !important;
-        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    #nr-topbar, #nr-filter-bar, #nr-status-bar, #nr-pagination { display: none !important; }
-    body { background: #fff !important; }
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    #nr-topbar, #nr-filter-bar, #nr-status-bar, #nr-pagination, .modal { display: none !important; }
+    body { background: #fff !important; margin: 0; padding: 0; }
     #nr-table-wrap { padding: 0 !important; }
-    #nr-table { box-shadow: none !important; border: 1px solid #000 !important; border-radius: 0; }
+    #nr-table { width: 100% !important; box-shadow: none !important; border: 1px solid #000 !important; border-radius: 0; }
+    #nr-table thead { display: table-header-group; }
     #nr-table thead tr { background: #fff !important; }
     #nr-table thead th { color: #000 !important; background: #fff !important; border-bottom: 2px solid #000 !important; }
-    #nr-table tbody tr { border-bottom: 1px solid #ccc !important; }
+    #nr-table tbody tr { border-bottom: 1px solid #ccc !important; page-break-inside: avoid !important; }
     #nr-table tbody td { color: #000 !important; background: #fff !important; }
   }
   .nr-print-title { display: none; }
@@ -190,6 +192,51 @@
   .detail-label { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
   .detail-value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
   .detail-section-title { font-size: 12px; font-weight: 700; color: var(--primary-color); margin: 20px 0 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); }
+
+  /* Present P Button Badge */
+  .badge-p-present {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff !important;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 5px rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.15s ease;
+  }
+  .badge-p-present:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.35);
+    filter: brightness(1.05);
+  }
+  .p-btn-symbol {
+    background: #ffffff;
+    color: #059669;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  /* Date Sheet Cells */
+  .cell-status-p   { background: #d1fae5; color: #065f46; font-weight: 700; text-align: center; border-radius: 4px; padding: 3px 0; font-size: 10px; }
+  .cell-status-l   { background: #fee2e2; color: #991b1b; font-weight: 700; text-align: center; border-radius: 4px; padding: 3px 0; font-size: 10px; }
+  .cell-status-det { background: #dbeafe; color: #1e40af; font-weight: 700; text-align: center; border-radius: 4px; padding: 3px 0; font-size: 9px; }
+  .cell-status-c   { background: #f3e8ff; color: #6b21a8; font-weight: 700; text-align: center; border-radius: 4px; padding: 3px 0; font-size: 10px; }
+  .cell-status-td  { background: #e5e7eb; color: #374151; font-weight: 700; text-align: center; border-radius: 4px; padding: 3px 0; font-size: 9px; }
+  .cell-today      { box-shadow: inset 0 0 0 2px #10b981; }
 </style>
 
 <!-- TOP BAR -->
@@ -244,6 +291,10 @@
     </div>
   </div>
   <div class="nr-filter-spacer"></div>
+  <button id="nr-p-sheet-btn" class="nr-action-btn" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; gap: 6px; box-shadow: 0 2px 5px rgba(16,185,129,0.3);" onclick="openMonthlySheetModal()">
+    <span style="background:#fff; color:#059669; width:18px; height:18px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:11px;">P</span>
+    Monthly Sheet (1-31)
+  </button>
   <button id="nr-export-btn" class="nr-action-btn" onclick="exportCSV()">
     <i class="fas fa-file-csv"></i>
     Export CSV
@@ -261,6 +312,11 @@
   <span id="nr-count-badge">0</span>
   <span id="nr-company-note" style="margin-left: 15px; font-weight: 600; color: var(--primary-color); display: none;"></span>
   <span id="nr-filter-note"></span>
+  <span id="nr-day-note" style="margin-left: auto; font-weight: 600; color: var(--success-color); display: inline-flex; align-items: center; gap: 6px;">
+    <i class="fas fa-calendar-day"></i>
+    <span>Day of Month:</span>
+    <span class="badge-p-present" style="padding: 2px 8px; font-size: 11px;"><span class="p-btn-symbol">P</span> Day <span id="nr-present-day-val">24</span></span>
+  </span>
 </div>
 
 <!-- TABLE -->
@@ -307,6 +363,74 @@
         <button type="button" class="btn btn-primary" onclick="window.print()" style="border-radius: 8px;">
           <i class="fas fa-print me-2"></i>Print Details
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MONTHLY DATE SHEET (1-31) MODAL -->
+<div class="modal fade" id="monthlySheetModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" style="max-width: 96%;">
+    <div class="modal-content" style="border:none; border-radius:12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+      <div class="modal-header" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 14px 20px;">
+        <div class="d-flex align-items-center gap-3">
+          <span style="background:#fff; color:#059669; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">P</span>
+          <div>
+            <h5 class="modal-title text-white mb-0" style="font-size:16px; font-weight:700; letter-spacing:0.5px;">Individual Full Month Date Sheet (Days 1 to 31)</h5>
+            <small style="color: rgba(255,255,255,0.85); font-size:11px;">15 CESR &bull; Daily Attendance Matrix & Duty Status Tracker</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: brightness(0) invert(1);"></button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px; background: var(--background);">
+        <!-- Controls & Legend Bar -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3" style="background: var(--card-bg-solid); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border-color);">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <div class="d-flex align-items-center gap-2">
+              <label for="ms-sel-month" style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Month:</label>
+              <select id="ms-sel-month" onchange="loadMonthlySheet()" style="padding: 4px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg-solid); color: var(--text-primary); font-weight: 600;">
+              </select>
+              <select id="ms-sel-year" onchange="loadMonthlySheet()" style="padding: 4px 10px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg-solid); color: var(--text-primary); font-weight: 600;">
+              </select>
+            </div>
+
+            <div class="d-flex align-items-center gap-2 ms-2">
+              <div style="position:relative;">
+                <input type="text" id="ms-search-input" placeholder="Search army no or name..." onkeyup="filterMonthlySheet()" style="padding: 4px 10px 4px 28px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--card-bg-solid); color: var(--text-primary); min-width: 210px;">
+                <i class="fas fa-search" style="position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:11px;"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size: 11px; font-weight: 700;">
+            <span class="badge" style="background:#10b981; color:#fff; padding: 4px 8px;">P = Present</span>
+            <span class="badge" style="background:#ef4444; color:#fff; padding: 4px 8px;">L = Leave</span>
+            <span class="badge" style="background:#3b82f6; color:#fff; padding: 4px 8px;">DET = Detachment</span>
+            <span class="badge" style="background:#8b5cf6; color:#fff; padding: 4px 8px;">C = Course</span>
+            <span class="badge" style="background:#6b7280; color:#fff; padding: 4px 8px;">TD = Temporary Duty</span>
+          </div>
+        </div>
+
+        <!-- Sheet Table -->
+        <div style="overflow-x: auto; max-height: 520px; border-radius: 8px; border: 1px solid var(--border-color);" id="ms-table-wrap">
+          <table class="table table-bordered table-sm align-middle mb-0" id="ms-table" style="font-size: 11px; min-width: 1150px; background: var(--card-bg-solid); border-color: var(--border-color);">
+            <thead style="position: sticky; top: 0; background: var(--primary-color); color: #fff; z-index: 10;">
+              <tr id="ms-thead-tr">
+                <!-- Injected via JS -->
+              </tr>
+            </thead>
+            <tbody id="ms-tbody"></tbody>
+          </table>
+          <div id="ms-empty" style="display:none; text-align:center; padding:30px; color:var(--text-secondary);">No sheet data available.</div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="border-top: 1px solid var(--border-color); padding: 12px 20px;">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal" style="border-radius: 6px;">Close</button>
+        <button type="button" class="btn btn-success btn-sm" onclick="exportMonthlySheetCSV()" style="border-radius: 6px;"><i class="fas fa-file-csv me-1"></i> Export Sheet CSV</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="printMonthlySheet()" style="border-radius: 6px;"><i class="fas fa-print me-1"></i> Print Sheet</button>
       </div>
     </div>
   </div>
@@ -499,6 +623,11 @@
       currentPage = 1;
       clearSortIcons();
 
+      if (json.present_day_of_month) {
+        const pDayVal = document.getElementById('nr-present-day-val');
+        if (pDayVal) pDayVal.textContent = json.present_day_of_month;
+      }
+
       countBadge.textContent = allData.length;
 
       const active = [];
@@ -573,7 +702,7 @@
             ${row.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON DET</span>' : ''}
             ${row.oncourse_status ? '<span style="background:var(--nav-link-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON COURSE</span>' : ''}
             ${row.td_status ? '<span style="background:var(--text-secondary); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON TD</span>' : ''}
-            ${!row.onleave_status && !row.detachment_status && !row.oncourse_status &&!row.td_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
+            ${!row.onleave_status && !row.detachment_status && !row.oncourse_status && !row.td_status ? '<span style="color:var(--success-color); font-size:10px; font-weight:600;">● PRESENT</span>' : ''}
           </td>
         `;
       } else {
@@ -788,8 +917,9 @@
 
     printWin.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: Arial, Helvetica, sans-serif; font-size: 11px; background: #fff; color: #000; padding: 20px; position: relative; }
+      @page { size: A4 portrait; margin: 10mm 8mm; }
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5px; background: #fff; color: #000; padding: 5px; position: relative; }
       .watermark-overlay {
         position: fixed;
         top: 0; left: 0; right: 0; bottom: 0;
@@ -798,32 +928,32 @@
         background-repeat: repeat;
         pointer-events: none;
         z-index: 999999;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
       }
-      h2 { text-align: center; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; }
+      h2 { text-align: center; margin-bottom: 6px; text-transform: uppercase; font-size: 13px; color: #1e3a8a; }
       .meta-bar {
         display: flex;
         justify-content: space-between;
-        font-size: 11px;
+        font-size: 9.5px;
         color: #444;
-        border-bottom: 1px dashed #888;
-        padding-bottom: 5px;
-        margin-bottom: 15px;
+        border-bottom: 1px solid #94a3b8;
+        padding-bottom: 4px;
+        margin-bottom: 10px;
       }
-      table { width: 100%; border-collapse: collapse; }
+      table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+      thead { display: table-header-group; }
+      tr { page-break-inside: avoid !important; }
       thead th {
         font-family: Arial, Helvetica, sans-serif;
-        font-size: 10px; font-weight: 700;
-        text-transform: uppercase; letter-spacing: 1px;
-        padding: 7px 10px; text-align: left;
+        font-size: 9.5px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 0.5px;
+        padding: 6px 8px; text-align: left;
         border-bottom: 2px solid #000;
-        background: #eee; color: #000;
+        background: #f1f5f9; color: #000;
       }
       tbody td {
         font-family: Arial, Helvetica, sans-serif;
-        padding: 6px 10px;
-        border-bottom: 1px solid #ccc;
+        padding: 5px 8px;
+        border-bottom: 1px solid #cbd5e1;
         color: #000; background: #fff;
       }
     </style></head><body>
@@ -971,7 +1101,44 @@
       modalTitle.textContent = `${d.rank} ${d.name} (${d.army_number})`;
       
       modalBody.innerHTML = `
-        <div class="detail-section-title" style="margin-top:0;">Personal & Service Information</div>
+        <div class="detail-section-title" style="margin-top:0;">Duty Status & Attendance</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">Current Status</div>
+            <div class="detail-value">
+              ${!d.onleave_status && !d.detachment_status && !d.oncourse_status && !d.td_status ? 
+                `<span style="color:var(--success-color); font-weight:700;">● PRESENT</span>` : 
+                (d.onleave_status ? '<span style="background:var(--danger-color); color:#fff; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600;">ON LEAVE</span>' : (d.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600;">ON DET</span>' : (d.oncourse_status ? '<span style="background:var(--nav-link-color); color:#fff; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600;">ON COURSE</span>' : '<span style="background:var(--text-secondary); color:#fff; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:600;">ON TD</span>')))}
+            </div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Present Days this Month</div>
+            <div class="detail-value" style="color: var(--success-color); font-weight: 700;">
+              Day ${d.present_day_of_month || new Date().getDate()} (${d.present_days != null ? d.present_days : new Date().getDate()} Days Present)
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section-title">Individual Full Month Date Sheet (Days 1 to 31)</div>
+        <div style="overflow-x: auto; padding: 10px; background: var(--card-bg-solid); border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px;">
+          <div class="d-flex align-items-center gap-1" style="min-width: 680px;">
+            ${Array.from({length: d.num_days_in_month || 31}, (_, i) => i + 1).map(day => {
+              const st = (d.daily_sheet && d.daily_sheet[day]) || 'P';
+              let cls = 'cell-status-p';
+              if (st === 'L') cls = 'cell-status-l';
+              else if (st === 'DET') cls = 'cell-status-det';
+              else if (st === 'C') cls = 'cell-status-c';
+              else if (st === 'TD') cls = 'cell-status-td';
+              const isToday = (day === (d.present_day_of_month || new Date().getDate()));
+              return `<div style="flex:1; min-width:24px; text-align:center;">
+                <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px; font-weight:600;">${day}</div>
+                <div class="${cls} ${isToday ? 'cell-today' : ''}" style="font-size:10px; padding:4px 0;">${st}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="detail-section-title">Personal & Service Information</div>
         <div class="detail-grid">
           <div class="detail-item"><div class="detail-label">Army Number</div><div class="detail-value">${esc(d.army_number)}</div></div>
           <div class="detail-item"><div class="detail-label">Full Name</div><div class="detail-value">${esc(d.name)}</div></div>
@@ -1006,6 +1173,204 @@
       loader.classList.remove('active');
     }
   }
+
+  /* ── Monthly Date Sheet (1 to 31) ── */
+  const msModalElement = document.getElementById('monthlySheetModal');
+  const msModal = msModalElement ? new bootstrap.Modal(msModalElement) : null;
+  let msData = [];
+  let msNumDays = 31;
+
+  window.openMonthlySheetModal = function() {
+    populateMonthYearSelectors();
+    loadMonthlySheet();
+    if (msModal) msModal.show();
+  };
+
+  function populateMonthYearSelectors() {
+    const selMonth = document.getElementById('ms-sel-month');
+    const selYear = document.getElementById('ms-sel-year');
+    if (!selMonth || selMonth.options.length > 0) return;
+
+    const now = new Date();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    months.forEach((m, idx) => {
+      const opt = new Option(m, idx + 1);
+      if (idx === now.getMonth()) opt.selected = true;
+      selMonth.appendChild(opt);
+    });
+
+    const curYr = now.getFullYear();
+    for (let y = curYr - 1; y <= curYr + 1; y++) {
+      const opt = new Option(y, y);
+      if (y === curYr) opt.selected = true;
+      selYear.appendChild(opt);
+    }
+  }
+
+  window.loadMonthlySheet = async function() {
+    const selMonth = document.getElementById('ms-sel-month');
+    const selYear = document.getElementById('ms-sel-year');
+    if (!selMonth || !selYear) return;
+
+    const month = selMonth.value;
+    const year = selYear.value;
+    const coy = selCompany ? selCompany.value : 'ALL';
+    const rank = selRank ? selRank.value : 'ALL';
+    const sec = selSection ? selSection.value : 'ALL';
+
+    const params = new URLSearchParams({ month, year, company: coy, rank, section: sec });
+    try {
+      const res = await fetch('/Nominal_Roll/api/monthly_sheet?' + params);
+      const json = await res.json();
+      if (json.status !== 'success') return;
+
+      msData = json.data;
+      msNumDays = json.num_days || 31;
+      renderMonthlySheet(json.today_day);
+    } catch (e) {
+      console.error('Failed to load monthly sheet:', e);
+    }
+  };
+
+  function renderMonthlySheet(todayDay) {
+    const theadTr = document.getElementById('ms-thead-tr');
+    const tbody = document.getElementById('ms-tbody');
+    const empty = document.getElementById('ms-empty');
+    if (!theadTr || !tbody) return;
+    tbody.innerHTML = '';
+
+    if (!msData.length) {
+      if (empty) empty.style.display = 'block';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    let ths = `<th style="width:36px; text-align:center;">S.No</th><th style="width:95px;">Army No</th><th style="width:130px;">Rank & Name</th><th style="width:65px;">Coy</th>`;
+    for (let d = 1; d <= msNumDays; d++) {
+      const isToday = (d === todayDay);
+      ths += `<th style="text-align:center; min-width:26px; padding:4px 1px; ${isToday ? 'background:#10b981; color:#fff;' : ''}">${d}</th>`;
+    }
+    ths += `<th style="text-align:center; width:55px; background:#059669; color:#fff;">Total P</th>`;
+    theadTr.innerHTML = ths;
+
+    const frag = document.createDocumentFragment();
+    msData.forEach((row, idx) => {
+      const tr = document.createElement('tr');
+      let tds = `<td class="text-center" style="font-size:10px;">${idx + 1}</td>
+                 <td style="font-family:monospace; font-weight:700; color:var(--primary-color);">${esc(row.army_number)}</td>
+                 <td><strong>${esc(row.rank)}</strong> ${esc(row.name)}</td>
+                 <td>${esc(row.company)}</td>`;
+
+      for (let d = 1; d <= msNumDays; d++) {
+        const st = (row.daily_sheet && row.daily_sheet[d]) || 'P';
+        let cls = 'cell-status-p';
+        if (st === 'L') cls = 'cell-status-l';
+        else if (st === 'DET') cls = 'cell-status-det';
+        else if (st === 'C') cls = 'cell-status-c';
+        else if (st === 'TD') cls = 'cell-status-td';
+
+        const isToday = (d === todayDay);
+        tds += `<td style="padding:1px;"><div class="${cls} ${isToday ? 'cell-today' : ''}" title="Day ${d}: ${st}">${st}</div></td>`;
+      }
+      tds += `<td style="text-align:center; font-weight:800; color:#059669; background:rgba(16,185,129,0.1);">${row.total_present != null ? row.total_present : ''}</td>`;
+      tr.innerHTML = tds;
+      frag.appendChild(tr);
+    });
+    tbody.appendChild(frag);
+  }
+
+  window.filterMonthlySheet = function() {
+    const searchEl = document.getElementById('ms-search-input');
+    if (!searchEl) return;
+    const q = searchEl.value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#ms-tbody tr');
+    rows.forEach(tr => {
+      const text = tr.innerText.toLowerCase();
+      tr.style.display = text.includes(q) ? '' : 'none';
+    });
+  };
+
+  window.exportMonthlySheetCSV = function() {
+    if (!msData.length) return;
+    const daysArr = Array.from({length: msNumDays}, (_, i) => i + 1);
+    const headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Company', ...daysArr.map(d => 'Day ' + d), 'Total Present'];
+    const rows = msData.map((row, idx) => [
+      idx + 1,
+      row.army_number,
+      row.rank,
+      row.name,
+      row.company,
+      ...daysArr.map(d => (row.daily_sheet && row.daily_sheet[d]) || 'P'),
+      row.total_present != null ? row.total_present : ''
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(','))
+      .join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `15CESR_Monthly_Date_Sheet_1-31_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  window.printMonthlySheet = function() {
+    const win = window.open('', '_blank');
+    const tableHtml = document.getElementById('ms-table-wrap').innerHTML;
+    const title = 'Individual Full Month Date Sheet (1 to 31)';
+    const clientIp = window.CLIENT_IP || "{{ client_ip or '127.0.0.1' }}";
+    const now = new Date();
+    const printTimeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const selM = document.getElementById('ms-sel-month');
+    const selY = document.getElementById('ms-sel-year');
+    const monthName = selM && selY ? selM.options[selM.selectedIndex].text + ' ' + selY.value : '';
+
+    win.document.write(`<!DOCTYPE html><html><head><title>${title}</title>
+      <style>
+        @page { size: A4 landscape; margin: 8mm 6mm; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        body { font-family: Arial, sans-serif; font-size: 8.5px; color: #000; background: #fff; padding: 5px; }
+        .hdr { text-align: center; margin-bottom: 6px; }
+        .hdr h2 { font-size: 13px; color: #059669; font-weight: 800; margin-bottom: 2px; text-transform: uppercase; }
+        .hdr h4 { font-size: 10.5px; color: #111827; font-weight: 700; margin-bottom: 4px; }
+        .meta { display: flex; justify-content: space-between; font-size: 9px; color: #475569; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; margin-bottom: 6px; }
+        table { width: 100% !important; border-collapse: collapse !important; font-size: 8px !important; }
+        thead { display: table-header-group; }
+        tr { page-break-inside: avoid !important; }
+        th, td { border: 1px solid #94a3b8 !important; padding: 2px 1px !important; text-align: center !important; vertical-align: middle; }
+        th { background: #059669 !important; color: #ffffff !important; font-weight: 700 !important; font-size: 8px !important; text-transform: uppercase; }
+        .cell-status-p { background-color: #d1fae5 !important; color: #065f46 !important; font-weight: 700 !important; border-radius: 2px; }
+        .cell-status-l { background-color: #fee2e2 !important; color: #991b1b !important; font-weight: 700 !important; border-radius: 2px; }
+        .cell-status-det { background-color: #dbeafe !important; color: #1e40af !important; font-weight: 700 !important; border-radius: 2px; font-size: 7.5px !important; }
+        .cell-status-c { background-color: #f3e8ff !important; color: #6b21a8 !important; font-weight: 700 !important; border-radius: 2px; }
+        .cell-status-td { background-color: #f3f4f6 !important; color: #374151 !important; font-weight: 700 !important; border-radius: 2px; font-size: 7.5px !important; }
+        .legend-print { display: flex; gap: 12px; font-size: 8.5px; font-weight: 700; margin-top: 6px; justify-content: center; }
+      </style></head><body>
+      <div class="hdr">
+        <h2>15 CORPS ENGINEERING SIGNAL REGIMENT</h2>
+        <h4>INDIVIDUAL FULL MONTH DATE SHEET (DAYS 1 TO 31) &mdash; ${monthName.toUpperCase()}</h4>
+      </div>
+      <div class="meta">
+        <span><strong>IP:</strong> ${clientIp}</span>
+        <span><strong>Printed On:</strong> ${printTimeStr}</span>
+      </div>
+      ${tableHtml}
+      <div class="legend-print">
+        <span style="color:#065f46;">P = Present</span> |
+        <span style="color:#991b1b;">L = On Leave</span> |
+        <span style="color:#1e40af;">DET = Detachment</span> |
+        <span style="color:#6b21a8;">C = Course</span> |
+        <span style="color:#374151;">TD = Temporary Duty</span>
+      </div>
+      <script>window.onload = function() { window.print(); window.close(); }<\/script>
+      </body></html>`);
+    win.document.close();
+  };
 
   loadFilters().then(loadPersonnel);
 })();
