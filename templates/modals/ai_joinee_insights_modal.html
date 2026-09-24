@@ -357,11 +357,11 @@
           </div>
         </div>
 
-        <!-- 7. Adjutant Recommendation Review & Proposal Section -->
+        <!-- 7. Placement & Assignment Status Section -->
         <div class="card border-0 shadow-sm rounded-3 bg-white" id="vrAdjutantSectionCard" style="border-left: 4px solid #4f46e5 !important;">
           <div class="card-header bg-white border-bottom py-2.5 px-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #ede9fe 0%, #e0e7ff 100%);">
-            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #4338ca;">
-              <i class="fas fa-user-edit text-primary me-1.5"></i> ADJUTANT RECOMMENDATION &amp; REVIEW
+            <span class="text-uppercase fw-bold" style="font-size: 0.76rem; letter-spacing: 0.5px; color: #4338ca;" id="vrSectionHeaderTitle">
+              <i class="fas fa-clipboard-check text-primary me-1.5" id="vrSectionHeaderIcon"></i> <span id="vrSectionHeaderText">ASSIGNMENT &amp; REVIEW STATUS</span>
             </span>
             <span class="badge" id="vrAdjutantBadge" style="background: #ede9fe; color: #6b21a8; font-size: 0.7rem; font-weight: 700;">Pending Review</span>
           </div>
@@ -1055,21 +1055,35 @@
     const badgeEl = document.getElementById('vrAdjutantBadge');
     const container = document.getElementById('vrAdjutantContainer');
     const btnAction = document.getElementById('vrBtnGoToAction');
+    const titleTextEl = document.getElementById('vrSectionHeaderText');
+    const titleIconEl = document.getElementById('vrSectionHeaderIcon');
     if (!container) return;
 
+    const has2ICDecision = !!(d.two_ic_updated || d.updated_by_role === '2IC' || (d.decision_type && d.decision_type !== 'pending'));
+    const hasAdjAction = !!d.adjutant_action;
+
     if (badgeEl) {
-      if (d.adjutant_action === 'updated') {
-        badgeEl.className = 'badge bg-primary text-white';
-        badgeEl.textContent = 'Adjutant Proposed Update';
-      } else if (d.adjutant_action === 'accepted') {
-        badgeEl.className = 'badge bg-success text-white';
-        badgeEl.textContent = 'Adjutant Accepted AI Rec';
-      } else if (d.adjutant_action === 'rejected') {
-        badgeEl.className = 'badge bg-danger text-white';
-        badgeEl.textContent = 'Adjutant Rejected AI Rec';
+      if (has2ICDecision) {
+        const decType = (d.decision_type || 'ASSIGNED').toUpperCase();
+        badgeEl.className = `badge ${decType === 'ACCEPTED' ? 'bg-success' : (decType === 'REJECTED' ? 'bg-danger' : 'bg-primary')} text-white`;
+        badgeEl.textContent = decType;
+      } else if (hasAdjAction) {
+        if (d.adjutant_action === 'updated') {
+          badgeEl.className = 'badge bg-primary text-white';
+          badgeEl.textContent = 'Adjutant Updated';
+        } else if (d.adjutant_action === 'accepted') {
+          badgeEl.className = 'badge bg-success text-white';
+          badgeEl.textContent = 'Adjutant Accepted';
+        } else if (d.adjutant_action === 'rejected') {
+          badgeEl.className = 'badge bg-danger text-white';
+          badgeEl.textContent = 'Adjutant Rejected';
+        } else {
+          badgeEl.className = 'badge bg-info text-dark';
+          badgeEl.textContent = 'Adjutant Reviewed';
+        }
       } else {
         badgeEl.className = 'badge bg-warning text-dark';
-        badgeEl.textContent = 'Pending Adjutant Review';
+        badgeEl.textContent = 'Pending Review';
       }
     }
 
@@ -1085,20 +1099,15 @@
     };
 
     if (isCO) {
-      let coHtml = `
-        <div class="alert alert-secondary border-secondary border-1 rounded-3 p-3 mb-2" style="background: #f8fafc;">
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <i class="fas fa-user-tie text-primary fs-5"></i>
-            <strong class="text-dark">Commanding Officer Oversight (View Only)</strong>
-          </div>
-          <div class="text-muted small mb-2">
-            Commanding Officer has view-only authority to inspect AI recommendations, scores, and decision history. Updations are handled by Adjutant and 2IC.
-          </div>
-      `;
+      if (titleTextEl) titleTextEl.textContent = 'ASSIGNMENT & REVIEW STATUS';
+      if (titleIconEl) titleIconEl.className = 'fas fa-clipboard-check text-primary me-1.5';
 
-      if (d.adjutant_action) {
+      let coHtml = '<div class="d-flex flex-column gap-2">';
+
+      // 1. Adjutant Proposed Placement / Review
+      if (hasAdjAction) {
         coHtml += `
-          <div class="p-2.5 rounded bg-white border border-primary-subtle mb-2 small">
+          <div class="p-2.5 rounded bg-white border border-primary-subtle small">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <strong class="text-primary"><i class="fas fa-user-edit me-1"></i>Adjutant Proposed Placement:</strong>
               <span class="badge ${d.adjutant_action === 'updated' ? 'bg-primary' : 'bg-success'} text-white text-uppercase" style="font-size: 0.65rem;">
@@ -1112,24 +1121,30 @@
         `;
       } else {
         coHtml += `
-          <div class="p-2 rounded bg-white border text-muted small mb-2">
-            <i class="fas fa-clock text-warning me-1"></i> Pending Adjutant Review
+          <div class="p-2 rounded bg-white border text-muted small d-flex align-items-center gap-1.5">
+            <i class="fas fa-clock text-warning"></i> <span>Pending Adjutant Review</span>
           </div>
         `;
       }
 
-      if (d.two_ic_updated || d.updated_by_role === '2IC' || (d.decision_type && d.decision_type !== 'pending')) {
+      // 2. 2IC Final Assignment
+      if (has2ICDecision) {
+        const decType = (d.decision_type || 'ASSIGNED').toUpperCase();
+        const badgeClass = decType === 'ACCEPTED' ? 'bg-success' : (decType === 'REJECTED' ? 'bg-danger' : 'bg-primary');
+        const borderClass = decType === 'ACCEPTED' ? 'border-success-subtle' : (decType === 'REJECTED' ? 'border-danger-subtle' : 'border-primary-subtle');
+        const iconColor = decType === 'ACCEPTED' ? 'text-success' : (decType === 'REJECTED' ? 'text-danger' : 'text-primary');
+
         coHtml += `
-          <div class="p-2.5 rounded bg-white border border-success-subtle small">
+          <div class="p-2.5 rounded bg-white border ${borderClass} small">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <strong class="text-success"><i class="fas fa-user-shield me-1"></i>2IC Final Assignment:</strong>
-              <span class="badge ${d.decision_type === 'accepted' ? 'bg-success' : 'bg-danger'} text-white text-uppercase" style="font-size: 0.65rem;">
-                ${d.decision_type.toUpperCase()}
+              <strong class="${iconColor}"><i class="fas fa-user-shield me-1"></i>2IC Final Assignment:</strong>
+              <span class="badge ${badgeClass} text-white text-uppercase" style="font-size: 0.65rem;">
+                ${decType}
               </span>
             </div>
             <div class="text-dark"><strong>${d.final_company || d.recommended_company}</strong> &bull; <strong>${d.final_section || d.recommended_section || 'GENERAL'}</strong> (${d.final_position || d.recommended_position})</div>
             <div class="text-muted" style="font-size: 0.72rem;">Assigned By: ${d.updated_by || d.decided_by || '2IC'} &bull; ${d.updated_at || d.decided_at || 'Recently'}</div>
-            ${d.decision_remarks ? `<div class="mt-1 p-2 rounded bg-light border text-secondary small"><i class="fas fa-comment-dots text-success me-1"></i><strong>Remarks:</strong> "${escapeHtml(d.decision_remarks)}"</div>` : ''}
+            ${d.decision_remarks ? `<div class="mt-1 p-2 rounded bg-light border text-secondary small"><i class="fas fa-comment-dots ${iconColor} me-1"></i><strong>Remarks:</strong> "${escapeHtml(d.decision_remarks)}"</div>` : ''}
           </div>
         `;
       }
@@ -1141,16 +1156,11 @@
         btnAction.style.display = 'none';
       }
     } else if (isAdjutant || !is2IC) {
+      if (titleTextEl) titleTextEl.textContent = 'ADJUTANT RECOMMENDATION & REVIEW';
+      if (titleIconEl) titleIconEl.className = 'fas fa-user-edit text-primary me-1.5';
       const initialRemarks = d.adjutant_remarks || d.decision_remarks || '';
 
       container.innerHTML = `
-        <div class="alert alert-info py-2 px-3 mb-3 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-          <i class="fas fa-info-circle text-primary fs-5"></i>
-          <div>
-            <strong>Adjutant Advisory Role:</strong> You can accept the AI recommendation with remarks. <strong>Adjutant never assigns an individual.</strong> The 2IC will review and execute the final allocation.
-          </div>
-        </div>
-
         <div class="row g-2 mb-3">
           <div class="col-12">
             <label class="form-label text-muted small fw-semibold mb-1">
@@ -1177,6 +1187,9 @@
       }
 
     } else if (is2IC) {
+      if (titleTextEl) titleTextEl.textContent = '2IC FINAL ASSIGNMENT';
+      if (titleIconEl) titleIconEl.className = 'fas fa-user-shield text-success me-1.5';
+
       let initialCoy = d.adjutant_company || d.recommended_company || 'HQ COY';
       initialCoy = getCanonicalCoy(initialCoy);
       const initialSec = d.adjutant_section || d.recommended_section || '';
@@ -1186,8 +1199,8 @@
       let adjHtml = '';
       if (d.adjutant_action) {
         adjHtml = `
-          <div class="alert alert-success border-success border-1 rounded-3 p-3 mb-3" style="background: #f0fdf4;">
-            <div class="d-flex justify-content-between align-items-center mb-1.5">
+          <div class="p-2.5 rounded bg-white border border-success-subtle mb-3 small">
+            <div class="d-flex justify-content-between align-items-center mb-1">
               <strong class="text-success-emphasis" style="font-size: 0.85rem;">
                 <i class="fas fa-user-edit me-1"></i> Adjutant Proposed: ${d.adjutant_company || d.recommended_company} - ${d.adjutant_section || d.recommended_section || 'GENERAL'} (${d.adjutant_position || d.recommended_position})
               </strong>
@@ -1195,11 +1208,11 @@
                 ${d.adjutant_action === 'updated' ? 'Updated by Adjutant' : 'Accepted AI Rec'}
               </span>
             </div>
-            <div class="text-dark small mb-1.5">
+            <div class="text-dark small mb-1">
               <strong>Reviewed By:</strong> ${d.adjutant_by || 'Adjutant'} &bull; <strong>Time:</strong> ${d.adjutant_at || 'Recently'}
             </div>
             ${d.adjutant_remarks ? `
-            <div class="p-2 rounded bg-white border border-success-subtle text-secondary small fw-medium">
+            <div class="p-2 rounded bg-light border border-success-subtle text-secondary small fw-medium">
               <i class="fas fa-comment-dots text-success me-1"></i><strong>Adjutant Reason:</strong> "${escapeHtml(d.adjutant_remarks)}"
             </div>
             ` : ''}
@@ -1207,20 +1220,15 @@
         `;
       } else {
         adjHtml = `
-          <div class="alert alert-warning border-warning border-1 rounded-3 p-2.5 mb-3 small d-flex align-items-center gap-2" style="background: #fffbeb;">
-            <i class="fas fa-clock text-warning fs-5"></i>
-            <div><strong>Pending Adjutant Review:</strong> Adjutant has not submitted a recommendation yet. You can review and finalize assignment.</div>
+          <div class="p-2 rounded bg-white border text-muted small mb-3 d-flex align-items-center gap-1.5">
+            <i class="fas fa-clock text-warning"></i>
+            <span>Pending Adjutant Review</span>
           </div>
         `;
       }
 
       container.innerHTML = `
         ${adjHtml}
-
-        <div class="alert alert-primary py-2 px-3 mb-3 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-          <i class="fas fa-shield-alt text-primary fs-5"></i>
-          <div><strong>2IC Executive Assignment:</strong> Review and select company, section, and position for final unit placement.</div>
-        </div>
 
         <div class="row g-2 mb-3">
           <div class="col-md-4">
@@ -1795,20 +1803,18 @@
 
       // Configure Section Controls based on User Role
       if (isCO) {
-        // Commanding Officer: View Only Mode (Updation removed for CO)
-        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-eye me-1.5 text-primary"></i> PLACEMENT &amp; DECISION STATUS (CO VIEW ONLY)';
-        if (sec6Subtitle) sec6Subtitle.textContent = 'Commanding Officer oversight mode — view results, matching rationale, and decision history';
+        // Commanding Officer: View Only Mode
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-eye me-1.5 text-primary"></i> PLACEMENT &amp; DECISION STATUS';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'View placement recommendations and decision history';
         if (coyLabel) coyLabel.textContent = 'Allocated / Recommended Company';
         if (secLabel) secLabel.textContent = 'Allocated / Recommended Section';
         if (posLabel) posLabel.textContent = 'Allocated / Recommended Position';
         if (remLabel) remLabel.innerHTML = 'Recorded Remarks / Justification';
 
-        if (scopeBanner) scopeBanner.innerHTML = `
-          <div class="alert alert-secondary py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #f1f5f9; border-color: #cbd5e1; color: #475569;">
-            <i class="fas fa-lock text-muted fs-5"></i>
-            <div><strong>Commanding Officer Oversight (View Only):</strong> You have oversight access to view recommendations, reasoning, and decision history. Modifications can only be performed by Adjutant or 2IC.</div>
-          </div>
-        `;
+        if (scopeBanner) {
+          scopeBanner.innerHTML = '';
+          scopeBanner.style.display = 'none';
+        }
 
         if (coySelect) coySelect.disabled = true;
         if (secSelect) secSelect.disabled = true;
@@ -1850,8 +1856,8 @@
           remarksTextarea.readOnly = false;
         }
 
-        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-shield me-1.5 text-success"></i> 2IC EXECUTIVE DECISION &amp; ASSIGNMENT';
-        if (sec6Subtitle) sec6Subtitle.textContent = 'Review Adjutant proposal and execute official company allocation';
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-shield me-1.5 text-success"></i> 2IC FINAL ASSIGNMENT';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'Review recommendation and execute final allocation';
         if (coyLabel) coyLabel.textContent = 'Assigned Company';
         if (secLabel) secLabel.textContent = 'Assigned Section';
         if (posLabel) posLabel.textContent = 'Assigned Position';
@@ -1880,21 +1886,20 @@
                 ` : ''}
               </div>
             </div>
-            <div class="alert alert-success py-1.5 px-2.5 mb-0 small d-flex align-items-center gap-2" style="background: #ecfdf5; border-color: #a7f3d0; color: #065f46;">
-              <i class="fas fa-shield-alt text-success fs-6"></i>
-              <div><strong>2IC Executive Assignment:</strong> Review Adjutant's proposal above, update company/section/position if required, and confirm final assignment.</div>
-            </div>
           `;
         } else {
           adjProposalHtml = `
-            <div class="alert alert-warning py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #fffbeb; border-color: #fde68a; color: #92400e;">
-              <i class="fas fa-clock text-warning fs-6"></i>
-              <div><strong>Pending Adjutant Review:</strong> Adjutant has not reviewed this joinee yet. 2IC can still proceed to assign directly.</div>
+            <div class="p-2 rounded bg-white border text-muted small mb-2 d-flex align-items-center gap-1.5">
+              <i class="fas fa-clock text-warning"></i>
+              <span>Pending Adjutant Review</span>
             </div>
           `;
         }
 
-        if (scopeBanner) scopeBanner.innerHTML = adjProposalHtml;
+        if (scopeBanner) {
+          scopeBanner.innerHTML = adjProposalHtml;
+          scopeBanner.style.display = 'block';
+        }
 
         if (btnsContainer) btnsContainer.innerHTML = `
           <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-semibold" onclick="closeDetailModalSafely()">
@@ -1927,16 +1932,14 @@
           remarksTextarea.readOnly = false;
         }
 
-        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-edit me-1.5 text-primary"></i> ADJUTANT RECOMMENDATION &amp; REVIEW (FOR 2IC DECISION)';
-        if (sec6Subtitle) sec6Subtitle.textContent = 'Adjutant reviews recommendation and adds remarks. Adjutant does not assign individuals.';
+        if (sec6Title) sec6Title.innerHTML = '<i class="fas fa-user-edit me-1.5 text-primary"></i> ADJUTANT RECOMMENDATION &amp; REVIEW';
+        if (sec6Subtitle) sec6Subtitle.textContent = 'Review AI recommendation and provide remarks';
         if (remLabel) remLabel.textContent = 'Adjutant Remarks / Justification';
 
-        if (scopeBanner) scopeBanner.innerHTML = `
-          <div class="alert alert-info py-2 px-3 mb-0 small d-flex align-items-center gap-2" style="background: #eff6ff; border-color: #bfdbfe; color: #1e40af;">
-            <i class="fas fa-info-circle text-primary fs-5"></i>
-            <div><strong>Adjutant Advisory Workflow:</strong> Review AI recommendation and provide remarks if needed. <strong>Adjutant never assigns an individual</strong>; your recommendation is forwarded to 2IC for final assignment.</div>
-          </div>
-        `;
+        if (scopeBanner) {
+          scopeBanner.innerHTML = '';
+          scopeBanner.style.display = 'none';
+        }
 
         if (btnsContainer) btnsContainer.innerHTML = `
           <button type="button" class="btn btn-sm btn-outline-secondary px-3 py-1.5 fw-semibold" onclick="closeDetailModalSafely()">

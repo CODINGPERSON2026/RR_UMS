@@ -6,51 +6,52 @@
 <!-- Fitness Trend Module CSS -->
 <link rel="stylesheet" href="{{ url_for('fitness_trend_bp.static', filename='css/fitness_trend.css') }}?v=13.0">
 <style>
-  /* Direct inline overrides for immediate render */
+  /* Direct alignment of Calculate All Individuals Fitness with UMS Application Design */
   .calc-all-fitness-btn,
   #btnCalculateAllFitness {
-    background: linear-gradient(135deg, #091a42 0%, #1e3a8a 45%, #2563eb 100%) !important;
+    background: linear-gradient(135deg, var(--primary-color, #2563eb) 0%, var(--secondary-color, #1d4ed8) 100%) !important;
     color: #ffffff !important;
-    border: 1.5px solid rgba(147, 197, 253, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
     border-radius: 9999px !important;
-    padding: 0.45rem 1.15rem 0.45rem 0.55rem !important;
-    font-size: 0.84rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.25px !important;
+    padding: 0.38rem 1.05rem !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.2px !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 0.75rem !important;
-    box-shadow: 0 4px 16px rgba(30, 64, 175, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    gap: 0.5rem !important;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.22), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
     cursor: pointer !important;
+    line-height: 1.5 !important;
+    text-decoration: none !important;
   }
   .calc-all-fitness-btn:hover,
   #btnCalculateAllFitness:hover {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%) !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5), 0 0 16px rgba(96, 165, 250, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    background: linear-gradient(135deg, var(--secondary-color, #1d4ed8) 0%, var(--primary-color, #2563eb) 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.32) !important;
+    color: #ffffff !important;
   }
-  .calc-btn-icon-pulse {
-    width: 30px !important;
-    height: 30px !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.18) !important;
-    border: 1px solid rgba(255, 255, 255, 0.4) !important;
-    color: #fbbf24 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 0.88rem !important;
+  .calc-all-fitness-btn:active,
+  #btnCalculateAllFitness:active {
+    transform: translateY(0) !important;
+    box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25) !important;
+  }
+  .calc-btn-text {
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    font-size: 0.82rem !important;
   }
   .calc-btn-chip {
-    background: rgba(0, 0, 0, 0.28) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    color: #e0e7ff !important;
+    background: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    color: #ffffff !important;
     font-size: 0.68rem !important;
-    font-weight: 800 !important;
-    padding: 3px 8px !important;
+    font-weight: 700 !important;
+    padding: 1.5px 7px !important;
     border-radius: 999px !important;
-    letter-spacing: 0.6px !important;
+    letter-spacing: 0.4px !important;
   }
 
   /* Beautiful Tactical AI Loader */
@@ -251,9 +252,9 @@
         <span>Total Personnel: <strong id="totalPersonnelCount" class="text-primary">{{ total_count if total_count is not none and total_count > 0 else '--' }}</strong></span>
       </div>
       <button type="button" id="btnCalculateAllFitness" class="calc-all-fitness-btn shadow-sm" title="Calculate AI Fitness for all individuals and sync with executive reports table" data-bs-toggle="modal" data-bs-target="#calculateAllFitnessModal">
-        <span class="calc-btn-icon-pulse"><i class="fas fa-calculator"></i></span>
+        <i class="fas fa-calculator"></i>
         <span class="calc-btn-text">Calculate All Individuals Fitness</span>
-        <span class="calc-btn-chip"><i class="fas fa-bolt me-1 text-warning"></i>AI BATCH</span>
+        <span class="calc-btn-chip"><i class="fas fa-bolt me-1"></i>AI BATCH</span>
       </button>
     </div>
   </div>
@@ -487,17 +488,17 @@
 <!-- Calculate All Individuals Fitness Progress & Results Modal -->
 <div class="modal fade" id="calculateAllFitnessModal" tabindex="-1" aria-labelledby="calculateAllFitnessModalLabel" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 620px;">
-    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
-      <div class="modal-header text-white px-4 py-3 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #09122c 0%, #172554 45%, #1e3a8a 100%);">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
+      <div class="modal-header text-white px-4 py-3 d-flex align-items-center justify-content-between" style="background: var(--modal-header-bg, linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%));">
         <div class="d-flex align-items-center gap-3">
-          <div class="calc-modal-header-icon">
+          <div class="calc-modal-header-icon" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff;">
             <i class="fas fa-calculator"></i>
           </div>
           <div>
             <h5 class="modal-title fw-bold mb-0 text-white" id="calculateAllFitnessModalLabel">
               Unit-Wide AI Fitness Assessment
             </h5>
-            <div class="calc-modal-header-sub">Operational Readiness &amp; Physical Standards Pipeline</div>
+            <div class="calc-modal-header-sub text-white-50 small">Operational Readiness &amp; Physical Standards Pipeline</div>
           </div>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" id="closeCalcAllModalBtn" onclick="if(window.fitnessApp &amp;&amp; window.fitnessApp.isCalculating){ window.fitnessApp.abortCalculateAllFitness(); }"></button>
@@ -682,7 +683,7 @@
 
       <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-between align-items-center" id="calcAllModalFooter">
         <button type="button" class="btn btn-secondary btn-sm px-4 fw-semibold rounded-pill" id="btnCancelCalcAll" onclick="if(window.fitnessApp &amp;&amp; window.fitnessApp.isCalculating){ window.fitnessApp.abortCalculateAllFitness(); }">Cancel</button>
-        <button type="button" class="btn btn-primary btn-sm px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 rounded-pill" id="btnConfirmProceedCalcAll" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border: none;">
+        <button type="button" class="btn btn-primary btn-sm px-4 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2 rounded-pill" id="btnConfirmProceedCalcAll" style="background: linear-gradient(135deg, var(--primary-color, #2563eb) 0%, var(--secondary-color, #1d4ed8) 100%); border: none;">
           <i class="fas fa-check"></i>
           <span>Confirm &amp; Calculate All</span>
         </button>

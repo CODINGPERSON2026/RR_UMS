@@ -516,125 +516,7 @@ window.addEventListener('load', function() {
 <!-- Clean page break between Page 1 and Page 2 -->
 <div style="page-break-after: always;"></div>
 
-<!-- Section 7: Personalized Exercise Plan (On Page 2) -->
-<div class="pdf-section">
-    <div class="section-heading section-heading-first">{{ labels.sec7_title or (labels.sec8_title | replace('8.', '7.')) or '7. Personalized Exercise Plan' }}</div>
-    {% if report and report.exercise_plan and report.exercise_plan.title %}
-    <div style="font-size: 8pt; color: #475569; margin-bottom: 3px;">
-        <strong>{{ report.exercise_plan.title }}:</strong> {{ report.exercise_plan.focus_area }}
-    </div>
-    {% elif recommendations and recommendations.exercise and recommendations.exercise.title %}
-    <div style="font-size: 8pt; color: #475569; margin-bottom: 3px;">
-        <strong>{{ recommendations.exercise.title }}:</strong> {{ recommendations.exercise.focus_area or recommendations.exercise.plan_name }}
-    </div>
-    {% endif %}
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th style="width: 32%;">{{ labels.exercise_drill or 'Exercise / Drill' }}</th>
-                <th style="width: 8%;">{{ labels.sets or 'Sets' }}</th>
-                <th style="width: 18%;">{{ labels.reps_volume or 'Reps / Volume' }}</th>
-                <th style="width: 14%;">{{ labels.duration or 'Duration' }}</th>
-                <th style="width: 14%;">{{ labels.frequency or 'Frequency' }}</th>
-                <th style="width: 14%;">Rest / Notes</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in ((report.exercise_plan.exercises if report and report.exercise_plan else recommendations.exercise.exercises) or recommendations.exercise.exercises) %}
-            <tr>
-                <td><strong>{{ item.exercise }}</strong></td>
-                <td>{{ item.sets }}</td>
-                <td>{{ item.reps }}</td>
-                <td>{{ item.duration }}</td>
-                <td>{{ item.frequency }}</td>
-                <td>{{ item.rest or item.notes or '60 sec' }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Section 8: Personalized Nutrition Recommendations (Mess Menu Constrained) -->
-<div class="pdf-section">
-    <div class="section-heading">{{ labels.sec8_title or (labels.sec9_title | replace('9.', '8.')) or '8. Personalized Nutrition Recommendations' }}</div>
-    
-    <!-- Mess Information Banner -->
-    <table style="width: 100%; margin-bottom: 4px; background: #1e3a8a; border-radius: 3px; border-collapse: collapse;">
-        <tr>
-            <td style="padding: 4px 8px; color: #ffffff; font-size: 7.5pt; font-weight: bold;">
-                MESS CATEGORY: <span style="color: #fde047;">{{ (report.nutrition.mess_category if report and report.nutrition else recommendations.diet.mess_category) or 'OR MESS' }}</span> (Rank: {{ (report.profile.rank if report and report.profile else soldier.rank) or soldier.rank }})
-            </td>
-        </tr>
-    </table>
-
-    <div style="font-size: 7.5pt; color: #475569; margin-bottom: 3px;">
-        <strong>{{ labels.diet_strategy or 'Diet Strategy:' }}</strong> {{ (report.nutrition.strategy if report and report.nutrition else recommendations.diet.strategy) or recommendations.diet.strategy }}
-    </div>
-
-    <!-- Daily Target vs Estimated Recommended Intake -->
-    <table class="data-table" style="margin-bottom: 4px;">
-        <thead>
-            <tr style="background: #f8fafc;">
-                <th style="width: 25%;">Nutritional Target</th>
-                <th style="width: 15%; text-align: center;">Calories</th>
-                <th style="width: 15%; text-align: center;">Protein</th>
-                <th style="width: 15%; text-align: center;">Carbohydrates</th>
-                <th style="width: 15%; text-align: center;">Fat</th>
-                <th style="width: 15%; text-align: center;">Fiber</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><strong>Daily Target</strong></td>
-                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.calories if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.calories) or (report.nutrition.target_calories if report and report.nutrition else recommendations.diet.target_calories) }} kcal</td>
-                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.protein if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.protein) or (report.nutrition.macros.protein_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_grams) }}g</td>
-                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.carbs if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.carbs) or (report.nutrition.macros.carb_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.carb_grams) }}g</td>
-                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.fat if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.fat) or (report.nutrition.macros.fat_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.fat_grams) }}g</td>
-                <td style="text-align: center; font-weight: bold;">{{ (report.nutrition.daily_targets.fiber if report and report.nutrition and report.nutrition.daily_targets else recommendations.diet.daily_targets.fiber) or 35 }}g</td>
-            </tr>
-            <tr style="background: #f8fafc;">
-                <td><strong>Estimated Intake</strong></td>
-                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.calories if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.calories) or (report.nutrition.target_calories if report and report.nutrition else recommendations.diet.target_calories) }} kcal</td>
-                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.protein if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.protein) or (report.nutrition.macros.protein_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.protein_grams) }}g</td>
-                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.carbs if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.carbs) or (report.nutrition.macros.carb_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.carb_grams) }}g</td>
-                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.fat if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.fat) or (report.nutrition.macros.fat_grams if report and report.nutrition and report.nutrition.macros else recommendations.diet.macros.fat_grams) }}g</td>
-                <td style="text-align: center; color: #0284c7; font-weight: bold;">~{{ (report.nutrition.estimated_intake.fiber if report and report.nutrition and report.nutrition.estimated_intake else recommendations.diet.estimated_intake.fiber) or 34 }}g</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- 30-Day Tactical Nutrition Progression Roadmap (4-Week Cycle) -->
-    <table class="data-table" style="margin-top: 4px; margin-bottom: 4px;">
-        <thead>
-            <tr style="background: #e0e7ff;">
-                <th colspan="4" style="color: #1e3a8a; font-weight: bold; font-size: 7.5pt; text-align: left; padding: 3px 6px;">
-                    30-DAY TACTICAL NUTRITION ROADMAP (4-WEEK PROGRESSION CYCLE)
-                </th>
-            </tr>
-            <tr style="background: #f1f5f9;">
-                <th style="width: 20%;">Cycle Phase</th>
-                <th style="width: 26%;">Phase Name</th>
-                <th style="width: 28%;">Tactical Mess Focus</th>
-                <th style="width: 26%;">30-Day Milestone Target</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rm in ((report.nutrition.roadmap_30d if report and report.nutrition and report.nutrition.roadmap_30d else recommendations.diet.roadmap_30d) or []) %}
-            <tr>
-                <td><strong>{{ rm.week }}</strong></td>
-                <td style="color: #1e3a8a; font-weight: bold;">{{ rm.phase }}</td>
-                <td style="font-size: 7pt;">{{ rm.mess_strategy or rm.focus }}</td>
-                <td style="font-size: 7pt; color: #047857;">{{ rm.milestone }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<!-- Clean page break: Move Full Month Unit Mess Nutrition Schedule completely to Page 3 -->
-<div style="page-break-after: always;"></div>
-
-<!-- Page 3: Full Month Unit Mess Nutrition Schedule -->
+<!-- Section 8: Unit Mess Nutrition Schedule (Mess Menu) -->
 {% set weekly_list = (report.nutrition.weekly_schedule_list if report and report.nutrition and report.nutrition.weekly_schedule_list else recommendations.diet.weekly_schedule_list) or [] %}
 {% set mess_cat = ((report.nutrition.mess_category if report and report.nutrition else recommendations.diet.mess_category) or '') | upper %}
 {% set s_rank = ((report.profile.rank if report and report.profile else soldier.rank) or '') | upper %}
@@ -642,38 +524,38 @@ window.addEventListener('load', function() {
 {% set is_jc = ('JCO' in mess_cat) or ('JC' in s_armyno) or ('SUBEDAR' in s_rank) or ('SUB' in s_rank) or ('HONY' in s_rank) or ('HONORARY' in s_rank) %}
 {% if weekly_list %}
 <div class="pdf-section">
-    <div class="section-heading section-heading-first">{{ labels.sec8_title or '8. Personalized Nutrition Recommendations' }} &ndash; FULL MONTH UNIT MESS SCHEDULE</div>
-    <table class="data-table" style="margin-top: 6px; margin-bottom: 8px;">
+    <div class="section-heading section-heading-first">8. UNIT MESS MENU</div>
+    <table class="data-table" style="margin-top: 3px; margin-bottom: 5px;">
         <thead>
             <tr style="background: #1e3a8a;">
-                <th colspan="{% if is_jc %}4{% else %}5{% endif %}" style="color: #ffffff; font-weight: bold; font-size: 8pt; text-align: left; padding: 5px 8px; letter-spacing: 0.5px;">
+                <th colspan="{% if is_jc %}4{% else %}5{% endif %}" style="color: #ffffff; font-weight: bold; font-size: 7.5pt; text-align: left; padding: 3px 5px; letter-spacing: 0.5px;">
                     FULL MONTH UNIT MESS NUTRITION SCHEDULE (DAY 1 MONDAY &ndash; DAY 7 SUNDAY RECURRING CYCLE)
                 </th>
             </tr>
             <tr style="background: #f1f5f9;">
-                <th style="width: {% if is_jc %}15%{% else %}14%{% endif %}; font-size: 8pt; padding: 5px 6px;">Day &amp; Rotation</th>
-                <th style="width: {% if is_jc %}27%{% else %}22%{% endif %}; font-size: 8pt; padding: 5px 6px;">Breakfast (Portion)</th>
+                <th style="width: {% if is_jc %}15%{% else %}14%{% endif %}; font-size: 7.2pt; padding: 3px 4px;">Day</th>
+                <th style="width: {% if is_jc %}27%{% else %}22%{% endif %}; font-size: 7.2pt; padding: 3px 4px;">Breakfast</th>
                 {% if not is_jc %}
-                <th style="width: 18%; font-size: 8pt; padding: 5px 6px;">Tea / Refreshment</th>
+                <th style="width: 18%; font-size: 7.2pt; padding: 3px 4px;">Tea / Refreshment</th>
                 {% endif %}
-                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 8pt; padding: 5px 6px;">Lunch (Grams)</th>
-                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 8pt; padding: 5px 6px;">Dinner (Grams)</th>
+                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 7.2pt; padding: 3px 4px;">Lunch</th>
+                <th style="width: {% if is_jc %}29%{% else %}23%{% endif %}; font-size: 7.2pt; padding: 3px 4px;">Dinner</th>
             </tr>
         </thead>
         <tbody>
             {% for d_info in weekly_list %}
             <tr>
-                <td style="padding: 6px 6px;">
-                    <strong style="color: #1e3a8a;">Day {{ loop.index }}</strong><br>
-                    <span style="font-weight: bold; font-size: 8pt;">{{ d_info.day }}</span>
+                <td style="padding: 2.5px 4px;">
+                    <strong style="color: #1e3a8a; font-size: 7pt;">Day {{ loop.index }}</strong><br>
+                    <span style="font-weight: bold; font-size: 6.8pt;">{{ d_info.day }}</span>
                 </td>
-                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                <td style="font-size: 6.8pt; padding: 2.5px 4px;">
                     {% for it in d_info.meals.get('Breakfast', []) %}
                         <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
                     {% endfor %}
                 </td>
                 {% if not is_jc %}
-                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                <td style="font-size: 6.8pt; padding: 2.5px 4px;">
                     {% set tea_items = d_info.meals.get('Tea', []) %}
                     {% if tea_items %}
                         {% for it in tea_items %}
@@ -684,12 +566,12 @@ window.addEventListener('load', function() {
                     {% endif %}
                 </td>
                 {% endif %}
-                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                <td style="font-size: 6.8pt; padding: 2.5px 4px;">
                     {% for it in d_info.meals.get('Lunch', []) %}
                         <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
                     {% endfor %}
                 </td>
-                <td style="font-size: 7.5pt; padding: 6px 6px;">
+                <td style="font-size: 6.8pt; padding: 2.5px 4px;">
                     {% for it in d_info.meals.get('Dinner', []) %}
                         <strong>{{ it.food_item }}:</strong> {{ it.portion }}{% if not loop.last %}<br>{% endif %}
                     {% endfor %}
@@ -701,8 +583,46 @@ window.addEventListener('load', function() {
 </div>
 {% endif %}
 
+<!-- Section 7: Personalized Exercise Plan (After Point 8) -->
+<div class="pdf-section">
+    <div class="section-heading">{{ labels.sec7_title or '7. Personalized Exercise Plan' }}</div>
+    {% if report and report.exercise_plan and report.exercise_plan.title %}
+    <div style="font-size: 7.5pt; color: #475569; margin-bottom: 2px;">
+        <strong>{{ report.exercise_plan.title }}:</strong> {{ report.exercise_plan.focus_area }}
+    </div>
+    {% elif recommendations and recommendations.exercise and recommendations.exercise.title %}
+    <div style="font-size: 7.5pt; color: #475569; margin-bottom: 2px;">
+        <strong>{{ recommendations.exercise.title }}:</strong> {{ recommendations.exercise.focus_area or recommendations.exercise.plan_name }}
+    </div>
+    {% endif %}
+    <table class="data-table" style="margin-bottom: 3px;">
+        <thead>
+            <tr>
+                <th style="width: 32%; font-size: 7.5pt; padding: 3px 4px;">{{ labels.exercise_drill or 'Exercise / Drill' }}</th>
+                <th style="width: 8%; font-size: 7.5pt; padding: 3px 4px;">{{ labels.sets or 'Sets' }}</th>
+                <th style="width: 18%; font-size: 7.5pt; padding: 3px 4px;">{{ labels.reps_volume or 'Reps / Volume' }}</th>
+                <th style="width: 14%; font-size: 7.5pt; padding: 3px 4px;">{{ labels.duration or 'Duration' }}</th>
+                <th style="width: 14%; font-size: 7.5pt; padding: 3px 4px;">{{ labels.frequency or 'Frequency' }}</th>
+                <th style="width: 14%; font-size: 7.5pt; padding: 3px 4px;">Rest / Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ((report.exercise_plan.exercises if report and report.exercise_plan else recommendations.exercise.exercises) or recommendations.exercise.exercises) %}
+            <tr>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;"><strong>{{ item.exercise }}</strong></td>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;">{{ item.sets }}</td>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;">{{ item.reps }}</td>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;">{{ item.duration }}</td>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;">{{ item.frequency }}</td>
+                <td style="font-size: 7.2pt; padding: 2.5px 4px;">{{ item.rest or item.notes or '60 sec' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
 <!-- Official Confidential Footer -->
-<div style="border-top: 1px solid #cbd5e1; padding-top: 4px; margin-top: 12px; font-size: 7pt; color: #64748b; text-align: center;">
+<div style="border-top: 1px solid #cbd5e1; padding-top: 3px; margin-top: 6px; font-size: 6.8pt; color: #64748b; text-align: center;">
     {{ (report.footer.regiment if report and report.footer else (labels.regiment_name or '15 CORPS UNIT MANAGEMENT SYSTEM')) or labels.regiment_name or '15 CORPS UNIT MANAGEMENT SYSTEM' }} • {{ labels.report_id or 'Report ID:' }} {{ (report.footer.report_id if report and report.footer else report.report_id) or report.report_id or '' }} • IP: {{ (report.footer.client_ip if report and report.footer else client_ip) or client_ip }} • {{ (report.footer.timestamp if report and report.footer else generated_at) or generated_at }} • {{ labels.confidential or 'CONFIDENTIAL' }}
 </div>
 
