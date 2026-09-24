@@ -65,10 +65,10 @@ def get_leave_details():
         
         # Set entitlements based on rank
         if is_agniveer:
-            # Agniveer: Only AL=30 days
+            # Agniveer: AL=30 days, AAL=15 days
             al_total = 30
             cl_total = 0
-            aal_total = 0
+            aal_total = 15
         else:
             # Other ranks: AL=60, CL=30, AAL=30
             al_total = 60
@@ -89,22 +89,22 @@ def get_leave_details():
             }
         ]
         
-        # Only add CL and AAL for non-Agniveer ranks
+        # Add CL for non-Agniveer ranks
         if not is_agniveer:
-            leave_balance.extend([
-                {
-                    "leave_type": "CL",
-                    "total_leave": cl_total,
-                    "leave_taken": int(cl_taken),
-                    "balance_leave": cl_total - int(cl_taken)
-                },
-                {
-                    "leave_type": "AAL",
-                    "total_leave": aal_total,
-                    "leave_taken": int(aal_taken),
-                    "balance_leave": aal_total - int(aal_taken)
-                }
-            ])
+            leave_balance.append({
+                "leave_type": "CL",
+                "total_leave": cl_total,
+                "leave_taken": int(cl_taken),
+                "balance_leave": cl_total - int(cl_taken)
+            })
+
+        # Add AAL for both Agniveer (15 days) and other ranks (30 days)
+        leave_balance.append({
+            "leave_type": "AAL",
+            "total_leave": aal_total,
+            "leave_taken": int(aal_taken),
+            "balance_leave": aal_total - int(aal_taken)
+        })
 
         # Add Summary Total Row
         total_auth = sum(l['total_leave'] for l in leave_balance)
@@ -861,16 +861,25 @@ def recommend_leave():
 
         # ================= UPDATE leave_details TABLE (Single + Combined) =================
         if request_status == 'Approved':
-            year = str(datetime.now().year)
+            current_year_num = datetime.now().year
             army_number = leave['army_number']
 
-            al = cl = aal = ptl = Annual_Leave = 0
-            remarks_text = None
+            # Check rank of personnel
+            cursor.execute("SELECT `rank` FROM personnel WHERE army_number = %s", (army_number,))
+            p_row = cursor.fetchone()
+            p_rank = (p_row.get('rank') or '').strip().upper() if p_row else ''
+            is_agniveer = p_rank in ['AGNIVEER', 'AV']
 
             leave_type_str = (leave['leave_type'] or '').strip().upper()
 
+            year_updates = {}
+
+            def get_year_entry(y_str):
+                if y_str not in year_updates:
+                    year_updates[y_str] = {'al': 0, 'cl': 0, 'aal': 0, 'ptl': 0, 'Annual_Leave': 0, 'remarks': []}
+                return year_updates[y_str]
+
             if '+' in leave_type_str:
-                # Combined Leave - Split using multi_leave_table
                 cursor.execute("""
                     SELECT leave_type, leave_days 
                     FROM multi_leave_table 
@@ -882,78 +891,98 @@ def recommend_leave():
                     lt = (item['leave_type'] or '').upper()
                     days = int(item['leave_days'] or 0)
 
-                    if lt == 'AL':
-                        al += days
-                    elif lt == 'CL':
-                        cl += days
-                    elif lt == 'AAL':
-                        aal += days
-                    elif lt == 'PL':
-                        ptl += days
-                    elif lt == 'ANNUAL LEAVE':
-                        Annual_Leave = days
-                    else:
-                        if remarks_text:
-                            remarks_text += f"; {lt}({days})"
+                    if lt == 'AAL':
+                        t_year = str(current_year_num + 1)
+                        y_entry = get_year_entry(t_year)
+                        y_entry['aal'] += days
+                        if is_agniveer:
+                            y_entry['Annual_Leave'] += days
                         else:
-                            remarks_text = f"{lt}({days})"
+                            y_entry['al'] += days
+                    else:
+                        t_year = str(current_year_num)
+                        y_entry = get_year_entry(t_year)
+                        if lt == 'AL':
+                            if is_agniveer:
+                                y_entry['Annual_Leave'] += days
+                            else:
+                                y_entry['al'] += days
+                        elif lt == 'CL':
+                            y_entry['cl'] += days
+                        elif lt == 'PL':
+                            y_entry['ptl'] += days
+                        elif lt == 'ANNUAL LEAVE':
+                            y_entry['Annual_Leave'] += days
+                        else:
+                            y_entry['remarks'].append(f"{lt}({days})")
             else:
-                # Single Leave
                 lt = leave_type_str
                 days = int(leave['leave_days'] or 0)
 
-                if lt == 'AL':
-                    al = days
-                elif lt == 'CL':
-                    cl = days
-                elif lt == 'AAL':
-                    aal = days
-                elif lt == 'PL':
-                    ptl = days
-                elif lt == 'ANNUAL LEAVE':
-                    Annual_Leave = days
-
+                if lt == 'AAL':
+                    t_year = str(current_year_num + 1)
+                    y_entry = get_year_entry(t_year)
+                    y_entry['aal'] += days
+                    if is_agniveer:
+                        y_entry['Annual_Leave'] += days
+                    else:
+                        y_entry['al'] += days
                 else:
-                    remarks_text = f"{lt}: {days} days"
+                    t_year = str(current_year_num)
+                    y_entry = get_year_entry(t_year)
+                    if lt == 'AL':
+                        if is_agniveer:
+                            y_entry['Annual_Leave'] += days
+                        else:
+                            y_entry['al'] += days
+                    elif lt == 'CL':
+                        y_entry['cl'] += days
+                    elif lt == 'PL':
+                        y_entry['ptl'] += days
+                    elif lt == 'ANNUAL LEAVE':
+                        y_entry['Annual_Leave'] += days
+                    else:
+                        y_entry['remarks'].append(f"{lt}: {days} days")
 
-            # Update or Insert into leave_details
-            cursor.execute("""
-                SELECT AL, CL, AAL, PL,`Annual Leave` FROM leave_details
-                WHERE army_number = %s AND year = %s
-                FOR UPDATE
-            """, (army_number, year))
-            existing = cursor.fetchone()
-
-            if existing:
-                new_al = (existing['AL'] or 0) + al
-                new_cl = (existing['CL'] or 0) + cl
-                new_aal = (existing['AAL'] or 0) + aal
-                new_ptl = (existing['PL'] or 0) + ptl
-                new_Annual_leave = (existing['Annual Leave'] or 0) + Annual_Leave
-
-                    
+            # Apply updates to leave_details table for each target_year
+            for target_year, vals in year_updates.items():
                 cursor.execute("""
-                    UPDATE leave_details
-                    SET AL = %s, CL = %s, AAL = %s, PL = %s,`Annual Leave` = %s,
-                        remarks = CONCAT(IFNULL(remarks, ''), %s)
+                    SELECT AL, CL, AAL, PL, `Annual Leave` FROM leave_details
                     WHERE army_number = %s AND year = %s
-                """, (
-                    new_al, new_cl, new_aal, new_ptl,new_Annual_leave,
-                    f"; {remarks_text}" if remarks_text else "",
-                    army_number, year
-                ))
+                    FOR UPDATE
+                """, (army_number, target_year))
+                existing = cursor.fetchone()
 
-            else:
-                cursor.execute("""
-                    INSERT INTO leave_details
-                    (army_number, year, AL, CL, AAL, PL,`Annual Leave`, remarks, leave_start_date, leave_end_date)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
-                """, (
-                    army_number, year, al, cl, aal, ptl,Annual_Leave,
-                    remarks_text,
-                    leave['from_date'],
-                    leave['to_date']
-                ))
+                rem_text = "; ".join(vals['remarks']) if vals['remarks'] else ""
+
+                if existing:
+                    new_al = (existing['AL'] or 0) + vals['al']
+                    new_cl = (existing['CL'] or 0) + vals['cl']
+                    new_aal = (existing['AAL'] or 0) + vals['aal']
+                    new_ptl = (existing['PL'] or 0) + vals['ptl']
+                    new_Annual_leave = (existing['Annual Leave'] or 0) + vals['Annual_Leave']
+
+                    cursor.execute("""
+                        UPDATE leave_details
+                        SET AL = %s, CL = %s, AAL = %s, PL = %s, `Annual Leave` = %s,
+                            remarks = CONCAT(IFNULL(remarks, ''), %s)
+                        WHERE army_number = %s AND year = %s
+                    """, (
+                        new_al, new_cl, new_aal, new_ptl, new_Annual_leave,
+                        f"; {rem_text}" if rem_text else "",
+                        army_number, target_year
+                    ))
+                else:
+                    cursor.execute("""
+                        INSERT INTO leave_details
+                        (army_number, year, AL, CL, AAL, PL, `Annual Leave`, remarks, leave_start_date, leave_end_date)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (
+                        army_number, target_year, vals['al'], vals['cl'], vals['aal'], vals['ptl'], vals['Annual_Leave'],
+                        rem_text,
+                        leave['from_date'],
+                        leave['to_date']
+                    ))
 
         # ================= INSERT HISTORY =================
         cursor.execute("""
@@ -1914,21 +1943,24 @@ def download_leave_certificate(leave_id):
         # ====================== LEAVE TYPE DISPLAY ======================
         leave_type_display = data['leave_type']
 
-        # ====================== 🔥 YOUR CUSTOM AL LOGIC ======================
+        # ====================== AAL / NEXT YEAR CONDITION ======================
         from datetime import datetime
-        if data['leave_type'] == 'AL':
-            current_year = str(datetime.now().year)
+        current_year_num = datetime.now().year
+        from_year = data['from_date'].year if data.get('from_date') else None
+        applied_year = data['applied_on'].year if data.get('applied_on') else current_year_num
 
+        if (from_year and (from_year > applied_year or from_year > current_year_num)) or data['leave_type'] == 'AAL':
+            leave_type_display = 'AAL'
+        elif data['leave_type'] == 'AL':
             cursor.execute("""
                 SELECT AL
                 FROM leave_details
                 WHERE army_number = %s
                   AND year = %s
-            """, (army_number, current_year))
+            """, (army_number, str(current_year_num)))
 
             result = cursor.fetchone()
             total_al = result['AL'] if result and result['AL'] is not None else 0
-
 
             remaining_al = 60 - total_al
 
@@ -2616,9 +2648,13 @@ def get_leave_balance():
     if not army_number or not leave_type:
         return jsonify({"error": "army_number and leave_type are required"}), 400
 
-    # Use current year if not provided
-    if not year:
-        year = str(datetime.now().year)
+    current_year_num = datetime.now().year
+
+    # If AAL is selected, target NEXT YEAR by default
+    if leave_type == 'AAL' and (not year or year == str(current_year_num)):
+        year = str(current_year_num + 1)
+    elif not year:
+        year = str(current_year_num)
 
     conn = get_db_connection()
     if not conn:
@@ -2627,6 +2663,11 @@ def get_leave_balance():
     try:
         # Use buffered=True to avoid 'Unread result found' errors
         cursor = conn.cursor(dictionary=True, buffered=True)
+        cursor.execute("SELECT `rank` FROM personnel WHERE army_number = %s", (army_number,))
+        p_info = cursor.fetchone()
+        p_rank = (p_info.get('rank') or '').strip().upper() if p_info else ''
+        is_agniveer = p_rank in ['AGNIVEER', 'AV']
+
         cursor.execute("""
             SELECT AL, CL, AAL, PL, `Annual Leave`
             FROM leave_details 
@@ -2635,14 +2676,23 @@ def get_leave_balance():
         
         record = cursor.fetchone()
 
-        # Define entitlements
-        entitlements = {
-            "AL": 60,
-            "CL": 30,
-            "AAL": 20,
-            "PL": 15,
-            "Annual Leave": 30
-        }
+        # Define entitlements dynamically based on rank
+        if is_agniveer:
+            entitlements = {
+                "AL": 30,
+                "CL": 0,
+                "AAL": 30,
+                "PL": 0,
+                "Annual Leave": 30
+            }
+        else:
+            entitlements = {
+                "AL": 60,
+                "CL": 30,
+                "AAL": 30,
+                "PL": 15,
+                "Annual Leave": 30
+            }
 
         entitled = entitlements.get(leave_type, 0)
         taken = 0
@@ -2653,7 +2703,10 @@ def get_leave_balance():
             elif leave_type == "CL":
                 taken = record.get('CL') or 0
             elif leave_type == "AAL":
-                taken = record.get('AAL') or 0
+                if is_agniveer:
+                    taken = (record.get('Annual Leave') or 0) or (record.get('AAL') or 0)
+                else:
+                    taken = (record.get('AL') or 0) or (record.get('AAL') or 0)
             elif leave_type == "PL":
                 taken = record.get('PL') or 0
             elif leave_type == "Annual Leave":

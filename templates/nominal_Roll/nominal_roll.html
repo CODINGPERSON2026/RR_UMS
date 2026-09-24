@@ -276,6 +276,7 @@
         <th>Trade</th>
         <th>Company</th>
         <th>Section</th>
+        <th>Mobile No</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -406,6 +407,7 @@
         <th>Trade</th>
         <th>Company</th>
         <th>Section</th>
+        <th>Mobile No</th>
         <th>Status</th>
       `;
       
@@ -565,6 +567,7 @@
           <td>${esc(row.trade)}</td>
           <td class="td-company">${esc(row.company)}</td>
           <td>${esc(row.section)}</td>
+          <td style="font-family: monospace; font-size: 12px; letter-spacing: 0.5px;">${esc(row.mobile_number || '—')}</td>
           <td>
             ${row.onleave_status ? '<span style="background:var(--danger-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON LEAVE</span>' : ''}
             ${row.detachment_status ? '<span style="background:var(--primary-color); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:600;">ON DET</span>' : ''}
@@ -689,7 +692,7 @@
     const ts = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
 
     if (viewMode === 'nominal') {
-        headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section', 'Status'];
+        headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Trade', 'Company', 'Section', 'Mobile No', 'Status'];
         rows = sortedData.map((row, i) => [
             i + 1,
             row.army_number,
@@ -698,6 +701,7 @@
             row.trade,
             row.company,
             row.section,
+            row.mobile_number || '—',
             row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course' : (row.td_status ? 'On TD' : 'Present')))
         ]);
         filename = '15CESR_NominalRoll_' + ts + '.csv';
@@ -751,7 +755,7 @@
     const bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(watermarkSvg);
 
     if (viewMode === 'nominal') {
-        headers = `<th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Trade</th><th>Company</th><th>Section</th><th>Status</th>`;
+        headers = `<th>S.No</th><th>Army Number</th><th>Rank</th><th>Name</th><th>Trade</th><th>Company</th><th>Section</th><th>Mobile No</th><th>Status</th>`;
         rows = sortedData.map((row, i) => `
           <tr>
             <td>${i + 1}</td>
@@ -761,6 +765,7 @@
             <td>${esc(row.trade)}</td>
             <td>${esc(row.company)}</td>
             <td>${esc(row.section)}</td>
+            <td>${esc(row.mobile_number || '—')}</td>
             <td>${row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course':(row.td_status ? 'On TD' : 'Present')))}</td>
           </tr>`).join('');
     } else {

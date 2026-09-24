@@ -678,7 +678,7 @@ label.fw-bold {
     };
 
     const grouped = {};
-    const totals  = { AL: 0, CL: 0, PL: 0, OTHER: 0, ANNUAL_LEAVE: 0 };
+    const totals  = { AL: 0, CL: 0, PL: 0, OTHER: 0, ANNUAL_LEAVE: 0, AAL: 0 };
     const currentYear = new Date().getFullYear();
 
     // 1. Process Detailed History first
@@ -698,6 +698,7 @@ label.fw-bold {
             else if (type === 'CL') totals.CL += days;
             else if (type === 'PL') totals.PL += days;
             else if (type.toUpperCase() === 'ANNUAL LEAVE') totals.ANNUAL_LEAVE += days;
+            else if (type.toUpperCase() === 'AAL') totals.AAL += days;
             else totals.OTHER += days;
         }
     });
@@ -746,6 +747,7 @@ label.fw-bold {
                         else if (t.key === 'CL') totals.CL += difference;
                         else if (t.key === 'PL') totals.PL += difference;
                         else if (t.key === 'Annual_Leave') totals.ANNUAL_LEAVE += difference;
+                        else if (t.key === 'AAL') totals.AAL += difference;
                         else totals.OTHER += difference;
                     }
                 }
@@ -776,12 +778,18 @@ label.fw-bold {
     // Summary Grid
     if (isAgniveer) {
       const balAnn = 30 - totals.ANNUAL_LEAVE;
+      const balAAL = 15 - totals.AAL;
       html += `
-      <div class="lhp-summary-grid" style="grid-template-columns: 1fr;">
+      <div class="lhp-summary-grid" style="grid-template-columns: 1fr 1fr;">
         <div class="lhp-summary-item type-AL" onclick="scrollToLeaveSection('Annual Leave')" style="border-top-color: #3b82f6;">
           <div class="lhp-summary-label">Annual Leave (Agniveer)</div>
           <div class="lhp-summary-value">${totals.ANNUAL_LEAVE} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
           <div style="font-size:0.8rem; font-weight:700; color:#2563eb; margin-top:2px;">Remaining Balance: ${balAnn} / 30</div>
+        </div>
+        <div class="lhp-summary-item type-AAL" onclick="scrollToLeaveSection('AAL')" style="border-top-color: #10b981;">
+          <div class="lhp-summary-label">AAL (Advance Annual Leave)</div>
+          <div class="lhp-summary-value">${totals.AAL} <span style="font-size:0.7rem; opacity:0.6;">Taken</span></div>
+          <div style="font-size:0.8rem; font-weight:700; color:#059669; margin-top:2px;">Remaining Balance: ${balAAL} / 15</div>
         </div>
       </div>
       `;
