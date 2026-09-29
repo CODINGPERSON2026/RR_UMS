@@ -1,0 +1,182 @@
+{% extends "baseView.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/readiness.css?v=2.0">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3 px-md-4">
+
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <div class="readiness-breadcrumb-bar">
+      <a href="/ai-company-readiness" class="breadcrumb-link-btn">
+        <i class="fas fa-shield-alt text-primary me-2"></i> AI Company Readiness
+      </a>
+      <i class="fas fa-chevron-right breadcrumb-chevron"></i>
+      <a href="/ai-company-readiness/company/{{ company }}" class="breadcrumb-link-btn">
+        <i class="fas fa-building text-primary me-1"></i> {{ company }}
+      </a>
+      <i class="fas fa-chevron-right breadcrumb-chevron"></i>
+      <span class="breadcrumb-current-text">
+        <i class="fas fa-brain text-secondary me-2"></i> AI/ML Prediction
+      </span>
+    </div>
+  </nav>
+
+  <!-- Prediction Header Card -->
+  <div class="card mb-4 border-0 shadow-sm" style="background: var(--card-bg-solid);">
+    <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-primary"><i class="fas fa-brain me-1"></i> Machine Learning Engine</span>
+          <span class="badge bg-secondary">{{ company }}</span>
+        </div>
+        <h1 class="h2 mb-1 mt-2 fw-bold">Predictive Readiness Analysis</h1>
+        <div class="text-muted small">
+          Forecasting formation readiness trends and forward-looking operational risk for {{ display_name }}.
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="/ai-company-readiness/company/{{ company }}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Company
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prediction KPI Cards -->
+  <div class="kpi-row mb-4">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap kpi-primary">
+        <i class="fas fa-tachometer-alt"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Current Readiness</div>
+        <div class="kpi-value text-primary">{{ prediction.current_readiness }}%</div>
+        <div class="text-muted" style="font-size: 0.75rem;">Deterministic database score</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap {% if prediction.predicted_readiness and prediction.predicted_readiness < prediction.current_readiness %}kpi-warning{% else %}kpi-success{% endif %}">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Predicted Readiness</div>
+        {% if prediction.predicted_readiness is not none %}
+          <div class="kpi-value">{{ prediction.predicted_readiness }}%</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Horizon: {{ prediction.prediction_period }}</div>
+        {% else %}
+          <div class="kpi-value" style="font-size: 1.15rem; color: #f59e0b;">Under Dev</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Logging snapshots</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap {% if prediction.risk_level == 'High Risk' %}kpi-danger{% else %}kpi-warning{% endif %}">
+        <i class="fas fa-shield-virus"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Projected Risk Level</div>
+        <div class="kpi-value" style="font-size: 1.25rem;">{{ prediction.risk_level }}</div>
+        <div class="text-muted" style="font-size: 0.75rem;">Horizon: {{ prediction.prediction_period }}</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap kpi-primary">
+        <i class="fas fa-check-double"></i>
+      </div>
+      <div>
+        <div class="kpi-label">Model Confidence</div>
+        {% if prediction.confidence is not none %}
+          <div class="kpi-value text-success">{{ prediction.confidence }}%</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Calibrated probability</div>
+        {% else %}
+          <div class="kpi-value text-muted" style="font-size: 1rem;">N/A</div>
+          <div class="text-muted" style="font-size: 0.75rem;">Requires trained model</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Status / Architecture Notice -->
+  {% if prediction.status_code == 'UNDER_DEVELOPMENT' %}
+  <div class="alert alert-warning d-flex align-items-start gap-3 p-4 rounded-3 border-warning mb-4" role="alert" style="background: rgba(245, 158, 11, 0.08);">
+    <i class="fas fa-info-circle fa-2x text-warning flex-shrink-0 mt-1"></i>
+    <div>
+      <h6 class="alert-heading fw-bold mb-1">Authentic Machine Learning Governance Notice</h6>
+      <p class="mb-2" style="font-size: 0.88rem;">
+        {{ prediction.status_message }}
+      </p>
+      <div class="text-muted small">
+        <strong>Anti-Fabrication Principle:</strong> Per UMS engineering standards, deterministic rules (<code>required - actual</code>) are never falsely branded as Machine Learning. The snapshot recording pipeline is active, and multi-model training (Logistic Regression, Random Forest, Gradient Boosting) will trigger once sufficient operational snapshots are accumulated.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="row g-4 mb-4">
+    <!-- Contributing Factors -->
+    <div class="col-lg-7">
+      <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg-solid);">
+        <div class="card-header bg-transparent border-bottom py-3">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-project-diagram text-primary me-2"></i> Leading Contributing Operational Factors</h5>
+          <div class="text-muted small">Explainable indicators influencing forward-looking readiness risks</div>
+        </div>
+        <div class="card-body p-3">
+          {% for factor in prediction.important_factors %}
+          <div class="factor-card">
+            <div class="factor-header">
+              <span class="factor-title">{{ factor.label }}</span>
+              <span class="factor-value-badge">{{ factor.value }}</span>
+            </div>
+            <p class="factor-desc">{{ factor.description }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Mitigation Recommendations -->
+    <div class="col-lg-5">
+      <div class="card h-100 border-0 shadow-sm" style="background: var(--card-bg-solid);">
+        <div class="card-header bg-transparent border-bottom py-3">
+          <h5 class="mb-0 fw-bold"><i class="fas fa-tasks text-success me-2"></i> Forward Risk Mitigations</h5>
+          <div class="text-muted small">Targeted measures to prevent anticipated readiness degradation</div>
+        </div>
+        <div class="card-body p-3">
+          <ul class="list-group list-group-flush">
+            {% for mit in prediction.mitigation_recommendations %}
+            <li class="list-group-item bg-transparent px-0 py-3 d-flex gap-3 align-items-start border-bottom">
+              <i class="fas fa-shield-alt text-success mt-1"></i>
+              <div style="font-size: 0.88rem;">{{ mit }}</div>
+            </li>
+            {% endfor %}
+          </ul>
+
+          <div class="mt-4 p-3 rounded" style="background: var(--nav-link-hover-bg); border: 1px solid var(--border-color);">
+            <div class="small fw-bold text-uppercase text-muted mb-2">Model Pipeline Specifications</div>
+            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+              <span>Model Architecture:</span>
+              <strong>Ensemble Classifier / Scaled LR</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+              <span>Feature Columns:</span>
+              <strong>19 Time-Aligned Features</strong>
+            </div>
+            <div class="d-flex justify-content-between" style="font-size: 0.85rem;">
+              <span>Data Leakage Guard:</span>
+              <strong class="text-success"><i class="fas fa-check"></i> Enforced</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

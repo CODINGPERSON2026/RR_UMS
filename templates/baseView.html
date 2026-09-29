@@ -1189,6 +1189,15 @@
       </a>
       {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER', 'ADMIN', 'SUPER ADMIN', 'JCO', 'TRG', 'HEAD CLK', 'CLERK', 'PA'] %}
+      <a class="nav-link {% if '/ai-company-readiness' in request.path %}active{% endif %}"
+        href="/ai-company-readiness" data-tiptext="AI Company Readiness">
+        <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
+        <span class="nav-label-text">Company Readiness</span>
+        <span class="nav-tooltip">Readiness</span>
+      </a>
+      {% endif %}
+
 
       <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}
       <a class="nav-link {% if '/task_manager' in request.path %}active{% endif %}" href="/task_manager/"

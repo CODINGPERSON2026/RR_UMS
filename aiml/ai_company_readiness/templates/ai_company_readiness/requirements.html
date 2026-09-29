@@ -1,0 +1,421 @@
+{% extends "baseView.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/readiness.css?v=3.0">
+{% endblock %}
+
+{% block content %}
+<div class="readiness-container py-2">
+
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <div class="readiness-breadcrumb-bar">
+      <a href="/ai-company-readiness" class="breadcrumb-link-btn">
+        <i class="fas fa-shield-alt text-primary me-2"></i> AI Company Readiness
+      </a>
+      <i class="fas fa-chevron-right breadcrumb-chevron"></i>
+      <span class="breadcrumb-current-text">
+        <i class="fas fa-sliders-h text-secondary me-2"></i> Requirements Configuration
+      </span>
+    </div>
+  </nav>
+
+  <!-- Header Card -->
+  <div class="card mb-4 border-0 shadow-sm" style="background: var(--card-bg-solid, #ffffff); border-radius: 18px; border: 1px solid var(--border-color, #e2e8f0) !important; overflow: hidden; position: relative;">
+    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);"></div>
+    <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+          <span class="badge" style="background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.25); font-weight: 600; font-size: 0.74rem;">
+            <i class="fas fa-sliders-h me-1"></i> Command Baseline
+          </span>
+          <span class="badge" style="background: rgba(100, 116, 139, 0.12); color: #475569; border: 1px solid rgba(100, 116, 139, 0.25); font-weight: 600; font-size: 0.74rem;">
+            <i class="fas fa-user-shield me-1"></i> Administration
+          </span>
+          <span class="badge" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); font-weight: 600; font-size: 0.74rem;">
+            <i class="fas fa-check-double me-1"></i> HQ COY &bull; COMN COY &bull; 3 COY
+          </span>
+        </div>
+        <h1 class="h2 mb-1 fw-bold" style="color: var(--text-primary, #1e293b); letter-spacing: -0.5px;">
+          <i class="fas fa-tasks text-primary me-2"></i> Company Requirements Configuration
+        </h1>
+        <div class="text-muted small">
+          Define authorized manpower, technical trade rosters, educational criteria, and military course quotas for monitored unit formations.
+        </div>
+      </div>
+
+      <div class="d-flex gap-2 flex-wrap">
+        <button type="button" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold" onclick="openAddRequirementModal()" style="border-radius: 10px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);">
+          <i class="fas fa-plus-circle"></i> Add Requirement
+        </button>
+        <a href="/ai-company-readiness" class="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-3 py-2 fw-semibold" style="border-radius: 10px;">
+          <i class="fas fa-arrow-left"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements List Card -->
+  <div class="card border-0 shadow-sm" style="background: var(--card-bg-solid, #ffffff); border-radius: 18px; border: 1px solid var(--border-color, #e2e8f0) !important; overflow: hidden;">
+    <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div class="d-flex align-items-center gap-3">
+        <h5 class="mb-0 fw-bold" style="color: var(--text-primary, #1e293b); font-size: 1.05rem;">
+          <i class="fas fa-list-check text-primary me-2"></i> Configured Formation Requirements
+        </h5>
+        <span class="badge rounded-pill bg-primary px-3 py-1" id="reqCountBadge" style="font-size: 0.75rem;">
+          {{ requirements|length }} Total
+        </span>
+      </div>
+
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <!-- Short-Form Company Filter Buttons -->
+        <div class="d-flex align-items-center gap-2">
+          <span class="text-muted small fw-bold text-uppercase" style="font-size: 0.74rem; letter-spacing: 0.5px;">
+            <i class="fas fa-filter text-primary me-1"></i> Coy:
+          </span>
+          <div class="btn-group btn-group-sm" role="group" id="coyShortFilterGroup" style="border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px var(--shadow, rgba(0,0,0,0.06));">
+            <button type="button" class="btn btn-sm btn-primary active py-1 px-3 fw-bold" data-coy="all" onclick="filterRequirementsByCoy('all', this)" style="font-size: 0.8rem;">
+              ALL
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 fw-bold" data-coy="HQ COY" onclick="filterRequirementsByCoy('HQ COY', this)" style="font-size: 0.8rem;">
+              HQ
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 fw-bold" data-coy="COMN COY" onclick="filterRequirementsByCoy('COMN COY', this)" style="font-size: 0.8rem;">
+              COMN
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-1 px-3 fw-bold" data-coy="3 COY" onclick="filterRequirementsByCoy('3 COY', this)" style="font-size: 0.8rem;">
+              3 COY
+            </button>
+          </div>
+        </div>
+
+        <div style="width: 260px;">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fas fa-search"></i></span>
+            <input type="text" class="form-control form-control-sm border-start-0 ps-0" id="reqSearchInput" placeholder="Search by Company, Type, or Name...">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="requirementsTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Company</th>
+              <th>Type</th>
+              <th>Requirement Name</th>
+              <th>Required Count</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in requirements %}
+            <tr id="reqRow_{{ r.id }}" data-company="{{ r.company }}">
+              <td class="text-muted fw-bold row-index">{{ loop.index }}</td>
+              <td><span class="badge bg-dark">{{ r.company }}</span></td>
+              <td><span class="badge bg-light text-dark border">{{ r.requirement_type }}</span></td>
+              <td class="fw-bold">{{ r.requirement_name }}</td>
+              <td class="fw-bold text-primary">{{ r.required_count }}</td>
+              <td>
+                {% if r.priority == 'Critical' %}
+                  <span class="badge bg-danger">Critical</span>
+                {% elif r.priority == 'High' %}
+                  <span class="badge bg-warning text-dark">High</span>
+                {% elif r.priority == 'Low' %}
+                  <span class="badge bg-light text-secondary border">Low</span>
+                {% else %}
+                  <span class="badge bg-info text-dark">Medium</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge {% if r.status == 'Active' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-secondary{% endif %}">
+                  {{ r.status }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button type="button" class="btn btn-sm btn-outline-primary py-1 px-2 me-1" onclick='openEditRequirementModal({{ r|tojson }})'>
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger py-1 px-2" onclick="confirmDeleteRequirement({{ r.id }}, '{{ r.requirement_name }}')">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+            <tr id="noReqRow" style="display: none;">
+              <td colspan="8" class="text-center py-4 text-muted">
+                <i class="fas fa-search me-2"></i> No requirements found matching the selected filter.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== ADD / EDIT REQUIREMENT MODAL ==================== -->
+<div class="modal fade" id="requirementModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="requirementModalTitle">Configure Requirement</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <form id="requirementForm" onsubmit="submitRequirementForm(event)">
+        <div class="modal-body p-4">
+          <input type="hidden" id="reqId" name="id">
+
+          <!-- Company Select -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Company Formation *</label>
+            <select class="form-select" id="reqCompany" name="company" required>
+              {% for coy in supported_companies %}
+              <option value="{{ coy }}">{{ coy }} ({{ display_names[coy] }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Type Select -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Requirement Type *</label>
+            <select class="form-select" id="reqType" name="requirement_type" required>
+              <option value="Strength">Strength (Authorized Manpower)</option>
+              <option value="Trade">Trade (Specialization)</option>
+              <option value="Qualification">Qualification (Educational)</option>
+              <option value="Course">Course (Military Training)</option>
+              <option value="Fitness">Fitness (Physical Standard)</option>
+              <option value="Medical">Medical (Medical Category)</option>
+            </select>
+          </div>
+
+          <!-- Name Input -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Requirement Name *</label>
+            <input type="text" class="form-control" id="reqName" name="requirement_name" placeholder="e.g. Total Personnel, TTC, 12th, TTC CL I" required>
+          </div>
+
+          <div class="row">
+            <!-- Count Input -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Required Count *</label>
+              <input type="number" class="form-control" id="reqCount" name="required_count" min="1" max="1000" required>
+            </div>
+
+            <!-- Priority Select -->
+            <div class="col-md-6 mb-3">
+              <label class="form-label fw-bold">Priority *</label>
+              <select class="form-select" id="reqPriority" name="priority">
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Status Select -->
+          <div class="mb-2">
+            <label class="form-label fw-bold">Status</label>
+            <select class="form-select" id="reqStatus" name="status">
+              <option value="Active" selected>Active</option>
+              <option value="Archived">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary px-4" id="btnSaveReq">
+            <i class="fas fa-save me-1"></i> Save Requirement
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="readinessToastContainer" style="z-index: 100000;"></div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/readiness.js?v=2.0"></script>
+<script>
+let reqModalInstance = null;
+
+document.addEventListener("DOMContentLoaded", function() {
+  const modalEl = document.getElementById("requirementModal");
+  if (modalEl) {
+    reqModalInstance = new bootstrap.Modal(modalEl);
+  }
+
+  const searchInput = document.getElementById("reqSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", function() {
+      const q = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#requirementsTable tbody tr");
+      rows.forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+  }
+});
+
+function openAddRequirementModal() {
+  document.getElementById("requirementModalTitle").innerText = "Add Operational Requirement";
+  document.getElementById("reqId").value = "";
+  document.getElementById("reqName").value = "";
+  document.getElementById("reqCount").value = "";
+  document.getElementById("reqPriority").value = "Medium";
+  document.getElementById("reqStatus").value = "Active";
+  if (reqModalInstance) reqModalInstance.show();
+}
+
+function openEditRequirementModal(req) {
+  document.getElementById("requirementModalTitle").innerText = "Edit Requirement: " + req.requirement_name;
+  document.getElementById("reqId").value = req.id || "";
+  document.getElementById("reqCompany").value = req.company || "HQ COY";
+  document.getElementById("reqType").value = req.requirement_type || "Trade";
+  document.getElementById("reqName").value = req.requirement_name || "";
+  document.getElementById("reqCount").value = req.required_count || 0;
+  document.getElementById("reqPriority").value = req.priority || "Medium";
+  document.getElementById("reqStatus").value = req.status || "Active";
+  if (reqModalInstance) reqModalInstance.show();
+}
+
+function submitRequirementForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById("btnSaveReq");
+  btn.disabled = true;
+
+  const data = {
+    id: document.getElementById("reqId").value ? parseInt(document.getElementById("reqId").value) : null,
+    company: document.getElementById("reqCompany").value,
+    requirement_type: document.getElementById("reqType").value,
+    requirement_name: document.getElementById("reqName").value,
+    required_count: parseInt(document.getElementById("reqCount").value),
+    priority: document.getElementById("reqPriority").value,
+    status: document.getElementById("reqStatus").value
+  };
+
+  fetch("/ai-company-readiness/api/requirements", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(resData => {
+    btn.disabled = false;
+    if (resData.success) {
+      if (reqModalInstance) reqModalInstance.hide();
+      showReadinessToast("Requirement Saved", resData.message, "success");
+      setTimeout(() => window.location.reload(), 800);
+    } else {
+      showReadinessToast("Error", resData.error || "Failed to save requirement", "danger");
+    }
+  })
+  .catch(err => {
+    btn.disabled = false;
+    showReadinessToast("Error", err.message, "danger");
+  });
+}
+
+function confirmDeleteRequirement(reqId, reqName) {
+  if (!confirm(`Are you sure you want to delete requirement '${reqName}'?`)) return;
+
+  fetch(`/ai-company-readiness/api/requirements/${reqId}/delete`, {
+    method: "POST"
+  })
+  .then(res => res.json())
+  .then(resData => {
+    if (resData.success) {
+      const row = document.getElementById(`reqRow_${reqId}`);
+      if (row) row.remove();
+      showReadinessToast("Deleted", "Requirement removed successfully", "success");
+    } else {
+      showReadinessToast("Error", resData.error || "Failed to delete", "danger");
+    }
+  })
+  .catch(err => {
+    showReadinessToast("Error", err.message, "danger");
+  });
+}
+
+// ==================== SHORT-FORM COMPANY & SEARCH FILTER ====================
+let currentCoyFilter = 'all';
+
+function filterRequirementsByCoy(coy, btnEl) {
+  currentCoyFilter = coy;
+
+  document.querySelectorAll('#coyShortFilterGroup .btn').forEach(btn => {
+    btn.classList.remove('btn-primary', 'active');
+    btn.classList.add('btn-outline-secondary');
+  });
+  if (btnEl) {
+    btnEl.classList.remove('btn-outline-secondary');
+    btnEl.classList.add('btn-primary', 'active');
+  }
+
+  applyRequirementsFilter();
+}
+
+function applyRequirementsFilter() {
+  const searchTerm = (document.getElementById('reqSearchInput')?.value || '').toLowerCase().trim();
+  const rows = document.querySelectorAll('#requirementsTable tbody tr:not(#noReqRow)');
+  let visibleCount = 0;
+  let visibleIndex = 1;
+
+  rows.forEach(row => {
+    const rowCoy = (row.getAttribute('data-company') || '').trim();
+    const rowText = row.innerText.toLowerCase();
+
+    const matchesCoy = (currentCoyFilter === 'all' || rowCoy === currentCoyFilter);
+    const matchesSearch = (!searchTerm || rowText.includes(searchTerm));
+
+    if (matchesCoy && matchesSearch) {
+      row.style.display = '';
+      visibleCount++;
+      const indexCell = row.querySelector('.row-index');
+      if (indexCell) {
+        indexCell.textContent = visibleIndex++;
+      }
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  const noRow = document.getElementById('noReqRow');
+  if (noRow) {
+    noRow.style.display = (visibleCount === 0) ? '' : 'none';
+  }
+
+  const countBadge = document.getElementById('reqCountBadge');
+  if (countBadge) {
+    if (currentCoyFilter === 'all' && !searchTerm) {
+      countBadge.textContent = `${visibleCount} Total`;
+      countBadge.className = 'badge bg-secondary';
+    } else {
+      countBadge.textContent = `${visibleCount} of ${rows.length}`;
+      countBadge.className = 'badge bg-primary';
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('reqSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', applyRequirementsFilter);
+  }
+});
+</script>
+{% endblock %}

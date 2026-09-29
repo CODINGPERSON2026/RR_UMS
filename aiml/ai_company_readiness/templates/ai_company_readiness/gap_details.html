@@ -1,0 +1,122 @@
+{% extends "baseView.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/readiness.css?v=2.0">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3 px-md-4">
+
+  <!-- Breadcrumb Navigation -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <div class="readiness-breadcrumb-bar">
+      <a href="/ai-company-readiness" class="breadcrumb-link-btn">
+        <i class="fas fa-shield-alt text-primary me-2"></i> AI Company Readiness
+      </a>
+      <i class="fas fa-chevron-right breadcrumb-chevron"></i>
+      <a href="/ai-company-readiness/company/{{ company }}" class="breadcrumb-link-btn">
+        <i class="fas fa-building text-primary me-1"></i> {{ company }}
+      </a>
+      <i class="fas fa-chevron-right breadcrumb-chevron"></i>
+      <span class="breadcrumb-current-text">
+        <i class="fas fa-exclamation-triangle text-danger me-2"></i> {{ gap_type }} Gap Details
+      </span>
+    </div>
+  </nav>
+
+  <!-- Gap Header Card -->
+  <div class="card mb-4 border-0 shadow-sm" style="background: var(--card-bg-solid);">
+    <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-danger">Deficit Identified</span>
+          <span class="badge bg-secondary">{{ company }}</span>
+        </div>
+        <h1 class="h2 mb-1 mt-2 fw-bold">{{ gap_type }} Gap: {{ gap_name }}</h1>
+        <div class="text-muted small">
+          Soldiers in {{ company }} currently identified as contributing to this operational shortfall.
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <div class="text-end">
+          <div class="text-muted small fw-bold text-uppercase">Contributing Records</div>
+          <div class="display-6 fw-bold text-danger">{{ personnel_list|length }}</div>
+        </div>
+        <a href="/ai-company-readiness/company/{{ company }}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i> Back to Company
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Personnel Table Card -->
+  <div class="card border-0 shadow-sm" style="background: var(--card-bg-solid);">
+    <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h5 class="mb-0 fw-bold"><i class="fas fa-users text-primary me-2"></i> Contributing Personnel Roster</h5>
+      <div style="width: 280px;">
+        <input type="text" class="form-control form-control-sm" id="pageSearchInput" placeholder="Filter by Army No, Name, or Trade...">
+      </div>
+    </div>
+    <div class="card-body p-0">
+      {% if personnel_list %}
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="gapPersonnelTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Army No.</th>
+              <th>Name</th>
+              <th>Rank</th>
+              <th>Trade</th>
+              <th>Category</th>
+              <th>Deficiency / Status Reason</th>
+              <th>Solution</th>
+              <th>Restrictions / Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in personnel_list %}
+            <tr>
+              <td class="text-muted fw-bold">{{ loop.index }}</td>
+              <td><span class="badge bg-secondary font-monospace">{{ p.army_number }}</span></td>
+              <td class="fw-bold">{{ p.name }}</td>
+              <td>{{ p.rank }}</td>
+              <td>{{ p.trade }}</td>
+              <td><span class="badge bg-light text-dark border">{{ p.gap_category }}</span></td>
+              <td class="text-danger fw-semibold">{{ p.reason }}</td>
+              <td class="text-success fw-semibold"><i class="fas fa-check-circle text-success me-1" style="font-size: 0.78rem;"></i>{{ p.solution or 'Review and resolve' }}</td>
+              <td class="small text-muted">{{ p.restrictions or p.status_details or '-' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-clipboard-check text-success fa-3x mb-3"></i>
+        <h6>No contributing personnel found for this gap!</h6>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const searchInput = document.getElementById("pageSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", function() {
+      const q = this.value.toLowerCase();
+      const rows = document.querySelectorAll("#gapPersonnelTable tbody tr");
+      rows.forEach(r => {
+        r.style.display = r.innerText.toLowerCase().includes(q) ? "" : "none";
+      });
+    });
+  }
+});
+</script>
+{% endblock %}
