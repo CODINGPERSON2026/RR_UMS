@@ -1544,6 +1544,13 @@ STATUS COLORS
           <span class="sc-val" id="co-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+
+      <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
+        <span class="sc-label"><i class="fas fa-shield-alt text-primary me-1"></i> AI Readiness</span>
+        <div class="sc-right">
+          <span class="sc-val" id="co-readiness-val"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
       {% endif %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
         <span class="sc-label">OC Interview</span>
@@ -1701,6 +1708,8 @@ STATUS COLORS
         {% include 'modals/honours_board/hb.html' %}
       </div>
     </div>
+
+
 
     <!-- ALL POPUP MODALS (Deferred parsing for instant initial page rendering) -->
     <template id="deferredModalContainer">
@@ -2811,6 +2820,20 @@ STATUS COLORS
         }
       })
       .catch(function(err) { console.warn('Could not load AI fitness stats:', err); });
+
+    fetch('/ai-company-readiness/api/dashboard')
+      .then(function(res) { return res.ok ? res.json() : null; })
+      .then(function(data) {
+        var d = data ? (data.dashboard || data.data) : null;
+        if (d) {
+          window.modalReadinessCache = d;
+          var cardVal = document.getElementById('co-readiness-val');
+          if (cardVal && d.summary) {
+            cardVal.innerHTML = '<span class="text-primary fw-bold">' + d.summary.average_readiness + '%</span>';
+          }
+        }
+      })
+      .catch(function(err) { console.warn('Could not load AI company readiness stats:', err); });
     {% endif %}
   });
 </script>
@@ -2820,10 +2843,12 @@ STATUS COLORS
 <script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %}false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% include 'modals/ai_company_readiness_modal.html' %}
+{% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}
 

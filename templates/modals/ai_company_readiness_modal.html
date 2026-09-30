@@ -1,0 +1,617 @@
+<!-- AI Company Operational Readiness Modal for CO / 2IC / Adjutant -->
+<style>
+  #aiCompanyReadinessModal .custom-size {
+    max-width: 96% !important;
+    width: 96% !important;
+  }
+  #aiCompanyReadinessModal .modal-dialog {
+    margin-top: 1.25rem !important;
+  }
+  #aiCompanyReadinessModal .modal-body {
+    overflow-y: auto;
+    max-height: calc(88vh - 120px);
+    padding: 1.25rem 1.5rem;
+  }
+  #aiCompanyReadinessModal .readiness-modal-kpi {
+    background: var(--nav-link-hover-bg, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #aiCompanyReadinessModal .rm-kpi-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+  #aiCompanyReadinessModal .rm-table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  #aiCompanyReadinessModal .rm-table td {
+    vertical-align: middle;
+    font-size: 0.85rem;
+  }
+  /* Modern Formation Segmented Filter Pill */
+  .coy-segmented-filter {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    gap: 3px;
+  }
+  .coy-filter-pill {
+    border: 1px solid transparent;
+    background: transparent;
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    transition: all 0.18s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.2;
+  }
+  .coy-filter-pill:hover {
+    color: #1e293b;
+    background: #e2e8f0;
+  }
+  .coy-filter-pill.active {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  }
+
+  /* 7 Dimensions Compliance Modern UI */
+  .dim-compliance-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 320px;
+    max-width: 400px;
+  }
+  .dim-pill-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+  .dim-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.25;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+  }
+  .dim-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  }
+  .dim-chip-optimal {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+  }
+  .dim-chip-optimal .dim-score {
+    color: #059669;
+    font-weight: 800;
+  }
+  .dim-chip-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+  }
+  .dim-chip-warning .dim-score {
+    color: #d97706;
+    font-weight: 800;
+  }
+  .dim-chip-deficit {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+  }
+  .dim-chip-deficit .dim-score {
+    color: #dc2626;
+    font-weight: 800;
+  }
+  .dim-telemetry-bar {
+    display: flex;
+    height: 4px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: #e2e8f0;
+    gap: 1.5px;
+    margin-top: 2px;
+  }
+  .dim-telemetry-seg {
+    flex: 1;
+    height: 100%;
+    border-radius: 1px;
+    transition: opacity 0.15s;
+  }
+  .dim-telemetry-seg:hover {
+    opacity: 0.8;
+  }
+</style>
+
+<div class="modal fade" id="aiCompanyReadinessModal" tabindex="-1" aria-labelledby="aiCompanyReadinessModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered custom-size">
+    <div class="modal-content shadow-lg border-0" style="border-radius: 18px; overflow: hidden; background: var(--card-bg-solid, #ffffff);">
+      
+      <!-- Modal Header -->
+      <div class="modal-header py-3 px-4 border-bottom" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);">
+        <div>
+          <h5 class="modal-title mb-0 d-flex align-items-center gap-2 fw-bold" id="aiCompanyReadinessModalLabel" style="color: var(--text-primary, #1e293b);">
+            <i class="fas fa-shield-alt text-primary"></i>
+            <span>AI Company Operational Readiness Assessment Table</span>
+            <span class="badge bg-primary text-white ms-2" style="font-size: 0.72rem; font-weight: 600;">CO / 2IC / Adjutant</span>
+          </h5>
+          <div class="text-muted small mt-1">
+            Multi-dimensional operational telemetry across 7 dimensions &bull; CO / 2IC / Adjutant Command Oversight
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <a href="/ai-company-readiness" class="btn btn-sm btn-primary fw-semibold px-3 text-white" target="_blank" title="Open Complete Analytics Dashboard">
+            <i class="fas fa-chart-line me-1"></i> Full Analytics
+          </a>
+          <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="recordReadinessSnapshot(this)" title="Save historical snapshot for trend modeling">
+            <i class="fas fa-camera me-1"></i> Snapshot
+          </button>
+          <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        
+        <!-- Summary KPI Row -->
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="readiness-modal-kpi shadow-sm">
+              <div class="rm-kpi-icon bg-primary bg-opacity-10 text-primary">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div>
+                <div class="text-muted small fw-semibold">Formation Avg Readiness</div>
+                <div class="h5 mb-0 fw-bold text-primary" id="mAvgReadiness">--%</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="readiness-modal-kpi shadow-sm">
+              <div class="rm-kpi-icon bg-success bg-opacity-10 text-success">
+                <i class="fas fa-users"></i>
+              </div>
+              <div>
+                <div class="text-muted small fw-semibold">Posted / Auth Strength</div>
+                <div class="h5 mb-0 fw-bold text-dark" id="mTotalStrength">-- / --</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="readiness-modal-kpi shadow-sm">
+              <div class="rm-kpi-icon bg-warning bg-opacity-10 text-warning">
+                <i class="fas fa-user-check"></i>
+              </div>
+              <div>
+                <div class="text-muted small fw-semibold">Available on Ground</div>
+                <div class="h5 mb-0 fw-bold text-success" id="mAvailStrength">--</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-6 col-xl-3">
+            <div class="readiness-modal-kpi shadow-sm">
+              <div class="rm-kpi-icon bg-info bg-opacity-10 text-info">
+                <i class="fas fa-building"></i>
+              </div>
+              <div>
+                <div class="text-muted small fw-semibold">Monitored Formations</div>
+                <div class="h5 mb-0 fw-bold text-secondary">3 Companies</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="text-muted small fw-bold text-uppercase"><i class="fas fa-filter text-primary me-1"></i> Formation:</span>
+            <div class="coy-segmented-filter d-inline-flex align-items-center p-1 rounded-pill" id="mCoyFilterGroup">
+              <button type="button" class="coy-filter-pill active" data-coy="all" onclick="filterModalCoy('all', this)">
+                <i class="fas fa-th-large me-1.5"></i>ALL
+              </button>
+              <button type="button" class="coy-filter-pill" data-coy="HQ COY" onclick="filterModalCoy('HQ COY', this)">
+                <i class="fas fa-flag me-1.5"></i>HQ COY
+              </button>
+              <button type="button" class="coy-filter-pill" data-coy="COMN COY" onclick="filterModalCoy('COMN COY', this)">
+                <i class="fas fa-satellite-dish me-1.5"></i>COMN COY
+              </button>
+              <button type="button" class="coy-filter-pill" data-coy="3 COY" onclick="filterModalCoy('3 COY', this)">
+                <i class="fas fa-shield-alt me-1.5"></i>3 COY
+              </button>
+            </div>
+          </div>
+          <div style="min-width: 260px;">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-transparent text-muted"><i class="fas fa-search"></i></span>
+              <input type="text" class="form-control" id="mSearchInput" placeholder="Search formation, gap, or trade...">
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Company Readiness Table -->
+        <div class="card border rounded-3 overflow-hidden shadow-sm mb-4">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0 rm-table" id="mReadinessTable">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-3 py-3">Formation</th>
+                  <th>Auth / Posted</th>
+                  <th>On Ground</th>
+                  <th style="min-width: 330px;">7 Dimensions Compliance</th>
+                  <th>Overall Score</th>
+                  <th>Identified Primary Gap</th>
+                </tr>
+              </thead>
+              <tbody id="mReadinessTableBody">
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Loading AI company readiness telemetry...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inline Personnel Drill-Down Container (Populated when user clicks any gap) -->
+        <div class="card border rounded-3 overflow-hidden shadow-sm" id="mDrilldownContainer" style="display: none;">
+          <div class="card-header bg-light py-2 px-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-user-tag text-primary"></i>
+              <strong id="mDrilldownTitle" class="small text-dark">Personnel Deficiency Drill-Down</strong>
+              <span class="badge bg-secondary" id="mDrilldownBadge" style="font-size: 0.7rem;">0 Soldiers</span>
+            </div>
+            <button type="button" class="btn-close btn-sm" onclick="document.getElementById('mDrilldownContainer').style.display='none';"></button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 260px;">
+              <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Army No</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Trade</th>
+                    <th>Deficiency Reason</th>
+                    <th>Recommended Solution</th>
+                  </tr>
+                </thead>
+                <tbody id="mDrilldownTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer py-2 px-4 border-top d-flex justify-content-between">
+        <div class="text-muted small">
+          <i class="fas fa-shield-alt text-success me-1"></i> Data calculated deterministically from active UMS personnel & training records.
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let modalReadinessCache = null;
+
+  function openAiCompanyReadinessModal() {
+    const modalEl = document.getElementById('aiCompanyReadinessModal');
+    if (!modalEl) return;
+    const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    bsModal.show();
+    
+    const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
+    const currentCoy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
+    const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
+
+    if (window.modalReadinessCache || modalReadinessCache) {
+      renderModalReadiness(window.modalReadinessCache || modalReadinessCache, currentCoy, searchVal);
+    } else {
+      fetchAiCompanyReadinessData(currentCoy);
+    }
+  }
+
+  function fetchAiCompanyReadinessData(targetCoy = 'all') {
+    fetch('/ai-company-readiness/api/dashboard')
+      .then(res => res.json())
+      .then(data => {
+        const d = (data && (data.dashboard || data.data)) ? (data.dashboard || data.data) : null;
+        if (!d) return;
+        modalReadinessCache = d;
+        window.modalReadinessCache = d;
+        const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
+        renderModalReadiness(d, targetCoy, searchVal);
+      })
+      .catch(err => {
+        console.warn('Error loading readiness modal data:', err);
+        const tbody = document.getElementById('mReadinessTableBody');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Failed to load company readiness telemetry.</td></tr>`;
+        }
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('aiCompanyReadinessModal');
+    if (modalEl) {
+      modalEl.addEventListener('show.bs.modal', function () {
+        const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
+        const currentCoy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
+        const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
+        if (window.modalReadinessCache || modalReadinessCache) {
+          renderModalReadiness(window.modalReadinessCache || modalReadinessCache, currentCoy, searchVal);
+        } else {
+          fetchAiCompanyReadinessData(currentCoy);
+        }
+      });
+    }
+
+    const searchInput = document.getElementById('mSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const cache = window.modalReadinessCache || modalReadinessCache;
+        if (cache) {
+          const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
+          const coy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
+          renderModalReadiness(cache, coy, this.value);
+        }
+      });
+    }
+  });
+
+  function renderModalReadiness(dashboard, filterCoy = 'all', searchQuery = '') {
+    filterCoy = (filterCoy || 'all').trim();
+    const isAll = (filterCoy.toLowerCase() === 'all');
+    const s = dashboard.summary;
+    const avgEl = document.getElementById('mAvgReadiness');
+    const totEl = document.getElementById('mTotalStrength');
+    const availEl = document.getElementById('mAvailStrength');
+    const monEl = document.querySelector('#aiCompanyReadinessModal .readiness-modal-kpi .h5.text-secondary');
+
+    if (isAll) {
+      if (avgEl && s) avgEl.textContent = (s.average_readiness || 0) + '%';
+      if (totEl && s) totEl.textContent = `${s.total_actual_strength || 0} / ${s.total_required_strength || 0}`;
+      if (availEl && s) availEl.textContent = `${s.total_available_strength || 0}`;
+      if (monEl) monEl.textContent = '3 Companies';
+    } else {
+      let coy = null;
+      let matchedName = filterCoy;
+      if (dashboard.companies) {
+        for (const [name, cData] of Object.entries(dashboard.companies)) {
+          if (name.toUpperCase().trim() === filterCoy.toUpperCase().trim()) {
+            coy = cData;
+            matchedName = name;
+            break;
+          }
+        }
+      }
+      if (coy) {
+        if (avgEl) avgEl.textContent = (coy.overall_readiness || 0) + '%';
+        if (totEl) totEl.textContent = `${coy.actual_strength || 0} / ${coy.required_strength || 0}`;
+        if (availEl) availEl.textContent = `${coy.effective_available_strength || 0}`;
+        if (monEl) monEl.textContent = matchedName;
+      }
+    }
+
+    const tbody = document.getElementById('mReadinessTableBody');
+    if (!tbody || !dashboard.companies) return;
+
+    let html = '';
+    const companies = ['HQ COY', 'COMN COY', '3 COY'];
+
+    companies.forEach((coyName) => {
+      const coy = dashboard.companies[coyName];
+      if (!coy) return;
+
+      if (!isAll && coyName.toUpperCase().trim() !== filterCoy.toUpperCase().trim()) return;
+      if (searchQuery) {
+        const text = (coyName + ' ' + (coy.main_gap ? coy.main_gap.name : '')).toLowerCase();
+        if (!text.includes(searchQuery.toLowerCase())) return;
+      }
+
+      const strPct = Math.min(100, Math.round((coy.actual_strength / (coy.required_strength || 1)) * 100));
+      const scoreClass = coy.overall_readiness >= 85 ? 'text-success' : (coy.overall_readiness >= 70 ? 'text-warning' : 'text-danger');
+
+      // Helper to generate modern 3-tier dimension chip & telemetry segment
+      function getDimBadge(abbr, fullName, icon, score) {
+        let cls = 'dim-chip-deficit';
+        let barColor = '#ef4444';
+        let status = 'Critical Deficit';
+        if (score >= 85) {
+          cls = 'dim-chip-optimal';
+          barColor = '#10b981';
+          status = 'Optimal Target';
+        } else if (score >= 70) {
+          cls = 'dim-chip-warning';
+          barColor = '#f59e0b';
+          status = 'Moderate Shortfall';
+        }
+        return {
+          chip: `<div class="dim-chip ${cls}" title="${fullName}: ${score}% (${status})">
+                   <span class="dim-tag"><i class="${icon} me-1"></i>${abbr}</span>
+                   <span class="dim-score">${score}%</span>
+                 </div>`,
+          bar: `<div class="dim-telemetry-seg" style="background: ${barColor};" title="${fullName}: ${score}% (${status})"></div>`
+        };
+      }
+
+      const dStr = getDimBadge('Str', 'Strength Baseline', 'fas fa-users', coy.dimensions.strength.score);
+      const dAvail = getDimBadge('Avail', 'Availability On Ground', 'fas fa-user-check', coy.dimensions.availability.score);
+      const dTrd = getDimBadge('Trd', 'Trade Fulfillment', 'fas fa-tools', coy.dimensions.trade.score);
+      const dEdu = getDimBadge('Edu', 'Education / Training', 'fas fa-graduation-cap', coy.dimensions.qualification.score);
+      const dCrs = getDimBadge('Crs', 'Mandatory Courses', 'fas fa-certificate', coy.dimensions.course.score);
+      const dFit = getDimBadge('Fit', 'Physical Fitness', 'fas fa-running', coy.dimensions.fitness.score);
+      const dMed = getDimBadge('Med', 'Medical Classification', 'fas fa-notes-medical', coy.dimensions.medical.score);
+
+      const allDims = [dStr, dAvail, dTrd, dEdu, dCrs, dFit, dMed];
+      const chipsHtml = allDims.map(d => d.chip).join('');
+      const barHtml = allDims.map(d => d.bar).join('');
+
+      html += `
+        <tr data-coy="${coyName}">
+          <td class="ps-3 py-3" style="min-width: 140px;">
+            <div class="fw-bold text-dark fs-6 mb-1">${coyName}</div>
+            <div class="d-inline-flex gap-1">
+              <button type="button" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="openCompanyDetailsDialog('${coyName}')" title="View ${coyName} Dimension Details">
+                <i class="fas fa-list-alt me-1"></i>Details
+              </button>
+              <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="openCompanyGapsDialog('${coyName}')" title="View ${coyName} Operational Gaps">
+                <i class="fas fa-search-plus me-1"></i>Gaps
+              </button>
+            </div>
+          </td>
+          <td>
+            <div class="fw-bold text-dark">${coy.actual_strength} <span class="text-muted small fw-normal">/ ${coy.required_strength}</span></div>
+            <div class="progress mt-1" style="height: 4px; width: 85px;">
+              <div class="progress-bar bg-primary" style="width: ${strPct}%;"></div>
+            </div>
+          </td>
+          <td>
+            <div class="fw-bold text-success">${coy.effective_available_strength}</div>
+            <div class="text-muted" style="font-size: 0.72rem;">${coy.dimensions.availability.score}% Available</div>
+          </td>
+          <td>
+            <div class="dim-compliance-container">
+              <div class="dim-pill-grid">
+                ${chipsHtml}
+              </div>
+              <div class="dim-telemetry-bar" title="7 Dimensions Aggregate Telemetry">
+                ${barHtml}
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="fw-bold fs-6 ${scoreClass}">${coy.overall_readiness}%</div>
+          </td>
+          <td>
+            ${coy.main_gap ? `
+              <span class="badge bg-danger-subtle text-danger border border-danger-subtle cursor-pointer" onclick="openCompanyGapsDialog('${coyName}')" title="Click to view full operational shortfalls & action plan" style="cursor: pointer;">
+                <i class="fas fa-exclamation-triangle me-1"></i>${coy.main_gap.gap_type}: -${coy.main_gap.gap} (${coy.main_gap.name})
+              </span>
+            ` : `
+              <span class="badge bg-success-subtle text-success border border-success-subtle">
+                <i class="fas fa-check-circle me-1"></i>Optimal Operations
+              </span>
+            `}
+          </td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html || `<tr><td colspan="6" class="text-center py-4 text-muted">No formations match the search criteria.</td></tr>`;
+  }
+
+  window.filterModalCoy = function(coyName, btnEl) {
+    document.querySelectorAll('#mCoyFilterGroup .coy-filter-pill').forEach(b => {
+      b.classList.remove('active');
+    });
+    if (btnEl) {
+      btnEl.classList.add('active');
+    }
+    const cache = window.modalReadinessCache || modalReadinessCache;
+    const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
+    if (cache) {
+      renderModalReadiness(cache, coyName, searchVal);
+    } else {
+      fetchAiCompanyReadinessData(coyName);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const cache = window.modalReadinessCache || modalReadinessCache;
+        if (cache) {
+          const activeBtn = document.querySelector('#mCoyFilterGroup button.active');
+          const coy = activeBtn ? (activeBtn.textContent.trim() === 'ALL' ? 'all' : activeBtn.textContent.trim()) : 'all';
+          renderModalReadiness(cache, coy, this.value);
+        }
+      });
+    }
+  });
+
+  function showModalPersonnelDrilldown(coy, gapType, gapName) {
+    const container = document.getElementById('mDrilldownContainer');
+    const titleEl = document.getElementById('mDrilldownTitle');
+    const badgeEl = document.getElementById('mDrilldownBadge');
+    const tbody = document.getElementById('mDrilldownTableBody');
+    if (!container || !tbody) return;
+
+    gapName = unescape(gapName);
+    titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading personnel records...</td></tr>`;
+    container.style.display = 'block';
+
+    const url = `/ai-company-readiness/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success || !data.personnel || data.personnel.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted">No contributing personnel records found for this gap.</td></tr>`;
+          if (badgeEl) badgeEl.textContent = '0 Soldiers';
+          return;
+        }
+
+        if (badgeEl) badgeEl.textContent = `${data.personnel.length} Identified Soldiers`;
+        let html = '';
+        data.personnel.forEach((p, idx) => {
+          html += `
+            <tr>
+              <td class="fw-bold">${idx + 1}</td>
+              <td><span class="badge bg-secondary font-monospace">${p.army_number || '-'}</span></td>
+              <td class="fw-semibold text-dark">${p.name || 'Unknown'}</td>
+              <td>${p.rank || '-'}</td>
+              <td>${p.trade || '-'}</td>
+              <td><span class="text-danger fw-semibold">${p.reason || p.gap_category || '-'}</span></td>
+              <td><span class="text-success fw-semibold"><i class="fas fa-check-circle me-1" style="font-size: 0.75rem;"></i>${p.solution || 'Resolve'}</span></td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      })
+      .catch(err => {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">Failed to load records: ${err.message}</td></tr>`;
+      });
+  }
+</script>

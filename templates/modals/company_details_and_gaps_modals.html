@@ -1,0 +1,514 @@
+<!-- Company Details & Gaps Dialog Modals for Executive Oversight -->
+
+<!-- 1. Company Details Dialog -->
+<div class="modal fade" id="companyDetailsDialog" tabindex="-1" aria-labelledby="companyDetailsDialogTitle" aria-hidden="true" style="z-index: 1060;">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="modal-header py-3 px-4 text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fas fa-layer-group fs-5"></i>
+          <div>
+            <h5 class="modal-title fw-bold mb-0" id="companyDetailsDialogTitle">Company Dimension Breakdown</h5>
+            <div class="small opacity-75" id="companyDetailsDialogSubtitle">Multi-dimensional operational compliance telemetry</div>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4 bg-light">
+        <!-- Top KPI Strip -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded-3 border text-center shadow-sm h-100">
+              <div class="text-muted small fw-semibold text-uppercase">Overall Readiness</div>
+              <div class="fs-4 fw-bold text-primary mt-1" id="cddReadinessScore">--%</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded-3 border text-center shadow-sm h-100">
+              <div class="text-muted small fw-semibold text-uppercase">Authorized Baseline</div>
+              <div class="fs-4 fw-bold text-dark mt-1" id="cddRequiredStrength">--</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded-3 border text-center shadow-sm h-100">
+              <div class="text-muted small fw-semibold text-uppercase">Actual Posted</div>
+              <div class="fs-4 fw-bold text-dark mt-1" id="cddActualStrength">--</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="bg-white p-3 rounded-3 border text-center shadow-sm h-100">
+              <div class="text-muted small fw-semibold text-uppercase">Available On Ground</div>
+              <div class="fs-4 fw-bold text-success mt-1" id="cddAvailStrength">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 Dimensions Table Card -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+          <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-tasks text-primary me-2"></i>7 Operational Readiness Dimensions
+            </h6>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Deterministic Model</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>Dimension</th>
+                    <th>Compliance Score</th>
+                    <th>Weight</th>
+                    <th>Contribution</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="cddDimensionsTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Insights Card -->
+        <div class="card border-0 shadow-sm rounded-3 mb-2">
+          <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-lightbulb text-warning me-2"></i>Factual Readiness Insights
+            </h6>
+          </div>
+          <div class="card-body p-3">
+            <ul class="list-group list-group-flush small" id="cddInsightsList">
+              <!-- Populated dynamically -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer py-2 px-4 bg-white border-top d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-danger btn-sm fw-semibold" id="cddSwitchToGapsBtn">
+          <i class="fas fa-exclamation-triangle me-1"></i>View Operational Gaps
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Company Gaps Dialog -->
+<div class="modal fade" id="companyGapsDialog" tabindex="-1" aria-labelledby="companyGapsDialogTitle" aria-hidden="true" style="z-index: 1060;">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="modal-header py-3 px-4 text-white" style="background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%);">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fas fa-exclamation-triangle fs-5"></i>
+          <div>
+            <h5 class="modal-title fw-bold mb-0" id="companyGapsDialogTitle">Operational Shortfalls &amp; Action Plan</h5>
+            <div class="small opacity-75" id="companyGapsDialogSubtitle">Identified deficits requiring command intervention</div>
+          </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4 bg-light">
+        <!-- Gaps Table Card -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
+          <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-list-check text-danger me-2"></i>Identified Operational Gaps
+            </h6>
+            <span class="badge bg-danger" id="cgdTotalGapsBadge">0 Gaps</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" style="font-size: 0.85rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>Gap Type</th>
+                    <th>Requirement Name</th>
+                    <th>Required</th>
+                    <th>Available</th>
+                    <th>Deficit</th>
+                    <th>Priority</th>
+                    <th>Recommended Action</th>
+                    <th class="text-end pe-3">Drill-Down</th>
+                  </tr>
+                </thead>
+                <tbody id="cgdGapsTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline Personnel Drill-Down Container (Inside Gaps Dialog) -->
+        <div class="card border-danger border-opacity-25 rounded-3 overflow-hidden shadow-sm mb-4" id="cgdPersonnelContainer" style="display: none;">
+          <div class="card-header bg-danger bg-opacity-10 py-2 px-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-user-tag text-danger"></i>
+              <strong id="cgdPersonnelTitle" class="small text-danger fw-bold">Contributing Personnel Roster</strong>
+              <span class="badge bg-danger" id="cgdPersonnelBadge" style="font-size: 0.7rem;">0 Soldiers</span>
+            </div>
+            <button type="button" class="btn-close btn-sm" onclick="document.getElementById('cgdPersonnelContainer').style.display='none';"></button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 250px;">
+              <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Army No</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Trade</th>
+                    <th>Deficiency Reason</th>
+                    <th>Recommended Solution</th>
+                  </tr>
+                </thead>
+                <tbody id="cgdPersonnelTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Command Recommendations -->
+        <div class="card border-0 shadow-sm rounded-3">
+          <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="fw-bold mb-0 text-dark">
+              <i class="fas fa-robot text-primary me-2"></i>AI Actionable Recommendations
+            </h6>
+          </div>
+          <div class="card-body p-3">
+            <div class="row g-3" id="cgdRecommendationsRow">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer py-2 px-4 bg-white border-top d-flex justify-content-between">
+        <button type="button" class="btn btn-outline-primary btn-sm fw-semibold" id="cgdSwitchToDetailsBtn">
+          <i class="fas fa-layer-group me-1"></i>View Dimension Details
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentActiveDialogCoy = null;
+
+  function getCompanyReadinessObj(coyName) {
+    if (window.modalReadinessCache && window.modalReadinessCache.companies && window.modalReadinessCache.companies[coyName]) {
+      return window.modalReadinessCache.companies[coyName];
+    }
+    return null;
+  }
+
+  function openCompanyDetailsDialog(coyName) {
+    currentActiveDialogCoy = coyName;
+    const coy = getCompanyReadinessObj(coyName);
+
+    const modalEl = document.getElementById('companyDetailsDialog');
+    if (!modalEl) return;
+
+    document.getElementById('companyDetailsDialogTitle').textContent = `${coyName} • Operational Readiness Details`;
+    document.getElementById('companyDetailsDialogSubtitle').textContent = `7-Dimensional Compliance Breakdown & Database Insights`;
+
+    // Configure switch button
+    const switchBtn = document.getElementById('cddSwitchToGapsBtn');
+    if (switchBtn) {
+      switchBtn.onclick = function() {
+        bootstrap.Modal.getInstance(modalEl)?.hide();
+        setTimeout(() => openCompanyGapsDialog(coyName), 200);
+      };
+    }
+
+    if (coy) {
+      populateCompanyDetailsUI(coy);
+      const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+      bsModal.show();
+    } else {
+      fetch(`/ai-company-readiness/api/company/${encodeURIComponent(coyName)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.data) {
+            populateCompanyDetailsUI(data.data);
+            const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.show();
+          }
+        })
+        .catch(err => console.warn('Could not load company details:', err));
+    }
+  }
+
+  function populateCompanyDetailsUI(coy) {
+    document.getElementById('cddReadinessScore').textContent = `${coy.overall_readiness}%`;
+    document.getElementById('cddRequiredStrength').textContent = coy.required_strength || '--';
+    document.getElementById('cddActualStrength').textContent = coy.actual_strength || '--';
+    document.getElementById('cddAvailStrength').textContent = `${coy.effective_available_strength} (${coy.dimensions?.availability?.score || 0}%)`;
+
+    // Populate 7 Dimensions
+    const tbody = document.getElementById('cddDimensionsTableBody');
+    if (tbody && coy.dimensions) {
+      const dimIcons = {
+        strength: 'fas fa-users text-primary',
+        availability: 'fas fa-user-check text-success',
+        trade: 'fas fa-tools text-warning',
+        qualification: 'fas fa-graduation-cap text-info',
+        course: 'fas fa-certificate text-danger',
+        fitness: 'fas fa-running text-primary',
+        medical: 'fas fa-heartbeat text-danger'
+      };
+
+      const dimLabels = {
+        strength: 'Strength Baseline',
+        availability: 'Availability On Ground',
+        trade: 'Technical Trade Fulfillment',
+        qualification: 'Educational / Military Qualification',
+        course: 'Military Specialization Courses',
+        fitness: 'Physical Efficiency (BPET / PPT)',
+        medical: 'Medical Category (SHAPE-1)'
+      };
+
+      let html = '';
+      Object.keys(coy.dimensions).forEach(key => {
+        const dim = coy.dimensions[key];
+        const icon = dimIcons[key] || 'fas fa-layer-group text-primary';
+        const label = dimLabels[key] || key;
+        const scoreClass = dim.score >= 85 ? 'bg-success' : (dim.score >= 70 ? 'bg-warning' : 'bg-danger');
+        const statusBadge = dim.gap_count === 0 ? 
+          '<span class="badge bg-success-subtle text-success border border-success-subtle">Met</span>' :
+          (dim.score >= 80 ? '<span class="badge bg-warning-subtle text-warning border border-warning-subtle">Warning</span>' : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle">Critical Deficit</span>');
+
+        html += `
+          <tr>
+            <td class="fw-bold py-2"><i class="${icon} me-2"></i>${label}</td>
+            <td style="min-width: 140px;">
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold" style="min-width: 42px;">${dim.score}%</span>
+                <div class="progress flex-grow-1" style="height: 6px;">
+                  <div class="progress-bar ${scoreClass}" style="width: ${dim.score}%;"></div>
+                </div>
+              </div>
+            </td>
+            <td>${Math.round((dim.weight || 0) * 100)}%</td>
+            <td class="fw-bold text-dark">${dim.weighted_score}%</td>
+            <td>${statusBadge}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    // Populate Insights
+    const insList = document.getElementById('cddInsightsList');
+    if (insList) {
+      if (coy.insights && coy.insights.length > 0) {
+        let insHtml = '';
+        coy.insights.forEach(ins => {
+          insHtml += `
+            <li class="list-group-item bg-transparent px-0 py-2 d-flex gap-2 align-items-start border-bottom">
+              <i class="fas fa-check-circle text-primary mt-1"></i>
+              <div>${ins}</div>
+            </li>
+          `;
+        });
+        insList.innerHTML = insHtml;
+      } else {
+        insList.innerHTML = '<li class="list-group-item bg-transparent px-0 py-2 text-muted">No specific anomalies detected for this formation.</li>';
+      }
+    }
+  }
+
+  function openCompanyGapsDialog(coyName) {
+    currentActiveDialogCoy = coyName;
+    const coy = getCompanyReadinessObj(coyName);
+
+    const modalEl = document.getElementById('companyGapsDialog');
+    if (!modalEl) return;
+
+    document.getElementById('companyGapsDialogTitle').textContent = `${coyName} • Operational Gaps & Action Plan`;
+    document.getElementById('companyGapsDialogSubtitle').textContent = `Deficits & Shortfalls Requiring Executive Decision`;
+
+    // Hide previous drill-down if any
+    const pContainer = document.getElementById('cgdPersonnelContainer');
+    if (pContainer) pContainer.style.display = 'none';
+
+    // Configure switch button
+    const switchBtn = document.getElementById('cgdSwitchToDetailsBtn');
+    if (switchBtn) {
+      switchBtn.onclick = function() {
+        bootstrap.Modal.getInstance(modalEl)?.hide();
+        setTimeout(() => openCompanyDetailsDialog(coyName), 200);
+      };
+    }
+
+    if (coy) {
+      populateCompanyGapsUI(coyName, coy);
+      const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+      bsModal.show();
+    } else {
+      fetch(`/ai-company-readiness/api/company/${encodeURIComponent(coyName)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.success && data.data) {
+            populateCompanyGapsUI(coyName, data.data);
+            const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            bsModal.show();
+          }
+        })
+        .catch(err => console.warn('Could not load company gaps:', err));
+    }
+  }
+
+  function populateCompanyGapsUI(coyName, coy) {
+    const gaps = coy.all_gaps || [];
+    const badgeEl = document.getElementById('cgdTotalGapsBadge');
+    if (badgeEl) badgeEl.textContent = `${gaps.length} Deficits`;
+
+    const tbody = document.getElementById('cgdGapsTableBody');
+    if (tbody) {
+      if (gaps.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-success"><i class="fas fa-check-circle me-2"></i>No operational gaps identified for ${coyName}.</td></tr>`;
+      } else {
+        let html = '';
+        gaps.forEach(gap => {
+          const priorityBadge = gap.priority === 'Critical' ?
+            '<span class="badge bg-danger">Critical</span>' :
+            (gap.priority === 'High' ? '<span class="badge bg-warning text-dark">High</span>' : '<span class="badge bg-info text-dark">Medium</span>');
+
+          html += `
+            <tr>
+              <td><span class="badge bg-light text-dark border">${gap.gap_type}</span></td>
+              <td class="fw-bold">${gap.name}</td>
+              <td>${gap.required}</td>
+              <td>${gap.available}</td>
+              <td class="text-danger fw-bold">-${gap.gap}</td>
+              <td>${priorityBadge}</td>
+              <td class="small text-muted" style="max-width: 280px;">${gap.action_needed || '-'}</td>
+              <td class="text-end pe-3">
+                <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="showDialogPersonnelDrilldown('${coyName}', '${gap.gap_type}', '${escape(gap.name)}')">
+                  <i class="fas fa-users me-1"></i>Personnel
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      }
+    }
+
+    // Populate Recommendations
+    const recRow = document.getElementById('cgdRecommendationsRow');
+    if (recRow) {
+      const recs = coy.recommendations || [];
+      if (recs.length === 0) {
+        recRow.innerHTML = '<div class="col-12 text-muted small py-2">No command recommendations generated.</div>';
+      } else {
+        let recHtml = '';
+        recs.forEach(rec => {
+          const borderCol = rec.priority === 'Critical' ? '#ef4444' : (rec.priority === 'High' ? '#f59e0b' : '#3b82f6');
+          const priBadge = rec.priority === 'Critical' ? 'bg-danger' : (rec.priority === 'High' ? 'bg-warning text-dark' : 'bg-primary');
+          const stepsHtml = (rec.action_steps || []).map(s => `<li>${s}</li>`).join('');
+
+          recHtml += `
+            <div class="col-md-6">
+              <div class="p-3 rounded h-100 bg-white shadow-sm border" style="border-left: 4px solid ${borderCol} !important;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge ${priBadge}">${rec.priority} Priority</span>
+                  <span class="text-muted small">${rec.issue_type}</span>
+                </div>
+                <h6 class="fw-bold mb-2 text-dark" style="font-size: 0.88rem;">${rec.title}</h6>
+                <p class="small text-muted mb-2">${rec.description}</p>
+                <div class="small fw-bold text-dark mb-1">Recommended Action Steps:</div>
+                <ul class="small ps-3 mb-0 text-secondary">
+                  ${stepsHtml}
+                </ul>
+              </div>
+            </div>
+          `;
+        });
+        recRow.innerHTML = recHtml;
+      }
+    }
+  }
+
+  function showDialogPersonnelDrilldown(coy, gapType, gapName) {
+    const container = document.getElementById('cgdPersonnelContainer');
+    const titleEl = document.getElementById('cgdPersonnelTitle');
+    const badgeEl = document.getElementById('cgdPersonnelBadge');
+    const tbody = document.getElementById('cgdPersonnelTableBody');
+    if (!container || !tbody) return;
+
+    gapName = unescape(gapName);
+    titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-danger me-2"></div>Loading personnel records...</td></tr>`;
+    container.style.display = 'block';
+
+    const url = `/ai-company-readiness/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (!data || !data.success || !data.personnel || data.personnel.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted">No contributing personnel records found for this gap.</td></tr>`;
+          if (badgeEl) badgeEl.textContent = '0 Soldiers';
+          return;
+        }
+
+        if (badgeEl) badgeEl.textContent = `${data.personnel.length} Identified Soldiers`;
+        let html = '';
+        data.personnel.forEach((p, idx) => {
+          html += `
+            <tr>
+              <td class="fw-bold">${idx + 1}</td>
+              <td><span class="badge bg-secondary font-monospace">${p.army_number || '-'}</span></td>
+              <td class="fw-semibold text-dark">${p.name || 'Unknown'}</td>
+              <td>${p.rank || '-'}</td>
+              <td>${p.trade || '-'}</td>
+              <td><span class="text-danger fw-semibold">${p.reason || p.gap_category || '-'}</span></td>
+              <td><span class="text-success fw-semibold"><i class="fas fa-check-circle me-1" style="font-size: 0.75rem;"></i>${p.solution || 'Resolve'}</span></td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      })
+      .catch(err => {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">Failed to load records: ${err.message}</td></tr>`;
+      });
+  }
+
+  // Handle stacked dialogs gracefully when launched over another modal
+  document.addEventListener('show.bs.modal', function(e) {
+    if (e.target && (e.target.id === 'companyDetailsDialog' || e.target.id === 'companyGapsDialog')) {
+      e.target.style.zIndex = '1070';
+      setTimeout(function() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 1) {
+          backdrops[backdrops.length - 1].style.zIndex = '1065';
+        }
+      }, 10);
+    }
+  });
+
+  document.addEventListener('hidden.bs.modal', function(e) {
+    if (e.target && (e.target.id === 'companyDetailsDialog' || e.target.id === 'companyGapsDialog')) {
+      const openModals = document.querySelectorAll('.modal.show');
+      if (openModals.length > 0) {
+        document.body.classList.add('modal-open');
+      }
+    }
+  });
+</script>

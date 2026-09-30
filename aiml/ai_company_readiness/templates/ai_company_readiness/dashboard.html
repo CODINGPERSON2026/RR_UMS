@@ -596,6 +596,104 @@
     </div>
   </div>
 
+  <!-- ==================== AI COMPANY READINESS ASSESSMENT TABLE ==================== -->
+  <div class="card border-0 shadow-sm mb-4" style="background: var(--card-bg-solid, #ffffff); border-radius: 18px; border: 1px solid var(--border-color, #e2e8f0) !important; overflow: hidden;">
+    <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <h5 class="mb-0 fw-bold" style="color: var(--text-primary, #1e293b); font-size: 1.12rem;">
+          <i class="fas fa-table text-primary me-2"></i> AI Company Readiness Assessment Table
+        </h5>
+        <div class="text-muted small">Comparative multi-dimensional evaluation, authorized vs posted manpower, and operational shortfall matrix</div>
+      </div>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1.5 px-2.5" style="font-size: 0.76rem;">
+          <i class="fas fa-shield-alt me-1"></i> Monitored Formations: HQ COY &bull; COMN COY &bull; 3 COY
+        </span>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="recordReadinessSnapshot(this)" title="Save historical snapshot for trend modeling">
+          <i class="fas fa-camera me-1"></i> Log Snapshot
+        </button>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="aiCompanyReadinessOverviewTable">
+          <thead class="table-light" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;">
+            <tr>
+              <th class="ps-3 py-3">Formation</th>
+              <th>Auth / Posted</th>
+              <th>On Ground</th>
+              <th style="min-width: 250px;">7 Dimensions Compliance</th>
+              <th>Overall Score</th>
+              <th>Primary Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for coy_name in supported_companies %}
+              {% set coy = dashboard.companies[coy_name] %}
+              {% set pred = dashboard.predictions[coy_name] %}
+              <tr>
+                <td class="ps-3 py-3" style="min-width: 130px;">
+                  <div class="fw-bold mb-1" style="color: var(--text-primary, #1e293b); font-size: 0.95rem;">{{ coy_name }}</div>
+                  <div class="d-inline-flex gap-1">
+                    <a href="/ai-company-readiness/company/{{ coy_name }}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="Dimension Breakdown & Details">
+                      <i class="fas fa-list-alt me-1"></i>Details
+                    </a>
+                    <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View Gaps">
+                      <i class="fas fa-search-plus me-1"></i>Gaps
+                    </a>
+                    {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+                    {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
+                    <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" target="_blank" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="AI/ML Prediction">
+                      <i class="fas fa-brain me-1"></i>Prediction
+                    </a>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <div class="fw-bold text-dark">{{ coy.actual_strength }} <span class="text-muted small fw-normal">/ {{ coy.required_strength }}</span></div>
+                  <div class="progress mt-1" style="height: 5px; width: 90px; border-radius: 4px;">
+                    <div class="progress-bar bg-primary" style="width: {{ [100, (coy.actual_strength / (coy.required_strength or 1) * 100)]|min }}%;"></div>
+                  </div>
+                </td>
+                <td>
+                  <div class="fw-bold text-success">{{ coy.effective_available_strength }}</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">{{ coy.dimensions.availability.score }}% Available</div>
+                </td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1" style="font-size: 0.7rem;">
+                    <span class="badge border bg-light text-dark" title="Strength: {{ coy.dimensions.strength.score }}%">Str: <strong class="{% if coy.dimensions.strength.score >= 85 %}text-success{% elif coy.dimensions.strength.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.strength.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Availability: {{ coy.dimensions.availability.score }}%">Avail: <strong class="{% if coy.dimensions.availability.score >= 85 %}text-success{% elif coy.dimensions.availability.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.availability.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Trade: {{ coy.dimensions.trade.score }}%">Trd: <strong class="{% if coy.dimensions.trade.score >= 85 %}text-success{% elif coy.dimensions.trade.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.trade.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Education: {{ coy.dimensions.qualification.score }}%">Edu: <strong class="{% if coy.dimensions.qualification.score >= 85 %}text-success{% elif coy.dimensions.qualification.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.qualification.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Courses: {{ coy.dimensions.course.score }}%">Crs: <strong class="{% if coy.dimensions.course.score >= 85 %}text-success{% elif coy.dimensions.course.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.course.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Fitness: {{ coy.dimensions.fitness.score }}%">Fit: <strong class="{% if coy.dimensions.fitness.score >= 85 %}text-success{% elif coy.dimensions.fitness.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.fitness.score }}%</strong></span>
+                    <span class="badge border bg-light text-dark" title="Medical (SHAPE-1): {{ coy.dimensions.medical.score }}%">Med: <strong class="{% if coy.dimensions.medical.score >= 85 %}text-success{% elif coy.dimensions.medical.score >= 70 %}text-warning{% else %}text-danger{% endif %}">{{ coy.dimensions.medical.score }}%</strong></span>
+                  </div>
+                </td>
+                <td>
+                  <div class="fw-bold fs-6 {% if coy.overall_readiness >= 85 %}text-success{% elif coy.overall_readiness >= 70 %}text-warning{% else %}text-danger{% endif %}">
+                    {{ coy.overall_readiness }}%
+                  </div>
+                </td>
+                <td>
+                  {% if coy.main_gap %}
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle cursor-pointer" onclick="openPersonnelDrilldownModal('{{ coy_name }}', '{{ coy.main_gap.gap_type }}', '{{ coy.main_gap.name }}')" title="Click to view contributing personnel" style="cursor: pointer;">
+                      <i class="fas fa-exclamation-triangle me-1"></i>{{ coy.main_gap.gap_type }}: -{{ coy.main_gap.gap }} ({{ coy.main_gap.name }})
+                    </span>
+                  {% else %}
+                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                      <i class="fas fa-check-circle me-1"></i>Optimal
+                    </span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== 3 COMPANY CARDS GRID ==================== -->
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <div>
@@ -780,9 +878,12 @@
           <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" class="btn-coy-action btn-outline-coy">
             <i class="fas fa-search-plus"></i> Gaps ({{ coy.all_gaps|length }})
           </a>
+          {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+          {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
           <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" class="btn-coy-action btn-outline-coy" title="AI/ML Prediction">
             <i class="fas fa-brain"></i> Prediction
           </a>
+          {% endif %}
         </div>
 
       </div>

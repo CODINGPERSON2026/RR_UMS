@@ -22,11 +22,26 @@ ai_company_readiness_bp = Blueprint(
 # Initialize service
 service = CompanyReadinessService()
 
-# Authorized roles for executive readiness review
+# Authorized roles for executive readiness review & operational access
 AUTHORIZED_READINESS_ROLES = [
     "CO", "2IC", "ADJUTANT", "OC", "ADMIN", "SUPER ADMIN",
-    "COMMANDING OFFICER", "HEAD CLK", "CLERK", "JCO", "TRG", "PA"
+    "COMMANDING OFFICER", "HEAD CLK", "CLERK", "JCO", "TRG", "PA",
+    "1COYONCO", "COMMCOYONCO", "COMNCOYONCO", "3COYONCO", "ONCO", "COYONCO",
+    "1 COY ONCO", "COMM COY ONCO", "COMN COY ONCO", "3 COY ONCO"
 ]
+
+# Authorized predicting roles (prediction is restricted to company ONCOs)
+ALLOWED_PREDICTION_ROLES = [
+    "1coyonco", "commcoyonco", "comncoyonco", "3coyonco", "coyonco", "onco",
+    "admin", "superadmin"
+]
+
+COY_ONCO_MAPPING = {
+    "1coyonco": "HQ COY",
+    "commcoyonco": "COMN COY",
+    "comncoyonco": "COMN COY",
+    "3coyonco": "3 COY"
+}
 
 
 def auth_required(f):
@@ -121,7 +136,18 @@ def gap_details_view(user_payload, company):
 @ai_company_readiness_bp.route("/ai-company-readiness/company/<company>/prediction", methods=["GET"])
 @auth_required
 def prediction_view(user_payload, company):
-    """AI/ML Prediction details and contributing factors."""
+    """AI/ML Prediction details and contributing factors. Restricted to 1coyonco, commcoyonco, 3coyonco."""
+    user_role = (user_payload.get("role") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
+    if user_role not in ALLOWED_PREDICTION_ROLES:
+        return redirect("/ai-company-readiness")
+
+    # If role is a company-specific onco, route to their designated company
+    if user_role in COY_ONCO_MAPPING:
+        expected_coy = COY_ONCO_MAPPING[user_role]
+        canonical_target = normalize_company_name(company)
+        if canonical_target != expected_coy:
+            return redirect(f"/ai-company-readiness/company/{expected_coy}/prediction")
+
     canonical = normalize_company_name(company)
     if not canonical or canonical not in SUPPORTED_COMPANIES:
         return redirect("/ai-company-readiness")
@@ -161,7 +187,7 @@ def api_dashboard(user_payload):
     """JSON API returning current readiness for all 3 companies."""
     try:
         data = service.get_dashboard_summary()
-        return jsonify({"success": True, "data": data})
+        return jsonify({"success": True, "data": data, "dashboard": data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

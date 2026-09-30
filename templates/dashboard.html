@@ -445,6 +445,20 @@
       </button>
       {% endif %}
 
+      <!-- AI Company Readiness Prediction Button — visible only to predicting roles (1coyonco, commcoyonco, 3coyonco) -->
+      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO']) %}
+        {% set target_coy = 'HQ COY' if ('1' in r_clean or 'hq' in r_clean) else ('COMN COY' if ('comm' in r_clean or 'comn' in r_clean) else ('3 COY' if '3' in r_clean else '')) %}
+        {% if target_coy %}
+        <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="ab-btn ab-primary" title="AI Readiness Prediction for {{ target_coy }}">
+          <i class="fas fa-brain" style="font-size:11px"></i> AI READINESS PREDICTION ({{ target_coy }})
+        </a>
+        {% else %}
+        <a href="/ai-company-readiness" class="ab-btn ab-primary" title="AI Company Readiness Prediction">
+          <i class="fas fa-brain" style="font-size:11px"></i> AI READINESS PREDICTION
+        </a>
+        {% endif %}
+      {% endif %}
+
        {%if role in ['PA']%}
       <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#scheduleModal">
          ADD  SHEDULE
@@ -581,6 +595,13 @@
         <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
         <div class="sc-right">
           <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+        </div>
+      </div>
+
+      <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness-dash" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
+        <span class="sc-label"><i class="fas fa-shield-alt text-primary me-1"></i> AI Readiness</span>
+        <div class="sc-right">
+          <span class="sc-val" id="dash-readiness-val"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
@@ -748,6 +769,8 @@
 
     </div>
     <!-- /statsGrid -->
+
+
 
     <!-- ===== ADD EVENT MODAL ===== -->
     <div class="modal fade" id="addEventModal" tabindex="-1">
@@ -1537,9 +1560,19 @@
           if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
           if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
           if (riskEl) riskEl.textContent = s.at_risk_count || 0;
+         fetch('/ai-company-readiness/api/dashboard')
+      .then(function(res) { return res.ok ? res.json() : null; })
+      .then(function(data) {
+        var d = data ? (data.dashboard || data.data) : null;
+        if (d) {
+          window.modalReadinessCache = d;
+          var cardVal = document.getElementById('dash-readiness-val');
+          if (cardVal && d.summary) {
+            cardVal.innerHTML = '<span class="text-primary fw-bold">' + d.summary.average_readiness + '%</span>';
+          }
         }
       })
-      .catch(() => {});
+      .catch(function(err) { console.warn('Could not load AI company readiness stats:', err); });
     {% endif %}
   });
 
@@ -1552,10 +1585,12 @@
 {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% include 'modals/ai_company_readiness_modal.html' %}
+{% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}
 
