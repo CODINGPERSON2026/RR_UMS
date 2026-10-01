@@ -118,6 +118,38 @@
 
       <!-- Modal Body -->
       <div class="modal-body p-4 bg-light">
+        <!-- Inline Personnel Drill-Down Container (Inside Gaps Dialog, Placed at Top for Direct Visibility) -->
+        <div class="card border-danger border-opacity-25 rounded-3 overflow-hidden shadow-sm mb-4" id="cgdPersonnelContainer" style="display: none;">
+          <div class="card-header bg-danger bg-opacity-10 py-2.5 px-3 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-user-tag text-danger"></i>
+              <strong id="cgdPersonnelTitle" class="small text-danger fw-bold">Contributing Personnel Roster</strong>
+              <span class="badge bg-danger" id="cgdPersonnelBadge" style="font-size: 0.7rem;">0 Soldiers</span>
+            </div>
+            <button type="button" class="btn-close btn-sm" onclick="document.getElementById('cgdPersonnelContainer').style.display='none';"></button>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive" style="max-height: 280px;">
+              <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Army No</th>
+                    <th>Name</th>
+                    <th>Rank</th>
+                    <th>Trade</th>
+                    <th>Deficiency Reason</th>
+                    <th>Recommended Solution</th>
+                  </tr>
+                </thead>
+                <tbody id="cgdPersonnelTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
         <!-- Gaps Table Card -->
         <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-4">
           <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
@@ -142,38 +174,6 @@
                   </tr>
                 </thead>
                 <tbody id="cgdGapsTableBody">
-                  <!-- Populated dynamically -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- Inline Personnel Drill-Down Container (Inside Gaps Dialog) -->
-        <div class="card border-danger border-opacity-25 rounded-3 overflow-hidden shadow-sm mb-4" id="cgdPersonnelContainer" style="display: none;">
-          <div class="card-header bg-danger bg-opacity-10 py-2 px-3 d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-2">
-              <i class="fas fa-user-tag text-danger"></i>
-              <strong id="cgdPersonnelTitle" class="small text-danger fw-bold">Contributing Personnel Roster</strong>
-              <span class="badge bg-danger" id="cgdPersonnelBadge" style="font-size: 0.7rem;">0 Soldiers</span>
-            </div>
-            <button type="button" class="btn-close btn-sm" onclick="document.getElementById('cgdPersonnelContainer').style.display='none';"></button>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive" style="max-height: 250px;">
-              <table class="table table-sm table-hover mb-0" style="font-size: 0.8rem;">
-                <thead class="table-light">
-                  <tr>
-                    <th>#</th>
-                    <th>Army No</th>
-                    <th>Name</th>
-                    <th>Rank</th>
-                    <th>Trade</th>
-                    <th>Deficiency Reason</th>
-                    <th>Recommended Solution</th>
-                  </tr>
-                </thead>
-                <tbody id="cgdPersonnelTableBody">
                   <!-- Populated dynamically -->
                 </tbody>
               </table>
@@ -222,7 +222,10 @@
     const coy = getCompanyReadinessObj(coyName);
 
     const modalEl = document.getElementById('companyDetailsDialog');
-    if (!modalEl) return;
+    if (!modalEl) {
+      window.location.href = `/ai-company-readiness/company/${encodeURIComponent(coyName)}`;
+      return;
+    }
 
     document.getElementById('companyDetailsDialogTitle').textContent = `${coyName} • Operational Readiness Details`;
     document.getElementById('companyDetailsDialogSubtitle').textContent = `7-Dimensional Compliance Breakdown & Database Insights`;
@@ -338,7 +341,10 @@
     const coy = getCompanyReadinessObj(coyName);
 
     const modalEl = document.getElementById('companyGapsDialog');
-    if (!modalEl) return;
+    if (!modalEl) {
+      window.location.href = `/ai-company-readiness/company/${encodeURIComponent(coyName)}/gaps`;
+      return;
+    }
 
     document.getElementById('companyGapsDialogTitle').textContent = `${coyName} • Operational Gaps & Action Plan`;
     document.getElementById('companyGapsDialogSubtitle').textContent = `Deficits & Shortfalls Requiring Executive Decision`;
@@ -390,6 +396,10 @@
             '<span class="badge bg-danger">Critical</span>' :
             (gap.priority === 'High' ? '<span class="badge bg-warning text-dark">High</span>' : '<span class="badge bg-info text-dark">Medium</span>');
 
+          const safeCoy = encodeURIComponent(coyName || '');
+          const safeType = encodeURIComponent(gap.gap_type || '');
+          const safeName = encodeURIComponent(gap.name || '');
+
           html += `
             <tr>
               <td><span class="badge bg-light text-dark border">${gap.gap_type}</span></td>
@@ -400,7 +410,7 @@
               <td>${priorityBadge}</td>
               <td class="small text-muted" style="max-width: 280px;">${gap.action_needed || '-'}</td>
               <td class="text-end pe-3">
-                <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="showDialogPersonnelDrilldown('${coyName}', '${gap.gap_type}', '${escape(gap.name)}')">
+                <button type="button" class="btn btn-xs btn-outline-danger py-1 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="showDialogPersonnelDrilldown('${safeCoy}', '${safeType}', '${safeName}')">
                   <i class="fas fa-users me-1"></i>Personnel
                 </button>
               </td>
@@ -447,23 +457,37 @@
   }
 
   function showDialogPersonnelDrilldown(coy, gapType, gapName) {
+    try {
+      coy = decodeURIComponent(coy);
+      gapType = decodeURIComponent(gapType);
+      gapName = decodeURIComponent(gapName);
+    } catch(e) {}
+
     const container = document.getElementById('cgdPersonnelContainer');
     const titleEl = document.getElementById('cgdPersonnelTitle');
     const badgeEl = document.getElementById('cgdPersonnelBadge');
     const tbody = document.getElementById('cgdPersonnelTableBody');
     if (!container || !tbody) return;
 
-    gapName = unescape(gapName);
-    titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-danger me-2"></div>Loading personnel records...</td></tr>`;
+    if (titleEl) titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-danger me-2"></div>Loading personnel records for ${gapName}...</td></tr>`;
     container.style.display = 'block';
 
-    const url = `/ai-company-readiness/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
+    setTimeout(() => {
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+
+    const url = `/ai-company-readiness/api/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`Server returned HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
         if (!data || !data.success || !data.personnel || data.personnel.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted">No contributing personnel records found for this gap.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><i class="fas fa-info-circle me-1"></i>No contributing personnel records found for ${gapName}.</td></tr>`;
           if (badgeEl) badgeEl.textContent = '0 Soldiers';
           return;
         }
@@ -486,9 +510,10 @@
         tbody.innerHTML = html;
       })
       .catch(err => {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">Failed to load records: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Failed to load records: ${err.message}</td></tr>`;
       });
   }
+  window.showDialogPersonnelDrilldown = showDialogPersonnelDrilldown;
 
   // Handle stacked dialogs gracefully when launched over another modal
   document.addEventListener('show.bs.modal', function(e) {

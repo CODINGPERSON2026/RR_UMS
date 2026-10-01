@@ -451,7 +451,22 @@
         Operational readiness analysis, deterministic gap identification, and predictive intelligence for Unit Formations.
       </div>
     </div>
-    <div class="d-flex gap-2 flex-wrap">
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+      {% set target_coy = 'HQ COY' %}
+      {% if 'comm' in (role|lower) or 'comn' in (role|lower) %}
+        {% set target_coy = 'COMN COY' %}
+      {% elif '3' in (role|lower) %}
+        {% set target_coy = '3 COY' %}
+      {% endif %}
+      <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="btn btn-primary d-inline-flex align-items-center gap-2 fw-semibold shadow-sm" title="AI Company Readiness Prediction">
+        <i class="fas fa-brain"></i> AI Company Readiness Prediction
+      </a>
+      {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
+      <button type="button" class="btn btn-outline-success d-inline-flex align-items-center gap-2" id="btnHeaderRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness">
+        <i class="fas fa-sync-alt"></i> Retrain AI Model
+      </button>
+      {% endif %}
       <a href="/ai-company-readiness/requirements" class="btn btn-outline-primary d-inline-flex align-items-center gap-2">
         <i class="fas fa-sliders-h"></i> Configure Requirements
       </a>
@@ -501,13 +516,21 @@
     </div>
   </div>
 
-  <!-- ==================== COMPANY READINESS ANALYTICS & GRAPHS ==================== -->
-  <div class="readiness-graphs-section mb-4">
-    <div class="graphs-header-bar">
+  <!-- ==================== COMPANY READINESS ANALYTICS & COMPARATIVE TELEMETRY (FIRST) ==================== -->
+  <div class="readiness-graphs-section mb-4 mt-2" id="readinessGraphsSection">
+    <div class="graphs-header-bar d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
       <div>
-        <h4 class="graphs-title">
-          <i class="fas fa-chart-line text-primary me-2"></i> Company Readiness Analytics & Comparative Telemetry
-        </h4>
+        <div class="d-flex align-items-center gap-2">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(37, 99, 235, 0.12); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <h4 class="graphs-title mb-0 fw-bold" style="color: var(--text-primary, #1e293b); font-size: 1.15rem;">
+            Company Readiness Analytics &amp; Comparative Telemetry
+          </h4>
+          <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.72rem; font-weight: 600;">
+            Live Telemetry
+          </span>
+        </div>
         <div class="text-muted small mt-1">
           Comparative multi-dimensional telemetry, strength distribution, and operational readiness across monitored companies
         </div>
@@ -515,8 +538,11 @@
 
       <!-- Graph View Toggle Buttons -->
       <div class="btn-group btn-group-sm" role="group" id="graphModeGroup">
-        <button type="button" class="btn btn-outline-primary active" id="btnViewDimensions" onclick="switchGraphMode('dimensions', this)">
+        <button type="button" class="btn btn-primary active" id="btnViewDimensions" onclick="switchGraphMode('dimensions', this)">
           <i class="fas fa-chart-bar me-1"></i> 7 Dimensions
+        </button>
+        <button type="button" class="btn btn-outline-primary" id="btnViewLine" onclick="switchGraphMode('line', this)">
+          <i class="fas fa-chart-line me-1"></i> Line Graph
         </button>
         <button type="button" class="btn btn-outline-primary" id="btnViewRadar" onclick="switchGraphMode('radar', this)">
           <i class="fas fa-spider me-1"></i> Operational Radar
@@ -530,14 +556,14 @@
     <div class="row g-3">
       <!-- Primary Main Chart (8 cols) -->
       <div class="col-12 col-xl-8">
-        <div class="graph-card">
+        <div class="graph-card h-100">
           <div class="graph-card-header">
             <div>
-              <h6 class="graph-card-title" id="mainChartHeading">7-Dimension Readiness Comparison</h6>
-              <span class="text-muted" style="font-size: 0.78rem;" id="mainChartSubheading">Comparative performance across Strength, Availability, Trade, Qualification, Course, Fitness, Medical</span>
+              <h6 class="graph-card-title mb-0 fw-bold" id="mainChartHeading">7-Dimension Readiness Comparison</h6>
+              <span class="text-muted" style="font-size: 0.78rem;" id="mainChartSubheading">Operational dimension scores (%) side-by-side for all 3 monitored companies</span>
             </div>
             <!-- Dynamic Legend Badges -->
-            <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="d-flex align-items-center gap-2 flex-wrap" id="coyTopBadges">
               <span class="badge border" style="background: rgba(37, 99, 235, 0.1); color: #2563eb; border-color: rgba(37, 99, 235, 0.3) !important;">
                 <i class="fas fa-circle me-1" style="font-size: 0.55rem; color: #2563eb;"></i> HQ COY
               </span>
@@ -557,10 +583,10 @@
 
       <!-- Secondary Chart & Company Telemetry Box (4 cols) -->
       <div class="col-12 col-xl-4">
-        <div class="graph-card">
+        <div class="graph-card h-100">
           <div class="graph-card-header">
             <div>
-              <h6 class="graph-card-title">Ground Availability Ratio</h6>
+              <h6 class="graph-card-title mb-0 fw-bold">Ground Availability Ratio</h6>
               <span class="text-muted" style="font-size: 0.78rem;">{{ dashboard.summary.total_available_strength }} Present of {{ dashboard.summary.total_actual_strength }} Total Posted</span>
             </div>
             <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.72rem; font-weight: 700;">
@@ -635,18 +661,15 @@
                 <td class="ps-3 py-3" style="min-width: 130px;">
                   <div class="fw-bold mb-1" style="color: var(--text-primary, #1e293b); font-size: 0.95rem;">{{ coy_name }}</div>
                   <div class="d-inline-flex gap-1">
-                    <a href="/ai-company-readiness/company/{{ coy_name }}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="Dimension Breakdown & Details">
+                    <a href="/ai-company-readiness/company/{{ coy_name }}" class="btn btn-xs btn-outline-primary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="Dimension Breakdown & Details">
                       <i class="fas fa-list-alt me-1"></i>Details
                     </a>
-                    <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View Gaps">
+                    <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View Gaps">
                       <i class="fas fa-search-plus me-1"></i>Gaps
                     </a>
-                    {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-                    {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
-                    <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" target="_blank" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="AI/ML Prediction">
+                    <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="AI/ML Prediction">
                       <i class="fas fa-brain me-1"></i>Prediction
                     </a>
-                    {% endif %}
                   </div>
                 </td>
                 <td>
@@ -878,12 +901,9 @@
           <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" class="btn-coy-action btn-outline-coy">
             <i class="fas fa-search-plus"></i> Gaps ({{ coy.all_gaps|length }})
           </a>
-          {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-          {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
           <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" class="btn-coy-action btn-outline-coy" title="AI/ML Prediction">
             <i class="fas fa-brain"></i> Prediction
           </a>
-          {% endif %}
         </div>
 
       </div>
@@ -1115,7 +1135,9 @@ function renderMainChart(mode) {
         backgroundColor: color.background,
         borderColor: color.border,
         borderWidth: 1.5,
-        borderRadius: 6
+        borderRadius: 6,
+        categoryPercentage: 0.72,
+        barPercentage: 0.82
       };
     });
 
@@ -1128,12 +1150,29 @@ function renderMainChart(mode) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
         plugins: {
-          legend: { display: false },
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 14,
+              boxWidth: 8,
+              boxHeight: 8,
+              color: theme.text,
+              font: { weight: '600', size: 12 }
+            }
+          },
           tooltip: {
             callbacks: {
               label: function(context) {
-                return `${context.dataset.label}: ${context.raw}%`;
+                return ` ${context.dataset.label}: ${context.raw}%`;
               }
             }
           }
@@ -1141,6 +1180,91 @@ function renderMainChart(mode) {
         scales: {
           x: {
             grid: { display: false },
+            ticks: { color: theme.text, font: { weight: '600', size: 11 } }
+          },
+          y: {
+            min: 0,
+            max: 100,
+            grid: { color: theme.grid },
+            ticks: {
+              color: theme.text,
+              callback: value => value + '%'
+            }
+          }
+        }
+      }
+    });
+
+  } else if (mode === 'line') {
+    document.getElementById('mainChartHeading').textContent = '7-Dimension Readiness Trend';
+    document.getElementById('mainChartSubheading').textContent = 'Operational dimension trajectories across all 7 operational dimensions side-by-side';
+
+    const datasets = Object.keys(readinessData.companies).map(coyName => {
+      const coy = readinessData.companies[coyName];
+      const color = COMPANY_COLORS[coyName] || { border: '#6366f1', background: 'rgba(99, 102, 241, 0.75)' };
+      return {
+        label: coyName,
+        data: [
+          coy.dimensions.strength,
+          coy.dimensions.availability,
+          coy.dimensions.trade,
+          coy.dimensions.qualification,
+          coy.dimensions.course,
+          coy.dimensions.fitness,
+          coy.dimensions.medical
+        ],
+        backgroundColor: color.radarBg || 'rgba(99, 102, 241, 0.2)',
+        borderColor: color.border,
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.35,
+        pointBackgroundColor: color.border,
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      };
+    });
+
+    mainChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: dimensionLabels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              padding: 14,
+              boxWidth: 8,
+              boxHeight: 8,
+              color: theme.text,
+              font: { weight: '600', size: 12 }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return ` ${context.dataset.label}: ${context.raw}%`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: theme.grid },
             ticks: { color: theme.text, font: { weight: '600', size: 11 } }
           },
           y: {
@@ -1433,7 +1557,21 @@ document.addEventListener('DOMContentLoaded', function () {
   startDevNoticeTimer();
   renderMainChart('dimensions');
   renderDoughnutChart();
-  showCompanyDetailGraph('HQ COY', document.querySelector('#coyDetailBtnGroup button'));
+
+  const userRole = ("{{ role|default('') }}").toLowerCase().replace(/[\s_\-]/g, '');
+  let defaultCoy = 'HQ COY';
+  let defaultBtnLabel = 'HQ';
+  if (userRole.includes('comm') || userRole.includes('comn')) {
+    defaultCoy = 'COMN COY';
+    defaultBtnLabel = 'COMN';
+  } else if (userRole.includes('3')) {
+    defaultCoy = '3 COY';
+    defaultBtnLabel = '3 COY';
+  }
+  const defaultBtn = Array.from(document.querySelectorAll('#coyDetailBtnGroup button')).find(b => b.textContent.trim().toUpperCase() === defaultBtnLabel.toUpperCase()) || document.querySelector('#coyDetailBtnGroup button');
+  showCompanyDetailGraph(defaultCoy, defaultBtn);
 });
 </script>
+
+{% include 'modals/ai_company_readiness_retrain_modal.html' %}
 {% endblock %}

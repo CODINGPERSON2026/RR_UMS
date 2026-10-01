@@ -1,5 +1,21 @@
 <!-- AI Company Operational Readiness Modal for CO / 2IC / Adjutant -->
 <style>
+  #aiCompanyReadinessModal .modal-header #mReadinessRoleSubtitle,
+  #aiCompanyReadinessModal #mReadinessRoleSubtitle {
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-size: 0.83rem !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  #aiCompanyReadinessModal #mReadinessRoleSubtitle span,
+  #aiCompanyReadinessModal #mReadinessRoleSubtitle #mReadinessRoleText {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
   #aiCompanyReadinessModal .custom-size {
     max-width: 96% !important;
     width: 96% !important;
@@ -152,31 +168,215 @@
   .dim-telemetry-seg:hover {
     opacity: 0.8;
   }
+
+  /* Modal 3 Companies Detail Cards */
+  .m-coy-card {
+    background: var(--card-bg-solid, #ffffff);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .m-coy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  }
+  .m-coy-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+  .m-coy-card-optimal::before { background: #10b981 !important; }
+  .m-coy-card-moderate::before { background: #f59e0b !important; }
+  .m-coy-card-critical::before { background: #ef4444 !important; }
+
+  .m-coy-card-header {
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg-solid, #ffffff);
+  }
+  .m-coy-name-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--text-primary, #1e293b);
+    margin: 0;
+  }
+  .m-coy-sublabel {
+    font-size: 0.74rem;
+    color: var(--text-secondary, #64748b);
+    font-weight: 500;
+  }
+  .m-coy-kpi-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+  }
+  .m-coy-kpi-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .m-coy-kpi-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: var(--text-secondary, #64748b);
+    margin-bottom: 1px;
+  }
+  .m-coy-kpi-val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text-primary, #1e293b);
+  }
+  .m-coy-kpi-unit {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary, #64748b);
+  }
+  .m-coy-kpi-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border-color, #e2e8f0);
+  }
+  .m-coy-gap-strip {
+    margin: 10px 14px 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .m-coy-gap-strip:hover {
+    background: rgba(239, 68, 68, 0.12);
+  }
+  .m-coy-gap-optimal {
+    background: rgba(16, 185, 129, 0.06);
+    border-color: rgba(16, 185, 129, 0.22);
+    cursor: default;
+  }
+  .m-coy-gap-lead {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ef4444;
+  }
+  .m-coy-gap-desc {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .m-coy-dimensions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    padding: 10px 14px 14px;
+    flex-grow: 1;
+  }
+  .m-dim-simple-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .m-dim-simple-item-wide {
+    grid-column: span 2;
+  }
+  .m-dim-simple-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .m-dim-simple-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+  }
+  .m-dim-simple-score {
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .m-dim-simple-bar {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .m-dim-simple-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+  .fill-optimal { background: #10b981 !important; }
+  .fill-moderate { background: #f59e0b !important; }
+  .fill-critical { background: #ef4444 !important; }
+
+  .m-coy-card-footer {
+    padding: 8px 14px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    gap: 6px;
+    background: var(--card-bg-solid, #ffffff);
+  }
 </style>
 
 <div class="modal fade" id="aiCompanyReadinessModal" tabindex="-1" aria-labelledby="aiCompanyReadinessModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered custom-size">
     <div class="modal-content shadow-lg border-0" style="border-radius: 18px; overflow: hidden; background: var(--card-bg-solid, #ffffff);">
       
+      {% set raw_role = role or (session.get('role') if session else '') %}
+      {% set current_role_display = raw_role|upper if raw_role else 'CO / 2IC / Adjutant' %}
+
       <!-- Modal Header -->
-      <div class="modal-header py-3 px-4 border-bottom" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%);">
+      <div class="modal-header py-3 px-4 border-bottom">
         <div>
-          <h5 class="modal-title mb-0 d-flex align-items-center gap-2 fw-bold" id="aiCompanyReadinessModalLabel" style="color: var(--text-primary, #1e293b);">
-            <i class="fas fa-shield-alt text-primary"></i>
-            <span>AI Company Operational Readiness Assessment Table</span>
-            <span class="badge bg-primary text-white ms-2" style="font-size: 0.72rem; font-weight: 600;">CO / 2IC / Adjutant</span>
+          <h5 class="modal-title mb-0 d-flex align-items-center gap-2 fw-bold" id="aiCompanyReadinessModalLabel" style="color: #ffffff !important;">
+            <i class="fas fa-shield-alt text-white"></i>
+            <span style="color: #ffffff !important;">AI Company Operational Readiness Assessment Table</span>
+            <span class="badge ms-2" id="mReadinessRoleBadge" style="font-size: 0.72rem; font-weight: 700; background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.45) !important;">{{ current_role_display }}</span>
           </h5>
-          <div class="text-muted small mt-1">
-            Multi-dimensional operational telemetry across 7 dimensions &bull; CO / 2IC / Adjutant Command Oversight
+          <div class="small mt-1" id="mReadinessRoleSubtitle" style="color: rgba(255, 255, 255, 0.95) !important; font-size: 0.83rem !important; font-weight: 500 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;">
+            Multi-dimensional operational telemetry across 7 dimensions &bull; <span id="mReadinessRoleText" style="color: #ffffff !important; font-weight: 700 !important;">{{ current_role_display }}</span> Command Oversight
           </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <a href="/ai-company-readiness" class="btn btn-sm btn-primary fw-semibold px-3 text-white" target="_blank" title="Open Complete Analytics Dashboard">
-            <i class="fas fa-chart-line me-1"></i> Full Analytics
+          {% set target_coy = 'HQ COY' %}
+          {% if 'comm' in (raw_role|lower) or 'comn' in (raw_role|lower) %}
+            {% set target_coy = 'COMN COY' %}
+          {% elif '3' in (raw_role|lower) %}
+            {% set target_coy = '3 COY' %}
+          {% endif %}
+          <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="btn btn-sm text-white fw-bold px-3 py-1.5 d-flex align-items-center gap-2" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 8px; backdrop-filter: blur(4px); font-size: 0.82rem; text-decoration: none;" title="AI Company Readiness Prediction">
+            <i class="fas fa-brain"></i>
+            <span>AI Company Readiness Prediction</span>
           </a>
-          <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold" onclick="recordReadinessSnapshot(this)" title="Save historical snapshot for trend modeling">
-            <i class="fas fa-camera me-1"></i> Snapshot
-          </button>
           <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
@@ -231,6 +431,116 @@
             </div>
           </div>
         </div>
+
+        <!-- =========================================================================
+             FULL ANALYTICS SECTION (Company Readiness Analytics & Comparative Telemetry)
+        ========================================================================= -->
+        <div id="mFullAnalyticsSection" class="mb-4">
+          <!-- Section Title Bar -->
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(37, 99, 235, 0.12); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                  <i class="fas fa-chart-line"></i>
+                </div>
+                <h5 class="mb-0 fw-bold" style="color: var(--text-primary, #1e293b); font-size: 1.05rem;">
+                  Company Readiness Analytics &amp; Comparative Telemetry
+                </h5>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle py-1 px-2" style="font-size: 0.72rem; font-weight: 600;">
+                  Live Telemetry
+                </span>
+              </div>
+              <div class="text-muted small mt-1" style="font-size: 0.78rem;">
+                Comparative multi-dimensional telemetry, strength distribution, and operational readiness across monitored companies
+              </div>
+            </div>
+
+            <!-- Graph Mode Switcher Buttons -->
+            <div class="btn-group btn-group-sm" role="group" id="mInlineGraphModeGroup">
+              <button type="button" class="btn btn-primary active py-1 px-2.5" onclick="switchInlineGraphMode('dimensions', this)" style="font-size: 0.78rem;">
+                <i class="fas fa-chart-bar me-1"></i> 7 Dimensions
+              </button>
+              <button type="button" class="btn btn-outline-primary py-1 px-2.5" onclick="switchInlineGraphMode('line', this)" style="font-size: 0.78rem;">
+                <i class="fas fa-chart-line me-1"></i> Line Graph
+              </button>
+              <button type="button" class="btn btn-outline-primary py-1 px-2.5" onclick="switchInlineGraphMode('radar', this)" style="font-size: 0.78rem;">
+                <i class="fas fa-spider me-1"></i> Radar
+              </button>
+              <button type="button" class="btn btn-outline-primary py-1 px-2.5" onclick="switchInlineGraphMode('strength', this)" style="font-size: 0.78rem;">
+                <i class="fas fa-users me-1"></i> Strength
+              </button>
+            </div>
+          </div>
+
+          <!-- Charts & Inspector Grid -->
+          <div class="row g-3">
+            <!-- Main Chart Column (8 cols) -->
+            <div class="col-12 col-xl-8">
+              <div class="card border rounded-3 shadow-sm h-100" style="background: var(--card-bg-solid, #ffffff);">
+                <div class="card-header bg-transparent py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark" id="mInlineChartHeading" style="font-size: 0.92rem;">7-Dimension Readiness Comparison</h6>
+                    <div class="text-muted small" id="mInlineChartSubheading" style="font-size: 0.74rem;">Performance across Strength, Availability, Trade, Qualification, Course, Fitness, Medical</div>
+                  </div>
+                  <span class="badge border bg-light text-muted px-2.5 py-1" style="font-size: 0.74rem;">
+                    <i class="fas fa-layer-group text-primary me-1"></i> Comparative Formation Telemetry
+                  </span>
+                </div>
+
+                <div class="card-body p-3">
+                  <div style="position: relative; height: 360px; width: 100%;">
+                    <canvas id="mInlineFullAnalyticsChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Secondary Doughnut & Formation Inspector (4 cols) -->
+            <div class="col-12 col-xl-4 d-flex flex-column gap-3">
+              <!-- Ground Availability Doughnut -->
+              <div class="card border rounded-3 shadow-sm" style="background: var(--card-bg-solid, #ffffff);">
+                <div class="card-header bg-transparent py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.88rem;">Ground Availability Ratio</h6>
+                    <span class="text-muted" style="font-size: 0.72rem;" id="mInlineDoughnutSub">Present vs Total Posted</span>
+                  </div>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.72rem; font-weight: 700;" id="mInlineEffectiveBadge">
+                    --% Effective
+                  </span>
+                </div>
+                <div class="card-body p-2" style="height: 145px; position: relative;">
+                  <canvas id="mInlineDoughnutChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Formation Quick-Inspector -->
+              <div class="card border rounded-3 shadow-sm flex-grow-1" style="background: var(--card-bg-solid, #ffffff);">
+                <div class="card-header bg-transparent py-2 px-3 border-bottom">
+                  <div class="d-flex justify-content-between align-items-center mb-1.5">
+                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.88rem;">
+                      <i class="fas fa-crosshairs text-primary me-1"></i> Formation Intelligence
+                    </h6>
+                  </div>
+                  <!-- Company Select Buttons -->
+                  <div class="btn-group btn-group-sm w-100" role="group" id="mInlineCoyBtnGroup">
+                    <button type="button" class="btn btn-primary active py-0.5" onclick="showInlineCompanyDetail('HQ COY', this)" style="font-size: 0.72rem;">HQ COY</button>
+                    <button type="button" class="btn btn-outline-secondary py-0.5" onclick="showInlineCompanyDetail('COMN COY', this)" style="font-size: 0.72rem;">COMN COY</button>
+                    <button type="button" class="btn btn-outline-secondary py-0.5" onclick="showInlineCompanyDetail('3 COY', this)" style="font-size: 0.72rem;">3 COY</button>
+                  </div>
+                </div>
+
+                <div class="card-body p-2.5" id="mInlineCompanyDetailDisplay">
+                  <div class="text-center py-3 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
+                    <div style="font-size: 0.75rem;">Loading formation telemetry...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4" style="border-color: var(--border-color, #e2e8f0); opacity: 0.6;">
 
         <!-- Filter & Search Toolbar -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -317,6 +627,36 @@
           </div>
         </div>
 
+        {% set r_norm = (role or (session.get('role') if session else ''))|upper|trim %}
+        {% set hide_cards_for_role = r_norm in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] %}
+        {% if not hide_cards_for_role %}
+        <!-- =========================================================================
+             DETAILS OF 3 COMPANIES (Monitored Formations Detail Cards)
+        ========================================================================= -->
+        <div class="mb-4 mt-4 pt-3 border-top" id="mCompanyCardsSection">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <h5 class="fw-bold mb-0 text-dark" style="font-size: 1.05rem;">
+                <i class="fas fa-building text-primary me-2"></i> Monitored Formations Detail Cards
+              </h5>
+              <div class="text-muted small" style="font-size: 0.78rem;">
+                Comprehensive deterministic dimension scores, personnel operational gaps, and formation readiness details
+              </div>
+            </div>
+            <span class="badge border bg-light text-muted px-3 py-1.5" style="font-size: 0.75rem;">
+              <i class="fas fa-shield-alt text-primary me-1"></i> 3 Monitored Companies (Fixed Scope)
+            </span>
+          </div>
+
+          <div class="row g-3" id="mCompanyCardsRow">
+            <div class="col-12 text-center py-3 text-muted">
+              <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+              Loading formation detail cards...
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
       </div>
 
       <!-- Modal Footer -->
@@ -333,12 +673,25 @@
 
 <script>
   let modalReadinessCache = null;
+  const CURRENT_USER_ROLE = (window.CURRENT_USER_ROLE || '{{ (role or (session.get("role") if session else ""))|escape }}' || '').toUpperCase().trim();
+  const IS_EXEC_ROLE = ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'].includes(CURRENT_USER_ROLE);
 
   function openAiCompanyReadinessModal() {
     const modalEl = document.getElementById('aiCompanyReadinessModal');
     if (!modalEl) return;
     const bsModal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
     bsModal.show();
+
+    if (CURRENT_USER_ROLE) {
+      const badgeEl = document.getElementById('mReadinessRoleBadge');
+      if (badgeEl && (!badgeEl.textContent || badgeEl.textContent.includes('/'))) {
+        badgeEl.textContent = CURRENT_USER_ROLE;
+      }
+      const roleTextEl = document.getElementById('mReadinessRoleText');
+      if (roleTextEl && (!roleTextEl.textContent || roleTextEl.textContent.includes('/'))) {
+        roleTextEl.textContent = CURRENT_USER_ROLE;
+      }
+    }
     
     const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
     const currentCoy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
@@ -434,9 +787,11 @@
     }
 
     const tbody = document.getElementById('mReadinessTableBody');
+    const cardsContainer = document.getElementById('mCompanyCardsRow');
     if (!tbody || !dashboard.companies) return;
 
     let html = '';
+    let cardsHtml = '';
     const companies = ['HQ COY', 'COMN COY', '3 COY'];
 
     companies.forEach((coyName) => {
@@ -487,6 +842,7 @@
       const chipsHtml = allDims.map(d => d.chip).join('');
       const barHtml = allDims.map(d => d.bar).join('');
 
+      // Summary Table Row
       html += `
         <tr data-coy="${coyName}">
           <td class="ps-3 py-3" style="min-width: 140px;">
@@ -498,6 +854,9 @@
               <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="openCompanyGapsDialog('${coyName}')" title="View ${coyName} Operational Gaps">
                 <i class="fas fa-search-plus me-1"></i>Gaps
               </button>
+              <a href="/ai-company-readiness/company/${encodeURIComponent(coyName)}/prediction" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View ${coyName} AI Readiness Prediction">
+                <i class="fas fa-brain me-1"></i>Prediction
+              </a>
             </div>
           </td>
           <td>
@@ -536,9 +895,173 @@
           </td>
         </tr>
       `;
+
+      // 3 Company Detail Card
+      const statusLevel = coy.status_badge?.level || (coy.overall_readiness >= 85 ? 'Optimal' : (coy.overall_readiness >= 70 ? 'Moderate' : 'Critical'));
+      const cardClass = statusLevel === 'Optimal' ? 'm-coy-card-optimal' : (statusLevel === 'Moderate' ? 'm-coy-card-moderate' : 'm-coy-card-critical');
+      const badgeClass = coy.status_badge?.badge_class || (statusLevel === 'Optimal' ? 'badge bg-success' : (statusLevel === 'Moderate' ? 'badge bg-warning text-dark' : 'badge bg-danger'));
+      const statusLabel = coy.status_badge?.label || statusLevel;
+      const subLabel = (coy.display_name || coyName).split('(')[0].trim();
+
+      const dimFill = (sc) => sc >= 85 ? 'fill-optimal' : (sc >= 70 ? 'fill-moderate' : 'fill-critical');
+      const dimTxt = (sc) => sc >= 85 ? 'text-success' : (sc >= 70 ? 'text-warning' : 'text-danger');
+
+      const dStrScore = coy.dimensions?.strength?.score || 0;
+      const dAvailScore = coy.dimensions?.availability?.score || 0;
+      const dTrdScore = coy.dimensions?.trade?.score || 0;
+      const dEduScore = coy.dimensions?.qualification?.score || 0;
+      const dCrsScore = coy.dimensions?.course?.score || 0;
+      const dFitScore = coy.dimensions?.fitness?.score || 0;
+      const dMedScore = coy.dimensions?.medical?.score || 0;
+
+      let gapSection = '';
+      if (coy.main_gap && coy.main_gap.gap_type && coy.main_gap.gap_type !== 'None') {
+        gapSection = `
+          <div class="m-coy-gap-strip" onclick="openCompanyGapsDialog('${coyName}')" role="button" title="Click to view gap drill-down">
+            <div class="m-coy-gap-info">
+              <div class="m-coy-gap-lead">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="gap-type-badge">${coy.main_gap.gap_type} GAP</span>
+                <span class="gap-shortage-badge">Shortage of ${coy.main_gap.gap}</span>
+              </div>
+              <div class="m-coy-gap-desc">${coy.main_gap.name}</div>
+            </div>
+            <button type="button" class="btn btn-drilldown-action">
+              Drill Down <i class="fas fa-arrow-right ms-1"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        gapSection = `
+          <div class="m-coy-gap-strip m-coy-gap-optimal">
+            <div class="m-coy-gap-info">
+              <div class="m-coy-gap-lead text-success">
+                <i class="fas fa-check-circle"></i>
+                <span>Optimal Operations</span>
+              </div>
+              <div class="m-coy-gap-desc text-muted">All baseline parameters satisfied</div>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle">Optimal</span>
+          </div>
+        `;
+      }
+
+      cardsHtml += `
+        <div class="col-12 col-md-4">
+          <div class="m-coy-card ${cardClass}">
+            <div class="m-coy-card-header">
+              <div>
+                <h5 class="m-coy-name-title mb-0">${coyName}</h5>
+                <div class="m-coy-sublabel">${subLabel}</div>
+              </div>
+              <span class="${badgeClass}">
+                <i class="fas fa-circle me-1" style="font-size: 0.5rem;"></i>${statusLabel}
+              </span>
+            </div>
+
+            <div class="m-coy-kpi-bar">
+              <div class="m-coy-kpi-item">
+                <div class="m-coy-kpi-label">Readiness</div>
+                <div class="m-coy-kpi-val ${scoreClass}">${coy.overall_readiness}%</div>
+              </div>
+              <div class="m-coy-kpi-divider"></div>
+              <div class="m-coy-kpi-item">
+                <div class="m-coy-kpi-label">Posted / Auth</div>
+                <div class="m-coy-kpi-val text-primary">${coy.actual_strength}<span class="m-coy-kpi-unit">/${coy.required_strength}</span></div>
+              </div>
+              <div class="m-coy-kpi-divider"></div>
+              <div class="m-coy-kpi-item">
+                <div class="m-coy-kpi-label">On-Ground</div>
+                <div class="m-coy-kpi-val text-success">${coy.effective_available_strength}<span class="m-coy-kpi-unit"> (${dAvailScore}%)</span></div>
+              </div>
+            </div>
+
+            ${gapSection}
+
+            <div class="m-coy-dimensions-grid">
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Strength</span>
+                  <span class="m-dim-simple-score ${dimTxt(dStrScore)}">${dStrScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dStrScore)}" style="width: ${dStrScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Availability</span>
+                  <span class="m-dim-simple-score ${dimTxt(dAvailScore)}">${dAvailScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dAvailScore)}" style="width: ${dAvailScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Trade</span>
+                  <span class="m-dim-simple-score ${dimTxt(dTrdScore)}">${dTrdScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dTrdScore)}" style="width: ${dTrdScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Education</span>
+                  <span class="m-dim-simple-score ${dimTxt(dEduScore)}">${dEduScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dEduScore)}" style="width: ${dEduScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Courses</span>
+                  <span class="m-dim-simple-score ${dimTxt(dCrsScore)}">${dCrsScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dCrsScore)}" style="width: ${dCrsScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Fitness</span>
+                  <span class="m-dim-simple-score ${dimTxt(dFitScore)}">${dFitScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dFitScore)}" style="width: ${dFitScore}%;"></div></div>
+              </div>
+
+              <div class="m-dim-simple-item m-dim-simple-item-wide">
+                <div class="m-dim-simple-header">
+                  <span class="m-dim-simple-title">Medical (SHAPE-1)</span>
+                  <span class="m-dim-simple-score ${dimTxt(dMedScore)}">${dMedScore}%</span>
+                </div>
+                <div class="m-dim-simple-bar"><div class="m-dim-simple-fill ${dimFill(dMedScore)}" style="width: ${dMedScore}%;"></div></div>
+              </div>
+            </div>
+
+            <div class="m-coy-card-footer">
+              <button type="button" class="btn btn-sm btn-outline-primary flex-fill py-1" onclick="openCompanyDetailsDialog('${coyName}')" style="font-size: 0.76rem;">
+                <i class="fas fa-list-alt me-1"></i>Details
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary flex-fill py-1" onclick="openCompanyGapsDialog('${coyName}')" style="font-size: 0.76rem;">
+                <i class="fas fa-search-plus me-1"></i>Gaps (${coy.all_gaps ? coy.all_gaps.length : 0})
+              </button>
+              <a href="/ai-company-readiness/company/${encodeURIComponent(coyName)}/prediction" class="btn btn-sm btn-outline-info flex-fill py-1 text-center" style="font-size: 0.76rem;">
+                <i class="fas fa-brain me-1"></i>Prediction
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
     });
 
     tbody.innerHTML = html || `<tr><td colspan="6" class="text-center py-4 text-muted">No formations match the search criteria.</td></tr>`;
+    if (IS_EXEC_ROLE) {
+      const sectionEl = document.getElementById('mCompanyCardsSection');
+      if (sectionEl) sectionEl.style.display = 'none';
+    } else if (cardsContainer) {
+      cardsContainer.innerHTML = cardsHtml || `<div class="col-12 text-center py-4 text-muted">No formation detail cards match the filter criteria.</div>`;
+    }
+
+    // Render Full Analytics Graphs & Formation Inspector directly at the bottom
+    renderInlineFullAnalytics(dashboard);
   }
 
   window.filterModalCoy = function(coyName, btnEl) {
@@ -572,23 +1095,35 @@
   });
 
   function showModalPersonnelDrilldown(coy, gapType, gapName) {
+    try {
+      coy = decodeURIComponent(coy);
+      gapType = decodeURIComponent(gapType);
+      gapName = decodeURIComponent(gapName);
+    } catch(e) {}
+
     const container = document.getElementById('mDrilldownContainer');
     const titleEl = document.getElementById('mDrilldownTitle');
     const badgeEl = document.getElementById('mDrilldownBadge');
     const tbody = document.getElementById('mDrilldownTableBody');
     if (!container || !tbody) return;
 
-    gapName = unescape(gapName);
-    titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
-    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading personnel records...</td></tr>`;
+    if (titleEl) titleEl.textContent = `${coy} • ${gapType} Gap: ${gapName}`;
+    tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading personnel records for ${gapName}...</td></tr>`;
     container.style.display = 'block';
 
-    const url = `/ai-company-readiness/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
+    setTimeout(() => {
+      container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+
+    const url = `/ai-company-readiness/api/company/${encodeURIComponent(coy)}/personnel?type=${encodeURIComponent(gapType)}&name=${encodeURIComponent(gapName || gapType)}`;
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then(data => {
-        if (!data.success || !data.personnel || data.personnel.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted">No contributing personnel records found for this gap.</td></tr>`;
+        if (!data || !data.success || !data.personnel || data.personnel.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-muted"><i class="fas fa-info-circle me-1"></i>No contributing personnel records found for this gap.</td></tr>`;
           if (badgeEl) badgeEl.textContent = '0 Soldiers';
           return;
         }
@@ -603,7 +1138,7 @@
               <td class="fw-semibold text-dark">${p.name || 'Unknown'}</td>
               <td>${p.rank || '-'}</td>
               <td>${p.trade || '-'}</td>
-              <td><span class="text-danger fw-semibold">${p.reason || p.gap_category || '-'}</span></td>
+              <td><span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold">${p.reason || p.gap_category || '-'}</span></td>
               <td><span class="text-success fw-semibold"><i class="fas fa-check-circle me-1" style="font-size: 0.75rem;"></i>${p.solution || 'Resolve'}</span></td>
             </tr>
           `;
@@ -611,7 +1146,542 @@
         tbody.innerHTML = html;
       })
       .catch(err => {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger">Failed to load records: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-3 text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Failed to load records: ${err.message}</td></tr>`;
       });
   }
+
+  // =========================================================================
+  // INLINE FULL ANALYTICS CONTROLLER (At Bottom of 3 Companies Table)
+  // =========================================================================
+  let inlineChartInstance = null;
+  let currentInlineGraphMode = 'dimensions';
+
+  function ensureChartJsLoaded(callback) {
+    if (typeof Chart !== 'undefined') {
+      callback();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = '/static/chart.umd.min.js';
+    script.onload = callback;
+    script.onerror = function() {
+      const cdnScript = document.createElement('script');
+      cdnScript.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+      cdnScript.onload = callback;
+      document.head.appendChild(cdnScript);
+    };
+    document.head.appendChild(script);
+  }
+
+  function scrollToFullAnalytics() {
+    const section = document.getElementById('mFullAnalyticsSection');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      section.style.transition = 'box-shadow 0.4s ease';
+      section.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.4)';
+      setTimeout(() => { section.style.boxShadow = ''; }, 1400);
+    }
+  }
+
+  let inlineDoughnutInstance = null;
+
+  function renderInlineDoughnut(d) {
+    if (typeof Chart === 'undefined') return;
+    const canvas = document.getElementById('mInlineDoughnutChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (inlineDoughnutInstance) {
+      inlineDoughnutInstance.destroy();
+      inlineDoughnutInstance = null;
+    }
+
+    const coys = d.companies || {};
+    const s = d.summary || {};
+    const coyNames = ['HQ COY', 'COMN COY', '3 COY'];
+    const availCounts = coyNames.map(name => coys[name] ? coys[name].effective_available_strength : 0);
+
+    const subEl = document.getElementById('mInlineDoughnutSub');
+    const badgeEl = document.getElementById('mInlineEffectiveBadge');
+    if (subEl && s) subEl.textContent = `${s.total_available_strength || 0} Present of ${s.total_actual_strength || 0} Posted`;
+    if (badgeEl && s && s.total_actual_strength) {
+      const eff = Math.round((s.total_available_strength / s.total_actual_strength) * 100);
+      badgeEl.textContent = `${eff}% Effective`;
+    }
+
+    inlineDoughnutInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: coyNames.map((name, i) => `${name} (${availCounts[i]})`),
+        datasets: [{
+          data: availCounts,
+          backgroundColor: ['#2563eb', '#10b981', '#8b5cf6'],
+          borderWidth: 2,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { boxWidth: 10, font: { size: 10, weight: '600' } }
+          }
+        }
+      }
+    });
+  }
+
+  function renderInlineFullAnalytics(dashboard) {
+    if (!dashboard || !dashboard.companies) return;
+
+    ensureChartJsLoaded(() => {
+      renderInlineGraph(dashboard, currentInlineGraphMode);
+      renderInlineDoughnut(dashboard);
+
+      let defaultCoy = 'HQ COY';
+      const cleanRole = (window.CURRENT_USER_ROLE || '{{ role|default("") }}').toLowerCase().replace(/[\s_\-]/g, '');
+      if (cleanRole.includes('comm') || cleanRole.includes('comn')) {
+        defaultCoy = 'COMN COY';
+      } else if (cleanRole.includes('3')) {
+        defaultCoy = '3 COY';
+      }
+
+      let activeBtn = document.querySelector('#mInlineCoyBtnGroup button.active');
+      if (!window._mInlineCoyUserSelected) {
+        activeBtn = Array.from(document.querySelectorAll('#mInlineCoyBtnGroup button')).find(b => b.textContent.trim().toUpperCase() === defaultCoy.toUpperCase()) || activeBtn;
+      }
+      const targetCoy = activeBtn ? activeBtn.textContent.trim() : defaultCoy;
+      showInlineCompanyDetail(targetCoy, activeBtn);
+    });
+  }
+
+  function switchInlineGraphMode(mode, btnEl) {
+    currentInlineGraphMode = mode;
+    if (btnEl) {
+      document.querySelectorAll('#mInlineGraphModeGroup button').forEach(b => {
+        b.classList.remove('btn-primary', 'active');
+        b.classList.add('btn-outline-primary');
+      });
+      btnEl.classList.remove('btn-outline-primary');
+      btnEl.classList.add('btn-primary', 'active');
+    }
+    const cache = window.modalReadinessCache || modalReadinessCache;
+    if (cache) {
+      renderInlineGraph(cache, mode);
+    }
+  }
+
+  function renderInlineGraph(d, mode) {
+    if (typeof Chart === 'undefined') return;
+    const canvas = document.getElementById('mInlineFullAnalyticsChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    if (inlineChartInstance) {
+      inlineChartInstance.destroy();
+      inlineChartInstance = null;
+    }
+
+    const coys = d.companies || {};
+    const coyNames = ['HQ COY', 'COMN COY', '3 COY'];
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark-theme');
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    const textColor = isDark ? '#94a3b8' : '#64748b';
+
+    const headingEl = document.getElementById('mInlineChartHeading');
+    const subheadEl = document.getElementById('mInlineChartSubheading');
+
+    if (mode === 'dimensions') {
+      if (headingEl) headingEl.textContent = '7-Dimension Readiness Comparison';
+      if (subheadEl) subheadEl.textContent = 'Comparative performance across Strength, Availability, Trade, Qualification, Course, Fitness, Medical';
+
+      const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
+      const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
+
+      const palette = [
+        { bg: 'rgba(37, 99, 235, 0.85)', border: '#2563eb' },
+        { bg: 'rgba(16, 185, 129, 0.85)', border: '#10b981' },
+        { bg: 'rgba(139, 92, 246, 0.85)', border: '#8b5cf6' }
+      ];
+
+      const datasets = coyNames.map((name, i) => {
+        const c = coys[name] || {};
+        const dims = c.dimensions || {};
+        const col = palette[i % palette.length];
+        return {
+          label: name,
+          data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
+          backgroundColor: col.bg,
+          borderColor: col.border,
+          borderWidth: 1.5,
+          borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
+          borderSkipped: 'bottom'
+        };
+      });
+
+      inlineChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: dimLabels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          categoryPercentage: 0.72,
+          barPercentage: 0.82,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 16,
+                boxWidth: 8,
+                boxHeight: 8,
+                color: textColor,
+                font: { weight: '600', size: 12 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: textColor, font: { weight: '600', size: 11 } }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                stepSize: 20,
+                callback: v => v + '%'
+              }
+            }
+          }
+        }
+      });
+
+    } else if (mode === 'line') {
+      if (headingEl) headingEl.textContent = '7-Dimension Readiness Line Graph';
+      if (subheadEl) subheadEl.textContent = 'Comparative continuous trajectory across Strength, Availability, Trade, Qualification, Course, Fitness, Medical';
+
+      const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
+      const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
+
+      const palette = [
+        { bg: 'rgba(37, 99, 235, 0.12)', border: '#2563eb' },
+        { bg: 'rgba(16, 185, 129, 0.12)', border: '#10b981' },
+        { bg: 'rgba(139, 92, 246, 0.12)', border: '#8b5cf6' }
+      ];
+
+      const datasets = coyNames.map((name, i) => {
+        const c = coys[name] || {};
+        const dims = c.dimensions || {};
+        const col = palette[i % palette.length];
+        return {
+          label: name,
+          data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
+          backgroundColor: col.bg,
+          borderColor: col.border,
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.35,
+          pointBackgroundColor: col.border,
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        };
+      });
+
+      inlineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: { labels: dimLabels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 16,
+                boxWidth: 8,
+                boxHeight: 8,
+                color: textColor,
+                font: { weight: '600', size: 12 }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%`
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { weight: '600', size: 11 } }
+            },
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: gridColor },
+              ticks: {
+                color: textColor,
+                stepSize: 20,
+                callback: v => v + '%'
+              }
+            }
+          }
+        }
+      });
+
+    } else if (mode === 'radar') {
+      if (headingEl) headingEl.textContent = 'Operational Readiness Radar';
+      if (subheadEl) subheadEl.textContent = 'Multi-axis dimensional symmetry and balance across monitored formations';
+
+      const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
+      const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
+
+      const palette = [
+        { bg: 'rgba(37, 99, 235, 0.18)', border: '#2563eb' },
+        { bg: 'rgba(16, 185, 129, 0.18)', border: '#10b981' },
+        { bg: 'rgba(139, 92, 246, 0.18)', border: '#8b5cf6' }
+      ];
+
+      const datasets = coyNames.map((name, i) => {
+        const c = coys[name] || {};
+        const dims = c.dimensions || {};
+        const col = palette[i % palette.length];
+        return {
+          label: name,
+          data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
+          backgroundColor: col.bg,
+          borderColor: col.border,
+          borderWidth: 2,
+          pointBackgroundColor: col.border,
+          pointBorderColor: '#fff',
+          pointRadius: 3
+        };
+      });
+
+      inlineChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: { labels: dimLabels, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              align: 'end',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 16,
+                boxWidth: 8,
+                boxHeight: 8,
+                color: textColor,
+                font: { weight: '600', size: 12 }
+              }
+            }
+          },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: { display: false, stepSize: 20 },
+              pointLabels: { color: textColor, font: { weight: '600', size: 11 } },
+              grid: { color: gridColor },
+              angleLines: { color: gridColor }
+            }
+          }
+        }
+      });
+
+    } else if (mode === 'strength') {
+      if (headingEl) headingEl.textContent = 'Formation Strength & Ground Availability';
+      if (subheadEl) subheadEl.textContent = 'Authorized Requirement vs Actual Posted vs Effective Ground Available';
+
+      const requiredData = coyNames.map(c => (coys[c] ? coys[c].required_strength : 0));
+      const actualData = coyNames.map(c => (coys[c] ? coys[c].actual_strength : 0));
+      const availableData = coyNames.map(c => (coys[c] ? coys[c].effective_available_strength : 0));
+
+      inlineChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: coyNames,
+          datasets: [
+            {
+              label: 'Authorized Requirement',
+              data: requiredData,
+              backgroundColor: 'rgba(100, 116, 139, 0.75)',
+              borderColor: '#64748b',
+              borderWidth: 1.5,
+              borderRadius: 6
+            },
+            {
+              label: 'Actual Posted Strength',
+              data: actualData,
+              backgroundColor: 'rgba(59, 130, 246, 0.75)',
+              borderColor: '#3b82f6',
+              borderWidth: 1.5,
+              borderRadius: 6
+            },
+            {
+              label: 'Available on Ground',
+              data: availableData,
+              backgroundColor: 'rgba(16, 185, 129, 0.75)',
+              borderColor: '#10b981',
+              borderWidth: 1.5,
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, position: 'top' } },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { weight: '600', size: 12 } }
+            },
+            y: {
+              min: 0,
+              grid: { color: gridColor },
+              ticks: { color: textColor }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  function showInlineCompanyDetail(coyName, btnEl) {
+    if (btnEl) {
+      window._mInlineCoyUserSelected = true;
+      document.querySelectorAll('#mInlineCoyBtnGroup button').forEach(b => {
+        b.classList.remove('btn-primary', 'active');
+        b.classList.add('btn-outline-secondary');
+      });
+      btnEl.classList.remove('btn-outline-secondary');
+      btnEl.classList.add('btn-primary', 'active');
+    }
+
+    const cache = window.modalReadinessCache || modalReadinessCache;
+    if (!cache || !cache.companies || !cache.companies[coyName]) return;
+    const coy = cache.companies[coyName];
+
+    const displayEl = document.getElementById('mInlineCompanyDetailDisplay');
+    if (!displayEl) return;
+
+    const availPct = Math.round(((coy.effective_available_strength || 0) / (coy.actual_strength || 1)) * 100);
+
+    let gapHtml = '';
+    if (coy.main_gap && coy.main_gap.gap_type && coy.main_gap.gap_type !== 'None') {
+      gapHtml = `
+        <div class="p-2.5 rounded-3 mb-2" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.25);">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="text-danger fw-bold" style="font-size: 0.78rem;">
+              <i class="fas fa-exclamation-triangle me-1"></i>Primary Shortfall: ${coy.main_gap.gap_type}
+            </span>
+            <span class="badge bg-danger">Deficit: -${coy.main_gap.gap}</span>
+          </div>
+          <div class="text-muted mt-1" style="font-size: 0.74rem;">${coy.main_gap.name}</div>
+        </div>
+      `;
+    } else {
+      gapHtml = `
+        <div class="p-2.5 rounded-3 mb-2 text-success" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); font-size: 0.78rem;">
+          <i class="fas fa-check-circle me-1"></i> All operational dimensions within authorized tolerances
+        </div>
+      `;
+    }
+
+    const dims = coy.dimensions || {};
+    const dimKeys = [
+      { key: 'strength', label: 'Str' },
+      { key: 'availability', label: 'Avail' },
+      { key: 'trade', label: 'Trd' },
+      { key: 'qualification', label: 'Edu' },
+      { key: 'course', label: 'Crs' },
+      { key: 'fitness', label: 'Fit' },
+      { key: 'medical', label: 'Med' }
+    ];
+
+    let dimMetersHtml = '<div class="d-flex flex-wrap gap-1 mb-3">';
+    dimKeys.forEach(dk => {
+      const sc = (dims[dk.key] && dims[dk.key].score !== undefined) ? dims[dk.key].score : 100;
+      const colClass = sc >= 85 ? 'text-success border-success-subtle bg-success-subtle' : (sc >= 70 ? 'text-warning border-warning-subtle bg-warning-subtle' : 'text-danger border-danger-subtle bg-danger-subtle');
+      dimMetersHtml += `<span class="badge border ${colClass}" style="font-size: 0.72rem; padding: 4px 6px;">${dk.label}: <strong>${sc}%</strong></span>`;
+    });
+    dimMetersHtml += '</div>';
+
+    displayEl.innerHTML = `
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div>
+          <strong class="fs-6 text-dark">${coyName}</strong>
+          <span class="text-muted small"> • ${coy.display_name || coyName}</span>
+        </div>
+        <span class="badge ${coy.status_badge ? coy.status_badge.badge_class : 'bg-primary'}" style="font-size: 0.75rem;">
+          ${coy.overall_readiness}% Readiness
+        </span>
+      </div>
+
+      <div class="row g-2 text-center mb-2.5">
+        <div class="col-4">
+          <div class="p-2 rounded border bg-light">
+            <div class="text-muted" style="font-size: 0.68rem; text-transform: uppercase;">Authorized</div>
+            <strong class="fs-6">${coy.required_strength || '--'}</strong>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded border bg-light">
+            <div class="text-muted" style="font-size: 0.68rem; text-transform: uppercase;">Posted</div>
+            <strong class="fs-6 text-primary">${coy.actual_strength || '--'}</strong>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="p-2 rounded border bg-light">
+            <div class="text-muted" style="font-size: 0.68rem; text-transform: uppercase;">On Ground</div>
+            <strong class="fs-6 text-success">${coy.effective_available_strength || '--'}</strong>
+          </div>
+        </div>
+      </div>
+
+      ${dimMetersHtml}
+      ${gapHtml}
+
+      <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+        <span class="text-muted" style="font-size: 0.75rem;">Ground Presence: <strong class="text-primary">${availPct}%</strong></span>
+        <button type="button" class="btn btn-xs btn-primary px-3 py-1" style="font-size: 0.75rem; border-radius: 6px;" onclick="openCompanyDetailsDialog('${coyName}')">
+          <i class="fas fa-layer-group me-1"></i> Dimension Breakdown
+        </button>
+      </div>
+    `;
+  }
 </script>
+

@@ -144,3 +144,64 @@ def to_feature_dataframe(feature_dicts: List[Dict[str, float]]) -> pd.DataFrame:
         if col not in df.columns:
             df[col] = 0.0
     return df[FEATURE_COLUMNS]
+
+
+def extract_features_from_snapshot(snapshot: Dict[str, Any]) -> Dict[str, float]:
+    """
+    Extracts ordered 19 operational features from an ai_company_readiness_history snapshot row.
+    Guarantees consistent column mapping across historical training and live inference.
+    """
+    coy = str(snapshot.get("company", ""))
+    c_hq = 1.0 if "hq" in coy.lower() or "1" in coy.lower() else 0.0
+    c_comn = 1.0 if "comm" in coy.lower() or "comn" in coy.lower() else 0.0
+    c_3coy = 1.0 if "3" in coy.lower() else 0.0
+
+    act = float(snapshot.get("actual_strength") or 1)
+    req = float(snapshot.get("required_strength") or act or 1)
+    str_ratio = safe_div(act, req, 1.0)
+
+    onleave = float(snapshot.get("onleave_count") or 0)
+    det = float(snapshot.get("detachment_count") or 0)
+    td = float(snapshot.get("td_count") or 0)
+    oncourse = float(snapshot.get("oncourse_count") or 0)
+    avail = float(snapshot.get("available_strength") or (act - onleave - det - td - oncourse))
+    unfit = float(snapshot.get("unfit_count") or 0)
+
+    leave_rate = safe_div(onleave, act)
+    det_rate = safe_div(det, act)
+    td_rate = safe_div(td, act)
+    course_rate = safe_div(oncourse, act)
+    avail_rate = safe_div(avail, act)
+
+    trade_score = float(snapshot.get("trade_score") if snapshot.get("trade_score") is not None else 100.0)
+    qual_score = float(snapshot.get("qualification_score") if snapshot.get("qualification_score") is not None else 100.0)
+    course_score = float(snapshot.get("course_score") if snapshot.get("course_score") is not None else 100.0)
+    fit_score = float(snapshot.get("fitness_score") if snapshot.get("fitness_score") is not None else 100.0)
+
+    shape1_rate = safe_div(max(0.0, act - unfit), act)
+    lmc_rate = safe_div(unfit, act)
+    bpet_rate = safe_div(fit_score, 100.0)
+    recat_rate = safe_div(min(unfit * 0.4, act), act)
+
+    return {
+        "company_hq": c_hq,
+        "company_comn": c_comn,
+        "company_3coy": c_3coy,
+        "authorized_strength": float(req),
+        "actual_strength": float(act),
+        "strength_ratio": round(str_ratio, 4),
+        "leave_rate": round(leave_rate, 4),
+        "detachment_rate": round(det_rate, 4),
+        "td_rate": round(td_rate, 4),
+        "course_away_rate": round(course_rate, 4),
+        "availability_rate": round(avail_rate, 4),
+        "trade_fulfillment_ratio": round(safe_div(trade_score, 100.0), 4),
+        "qualification_fulfillment_ratio": round(safe_div(qual_score, 100.0), 4),
+        "course_fulfillment_ratio": round(safe_div(course_score, 100.0), 4),
+        "shape1_ratio": round(shape1_rate, 4),
+        "lmc_ratio": round(lmc_rate, 4),
+        "bpet_pass_ratio": round(bpet_rate, 4),
+        "ppt_pass_ratio": round(bpet_rate, 4),
+        "upcoming_recat_ratio": round(recat_rate, 4)
+    }
+

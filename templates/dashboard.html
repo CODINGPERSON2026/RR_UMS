@@ -445,18 +445,11 @@
       </button>
       {% endif %}
 
-      <!-- AI Company Readiness Prediction Button — visible only to predicting roles (1coyonco, commcoyonco, 3coyonco) -->
+      <!-- AI Company Readiness Button — visible only to predicting roles (1coyonco, commcoyonco, 3coyonco) -->
       {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO']) %}
-        {% set target_coy = 'HQ COY' if ('1' in r_clean or 'hq' in r_clean) else ('COMN COY' if ('comm' in r_clean or 'comn' in r_clean) else ('3 COY' if '3' in r_clean else '')) %}
-        {% if target_coy %}
-        <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="ab-btn ab-primary" title="AI Readiness Prediction for {{ target_coy }}">
-          <i class="fas fa-brain" style="font-size:11px"></i> AI READINESS PREDICTION ({{ target_coy }})
-        </a>
-        {% else %}
-        <a href="/ai-company-readiness" class="ab-btn ab-primary" title="AI Company Readiness Prediction">
-          <i class="fas fa-brain" style="font-size:11px"></i> AI READINESS PREDICTION
-        </a>
-        {% endif %}
+        <button type="button" class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Readiness Analytics &amp; Comparative Telemetry">
+          AI COMPANY READINESS
+        </button>
       {% endif %}
 
        {%if role in ['PA']%}
@@ -597,7 +590,9 @@
           <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
+      {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO']) %}
       <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness-dash" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
         <span class="sc-label"><i class="fas fa-shield-alt text-primary me-1"></i> AI Readiness</span>
         <div class="sc-right">
@@ -1585,6 +1580,9 @@
 {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% endif %}
+
+{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_company_readiness_modal.html' %}
 {% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
@@ -1592,6 +1590,7 @@
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
+{% include 'modals/ai_company_readiness_retrain_modal.html' %}
 {% endif %}
 
 {% endblock %}

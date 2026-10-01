@@ -2838,16 +2838,19 @@ STATUS COLORS
   });
 </script>
 
+{% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
 <script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %}false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% endif %}
+
+{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_company_readiness_modal.html' %}
 {% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
 
-{% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}

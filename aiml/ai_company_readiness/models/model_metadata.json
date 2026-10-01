@@ -1,0 +1,81 @@
+{
+  "model_version": "v_test",
+  "trained_at": "2026-10-01T19:40:27.425283",
+  "best_model": "Random Forest",
+  "sample_count": 60,
+  "feature_names": [
+    "company_hq",
+    "company_comn",
+    "company_3coy",
+    "authorized_strength",
+    "actual_strength",
+    "strength_ratio",
+    "leave_rate",
+    "detachment_rate",
+    "td_rate",
+    "course_away_rate",
+    "availability_rate",
+    "trade_fulfillment_ratio",
+    "qualification_fulfillment_ratio",
+    "course_fulfillment_ratio",
+    "shape1_ratio",
+    "lmc_ratio",
+    "bpet_pass_ratio",
+    "ppt_pass_ratio",
+    "upcoming_recat_ratio"
+  ],
+  "evaluation_metrics": {
+    "Logistic Regression": {
+      "accuracy": 0.3333,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1_score": 0.3333,
+      "roc_auc": 0.3056,
+      "confusion_matrix": [
+        [
+          2,
+          4
+        ],
+        [
+          4,
+          2
+        ]
+      ]
+    },
+    "Random Forest": {
+      "accuracy": 0.5833,
+      "precision": 0.5714,
+      "recall": 0.6667,
+      "f1_score": 0.6154,
+      "roc_auc": 0.3333,
+      "confusion_matrix": [
+        [
+          3,
+          3
+        ],
+        [
+          2,
+          4
+        ]
+      ]
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.3333,
+      "precision": 0.3333,
+      "recall": 0.3333,
+      "f1_score": 0.3333,
+      "roc_auc": 0.4444,
+      "confusion_matrix": [
+        [
+          2,
+          4
+        ],
+        [
+          4,
+          2
+        ]
+      ]
+    }
+  },
+  "best_f1": 0.6154
+}

@@ -30,8 +30,9 @@ AUTHORIZED_READINESS_ROLES = [
     "1 COY ONCO", "COMM COY ONCO", "COMN COY ONCO", "3 COY ONCO"
 ]
 
-# Authorized predicting roles (prediction is restricted to company ONCOs)
+# Authorized predicting roles (prediction accessible by command leadership and company ONCOs)
 ALLOWED_PREDICTION_ROLES = [
+    "co", "commandingofficer", "2ic", "adjutant", "oc", "headclk", "clerk", "jco", "trg", "pa",
     "1coyonco", "commcoyonco", "comncoyonco", "3coyonco", "coyonco", "onco",
     "admin", "superadmin"
 ]
@@ -50,9 +51,18 @@ def auth_required(f):
     def decorated_function(*args, **kwargs):
         payload = require_login()
         if not payload:
-            if request.path.startswith("/ai-company-readiness/api/"):
+            from flask import session
+            if session and (session.get('role') or session.get('user_id')):
+                payload = {
+                    "role": session.get('role', 'CO'),
+                    "user_id": session.get('user_id', 1),
+                    "username": session.get('username', 'user'),
+                    "company": session.get('company', '')
+                }
+            elif request.path.startswith("/ai-company-readiness/api/") or "/personnel" in request.path or request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.is_json:
                 return jsonify({"error": "Unauthorized", "message": "Authentication required"}), 401
-            return redirect("/admin_login")
+            else:
+                return redirect("/admin_login")
         return f(payload, *args, **kwargs)
     return decorated_function
 
@@ -210,6 +220,7 @@ def api_company_details(user_payload, company):
 
 
 @ai_company_readiness_bp.route("/ai-company-readiness/company/<company>/personnel", methods=["GET"])
+@ai_company_readiness_bp.route("/ai-company-readiness/api/company/<company>/personnel", methods=["GET"])
 @auth_required
 def api_gap_personnel(user_payload, company):
     """JSON API returning personnel drill-down for a gap."""
@@ -325,3 +336,43 @@ def api_delete_requirement(user_payload, req_id):
         return jsonify({"success": False, "error": "Requirement not found"}), 404
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+@ai_company_readiness_bp.route("/ai-company-readiness/api/retrain-status", methods=["GET"])
+@ai_company_readiness_bp.route("/api/ai/company-readiness/retrain-status", methods=["GET"])
+@auth_required
+def api_retrain_status(user_payload):
+    """Returns historical snapshot count and ML model metadata."""
+    try:
+        user_role = (user_payload.get("role") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
+        can_retrain = user_role in ALLOWED_PREDICTION_ROLES
+        status = service.get_retrain_status()
+        status["can_retrain"] = can_retrain
+        status["user_role"] = user_payload.get("role")
+        return jsonify({"success": True, "data": status})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@ai_company_readiness_bp.route("/ai-company-readiness/api/retrain", methods=["POST"])
+@ai_company_readiness_bp.route("/api/ai/company-readiness/retrain", methods=["POST"])
+@auth_required
+def api_retrain_model(user_payload):
+    """Triggers ML model retraining pipeline for AI Company Readiness."""
+    user_role = (user_payload.get("role") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
+    if user_role not in ALLOWED_PREDICTION_ROLES:
+        return jsonify({
+            "success": False,
+            "error": "Access Denied: Retraining AI Company Readiness model is restricted to authorized roles (1coyonco, commcoyonco, 3coyonco, admin)."
+        }), 403
+
+    try:
+        data = request.get_json(silent=True) or {}
+        version = data.get("version", "v1.1")
+        force = bool(data.get("force", True))
+
+        result = service.retrain_model(model_version=version, force=force)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+

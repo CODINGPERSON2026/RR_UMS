@@ -1189,15 +1189,7 @@
       </a>
       {% endif %}
 
-      {% set r_clean_nav = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER', 'ADMIN', 'SUPER ADMIN', 'JCO', 'TRG', 'HEAD CLK', 'CLERK', 'PA'] or r_clean_nav in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] %}
-      <a class="nav-link {% if '/ai-company-readiness' in request.path %}active{% endif %}"
-        href="/ai-company-readiness" data-tiptext="AI Company Readiness">
-        <span class="nav-icon"><i class="fas fa-shield-alt"></i></span>
-        <span class="nav-label-text">Company Readiness</span>
-        <span class="nav-tooltip">Readiness</span>
-      </a>
-      {% endif %}
+
 
 
       <!-- {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO'] %}

@@ -1,0 +1,435 @@
+<!-- AI Company Readiness Model Retraining Modal -->
+<style>
+  #aiCompanyReadinessRetrainModal .modal-dialog {
+    max-width: 820px;
+    margin-top: 2rem;
+  }
+  #aiCompanyReadinessRetrainModal .modal-content {
+    border-radius: 14px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+    background: var(--card-bg-solid, #ffffff);
+    color: var(--text-primary, #1e293b);
+  }
+  #aiCompanyReadinessRetrainModal .retrain-header-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  #aiCompanyReadinessRetrainModal .retrain-stat-card {
+    background: var(--nav-link-hover-bg, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #aiCompanyReadinessRetrainModal .retrain-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+  }
+  #aiCompanyReadinessRetrainModal .pipeline-step {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    background: var(--card-bg-solid, #ffffff);
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+  }
+  #aiCompanyReadinessRetrainModal .pipeline-step.step-active {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    font-weight: 600;
+  }
+  #aiCompanyReadinessRetrainModal .pipeline-step.step-done {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.06);
+    color: #1e40af;
+  }
+</style>
+
+<div class="modal fade" id="aiCompanyReadinessRetrainModal" tabindex="-1" aria-labelledby="aiCompanyReadinessRetrainModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header border-bottom py-3 px-4" style="background: var(--nav-link-hover-bg, #f8fafc);">
+        <div class="d-flex align-items-center gap-3">
+          <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+            <i class="fas fa-brain"></i>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <h5 class="modal-title fw-bold mb-0" id="aiCompanyReadinessRetrainModalLabel">Retrain AI Readiness Model</h5>
+              <span class="badge bg-success-subtle text-success border border-success-subtle retrain-header-badge">
+                <i class="fas fa-user-shield me-1"></i> Authorized Role: 1 COY ONCO
+              </span>
+            </div>
+            <div class="text-muted small" style="font-size: 0.78rem;">
+              Multi-Model Training Pipeline (Logistic Regression, Random Forest, Gradient Boosting)
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4">
+
+        <!-- Architecture & Scope Summary Banner -->
+        <div class="p-3 rounded-3 mb-4" style="background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.2);">
+          <div class="d-flex align-items-start gap-2.5">
+            <i class="fas fa-info-circle text-primary mt-1"></i>
+            <div style="font-size: 0.82rem; line-height: 1.45;">
+              <strong>Model Retraining Governance:</strong> Retraining evaluates <strong>3 candidate classifiers</strong> (Logistic Regression, Random Forest, and Gradient Boosting) across <strong>19 time-aligned operational features</strong>. The model with highest test F1-score is automatically designated Champion, exported to model storage, and hot-reloaded into the live prediction engine.
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Status KPI Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-4">
+            <div class="retrain-stat-card">
+              <div class="retrain-stat-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                <i class="fas fa-database"></i>
+              </div>
+              <div>
+                <div class="text-muted small" style="font-size: 0.72rem; text-transform: uppercase;">Snapshots in DB</div>
+                <div class="fw-bold" style="font-size: 1.15rem;" id="lblRetrainSnapshots">Loading...</div>
+                <div class="text-muted" style="font-size: 0.7rem;" id="lblRetrainThreshold">Target: 50 Records</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="retrain-stat-card">
+              <div class="retrain-stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                <i class="fas fa-trophy"></i>
+              </div>
+              <div>
+                <div class="text-muted small" style="font-size: 0.72rem; text-transform: uppercase;">Champion Model</div>
+                <div class="fw-bold text-success" style="font-size: 1.05rem;" id="lblRetrainChampion">Loading...</div>
+                <div class="text-muted" style="font-size: 0.7rem;" id="lblRetrainF1">Best F1: --</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4">
+            <div class="retrain-stat-card">
+              <div class="retrain-stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div>
+                <div class="text-muted small" style="font-size: 0.72rem; text-transform: uppercase;">Last Trained</div>
+                <div class="fw-bold text-truncate" style="font-size: 0.95rem; max-width: 140px;" id="lblRetrainTrainedAt">--</div>
+                <div class="text-muted" style="font-size: 0.7rem;" id="lblRetrainVersion">Version: --</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Retraining Options -->
+        <div class="card border mb-4" style="background: var(--card-bg-solid, #ffffff);">
+          <div class="card-body p-3">
+            <div class="fw-bold mb-2 small text-uppercase text-muted" style="letter-spacing: 0.4px;">Retraining Pipeline Configuration</div>
+            <div class="d-flex flex-column gap-2" style="font-size: 0.85rem;">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="chkCaptureFreshSnapshot" checked>
+                <label class="form-check-label" for="chkCaptureFreshSnapshot">
+                  <strong>Capture Fresh Snapshot:</strong> Log live troop availability, medical, trade &amp; fitness counts for HQ COY, COMN COY, 3 COY before training.
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="chkMultiModelCompare" checked>
+                <label class="form-check-label" for="chkMultiModelCompare">
+                  <strong>Multi-Model Comparison:</strong> Evaluate Logistic Regression vs Random Forest vs Gradient Boosting with 80/20 train/test split.
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Training Progress Area (Hidden by default) -->
+        <div id="readinessRetrainProgressBox" style="display: none;" class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small fw-bold text-success" id="readinessRetrainStatusText">
+              <i class="fas fa-sync-alt fa-spin me-1"></i> Running ML Training Pipeline...
+            </span>
+            <span class="small text-muted" id="readinessRetrainPercent">0%</span>
+          </div>
+          <div class="progress mb-3" style="height: 8px; border-radius: 4px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="readinessRetrainProgressBar" role="progressbar" style="width: 0%;"></div>
+          </div>
+
+          <div class="pipeline-steps-wrap">
+            <div class="pipeline-step" id="pipeStep1">
+              <i class="fas fa-circle-notch text-muted" id="pipeIcon1"></i>
+              <span>1. Ingesting operational snapshots &amp; recording latest troop state</span>
+            </div>
+            <div class="pipeline-step" id="pipeStep2">
+              <i class="fas fa-circle-notch text-muted" id="pipeIcon2"></i>
+              <span>2. Extracting 19 time-aligned operational feature vectors</span>
+            </div>
+            <div class="pipeline-step" id="pipeStep3">
+              <i class="fas fa-circle-notch text-muted" id="pipeIcon3"></i>
+              <span>3. Performing stratified 80/20 train-test separation</span>
+            </div>
+            <div class="pipeline-step" id="pipeStep4">
+              <i class="fas fa-circle-notch text-muted" id="pipeIcon4"></i>
+              <span>4. Training &amp; cross-evaluating Logistic Regression, Random Forest, Gradient Boosting</span>
+            </div>
+            <div class="pipeline-step" id="pipeStep5">
+              <i class="fas fa-circle-notch text-muted" id="pipeIcon5"></i>
+              <span>5. Exporting champion model artifacts &amp; reloading live inference cache</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Display Box (Hidden by default) -->
+        <div id="readinessRetrainResultsBox" style="display: none;" class="mb-3">
+          <div class="alert alert-success border-success d-flex align-items-center gap-3 p-3 rounded-3 mb-3">
+            <i class="fas fa-check-circle fa-2x text-success"></i>
+            <div>
+              <div class="fw-bold" style="font-size: 0.95rem;">Model Retraining Complete!</div>
+              <div class="small" id="lblRetrainSuccessMsg">Champion model selected and active for live predictions.</div>
+            </div>
+          </div>
+
+          <!-- Comparison Table -->
+          <div class="table-responsive">
+            <table class="table table-sm table-bordered text-center align-middle" style="font-size: 0.82rem;">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-start">Candidate Model</th>
+                  <th>Accuracy</th>
+                  <th>Precision</th>
+                  <th>Recall</th>
+                  <th>F1 Score</th>
+                  <th>ROC-AUC</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tblRetrainModelResults">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Quick Navigation Links -->
+          <div class="d-flex gap-2 justify-content-end mt-3">
+            <a href="/ai-company-readiness/company/HQ COY/prediction" class="btn btn-sm btn-primary">
+              <i class="fas fa-brain me-1"></i> View Live HQ COY Prediction
+            </a>
+            <a href="/ai-company-readiness" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-shield-alt me-1"></i> Open Readiness Dashboard
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer border-top py-2.5 px-4" style="background: var(--nav-link-hover-bg, #f8fafc);">
+        <button type="button" class="btn btn-outline-secondary btn-sm px-3" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success btn-sm fw-bold px-4 py-2 shadow-sm" id="btnExecuteReadinessRetrain" onclick="executeReadinessRetrain()">
+          <i class="fas fa-sync-alt me-1" id="iconExecuteReadinessRetrain"></i> Retrain AI Model Now
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/**
+ * AI Company Readiness Model Retraining Controller
+ */
+async function openReadinessRetrainModal() {
+  const modalEl = document.getElementById('aiCompanyReadinessRetrainModal');
+  if (!modalEl) {
+    console.warn('aiCompanyReadinessRetrainModal element not found');
+    return;
+  }
+
+  // Open modal via bootstrap
+  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+    modal.show();
+  } else {
+    modalEl.classList.add('show');
+    modalEl.style.display = 'block';
+  }
+
+  // Fetch current retrain status
+  fetchReadinessRetrainStatus();
+}
+
+async function fetchReadinessRetrainStatus() {
+  try {
+    const res = await fetch('/ai-company-readiness/api/retrain-status');
+    const json = await res.json();
+    if (json.success && json.data) {
+      const d = json.data;
+      const snapEl = document.getElementById('lblRetrainSnapshots');
+      const champEl = document.getElementById('lblRetrainChampion');
+      const f1El = document.getElementById('lblRetrainF1');
+      const trainedEl = document.getElementById('lblRetrainTrainedAt');
+      const verEl = document.getElementById('lblRetrainVersion');
+
+      if (snapEl) snapEl.textContent = `${d.snapshot_count} Snapshots`;
+      if (champEl) champEl.textContent = d.champion_model || 'Random Forest';
+      if (f1El) f1El.textContent = d.best_f1 ? `Best F1: ${(d.best_f1 * 100).toFixed(1)}%` : 'Best F1: --';
+      if (verEl) verEl.textContent = `Version: ${d.model_version || 'v1.0'}`;
+      
+      if (trainedEl) {
+        if (d.trained_at) {
+          const dt = new Date(d.trained_at);
+          trainedEl.textContent = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        } else {
+          trainedEl.textContent = 'Active Baseline';
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('Error fetching retrain status:', err);
+  }
+}
+
+async function executeReadinessRetrain() {
+  const btn = document.getElementById('btnExecuteReadinessRetrain');
+  const icon = document.getElementById('iconExecuteReadinessRetrain');
+  const progressBox = document.getElementById('readinessRetrainProgressBox');
+  const resultsBox = document.getElementById('readinessRetrainResultsBox');
+  const bar = document.getElementById('readinessRetrainProgressBar');
+  const pct = document.getElementById('readinessRetrainPercent');
+  const statusTxt = document.getElementById('readinessRetrainStatusText');
+
+  if (btn) btn.disabled = true;
+  if (icon) icon.className = 'fas fa-sync-alt fa-spin me-1';
+  if (resultsBox) resultsBox.style.display = 'none';
+  if (progressBox) progressBox.style.display = 'block';
+
+  // Step helper
+  function setStep(stepNum, percent, text) {
+    if (bar) bar.style.width = percent + '%';
+    if (pct) pct.textContent = percent + '%';
+    if (statusTxt) statusTxt.innerHTML = `<i class="fas fa-sync-alt fa-spin me-1"></i> ${text}`;
+
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('pipeStep' + i);
+      const ic = document.getElementById('pipeIcon' + i);
+      if (!el || !ic) continue;
+
+      if (i < stepNum) {
+        el.className = 'pipeline-step step-done';
+        ic.className = 'fas fa-check-circle text-primary';
+      } else if (i === stepNum) {
+        el.className = 'pipeline-step step-active';
+        ic.className = 'fas fa-spinner fa-spin text-success';
+      } else {
+        el.className = 'pipeline-step';
+        ic.className = 'fas fa-circle-notch text-muted';
+      }
+    }
+  }
+
+  setStep(1, 15, 'Ingesting formation snapshots...');
+
+  try {
+    setTimeout(() => setStep(2, 35, 'Extracting 19 operational features...'), 400);
+    setTimeout(() => setStep(3, 55, 'Performing stratified 80/20 train/test split...'), 800);
+    setTimeout(() => setStep(4, 75, 'Training Logistic Regression, Random Forest, Gradient Boosting...'), 1200);
+
+    const res = await fetch('/ai-company-readiness/api/retrain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ force: true, version: 'v1.1' })
+    });
+
+    const result = await res.json();
+
+    setStep(5, 95, 'Exporting champion artifacts...');
+    await new Promise(r => setTimeout(r, 400));
+
+    if (bar) bar.style.width = '100%';
+    if (pct) pct.textContent = '100%';
+    if (statusTxt) statusTxt.innerHTML = `<i class="fas fa-check text-success me-1"></i> Retraining Finished!`;
+
+    // Mark step 5 done
+    const s5 = document.getElementById('pipeStep5');
+    const ic5 = document.getElementById('pipeIcon5');
+    if (s5) s5.className = 'pipeline-step step-done';
+    if (ic5) ic5.className = 'fas fa-check-circle text-primary';
+
+    if (result.success) {
+      setTimeout(() => {
+        if (progressBox) progressBox.style.display = 'none';
+        if (resultsBox) resultsBox.style.display = 'block';
+
+        const successMsg = document.getElementById('lblRetrainSuccessMsg');
+        if (successMsg) {
+          successMsg.textContent = `Retrained on ${result.sample_count} snapshots. Active Champion Model: ${result.best_model}`;
+        }
+
+        // Populate comparison table
+        const tbody = document.getElementById('tblRetrainModelResults');
+        if (tbody && result.results) {
+          tbody.innerHTML = '';
+          const best = result.best_model;
+
+          for (const [modelName, m] of Object.entries(result.results)) {
+            const isBest = (modelName === best);
+            const tr = document.createElement('tr');
+            if (isBest) tr.className = 'table-success fw-bold';
+
+            tr.innerHTML = `
+              <td class="text-start">
+                ${isBest ? '<i class="fas fa-crown text-warning me-1"></i>' : ''}
+                ${modelName}
+              </td>
+              <td>${(m.accuracy * 100).toFixed(1)}%</td>
+              <td>${(m.precision * 100).toFixed(1)}%</td>
+              <td>${(m.recall * 100).toFixed(1)}%</td>
+              <td class="text-success">${(m.f1_score * 100).toFixed(1)}%</td>
+              <td>${m.roc_auc !== 'N/A' ? (m.roc_auc * 100).toFixed(1) + '%' : 'N/A'}</td>
+              <td>
+                <span class="badge ${isBest ? 'bg-success' : 'bg-secondary'}">
+                  ${isBest ? 'CHAMPION' : 'Evaluated'}
+                </span>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          }
+        }
+
+        // Refresh top stats
+        fetchReadinessRetrainStatus();
+      }, 500);
+
+    } else {
+      alert('Retraining Failed: ' + (result.message || result.error || 'Unknown error'));
+      if (progressBox) progressBox.style.display = 'none';
+    }
+
+  } catch (err) {
+    console.error('Error during retrain:', err);
+    alert('Error executing retraining: ' + err.message);
+    if (progressBox) progressBox.style.display = 'none';
+  } finally {
+    if (btn) btn.disabled = false;
+    if (icon) icon.className = 'fas fa-sync-alt me-1';
+  }
+}
+</script>

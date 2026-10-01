@@ -57,5 +57,45 @@ class TestPredictionService(unittest.TestCase):
             self.assertIsNone(pred.confidence, "Confidence must be None when model is under development")
 
 
+    def test_extract_features_from_snapshot(self):
+        """Verifies snapshot dictionary converts to all 19 feature columns."""
+        from aiml.ai_company_readiness.feature_engineering import extract_features_from_snapshot
+        snapshot = {
+            "company": "HQ COY",
+            "actual_strength": 100,
+            "required_strength": 110,
+            "onleave_count": 10,
+            "detachment_count": 4,
+            "td_count": 2,
+            "oncourse_count": 3,
+            "available_strength": 81,
+            "unfit_count": 5,
+            "trade_score": 90.0,
+            "qualification_score": 85.0,
+            "course_score": 80.0,
+            "fitness_score": 88.0
+        }
+        feats = extract_features_from_snapshot(snapshot)
+        for col in FEATURE_COLUMNS:
+            self.assertIn(col, feats, f"Missing feature column: {col}")
+        self.assertEqual(feats["company_hq"], 1.0)
+        self.assertEqual(feats["company_comn"], 0.0)
+        self.assertEqual(feats["company_3coy"], 0.0)
+        self.assertAlmostEqual(feats["leave_rate"], 0.10)
+
+    def test_training_pipeline_success(self):
+        """Tests that compare_and_train completes successfully when sample count >= MIN_TRAINING_SAMPLES."""
+        # 60 samples >= 50 MIN_TRAINING_SAMPLES
+        X = pd.DataFrame(np.random.rand(60, len(FEATURE_COLUMNS)), columns=FEATURE_COLUMNS)
+        y = pd.Series([1 if i % 2 == 0 else 0 for i in range(60)])
+
+        result = self.trainer.compare_and_train(X, y, model_version="v_test")
+        self.assertTrue(result["success"])
+        self.assertEqual(result["status"], "TRAINED")
+        self.assertIn(result["best_model"], ["Logistic Regression", "Random Forest", "Gradient Boosting"])
+        self.assertIn("evaluation_metrics", result["metadata"])
+
+
 if __name__ == "__main__":
     unittest.main()
+

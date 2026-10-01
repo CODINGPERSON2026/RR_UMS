@@ -39,6 +39,12 @@
       </div>
 
       <div class="d-flex gap-2">
+        {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+        {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
+        <button type="button" class="btn btn-outline-success" id="btnPredictionRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness">
+          <i class="fas fa-sync-alt me-1"></i> Retrain AI Model
+        </button>
+        {% endif %}
         <a href="/ai-company-readiness/company/{{ company }}" class="btn btn-outline-secondary">
           <i class="fas fa-arrow-left"></i> Back to Company
         </a>
@@ -115,6 +121,14 @@
       <div class="text-muted small">
         <strong>Anti-Fabrication Principle:</strong> Per UMS engineering standards, deterministic rules (<code>required - actual</code>) are never falsely branded as Machine Learning. The snapshot recording pipeline is active, and multi-model training (Logistic Regression, Random Forest, Gradient Boosting) will trigger once sufficient operational snapshots are accumulated.
       </div>
+      {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
+      <div class="mt-3">
+        <button type="button" class="btn btn-sm btn-warning text-dark fw-bold" onclick="openReadinessRetrainModal()">
+          <i class="fas fa-sync-alt me-1"></i> Retrain AI Model Now
+        </button>
+      </div>
+      {% endif %}
     </div>
   </div>
   {% endif %}
@@ -179,4 +193,6 @@
   </div>
 
 </div>
+
+{% include 'modals/ai_company_readiness_retrain_modal.html' %}
 {% endblock %}
