@@ -1,5 +1,5 @@
 """
-Controlled Test Suite for Retrained AI New Joinee Recommendation Model
+Controlled Test Suite for Retrained AI NEW ARRIVAL RECOMMENDATION Model
 Tests 1 to 7 + Anti-Copy Test as required by specifications.
 Demonstrates probability shifts and candidate re-ranking driven strictly by historical data.
 """
@@ -17,7 +17,7 @@ from aiml.ai_new_joinee_recommendation.recommendation import recommend_placement
 
 def run_all_controlled_tests():
     print("=" * 80)
-    print("CONTROLLED TEST SUITE: RETRAINED AI NEW JOINEE RECOMMENDATION MODEL")
+    print("CONTROLLED TEST SUITE: RETRAINED AI NEW ARRIVAL RECOMMENDATION MODEL")
     print("=" * 80)
 
     # -------------------------------------------------------------

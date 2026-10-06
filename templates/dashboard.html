@@ -437,11 +437,11 @@
     <!-- ===== ACTION BAR ===== -->
     <div class="action-bar" id="actionBar">
 
-      <!-- AI New Joinee Posting Recommendation Button — visible only to predicting roles (1coyonco, 2coyonco) -->
+      <!--  Joinee Posting Recommendation Button — visible only to predicting roles (1coyonco, 2coyonco) -->
       {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
-      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();" title="AI New Joinee Posting Recommendation &amp; Hierarchical Allocation">
-        AI NEW JOINEE RECOMMENDATION
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="AI New#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();" title="AI New Joinee Posting Recommendation &amp; Hierarchical Allocation">
+        AI NEW ARRIVAL RECOMMENDATION
       </button>
       {% endif %}
 

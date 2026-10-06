@@ -40,7 +40,7 @@
 
 </style>
 
-<!-- AI New Joinee Recommendation Insights Modal for CO / Adjutant / 2IC -->
+<!-- AI NEW ARRIVAL RECOMMENDATION Insights Modal for CO / Adjutant / 2IC -->
 <div class="modal fade" id="aiJoineeInsightsModal" aria-labelledby="aiJoineeInsightsModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-focus="false" data-focus="false">
   <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 96vw; width: 1480px; margin: 1.5rem auto;">
     <div class="modal-content border-0 shadow-lg" style="border-radius: 14px; overflow: hidden; background: #f8fafc;">
@@ -53,7 +53,7 @@
           </div>
           <div>
             <h5 class="modal-title fw-bold mb-0 text-white" id="aiJoineeInsightsModalLabel" style="letter-spacing: -0.3px;">
-              AI New Joinee Recommendation Insights (Unit 15 CESR)
+              AI NEW ARRIVAL RECOMMENDATION Insights (Unit 15 CESR)
             </h5>
             <p class="text-white-50 mb-0 small" style="font-size: 0.82rem;">
               Executive allocation intelligence and posting decisions for CO / Adjutant / 2IC.
@@ -164,7 +164,7 @@
           </div>
           <h6 class="text-dark fw-bold mb-1">No AI Recommendations Found</h6>
           <p class="text-muted small mb-3" style="max-width: 440px; margin: 0 auto;">
-            Recommendations will appear here after personnel are evaluated by the AI New Joinee Recommendation system or when filters match records.
+            Recommendations will appear here after personnel are evaluated by the AI NEW ARRIVAL RECOMMENDATION system or when filters match records.
           </p>
           <button class="btn btn-sm btn-primary px-3" onclick="resetInsightsFilters()">
             <i class="fas fa-undo me-1"></i> Reset Filters
@@ -400,7 +400,7 @@
             <i class="fas fa-brain text-warning"></i>
           </div>
           <div>
-            <h6 class="modal-title fw-bold mb-0 text-white" id="aiInsightDetailModalLabel" style="letter-spacing: 0.2px;">AI NEW JOINEE RECOMMENDATION</h6>
+            <h6 class="modal-title fw-bold mb-0 text-white" id="aiInsightDetailModalLabel" style="letter-spacing: 0.2px;">AI NEW ARRIVAL RECOMMENDATION</h6>
             <span class="text-white-50 small" id="detailModalSubtitle" style="font-size: 0.78rem;">Unit 15 CESR Placement Oversight &amp; Decision</span>
           </div>
         </div>
@@ -591,7 +591,7 @@
 
 <script>
   // =========================================================================
-  // AI NEW JOINEE RECOMMENDATION INSIGHTS CLIENT JAVASCRIPT
+  // AI NEW ARRIVAL RECOMMENDATION INSIGHTS CLIENT JAVASCRIPT
   // =========================================================================
 
   let currentInsightsPage = 1;
@@ -775,7 +775,7 @@
             ? 'No AI Recommendations Yet'
             : 'No Results Match Filters';
           if (emptyDesc) emptyDesc.textContent = json.total_count === 0
-            ? 'Recommendations will appear here after personnel are evaluated by the AI New Joinee Recommendation system.'
+            ? 'Recommendations will appear here after personnel are evaluated by the AI NEW ARRIVAL RECOMMENDATION system.'
             : 'Try adjusting the search or filters to find records.';
           if (emptyState) emptyState.classList.remove('d-none');
         }

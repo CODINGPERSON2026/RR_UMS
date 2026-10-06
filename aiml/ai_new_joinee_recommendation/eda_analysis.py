@@ -1,5 +1,5 @@
 """
-Exploratory Data Analysis (EDA) Script for AI New Joinee Recommendation
+Exploratory Data Analysis (EDA) Script for AI NEW ARRIVAL RECOMMENDATION
 Analyzes historical database relationships across Company, Section, Trade, Rank, Postings, and Duties.
 """
 

@@ -1,5 +1,5 @@
 """
-Flask Blueprint & REST API Routes for AI New Joinee Recommendation (Unit 15 CESR)
+Flask Blueprint & REST API Routes for AI NEW ARRIVAL RECOMMENDATION (Unit 15 CESR)
 Enforces Hierarchical Placement, Role-Based Access Control (CO, Adjutant, 2IC),
 and Trade-Free Supervised Recommendation Pipeline.
 """

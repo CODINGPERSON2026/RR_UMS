@@ -82,11 +82,13 @@ def attach_present_month_info(cursor, rows):
                 elif row.get('oncourse_status'): st = 'C'
                 elif row.get('td_status'): st = 'TD'
                 else: st = 'P'
-            else:
-                if row.get('detachment_status') and cur_d <= today_date: st = 'DET'
-                elif row.get('oncourse_status') and cur_d <= today_date: st = 'C'
-                elif row.get('td_status') and cur_d <= today_date: st = 'TD'
+            elif cur_d < today_date:
+                if row.get('detachment_status'): st = 'DET'
+                elif row.get('oncourse_status'): st = 'C'
+                elif row.get('td_status'): st = 'TD'
                 else: st = 'P'
+            else:
+                st = ''
             daily_sheet[str(d)] = st
         row['daily_sheet'] = daily_sheet
         row['num_days_in_month'] = num_days
@@ -541,14 +543,15 @@ def get_monthly_sheet():
                     else: 
                         status = 'P'
                         total_present += 1
-                else:
-                    if p.get('detachment_status') and cur_d <= today_date: status = 'DET'
-                    elif p.get('oncourse_status') and cur_d <= today_date: status = 'C'
-                    elif p.get('td_status') and cur_d <= today_date: status = 'TD'
+                elif cur_d < today_date:
+                    if p.get('detachment_status'): status = 'DET'
+                    elif p.get('oncourse_status'): status = 'C'
+                    elif p.get('td_status'): status = 'TD'
                     else: 
                         status = 'P'
-                        if cur_d <= today_date:
-                            total_present += 1
+                        total_present += 1
+                else:
+                    status = ''
                 
                 daily_sheet[str(d)] = status
 

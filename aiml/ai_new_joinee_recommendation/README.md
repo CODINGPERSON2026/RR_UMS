@@ -1,4 +1,4 @@
-# AI New Joinee Recommendation (Unit 15 CESR)
+# AI NEW ARRIVAL RECOMMENDATION (Unit 15 CESR)
 
 A production-grade, two-stage AI/ML recommendation engine for placement and appointment allocation of new joinees within Unit 15 CESR.
 

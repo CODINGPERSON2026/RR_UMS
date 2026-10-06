@@ -1,5 +1,5 @@
 """
-Comprehensive Statistical & Exploratory Data Analysis for AI New Joinee Recommendation
+Comprehensive Statistical & Exploratory Data Analysis for AI NEW ARRIVAL RECOMMENDATION
 Analyzes both the real MySQL database tables (personnel, units_served) and the historical CSV datasets.
 Calculates empirical transition distributions and pattern combinations.
 """
@@ -19,7 +19,7 @@ from db_config import get_db_connection
 
 def run_comprehensive_eda():
     print("=" * 80)
-    print("AI NEW JOINEE RECOMMENDATION: COMPREHENSIVE DATA & PATTERN ANALYSIS")
+    print("AI NEW ARRIVAL RECOMMENDATION: COMPREHENSIVE DATA & PATTERN ANALYSIS")
     print("=" * 80)
 
     # -------------------------------------------------------------

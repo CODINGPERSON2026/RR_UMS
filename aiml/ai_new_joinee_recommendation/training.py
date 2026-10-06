@@ -66,7 +66,7 @@ def run_training_pipeline(force_retrain: bool = True) -> Dict[str, Any]:
     Executes full multi-stage pattern model training, evaluation, comparison, and artifact export.
     """
     print("=" * 70)
-    print("STARTING AI NEW JOINEE RECOMMENDATION RETRAINING PIPELINE")
+    print("STARTING AI NEW ARRIVAL RECOMMENDATION RETRAINING PIPELINE")
     print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 70)
 
