@@ -9,11 +9,126 @@ import mysql.connector
 from .utils import get_db_company_variants, normalize_company_name
 
 
+_TABLES_ENSURED = False
+
+
+def ensure_company_readiness_tables(conn) -> None:
+    """
+    Auto-creates `ai_company_requirements` and `ai_company_readiness_history` tables
+    if they do not exist, and seeds default baseline requirements if empty.
+    """
+    global _TABLES_ENSURED
+    if _TABLES_ENSURED:
+        return
+
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS ai_company_requirements (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                company VARCHAR(100) NOT NULL,
+                requirement_type VARCHAR(100) NOT NULL,
+                requirement_name VARCHAR(255) NOT NULL,
+                required_count INT NOT NULL DEFAULT 0,
+                priority VARCHAR(50) DEFAULT 'Medium',
+                status VARCHAR(20) DEFAULT 'Active',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+                INDEX idx_company (company),
+                INDEX idx_requirement_type (requirement_type),
+                INDEX idx_status (status)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        """)
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS ai_company_readiness_history (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                company VARCHAR(100) NOT NULL,
+                snapshot_date DATE NOT NULL,
+                strength_score FLOAT NOT NULL,
+                qualification_score FLOAT NOT NULL,
+                course_score FLOAT NOT NULL,
+                trade_score FLOAT NOT NULL,
+                fitness_score FLOAT NOT NULL,
+                medical_score FLOAT NOT NULL,
+                availability_score FLOAT NOT NULL,
+                overall_readiness FLOAT NOT NULL,
+                main_gap_type VARCHAR(100),
+                gap_count INT DEFAULT 0,
+                actual_strength INT DEFAULT 0,
+                required_strength INT DEFAULT 0,
+                available_strength INT DEFAULT 0,
+                unfit_count INT DEFAULT 0,
+                onleave_count INT DEFAULT 0,
+                detachment_count INT DEFAULT 0,
+                td_count INT DEFAULT 0,
+                oncourse_count INT DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                INDEX idx_comp_date (company, snapshot_date),
+                INDEX idx_company_hist (company)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        """)
+        conn.commit()
+
+        # Check if ai_company_requirements has data
+        cursor.execute("SELECT COUNT(*) FROM ai_company_requirements")
+        row = cursor.fetchone()
+        count = row[0] if isinstance(row, (tuple, list)) else 0
+
+        if count == 0:
+            seed_data = [
+                # HQ COY
+                ("HQ COY", "Strength", "Total Personnel", 100, "Critical", "Active"),
+                ("HQ COY", "Trade", "TTC", 40, "High", "Active"),
+                ("HQ COY", "Trade", "LMN", 20, "High", "Active"),
+                ("HQ COY", "Trade", "EFS", 15, "Medium", "Active"),
+                ("HQ COY", "Trade", "OCC", 10, "Medium", "Active"),
+                ("HQ COY", "Trade", "CLK SD", 10, "High", "Active"),
+                ("HQ COY", "Qualification", "12th", 80, "Medium", "Active"),
+                ("HQ COY", "Qualification", "Graduation", 20, "Low", "Active"),
+                ("HQ COY", "Course", "TTC CL I", 15, "High", "Active"),
+                ("HQ COY", "Course", "Signals", 25, "Medium", "Active"),
+
+                # COMN COY
+                ("COMN COY", "Strength", "Total Personnel", 120, "Critical", "Active"),
+                ("COMN COY", "Trade", "TTC", 50, "High", "Active"),
+                ("COMN COY", "Trade", "LMN", 35, "High", "Active"),
+                ("COMN COY", "Trade", "EFS", 20, "Medium", "Active"),
+                ("COMN COY", "Trade", "OCC", 15, "Medium", "Active"),
+                ("COMN COY", "Qualification", "12th", 90, "Medium", "Active"),
+                ("COMN COY", "Course", "TTC CL I", 20, "High", "Active"),
+                ("COMN COY", "Course", "Signals", 40, "High", "Active"),
+
+                # 3 COY
+                ("3 COY", "Strength", "Total Personnel", 110, "Critical", "Active"),
+                ("3 COY", "Trade", "TTC", 45, "High", "Active"),
+                ("3 COY", "Trade", "LMN", 25, "High", "Active"),
+                ("3 COY", "Trade", "EFS", 15, "Medium", "Active"),
+                ("3 COY", "Qualification", "12th", 85, "Medium", "Active"),
+                ("3 COY", "Course", "TTC CL I", 15, "High", "Active"),
+            ]
+            insert_stmt = """
+                INSERT INTO ai_company_requirements (company, requirement_type, requirement_name, required_count, priority, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cursor.executemany(insert_stmt, seed_data)
+            conn.commit()
+
+        _TABLES_ENSURED = True
+    except Exception as err:
+        print(f"[AI Company Readiness] Error in ensure_company_readiness_tables: {err}")
+    finally:
+        cursor.close()
+
+
 def fetch_company_requirements(conn, canonical_company: str) -> List[Dict[str, Any]]:
     """
     Fetches active requirements for the specified company.
     Queries ai_company_requirements matching the canonical company name.
     """
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor(dictionary=True)
     query = """
         SELECT id, company, requirement_type, requirement_name, required_count, priority, status
@@ -31,6 +146,7 @@ def fetch_company_requirements(conn, canonical_company: str) -> List[Dict[str, A
 
 def fetch_all_active_requirements(conn) -> List[Dict[str, Any]]:
     """Fetches all active baseline requirements across companies."""
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor(dictionary=True)
     query = """
         SELECT id, company, requirement_type, requirement_name, required_count, priority, status
@@ -109,6 +225,7 @@ def fetch_personnel_weight_info(conn, army_numbers: List[str]) -> Dict[str, Dict
 
 def insert_readiness_snapshot(conn, data: Dict[str, Any]) -> int:
     """Inserts a calculated readiness snapshot into ai_company_readiness_history."""
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor()
     query = """
         INSERT INTO ai_company_readiness_history (
@@ -134,6 +251,7 @@ def insert_readiness_snapshot(conn, data: Dict[str, Any]) -> int:
 
 def fetch_historical_snapshots(conn, canonical_company: Optional[str] = None, limit: int = 100) -> List[Dict[str, Any]]:
     """Fetches historical readiness snapshots ordered by date."""
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor(dictionary=True)
     if canonical_company:
         query = """
@@ -157,6 +275,7 @@ def fetch_historical_snapshots(conn, canonical_company: Optional[str] = None, li
 
 def upsert_requirement(conn, data: Dict[str, Any]) -> int:
     """Inserts or updates a requirement in ai_company_requirements."""
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor()
     req_id = data.get("id")
     if req_id:
@@ -190,6 +309,7 @@ def upsert_requirement(conn, data: Dict[str, Any]) -> int:
 
 def delete_requirement(conn, req_id: int) -> bool:
     """Deletes or archives a requirement from ai_company_requirements."""
+    ensure_company_readiness_tables(conn)
     cursor = conn.cursor()
     query = "DELETE FROM ai_company_requirements WHERE id = %s"
     cursor.execute(query, (req_id,))

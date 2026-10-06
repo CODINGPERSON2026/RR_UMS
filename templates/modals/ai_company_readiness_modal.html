@@ -352,6 +352,8 @@
     <div class="modal-content shadow-lg border-0" style="border-radius: 18px; overflow: hidden; background: var(--card-bg-solid, #ffffff);">
       
       {% set raw_role = role or (session.get('role') if session else '') %}
+      {% set r_clean = (raw_role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% set is_onco_retrain_role = r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'coyonco', 'onco', 'co', '2ic', 'adjutant', 'commandingofficer', 'admin', 'superadmin'] %}
       {% set current_role_display = raw_role|upper if raw_role else 'CO / 2IC / Adjutant' %}
 
       <!-- Modal Header -->
@@ -367,16 +369,11 @@
           </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-          {% set target_coy = 'HQ COY' %}
-          {% if 'comm' in (raw_role|lower) or 'comn' in (raw_role|lower) %}
-            {% set target_coy = 'COMN COY' %}
-          {% elif '3' in (raw_role|lower) %}
-            {% set target_coy = '3 COY' %}
+          {% if is_onco_retrain_role %}
+          <button type="button" class="btn btn-sm btn-outline-light text-white fw-bold px-3 py-1.5 d-flex align-items-center gap-2 shadow-sm" style="background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 8px; backdrop-filter: blur(4px); font-size: 0.82rem;" id="btnModalHeaderRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness">
+            <i class="fas fa-sync-alt me-1"></i> Retrain AI Model
+          </button>
           {% endif %}
-          <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="btn btn-sm text-white fw-bold px-3 py-1.5 d-flex align-items-center gap-2" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.45); border-radius: 8px; backdrop-filter: blur(4px); font-size: 0.82rem; text-decoration: none;" title="AI Company Readiness Prediction">
-            <i class="fas fa-brain"></i>
-            <span>AI Company Readiness Prediction</span>
-          </a>
           <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
@@ -561,11 +558,18 @@
               </button>
             </div>
           </div>
-          <div style="min-width: 260px;">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-transparent text-muted"><i class="fas fa-search"></i></span>
-              <input type="text" class="form-control" id="mSearchInput" placeholder="Search formation, gap, or trade...">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div style="min-width: 240px;">
+              <div class="input-group input-group-sm">
+                <span class="input-group-text bg-transparent text-muted"><i class="fas fa-search"></i></span>
+                <input type="text" class="form-control" id="mSearchInput" placeholder="Search formation, gap, or trade...">
+              </div>
             </div>
+            {% if is_onco_retrain_role %}
+            <button type="button" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 fw-semibold shadow-sm" id="btnModalBodyRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness" style="font-size: 0.78rem; border-radius: 8px; padding: 0.35rem 0.75rem;">
+              <i class="fas fa-sync-alt"></i> Retrain AI Model
+            </button>
+            {% endif %}
           </div>
         </div>
 
@@ -712,6 +716,15 @@
         if (!d) return;
         modalReadinessCache = d;
         window.modalReadinessCache = d;
+
+        if (d.summary && d.summary.average_readiness !== undefined) {
+          const valHtml = '<span class="text-primary fw-bold">' + d.summary.average_readiness + '%</span>';
+          ['co-readiness-val', 'dash-readiness-val'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = valHtml;
+          });
+        }
+
         const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
         renderModalReadiness(d, targetCoy, searchVal);
       })
@@ -725,6 +738,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    // Proactively pre-fetch readiness data on DOM load so cards update immediately
+    fetchAiCompanyReadinessData('all');
+
     const modalEl = document.getElementById('aiCompanyReadinessModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
@@ -854,9 +870,6 @@
               <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" onclick="openCompanyGapsDialog('${coyName}')" title="View ${coyName} Operational Gaps">
                 <i class="fas fa-search-plus me-1"></i>Gaps
               </button>
-              <a href="/ai-company-readiness/company/${encodeURIComponent(coyName)}/prediction" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View ${coyName} AI Readiness Prediction">
-                <i class="fas fa-brain me-1"></i>Prediction
-              </a>
             </div>
           </td>
           <td>
@@ -1043,9 +1056,6 @@
               <button type="button" class="btn btn-sm btn-outline-secondary flex-fill py-1" onclick="openCompanyGapsDialog('${coyName}')" style="font-size: 0.76rem;">
                 <i class="fas fa-search-plus me-1"></i>Gaps (${coy.all_gaps ? coy.all_gaps.length : 0})
               </button>
-              <a href="/ai-company-readiness/company/${encodeURIComponent(coyName)}/prediction" class="btn btn-sm btn-outline-info flex-fill py-1 text-center" style="font-size: 0.76rem;">
-                <i class="fas fa-brain me-1"></i>Prediction
-              </a>
             </div>
           </div>
         </div>
@@ -1512,7 +1522,17 @@
             r: {
               min: 0,
               max: 100,
-              ticks: { display: false, stepSize: 20 },
+              ticks: {
+                display: true,
+                stepSize: 20,
+                color: textColor,
+                font: { weight: '700', size: 10 },
+                showLabelBackdrop: true,
+                backdropColor: isDark ? 'rgba(30, 41, 59, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+                backdropPadding: { top: 1, bottom: 1, left: 4, right: 4 },
+                borderRadius: 4,
+                z: 10
+              },
               pointLabels: { color: textColor, font: { weight: '600', size: 11 } },
               grid: { color: gridColor },
               angleLines: { color: gridColor }

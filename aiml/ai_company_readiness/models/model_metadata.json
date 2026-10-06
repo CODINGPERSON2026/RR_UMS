@@ -1,8 +1,8 @@
 {
-  "model_version": "v_test",
-  "trained_at": "2026-10-01T19:40:27.425283",
-  "best_model": "Random Forest",
-  "sample_count": 60,
+  "model_version": "v1.1",
+  "trained_at": "2026-10-06T13:52:20.488378",
+  "best_model": "Logistic Regression",
+  "sample_count": 66,
   "feature_names": [
     "company_hq",
     "company_comn",
@@ -26,56 +26,56 @@
   ],
   "evaluation_metrics": {
     "Logistic Regression": {
-      "accuracy": 0.3333,
-      "precision": 0.3333,
-      "recall": 0.3333,
-      "f1_score": 0.3333,
-      "roc_auc": 0.3056,
+      "accuracy": 0.9286,
+      "precision": 0.875,
+      "recall": 1.0,
+      "f1_score": 0.9333,
+      "roc_auc": 0.9592,
       "confusion_matrix": [
         [
-          2,
-          4
+          6,
+          1
         ],
         [
-          4,
-          2
+          0,
+          7
         ]
       ]
     },
     "Random Forest": {
-      "accuracy": 0.5833,
-      "precision": 0.5714,
-      "recall": 0.6667,
-      "f1_score": 0.6154,
-      "roc_auc": 0.3333,
+      "accuracy": 0.9286,
+      "precision": 0.875,
+      "recall": 1.0,
+      "f1_score": 0.9333,
+      "roc_auc": 0.9796,
       "confusion_matrix": [
         [
-          3,
-          3
+          6,
+          1
         ],
         [
-          2,
-          4
+          0,
+          7
         ]
       ]
     },
     "Gradient Boosting": {
-      "accuracy": 0.3333,
-      "precision": 0.3333,
-      "recall": 0.3333,
-      "f1_score": 0.3333,
-      "roc_auc": 0.4444,
+      "accuracy": 0.8571,
+      "precision": 0.8571,
+      "recall": 0.8571,
+      "f1_score": 0.8571,
+      "roc_auc": 0.9184,
       "confusion_matrix": [
         [
-          2,
-          4
+          6,
+          1
         ],
         [
-          4,
-          2
+          1,
+          6
         ]
       ]
     }
   },
-  "best_f1": 0.6154
+  "best_f1": 0.9333
 }

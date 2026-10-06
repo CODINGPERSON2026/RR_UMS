@@ -21,7 +21,8 @@ from .queries import (
     fetch_personnel_courses,
     fetch_personnel_weight_info,
     insert_readiness_snapshot,
-    fetch_historical_snapshots
+    fetch_historical_snapshots,
+    ensure_company_readiness_tables
 )
 from .readiness_engine import ReadinessEngine
 from .recommendation_engine import RecommendationEngine
@@ -262,6 +263,7 @@ class CompanyReadinessService:
             return {"success": False, "error": "Database connection failed"}
 
         try:
+            ensure_company_readiness_tables(conn)
             cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT COUNT(*) AS snapshot_count FROM ai_company_readiness_history")
             row = cursor.fetchone() or {}
@@ -301,6 +303,7 @@ class CompanyReadinessService:
             return {"success": False, "error": "Database connection failed"}
 
         try:
+            ensure_company_readiness_tables(conn)
             # 1. Capture current live operational snapshot
             try:
                 self.record_current_snapshots()

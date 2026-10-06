@@ -1555,20 +1555,23 @@
           if (healthyEl) healthyEl.textContent = s.healthy_count || 0;
           if (needsEl) needsEl.textContent = s.needs_improvement_count || 0;
           if (riskEl) riskEl.textContent = s.at_risk_count || 0;
-         fetch('/ai-company-readiness/api/dashboard')
+        }
+      });
+    {% endif %}
+
+    fetch('/ai-company-readiness/api/dashboard')
       .then(function(res) { return res.ok ? res.json() : null; })
       .then(function(data) {
         var d = data ? (data.dashboard || data.data) : null;
         if (d) {
           window.modalReadinessCache = d;
-          var cardVal = document.getElementById('dash-readiness-val');
-          if (cardVal && d.summary) {
+          var cardVal = document.getElementById('dash-readiness-val') || document.getElementById('co-readiness-val');
+          if (cardVal && d.summary && d.summary.average_readiness !== undefined) {
             cardVal.innerHTML = '<span class="text-primary fw-bold">' + d.summary.average_readiness + '%</span>';
           }
         }
       })
       .catch(function(err) { console.warn('Could not load AI company readiness stats:', err); });
-    {% endif %}
   });
 
   window.addEventListener('themechange', function() {

@@ -452,15 +452,6 @@
       </div>
     </div>
     <div class="d-flex gap-2 flex-wrap align-items-center">
-      {% set target_coy = 'HQ COY' %}
-      {% if 'comm' in (role|lower) or 'comn' in (role|lower) %}
-        {% set target_coy = 'COMN COY' %}
-      {% elif '3' in (role|lower) %}
-        {% set target_coy = '3 COY' %}
-      {% endif %}
-      <a href="/ai-company-readiness/company/{{ target_coy }}/prediction" class="btn btn-primary d-inline-flex align-items-center gap-2 fw-semibold shadow-sm" title="AI Company Readiness Prediction">
-        <i class="fas fa-brain"></i> AI Company Readiness Prediction
-      </a>
       {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco', 'admin', 'superadmin'] %}
       <button type="button" class="btn btn-outline-success d-inline-flex align-items-center gap-2" id="btnHeaderRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness">
@@ -666,9 +657,6 @@
                     </a>
                     <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" class="btn btn-xs btn-outline-secondary py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="View Gaps">
                       <i class="fas fa-search-plus me-1"></i>Gaps
-                    </a>
-                    <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" class="btn btn-xs btn-outline-info py-0 px-2" style="font-size: 0.72rem; border-radius: 4px;" title="AI/ML Prediction">
-                      <i class="fas fa-brain me-1"></i>Prediction
                     </a>
                   </div>
                 </td>
@@ -900,9 +888,6 @@
           </a>
           <a href="/ai-company-readiness/company/{{ coy_name }}/gaps" class="btn-coy-action btn-outline-coy">
             <i class="fas fa-search-plus"></i> Gaps ({{ coy.all_gaps|length }})
-          </a>
-          <a href="/ai-company-readiness/company/{{ coy_name }}/prediction" class="btn-coy-action btn-outline-coy" title="AI/ML Prediction">
-            <i class="fas fa-brain"></i> Prediction
           </a>
         </div>
 
@@ -1323,7 +1308,17 @@ function renderMainChart(mode) {
           r: {
             min: 0,
             max: 100,
-            ticks: { display: false, stepSize: 20 },
+            ticks: {
+              display: true,
+              stepSize: 20,
+              color: theme.textSecondary || '#64748b',
+              font: { weight: '700', size: 10 },
+              showLabelBackdrop: true,
+              backdropColor: theme.cardBg || 'rgba(255, 255, 255, 0.85)',
+              backdropPadding: { top: 1, bottom: 1, left: 4, right: 4 },
+              borderRadius: 4,
+              z: 10
+            },
             pointLabels: {
               color: theme.text,
               font: { weight: '600', size: 11 }
