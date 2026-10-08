@@ -521,8 +521,10 @@ def api_get_reports():
     search_query = request.args.get("search", "").strip()
     company = request.args.get("company", "").strip()
     raw_status = request.args.get("status", "").strip()
-    # For CO, 2IC, Adjutant roles table: defaults strictly to Unfit
-    if raw_status:
+    # Explicit status handling: all, fit, unfit
+    if raw_status.lower() in ("all", "any"):
+        status = "all"
+    elif raw_status:
         status = raw_status
     elif not search_query:
         status = "Unfit"
@@ -641,7 +643,13 @@ def api_export_directory_pdf():
 
     search_query = request.args.get("search", "").strip()
     company = request.args.get("company", "").strip()
-    status = request.args.get("status", "").strip() or "Unfit"
+    raw_status = request.args.get("status", "").strip()
+    if raw_status.lower() in ("all", "any"):
+        status = "all"
+    elif raw_status:
+        status = raw_status
+    else:
+        status = "Unfit"
     from_date = request.args.get("from_date", "").strip() or None
     to_date = request.args.get("to_date", "").strip() or None
 
@@ -666,6 +674,8 @@ def api_export_directory_pdf():
             filter_labels.append("Fit Only (Combat Ready)")
         elif st_l in ('unfit', 'unfit only'):
             filter_labels.append("Unfit Only (Needs Imp / At Risk)")
+        elif st_l in ('all', 'any'):
+            filter_labels.append("All Personnel (Fit & Unfit)")
         else:
             filter_labels.append(status)
     if company and company.lower() != 'all':
@@ -679,7 +689,7 @@ def api_export_directory_pdf():
 
     raw_ip = request.headers.get('X-Forwarded-For', request.remote_addr or '127.0.0.1')
     client_ip = raw_ip.split(',')[0].strip() if raw_ip else '127.0.0.1'
-    timestamp_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
+    timestamp_str = datetime.now().strftime("%d/%m/%Y, %I:%M %p")
 
     template_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
     from jinja2 import Environment, FileSystemLoader

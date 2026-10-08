@@ -853,8 +853,10 @@ label.fw-bold {
             if (isManual) {
               dateStr = `Recorded in Year ${leave.year}`;
             } else {
-              const fromDate = new Date(leave.from_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-              const toDate = new Date(leave.to_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+              const fd = new Date(leave.from_date);
+              const td = new Date(leave.to_date);
+              const fromDate = !isNaN(fd.getTime()) ? `${String(fd.getDate()).padStart(2, '0')}/${String(fd.getMonth() + 1).padStart(2, '0')}/${fd.getFullYear()}` : leave.from_date;
+              const toDate = !isNaN(td.getTime()) ? `${String(td.getDate()).padStart(2, '0')}/${String(td.getMonth() + 1).padStart(2, '0')}/${td.getFullYear()}` : leave.to_date;
               dateStr = `${fromDate} <span style="color: #94a3b8; font-weight: 400; margin: 0 5px;">→</span> ${toDate}`;
             }
 

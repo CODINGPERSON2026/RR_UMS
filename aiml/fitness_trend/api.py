@@ -63,7 +63,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         if saved and saved.get('prediction_result') and saved.get('recommendations') and saved.get('progression_prediction'):
             logger.info(f"Loaded existing AI fitness report ID {saved.get('id')} from database for {clean_army_no}.")
             touch_fitness_report_timestamp(clean_army_no)
-            now_12hr = datetime.now().strftime('%d %b %Y, %I:%M %p')
+            now_12hr = datetime.now().strftime('%d/%m/%Y, %I:%M %p')
             saved['generated_at_str'] = now_12hr
             saved['date_time_12hr'] = now_12hr
             soldier_features = _reconstruct_soldier_features(saved)
@@ -137,7 +137,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         'model_version': prediction.get('model_version', 'v1')
     }
     report_id = insert_or_update_ai_fitness_report(report_payload)
-    now_12hr = datetime.now().strftime('%d %b %Y, %I:%M %p')
+    now_12hr = datetime.now().strftime('%d/%m/%Y, %I:%M %p')
 
     return {
         'success': True,

@@ -302,7 +302,7 @@ def sync_dues_in_recommendations(cursor=None, conn=None) -> int:
             move_str = ""
             if date_of_move:
                 try:
-                    move_str = date_of_move.strftime("%d-%m-%Y") if hasattr(date_of_move, "strftime") else str(date_of_move)
+                    move_str = date_of_move.strftime("%d/%m/%Y") if hasattr(date_of_move, "strftime") else str(date_of_move)
                 except Exception:
                     move_str = str(date_of_move)
 
@@ -508,13 +508,13 @@ def api_lookup_personnel():
                 f_date = ""
                 if u.get("from_date"):
                     try:
-                        f_date = u["from_date"].strftime("%d-%m-%Y") if hasattr(u["from_date"], "strftime") else str(u["from_date"])
+                        f_date = u["from_date"].strftime("%d/%m/%Y") if hasattr(u["from_date"], "strftime") else str(u["from_date"])
                     except Exception:
                         f_date = str(u["from_date"])
                 t_date = ""
                 if u.get("to_date"):
                     try:
-                        t_date = u["to_date"].strftime("%d-%m-%Y") if hasattr(u["to_date"], "strftime") else str(u["to_date"])
+                        t_date = u["to_date"].strftime("%d/%m/%Y") if hasattr(u["to_date"], "strftime") else str(u["to_date"])
                     except Exception:
                         t_date = str(u["to_date"])
                 units_list.append({
@@ -538,7 +538,7 @@ def api_lookup_personnel():
                     m_date = ""
                     if d.get("date_of_move"):
                         try:
-                            m_date = d["date_of_move"].strftime("%d-%m-%Y") if hasattr(d["date_of_move"], "strftime") else str(d["date_of_move"])
+                            m_date = d["date_of_move"].strftime("%d/%m/%Y") if hasattr(d["date_of_move"], "strftime") else str(d["date_of_move"])
                         except Exception:
                             m_date = str(d["date_of_move"])
                     units_list.append({
@@ -621,7 +621,7 @@ def api_lookup_personnel():
                 m_date = ""
                 if d_row.get("date_of_move"):
                     try:
-                        m_date = d_row["date_of_move"].strftime("%d-%m-%Y") if hasattr(d_row["date_of_move"], "strftime") else str(d_row["date_of_move"])
+                        m_date = d_row["date_of_move"].strftime("%d/%m/%Y") if hasattr(d_row["date_of_move"], "strftime") else str(d_row["date_of_move"])
                     except Exception:
                         m_date = str(d_row["date_of_move"])
 
@@ -652,7 +652,7 @@ def api_lookup_personnel():
             enroll_str = ""
             if row.get("date_of_enrollment"):
                 try:
-                    enroll_str = row["date_of_enrollment"].strftime("%d-%m-%Y") if hasattr(row["date_of_enrollment"], "strftime") else str(row["date_of_enrollment"])
+                    enroll_str = row["date_of_enrollment"].strftime("%d/%m/%Y") if hasattr(row["date_of_enrollment"], "strftime") else str(row["date_of_enrollment"])
                 except Exception:
                     enroll_str = str(row["date_of_enrollment"])
 
@@ -750,8 +750,8 @@ def api_search_personnel():
             u_rows = cursor.fetchall() or []
             units = []
             for u in u_rows:
-                f_d = u["from_date"].strftime("%d-%m-%Y") if u.get("from_date") and hasattr(u["from_date"], "strftime") else str(u.get("from_date") or "")
-                t_d = u["to_date"].strftime("%d-%m-%Y") if u.get("to_date") and hasattr(u["to_date"], "strftime") else str(u.get("to_date") or "")
+                f_d = u["from_date"].strftime("%d/%m/%Y") if u.get("from_date") and hasattr(u["from_date"], "strftime") else str(u.get("from_date") or "")
+                t_d = u["to_date"].strftime("%d/%m/%Y") if u.get("to_date") and hasattr(u["to_date"], "strftime") else str(u.get("to_date") or "")
                 units.append({
                     "unit": (u.get("unit") or "").strip(),
                     "from_date": f_d,
@@ -775,7 +775,7 @@ def api_search_personnel():
             enroll_str = ""
             if r.get("date_of_enrollment"):
                 try:
-                    enroll_str = r["date_of_enrollment"].strftime("%d-%m-%Y") if hasattr(r["date_of_enrollment"], "strftime") else str(r["date_of_enrollment"])
+                    enroll_str = r["date_of_enrollment"].strftime("%d/%m/%Y") if hasattr(r["date_of_enrollment"], "strftime") else str(r["date_of_enrollment"])
                 except Exception:
                     enroll_str = str(r["date_of_enrollment"])
 
@@ -828,7 +828,7 @@ def api_search_personnel():
                 continue
             seen_army_nos.add(ano)
 
-            m_d = d["date_of_move"].strftime("%d-%m-%Y") if d.get("date_of_move") and hasattr(d["date_of_move"], "strftime") else str(d.get("date_of_move") or "")
+            m_d = d["date_of_move"].strftime("%d/%m/%Y") if d.get("date_of_move") and hasattr(d["date_of_move"], "strftime") else str(d.get("date_of_move") or "")
             d_units = []
             if d.get("unit"):
                 d_units.append({
@@ -892,14 +892,14 @@ def validate_date_field(val: Any, field_name: str, allow_future: bool = False, m
             pass
 
     if not parsed_dt:
-        return False, None, f"Invalid date format for {field_name} ('{val_str}'). Proper format is DD-MM-YYYY or YYYY-MM-DD."
+        return False, None, f"Invalid date format for {field_name} ('{val_str}'). Proper format is DD/MM/YYYY or YYYY-MM-DD."
 
     if parsed_dt.year < min_year:
         return False, None, f"{field_name} year ({parsed_dt.year}) must be {min_year} or later."
 
     today = date.today()
     if not allow_future and parsed_dt > today:
-        return False, None, f"{field_name} ({parsed_dt.strftime('%d-%m-%Y')}) exceeds current date ({today.strftime('%d-%m-%Y')}). Future dates are not allowed."
+        return False, None, f"{field_name} ({parsed_dt.strftime('%d/%m/%Y')}) exceeds current date ({today.strftime('%d/%m/%Y')}). Future dates are not allowed."
 
     return True, parsed_dt, ""
 
@@ -946,7 +946,7 @@ def api_predict_recommendation():
             if parsed_enroll_dt and parsed_birth_dt and (parsed_enroll_dt - parsed_birth_dt).days < (16 * 365):
                 return jsonify({
                     "success": False,
-                    "error": f"Date of Enrollment ({parsed_enroll_dt.strftime('%d-%m-%Y')}) must be at least 16 years after Date of Birth ({parsed_birth_dt.strftime('%d-%m-%Y')})."
+                    "error": f"Date of Enrollment ({parsed_enroll_dt.strftime('%d/%m/%Y')}) must be at least 16 years after Date of Birth ({parsed_birth_dt.strftime('%d/%m/%Y')})."
                 }), 400
 
         # Validate Date of TOS (if provided)
@@ -958,7 +958,7 @@ def api_predict_recommendation():
             if parsed_enroll_dt and parsed_tos_dt and parsed_tos_dt < parsed_enroll_dt:
                 return jsonify({
                     "success": False,
-                    "error": f"Date of TOS ({parsed_tos_dt.strftime('%d-%m-%Y')}) cannot precede Date of Enrollment ({parsed_enroll_dt.strftime('%d-%m-%Y')})."
+                    "error": f"Date of TOS ({parsed_tos_dt.strftime('%d/%m/%Y')}) cannot precede Date of Enrollment ({parsed_enroll_dt.strftime('%d/%m/%Y')})."
                 }), 400
 
         # Validate Date of TORS (if provided)
@@ -984,7 +984,7 @@ def api_predict_recommendation():
                     if parsed_enroll_dt and dt_from < parsed_enroll_dt:
                         return jsonify({
                             "success": False,
-                            "error": f"Posting From Date for {u_name} ({dt_from.strftime('%d-%m-%Y')}) cannot precede Date of Enrollment ({parsed_enroll_dt.strftime('%d-%m-%Y')})."
+                            "error": f"Posting From Date for {u_name} ({dt_from.strftime('%d/%m/%Y')}) cannot precede Date of Enrollment ({parsed_enroll_dt.strftime('%d/%m/%Y')})."
                         }), 400
 
                 if raw_to:
@@ -995,7 +995,7 @@ def api_predict_recommendation():
                 if dt_from and dt_to and dt_from > dt_to:
                     return jsonify({
                         "success": False,
-                        "error": f"Posting From Date ({dt_from.strftime('%d-%m-%Y')}) cannot be later than To Date ({dt_to.strftime('%d-%m-%Y')}) for {u_name}."
+                        "error": f"Posting From Date ({dt_from.strftime('%d/%m/%Y')}) cannot be later than To Date ({dt_to.strftime('%d/%m/%Y')}) for {u_name}."
                     }), 400
 
         selected_domains = data.get("selected_domains") or data.get("domains") or []
@@ -1152,7 +1152,7 @@ def api_save_recommendation():
         cursor.close()
         conn.close()
 
-        now_str = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+        now_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         return jsonify({
             "success": True,
             "id": saved_id,
@@ -1346,8 +1346,8 @@ def api_get_insights_list():
 
             created_at_dt = r.get("created_at")
             updated_at_dt = r.get("updated_at")
-            created_at_str = created_at_dt.strftime("%d-%m-%Y %H:%M") if created_at_dt else ""
-            updated_at_str = updated_at_dt.strftime("%d-%m-%Y %H:%M") if updated_at_dt else ""
+            created_at_str = created_at_dt.strftime("%d/%m/%Y %H:%M") if created_at_dt else ""
+            updated_at_str = updated_at_dt.strftime("%d/%m/%Y %H:%M") if updated_at_dt else ""
 
             is_re_calculated = False
             if created_at_dt and updated_at_dt:
@@ -1378,7 +1378,7 @@ def api_get_insights_list():
                 "decision_type": r.get("decision_type") or "pending",
                 "decision_remarks": r.get("decision_remarks") or "",
                 "decided_by": r.get("decided_by") or "",
-                "decided_at": r.get("decided_at").strftime("%d-%m-%Y %H:%M") if r.get("decided_at") else "",
+                "decided_at": r.get("decided_at").strftime("%d/%m/%Y %H:%M") if r.get("decided_at") else "",
                 "updated_by": r.get("updated_by") or "",
                 "updated_by_role": r.get("updated_by_role") or "",
                 "created_at": created_at_str,
@@ -1391,7 +1391,7 @@ def api_get_insights_list():
                 "adjutant_position": r.get("adjutant_position") or "",
                 "adjutant_remarks": r.get("adjutant_remarks") or "",
                 "adjutant_by": r.get("adjutant_by") or "",
-                "adjutant_at": r.get("adjutant_at").strftime("%d-%m-%Y %H:%M") if r.get("adjutant_at") else "",
+                "adjutant_at": r.get("adjutant_at").strftime("%d/%m/%Y %H:%M") if r.get("adjutant_at") else "",
                 "two_ic_updated": two_ic_was_updated,
                 "two_ic_message": two_ic_msg
             })
@@ -1484,7 +1484,7 @@ def api_get_insight_detail(rec_id: int):
         )
 
         two_ic_was_updated = bool(row.get("two_ic_updated") or row.get("updated_by_role") == "2IC" or row.get("decision_type") in ["accepted", "rejected"])
-        two_ic_msg = row.get("two_ic_message") or (f"Notice to Adjutant: 2IC ({row.get('updated_by') or row.get('decided_by') or '2IC'}) updated & finalized allocation to {final_coy} - {final_sec} ({final_pos}) on {row.get('updated_at').strftime('%d-%m-%Y %H:%M') if row.get('updated_at') else 'N/A'}." if two_ic_was_updated else "")
+        two_ic_msg = row.get("two_ic_message") or (f"Notice to Adjutant: 2IC ({row.get('updated_by') or row.get('decided_by') or '2IC'}) updated & finalized allocation to {final_coy} - {final_sec} ({final_pos}) on {row.get('updated_at').strftime('%d/%m/%Y %H:%M') if row.get('updated_at') else 'N/A'}." if two_ic_was_updated else "")
 
         return jsonify({
             "success": True,
@@ -1515,17 +1515,17 @@ def api_get_insight_detail(rec_id: int):
                 "decision_type": row.get("decision_type") or "pending",
                 "decision_remarks": row.get("decision_remarks") or "",
                 "decided_by": row.get("decided_by") or "",
-                "decided_at": row.get("decided_at").strftime("%d-%m-%Y %H:%M") if row.get("decided_at") else "",
+                "decided_at": row.get("decided_at").strftime("%d/%m/%Y %H:%M") if row.get("decided_at") else "",
                 "updated_by": row.get("updated_by") or "",
                 "updated_by_role": row.get("updated_by_role") or "",
-                "updated_at": row.get("updated_at").strftime("%d-%m-%Y %H:%M") if row.get("updated_at") else "",
+                "updated_at": row.get("updated_at").strftime("%d/%m/%Y %H:%M") if row.get("updated_at") else "",
                 "adjutant_action": row.get("adjutant_action") or "",
                 "adjutant_company": row.get("adjutant_company") or "",
                 "adjutant_section": row.get("adjutant_section") or (get_section_for_position(row.get("adjutant_company"), row.get("adjutant_position")) if row.get("adjutant_company") and row.get("adjutant_position") else ""),
                 "adjutant_position": row.get("adjutant_position") or "",
                 "adjutant_remarks": row.get("adjutant_remarks") or "",
                 "adjutant_by": row.get("adjutant_by") or "",
-                "adjutant_at": row.get("adjutant_at").strftime("%d-%m-%Y %H:%M") if row.get("adjutant_at") else "",
+                "adjutant_at": row.get("adjutant_at").strftime("%d/%m/%Y %H:%M") if row.get("adjutant_at") else "",
                 "two_ic_updated": two_ic_was_updated,
                 "two_ic_message": two_ic_msg,
                 "hierarchy": UNIT_15_CESR_STRUCTURE,
@@ -1709,7 +1709,7 @@ def api_save_recommendation_decision():
 
         final_sec_val = data.get("final_section") or get_section_for_position(final_coy_val, final_pos_val)
 
-        now_str = datetime.now().strftime("%d-%m-%Y %H:%M")
+        now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
         two_ic_msg = f"Notice to Adjutant: 2IC ({user_name}) updated & finalized allocation to {final_coy_val} - {final_sec_val} ({final_pos_val}) on {now_str}."
 
         update_sql = """

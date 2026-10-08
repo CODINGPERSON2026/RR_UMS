@@ -904,9 +904,13 @@ async function loadAllPersonnelData() {
       const name = person.name || 'N/A';
       const trade = person.trade || 'N/A';
       const company = person.company || 'Unknown';
-      const enrollmentDate = person.date_of_enrollment
-        ? new Date(person.date_of_enrollment).toLocaleDateString('en-GB')
-        : 'N/A';
+      let enrollmentDate = 'N/A';
+      if (person.date_of_enrollment) {
+        const pDt = new Date(person.date_of_enrollment);
+        if (!isNaN(pDt.getTime())) {
+          enrollmentDate = `${String(pDt.getDate()).padStart(2, '0')}/${String(pDt.getMonth() + 1).padStart(2, '0')}/${pDt.getFullYear()}`;
+        }
+      }
 
       const companyBadge = company !== 'Unknown'
         ? `<span class="company-badge">${company}</span>`

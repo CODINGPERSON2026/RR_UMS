@@ -281,7 +281,7 @@ def jco_update_task():
             current_remarks = row['remarks'] if row and row['remarks'] else ""
             
             import datetime
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
             formatted_new_remark = f"[{timestamp}]: {new_remark}"
             
             if current_remarks:
@@ -315,7 +315,7 @@ def jco_update_task():
                     current_remarks = row['remarks'] if row and row['remarks'] else ""
                     
                     import datetime
-                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                    timestamp = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")
                     formatted_new_remark = f"[{timestamp}]: {value}"
                     
                     if current_remarks:

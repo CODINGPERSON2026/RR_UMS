@@ -266,7 +266,7 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
     safe_army_no = "".join(c for c in raw_army if c.isalnum() or c in ("-", "_"))
     date_str = datetime.now().strftime("%Y%m%d")
     report_id = f"UMS-FIT-{date_str}-{safe_army_no}"
-    timestamp_str = datetime.now().strftime("%d %b %Y, %I:%M %p")
+    timestamp_str = datetime.now().strftime("%d/%m/%Y, %I:%M %p")
     lang_code = (language or "en").lower().strip()
 
     # Section 1: Header / Cover

@@ -157,20 +157,20 @@
         .ops-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
+            gap: 22px;
             margin-top: 20px;
         }
 
         .op-card {
-            background: linear-gradient(145deg, #ffffff 0%, #f4faf6 100%);
+            background: #ffffff;
             border: 1px solid #d0e4d7;
-            border-radius: 14px;
-            padding: 22px 24px;
+            border-radius: 16px;
+            padding: 0;
             cursor: pointer;
             position: relative;
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -185,36 +185,90 @@
             height: 100%;
             background: linear-gradient(180deg, #1e5631, #5aaf6f);
             transition: width 0.3s ease;
+            z-index: 3;
         }
 
         .op-card:hover {
             transform: translateY(-5px);
             border-color: #1e5631;
-            box-shadow: 0 12px 30px rgba(30, 86, 49, 0.16);
+            box-shadow: 0 14px 34px rgba(30, 86, 49, 0.18);
         }
 
         .op-card:hover::before {
             width: 6px;
         }
 
+        /* Card Image Box */
+        .op-card-image-box {
+            position: relative;
+            width: 100%;
+            height: 190px;
+            overflow: hidden;
+            background: #112818;
+        }
+
+        .op-card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .op-card:hover .op-card-img {
+            transform: scale(1.08);
+        }
+
+        .op-card-img-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.15) 50%, rgba(15,40,24,0.65) 100%);
+            pointer-events: none;
+        }
+
+        .op-img-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.94);
+            color: #164024;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+            backdrop-filter: blur(6px);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 4px 11px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .op-card-content {
+            padding: 18px 20px 18px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+        }
+
         .op-card-header {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
+            align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .op-icon-wrapper {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             background: rgba(30, 86, 49, 0.08);
             color: #1e5631;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             flex-shrink: 0;
             transition: all 0.3s ease;
         }
@@ -226,10 +280,10 @@
         }
 
         .op-card-title {
-            font-size: 1.1rem;
+            font-size: 1.12rem;
             font-weight: 700;
             color: #1e5631;
-            margin: 0 0 4px 0;
+            margin: 0;
             line-height: 1.3;
         }
 
@@ -250,7 +304,7 @@
             font-size: 0.88rem;
             color: #4a5d52;
             line-height: 1.6;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -448,7 +502,7 @@
         <div class="history-section">
             <h2 class="section-heading">Formation &amp; Background</h2>
             <p>
-                The 15 Corps Engineering Signal Regiment (15 CESR) was raised as a specialised signals formation to provide dedicated communication, electronic warfare, and technical support to the 15 Corps — famously known as the <strong>Chinar Corps</strong> — of the Indian Army. Headquartered in <strong>Srinagar, Jammu &amp; Kashmir</strong>, the regiment operates at the strategic heart of one of the most operationally demanding theatres in the country, managing secure, uninterrupted connectivity across the rugged terrain of the Kashmir Valley and along the Line of Control (LoC).
+                The 15 Corps Engineering Signal Regiment (15 CESR) was raised as a specialised signals formation to provide dedicated communication, electronic warfare, and technical support to the 15 Corps — known as the <strong>Chinar Corps</strong> — of the Indian Army. Headquartered in <strong>Srinagar, Jammu &amp; Kashmir</strong>, the regiment operates at the strategic heart of one of the most operationally demanding theatres in the country, managing secure, uninterrupted connectivity across the rugged terrain of the Kashmir Valley and along the Line of Control (LoC).
             </p>
         </div>
 
@@ -477,109 +531,145 @@
             <div class="ops-grid">
                 <!-- Operation Vijay Card -->
                 <div class="op-card" onclick="openOperationModal('op-vijay')" title="Click to view Operation Vijay details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-                            <span class="op-badge-pill">Kargil 1999</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Vijay</h3>
-                        <p class="op-card-body">High-altitude tactical signal matrix deployed across Dras, Batalik, and Kargil sectors under heavy enemy shelling.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_vijay.jpg') }}" alt="Operation Vijay 1999 Kargil" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">Kargil 1999</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>15 CESR Signal Grid</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Vijay</h3>
+                            </div>
+                            <p class="op-card-body">High-altitude tactical signal matrix deployed across Dras, Batalik, and Kargil sectors under heavy enemy shelling.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>15 CESR Signal Grid</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Operation Rakshak Card -->
                 <div class="op-card" onclick="openOperationModal('op-rakshak')" title="Click to view Operation Rakshak details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-tower-cell"></i>
-                            </div>
-                            <span class="op-badge-pill">CI/CT Grid</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Rakshak</h3>
-                        <p class="op-card-body">24/7 integrated Valley counter-terrorism communication &amp; electronic support grid across Kashmir.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_rakshak.jpg') }}" alt="Operation Rakshak CI/CT Grid" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">CI/CT Grid</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>1990 – Present</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-tower-cell"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Rakshak</h3>
+                            </div>
+                            <p class="op-card-body">24/7 integrated Valley counter-terrorism communication &amp; electronic support grid across Kashmir.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>1990 – Present</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Operation Parakram Card -->
                 <div class="op-card" onclick="openOperationModal('op-parakram')" title="Click to view Operation Parakram details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-satellite-dish"></i>
-                            </div>
-                            <span class="op-badge-pill">Mobilization</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Parakram</h3>
-                        <p class="op-card-body">Rapid strategic forward border deployment of tactical switching centers and high-capacity communication nodes.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_parakram.jpg') }}" alt="Operation Parakram Mobilization" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">Mobilization</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>2001 – 2002</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-satellite-dish"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Parakram</h3>
+                            </div>
+                            <p class="op-card-body">Rapid strategic forward border deployment of tactical switching centers and high-capacity communication nodes.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>2001 – 2002</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Operation Meghdoot Card -->
                 <div class="op-card" onclick="openOperationModal('op-meghdoot')" title="Click to view Operation Meghdoot details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-mountain-sun"></i>
-                            </div>
-                            <span class="op-badge-pill">Glacier Comms</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Meghdoot</h3>
-                        <p class="op-card-body">Glacial signal backbone connecting Siachen forward posts with solar-hybrid relays under sub-zero extremes.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_meghdoot.jpg') }}" alt="Operation Meghdoot Siachen Glacier" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">Glacier Comms</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>1984 – Present</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-mountain-sun"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Meghdoot</h3>
+                            </div>
+                            <p class="op-card-body">Glacial signal backbone connecting Siachen forward posts with solar-hybrid relays under sub-zero extremes.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>1984 – Present</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Operation Snow Leopard Card -->
                 <div class="op-card" onclick="openOperationModal('op-snow-leopard')" title="Click to view Operation Snow Leopard details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-snowflake"></i>
-                            </div>
-                            <span class="op-badge-pill">High Altitude Ops</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Snow Leopard</h3>
-                        <p class="op-card-body">Next-gen software-defined radios and satellite networks established across high-altitude battle sectors.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_snow_leopard.jpg') }}" alt="Operation Snow Leopard High Altitude" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">High Altitude Ops</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>2020 – Present</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-snowflake"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Snow Leopard</h3>
+                            </div>
+                            <p class="op-card-body">Next-gen software-defined radios and satellite networks established across high-altitude battle sectors.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>2020 – Present</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Operation Sadbhavana Card -->
                 <div class="op-card" onclick="openOperationModal('op-sadbhavana')" title="Click to view Operation Sadbhavana details">
-                    <div>
-                        <div class="op-card-header">
-                            <div class="op-icon-wrapper">
-                                <i class="fa-solid fa-hands-holding-child"></i>
-                            </div>
-                            <span class="op-badge-pill">Humanitarian</span>
-                        </div>
-                        <h3 class="op-card-title">Operation Sadbhavana</h3>
-                        <p class="op-card-body">Emergency communication restoration and civil helpline networks established during the 2014 Kashmir Floods.</p>
+                    <div class="op-card-image-box">
+                        <img src="{{ url_for('static', filename='operations/op_sadbhavana.jpg') }}" alt="Operation Sadbhavana Humanitarian" class="op-card-img" loading="lazy" />
+                        <div class="op-card-img-overlay"></div>
+                        <span class="op-img-badge">Humanitarian</span>
                     </div>
-                    <div class="op-card-footer">
-                        <span>Disaster &amp; Civil Comms</span>
-                        <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                    <div class="op-card-content">
+                        <div>
+                            <div class="op-card-header">
+                                <div class="op-icon-wrapper">
+                                    <i class="fa-solid fa-hands-holding-child"></i>
+                                </div>
+                                <h3 class="op-card-title">Operation Sadbhavana</h3>
+                            </div>
+                            <p class="op-card-body">Emergency communication restoration and civil helpline networks established during the 2014 Kashmir Floods.</p>
+                        </div>
+                        <div class="op-card-footer">
+                            <span>Disaster &amp; Civil Comms</span>
+                            <span class="op-card-action">View Details <i class="fa-solid fa-arrow-right"></i></span>
+                        </div>
                     </div>
                 </div>
 
@@ -619,6 +709,12 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Operation Tactical Hero View -->
+                    <div class="op-modal-hero mb-3" style="border-radius: 14px; overflow: hidden; height: 260px; box-shadow: 0 4px 18px rgba(0,0,0,0.12); position: relative; background: #0e2416;">
+                        <img id="opModalImage" src="" alt="Operation Tactical View" style="width: 100%; height: 100%; object-fit: cover;" />
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 40%; background: linear-gradient(to top, rgba(15,40,24,0.7), transparent);"></div>
+                    </div>
+
                     <!-- Meta Ribbon -->
                     <div class="op-meta-ribbon">
                         <div class="op-meta-item">
@@ -688,6 +784,7 @@
     <script>
         const CESR_OPERATIONS = {
             'op-vijay': {
+                image: "{{ url_for('static', filename='operations/op_vijay.jpg') }}",
                 title: 'Operation Vijay (1999 Kargil War)',
                 subtitle: 'High-Altitude Tactical Signal Matrix & LoC Comms Grid',
                 sector: 'Kargil, Dras, Batalik & Mushkoh Valley',
@@ -709,6 +806,7 @@
                 ]
             },
             'op-rakshak': {
+                image: "{{ url_for('static', filename='operations/op_rakshak.jpg') }}",
                 title: 'Operation Rakshak (Valley CI/CT Grid)',
                 subtitle: 'Continuous Integrated Counter-Terrorism Signal & EW Network',
                 sector: 'Kashmir Valley & Line of Control',
@@ -730,6 +828,7 @@
                 ]
             },
             'op-parakram': {
+                image: "{{ url_for('static', filename='operations/op_parakram.jpg') }}",
                 title: 'Operation Parakram (Border Mobilization)',
                 subtitle: 'Full-Scale Forward Theater Signal Deployment',
                 sector: 'Line of Control & Forward Sectors',
@@ -751,6 +850,7 @@
                 ]
             },
             'op-meghdoot': {
+                image: "{{ url_for('static', filename='operations/op_meghdoot.jpg') }}",
                 title: 'Operation Meghdoot (Siachen Glacier Signals)',
                 subtitle: 'Extreme High-Altitude Glacier Communication & Relays',
                 sector: 'Siachen Glacier & Northern Glacial Belts',
@@ -772,6 +872,7 @@
                 ]
             },
             'op-snow-leopard': {
+                image: "{{ url_for('static', filename='operations/op_snow_leopard.jpg') }}",
                 title: 'Operation Snow Leopard (High Altitude Grid)',
                 subtitle: 'Tactical Satellite Networks & Dynamic Command Grid',
                 sector: 'Eastern Ladakh & High-Altitude Passes',
@@ -793,6 +894,7 @@
                 ]
             },
             'op-sadbhavana': {
+                image: "{{ url_for('static', filename='operations/op_sadbhavana.jpg') }}",
                 title: 'Operation Sadbhavana & Relief Operations',
                 subtitle: 'Humanitarian Signal Restoration & Civil Connectivity',
                 sector: 'Jammu & Kashmir Flood & Disaster Zones',
@@ -818,6 +920,12 @@
         function openOperationModal(opId) {
             const data = CESR_OPERATIONS[opId];
             if (!data) return;
+
+            const modalImg = document.getElementById('opModalImage');
+            if (modalImg && data.image) {
+                modalImg.src = data.image;
+                modalImg.alt = data.title;
+            }
 
             document.getElementById('opDetailModalTitle').textContent = data.title;
             document.getElementById('opDetailModalSubtitle').textContent = data.subtitle;

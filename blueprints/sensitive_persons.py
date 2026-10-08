@@ -202,7 +202,7 @@ def get_sensitive_list():
                 "reason": l[0],
                 "added_by": l[1],
                 "added_by_role": l[2],
-                "added_on": l[3].strftime("%d %b %Y, %H:%M") if l[3] else ""
+                "added_on": l[3].strftime("%d/%m/%Y, %H:%M") if l[3] else ""
             } for l in logs]
 
             result.append({
@@ -212,7 +212,7 @@ def get_sensitive_list():
                 "rank": r[3],
                 "company": r[4] or "N/A",
                 "reason_logs": reason_logs,
-                "last_remark_date": latest_date.strftime("%d %b %Y, %H:%M") if latest_date else "",
+                "last_remark_date": latest_date.strftime("%d/%m/%Y, %H:%M") if latest_date else "",
                 "days_since_last_remark": days_since,
                 "months_since_last_remark": months_since,
                 "is_alarm": is_alarm

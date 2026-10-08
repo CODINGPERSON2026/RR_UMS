@@ -179,7 +179,7 @@ def attachment_details():
         # ✅ FORCE JSON SAFE DATE
         for r in rows:
             td = r.get("td_date")
-            r["td_date"] = td.strftime("%d-%m-%Y") if td else ""
+            r["td_date"] = td.strftime("%d/%m/%Y") if td else ""
 
         return jsonify(rows), 200
 
@@ -336,7 +336,7 @@ def get_honours_board():
         # Format date for JSON response
         for row in data:
             if row['appreciation_date']:
-                row['appreciation_date'] = row['appreciation_date'].strftime("%d-%m-%Y")
+                row['appreciation_date'] = row['appreciation_date'].strftime("%d/%m/%Y")
                 
         return jsonify({"status": "success", "data": data})
     except Exception as e:

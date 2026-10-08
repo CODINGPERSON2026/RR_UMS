@@ -422,7 +422,12 @@
 
   function formatDuesOutDate(date) {
     if (!date) return "—";
-    return new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    const dt = new Date(date);
+    if (isNaN(dt.getTime())) return date;
+    const day = String(dt.getDate()).padStart(2, "0");
+    const month = String(dt.getMonth() + 1).padStart(2, "0");
+    const year = dt.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   document.getElementById("duesOutListModal")?.addEventListener("show.bs.modal", async function () {

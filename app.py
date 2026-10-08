@@ -39,6 +39,26 @@ app.register_blueprint(fitness_trend_bp)
 app.register_blueprint(ai_company_readiness_bp)
 
 
+@app.template_filter('format_date')
+def format_date_filter(value, fmt='%d/%m/%Y'):
+    if not value:
+        return ''
+    if hasattr(value, 'strftime'):
+        return value.strftime(fmt)
+    try:
+        val_str = str(value).strip()
+        for in_fmt in ('%Y-%m-%d', '%Y-%m-%d %H:%M:%S', '%d-%m-%Y', '%d/%m/%Y', '%d %b %Y'):
+            try:
+                from datetime import datetime as dt_cls
+                dt = dt_cls.strptime(val_str, in_fmt)
+                return dt.strftime(fmt)
+            except ValueError:
+                pass
+    except Exception:
+        pass
+    return str(value)
+
+
 @app.route("/api/fitness-trend/export-pdf", methods=["POST"])
 @app.route("/fitness-trend/report/pdf", methods=["POST"])
 @app.route("/fitness/report/pdf", methods=["POST"])
@@ -3551,6 +3571,16 @@ def export_parade_csv(date_str, company):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
+        # Display date in DD/MM/YYYY for CSV header
+        disp_date_str = date_str
+        try:
+            if '-' in date_str and len(date_str) == 10:
+                parts = date_str.split('-')
+                if len(parts[0]) == 4:
+                    disp_date_str = f"{parts[2]}/{parts[1]}/{parts[0]}"
+        except Exception:
+            pass
+
         if company == 'All':
             # Only O CENTRE NCO can export all companies
             if user_role != 'O CENTRE NCO':
@@ -3581,9 +3611,9 @@ def export_parade_csv(date_str, company):
                       'MH', 'SICK/LVE', 'EX', 'TD', 'ATT', 'AWL/OSL/JC', 'T/OUT', 
                       'PRES/DET', 'PRES/UNIT', 'DUES IN', 'DUES OUT']
             writer.writerow(['AGGREGATED PARADE STATE - ALL COMPANIES'])
-            writer.writerow([f'Date: {date_str}'])
+            writer.writerow([f'Date: {disp_date_str}'])
             writer.writerow([f'Exported by: {user.get("username")} ({user_role})'])
-            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}'])
+            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}'])
             writer.writerow([])
             writer.writerow(headers)
             
@@ -3643,9 +3673,9 @@ def export_parade_csv(date_str, company):
                       'MH', 'SICK/LVE', 'EX', 'TD', 'ATT', 'AWL/OSL/JC', 'T/OUT', 
                       'PRES/DET', 'PRES/UNIT', 'DUES IN', 'DUES OUT']
             writer.writerow([f'PARADE STATE - {company}'])
-            writer.writerow([f'Date: {date_str}'])
+            writer.writerow([f'Date: {disp_date_str}'])
             writer.writerow([f'Exported by: {user.get("username")} ({user_role})'])
-            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d-%m-%Y %H:%M:%S")}'])
+            writer.writerow([f'Device IP: {get_client_ip()} | Exported on: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}'])
             writer.writerow([])
             writer.writerow(headers)
             
@@ -3828,8 +3858,8 @@ def get_courses():
             p.rank,
             p.company,
             coc.course_name,
-            DATE_FORMAT(coc.course_starting_date, '%d-%m-%Y') AS from_date,
-            DATE_FORMAT(coc.course_end_date, '%d-%m-%Y') AS to_date,
+            DATE_FORMAT(coc.course_starting_date, '%d/%m/%Y') AS from_date,
+            DATE_FORMAT(coc.course_end_date, '%d/%m/%Y') AS to_date,
             coc.institute_name
         FROM candidate_on_courses coc
         LEFT JOIN personnel p 
@@ -6262,7 +6292,7 @@ def get_honours_board():
             hb.appreciation_type,
             DATE_FORMAT(
     hb.appreciation_date,
-    '%d %b %Y'
+    '%d/%m/%Y'
 ) AS appreciation_date,
 
             p.name,

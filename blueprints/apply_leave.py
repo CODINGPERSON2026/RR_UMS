@@ -689,24 +689,24 @@ def get_leave_request(leave_id):
                     leave['leave_details'].append({
                         "leave_type": d['leave_type'],
                         "leave_days": d['leave_days'],
-                        "from_date": d['from_date'].strftime('%d-%b-%Y') if d['from_date'] else None,
-                        "to_date": d['to_date'].strftime('%d-%b-%Y') if d['to_date'] else None
+                        "from_date": d['from_date'].strftime('%d/%m/%Y') if d['from_date'] else None,
+                        "to_date": d['to_date'].strftime('%d/%m/%Y') if d['to_date'] else None
                     })
 
                 leave['leave_type'] = " + ".join(formatted)
 
         # ================== FORMAT DATES ==================
         if leave.get('from_date'):
-            leave['from_date'] = leave['from_date'].strftime('%d-%b-%Y')
+            leave['from_date'] = leave['from_date'].strftime('%d/%m/%Y')
 
         if leave.get('to_date'):
-            leave['to_date'] = leave['to_date'].strftime('%d-%b-%Y')
+            leave['to_date'] = leave['to_date'].strftime('%d/%m/%Y')
 
         if leave.get('prefix_date'):
-            leave['prefix_date'] = leave['prefix_date'].strftime('%d-%b-%Y')
+            leave['prefix_date'] = leave['prefix_date'].strftime('%d/%m/%Y')
 
         if leave.get('suffix_date'):
-            leave['suffix_date'] = leave['suffix_date'].strftime('%d-%b-%Y')
+            leave['suffix_date'] = leave['suffix_date'].strftime('%d/%m/%Y')
 
         # ================== FETCH LEAVE HISTORY ==================
         cursor.execute("""
@@ -1991,8 +1991,8 @@ def download_leave_certificate(leave_id):
                     leave_details_list.append({
                         "type": lt,
                         "days": days,
-                        "from_date": item['from_date'].strftime('%d-%m-%Y') if item['from_date'] else None,
-                        "to_date": item['to_date'].strftime('%d-%m-%Y') if item['to_date'] else None
+                        "from_date": item['from_date'].strftime('%d/%m/%Y') if item['from_date'] else None,
+                        "to_date": item['to_date'].strftime('%d/%m/%Y') if item['to_date'] else None
                     })
                 leave_type_display = " + ".join(formatted_parts)
 
@@ -2139,7 +2139,7 @@ def download_leave_certificate(leave_id):
                 dates.append(curr.strftime('%d %b'))
                 curr += timedelta(days=1)
             date_list_str = ", ".join(dates)
-            prefix_details = f"{prefix_days} day(s) ({date_list_str}) w.e.f. {data['prefix_date'].strftime('%d-%m-%Y')}"
+            prefix_details = f"{prefix_days} day(s) ({date_list_str}) w.e.f. {data['prefix_date'].strftime('%d/%m/%Y')}"
 
         suffix_details = "NIL"
         if suffix_days > 0 and data.get('suffix_date') and data.get('to_date'):
@@ -2147,10 +2147,10 @@ def download_leave_certificate(leave_id):
             dates = []
             curr = data['to_date'] + timedelta(days=1)
             while curr <= data['suffix_date']:
-                dates.append(curr.strftime('%d %b'))
+                dates.append(curr.strftime('%d/%m'))
                 curr += timedelta(days=1)
             date_list_str = ", ".join(dates)
-            suffix_start_date = (data['to_date'] + timedelta(days=1)).strftime('%d-%m-%Y')
+            suffix_start_date = (data['to_date'] + timedelta(days=1)).strftime('%d/%m/%Y')
             suffix_details = f"{suffix_days} day(s) ({date_list_str}) w.e.f. {suffix_start_date}"
 
         # ====================== PREPARE CERTIFICATE DATA ======================
@@ -2185,7 +2185,7 @@ def download_leave_certificate(leave_id):
             "remarks": data.get('remarks', 'N/A'),
             "address_during_leave": address_during_leave,
             "transport": transport_info,
-            "reporting_date": (data['suffix_date'] if data['suffix_date'] else data['to_date']).strftime('%d-%m-%Y') 
+            "reporting_date": (data['suffix_date'] if data['suffix_date'] else data['to_date']).strftime('%d/%m/%Y') 
                               if (data.get('suffix_date') or data.get('to_date')) else 'Not specified',
             "leave_details": leave_details_list,
             "request_status": data['request_status']
@@ -2531,7 +2531,7 @@ ORDER BY lsi.to_date ASC;
                 "army_number": row["army_number"],
                 "name": row["name"],
                 "rank": row["rank"],
-                "leave_end_date": row["leave_end_date"].strftime("%d %b %Y")
+                "leave_end_date": row["leave_end_date"].strftime("%d/%m/%Y")
             })
 
         return jsonify(result)
@@ -2550,7 +2550,7 @@ def serialize_dates(rows):
     for r in rows:
         for key, value in r.items():
             if isinstance(value, (datetime, date)):
-                r[key] = value.strftime('%d-%m-%Y')  # ✅ only date, no time
+                r[key] = value.strftime('%d/%m/%Y')  # ✅ only date, no time
     return rows
 
 

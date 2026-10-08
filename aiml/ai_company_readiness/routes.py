@@ -37,6 +37,12 @@ ALLOWED_PREDICTION_ROLES = [
     "admin", "superadmin"
 ]
 
+# Authorized retraining roles (retraining restricted to company ONCOs and admin; excluded for CO, 2IC, ADJUTANT)
+ALLOWED_RETRAIN_ROLES = [
+    "1coyonco", "commcoyonco", "comncoyonco", "3coyonco", "coyonco", "onco",
+    "admin", "superadmin"
+]
+
 COY_ONCO_MAPPING = {
     "1coyonco": "HQ COY",
     "commcoyonco": "COMN COY",
@@ -345,7 +351,7 @@ def api_retrain_status(user_payload):
     """Returns historical snapshot count and ML model metadata."""
     try:
         user_role = (user_payload.get("role") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
-        can_retrain = user_role in ALLOWED_PREDICTION_ROLES
+        can_retrain = (user_role in ALLOWED_RETRAIN_ROLES) and (user_role not in ["co", "commandingofficer", "2ic", "adjutant"])
         status = service.get_retrain_status()
         status["can_retrain"] = can_retrain
         status["user_role"] = user_payload.get("role")
@@ -360,7 +366,7 @@ def api_retrain_status(user_payload):
 def api_retrain_model(user_payload):
     """Triggers ML model retraining pipeline for AI Company Readiness."""
     user_role = (user_payload.get("role") or "").lower().replace(" ", "").replace("_", "").replace("-", "")
-    if user_role not in ALLOWED_PREDICTION_ROLES:
+    if user_role not in ALLOWED_RETRAIN_ROLES or user_role in ["co", "commandingofficer", "2ic", "adjutant"]:
         return jsonify({
             "success": False,
             "error": "Access Denied: Retraining AI Company Readiness model is restricted to authorized roles (1coyonco, commcoyonco, 3coyonco, admin)."

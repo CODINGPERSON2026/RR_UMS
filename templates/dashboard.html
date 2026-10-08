@@ -445,8 +445,8 @@
       </button>
       {% endif %}
 
-      <!-- AI Company Readiness Button — visible only to predicting roles (1coyonco, commcoyonco, 3coyonco) -->
-      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO']) %}
+      <!-- AI Company Readiness Button -->
+      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO', 'CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
         <button type="button" class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Readiness Analytics &amp; Comparative Telemetry">
           AI COMPANY READINESS
         </button>
@@ -592,14 +592,6 @@
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO']) %}
-      <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness-dash" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
-        <span class="sc-label"><i class="fas fa-shield-alt text-primary me-1"></i> AI Readiness</span>
-        <div class="sc-right">
-          <span class="sc-val" id="dash-readiness-val"><span class="val-dots"><span></span><span></span><span></span></span></span>
-        </div>
-      </div>
-      {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
       <div class="sc" id="openCourses">

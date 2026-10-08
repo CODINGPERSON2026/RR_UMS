@@ -230,7 +230,7 @@ def get_personnel_details(army_number):
         # Format dates for JSON
         for k, v in row.items():
             if isinstance(v, (date, datetime)):
-                row[k] = v.strftime('%d %b %Y')
+                row[k] = v.strftime('%d/%m/%Y')
 
         return jsonify({'status': 'success', 'data': row})
 
@@ -408,9 +408,9 @@ def get_leave_history():
         # Format dates
         for row in rows:
             if row.get('from_date'):
-                row['from_date'] = row['from_date'].strftime('%d %b %Y')
+                row['from_date'] = row['from_date'].strftime('%d/%m/%Y')
             if row.get('to_date'):
-                row['to_date'] = row['to_date'].strftime('%d %b %Y')
+                row['to_date'] = row['to_date'].strftime('%d/%m/%Y')
 
         cursor.close()
         conn.close()

@@ -1572,7 +1572,10 @@
         const clientIp = window.CLIENT_IP || "{{ client_ip or '127.0.0.1' }}";
         const user = window.CURRENT_USER || "{{ current_user_name or '' }}";
         const now = new Date();
-        const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const year = now.getFullYear();
+        const dateStr = `${day}/${month}/${year}`;
         const timeStr = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const svg = generateWatermarkSvg(clientIp, user, dateStr, timeStr);
         const bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
@@ -1593,6 +1596,23 @@
       window.updateAllPrintWatermarks = updateAllPrintWatermarks;
       window.addEventListener('beforeprint', updateAllPrintWatermarks);
       document.addEventListener('DOMContentLoaded', updateAllPrintWatermarks);
+
+      // Global application standard date formatter: DD/MM/YYYY
+      window.formatAppDate = function (val) {
+        if (!val) return '';
+        const s = String(val).trim();
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+          const parts = s.slice(0, 10).split('-');
+          return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+        const d = (val instanceof Date) ? val : new Date(val);
+        if (isNaN(d.getTime())) return s;
+        const dNum = String(d.getDate()).padStart(2, '0');
+        const mNum = String(d.getMonth() + 1).padStart(2, '0');
+        const yNum = d.getFullYear();
+        return `${dNum}/${mNum}/${yNum}`;
+      };
     })();
   </script>
 

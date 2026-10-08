@@ -197,9 +197,6 @@
                 <th scope="col" class="py-3 px-2 text-center" style="width: 170px; color: #6b21a8 !important; background: #ede9fe;">
                   <i class="fas fa-map-marker-alt me-1.5" style="color: #9333ea;"></i>Recommended Position
                 </th>
-                <th scope="col" class="py-3 px-2 text-center" style="width: 160px; color: #0369a1 !important; background: #ede9fe;">
-                  <i class="fas fa-calendar-check me-1.5" style="color: #0284c7;"></i>Date / Status
-                </th>
                 <th scope="col" class="py-3 px-2 text-center" style="width: 150px; color: #4f46e5 !important; background: #ede9fe;">
                   <i class="fas fa-poll-h me-1.5" style="color: #6366f1;"></i>View Result
                 </th>
@@ -751,7 +748,7 @@
 
         const mainTable = document.getElementById('insightsMainTable');
         if (mainTable) {
-          mainTable.style.minWidth = '1020px';
+          mainTable.style.minWidth = '920px';
         }
 
         if (json.available_ranks && Array.isArray(json.available_ranks)) {
@@ -817,43 +814,11 @@
       const recCompany = r.recommended_company || 'HQ Coy';
       const recPos = r.recommended_position || 'GD';
       const recSec = r.recommended_section || '';
-      const decisionType = (r.decision_type || 'pending').toLowerCase();
       const isReCal = r.is_re_calculated || false;
-      const createdAt = r.created_at || '';
-      const updatedAt = r.updated_at || '';
 
       let coyBadgeClass = 'bg-primary text-white';
       if (recCompany.includes('Comn') || recCompany.includes('COMN')) coyBadgeClass = 'bg-success text-white';
       else if (recCompany.includes('3')) coyBadgeClass = 'bg-secondary text-white';
-
-      // Date + Status cell
-      let dateStatusHtml;
-      if (isReCal) {
-        dateStatusHtml = `
-          <div class="d-flex flex-column align-items-center gap-1">
-            <span class="badge fw-bold px-2 py-1" style="background: #3b82f6; font-size: 0.72rem; border-radius: 8px;">
-              <i class="fas fa-sync-alt me-1"></i>Updated
-            </span>
-            <span class="text-muted" style="font-size: 0.7rem; line-height: 1.3;">${updatedAt}</span>
-          </div>`;
-      } else {
-        const decBadge = decisionType === 'accepted'
-          ? `<span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.68rem;"><i class="fas fa-check-circle me-1"></i>Assigned</span>`
-          : decisionType === 'rejected'
-            ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.68rem;"><i class="fas fa-times-circle me-1"></i>Rejected</span>`
-            : (r.adjutant_action === 'updated'
-                ? `<span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;"><i class="fas fa-user-edit me-1"></i>Adj: Proposed</span>`
-                : (r.adjutant_action === 'accepted'
-                    ? `<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle" style="font-size: 0.68rem;"><i class="fas fa-check me-1"></i>Adj: Accepted</span>`
-                    : (r.adjutant_action === 'rejected'
-                        ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size: 0.68rem;"><i class="fas fa-times-circle me-1"></i>Adj: Rejected</span>`
-                        : `<span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size: 0.68rem;"><i class="fas fa-clock me-1"></i>Pending</span>`)));
-        dateStatusHtml = `
-          <div class="d-flex flex-column align-items-center gap-1">
-            ${decBadge}
-            <span class="text-muted" style="font-size: 0.7rem; line-height: 1.3;">${createdAt}</span>
-          </div>`;
-      }
 
       const rowBorderStyle = isReCal ? 'border-left: 3px solid #3b82f6 !important;' : '';
 
@@ -867,7 +832,6 @@
         <td class="text-center fw-semibold text-secondary">${trade}</td>
         <td class="text-center"><span class="badge ${coyBadgeClass} px-2 py-1 fw-bold">${recCompany}</span>${recSec ? `<div class="text-muted mt-0.5" style="font-size:0.68rem;">${recSec}</div>` : ''}</td>
         <td class="text-center fw-bold text-indigo" style="color: #4f46e5;">${recPos}</td>
-        <td class="text-center">${dateStatusHtml}</td>
         <td class="text-center">
           <button class="btn btn-sm btn-outline-primary py-1 px-3 fw-bold shadow-sm" onclick="openViewResultDialog(${r.id})" style="border-radius: 6px; font-size: 0.78rem;">
             <i class="fas fa-poll-h me-1 text-primary"></i> View Result

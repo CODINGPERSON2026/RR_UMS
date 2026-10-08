@@ -144,7 +144,7 @@
         <table class="info-header">
             <tr>
                 <td align="left"><strong>Extension Cert No:</strong> EXT-{{ leave.leave_id }}-{{ issue_date.strftime('%Y%m%d') }}</td>
-                <td align="right"><strong>DATE:</strong> {{ issue_date.strftime('%d %b %Y') }}</td>
+                <td align="right"><strong>DATE:</strong> {{ issue_date.strftime('%d/%m/%Y') }}</td>
             </tr>
         </table>
 
@@ -156,15 +156,15 @@
             Trade <strong>{{ applicant.trade or '—' }}</strong> 
             (I-Card No: <strong>{{ applicant.i_card_no or 'N/A' }}</strong>) of 
             <strong>{{ applicant.company_name or applicant.company }}, {{ applicant.section_name or 'HQ' }}</strong> Section,
-            who was previously granted leave from <strong>{{ leave.orig_start_date.strftime('%d-%m-%Y') }}</strong> to <strong>{{ leave.orig_end_date.strftime('%d-%m-%Y') }}</strong>,
+            who was previously granted leave from <strong>{{ leave.orig_start_date.strftime('%d/%m/%Y') }}</strong> to <strong>{{ leave.orig_end_date.strftime('%d/%m/%Y') }}</strong>,
             is hereby granted an <strong>EXTENSION OF LEAVE</strong> under <strong>{{ leave.leave_type }}</strong>.
         </div>
 
         <div class="extension-badge-box">
             <strong>EXTENSION DETAILS:</strong><br>
             • Extended Duration: <strong>{{ leave.extended_days }} day(s)</strong><br>
-            • Extension Period: w.e.f. <strong>{{ leave.ext_start_date.strftime('%d-%m-%Y') }}</strong> to <strong>{{ leave.ext_end_date.strftime('%d-%m-%Y') }}</strong><br>
-            • Revised Total Absence: <strong>{{ leave.revised_total_days }} day(s)</strong> (w.e.f. {{ leave.orig_start_date.strftime('%d-%m-%Y') }} to {{ leave.ext_end_date.strftime('%d-%m-%Y') }})
+            • Extension Period: w.e.f. <strong>{{ leave.ext_start_date.strftime('%d/%m/%Y') }}</strong> to <strong>{{ leave.ext_end_date.strftime('%d/%m/%Y') }}</strong><br>
+            • Revised Total Absence: <strong>{{ leave.revised_total_days }} day(s)</strong> (w.e.f. {{ leave.orig_start_date.strftime('%d/%m/%Y') }} to {{ leave.ext_end_date.strftime('%d/%m/%Y') }})
         </div>
 
         <!-- Personal Details -->
@@ -186,7 +186,7 @@
         <!-- Reporting Instruction -->
         <div class="report-line">
             ⚡ DIRECTIVE: The individual is directed to report back to the unit by 
-            <strong>{{ leave.reporting_date.strftime('%d-%m-%Y') }}</strong> (1800 hrs) on expiry of extended leave.
+            <strong>{{ leave.reporting_date.strftime('%d/%m/%Y') }}</strong> (1800 hrs) on expiry of extended leave.
         </div>
 
         <!-- Signature Section -->
@@ -206,7 +206,7 @@
                 <td width="33%" style="vertical-align: bottom;">
                     <div class="digital-sig">
                         Officer Commanding <br>
-                        <strong>Date:</strong> {{ issue_date.strftime('%d-%m-%Y') }}
+                        <strong>Date:</strong> {{ issue_date.strftime('%d/%m/%Y') }}
                     </div>
                     <strong>Approving Authority</strong><br>
                     (Signature, Rank & Date)

@@ -1637,6 +1637,9 @@ class FitnessTrendApp {
     const prevBtnTextEl = document.getElementById('reportPreviewDownloadText');
     if (prevBtnTextEl) prevBtnTextEl.textContent = t('download_pdf', 'Download PDF Document');
 
+    const _now = new Date();
+    const genDateStr = `${String(_now.getDate()).padStart(2, '0')}/${String(_now.getMonth() + 1).padStart(2, '0')}/${_now.getFullYear()} ${String(_now.getHours()).padStart(2, '0')}:${String(_now.getMinutes()).padStart(2, '0')}`;
+
     previewCont.innerHTML = `
       <div class="card p-4 shadow-sm border" style="background: white; color: #1e293b; max-width: 900px; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; ${isRtl ? 'direction: rtl; text-align: right;' : ''}">
         <!-- Official Regiment Header Banner -->
@@ -1647,7 +1650,7 @@ class FitnessTrendApp {
             <div style="display: inline-block; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 999px; padding: 3px 14px; font-size: 0.8rem; font-weight: 600; color: rgba(255, 255, 255, 0.95); margin-top: 3px;">
               ${t('report_title', 'Personal Fitness Report')}
             </div>
-            <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">${t('military_record_sub', 'UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL')} &bull; ${t('report_generated', 'Generated')}: ${new Date().toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })} hrs</div>
+            <div class="small text-white-50 mt-1" style="font-size: 0.72rem;">${t('military_record_sub', 'UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL')} &bull; ${t('report_generated', 'Generated')}: ${genDateStr} hrs</div>
           </div>
           <img src="/static/image_for_login_page/chinar.jpg" class="org-logo" alt="15 COR Logo" style="width: 75px; height: 75px; object-fit: contain; border-radius: 20%; padding: 6px; background: rgba(255, 255, 255, 0.15); flex-shrink: 0;">
         </div>

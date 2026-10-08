@@ -116,7 +116,13 @@
             <div class="small text-muted">${row.rank || '-'} &bull; ${row.army_number || '-'} &bull; <span class="badge bg-secondary">${row.company || '-'}</span></div>
            </div>`;
 
-      const formattedDate = row.created_at ? new Date(row.created_at).toLocaleDateString() : '-';
+      let formattedDate = '-';
+      if (row.created_at) {
+        const rcDt = new Date(row.created_at);
+        if (!isNaN(rcDt.getTime())) {
+          formattedDate = `${String(rcDt.getDate()).padStart(2, '0')}/${String(rcDt.getMonth() + 1).padStart(2, '0')}/${rcDt.getFullYear()}`;
+        }
+      }
 
       return `
         <tr>

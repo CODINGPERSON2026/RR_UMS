@@ -101,7 +101,7 @@
             <td>{{ loop.index }}</td>
             <td>{{ so.so_number }}</td>
             <td>{{ "{:,.2f}".format(so.so_amount or 0) }}</td>
-            <td>{{ so.created_at.strftime("%d-%m-%Y") }}</td>
+            <td>{{ so.created_at.strftime("%d/%m/%Y") }}</td>
             {% if role != 'CO' %}
             <td>
               <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditSoModal({{ so.id }}, "{{ so.so_number }}", {{ so.so_amount or 0 }})'>Edit</button>
@@ -151,7 +151,7 @@
               {{ "{:,.2f}".format(a.amount or 0) }}
             </td>
             <td>{{ a.remarks or '-' }}</td>
-            <td>{{ a.created_at.strftime("%d-%m-%Y") if a.created_at else '-' }}</td>
+            <td>{{ a.created_at.strftime("%d/%m/%Y") if a.created_at else '-' }}</td>
             {% if role != 'CO' %}
             <td>
               <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditAllocModal({{ a.id }}, {{ a.amount or 0 }}, "{{ a.remarks or '' }}")'>Edit</button>
@@ -194,7 +194,7 @@
               {{ "{:,.2f}".format(e.amount or 0) }}
             </td>
             <td>{{ e.remarks or '-' }}</td>
-            <td>{{ e.created_at.strftime("%d-%m-%Y") }}</td>
+            <td>{{ e.created_at.strftime("%d/%m/%Y") }}</td>
             {% if role != 'CO' %}
             <td>
               <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditExpModal({{ e.id }}, {{ e.amount or 0 }}, "{{ e.remarks or '' }}")'>Edit</button>

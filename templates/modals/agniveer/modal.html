@@ -533,8 +533,12 @@
   }
   function agni_fmtFull(d) {
     if (!d) return '<span class="text-muted">—</span>';
-    return `<strong>${new Date(d).toLocaleDateString('en-GB',
-      { day: '2-digit', month: 'short', year: 'numeric' })}</strong>`;
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return `<strong>${d}</strong>`;
+    const day = String(dt.getDate()).padStart(2, '0');
+    const month = String(dt.getMonth() + 1).padStart(2, '0');
+    const year = dt.getFullYear();
+    return `<strong>${day}/${month}/${year}</strong>`;
   }
   function agni_testCell(date, status) {
     if (!date) return '<span class="text-muted">—</span>';

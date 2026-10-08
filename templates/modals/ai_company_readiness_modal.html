@@ -1,11 +1,14 @@
 <!-- AI Company Operational Readiness Modal for CO / 2IC / Adjutant -->
 <style>
+  #aiCompanyReadinessModal .modal-header * {
+    color: #ffffff !important;
+  }
   #aiCompanyReadinessModal .modal-header #mReadinessRoleSubtitle,
   #aiCompanyReadinessModal #mReadinessRoleSubtitle {
-    color: rgba(255, 255, 255, 0.95) !important;
-    font-size: 0.83rem !important;
+    color: #ffffff !important;
+    font-size: 0.85rem !important;
     font-weight: 500 !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
     display: block !important;
     opacity: 1 !important;
     visibility: visible !important;
@@ -14,6 +17,15 @@
   #aiCompanyReadinessModal #mReadinessRoleSubtitle #mReadinessRoleText {
     color: #ffffff !important;
     font-weight: 700 !important;
+  }
+  #aiCompanyReadinessModal #aiCompanyReadinessModalLabel,
+  #aiCompanyReadinessModal .modal-title,
+  #aiCompanyReadinessModal .modal-title span {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
   }
 
   #aiCompanyReadinessModal .custom-size {
@@ -353,28 +365,28 @@
       
       {% set raw_role = role or (session.get('role') if session else '') %}
       {% set r_clean = (raw_role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-      {% set is_onco_retrain_role = r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'coyonco', 'onco', 'co', '2ic', 'adjutant', 'commandingofficer', 'admin', 'superadmin'] %}
+      {% set is_onco_retrain_role = (r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'coyonco', 'onco', 'admin', 'superadmin']) and (r_clean not in ['co', '2ic', 'adjutant', 'commandingofficer']) and (not (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'])) %}
       {% set current_role_display = raw_role|upper if raw_role else 'CO / 2IC / Adjutant' %}
 
       <!-- Modal Header -->
-      <div class="modal-header py-3 px-4 border-bottom">
-        <div>
-          <h5 class="modal-title mb-0 d-flex align-items-center gap-2 fw-bold" id="aiCompanyReadinessModalLabel" style="color: #ffffff !important;">
+      <div class="modal-header py-3 px-4 border-bottom d-flex align-items-center justify-content-between gap-3" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; color: #ffffff !important;">
+        <div class="flex-grow-1" style="min-width: 0;">
+          <h5 class="modal-title mb-0 d-flex align-items-center gap-2 fw-bold flex-wrap" id="aiCompanyReadinessModalLabel" style="color: #ffffff !important; line-height: 1.3;">
             <i class="fas fa-shield-alt text-white"></i>
-            <span style="color: #ffffff !important;">AI Company Operational Readiness Assessment Table</span>
-            <span class="badge ms-2" id="mReadinessRoleBadge" style="font-size: 0.72rem; font-weight: 700; background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.45) !important;">{{ current_role_display }}</span>
+            <span style="color: #ffffff !important; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">AI Company Operational Readiness Assessment</span>
+            <span class="badge ms-1" id="mReadinessRoleBadge" style="font-size: 0.72rem; font-weight: 700; background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.45) !important; border-radius: 99px;">{{ current_role_display }}</span>
           </h5>
-          <div class="small mt-1" id="mReadinessRoleSubtitle" style="color: rgba(255, 255, 255, 0.95) !important; font-size: 0.83rem !important; font-weight: 500 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;">
+          <div class="small mt-1" id="mReadinessRoleSubtitle" style="color: #ffffff !important; font-size: 0.84rem !important; font-weight: 500 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.25) !important;">
             Multi-dimensional operational telemetry across 7 dimensions &bull; <span id="mReadinessRoleText" style="color: #ffffff !important; font-weight: 700 !important;">{{ current_role_display }}</span> Command Oversight
           </div>
         </div>
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2 flex-shrink-0">
           {% if is_onco_retrain_role %}
           <button type="button" class="btn btn-sm btn-outline-light text-white fw-bold px-3 py-1.5 d-flex align-items-center gap-2 shadow-sm" style="background: rgba(255, 255, 255, 0.22); border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 8px; backdrop-filter: blur(4px); font-size: 0.82rem;" id="btnModalHeaderRetrain" onclick="openReadinessRetrainModal()" title="Retrain AI Model for Predicting Company Readiness">
             <i class="fas fa-sync-alt me-1"></i> Retrain AI Model
           </button>
           {% endif %}
-          <button type="button" class="btn-close ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close btn-close-white ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
 

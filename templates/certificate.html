@@ -195,7 +195,7 @@
         <table class="info-header">
             <tr>
                 <td align="left"><strong>Certificate No:</strong> {{ leave.certificate_number }}</td>
-                <td align="right"><strong>DATE:</strong> {{ leave.issue_date.strftime('%d %b %Y') }}</td>
+                <td align="right"><strong>DATE:</strong> {{ leave.issue_date.strftime('%d/%m/%Y') }}</td>
             </tr>
         </table>
 
@@ -210,8 +210,8 @@
 
             is hereby granted <strong>{{ leave.leave_type }}</strong> leave 
             for a period of <strong>{{ leave.actual_leave_days }} days</strong> (actual leave) 
-            w.e.f. <strong>{{ leave.start_date.strftime('%d-%m-%Y') }}</strong> 
-            to <strong>{{ leave.end_date.strftime('%d-%m-%Y') }}</strong>.
+            w.e.f. <strong>{{ leave.start_date.strftime('%d/%m/%Y') }}</strong> 
+            to <strong>{{ leave.end_date.strftime('%d/%m/%Y') }}</strong>.
 
             
             <!-- {% if leave.prefix_days > 0 or leave.suffix_days > 0 %}
@@ -323,7 +323,7 @@
                     <div class="digital-sig">
                         <!-- <strong style="color: #c00;">✓ DIGITALLY SIGNED</strong><br> -->
                         Officer Commanding <br>
-                        <strong>Date:</strong> {{ leave.issue_date.strftime('%d-%m-%Y') }}
+                        <strong>Date:</strong> {{ leave.issue_date.strftime('%d/%m/%Y') }}
                     </div>
                     <strong>Approving Authority</strong><br>
                     (Signature, Rank & Date)

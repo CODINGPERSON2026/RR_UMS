@@ -145,12 +145,14 @@
               <option value="HQ company">HQ company</option>
             </select>
 
-            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 160px; font-weight: 600; color: #dc2626; background-color: #fef2f2; border-color: #fca5a5;">
-              <option value="Unfit" selected>Unfit Personnel Only</option>
+            <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 140px; font-weight: 600; color: #dc2626; background-color: #fef2f2; border-color: #fca5a5;">
+              <option value="all">All</option>
+              <option value="fit">Fit</option>
+              <option value="unfit" selected>Unfit</option>
             </select>
 
-            <div class="modal-count-pill" title="Total Unfit Personnel Count">
-              <span class="count-label">Unfit Count</span>
+            <div class="modal-count-pill" title="Total Personnel Count">
+              <span class="count-label" id="fitnessCountLabel">Unfit Count</span>
               <span id="fitnessTotalCountUniqueScope" class="badge rounded-pill fitCountBadgeUnique count-number">0</span>
             </div>
 
@@ -267,13 +269,59 @@ const FitnessModalController = (function() {
   let modalInstance = null;
   let subModalInstance = null;
 
+  function updateStatusStyle(statusVal) {
+    const selectEl = document.getElementById('fitnessStatusFilterUniqueScope');
+    const labelEl = document.getElementById('fitnessCountLabel');
+    const badgeEl = document.getElementById('fitnessTotalCountUniqueScope');
+    const sLower = String(statusVal || 'unfit').toLowerCase();
+
+    if (selectEl) {
+      if (sLower === 'fit') {
+        selectEl.style.color = '#15803d';
+        selectEl.style.backgroundColor = '#f0fdf4';
+        selectEl.style.borderColor = '#86efac';
+      } else if (sLower === 'all') {
+        selectEl.style.color = '#1d4ed8';
+        selectEl.style.backgroundColor = '#eff6ff';
+        selectEl.style.borderColor = '#93c5fd';
+      } else {
+        selectEl.style.color = '#dc2626';
+        selectEl.style.backgroundColor = '#fef2f2';
+        selectEl.style.borderColor = '#fca5a5';
+      }
+    }
+
+    if (labelEl) {
+      if (sLower === 'fit') {
+        labelEl.textContent = 'Fit Count';
+      } else if (sLower === 'all') {
+        labelEl.textContent = 'Total Count';
+      } else {
+        labelEl.textContent = 'Unfit Count';
+      }
+    }
+
+    if (badgeEl) {
+      if (sLower === 'fit') {
+        badgeEl.style.backgroundColor = '#15803d';
+        badgeEl.style.color = '#ffffff';
+      } else if (sLower === 'all') {
+        badgeEl.style.backgroundColor = '#1d4ed8';
+        badgeEl.style.color = '#ffffff';
+      } else {
+        badgeEl.style.backgroundColor = '#dc2626';
+        badgeEl.style.color = '#ffffff';
+      }
+    }
+  }
+
   function init() {
     const modalEl = document.getElementById('aiFitnessReportsModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function() {
-        state.status = 'Unfit';
         const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
-        if (statusSelect) statusSelect.value = 'Unfit';
+        state.status = statusSelect ? statusSelect.value : 'unfit';
+        updateStatusStyle(state.status);
         loadModalStats();
         loadModalData();
       });
@@ -303,7 +351,8 @@ const FitnessModalController = (function() {
     const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
     if (statusSelect) {
       statusSelect.addEventListener('change', function(e) {
-        state.status = e.target.value || 'Unfit';
+        state.status = e.target.value;
+        updateStatusStyle(state.status);
         state.page = 1;
         loadModalData();
       });
@@ -331,12 +380,19 @@ const FitnessModalController = (function() {
     loadModalStats();
   }
 
-  function openModal() {
+  function openModal(defaultStatus) {
     const modalEl = document.getElementById('aiFitnessReportsModal');
     if (!modalEl) return;
-    state.status = 'Unfit';
     const statusSelect = document.getElementById('fitnessStatusFilterUniqueScope');
-    if (statusSelect) statusSelect.value = 'Unfit';
+    if (defaultStatus) {
+      state.status = defaultStatus;
+      if (statusSelect) statusSelect.value = defaultStatus;
+    } else if (statusSelect) {
+      state.status = statusSelect.value || 'unfit';
+    } else {
+      state.status = 'unfit';
+    }
+    updateStatusStyle(state.status);
     if (!modalInstance && window.bootstrap) {
       modalInstance = new bootstrap.Modal(modalEl);
     }
@@ -357,9 +413,18 @@ const FitnessModalController = (function() {
       if (data && data.success && data.stats) {
         const s = data.stats;
         
-        // Update header count badge with unfit count
+        // Update header count badge with appropriate count
         const modalTotalBadge = document.getElementById('fitnessTotalCountUniqueScope');
-        if (modalTotalBadge) modalTotalBadge.textContent = s.unfit_count || 0;
+        if (modalTotalBadge) {
+          const sLower = String(state.status || 'unfit').toLowerCase();
+          if (sLower === 'unfit') {
+            modalTotalBadge.textContent = s.unfit_count || 0;
+          } else if (sLower === 'fit') {
+            modalTotalBadge.textContent = s.fit_count || 0;
+          } else {
+            modalTotalBadge.textContent = s.total_reports || 0;
+          }
+        }
 
         // Update dashboard badges with unfit count
         const dashTotal = document.getElementById('dash-fit-total');
@@ -393,7 +458,13 @@ const FitnessModalController = (function() {
     const tbody = document.getElementById('fitnessTableBodyUniqueScope');
     const refreshIcon = document.getElementById('fitnessRefreshIcon');
 
-    if (spinner) spinner.classList.remove('d-none');
+    if (spinner) {
+      spinner.innerHTML = `
+        <div class="spinner-border text-primary"></div>
+        <div class="mt-2 text-muted">Fetching fitness reports...</div>
+      `;
+      spinner.classList.remove('d-none');
+    }
     if (table) table.classList.add('d-none');
     if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
@@ -466,7 +537,8 @@ const FitnessModalController = (function() {
     hours = hours % 12;
     hours = hours ? hours : 12;
     const hoursStr = String(hours).padStart(2, '0');
-    return `${day} ${month} ${year}, ${hoursStr}:${minutes} ${ampm}`;
+    const monthNum = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}/${monthNum}/${year}, ${hoursStr}:${minutes} ${ampm}`;
   }
 
   function renderTableRows(rows, page, perPage) {
@@ -619,12 +691,20 @@ const FitnessModalController = (function() {
   }
 
   function applyQuickStatusFilter(val) {
-    state.status = val;
+    const sLower = String(val || 'all').toLowerCase();
+    if (sLower === 'healthy' || sLower === 'fit') {
+      state.status = 'fit';
+    } else if (sLower === 'unfit' || sLower === 'at risk' || sLower === 'needs improvement') {
+      state.status = 'unfit';
+    } else {
+      state.status = 'all';
+    }
     state.page = 1;
     const selectEl = document.getElementById('fitnessStatusFilterUniqueScope');
     if (selectEl) {
-      selectEl.value = val;
+      selectEl.value = state.status;
     }
+    updateStatusStyle(state.status);
     updateQuickFilterButtons(val);
     loadModalData();
   }

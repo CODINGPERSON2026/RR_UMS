@@ -1157,7 +1157,13 @@
   }
 
   function formatProjectDate(d) {
-    return d ? new Date(d).toLocaleDateString('en-IN', {year:'numeric', month:'short', day:'numeric'}) : 'N/A';
+    if (!d) return 'N/A';
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    const day = String(dt.getDate()).padStart(2, '0');
+    const month = String(dt.getMonth() + 1).padStart(2, '0');
+    const year = dt.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
   function formatProjectCurrency(a) {

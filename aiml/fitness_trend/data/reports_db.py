@@ -810,8 +810,8 @@ def _deserialize_report_row(row):
     if d.get('fitness_score') is not None:
         d['fitness_score'] = float(d['fitness_score'])
     if d.get('generated_at') and isinstance(d['generated_at'], datetime):
-        d['generated_at_str'] = d['generated_at'].strftime('%d %b %Y, %I:%M %p')
-        d['date_time_12hr'] = d['generated_at'].strftime('%d %b %Y, %I:%M %p')
+        d['generated_at_str'] = d['generated_at'].strftime('%d/%m/%Y, %I:%M %p')
+        d['date_time_12hr'] = d['generated_at'].strftime('%d/%m/%Y, %I:%M %p')
     return d
 
 
@@ -831,8 +831,8 @@ def _format_report_summary(row):
 
     gen_at = d.get('generated_at') or d.get('updated_at')
     if gen_at and isinstance(gen_at, datetime):
-        d['generated_at_str'] = gen_at.strftime('%d %b %Y, %I:%M %p')
-        d['date_time_12hr'] = gen_at.strftime('%d %b %Y, %I:%M %p')
+        d['generated_at_str'] = gen_at.strftime('%d/%m/%Y, %I:%M %p')
+        d['date_time_12hr'] = gen_at.strftime('%d/%m/%Y, %I:%M %p')
     elif gen_at:
         try:
             if isinstance(gen_at, str):
@@ -844,8 +844,8 @@ def _format_report_summary(row):
                     except ValueError:
                         pass
                 if parsed_dt:
-                    d['generated_at_str'] = parsed_dt.strftime('%d %b %Y, %I:%M %p')
-                    d['date_time_12hr'] = parsed_dt.strftime('%d %b %Y, %I:%M %p')
+                    d['generated_at_str'] = parsed_dt.strftime('%d/%m/%Y, %I:%M %p')
+                    d['date_time_12hr'] = parsed_dt.strftime('%d/%m/%Y, %I:%M %p')
                 else:
                     d['generated_at_str'] = str(gen_at)
                     d['date_time_12hr'] = str(gen_at)

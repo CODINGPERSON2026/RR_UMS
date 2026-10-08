@@ -530,7 +530,7 @@ def get_company_interview_pending():
             if r.get('interview_done_on'):
                 try:
                     if hasattr(r['interview_done_on'], 'strftime'):
-                        r['interview_done_on'] = r['interview_done_on'].strftime('%d %b %Y')
+                        r['interview_done_on'] = r['interview_done_on'].strftime('%d/%m/%Y')
                     else:
                         r['interview_done_on'] = str(r['interview_done_on'])
                 except Exception:
@@ -789,7 +789,7 @@ def get_co_interview_pending():
             if r.get('co_interview_done_on'):
                 try:
                     if hasattr(r['co_interview_done_on'], 'strftime'):
-                        r['co_interview_done_on'] = r['co_interview_done_on'].strftime('%d %b %Y')
+                        r['co_interview_done_on'] = r['co_interview_done_on'].strftime('%d/%m/%Y')
                     else:
                         r['co_interview_done_on'] = str(r['co_interview_done_on'])
                 except Exception:

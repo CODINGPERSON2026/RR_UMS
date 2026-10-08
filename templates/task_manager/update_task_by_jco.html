@@ -181,7 +181,7 @@
                     ${task.priority || 'Low'}
                   </span>
                 </td>
-                <td class="text-nowrap">${task.due_date || '-'}</td>
+                <td class="text-nowrap">${(window.formatAppDate ? window.formatAppDate(task.due_date) : task.due_date) || '-'}</td>
                 <td class="text-center action-td"></td>
               `;
               

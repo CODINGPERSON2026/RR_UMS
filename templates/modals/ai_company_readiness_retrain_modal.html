@@ -1,15 +1,41 @@
 <!-- AI Company Readiness Model Retraining Modal -->
 <style>
+  #aiCompanyReadinessRetrainModal {
+    z-index: 1070 !important;
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(6px) !important;
+  }
   #aiCompanyReadinessRetrainModal .modal-dialog {
     max-width: 820px;
-    margin-top: 2rem;
+    z-index: 1071 !important;
   }
   #aiCompanyReadinessRetrainModal .modal-content {
-    border-radius: 14px;
+    border-radius: 16px;
     border: 1px solid var(--border-color, #e2e8f0);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     background: var(--card-bg-solid, #ffffff);
     color: var(--text-primary, #1e293b);
+    overflow: hidden;
+  }
+  #aiCompanyReadinessRetrainModal .modal-header * {
+    color: #ffffff !important;
+  }
+  #aiCompanyReadinessRetrainModal #mRetrainSubtitle,
+  #aiCompanyReadinessRetrainModal .modal-header #mRetrainSubtitle {
+    color: #ffffff !important;
+    font-size: 0.84rem !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+    display: block !important;
+    opacity: 0.95 !important;
+    visibility: visible !important;
+  }
+  #aiCompanyReadinessRetrainModal #aiCompanyReadinessRetrainModalLabel,
+  #aiCompanyReadinessRetrainModal .modal-title {
+    color: #ffffff !important;
+    font-size: 1.18rem !important;
+    font-weight: 700 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
   }
   #aiCompanyReadinessRetrainModal .retrain-header-badge {
     font-size: 0.75rem;
@@ -65,24 +91,24 @@
     <div class="modal-content">
 
       <!-- Modal Header -->
-      <div class="modal-header border-bottom py-3 px-4" style="background: var(--nav-link-hover-bg, #f8fafc);">
-        <div class="d-flex align-items-center gap-3">
-          <div style="width: 42px; height: 42px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
-            <i class="fas fa-brain"></i>
+      <div class="modal-header border-bottom py-3 px-4 d-flex align-items-center justify-content-between gap-3" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important; color: #ffffff !important;">
+        <div class="d-flex align-items-center gap-3 flex-grow-1" style="min-width: 0;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; border: 1px solid rgba(255, 255, 255, 0.35); flex-shrink: 0;">
+            <i class="fas fa-brain text-white"></i>
           </div>
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <h5 class="modal-title fw-bold mb-0" id="aiCompanyReadinessRetrainModalLabel">Retrain AI Readiness Model</h5>
-              <span class="badge bg-success-subtle text-success border border-success-subtle retrain-header-badge">
-                <i class="fas fa-user-shield me-1"></i> Authorized Role: 1 COY ONCO
+          <div class="flex-grow-1" style="min-width: 0;">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <h5 class="modal-title fw-bold mb-0 text-white" id="aiCompanyReadinessRetrainModalLabel" style="color: #ffffff !important; font-size: 1.18rem; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);">Retrain AI Readiness Model</h5>
+              <span class="badge" id="lblRetrainAuthorizedBadge" style="font-size: 0.72rem; font-weight: 700; background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; border: 1px solid rgba(255, 255, 255, 0.45) !important; border-radius: 99px;">
+                <i class="fas fa-user-shield me-1"></i> Authorized Role: <span id="lblRetrainRoleName">Authorized ONCO</span>
               </span>
             </div>
-            <div class="text-muted small" style="font-size: 0.78rem;">
+            <div class="mt-1" id="mRetrainSubtitle" style="font-size: 0.84rem !important; color: #ffffff !important; font-weight: 500 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;">
               Multi-Model Training Pipeline (Logistic Regression, Random Forest, Gradient Boosting)
             </div>
           </div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white flex-shrink-0 ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
       <!-- Modal Body -->
@@ -255,6 +281,37 @@ async function openReadinessRetrainModal() {
     return;
   }
 
+  // Update authorized role text from current role badge
+  try {
+    const parentBadge = document.getElementById('mReadinessRoleBadge');
+    const roleTxt = parentBadge ? parentBadge.textContent.trim() : '';
+    const roleSpan = document.getElementById('lblRetrainRoleName');
+    if (roleSpan && roleTxt && !roleTxt.includes('/')) {
+      roleSpan.textContent = roleTxt;
+    }
+  } catch (e) {}
+
+  // Check if parent readiness modal is currently open
+  const parentModalEl = document.getElementById('aiCompanyReadinessModal');
+  const wasParentOpen = parentModalEl && (parentModalEl.classList.contains('show') || parentModalEl.style.display === 'block');
+
+  if (wasParentOpen && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    const parentInst = bootstrap.Modal.getInstance(parentModalEl);
+    if (parentInst) {
+      // Temporarily hide parent modal so headers do not collide / overlap
+      parentInst.hide();
+
+      // When retrain modal closes, restore parent modal and refresh data
+      const onRetrainClose = function() {
+        modalEl.removeEventListener('hidden.bs.modal', onRetrainClose);
+        if (typeof openAiCompanyReadinessModal === 'function') {
+          openAiCompanyReadinessModal();
+        }
+      };
+      modalEl.addEventListener('hidden.bs.modal', onRetrainClose, { once: true });
+    }
+  }
+
   // Open modal via bootstrap
   if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
     const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
@@ -288,7 +345,10 @@ async function fetchReadinessRetrainStatus() {
       if (trainedEl) {
         if (d.trained_at) {
           const dt = new Date(d.trained_at);
-          trainedEl.textContent = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          const day = String(dt.getDate()).padStart(2, '0');
+          const month = String(dt.getMonth() + 1).padStart(2, '0');
+          const year = dt.getFullYear();
+          trainedEl.textContent = `${day}/${month}/${year} ` + dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         } else {
           trainedEl.textContent = 'Active Baseline';
         }

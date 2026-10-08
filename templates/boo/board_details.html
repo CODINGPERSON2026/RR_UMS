@@ -265,12 +265,12 @@
       tr.innerHTML = `
         <td>${idx + 1}</td>
         <td>${escapeHtml(board[1] || "")}</td>
-        <td>${escapeHtml(formatDate(board[2]))}</td>
+        <td>${escapeHtml(formatDisplayDate(board[2]))}</td>
         <td>${escapeHtml(board[3] || "")}</td>
         <td>${escapeHtml(board[4] || "")}</td>
         <td>${escapeHtml(board[5] || "")}</td>
         <td id="members-cell-${board[1]}"><span class="small-muted">loading...</span></td>
-        <td>${escapeHtml(formatDate(board[6]))}</td>
+        <td>${escapeHtml(formatDisplayDate(board[6]))}</td>
         <td>${escapeHtml(board[7] || "")}</td>
         <td>
           <div class="btn-group" role="group">
@@ -321,10 +321,8 @@
   }
   function escapeHtmlAttr(str) { return escapeHtml(str).replaceAll('"','&quot;'); }
 
-  function formatDate(d) {
+  function formatInputDate(d) {
     if (!d) return "";
-    // If date is already YYYY-MM-DD, return as is.
-    // If server returns "Tue, 25 Nov 2025 00:00:00 GMT" or similar, try Date parse.
     if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
     const dt = new Date(d);
     if (isNaN(dt)) return d;
@@ -332,6 +330,16 @@
     const mm = String(dt.getMonth() + 1).padStart(2, "0");
     const dd = String(dt.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function formatDisplayDate(d) {
+    if (!d) return "";
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    const dd = String(dt.getDate()).padStart(2, "0");
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const yyyy = dt.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
   }
 
   // ---------- open add modal ----------
@@ -405,11 +413,11 @@
     boardModalTitle.textContent = "Edit Board";
     document.getElementById("board_id").value = b[0];
     document.getElementById("order_no").value = b[1] || "";
-    document.getElementById("entry_date").value = formatDate(b[2]) || "";
+    document.getElementById("entry_date").value = formatInputDate(b[2]) || "";
     document.getElementById("authority").value = b[3] || "";
     document.getElementById("subject").value = b[4] || "";
     document.getElementById("presiding_officer").value = b[5] || "";
-    document.getElementById("completion_date").value = formatDate(b[6]) || "";
+    document.getElementById("completion_date").value = formatInputDate(b[6]) || "";
     document.getElementById("remarks").value = b[7] || "";
     boardSaveBtn.textContent = "Update";
     boardModal.show();

@@ -582,7 +582,12 @@
   }
   function formatDate(d) {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return d;
+    const day = String(dt.getDate()).padStart(2, '0');
+    const month = String(dt.getMonth() + 1).padStart(2, '0');
+    const year = dt.getFullYear();
+    return `${day}/${month}/${year}`;
   }
   function updateCount(n) {
     const el = document.getElementById('duesInCount');

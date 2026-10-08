@@ -402,7 +402,7 @@
             <td><strong>${escapeHtml(task.task_name)}</strong></td>
             <td>${escapeHtml(task.assigned_name || "Unassigned")}</td>
             <td><span class="badge ${priorityBadgeClass}">${task.priority || "Low"}</span></td>
-            <td>${task.due_date || "-"}</td>
+            <td>${(window.formatAppDate ? window.formatAppDate(task.due_date) : task.due_date) || "-"}</td>
             <td><span class="badge ${badgeClass}">${task.task_status || "Pending"}</span></td>
           `;
           recentBody.appendChild(row);

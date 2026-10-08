@@ -393,12 +393,7 @@
 
         document.getElementById('detailDate').textContent =
             eventData.start
-                ? eventData.start.toLocaleDateString('en-IN', {
-                    weekday: 'long',
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                })
+                ? `${String(eventData.start.getDate()).padStart(2, '0')}/${String(eventData.start.getMonth() + 1).padStart(2, '0')}/${eventData.start.getFullYear()}`
                 : "N/A";
 
         document.getElementById('detailVenue').textContent =
