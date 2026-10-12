@@ -504,27 +504,11 @@
               </div>
             </div>
 
-            <!-- Secondary Doughnut & Formation Inspector (4 cols) -->
-            <div class="col-12 col-xl-4 d-flex flex-column gap-3">
-              <!-- Ground Availability Doughnut -->
-              <div class="card border rounded-3 shadow-sm" style="background: var(--card-bg-solid, #ffffff);">
-                <div class="card-header bg-transparent py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
-                  <div>
-                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.88rem;">Ground Availability Ratio</h6>
-                    <span class="text-muted" style="font-size: 0.72rem;" id="mInlineDoughnutSub">Present vs Total Posted</span>
-                  </div>
-                  <span class="badge bg-success-subtle text-success border border-success-subtle py-1 px-2" style="font-size: 0.72rem; font-weight: 700;" id="mInlineEffectiveBadge">
-                    --% Effective
-                  </span>
-                </div>
-                <div class="card-body p-2" style="height: 145px; position: relative;">
-                  <canvas id="mInlineDoughnutChart"></canvas>
-                </div>
-              </div>
-
+            <!-- Formation Quick-Inspector (4 cols) -->
+            <div class="col-12 col-xl-4">
               <!-- Formation Quick-Inspector -->
-              <div class="card border rounded-3 shadow-sm flex-grow-1" style="background: var(--card-bg-solid, #ffffff);">
-                <div class="card-header bg-transparent py-2 px-3 border-bottom">
+              <div class="card border rounded-3 shadow-sm h-100" style="background: var(--card-bg-solid, #ffffff);">
+                <div class="card-header bg-transparent py-2.5 px-3 border-bottom">
                   <div class="d-flex justify-content-between align-items-center mb-1.5">
                     <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.88rem;">
                       <i class="fas fa-crosshairs text-primary me-1"></i> Formation Intelligence
@@ -538,7 +522,7 @@
                   </div>
                 </div>
 
-                <div class="card-body p-2.5" id="mInlineCompanyDetailDisplay">
+                <div class="card-body p-3" id="mInlineCompanyDetailDisplay">
                   <div class="text-center py-3 text-muted">
                     <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
                     <div style="font-size: 0.75rem;">Loading formation telemetry...</div>
@@ -1205,63 +1189,11 @@
     }
   }
 
-  let inlineDoughnutInstance = null;
-
-  function renderInlineDoughnut(d) {
-    if (typeof Chart === 'undefined') return;
-    const canvas = document.getElementById('mInlineDoughnutChart');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    if (inlineDoughnutInstance) {
-      inlineDoughnutInstance.destroy();
-      inlineDoughnutInstance = null;
-    }
-
-    const coys = d.companies || {};
-    const s = d.summary || {};
-    const coyNames = ['HQ COY', 'COMN COY', '3 COY'];
-    const availCounts = coyNames.map(name => coys[name] ? coys[name].effective_available_strength : 0);
-
-    const subEl = document.getElementById('mInlineDoughnutSub');
-    const badgeEl = document.getElementById('mInlineEffectiveBadge');
-    if (subEl && s) subEl.textContent = `${s.total_available_strength || 0} Present of ${s.total_actual_strength || 0} Posted`;
-    if (badgeEl && s && s.total_actual_strength) {
-      const eff = Math.round((s.total_available_strength / s.total_actual_strength) * 100);
-      badgeEl.textContent = `${eff}% Effective`;
-    }
-
-    inlineDoughnutInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: coyNames.map((name, i) => `${name} (${availCounts[i]})`),
-        datasets: [{
-          data: availCounts,
-          backgroundColor: ['#2563eb', '#10b981', '#8b5cf6'],
-          borderWidth: 2,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: { boxWidth: 10, font: { size: 10, weight: '600' } }
-          }
-        }
-      }
-    });
-  }
-
   function renderInlineFullAnalytics(dashboard) {
     if (!dashboard || !dashboard.companies) return;
 
     ensureChartJsLoaded(() => {
       renderInlineGraph(dashboard, currentInlineGraphMode);
-      renderInlineDoughnut(dashboard);
 
       let defaultCoy = 'HQ COY';
       const cleanRole = (window.CURRENT_USER_ROLE || '{{ role|default("") }}').toLowerCase().replace(/[\s_\-]/g, '');
