@@ -138,7 +138,7 @@
     border: 1px solid var(--border-color, #e2e8f0) !important;
     cursor: pointer !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.05) !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05) !important;
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
@@ -162,7 +162,7 @@
 
   .projdash-single-card:hover {
     transform: translateY(-4px) !important;
-    box-shadow: 0 12px 28px rgba(59,130,246,0.15) !important;
+    box-shadow: 0 12px 28px rgba(59, 130, 246, 0.15) !important;
   }
 
   .projdash-card-accent {
@@ -224,7 +224,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 2px 6px rgba(59,130,246,0.35);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.35);
   }
 
   .text-truncate-2 {
@@ -309,8 +309,10 @@
   /* ==================== MODERN PROJECT POPUP CARD ==================== */
   .projdash-popup-overlay {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background: rgba(10, 15, 30, 0.65);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -327,15 +329,22 @@
     max-width: 860px;
     max-height: 88vh;
     overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
     animation: popupFadeIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     display: flex;
     flex-direction: column;
   }
 
   @keyframes popupFadeIn {
-    from { opacity: 0; transform: scale(0.92) translateY(30px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
+    from {
+      opacity: 0;
+      transform: scale(0.92) translateY(30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 
   .projdash-popup-header {
@@ -379,7 +388,7 @@
   }
 
   .projdash-popup-close:hover {
-    background: rgba(255,255,255,0.35);
+    background: rgba(255, 255, 255, 0.35);
     transform: rotate(90deg);
   }
 
@@ -401,7 +410,9 @@
     scrollbar-width: thin;
   }
 
-  .projdash-stepper::-webkit-scrollbar { display: none; }
+  .projdash-stepper::-webkit-scrollbar {
+    display: none;
+  }
 
   .projdash-step {
     display: flex;
@@ -440,7 +451,7 @@
     background: var(--card-bg-solid, white);
     border-color: var(--primary-color, #3b82f6);
     color: var(--primary-color, #3b82f6);
-    box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
     width: 26px;
     height: 26px;
   }
@@ -510,8 +521,20 @@
     line-height: 1.3;
   }
 
-  .popup-info-value.cost { color: var(--success-color, #16a34a); font-size: 1.35rem; }
-  .popup-info-value.desc { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary, #475569); line-height: 1.6; max-height: 100px; overflow-y: auto; white-space: pre-line; }
+  .popup-info-value.cost {
+    color: var(--success-color, #16a34a);
+    font-size: 1.35rem;
+  }
+
+  .popup-info-value.desc {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary, #475569);
+    line-height: 1.6;
+    max-height: 100px;
+    overflow-y: auto;
+    white-space: pre-line;
+  }
 
   .projdash-stage-badge {
     display: inline-block;
@@ -524,26 +547,82 @@
   }
 
   /* Stage Colors */
-  .projdash-stage-ppp { background: #e0f2fe; color: #0284c7; }
-  .projdash-stage-aon { background: #f3e5f5; color: #7b1fa2; }
-  .projdash-stage-fbu { background: #fff3e0; color: #f57c00; }
-  .projdash-stage-tob-tec { background: #e8f5e9; color: #388e3c; }
-  .projdash-stage-b-bd { background: #fce4ec; color: #c2185b; }
-  .projdash-stage-ocb-ra { background: #e0f2f1; color: #00796b; }
-  .projdash-stage-placement-of-so { background: #fef9c3; color: #a16207; }
-  .projdash-stage-store-delivery { background: #ede7f6; color: #5e35b1; }
-  .projdash-stage-atp { background: #e0f2fe; color: #0369a1; }
-  .projdash-stage-prac-crac { background: #f0fdf4; color: #166534; }
-  .projdash-stage-payment { background: #fffbeb; color: #b45309; }
-  .projdash-stage-completed { background: #dcfce7; color: #15803d; }
+  .projdash-stage-ppp {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+
+  .projdash-stage-aon {
+    background: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  .projdash-stage-fbu {
+    background: #fff3e0;
+    color: #f57c00;
+  }
+
+  .projdash-stage-tob-tec {
+    background: #e8f5e9;
+    color: #388e3c;
+  }
+
+  .projdash-stage-b-bd {
+    background: #fce4ec;
+    color: #c2185b;
+  }
+
+  .projdash-stage-ocb-ra {
+    background: #e0f2f1;
+    color: #00796b;
+  }
+
+  .projdash-stage-placement-of-so {
+    background: #fef9c3;
+    color: #a16207;
+  }
+
+  .projdash-stage-store-delivery {
+    background: #ede7f6;
+    color: #5e35b1;
+  }
+
+  .projdash-stage-atp {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  .projdash-stage-prac-crac {
+    background: #f0fdf4;
+    color: #166534;
+  }
+
+  .projdash-stage-payment {
+    background: #fffbeb;
+    color: #b45309;
+  }
+
+  .projdash-stage-completed {
+    background: #dcfce7;
+    color: #15803d;
+  }
 
 
 
   /* Responsive */
   @media (max-width: 768px) {
-    .projdash-cards-grid { grid-template-columns: 1fr; padding: 1rem; }
-    .projdash-main-stats { gap: 16px; }
-    .projdash-popup-card { width: 94%; }
+    .projdash-cards-grid {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+
+    .projdash-main-stats {
+      gap: 16px;
+    }
+
+    .projdash-popup-card {
+      width: 94%;
+    }
   }
 </style>
 
@@ -551,7 +630,7 @@
 <div class="modal fade" id="projDash_modal" tabindex="-1" data-bs-focus="false">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content overflow-hidden">
-      
+
       <!-- Minimal & Clean Compact Header -->
       <div class="projdash-header-wrapper">
         <div class="d-flex align-items-center gap-3">
@@ -559,11 +638,13 @@
             <h6 class="mb-0 text-white fw-bold d-flex align-items-center gap-2" style="font-size: 1.1rem;">
               <i class="fas fa-tasks"></i> Projects Dashboard
             </h6>
-            <div style="font-size: 0.68rem; font-weight: 600; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.5px; margin-top: 1px;">
-              <i class="fa fa-user-shield me-1" style="font-size: 0.65rem;"></i> UPDATED BY PROJCO
+            <div
+              style="font-size: 0.68rem; font-weight: 600; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.5px; margin-top: 1px;">
+              <i class="fa fa-user-shield me-1" style="font-size: 0.65rem;"></i> UPDATED BY PROJECT JCO
             </div>
           </div>
-          <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 py-1 ms-2 shadow-sm" style="font-size: 0.78rem;" onclick="openStatisticsModal()">
+          <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 py-1 ms-2 shadow-sm" style="font-size: 0.78rem;"
+            onclick="openStatisticsModal()">
             <i class="fas fa-chart-bar me-1"></i> View Statistics
           </button>
         </div>
@@ -575,22 +656,26 @@
             <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Total</div>
           </div>
           <div class="projdash-main-stat" style="min-width: 50px;">
-            <div class="projdash-main-stat-number text-warning" id="projdashActiveCount" style="font-size: 1.1rem;">0</div>
+            <div class="projdash-main-stat-number text-warning" id="projdashActiveCount" style="font-size: 1.1rem;">0
+            </div>
             <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Active</div>
           </div>
           <div class="projdash-main-stat" style="min-width: 50px;">
-            <div class="projdash-main-stat-number" id="projdashCompletedCount" style="font-size: 1.1rem; color: #4ade80; font-weight: 900;">0</div>
+            <div class="projdash-main-stat-number" id="projdashCompletedCount"
+              style="font-size: 1.1rem; color: #4ade80; font-weight: 900;">0</div>
             <div class="projdash-main-stat-label" style="font-size: 0.65rem;">Completed</div>
           </div>
         </div>
 
-        <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal"
+          aria-label="Close"></button>
       </div>
 
       <!-- Clean Filters -->
       <div class="projdash-filters-bar">
         <div class="projdash-filter-group">
-          <span class="small fw-bold text-secondary text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Stage</span>
+          <span class="small fw-bold text-secondary text-uppercase"
+            style="font-size: 0.72rem; letter-spacing: 0.5px;">Stage</span>
           <select class="projdash-filter-dropdown" id="prjStageFilter" onchange="filterProjectsData()">
             <option value="">All Stages</option>
             <option value="PPP">PPP</option>
@@ -609,16 +694,17 @@
         </div>
 
         <div class="projdash-filter-group">
-          <span class="small fw-bold text-secondary text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Head</span>
+          <span class="small fw-bold text-secondary text-uppercase"
+            style="font-size: 0.72rem; letter-spacing: 0.5px;">Head</span>
           <select class="projdash-filter-dropdown" id="prjHeadFilter" onchange="filterProjectsData()">
             <option value="">All Heads</option>
           </select>
         </div>
-       
+
         <div class="projdash-search-wrapper">
           <i class="fas fa-search projdash-search-icon"></i>
           <input type="text" class="projdash-search-field" id="prjSearchInput"
-                 placeholder="Search projects by title, description or owner..." onkeyup="filterProjectsData()">
+            placeholder="Search projects by title, description or owner..." onkeyup="filterProjectsData()">
         </div>
       </div>
 
@@ -643,8 +729,9 @@
       <div class="d-flex align-items-center justify-content-between w-100 pe-4 mb-2">
         <div class="d-flex align-items-center gap-2">
           <span id="popupBadge" class="badge text-white"
-                style="background:rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">PRJ-001</span>
-          <button id="popupBOMBtn" class="btn btn-sm btn-light fw-bold ms-2 text-primary" onclick="openBOMFromPopup()" style="border-radius: 8px; font-size:0.8rem; padding: 3px 12px;">
+            style="background:rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.35); font-size:0.75rem; font-weight: 800; padding: 4px 12px; border-radius: 12px; letter-spacing: 0.5px;">PRJ-001</span>
+          <button id="popupBOMBtn" class="btn btn-sm btn-light fw-bold ms-2 text-primary" onclick="openBOMFromPopup()"
+            style="border-radius: 8px; font-size:0.8rem; padding: 3px 12px;">
             <i class="fas fa-boxes me-1 text-warning"></i>BOM
           </button>
         </div>
@@ -704,7 +791,8 @@
 </div>
 
 <!-- ================= EDIT PROJECT MODAL ================= -->
-<div class="modal fade" id="modalPrjEditModal" tabindex="-1" data-bs-focus="false" style="z-index: 1060;" aria-hidden="true">
+<div class="modal fade" id="modalPrjEditModal" tabindex="-1" data-bs-focus="false" style="z-index: 1060;"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content border-0 shadow">
       <div class="modal-header bg-primary text-white">
@@ -791,33 +879,38 @@
 
 <!-- ================= VIEW BOM MODAL ================= -->
 <div class="modal fade" id="viewBOMModal" tabindex="-1" data-bs-focus="false" style="z-index: 1070;">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-2xl border-0" style="border-radius: 20px; overflow: hidden; background: #f8fafc;">
-            <div class="modal-header border-0 py-3 px-4" style="background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);">
-                <div class="d-flex align-items-center gap-3 w-100">
-                    <div class="p-2 rounded-3 text-white d-flex align-items-center justify-content-center shadow-sm" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); width: 44px; height: 44px;">
-                        <i class="fas fa-boxes-stacked fs-4 text-warning"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="text-warning text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 1px;">Project Details</div>
-                        <h5 class="modal-title text-white fw-bold m-0 fs-5" id="viewBOMModalTitle">Bill of Materials</h5>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-            </div>
-            <div class="modal-body p-4" id="viewBOMModalBody">
-                <!-- Dynamic Content -->
-            </div>
-            <div class="modal-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
-                <span class="badge px-3 py-2 rounded-pill fw-semibold shadow-sm" id="viewBOMFooterCount" style="background: #f1f5f9; color: #334155; font-size: 0.8rem;">
-                    <i class="fas fa-layer-group me-1 text-primary"></i>0 items
-                </span>
-                <button type="button" class="btn btn-dark px-4 py-2 fw-semibold shadow-sm" style="border-radius: 12px; background: linear-gradient(135deg, #1e293b, #0f172a);" data-bs-dismiss="modal">
-                    <i class="fas fa-times me-1"></i>Close
-                </button>
-            </div>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-2xl border-0" style="border-radius: 20px; overflow: hidden; background: #f8fafc;">
+      <div class="modal-header border-0 py-3 px-4"
+        style="background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);">
+        <div class="d-flex align-items-center gap-3 w-100">
+          <div class="p-2 rounded-3 text-white d-flex align-items-center justify-content-center shadow-sm"
+            style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); width: 44px; height: 44px;">
+            <i class="fas fa-boxes-stacked fs-4 text-warning"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="text-warning text-uppercase fw-bold" style="font-size: 0.68rem; letter-spacing: 1px;">Project
+              Details</div>
+            <h5 class="modal-title text-white fw-bold m-0 fs-5" id="viewBOMModalTitle">Bill of Materials</h5>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
+      </div>
+      <div class="modal-body p-4" id="viewBOMModalBody">
+        <!-- Dynamic Content -->
+      </div>
+      <div class="modal-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
+        <span class="badge px-3 py-2 rounded-pill fw-semibold shadow-sm" id="viewBOMFooterCount"
+          style="background: #f1f5f9; color: #334155; font-size: 0.8rem;">
+          <i class="fas fa-layer-group me-1 text-primary"></i>0 items
+        </span>
+        <button type="button" class="btn btn-dark px-4 py-2 fw-semibold shadow-sm"
+          style="border-radius: 12px; background: linear-gradient(135deg, #1e293b, #0f172a);" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>Close
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 
 
@@ -833,7 +926,7 @@
     }
   }
 
-  document.getElementById('projDash_modal')?.addEventListener('show.bs.modal', function() {
+  document.getElementById('projDash_modal')?.addEventListener('show.bs.modal', function () {
     loadAllProjectsData();
     loadProjectHeadsData();
   });
@@ -849,7 +942,7 @@
         opt.value = h.head_name; opt.textContent = h.head_name;
         filter.appendChild(opt);
       });
-    } catch(e) {}
+    } catch (e) { }
   }
 
   async function loadAllProjectsData() {
@@ -863,7 +956,7 @@
         renderStageWiseStats();
         renderProjectsData(filteredProjectsData);
       }
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   }
 
   function updateMainHeaderStats() {
@@ -900,7 +993,7 @@
       grid.innerHTML = `<div class="w-100 text-center text-muted py-5"><i class="fas fa-search fs-1"></i><h4 class="mt-2">No Projects Found</h4></div>`;
       return;
     }
-    
+
     grid.innerHTML = projects.map(p => {
       const progress = getProjectProgress(p.stage);
       const stageClass = getProjectStageClass(p.stage);
@@ -923,7 +1016,7 @@
         'completed': 'linear-gradient(90deg,#15803d,#86efac)'
       };
 
-      const stageKey = (p.stage||'').toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
+      const stageKey = (p.stage || '').toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_').replace(/&/g, '').replace(/__+/g, '_').trim();
       const accentGrad = stageGradients[stageKey] || 'linear-gradient(90deg,#3b82f6,#8b5cf6)';
       const progressBarGrad = accentGrad;
 
@@ -1001,7 +1094,7 @@
       'payment': 'linear-gradient(135deg,#b45309,#fcd34d)',
       'completed': 'linear-gradient(135deg,#15803d,#86efac)'
     };
-    const stageKey = (p.stage||'').toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
+    const stageKey = (p.stage || '').toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_').replace(/&/g, '').replace(/__+/g, '_').trim();
     const headerGrad = stageGradients[stageKey] || 'linear-gradient(135deg,#1e3a8a,#3b82f6)';
 
     document.getElementById('popupHeader').style.background = headerGrad;
@@ -1016,14 +1109,14 @@
       `<span class="projdash-stage-badge ${stageClass}">${p.stage || 'Planning'}</span>`;
 
     // Build stage stepper
-    const stages = ['PPP','AON','BIDDING','TOB & TEC','BENCH MARKING BOARD','OCB RA','Placement Of SO','Store/Items Delivery','ATP','PRAC & CRAC','Payment','Completed'];
-    const currentIdx = stages.findIndex(s => s.toUpperCase() === (p.stage||'').toUpperCase() || (s === 'BIDDING' && (p.stage||'').toUpperCase() === 'FBU') || (s === 'BENCH MARKING BOARD' && (p.stage||'').toUpperCase() === 'B BD'));
+    const stages = ['PPP', 'AON', 'BIDDING', 'TOB & TEC', 'BENCH MARKING BOARD', 'OCB RA', 'Placement Of SO', 'Store/Items Delivery', 'ATP', 'PRAC & CRAC', 'Payment', 'Completed'];
+    const currentIdx = stages.findIndex(s => s.toUpperCase() === (p.stage || '').toUpperCase() || (s === 'BIDDING' && (p.stage || '').toUpperCase() === 'FBU') || (s === 'BENCH MARKING BOARD' && (p.stage || '').toUpperCase() === 'B BD'));
     const stepper = document.getElementById('popupStepper');
     stepper.innerHTML = stages.map((s, i) => {
       const isDone = i < currentIdx;
       const isActive = i === currentIdx;
       const cls = isDone ? 'done' : isActive ? 'active' : '';
-      const shortLabel = s.replace('Placement Of SO','SO').replace('Store/Items Delivery','Delivery').replace('TOB & TEC','TEC').replace('PRAC & CRAC','CRAC').replace('BENCH MARKING BOARD','BENCHMARK');
+      const shortLabel = s.replace('Placement Of SO', 'SO').replace('Store/Items Delivery', 'Delivery').replace('TOB & TEC', 'TEC').replace('PRAC & CRAC', 'CRAC').replace('BENCH MARKING BOARD', 'BENCHMARK');
       const dotContent = isDone ? '✓' : (i + 1);
       const lineHtml = i < stages.length - 1
         ? `<div class="projdash-step-line ${isDone ? 'done' : ''}"></div>`
@@ -1060,7 +1153,7 @@
         else matchStage = pStage === stageF;
       }
       const matchHead = !headF || (p.owner || '').toLowerCase() === headF;
-      const matchSearch = !search || 
+      const matchSearch = !search ||
         (p.title || '').toLowerCase().includes(search) ||
         (p.description || '').toLowerCase().includes(search) ||
         (p.owner || '').toLowerCase().includes(search);
@@ -1127,12 +1220,12 @@
     bar.innerHTML = html;
   }
 
-  window.filterByStageCard = function(stageKey) {
+  window.filterByStageCard = function (stageKey) {
     const stageSelect = document.getElementById('prjStageFilter');
     if (!stageSelect) return;
 
     const currentVal = (stageSelect.value || '').toLowerCase().trim();
-    const targetKey  = (stageKey || '').toLowerCase().trim();
+    const targetKey = (stageKey || '').toLowerCase().trim();
 
     if (currentVal === targetKey || (targetKey.includes('store') && currentVal.includes('store'))) {
       stageSelect.value = '';
@@ -1148,11 +1241,13 @@
 
   function getProjectStageClass(stage) {
     if (!stage) return 'projdash-stage-ppp';
-    const n = stage.toLowerCase().replace(/\s+/g,'_').replace(/\//g,'_').replace(/&/g,'').replace(/__+/g,'_').trim();
-    const map = { 'ppp':'projdash-stage-ppp','aon':'projdash-stage-aon','fbu':'projdash-stage-fbu','bidding':'projdash-stage-fbu','tob_tec':'projdash-stage-tob-tec',
-      'b_bd':'projdash-stage-b-bd','bench_marking_board':'projdash-stage-b-bd','benchmarking_board':'projdash-stage-b-bd','ocb_ra':'projdash-stage-ocb-ra','placement_of_so':'projdash-stage-placement-of-so',
-      'store_items_delivery':'projdash-stage-store-delivery','atp':'projdash-stage-atp',
-      'prac_crac':'projdash-stage-prac-crac','payment':'projdash-stage-payment','completed':'projdash-stage-completed' };
+    const n = stage.toLowerCase().replace(/\s+/g, '_').replace(/\//g, '_').replace(/&/g, '').replace(/__+/g, '_').trim();
+    const map = {
+      'ppp': 'projdash-stage-ppp', 'aon': 'projdash-stage-aon', 'fbu': 'projdash-stage-fbu', 'bidding': 'projdash-stage-fbu', 'tob_tec': 'projdash-stage-tob-tec',
+      'b_bd': 'projdash-stage-b-bd', 'bench_marking_board': 'projdash-stage-b-bd', 'benchmarking_board': 'projdash-stage-b-bd', 'ocb_ra': 'projdash-stage-ocb-ra', 'placement_of_so': 'projdash-stage-placement-of-so',
+      'store_items_delivery': 'projdash-stage-store-delivery', 'atp': 'projdash-stage-atp',
+      'prac_crac': 'projdash-stage-prac-crac', 'payment': 'projdash-stage-payment', 'completed': 'projdash-stage-completed'
+    };
     return map[n] || 'projdash-stage-ppp';
   }
 
@@ -1169,7 +1264,7 @@
   function formatProjectCurrency(a) {
     if (!a) return '₹ 0';
     const n = parseFloat(a);
-    return isNaN(n) ? '₹ 0' : '₹ ' + n.toLocaleString('en-IN', {maximumFractionDigits: 2});
+    return isNaN(n) ? '₹ 0' : '₹ ' + n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
   }
 
   // Helper function to safely escape text to avoid HTML injection
@@ -1207,7 +1302,7 @@
           headSelect.appendChild(opt);
         });
       }
-    } catch(e) {}
+    } catch (e) { }
 
     document.getElementById('modalEditPrjId').value = p.id || p.project_id;
     document.getElementById('modalEditPrjTitle').value = p.project_name || p.title || '';
@@ -1279,7 +1374,7 @@
       } else {
         alert(result.message || "Failed to update project");
       }
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       alert("Error updating project");
     } finally {
@@ -1292,50 +1387,50 @@
 
   // ── VIEW BOM MODAL FUNCTION (GLOBAL) ──
   async function viewProjectBOM(projectId, projectName) {
-      const modalTitle = document.getElementById('viewBOMModalTitle');
-      const modalBody = document.getElementById('viewBOMModalBody');
-      const modalFooterCount = document.getElementById('viewBOMFooterCount');
+    const modalTitle = document.getElementById('viewBOMModalTitle');
+    const modalBody = document.getElementById('viewBOMModalBody');
+    const modalFooterCount = document.getElementById('viewBOMFooterCount');
 
-      if (modalTitle) {
-          modalTitle.innerHTML = `${projectName || 'Project'}`;
-      }
+    if (modalTitle) {
+      modalTitle.innerHTML = `${projectName || 'Project'}`;
+    }
 
-      if (modalBody) {
-          modalBody.innerHTML = `
+    if (modalBody) {
+      modalBody.innerHTML = `
               <div class="text-center py-5">
                   <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
                   <h6 class="fw-semibold text-secondary">Fetching Bill of Materials...</h6>
               </div>
           `;
-      }
+    }
 
-      const modalEl = document.getElementById('viewBOMModal');
-      if (!modalEl) {
-          alert("BOM Modal structure missing.");
-          return;
-      }
-      const bomModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: false });
-      bomModal.show();
+    const modalEl = document.getElementById('viewBOMModal');
+    if (!modalEl) {
+      alert("BOM Modal structure missing.");
+      return;
+    }
+    const bomModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: false });
+    bomModal.show();
 
-      try {
-          const response = await fetch(`/projects/bom/${projectId}`);
-          const result = await response.json();
+    try {
+      const response = await fetch(`/projects/bom/${projectId}`);
+      const result = await response.json();
 
-          if (result.status === 'success' && result.bom_items && result.bom_items.length > 0) {
-              const items = result.bom_items;
+      if (result.status === 'success' && result.bom_items && result.bom_items.length > 0) {
+        const items = result.bom_items;
 
-              let totalQty = 0;
-              let totalCost = 0;
+        let totalQty = 0;
+        let totalCost = 0;
 
-              let rowsHtml = items.map((item, idx) => {
-                  const qty = Number(item.qty) || 0;
-                  const rate = Number(item.rate) || 0;
-                  const cost = Number(item.total_cost) || (qty * rate);
+        let rowsHtml = items.map((item, idx) => {
+          const qty = Number(item.qty) || 0;
+          const rate = Number(item.rate) || 0;
+          const cost = Number(item.total_cost) || (qty * rate);
 
-                  totalQty += qty;
-                  totalCost += cost;
+          totalQty += qty;
+          totalCost += cost;
 
-                  return `
+          return `
                       <tr class="align-middle" style="transition: background 0.2s;">
                           <td class="text-center py-3">
                               <span class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle fw-bold" style="width:28px; height:28px; font-size:0.75rem;">
@@ -1361,18 +1456,18 @@
                               </span>
                           </td>
                           <td class="text-end py-3 fw-semibold" style="color: #475569;">
-                              ₹${rate.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                              ₹${rate.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </td>
                           <td class="text-end py-3 pe-3">
                               <span class="badge px-3 py-1.5 rounded-pill shadow-sm fs-6" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0); color: #15803d; font-weight: 800;">
-                                  ₹${cost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                  ₹${cost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                               </span>
                           </td>
                       </tr>
                   `;
-              }).join('');
+        }).join('');
 
-              modalBody.innerHTML = `
+        modalBody.innerHTML = `
                   <!-- Quick KPI Stats Cards & Edit Button -->
                   <div class="d-flex justify-content-between align-items-center mb-3">
                       <h6 class="fw-bold text-dark m-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Summary & Items</h6>
@@ -1396,7 +1491,7 @@
                       <div class="col-md-4">
                           <div class="p-3 rounded-4 shadow-sm border border-success-subtle" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
                               <div class="text-success text-uppercase fw-bold small" style="font-size: 0.7rem; letter-spacing: 0.5px;"><i class="fas fa-indian-rupee-sign me-1"></i> Total BOM Cost</div>
-                              <div class="fs-4 fw-bold text-success mt-1">₹${totalCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                              <div class="fs-4 fw-bold text-success mt-1">₹${totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
                           </div>
                       </div>
                   </div>
@@ -1426,7 +1521,7 @@
                                   <td class="text-end py-3 text-muted">&mdash;</td>
                                   <td class="text-end py-3 pe-3">
                                       <span class="badge text-white px-3 py-1.5 rounded-pill fs-6 shadow-sm" style="background: linear-gradient(135deg, #16a34a, #15803d);">
-                                          ₹${totalCost.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                          ₹${totalCost.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                       </span>
                                   </td>
                               </tr>
@@ -1434,10 +1529,10 @@
                       </table>
                   </div>
               `;
-              if (modalFooterCount) modalFooterCount.innerHTML = `<i class="fas fa-check-circle me-1 text-success"></i><strong>${items.length}</strong> BOM item(s) loaded`;
-          } else {
-              const escapedName = (projectName || '').replace(/'/g, "\\'");
-              modalBody.innerHTML = `
+        if (modalFooterCount) modalFooterCount.innerHTML = `<i class="fas fa-check-circle me-1 text-success"></i><strong>${items.length}</strong> BOM item(s) loaded`;
+      } else {
+        const escapedName = (projectName || '').replace(/'/g, "\\'");
+        modalBody.innerHTML = `
                   <div class="p-4 rounded-4 shadow-sm border border-warning-subtle text-center my-3" style="background: linear-gradient(135deg, #fff7ed, #ffedd5);">
                       <div class="mb-3">
                           <div class="d-inline-flex p-3 rounded-circle shadow-sm" style="background: #ffedd5; color: #c2410c;">
@@ -1451,11 +1546,11 @@
                       </button>
                   </div>
               `;
-              if (modalFooterCount) modalFooterCount.innerHTML = `<i class="fas fa-info-circle me-1 text-warning"></i>0 BOM items`;
-          }
-      } catch (error) {
-          console.error("Error fetching BOM:", error);
-          modalBody.innerHTML = `
+        if (modalFooterCount) modalFooterCount.innerHTML = `<i class="fas fa-info-circle me-1 text-warning"></i>0 BOM items`;
+      }
+    } catch (error) {
+      console.error("Error fetching BOM:", error);
+      modalBody.innerHTML = `
               <div class="alert alert-danger rounded-4 p-4 shadow-sm mb-0 d-flex align-items-center gap-3">
                   <i class="fas fa-circle-exclamation fs-2 text-danger"></i>
                   <div>
@@ -1464,22 +1559,22 @@
                   </div>
               </div>
           `;
-      }
+    }
   }
   window.viewProjectBOM = viewProjectBOM;
 
   // ── SHOW ADD / EDIT BOM FORM ──
   function showAddBOMForm(projectId, projectName, existingItems = []) {
-      const modalBody = document.getElementById('viewBOMModalBody');
-      const modalFooterCount = document.getElementById('viewBOMFooterCount');
+    const modalBody = document.getElementById('viewBOMModalBody');
+    const modalFooterCount = document.getElementById('viewBOMFooterCount');
 
-      if (modalFooterCount) {
-          modalFooterCount.innerHTML = `<i class="fas fa-edit me-1 text-primary"></i>${existingItems.length > 0 ? 'Editing' : 'Adding'} BOM Items`;
-      }
+    if (modalFooterCount) {
+      modalFooterCount.innerHTML = `<i class="fas fa-edit me-1 text-primary"></i>${existingItems.length > 0 ? 'Editing' : 'Adding'} BOM Items`;
+    }
 
-      const escapedName = (projectName || '').replace(/'/g, "\\'");
+    const escapedName = (projectName || '').replace(/'/g, "\\'");
 
-      modalBody.innerHTML = `
+    modalBody.innerHTML = `
           <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
               <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3 px-4" style="background: linear-gradient(135deg, #1e293b, #0f172a);">
                   <span class="fw-bold fs-6"><i class="fas fa-boxes-packing me-2 text-warning"></i>${existingItems.length > 0 ? 'Edit' : 'Add'} Bill of Materials</span>
@@ -1522,22 +1617,22 @@
           </div>
       `;
 
-      if (existingItems && existingItems.length > 0) {
-          existingItems.forEach(item => {
-              addNewBOMViewRow(item.nomenclature || '', item.au || '', item.qty || 1, item.rate || 0);
-          });
-      } else {
-          addNewBOMViewRow();
-      }
+    if (existingItems && existingItems.length > 0) {
+      existingItems.forEach(item => {
+        addNewBOMViewRow(item.nomenclature || '', item.au || '', item.qty || 1, item.rate || 0);
+      });
+    } else {
+      addNewBOMViewRow();
+    }
   }
 
   function addNewBOMViewRow(nomen = '', au = '', qty = 1, rate = 0) {
-      const bodyEl = document.getElementById('viewBOMFormTableBody');
-      if (!bodyEl) return;
+    const bodyEl = document.getElementById('viewBOMFormTableBody');
+    if (!bodyEl) return;
 
-      const tr = document.createElement('tr');
-      tr.className = 'align-middle';
-      tr.innerHTML = `
+    const tr = document.createElement('tr');
+    tr.className = 'align-middle';
+    tr.innerHTML = `
           <td><input type="text" class="form-control form-control-sm bom-v-nomen" placeholder="Nomenclature" value="${nomen}" oninput="calculateViewBOMTotals()"></td>
           <td><input type="text" class="form-control form-control-sm bom-v-au" placeholder="A/U" value="${au}"></td>
           <td><input type="number" class="form-control form-control-sm bom-v-qty" min="0" value="${qty}" oninput="calculateViewBOMTotals()"></td>
@@ -1545,95 +1640,95 @@
           <td><input type="number" class="form-control form-control-sm bom-v-total bg-light" readonly value="0.00"></td>
           <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeNewBOMViewRow(this)" title="Remove item"><i class="fas fa-trash-alt"></i></button></td>
       `;
-      bodyEl.appendChild(tr);
-      calculateViewBOMTotals();
+    bodyEl.appendChild(tr);
+    calculateViewBOMTotals();
   }
 
   function removeNewBOMViewRow(btn) {
-      const row = btn.closest('tr');
-      if (row) row.remove();
-      calculateViewBOMTotals();
+    const row = btn.closest('tr');
+    if (row) row.remove();
+    calculateViewBOMTotals();
   }
 
   function calculateViewBOMTotals() {
-      const rows = document.querySelectorAll('#viewBOMFormTableBody tr');
-      let grandTotal = 0;
-      let grandQty = 0;
+    const rows = document.querySelectorAll('#viewBOMFormTableBody tr');
+    let grandTotal = 0;
+    let grandQty = 0;
 
-      rows.forEach(row => {
-          const qtyEl = row.querySelector('.bom-v-qty');
-          const rateEl = row.querySelector('.bom-v-rate');
-          const totalEl = row.querySelector('.bom-v-total');
+    rows.forEach(row => {
+      const qtyEl = row.querySelector('.bom-v-qty');
+      const rateEl = row.querySelector('.bom-v-rate');
+      const totalEl = row.querySelector('.bom-v-total');
 
-          const qty = parseFloat(qtyEl?.value) || 0;
-          const rate = parseFloat(rateEl?.value) || 0;
-          const total = qty * rate;
+      const qty = parseFloat(qtyEl?.value) || 0;
+      const rate = parseFloat(rateEl?.value) || 0;
+      const total = qty * rate;
 
-          if (totalEl) totalEl.value = total.toFixed(2);
-          grandTotal += total;
-          grandQty += qty;
-      });
+      if (totalEl) totalEl.value = total.toFixed(2);
+      grandTotal += total;
+      grandQty += qty;
+    });
 
-      const grandTotEl = document.getElementById('viewBOMGrandTotal');
-      if (grandTotEl) grandTotEl.innerText = grandTotal.toFixed(2);
+    const grandTotEl = document.getElementById('viewBOMGrandTotal');
+    if (grandTotEl) grandTotEl.innerText = grandTotal.toFixed(2);
 
-      const grandQtyEl = document.getElementById('viewBOMGrandQty');
-      if (grandQtyEl) grandQtyEl.innerText = grandQty;
+    const grandQtyEl = document.getElementById('viewBOMGrandQty');
+    if (grandQtyEl) grandQtyEl.innerText = grandQty;
   }
 
   async function submitProjectBOM(projectId, projectName) {
-      const rows = document.querySelectorAll('#viewBOMFormTableBody tr');
-      const bom_items = [];
+    const rows = document.querySelectorAll('#viewBOMFormTableBody tr');
+    const bom_items = [];
 
-      rows.forEach(row => {
-          const nomenclature = row.querySelector('.bom-v-nomen')?.value.trim() || '';
-          const au = row.querySelector('.bom-v-au')?.value.trim() || '';
-          const qty = parseFloat(row.querySelector('.bom-v-qty')?.value) || 0;
-          const rate = parseFloat(row.querySelector('.bom-v-rate')?.value) || 0;
-          const total_cost = parseFloat(row.querySelector('.bom-v-total')?.value) || (qty * rate);
+    rows.forEach(row => {
+      const nomenclature = row.querySelector('.bom-v-nomen')?.value.trim() || '';
+      const au = row.querySelector('.bom-v-au')?.value.trim() || '';
+      const qty = parseFloat(row.querySelector('.bom-v-qty')?.value) || 0;
+      const rate = parseFloat(row.querySelector('.bom-v-rate')?.value) || 0;
+      const total_cost = parseFloat(row.querySelector('.bom-v-total')?.value) || (qty * rate);
 
-          if (nomenclature) {
-              bom_items.push({ nomenclature, au, qty, rate, total_cost });
-          }
+      if (nomenclature) {
+        bom_items.push({ nomenclature, au, qty, rate, total_cost });
+      }
+    });
+
+    if (bom_items.length === 0) {
+      alert("Please add at least one Nomenclature before saving.");
+      return;
+    }
+
+    const saveBtn = document.getElementById('saveBOMBtn');
+    if (saveBtn) {
+      saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>Saving...`;
+      saveBtn.disabled = true;
+    }
+
+    try {
+      const response = await fetch(`/projects/bom/${projectId}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bom_items })
       });
 
-      if (bom_items.length === 0) {
-          alert("Please add at least one Nomenclature before saving.");
-          return;
-      }
+      const result = await response.json();
 
-      const saveBtn = document.getElementById('saveBOMBtn');
+      if (result.status === 'success') {
+        viewProjectBOM(projectId, projectName);
+      } else {
+        alert(result.message || "Failed to save BOM items");
+        if (saveBtn) {
+          saveBtn.innerHTML = `<i class="fas fa-save me-1"></i>Save BOM`;
+          saveBtn.disabled = false;
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting BOM:", error);
+      alert("Server error. Could not save BOM.");
       if (saveBtn) {
-          saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>Saving...`;
-          saveBtn.disabled = true;
+        saveBtn.innerHTML = `<i class="fas fa-save me-1"></i>Save BOM`;
+        saveBtn.disabled = false;
       }
-
-      try {
-          const response = await fetch(`/projects/bom/${projectId}/save`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ bom_items })
-          });
-
-          const result = await response.json();
-
-          if (result.status === 'success') {
-              viewProjectBOM(projectId, projectName);
-          } else {
-              alert(result.message || "Failed to save BOM items");
-              if (saveBtn) {
-                  saveBtn.innerHTML = `<i class="fas fa-save me-1"></i>Save BOM`;
-                  saveBtn.disabled = false;
-              }
-          }
-      } catch (error) {
-          console.error("Error submitting BOM:", error);
-          alert("Server error. Could not save BOM.");
-          if (saveBtn) {
-              saveBtn.innerHTML = `<i class="fas fa-save me-1"></i>Save BOM`;
-              saveBtn.disabled = false;
-          }
-      }
+    }
   }
 
   window.showAddBOMForm = showAddBOMForm;

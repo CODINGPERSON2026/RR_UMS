@@ -34,7 +34,7 @@
 </style>
 
 <!-- Alarm Badge -->
-<span id="alarmAlert" class="alarm-gradient d-none">
+<span id="jcoKunbaAlarmAlert" class="alarm-gradient d-none" style="cursor:pointer;">
     🔔 You have pending JCO Kunba assignments!
 </span>
 
@@ -107,17 +107,19 @@
     });
 
     /* ── Show the alarm badge ── */
-    async function showAssignedAlarms() {
+    async function showKunbaAssignedAlarms() {
         try {
             const res    = await fetch('/api/alarms_pending_kunda_assignments');
             if (!res.ok) throw new Error("Network error");
             const result = await res.json();
-            const badge  = document.getElementById("alarmAlert");
+            const badge  = document.getElementById("jcoKunbaAlarmAlert");
 
-            if (result.rows && result.rows.length > 0) {
-                badge.classList.remove('d-none');
-            } else {
-                badge.classList.add('d-none');
+            if (badge) {
+                if (result.rows && result.rows.length > 0) {
+                    badge.classList.remove('d-none');
+                } else {
+                    badge.classList.add('d-none');
+                }
             }
         } catch (err) {
             console.error(err);
@@ -190,7 +192,7 @@
     /* ── Refresh both badge and table ── */
     async function refreshAlarmsAndTable() {
         await load_pending_interview();
-        await showAssignedAlarms();
+        await showKunbaAssignedAlarms();
     }
 
     /* ── Submit remarks ── */
@@ -227,11 +229,11 @@
     });
 
     /* ── Open main modal on badge click ── */
-    document.getElementById("alarmAlert")?.addEventListener("click", function () {
+    document.getElementById("jcoKunbaAlarmAlert")?.addEventListener("click", function () {
         new bootstrap.Modal(document.getElementById('update_assigned_interview')).show();
         load_pending_interview();
     });
 
     /* ── Initial load ── */
-    document.addEventListener('DOMContentLoaded', showAssignedAlarms);
+    document.addEventListener('DOMContentLoaded', showKunbaAssignedAlarms);
 </script>

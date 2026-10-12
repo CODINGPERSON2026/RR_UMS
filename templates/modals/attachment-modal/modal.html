@@ -243,12 +243,14 @@ attachmentCountBadgeUniqueScope.textContent =
 
     if (filteredAttachmentDataUniqueScope.length === 0) {
 
+      attachmentCountBadgeUniqueScope.textContent = "0";
+
       attachmentTableBodyUniqueScope.innerHTML = `
         <tr>
 
           <td colspan="8" class="text-center text-muted py-4">
 
-            No attachment records found
+            <i class="fas fa-info-circle me-1"></i> No attachment records available
 
           </td>
 
@@ -418,8 +420,11 @@ attachmentCountBadgeUniqueScope.textContent =
         const attachmentResponseUniqueScope =
           await fetch("/stats/attachment-details");
 
-        attachmentFetchedDataUniqueScope =
+        const resData =
           await attachmentResponseUniqueScope.json();
+
+        attachmentFetchedDataUniqueScope =
+          Array.isArray(resData) ? resData : [];
 
         /* ================= RESET FILTER ================= */
 
@@ -433,12 +438,14 @@ attachmentCountBadgeUniqueScope.textContent =
 
         /* ================= DISTINCT COMPANIES ================= */
 
+        const baseCompanies = ["HQ company", "COMN Company", "3 Company"];
         const distinctCompaniesUniqueScope = [
-          ...new Set(
-            attachmentFetchedDataUniqueScope
+          ...new Set([
+            ...attachmentFetchedDataUniqueScope
               .map(item => (item.company || "").trim())
-              .filter(Boolean)
-          )
+              .filter(Boolean),
+            ...baseCompanies
+          ])
         ];
 
         distinctCompaniesUniqueScope.forEach(company => {
@@ -463,19 +470,11 @@ attachmentCountBadgeUniqueScope.textContent =
 
       } catch (error) {
 
-        console.error(error);
+        console.warn("Error loading attachments:", error);
 
-        attachmentTableBodyUniqueScope.innerHTML = `
-          <tr>
+        attachmentFetchedDataUniqueScope = [];
 
-            <td colspan="8" class="text-center text-danger py-4">
-
-              Failed to load data
-
-            </td>
-
-          </tr>
-        `;
+        renderAttachmentTableUniqueScope();
 
       }
 

@@ -420,10 +420,8 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
-      {% if role in ['OC'] %}
       {% include 'modals/alarm/alarm.html' %}
       {% include 'modals/alarm/attachment_alarm.html' %}
-      {% endif %}
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
@@ -565,14 +563,12 @@
       </div>
       {% endif %}
 
-      {% if role in ['CO','ONCO','NCO CHQ','2IC','JCO MW','ADJUTANT','OC','S/JCO','HEAD CLK'] %}
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope">
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope" style="cursor: pointer;">
         <span class="sc-label">TD / Attachment</span>
         <div class="sc-right">
           <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
@@ -623,14 +619,12 @@
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC','ONCO','ADJUTANT','OC','S/JCO'] %}
-      <div class="sc" id="viewDetailsBtn">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
         <span class="sc-label">Detachment</span>
         <div class="sc-right">
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      {% endif %}
 
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC'] %}
       <div class="sc" id="openSensitive">
@@ -1105,7 +1099,7 @@
       }
     } catch (e) {
       console.error("Error fetching " + id + ":", e);
-      safeSet(id, "—");
+      safeSet(id, (id === "attachment-count" || id === "locationCount") ? "0" : "—");
     }
   }
 
@@ -1205,6 +1199,9 @@
 
     // 2. Fetch dashboard data & badges asynchronously in background without blocking UI
     try {
+      if (typeof showAssignedAttachmentAlarms === 'function') showAssignedAttachmentAlarms();
+      if (typeof showAssignedDetachmentAlarms === 'function') showAssignedDetachmentAlarms();
+      if (typeof showAssignedAlarms === 'function') showAssignedAlarms();
       loadAllDashboardCards();
       Promise.allSettled([
         updateRejectedLeaveCount(),
@@ -1342,16 +1339,45 @@
     try {
       const res    = await fetch(`/get_detachment_stats_for_graph?company=${encodeURIComponent(company)}`);
       const result = await res.json();
-      if (result.status !== "success") return;
-
-      const labels = result.data.map(r => r.detachment);
-      const values = result.data.map(r => r.count);
+      const dataRows = (result && result.data) ? result.data : [];
+      const total = (result && result.total != null) ? result.total : dataRows.reduce((a, b) => a + (b.count || 0), 0);
 
       const el = document.getElementById("detachmentTotal");
-      if (el) el.textContent = "Total: " + result.total;
+      if (el) el.textContent = "Total: " + total;
 
       const tc = getThemeChartColors();
       const isDark = (document.documentElement.getAttribute('data-theme') === 'dark');
+
+      const canvas = document.getElementById("detachmentChart");
+      if (!canvas) return;
+      if (detachmentChartInstance) detachmentChartInstance.destroy();
+
+      if (dataRows.length === 0 || total === 0) {
+        detachmentChartInstance = new Chart(canvas.getContext("2d"), {
+          type: "doughnut",
+          data: {
+            labels: ["No Detachments"],
+            datasets: [{
+              data: [1],
+              backgroundColor: [isDark ? "#334155" : "#cbd5e1"],
+              borderWidth: 2, borderColor: isDark ? "#1e293b" : "#fff",
+            }],
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: "65%",
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: { label: function() { return "No active detachments"; } }
+              }
+            },
+          },
+        });
+        return;
+      }
+
+      const labels = dataRows.map(r => r.detachment);
+      const values = dataRows.map(r => r.count);
 
       const donutDatalabelsPlugin = {
         id: 'donutDatalabels',
@@ -1382,9 +1408,6 @@
         }
       };
 
-      const canvas = document.getElementById("detachmentChart");
-      if (!canvas) return;
-      if (detachmentChartInstance) detachmentChartInstance.destroy();
       detachmentChartInstance = new Chart(canvas.getContext("2d"), {
         type: "doughnut",
         data: {
@@ -1402,7 +1425,11 @@
           plugins: { legend: { display:false } },
         },
       });
-    } catch (err) { console.error("Donut chart error:", err); }
+    } catch (err) {
+      console.error("Donut chart error:", err);
+      const el = document.getElementById("detachmentTotal");
+      if (el) el.textContent = "Total: 0";
+    }
   }
 
   async function loadUnfitTrend(company = "All") {

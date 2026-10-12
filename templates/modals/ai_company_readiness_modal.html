@@ -481,11 +481,10 @@
             </div>
           </div>
 
-          <!-- Charts & Inspector Grid -->
+          <!-- End-to-End Graphical Representation -->
           <div class="row g-3">
-            <!-- Main Chart Column (8 cols) -->
-            <div class="col-12 col-xl-8">
-              <div class="card border rounded-3 shadow-sm h-100" style="background: var(--card-bg-solid, #ffffff);">
+            <div class="col-12">
+              <div class="card border rounded-3 shadow-sm" style="background: var(--card-bg-solid, #ffffff);">
                 <div class="card-header bg-transparent py-2.5 px-3 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
                   <div>
                     <h6 class="mb-0 fw-bold text-dark" id="mInlineChartHeading" style="font-size: 0.92rem;">7-Dimension Readiness Comparison</h6>
@@ -497,35 +496,8 @@
                 </div>
 
                 <div class="card-body p-3">
-                  <div style="position: relative; height: 360px; width: 100%;">
+                  <div style="position: relative; height: 380px; width: 100%;">
                     <canvas id="mInlineFullAnalyticsChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Formation Quick-Inspector (4 cols) -->
-            <div class="col-12 col-xl-4">
-              <!-- Formation Quick-Inspector -->
-              <div class="card border rounded-3 shadow-sm h-100" style="background: var(--card-bg-solid, #ffffff);">
-                <div class="card-header bg-transparent py-2.5 px-3 border-bottom">
-                  <div class="d-flex justify-content-between align-items-center mb-1.5">
-                    <h6 class="mb-0 fw-bold text-dark" style="font-size: 0.88rem;">
-                      <i class="fas fa-crosshairs text-primary me-1"></i> Formation Intelligence
-                    </h6>
-                  </div>
-                  <!-- Company Select Buttons -->
-                  <div class="btn-group btn-group-sm w-100" role="group" id="mInlineCoyBtnGroup">
-                    <button type="button" class="btn btn-primary active py-0.5" onclick="showInlineCompanyDetail('HQ COY', this)" style="font-size: 0.72rem;">HQ COY</button>
-                    <button type="button" class="btn btn-outline-secondary py-0.5" onclick="showInlineCompanyDetail('COMN COY', this)" style="font-size: 0.72rem;">COMN COY</button>
-                    <button type="button" class="btn btn-outline-secondary py-0.5" onclick="showInlineCompanyDetail('3 COY', this)" style="font-size: 0.72rem;">3 COY</button>
-                  </div>
-                </div>
-
-                <div class="card-body p-3" id="mInlineCompanyDetailDisplay">
-                  <div class="text-center py-3 text-muted">
-                    <div class="spinner-border spinner-border-sm text-primary mb-1" role="status"></div>
-                    <div style="font-size: 0.75rem;">Loading formation telemetry...</div>
                   </div>
                 </div>
               </div>
@@ -538,20 +510,19 @@
         <!-- Filter & Search Toolbar -->
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
           <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="text-muted small fw-bold text-uppercase"><i class="fas fa-filter text-primary me-1"></i> Formation:</span>
-            <div class="coy-segmented-filter d-inline-flex align-items-center p-1 rounded-pill" id="mCoyFilterGroup">
-              <button type="button" class="coy-filter-pill active" data-coy="all" onclick="filterModalCoy('all', this)">
-                <i class="fas fa-th-large me-1.5"></i>ALL
-              </button>
-              <button type="button" class="coy-filter-pill" data-coy="HQ COY" onclick="filterModalCoy('HQ COY', this)">
-                <i class="fas fa-flag me-1.5"></i>HQ COY
-              </button>
-              <button type="button" class="coy-filter-pill" data-coy="COMN COY" onclick="filterModalCoy('COMN COY', this)">
-                <i class="fas fa-satellite-dish me-1.5"></i>COMN COY
-              </button>
-              <button type="button" class="coy-filter-pill" data-coy="3 COY" onclick="filterModalCoy('3 COY', this)">
-                <i class="fas fa-shield-alt me-1.5"></i>3 COY
-              </button>
+            <label for="mCoySelectFilter" class="text-muted small fw-bold text-uppercase mb-0 d-flex align-items-center">
+              <i class="fas fa-filter text-primary me-1.5"></i> Formation:
+            </label>
+            <div class="input-group input-group-sm" style="width: auto; min-width: 175px;">
+              <span class="input-group-text bg-white text-primary border-end-0" style="border-radius: 8px 0 0 8px; border-color: #cbd5e1;">
+                <i class="fas fa-shield-alt"></i>
+              </span>
+              <select class="form-select form-select-sm fw-semibold border-start-0 ps-1" id="mCoySelectFilter" onchange="filterModalCoy(this.value)" style="border-radius: 0 8px 8px 0; border-color: #cbd5e1; font-size: 0.84rem; cursor: pointer;">
+                <option value="all" selected>ALL</option>
+                <option value="HQ COY">HQ COY</option>
+                <option value="COMN COY">COMN COY</option>
+                <option value="3 COY">3 COY</option>
+              </select>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -740,8 +711,8 @@
     const modalEl = document.getElementById('aiCompanyReadinessModal');
     if (modalEl) {
       modalEl.addEventListener('show.bs.modal', function () {
-        const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
-        const currentCoy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
+        const selectEl = document.getElementById('mCoySelectFilter');
+        const currentCoy = selectEl ? (selectEl.value || 'all') : 'all';
         const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
         if (window.modalReadinessCache || modalReadinessCache) {
           renderModalReadiness(window.modalReadinessCache || modalReadinessCache, currentCoy, searchVal);
@@ -756,8 +727,8 @@
       searchInput.addEventListener('input', function() {
         const cache = window.modalReadinessCache || modalReadinessCache;
         if (cache) {
-          const activeBtn = document.querySelector('#mCoyFilterGroup .coy-filter-pill.active');
-          const coy = activeBtn ? (activeBtn.getAttribute('data-coy') || 'all') : 'all';
+          const selectEl = document.getElementById('mCoySelectFilter');
+          const coy = selectEl ? (selectEl.value || 'all') : 'all';
           renderModalReadiness(cache, coy, this.value);
         }
       });
@@ -1070,35 +1041,22 @@
     renderInlineFullAnalytics(dashboard);
   }
 
-  window.filterModalCoy = function(coyName, btnEl) {
-    document.querySelectorAll('#mCoyFilterGroup .coy-filter-pill').forEach(b => {
-      b.classList.remove('active');
-    });
-    if (btnEl) {
-      btnEl.classList.add('active');
+  let currentModalCoyFilter = 'all';
+
+  window.filterModalCoy = function(coyName) {
+    currentModalCoyFilter = (coyName || 'all').trim();
+    const selectEl = document.getElementById('mCoySelectFilter');
+    if (selectEl && selectEl.value !== currentModalCoyFilter) {
+      selectEl.value = currentModalCoyFilter;
     }
     const cache = window.modalReadinessCache || modalReadinessCache;
     const searchVal = document.getElementById('mSearchInput') ? document.getElementById('mSearchInput').value : '';
     if (cache) {
-      renderModalReadiness(cache, coyName, searchVal);
+      renderModalReadiness(cache, currentModalCoyFilter, searchVal);
     } else {
-      fetchAiCompanyReadinessData(coyName);
+      fetchAiCompanyReadinessData(currentModalCoyFilter);
     }
   };
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('mSearchInput');
-    if (searchInput) {
-      searchInput.addEventListener('input', function() {
-        const cache = window.modalReadinessCache || modalReadinessCache;
-        if (cache) {
-          const activeBtn = document.querySelector('#mCoyFilterGroup button.active');
-          const coy = activeBtn ? (activeBtn.textContent.trim() === 'ALL' ? 'all' : activeBtn.textContent.trim()) : 'all';
-          renderModalReadiness(cache, coy, this.value);
-        }
-      });
-    }
-  });
 
   function showModalPersonnelDrilldown(coy, gapType, gapName) {
     try {
@@ -1203,12 +1161,15 @@
         defaultCoy = '3 COY';
       }
 
-      let activeBtn = document.querySelector('#mInlineCoyBtnGroup button.active');
-      if (!window._mInlineCoyUserSelected) {
-        activeBtn = Array.from(document.querySelectorAll('#mInlineCoyBtnGroup button')).find(b => b.textContent.trim().toUpperCase() === defaultCoy.toUpperCase()) || activeBtn;
+      const coyGroup = document.getElementById('mInlineCoyBtnGroup');
+      if (coyGroup) {
+        let activeBtn = coyGroup.querySelector('button.active');
+        if (!window._mInlineCoyUserSelected) {
+          activeBtn = Array.from(coyGroup.querySelectorAll('button')).find(b => b.textContent.trim().toUpperCase() === defaultCoy.toUpperCase()) || activeBtn;
+        }
+        const targetCoy = activeBtn ? activeBtn.textContent.trim() : defaultCoy;
+        showInlineCompanyDetail(targetCoy, activeBtn);
       }
-      const targetCoy = activeBtn ? activeBtn.textContent.trim() : defaultCoy;
-      showInlineCompanyDetail(targetCoy, activeBtn);
     });
   }
 
@@ -1240,7 +1201,18 @@
     }
 
     const coys = d.companies || {};
-    const coyNames = ['HQ COY', 'COMN COY', '3 COY'];
+    const allCoyNames = ['HQ COY', 'COMN COY', '3 COY'];
+    const activeFilter = (currentModalCoyFilter || 'all').trim();
+    const coyNames = (activeFilter.toLowerCase() === 'all')
+      ? allCoyNames
+      : allCoyNames.filter(name => name.toUpperCase() === activeFilter.toUpperCase());
+
+    const paletteMap = {
+      'HQ COY': { bg: 'rgba(37, 99, 235, 0.85)', border: '#2563eb', radarBg: 'rgba(37, 99, 235, 0.18)' },
+      'COMN COY': { bg: 'rgba(16, 185, 129, 0.85)', border: '#10b981', radarBg: 'rgba(16, 185, 129, 0.18)' },
+      '3 COY': { bg: 'rgba(139, 92, 246, 0.85)', border: '#8b5cf6', radarBg: 'rgba(139, 92, 246, 0.18)' }
+    };
+
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.body.classList.contains('dark-theme');
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
     const textColor = isDark ? '#94a3b8' : '#64748b';
@@ -1255,16 +1227,10 @@
       const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
       const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
 
-      const palette = [
-        { bg: 'rgba(37, 99, 235, 0.85)', border: '#2563eb' },
-        { bg: 'rgba(16, 185, 129, 0.85)', border: '#10b981' },
-        { bg: 'rgba(139, 92, 246, 0.85)', border: '#8b5cf6' }
-      ];
-
-      const datasets = coyNames.map((name, i) => {
+      const datasets = coyNames.map((name) => {
         const c = coys[name] || {};
         const dims = c.dimensions || {};
-        const col = palette[i % palette.length];
+        const col = paletteMap[name] || { bg: 'rgba(37, 99, 235, 0.85)', border: '#2563eb' };
         return {
           label: name,
           data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
@@ -1335,23 +1301,17 @@
       const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
       const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
 
-      const palette = [
-        { bg: 'rgba(37, 99, 235, 0.12)', border: '#2563eb' },
-        { bg: 'rgba(16, 185, 129, 0.12)', border: '#10b981' },
-        { bg: 'rgba(139, 92, 246, 0.12)', border: '#8b5cf6' }
-      ];
-
-      const datasets = coyNames.map((name, i) => {
+      const datasets = coyNames.map((name) => {
         const c = coys[name] || {};
         const dims = c.dimensions || {};
-        const col = palette[i % palette.length];
+        const col = paletteMap[name] || { border: '#2563eb' };
         return {
           label: name,
           data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
-          backgroundColor: col.bg,
+          backgroundColor: 'transparent',
           borderColor: col.border,
           borderWidth: 2.5,
-          fill: true,
+          fill: false,
           tension: 0.35,
           pointBackgroundColor: col.border,
           pointBorderColor: '#ffffff',
@@ -1418,20 +1378,14 @@
       const dimLabels = ['Strength', 'Availability', 'Trade', 'Qualification', 'Course', 'Fitness', 'Medical'];
       const dimKeys = ['strength', 'availability', 'trade', 'qualification', 'course', 'fitness', 'medical'];
 
-      const palette = [
-        { bg: 'rgba(37, 99, 235, 0.18)', border: '#2563eb' },
-        { bg: 'rgba(16, 185, 129, 0.18)', border: '#10b981' },
-        { bg: 'rgba(139, 92, 246, 0.18)', border: '#8b5cf6' }
-      ];
-
-      const datasets = coyNames.map((name, i) => {
+      const datasets = coyNames.map((name) => {
         const c = coys[name] || {};
         const dims = c.dimensions || {};
-        const col = palette[i % palette.length];
+        const col = paletteMap[name] || { border: '#2563eb', radarBg: 'rgba(37, 99, 235, 0.18)' };
         return {
           label: name,
           data: dimKeys.map(k => (dims[k] && dims[k].score !== undefined) ? dims[k].score : 0),
-          backgroundColor: col.bg,
+          backgroundColor: col.radarBg || 'rgba(37, 99, 235, 0.18)',
           borderColor: col.border,
           borderWidth: 2,
           pointBackgroundColor: col.border,

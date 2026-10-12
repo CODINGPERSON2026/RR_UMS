@@ -2053,6 +2053,10 @@ STATUS COLORS
       .then(function (d) { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
       .catch(function () {});
 
+    if (typeof showAssignedAttachmentAlarms === 'function') showAssignedAttachmentAlarms();
+    if (typeof showAssignedDetachmentAlarms === 'function') showAssignedDetachmentAlarms();
+    if (typeof showAssignedAlarms === 'function') showAssignedAlarms();
+
     // 3. Fetch primary dashboard stats asynchronously to populate metric cards
     try {
       var res = await fetch("/api/dashboard_summary");
@@ -2060,12 +2064,12 @@ STATUS COLORS
       var data = await res.json(), mp = data.manpower || {}, iv = data.interview || {};
       safeSet("mainPower",
         (mp.officerCount || 0) + " \u2013 " + (mp.jcoCount || 0) + " \u2013 " + (mp.orCount || 0));
-      safeSet("attachment-count", data.attachment_count);
+      safeSet("attachment-count", data.attachment_count != null ? data.attachment_count : 0);
       safeSet("duty-search-count", data.duty_count);
       safeSet("totalCoursesDone", data.courses_count);
       safeSet("interview-Count", iv.pending_count);
       safeSet("total-count", iv.total_count);
-      safeSet("locationCount", data.detachments);
+      safeSet("locationCount", data.detachments != null ? data.detachments : 0);
       safeSet("sensitive-count", data.sensitive_count);
       var sensBadge = document.getElementById("sensitive-alarm-badge");
       if (sensBadge) {
@@ -2087,6 +2091,8 @@ STATUS COLORS
       safeSet("dues_out_count", data.dues_out);
     } catch (e) {
       console.error("Dashboard load error:", e);
+      safeSet("attachment-count", "0");
+      safeSet("locationCount", "0");
     }
   }
 
@@ -2477,12 +2483,47 @@ STATUS COLORS
     try {
       var res = await fetch("/get_detachment_stats_for_graph?company=" + encodeURIComponent(company));
       var result = await res.json();
-      if (result.status !== "success") return;
-      var labels = result.data.map(function (r) { return r.detachment; });
-      var values = result.data.map(function (r) { return r.count; });
-      document.getElementById("detachmentTotal").textContent = "Total: " + result.total;
+      var dataRows = (result && result.data) ? result.data : [];
+      var total = (result && result.total != null) ? result.total : dataRows.reduce(function (a, b) { return a + (b.count || 0); }, 0);
+      var totalEl = document.getElementById("detachmentTotal");
+      if (totalEl) totalEl.textContent = "Total: " + total;
+
       var ctx = document.getElementById("detachmentChart").getContext("2d");
       detCI = destroyChart(detCI, "detachmentChart");
+
+      if (dataRows.length === 0 || total === 0) {
+        detCI = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: ["No Detachments"],
+            datasets: [{
+              data: [1],
+              backgroundColor: ["#cbd5e1"],
+              borderWidth: 2,
+              borderColor: getThemeColor('--card-bg-solid', '#fff')
+            }]
+          },
+          plugins: [donutHoverCenterPlugin],
+          options: {
+            responsive: true, maintainAspectRatio: false, cutout: "65%",
+            plugins: {
+              legend: {
+                position: "left",
+                labels: { boxWidth: 8, font: { size: 10 }, color: getThemeColor('--text-secondary', '#6b7280') }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function() { return "No active detachments"; }
+                }
+              }
+            }
+          }
+        });
+        return;
+      }
+
+      var labels = dataRows.map(function (r) { return r.detachment; });
+      var values = dataRows.map(function (r) { return r.count; });
       detCI = new Chart(ctx, {
         type: "doughnut",
         data: {
@@ -2518,7 +2559,11 @@ STATUS COLORS
           },
         },
       });
-    } catch (e) { console.error("detachmentChart:", e); }
+    } catch (e) {
+      console.error("detachmentChart:", e);
+      var totalEl = document.getElementById("detachmentTotal");
+      if (totalEl) totalEl.textContent = "Total: 0";
+    }
   }
 
   async function loadUnfitTrend(company) {

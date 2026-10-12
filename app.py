@@ -10,7 +10,21 @@ from functools import wraps
 app = Flask(__name__)
 
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get('SECRET_KEY', 'UMS_FLASK_SESSION_SECRET_KEY_2026_SECURE')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
+@app.after_request
+def add_security_headers(response):
+    # Do not prevent caching for static files (CSS, JS, images, fonts)
+    if request.endpoint and (request.endpoint == 'static' or request.path.startswith('/static/')):
+        return response
+    # For HTML and dynamic endpoints, prevent browser back/forward cache from showing protected content after logout
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 app.register_blueprint(personnel_info)
 app.register_blueprint(nominal_bp)
@@ -132,10 +146,18 @@ def history_15cor():
 def chat_bot():
     return render_template('/chat_ai.html')
 
-@app.route("/admin_login", methods=["POST",'GET'])
+@app.route("/admin_login", methods=["POST", 'GET'])
 def admin_login():
     if request.method == 'GET':
-        return render_template('/loginpage/loginpage.html')
+        user = require_login()
+        if user:
+            return redirect(url_for('dashboard'))
+        resp = make_response(render_template('/loginpage/loginpage.html'))
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+        resp.headers['Pragma'] = 'no-cache'
+        resp.headers['Expires'] = '0'
+        return resp
+
     data = request.get_json()
     email = data.get("email")
     password = data.get("password")
@@ -149,38 +171,66 @@ def admin_login():
     user = cursor.fetchone()
 
     if not user:
+        cursor.close()
+        conn.close()
         return jsonify({"success": False, "error": "Invalid email or password"}), 401
-    username  =  user['username']
+    username = user['username']
     role = user['role']
     
     cursor.close()
     conn.close()
 
-
     # create JWT
     payload = {
         "user_id": user["id"],
         "email": user["email"],
-        'username':user['username'],
+        'username': user['username'],
         "role": user["role"],
-        'company':user['company'],
-        'army_number':user['army_number']
+        'company': user['company'],
+        'army_number': user['army_number']
     }
 
     token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
 
-    # set JWT in cookie
-    resp = jsonify({"success": True,"username":username,'role' : role})
-    resp.set_cookie("token", token, httponly=True, samesite="Lax")
+    # Establish persistent Flask session
+    session.permanent = True
+    session['user'] = payload
+    session['user_id'] = user['id']
+    session['email'] = user['email']
+    session['username'] = user['username']
+    session['role'] = user['role']
+    session['company'] = user['company']
+    session['army_number'] = user['army_number']
+
+    # set JWT in cookie with 7-day max_age
+    resp = jsonify({"success": True, "username": username, 'role': role})
+    resp.set_cookie("token", token, httponly=True, samesite="Lax", max_age=7*24*3600, path="/")
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
 
     return resp
 
 @app.route("/logout")
 def logout():
-    # Simple logout that clears cookie and redirects to root
-    resp = redirect("/")  # This will trigger the dashboard() function which checks authentication
-    resp.set_cookie("token", "", expires=0)
+    session.clear()
+    resp = redirect(url_for('admin_login'))
+    resp.delete_cookie("token", path="/")
+    resp.set_cookie("token", "", expires=0, max_age=0, path="/")
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, private'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
     return resp
+
+@app.route("/api/check_session", methods=["GET"])
+def api_check_session():
+    user = require_login()
+    if user:
+        return jsonify({
+            "authenticated": True,
+            "username": user.get("username"),
+            "role": user.get("role"),
+            "company": user.get("company")
+        })
+    return jsonify({"authenticated": False}), 401
 
 
 
@@ -1574,7 +1624,9 @@ def assigned_alarm():
     cursor = None
     try:
         user = require_login()  # Get logged-in user
-        user_company = user['company']
+        if not user:
+            return jsonify({"status": "error", "message": "Unauthorized", "rows": []}), 401
+        user_company = user.get('company', '')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)

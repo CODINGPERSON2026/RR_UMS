@@ -34,6 +34,8 @@ def get_detachment_details():
 
     # Get logged in user
     user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
 
     try:
         # Base query: only active det assignments (det_status=1)
@@ -202,8 +204,10 @@ def assigned_attachment_alarm():
     user = require_login()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-    if user['role'] != 'CO':
-        return jsonify({"error": 'Forbidden'}), 403
+
+    role = (user.get('role') or '').upper()
+    user_company = user.get('company') or ''
+    privileged = ['CO', '2IC', 'ADJUTANT', 'ADMIN', 'COMMANDING OFFICER']
 
     conn = get_db_connection()
     if not conn:
@@ -212,7 +216,7 @@ def assigned_attachment_alarm():
     cursor = None
     try:
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
+        query = """
             SELECT
                 t.id,
                 t.army_number,
@@ -227,9 +231,15 @@ def assigned_attachment_alarm():
             FROM td_table t
             LEFT JOIN personnel p ON p.army_number = t.army_number
             WHERE t.td_date <= NOW() - INTERVAL 180 DAY
-            ORDER BY t.td_date ASC
-        """)
+        """
+        params = []
+        if user_company != "Admin" and role not in privileged:
+            query += " AND (COALESCE(t.company, p.company) = %s)"
+            params.append(user_company)
 
+        query += " ORDER BY t.td_date ASC"
+
+        cursor.execute(query, params)
         rows = cursor.fetchall()
         for r in rows:
             if r['td_date']:
@@ -253,13 +263,11 @@ def assigned_attachment_alarm():
 
 
 
-@dashboard_bp.route("/delete-attachment/<army_number>", methods=["DELETE"])
+@dashboard_bp.route("/delete-attachment/<army_number>", methods=["DELETE", "POST"])
 def delete_attachment(army_number):
     user = require_login()
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
-
-    company = user["company"]
 
     conn = get_db_connection()
     if not conn:
@@ -275,26 +283,23 @@ def delete_attachment(army_number):
             WHERE army_number = %s 
         """, (army_number, ))
 
-        if cursor.rowcount == 0:
-            conn.rollback()
-            return jsonify({"error": "Personnel record not found"}), 404
-
         # Delete from td_table
         cursor.execute("""
             DELETE FROM td_table
             WHERE army_number = %s
         """, (army_number,))
 
-        # Commit only if both queries succeed
         conn.commit()
-        _assigned_attachment_alarm_cache["data"] = None
-        return jsonify({"message": "Attachment marked inactive and TD record deleted successfully"})
+        return jsonify({
+            "status": "success",
+            "message": "Attachment marked inactive and TD record deleted successfully"
+        }), 200
 
     except Exception as e:
         if conn:
             try: conn.rollback()
             except Exception: pass
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "error", "error": str(e)}), 500
 
     finally:
         if cursor:

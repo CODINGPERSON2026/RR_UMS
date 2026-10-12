@@ -184,7 +184,7 @@
 <!-- ================= ALARM BADGE ================= -->
 
 <span id="alarmAlert" class="alarm-gradient d-none" style="cursor:pointer;">
-    🔔 You have Detachment alarms!
+    🔔 You have 0 Detachment alarm(s)!
 </span>
 
 <!-- ================= DET ALARM MODAL ================= -->
@@ -361,19 +361,27 @@ document.addEventListener("DOMContentLoaded", function () {
         rows = rows.filter(item => item.company && item.company.toLowerCase().trim() === userCompanyStr.toLowerCase().trim());
       }
 
-      if (rows && rows.length > 0) {
-        alarmAlert.classList.remove("d-none");
-        alarmAlert.classList.add("alert-pulse");
-        alarmAlert.innerText = `🔔 You have ${rows.length} Detachment alarm(s)!`;
-      } else {
-        alarmAlert.classList.add("d-none");
-        alarmAlert.classList.remove("alert-pulse");
+      if (alarmAlert) {
+        const cnt = rows ? rows.length : 0;
+        if (cnt > 0) {
+          alarmAlert.classList.remove("d-none");
+          alarmAlert.classList.add("alert-pulse");
+          alarmAlert.innerText = `🔔 You have ${cnt} Detachment alarm(s)!`;
+        } else {
+          alarmAlert.classList.add("d-none");
+          alarmAlert.classList.remove("alert-pulse");
+        }
       }
 
     } catch (err) {
       console.error("Error fetching assigned alarms:", err);
+      const alarmAlert = document.getElementById("alarmAlert");
+      if (alarmAlert) {
+        alarmAlert.classList.add("d-none");
+      }
     }
-  }
+  window.showAssignedDetachmentAlarms = showAssignedAlarms;
+  window.showAssignedAlarms = showAssignedAlarms;
 
   showAssignedAlarms();
 
@@ -712,7 +720,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 "success"
               ) {
 
-                loadAlarmPersonnel();
+                await loadAlarmPersonnel();
+                showAssignedAlarms();
 
               } else {
 

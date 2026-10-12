@@ -22,11 +22,26 @@
     background-color: #dc3545 !important;
     color: #ffffff !important;
   }
+
+  #attachmentAlarmAlert {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #ffffff !important;
+    position: relative;
+    overflow: hidden;
+    padding: 2px 10px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  }
 </style>
 
 <!-- Attachment Alarm Badge -->
 <span id="attachmentAlarmAlert" class="alert-gradient d-none" style="cursor:pointer;">
-    🔔 You have Attachment alarms!
+    🔔 You have 0 Attachment alarm(s)!
 </span>
 
 <!-- ================= ATTACHMENT ALARM OVER 180 DAYS MODAL ================= -->
@@ -108,16 +123,23 @@ async function showAssignedAttachmentAlarms() {
         attachAlarmFetchedData = rows;
         const alarmAlert = document.getElementById("attachmentAlarmAlert");
 
-        if (attachAlarmFetchedData.length > 0) {
-            alarmAlert.classList.remove("d-none");
-            alarmAlert.classList.add("alert-pulse");
-            alarmAlert.innerText = `🔔 You have ${attachAlarmFetchedData.length} Attachment alarm(s)!`;
-        } else {
-            alarmAlert.classList.add("d-none");
-            alarmAlert.classList.remove("alert-pulse");
+        if (alarmAlert) {
+            const cnt = attachAlarmFetchedData ? attachAlarmFetchedData.length : 0;
+            if (cnt > 0) {
+                alarmAlert.classList.remove("d-none");
+                alarmAlert.classList.add("alert-pulse");
+                alarmAlert.innerText = `🔔 You have ${cnt} Attachment alarm(s)!`;
+            } else {
+                alarmAlert.classList.add("d-none");
+                alarmAlert.classList.remove("alert-pulse");
+            }
         }
     } catch (err) {
         console.error("Error fetching attachment alarms:", err);
+        const alarmAlert = document.getElementById("attachmentAlarmAlert");
+        if (alarmAlert) {
+            alarmAlert.classList.add("d-none");
+        }
     }
 }
 
@@ -195,6 +217,8 @@ async function deleteAttachmentAlarm(armyNumber) {
     }
 }
 
+window.showAssignedAttachmentAlarms = showAssignedAttachmentAlarms;
+showAssignedAttachmentAlarms();
 document.addEventListener('DOMContentLoaded', showAssignedAttachmentAlarms);
 
 document.getElementById("attachAlarmCompanyFilter")?.addEventListener("change", renderAttachAlarmTable);

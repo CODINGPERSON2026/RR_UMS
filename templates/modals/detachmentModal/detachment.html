@@ -327,32 +327,26 @@ document.addEventListener("DOMContentLoaded", function () {
       const resultUniqueScope =
         await responseUniqueScope.json();
 
-      if (resultUniqueScope.status !== "success") {
-        throw new Error("Failed");
-      }
-
       detFilterUniqueScope.innerHTML = `
         <option value="">All Detachments</option>
       `;
 
-      resultUniqueScope.data.forEach(det => {
-
-        detFilterUniqueScope.insertAdjacentHTML(
-          "beforeend",
-          `
-            <option value="${det.det_id}">
-              ${det.det_name}
-            </option>
-          `
-        );
-
-      });
+      if (resultUniqueScope && resultUniqueScope.status === "success" && Array.isArray(resultUniqueScope.data)) {
+        resultUniqueScope.data.forEach(det => {
+          detFilterUniqueScope.insertAdjacentHTML(
+            "beforeend",
+            `
+              <option value="${det.det_id}">
+                ${det.det_name}
+              </option>
+            `
+          );
+        });
+      }
 
     } catch (error) {
 
-      console.error(error);
-
-      alert("Failed to load detachments");
+      console.warn("Failed to load detachments list:", error);
 
     }
 
@@ -376,12 +370,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const resultUniqueScope =
         await responseUniqueScope.json();
 
-      if (resultUniqueScope.status !== "success") {
-        throw new Error("Failed");
-      }
-
       detFetchedDataUniqueScope =
-        resultUniqueScope.data;
+        (resultUniqueScope && Array.isArray(resultUniqueScope.data))
+          ? resultUniqueScope.data
+          : [];
 
       /* ================= COMPANY FILTER ================= */
 
@@ -389,12 +381,12 @@ document.addEventListener("DOMContentLoaded", function () {
         <option value="">All Companies</option>
       `;
 
+      const baseCompanies = ["HQ company", "COMN Company", "3 Company"];
       const uniqueCompaniesUniqueScope = [
-        ...new Set(
-          detFetchedDataUniqueScope
-            .map(item => item.company)
-            .filter(Boolean)
-        )
+        ...new Set([
+          ...(detFetchedDataUniqueScope.map(item => item.company).filter(Boolean)),
+          ...baseCompanies
+        ])
       ];
 
       uniqueCompaniesUniqueScope.forEach(company => {
@@ -415,13 +407,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     } catch (error) {
 
-      console.error(error);
+      console.warn("Error loading detachment details:", error);
 
-      detSpinnerUniqueScope.innerHTML = `
-        <p class="text-danger fw-bold mt-3">
-          Failed to load data
-        </p>
-      `;
+      detFetchedDataUniqueScope = [];
+
+      renderDetTableUniqueScope();
+
+    } finally {
+
+      detSpinnerUniqueScope.classList.add("d-none");
+
+      detTableUniqueScope.classList.remove("d-none");
 
     }
 
@@ -476,8 +472,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
       detTableBodyUniqueScope.innerHTML = `
         <tr>
-          <td colspan="7" class="text-center py-4">
-            No personnel found
+          <td colspan="7" class="text-center text-muted py-4">
+            <i class="fas fa-info-circle me-1"></i> No detachment records available
           </td>
         </tr>
       `;

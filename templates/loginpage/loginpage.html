@@ -321,11 +321,24 @@
             const data = await response.json();
 
             if (data.success) {
-                window.location.href = "/";
+                window.location.replace("/");
             } else {
                 errorMsg.textContent = data.error;
                 errorMsg.style.display = "block";
             }
+        });
+
+        // ── Handle Browser Back / Forward Cache (bfcache) on login page ──
+        window.addEventListener('pageshow', function (event) {
+            // If already authenticated and navigating back to login page, return to dashboard
+            fetch('/api/check_session')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.authenticated) {
+                        window.location.replace('/');
+                    }
+                })
+                .catch(() => {});
         });
 
         // ── Modal open / close ──

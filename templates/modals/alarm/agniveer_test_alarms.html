@@ -82,7 +82,7 @@
 
 <!-- ================= FETCH ALERT COUNT ================= -->
 <script>
-    async function showAssignedAlarms() {
+    async function showAgniveerUpcomingAlarms() {
         try {
             const res = await fetch('/agni/api/upcomming_test_alarms');
             if (!res.ok) throw new Error("Network error");
@@ -104,7 +104,7 @@
         }
     }
 
-    document.addEventListener("DOMContentLoaded", showAssignedAlarms);
+    document.addEventListener("DOMContentLoaded", showAgniveerUpcomingAlarms);
 </script>
 
 <!-- ================= OPEN MODAL ON CLICK ================= -->

@@ -10,7 +10,8 @@ from flask import (
     make_response,
     send_file,
     Request,
-    current_app
+    current_app,
+    session
 )
 
 from datetime import datetime, date, timedelta
