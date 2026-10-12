@@ -743,7 +743,7 @@
       </div>
       {% endif %}
 
-      {# ── CO INTERVIEW CARD ── #}
+      {# ── CO INTERVIEW CARD (COMMENTED OUT) ──
       {% if role in ['CO','2IC','ADJUTANT','COMMANDING OFFICER'] or (role and role|upper in ['CO','2IC','ADJUTANT','COMMANDING OFFICER']) %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
         <span class="sc-label">CO Interview</span>
@@ -753,6 +753,7 @@
         </div>
       </div>
       {% endif %}
+      ── #}
 
     </div>
     <!-- /statsGrid -->
@@ -806,7 +807,7 @@
     {% include 'modals/messenger/modal.html' %}
     {% include 'modals/Sanctioned_leaves/sanction_leave_modal.html' %}
     {% include 'modals/company_interview/modal.html' %}
-    {% include 'modals/co_interview/modal.html' %}
+    {# {% include 'modals/co_interview/modal.html' %} #}
 
     {% if role in ['O CENTRE NCO'] %}
     <div class="modal fade" id="tradeModal" tabindex="-1">
@@ -1170,7 +1171,7 @@
       { id: "count-dues-out",          endpoint: "/dues/count-dues-out",                    key: "count_dues_out" },
       { id: "board-count",             endpoint: "/api/dashboard/boards",                   key: "count" },
       { id: "company-interview-count", endpoint: "/interview_update/company_interview_count", key: "count" },
-      { id: "co-interview-count",      endpoint: "/interview_update/co_interview_count",      key: "count" },
+      // { id: "co-interview-count",      endpoint: "/interview_update/co_interview_count",      key: "count" },
     ];
 
     var promises = [];

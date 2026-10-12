@@ -1560,6 +1560,7 @@ STATUS COLORS
         </div>
       </div>
 
+      {# ── CO INTERVIEW CARD (COMMENTED OUT) ──
       {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
         <span class="sc-label">CO Interview</span>
@@ -1569,6 +1570,7 @@ STATUS COLORS
         </div>
       </div>
       {% endif %}
+      ── #}
       
     </div>
 
@@ -1744,7 +1746,7 @@ STATUS COLORS
       {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
       {% include 'modals/today_schedule/ts.html' %}
       {% include 'modals/company_interview/modal.html' %}
-      {% include 'modals/co_interview/modal.html' %}
+      {# {% include 'modals/co_interview/modal.html' %} #}
     </template>
 
     <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
@@ -2017,7 +2019,7 @@ STATUS COLORS
     }
   }
 
-  /* ── load CO interview count ── */
+  /* ── load CO interview count (COMMENTED OUT) ──
   async function loadCoInterviewCount() {
     try {
       var r = await fetch("/interview_update/co_interview_count");
@@ -2027,6 +2029,7 @@ STATUS COLORS
       safeSet("co-interview-count", "0");
     }
   }
+  ── */
 
   /* ── main dashboard data ── */
   async function loadDashboard() {
@@ -2042,7 +2045,7 @@ STATUS COLORS
       loadLeaveRequests_CO(),
       loadEvents(),
       loadCompanyInterviewCount(),
-      loadCoInterviewCount()
+      // loadCoInterviewCount()
     ]).catch(function (err) { console.warn("Background badges load warning:", err); });
 
     fetch('/api/ai/company-recommendation/insights-count')
