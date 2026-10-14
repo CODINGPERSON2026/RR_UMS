@@ -102,6 +102,42 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
+    .leave-module .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 22px;
+      padding: 2px 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 999px;
+      line-height: 1;
+      margin-left: 6px;
+      transition: all 0.25s ease;
+    }
+
+    /* Inactive Tab Badge */
+    .leave-module .leave-tab-btn .tab-badge {
+      background: rgba(255, 255, 255, 0.22) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.35) !important;
+      box-shadow: none !important;
+    }
+
+    .leave-module .leave-tab-btn:hover:not(.active) .tab-badge {
+      background: rgba(255, 255, 255, 0.32) !important;
+      color: #ffffff !important;
+    }
+
+    /* Active Tab Badge */
+    .leave-module .leave-tab-btn.active .tab-badge {
+      background: #1e40af !important;
+      color: #ffffff !important;
+      border: 1px solid #1e40af !important;
+      box-shadow: 0 2px 4px rgba(30, 64, 175, 0.25) !important;
+    }
+
     /* ================= BODY ================= */
     .leave-module .modal-body {
       padding: 24px 28px;
@@ -291,11 +327,11 @@
             <div class="leave-tabs">
               <button class="leave-tab-btn active" data-tab="approved" onclick="switchTab('approved')">
                 <i class="bi bi-check-circle-fill"></i> Approved
-                <span class="tab-badge badge bg-light text-dark ms-2" id="approved-count">0</span>
+                <span class="tab-badge" id="approved-count">0</span>
               </button>
               <button class="leave-tab-btn" data-tab="pending" onclick="switchTab('pending')">
                 <i class="bi bi-clock-fill"></i> Pending
-                <span class="tab-badge badge bg-light text-dark ms-2" id="pending-count">0</span>
+                <span class="tab-badge" id="pending-count">0</span>
               </button>
             </div>
           </div>
@@ -404,11 +440,34 @@
 
     function daysBetween(d1, d2) {
       try {
+        if (!d1 || !d2 || d1 === '–' || d2 === '–') return '–';
         const parse = s => {
-          const [d, m, y] = s.split('-');
-          return new Date(y, m - 1, d);
+          if (!s) return null;
+          if (s instanceof Date) return s;
+          const str = String(s).trim();
+          // Support DD/MM/YYYY or DD-MM-YYYY
+          const dmyMatch = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
+          if (dmyMatch) {
+            const [, d, m, y] = dmyMatch;
+            return new Date(Number(y), Number(m) - 1, Number(d));
+          }
+          // Support YYYY-MM-DD or YYYY/MM/DD
+          const ymdMatch = str.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/);
+          if (ymdMatch) {
+            const [, y, m, d] = ymdMatch;
+            return new Date(Number(y), Number(m) - 1, Number(d));
+          }
+          const dt = new Date(str);
+          return isNaN(dt.getTime()) ? null : dt;
         };
-        return Math.round(Math.abs(parse(d2) - parse(d1)) / 86400000) + 1;
+
+        const dt1 = parse(d1);
+        const dt2 = parse(d2);
+        if (!dt1 || !dt2 || isNaN(dt1.getTime()) || isNaN(dt2.getTime())) {
+          return '–';
+        }
+        const diffDays = Math.round(Math.abs(dt2 - dt1) / 86400000) + 1;
+        return isNaN(diffDays) ? '–' : diffDays;
       } catch {
         return '–';
       }
@@ -422,7 +481,9 @@
       const from = r.from_date || r.start_date || '–';
       const to = r.to_date || r.end_date || '–';
       const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-      const days = r.leave_days;
+      const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
+        ? r.leave_days
+        : ((from !== '–' && to !== '–') ? daysBetween(from, to) : '–');
       const get_leave_id = r.id;
     
       return `
@@ -461,7 +522,9 @@
       const to = r.to_date || r.end_date || '–';
       const pendingAt = r.request_status || 'Pending';
       const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-      const days = (from !== '–' && to !== '–') ? daysBetween(from, to) : '–';
+      const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
+        ? r.leave_days
+        : ((from !== '–' && to !== '–') ? daysBetween(from, to) : '–');
 
       return `
         <tr data-search="${(name + ltype + pendingAt).toLowerCase()}">
