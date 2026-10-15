@@ -2177,7 +2177,7 @@ def dashboard_summary():
     conn = get_db_connection()
     if not conn:
         return jsonify({"status": "error", "message": "Database connection failed"}), 500
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(dictionary=True , buffered = True)
 
     try:
         # 1️⃣ Detachments Count
@@ -2192,6 +2192,23 @@ def dashboard_summary():
         )
         detachment_result = cursor.fetchone()
         detachments = detachment_result['count'] if detachment_result else 0
+
+        # Detachment Last Updated Timestamp
+        cursor.execute(
+            """
+            SELECT MAX(ad.assigned_on) AS last_assigned_on
+            FROM assigned_det ad
+            INNER JOIN personnel p ON p.army_number = ad.army_number
+            """ + (f" WHERE p.company = %s" if company != "Admin" else ""),
+            (company,) if company != "Admin" else ()
+        )
+        det_last_row = cursor.fetchone()
+        det_last_dt = det_last_row['last_assigned_on'] if det_last_row else None
+        if not det_last_dt:
+            cursor.execute("SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det")
+            det_all_row = cursor.fetchone()
+            det_last_dt = det_all_row['last_assigned_on'] if det_all_row else None
+        detachment_last_updated = det_last_dt.strftime("%d/%m/%Y %I:%M:%S %p") if det_last_dt else "N/A"
 
         # 2️⃣ Manpower Count
         date_query = """SELECT report_date as max_date FROM parade_state_daily WHERE report_date = CURRENT_DATE"""
@@ -2240,6 +2257,15 @@ def dashboard_summary():
         else:
             manpower = {"total": 0, "jcoCount": 0, "officerCount": 0, "orCount": 0}
         
+        # Parade State Last Updated Timestamp
+        cursor.execute("""
+            SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated
+            FROM parade_state_daily
+        """ + (f" WHERE company = %s" if company != "Admin" else ""),
+        (company,) if company != "Admin" else ())
+        ps_last_up = cursor.fetchone()
+        parade_last_updated = ps_last_up['last_updated'].strftime("%d/%m/%Y %I:%M:%S %p") if (ps_last_up and ps_last_up.get('last_updated')) else "N/A"
+
         # 3️⃣ Interview Pending
         if role in ['JCO', 'S/JCO']:
              cursor.execute('SELECT home_state FROM personnel WHERE army_number = %s', (current_user,))
@@ -2365,14 +2391,23 @@ def dashboard_summary():
             SELECT 
                 (SELECT COUNT(*) FROM boards) AS boards_count,
                 (SELECT COUNT(*) FROM roll_call_points WHERE status IN ('PENDING', 'SUGGESSTED')) AS roll_call_count,
+                (SELECT MAX(created_at) FROM roll_call_points) AS roll_call_last_created,
                 (SELECT COUNT(*) FROM dues_in) AS dues_in,
-                (SELECT COUNT(*) FROM dues_out) AS dues_out
+                (SELECT MAX(created_at) FROM dues_in) AS dues_in_last_created,
+                (SELECT COUNT(*) FROM dues_out) AS dues_out,
+                (SELECT MAX(created_at) FROM dues_out) AS dues_out_last_created
         """)
         misc_counts = cursor.fetchone() or {}
         boards_count = misc_counts.get('boards_count', 0)
         roll_call_pending_count = misc_counts.get('roll_call_count', 0)
+        rc_last_created = misc_counts.get('roll_call_last_created')
+        roll_call_last_timestamp = rc_last_created.strftime("%d/%m/%Y %I:%M:%S %p") if rc_last_created else "N/A"
         dues_in = misc_counts.get('dues_in', 0)
+        di_last_created = misc_counts.get('dues_in_last_created')
+        dues_in_last_updated = di_last_created.strftime("%d/%m/%Y %I:%M:%S %p") if di_last_created else "N/A"
         dues_out = misc_counts.get('dues_out', 0)
+        do_last_created = misc_counts.get('dues_out_last_created')
+        dues_out_last_updated = do_last_created.strftime("%d/%m/%Y %I:%M:%S %p") if do_last_created else "N/A"
 
         # 8️⃣ TD Attachments Count
         cursor.execute(
@@ -2496,7 +2531,12 @@ def dashboard_summary():
             "agniveer_on_leave": count_of_agniveer_leave,
             "duty_count": duty_count,
             "dues_in": dues_in,
-            "dues_out": dues_out
+            "dues_in_last_updated": dues_in_last_updated,
+            "dues_out": dues_out,
+            "dues_out_last_updated": dues_out_last_updated,
+            "parade_last_updated": parade_last_updated,
+            "roll_call_last_timestamp": roll_call_last_timestamp,
+            "detachment_last_updated": detachment_last_updated
         }
 
         # Store in 10-second cache
@@ -2624,6 +2664,78 @@ def get_column_name(index):
         'present_det', 'present_unit', 'dues_in', 'dues_out'
     ]
     return columns[index] if index < len(columns) else f'col_{index}'
+
+@app.route('/api/parade-state/last-updated', methods=['GET'])
+def get_parade_state_last_updated():
+    user = require_login() or get_current_user()
+    if not user:
+        return jsonify({"success": False, "error": "Unauthorized"}), 401
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "error": "Database connection error"}), 500
+
+    date_str = request.args.get('date')
+    company = user.get('company')
+    role = user.get('role', '')
+
+    company_filter = ""
+    params = []
+    if role == 'OC':
+        company_filter = " AND company = %s"
+        params.append(company)
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SHOW TABLES LIKE 'parade_state_daily'")
+        if not cursor.fetchone():
+            return jsonify({"success": True, "last_updated": None, "formatted": "N/A", "formatted_short": "N/A"})
+
+        last_updated_dt = None
+        if date_str:
+            cursor.execute(f"""
+                SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated
+                FROM parade_state_daily
+                WHERE report_date = %s {company_filter}
+            """, tuple([date_str] + params))
+            row = cursor.fetchone()
+            if row and row.get('last_updated'):
+                last_updated_dt = row['last_updated']
+
+        # Overall latest from parade_state_daily
+        cursor.execute(f"""
+            SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated
+            FROM parade_state_daily
+            WHERE 1=1 {company_filter}
+        """, tuple(params))
+        overall_row = cursor.fetchone()
+        overall_dt = overall_row['last_updated'] if overall_row else None
+
+        target_dt = last_updated_dt or overall_dt
+
+        formatted_str = target_dt.strftime("%d/%m/%Y %I:%M:%S %p") if target_dt else "N/A"
+        formatted_short = target_dt.strftime("%d %b %Y, %I:%M %p") if target_dt else "N/A"
+
+        return jsonify({
+            "success": True,
+            "last_updated": target_dt.isoformat() if target_dt else None,
+            "formatted": formatted_str,
+            "formatted_short": formatted_short,
+            "for_date": date_str if last_updated_dt else None,
+            "is_overall": last_updated_dt is None
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 @app.route('/api/parade-state/get/<date_str>', methods=['GET'])
 def get_parade_state(date_str):
@@ -2844,10 +2956,31 @@ def get_co_all_dashboard_data(date_str):
         total_jcos = sum(row['jcos'] or 0 for row in manpower_data)
         total_other_ranks = sum(row['other_ranks'] or 0 for row in manpower_data)
         total_manpower = total_officers + total_jcos + total_other_ranks
+
+        # Get last updated timestamp from parade_state_daily
+        cursor.execute(f"""
+            SELECT MAX(COALESCE(updated_at, created_at)) as last_updated
+            FROM parade_state_daily
+            WHERE report_date = %s {company_filter}
+        """, tuple(params))
+        dt_res = cursor.fetchone()
+        dt_val = dt_res['last_updated'] if dt_res else None
+
+        if not dt_val:
+            cursor.execute(f"""
+                SELECT MAX(COALESCE(updated_at, created_at)) as last_updated
+                FROM parade_state_daily
+                WHERE 1=1 {company_filter}
+            """, tuple(params[1:]) if len(params) > 1 else ())
+            dt_overall = cursor.fetchone()
+            dt_val = dt_overall['last_updated'] if dt_overall else None
+
+        formatted_last_updated = dt_val.strftime("%d/%m/%Y %I:%M:%S %p") if dt_val else "N/A"
         
         return jsonify({
             'success': True,
             'data': {
+                'last_updated': formatted_last_updated,
                 'parade_summary': {
                     'total_posted_str': parade_summary['total_posted_str'] or 0,
                     'present_unit': parade_summary['present_unit'] or 0,

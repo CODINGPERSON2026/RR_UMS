@@ -1987,6 +1987,13 @@
                         document.getElementById('presentUnit').textContent = coData.parade_summary.present_unit || 0;
                         document.getElementById('totalOut').textContent = coData.parade_summary.total_out || 0;
                         currentDate = date;
+                        if (coData.last_updated) {
+                            document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp, #manpowerLastUpdatedTimestampDash').forEach(function(el) {
+                                el.textContent = coData.last_updated;
+                            });
+                        } else if (typeof window.fetchManpowerLastUpdated === 'function') {
+                            window.fetchManpowerLastUpdated(date);
+                        }
                         await loadCODashboardData(date);
                         showStatus(`CO Dashboard loaded for ${formattedDate}`, 'success');
                     } else {
@@ -2007,6 +2014,9 @@
                     if (response.success && response.data) {
                         const loadedData = response.data.data;
                         currentDate = loadedData.date || date;
+                        if (typeof window.fetchManpowerLastUpdated === 'function') {
+                            window.fetchManpowerLastUpdated(currentDate);
+                        }
                         isUsingTemplate = loadedData.is_previous_day_template || false;
                         templateOriginalDate = loadedData.original_date || '';
                         userCompany = loadedData.company || '';
@@ -2281,6 +2291,24 @@
 
             searchInput.addEventListener('change', searchByDate);
 
+            if (!window.fetchManpowerLastUpdated) {
+                window.fetchManpowerLastUpdated = async function(dateStr) {
+                    try {
+                        const url = dateStr ? `/api/parade-state/last-updated?date=${encodeURIComponent(dateStr)}` : '/api/parade-state/last-updated';
+                        const res = await fetch(url);
+                        const json = await res.json();
+                        if (json && json.success && json.formatted) {
+                            document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp, #manpowerLastUpdatedTimestampDash').forEach(function(el) {
+                                el.textContent = json.formatted;
+                            });
+                        }
+                    } catch(e) {
+                        console.warn('Error fetching manpower last updated:', e);
+                    }
+                };
+            }
+            window.fetchManpowerLastUpdated(today);
+
             const paradeModalEl = document.getElementById('paradeStateModal');
             if (paradeModalEl) {
                 paradeModalEl.addEventListener('shown.bs.modal', async () => {
@@ -2289,6 +2317,9 @@
                     const activeDate = searchInput ? (searchInput.value || currentDate) : currentDate;
                     if (!coLeaveChartInstance || currentDate !== activeDate) {
                         await loadDataForDate(activeDate);
+                    }
+                    if (typeof window.fetchManpowerLastUpdated === 'function') {
+                        window.fetchManpowerLastUpdated(activeDate);
                     }
                 });
             }

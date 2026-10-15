@@ -73,7 +73,37 @@ def get_detachment_details():
         cursor.execute(query, params)
         data = cursor.fetchall()
 
-        return jsonify({"status": "success", "data": data})
+        # Last updated timestamp from assigned_det table (assigned_on column)
+        last_assigned_query = "SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det"
+        last_assigned_params = []
+        if user['company'] != "Admin" and user['company'] != 'Center':
+            last_assigned_query = """
+                SELECT MAX(a.assigned_on) AS last_assigned_on
+                FROM assigned_det a
+                JOIN personnel p ON p.army_number = a.army_number
+                WHERE p.company = %s
+            """
+            last_assigned_params = [user['company']]
+
+        cursor.execute(last_assigned_query, last_assigned_params)
+        last_row = cursor.fetchone()
+        last_assigned_dt = last_row['last_assigned_on'] if last_row else None
+
+        if not last_assigned_dt:
+            cursor.execute("SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det")
+            overall_row = cursor.fetchone()
+            last_assigned_dt = overall_row['last_assigned_on'] if overall_row else None
+
+        formatted_dt = last_assigned_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_assigned_dt else "N/A"
+        formatted_short = last_assigned_dt.strftime("%d %b %Y, %I:%M %p") if last_assigned_dt else "N/A"
+
+        return jsonify({
+            "status": "success", 
+            "data": data,
+            "last_updated": formatted_dt,
+            "last_updated_short": formatted_short,
+            "last_assigned_on": last_assigned_dt.isoformat() if last_assigned_dt else None
+        })
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
@@ -81,6 +111,59 @@ def get_detachment_details():
     finally:
         cursor.close()
         conn.close()
+
+
+@dashboard_bp.route('/get_detachment_last_updated')
+def get_detachment_last_updated():
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        last_assigned_query = "SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det"
+        last_assigned_params = []
+        if user['company'] != "Admin" and user['company'] != 'Center':
+            last_assigned_query = """
+                SELECT MAX(a.assigned_on) AS last_assigned_on
+                FROM assigned_det a
+                JOIN personnel p ON p.army_number = a.army_number
+                WHERE p.company = %s
+            """
+            last_assigned_params = [user['company']]
+
+        cursor.execute(last_assigned_query, last_assigned_params)
+        last_row = cursor.fetchone()
+        last_assigned_dt = last_row['last_assigned_on'] if last_row else None
+
+        if not last_assigned_dt:
+            cursor.execute("SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det")
+            overall_row = cursor.fetchone()
+            last_assigned_dt = overall_row['last_assigned_on'] if overall_row else None
+
+        formatted_dt = last_assigned_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_assigned_dt else "N/A"
+        formatted_short = last_assigned_dt.strftime("%d %b %Y, %I:%M %p") if last_assigned_dt else "N/A"
+
+        return jsonify({
+            "status": "success",
+            "last_updated": formatted_dt,
+            "last_updated_short": formatted_short,
+            "last_assigned_on": last_assigned_dt.isoformat() if last_assigned_dt else None
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 @dashboard_bp.route('/delete_personnel', methods=['POST'])
 def delete_personnel():
     data = request.get_json()

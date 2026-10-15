@@ -27,9 +27,12 @@
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+      <div class="text-center py-2 d-flex justify-content-center align-items-center gap-2 flex-wrap" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
         <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
           <i class="fa fa-list-check me-1"></i> ROLL CALL POINTS <span class="badge bg-white text-primary ms-1" id="allPointsCountBadge">0</span>
+        </span>
+        <span class="badge shadow-sm" id="rollCallLastUpdatedBadge" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-clock me-1"></i> LAST UPDATED: <span id="rollCallLastUpdatedTimestamp" class="rollcall-last-updated-text">--</span>
         </span>
       </div>
 
@@ -139,6 +142,24 @@
   (function() {
     const modal = document.getElementById('centerRollCallModal');
 
+    function updateRollCallLastTimestamp(ts) {
+      if (!ts) return;
+      document.querySelectorAll('.rollcall-last-updated-text, #rollCallLastUpdatedTimestamp').forEach(function(el) {
+        el.textContent = ts;
+      });
+    }
+
+    function fetchRollCallLastTimestamp() {
+      fetch('/roll_call/last-timestamp')
+        .then(res => res.json())
+        .then(res => {
+          if (res.status === 'success' && res.last_timestamp) {
+            updateRollCallLastTimestamp(res.last_timestamp);
+          }
+        })
+        .catch(() => {});
+    }
+
     function fetchAllRollCallData() {
       const tbody = document.getElementById('allPointsTableBody');
       if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4"><i class="fa fa-spinner fa-spin me-2"></i> Loading all roll call points...</td></tr>';
@@ -151,6 +172,10 @@
           const badgeEl = document.getElementById('allPointsCountBadge');
           if (badgeEl) badgeEl.textContent = allRollCallCache.length;
 
+          if (res.last_timestamp) {
+            updateRollCallLastTimestamp(res.last_timestamp);
+          }
+
           renderCombinedTable();
         })
         .catch(() => {
@@ -159,7 +184,13 @@
     }
 
     if (modal) {
-      modal.addEventListener('show.bs.modal', fetchAllRollCallData);
+      modal.addEventListener('show.bs.modal', function() {
+        fetchAllRollCallData();
+        fetchRollCallLastTimestamp();
+      });
     }
+
+    // Initial fetch of timestamp
+    fetchRollCallLastTimestamp();
   })();
 </script>

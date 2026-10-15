@@ -165,8 +165,8 @@
       </div>
 
       <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fa fa-user-shield me-1"></i> UPDATED BY COY ONCO
+        <span class="badge shadow-sm" id="detachmentLastUpdatedBadge" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-clock me-1"></i> LAST UPDATED ON: <span id="detachmentLastUpdatedTimestamp" class="detachment-last-updated-text">--</span>
         </span>
       </div>
 
@@ -272,7 +272,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* ================= OPEN MODAL ================= */
 
+  async function fetchDetachmentLastUpdated() {
+    try {
+      const res = await fetch("/stats/get_detachment_last_updated");
+      const json = await res.json();
+      if (json && json.status === "success" && json.last_updated) {
+        document.querySelectorAll('.detachment-last-updated-text, #detachmentLastUpdatedTimestamp').forEach(function(el) {
+          el.textContent = json.last_updated;
+        });
+      }
+    } catch(e) {
+      console.warn("Failed to fetch detachment last updated:", e);
+    }
+  }
+
   async function openDetachmentModalData() {
+    fetchDetachmentLastUpdated();
     await loadDetachmentsUniqueScope();
     loadDetPersonnelUniqueScope();
   }
@@ -369,6 +384,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const resultUniqueScope =
         await responseUniqueScope.json();
+
+      if (resultUniqueScope && resultUniqueScope.last_updated) {
+        document.querySelectorAll('.detachment-last-updated-text, #detachmentLastUpdatedTimestamp').forEach(function(el) {
+          el.textContent = resultUniqueScope.last_updated;
+        });
+      }
 
       detFetchedDataUniqueScope =
         (resultUniqueScope && Array.isArray(resultUniqueScope.data))
@@ -624,6 +645,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
   }
+
+  fetchDetachmentLastUpdated();
 
 });
 

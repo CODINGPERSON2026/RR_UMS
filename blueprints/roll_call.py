@@ -103,11 +103,61 @@ def get_pending_roll_call_points():
         cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
 
-        return jsonify({"status": "success", "data": rows}), 200
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM roll_call_points")
+        ts_row = cursor.fetchone()
+        last_dt = ts_row['last_created_at'] if ts_row else None
+
+        formatted_ts = last_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_dt else "N/A"
+        formatted_short = last_dt.strftime("%d %b %Y, %I:%M %p") if last_dt else "N/A"
+
+        return jsonify({
+            "status": "success", 
+            "data": rows,
+            "last_timestamp": formatted_ts,
+            "last_timestamp_short": formatted_short,
+            "last_created_at": last_dt.isoformat() if last_dt else None
+        }), 200
 
     except Exception as e:
         return jsonify({"status": "error", "details": str(e)}), 500
 
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+
+@roll_call_bp.route('/last-timestamp', methods=['GET'])
+def get_roll_call_last_timestamp():
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error"}), 500
+
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM roll_call_points")
+        ts_row = cursor.fetchone()
+        last_dt = ts_row['last_created_at'] if ts_row else None
+
+        formatted_ts = last_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_dt else "N/A"
+        formatted_short = last_dt.strftime("%d %b %Y, %I:%M %p") if last_dt else "N/A"
+
+        return jsonify({
+            "status": "success",
+            "last_timestamp": formatted_ts,
+            "last_timestamp_short": formatted_short,
+            "last_created_at": last_dt.isoformat() if last_dt else None
+        }), 200
+    except Exception as e:
+        return jsonify({"status": "error", "details": str(e)}), 500
     finally:
         if cursor:
             try: cursor.close()

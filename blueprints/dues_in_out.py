@@ -152,9 +152,13 @@ def get_dues_out1():
             ORDER BY id DESC
         """)
         data = cursor.fetchall()
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM dues_out")
+        row = cursor.fetchone()
+        last_updated_dt = row['last_created_at'] if row else None
+        last_updated = last_updated_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_updated_dt else "N/A"
         cursor.close()
         conn.close()
-        return jsonify({"success": True, "data": data})
+        return jsonify({"success": True, "data": data, "last_updated": last_updated})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
     
@@ -180,13 +184,32 @@ def get_dues_in():
             ORDER BY id DESC
         """)
         data = cursor.fetchall()
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM dues_in")
+        row = cursor.fetchone()
+        last_updated_dt = row['last_created_at'] if row else None
+        last_updated = last_updated_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_updated_dt else "N/A"
         cursor.close()
         conn.close()
-        return jsonify({"success": True, "data": data})
+        return jsonify({"success": True, "data": data, "last_updated": last_updated})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@dues_bp.route('/dues-in/last-updated', methods=['GET'])
+def get_dues_in_last_updated():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM dues_in")
+        row = cursor.fetchone()
+        last_updated_dt = row['last_created_at'] if row else None
+        last_updated = last_updated_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_updated_dt else "N/A"
+        cursor.close()
+        conn.close()
+        return jsonify({"success": True, "last_updated": last_updated})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
     
-
 
 
 @dues_bp.route('/dues-in/delete/<int:record_id>', methods=['DELETE'])
@@ -237,9 +260,29 @@ def get_dues_out():
             ORDER BY id DESC
         """)
         data = cursor.fetchall()
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM dues_out")
+        row = cursor.fetchone()
+        last_updated_dt = row['last_created_at'] if row else None
+        last_updated = last_updated_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_updated_dt else "N/A"
         cursor.close()
         conn.close()
-        return jsonify({"success": True, "data": data})
+        return jsonify({"success": True, "data": data, "last_updated": last_updated})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@dues_bp.route('/dues-out/last-updated', methods=['GET'])
+def get_dues_out_last_updated():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT MAX(created_at) AS last_created_at FROM dues_out")
+        row = cursor.fetchone()
+        last_updated_dt = row['last_created_at'] if row else None
+        last_updated = last_updated_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_updated_dt else "N/A"
+        cursor.close()
+        conn.close()
+        return jsonify({"success": True, "last_updated": last_updated})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
