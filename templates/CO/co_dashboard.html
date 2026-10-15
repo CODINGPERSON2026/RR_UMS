@@ -484,6 +484,12 @@
   .sc-label {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .sc-label-text {
     font-size: clamp(11.5px, 0.9vw, 14px);
     font-weight: 700;
     line-height: 1.35;
@@ -493,8 +499,40 @@
     transition: color 0.2s ease;
   }
 
-  .sc:hover .sc-label {
+  .sc:hover .sc-label-text {
     color: var(--primary-color);
+  }
+
+  .sc-updater {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.55px;
+    text-transform: uppercase;
+    color: var(--text-secondary, #888);
+    background: var(--nav-link-hover-bg, rgba(0,0,0,0.04));
+    border: 1px solid var(--border-color, rgba(0,0,0,0.1));
+    border-radius: 3px;
+    padding: 1px 5px;
+    line-height: 1.4;
+    white-space: nowrap;
+    width: fit-content;
+    transition: all 0.2s ease;
+    opacity: 0.75;
+  }
+
+  .sc-updater i {
+    font-size: 7px;
+    opacity: 0.8;
+  }
+
+  .sc:hover .sc-updater {
+    opacity: 1;
+    color: var(--primary-color);
+    border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+    background: color-mix(in srgb, var(--primary-color) 6%, var(--nav-link-hover-bg));
   }
 
   .sc-right {
@@ -1448,82 +1486,121 @@ STATUS COLORS
     <!-- SECTION 1: METRICS GRID -->
     <div class="metrics-grid stagger-children" id="metricsGrid">
       <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
-        <span class="sc-label">PARADE STATE</span>
+        <div class="sc-label">
+          <span class="sc-label-text">PARADE STATE</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> CENTRE ONCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="openCourses">
-        <span class="sc-label">On Course</span>
+        <div class="sc-label">
+          <span class="sc-label-text">On Course</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
-        <span class="sc-label">Roll Call Points</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Roll Call Points</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> SM</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope" style="cursor: pointer;">
-        <span class="sc-label">TD / Attachment</span>
+        <div class="sc-label">
+          <span class="sc-label-text">TD / Attachment</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
-        <span class="sc-label">Detachment</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Detachment</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal" id="card-agniveer" style="cursor: pointer">
-        <span class="sc-label">Agniveer Str</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Agniveer Str</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% if role in ['YAWAR'] %}
       <div class="sc" id="agniveer_on_leave" style="cursor: pointer">
-        <span class="sc-label">Agniveer Leave</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Agniveer Leave</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="onleave_leave"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
-        <span class="sc-label">Domain Spl</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Domain Spl</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> DUTY CLK</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal">
-        <span class="sc-label">Loans</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Loans</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> ACCT JCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#projDash_modal">
-        <span class="sc-label">Projects</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Projects</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> PROJECT JCO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
-        <span class="sc-label">Dues In</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Dues In</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> POSTING CLK</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="dues_in_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesOutListModal">
-        <span class="sc-label">Dues Out</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Dues Out</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> POSTING CLK</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="dues_out_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC'] %}
       <div class="sc" style="cursor: pointer" id="openSensitive">
-        <span class="sc-label">Sensitive Indl</span>
+        <div class="sc-label">
+          <span class="sc-label-text">Sensitive Indl</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> OC</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
@@ -1532,28 +1609,40 @@ STATUS COLORS
       {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
       <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Joinee Company Recommendation Insights">
-        <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+        <div class="sc-label">
+          <span class="sc-label-text"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> 2IC / ADJUTANT</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
 
       <div class="sc" style="cursor: pointer;" id="card-ai-fitness-reports" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();" title="AI Individual Fitness Reports & Operational Readiness">
-        <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
+        <div class="sc-label">
+          <span class="sc-label-text"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
+          <span class="sc-updater"><i class="fas fa-robot"></i> AI SYSTEM</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="co-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
 
       <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
-        <span class="sc-label"><i class="fas fa-shield-alt text-primary me-1"></i> AI Company Readiness</span>
+        <div class="sc-label">
+          <span class="sc-label-text"><i class="fas fa-shield-alt text-primary me-1"></i> AI Company Readiness</span>
+          <span class="sc-updater"><i class="fas fa-robot"></i> AI SYSTEM</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="co-readiness-val"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
-        <span class="sc-label">OC Interview</span>
+        <div class="sc-label">
+          <span class="sc-label-text">OC Interview</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> OC</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub">Pending</span>
@@ -1563,7 +1652,10 @@ STATUS COLORS
       {# ── CO INTERVIEW CARD (COMMENTED OUT) ──
       {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
-        <span class="sc-label">CO Interview</span>
+        <div class="sc-label">
+          <span class="sc-label-text">CO Interview</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> CO</span>
+        </div>
         <div class="sc-right">
           <span class="sc-val" id="co-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub">Pending</span>
