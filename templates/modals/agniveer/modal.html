@@ -2,21 +2,25 @@
 <div class="modal fade" id="agni_Modal" tabindex="-1">
   <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
     <div class="modal-content overflow-hidden">
-      <!-- HEADER — compact -->
-      <div class="modal-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h6 class="modal-title fw-bold mb-0">
-          <i class="bi bi-shield-fill-check me-2"></i>Agniveer Assessment Test
+      <!-- HEADER — compact light -->
+      <div class="modal-header bg-white border-bottom d-flex justify-content-between align-items-center py-2 px-3">
+        <h6 class="modal-title fw-bold text-dark mb-0 d-flex align-items-center">
+          <i class="bi bi-shield-fill-check text-primary me-2 fs-5"></i>
+          <span>SM ROLL CALL POINTS</span>
         </h6>
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-light btn-sm fw-semibold" onclick="agni_printTable()">
+        <div class="d-flex gap-2 align-items-center">
+          <button type="button" class="btn btn-outline-secondary btn-sm fw-semibold d-inline-flex align-items-center gap-1 shadow-none" onclick="agni_printTable()">
             <i class="bi bi-printer-fill"></i> Print
           </button>
-          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
-      <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fa fa-user-shield me-1"></i> UPDATED BY TRGJCO
+      <div class="text-center py-2 d-flex justify-content-center align-items-center gap-2 flex-wrap" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <span class="badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-user-shield me-1 text-primary"></i> UPDATED BY TRGJCO
+        </span>
+        <span class="badge" id="agniLastUpdatedBadge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+          <i class="fa fa-clock me-1 text-primary"></i> LAST UPDATED: <span id="agniLastUpdatedTimestamp" class="agni-last-updated-text">--</span>
         </span>
       </div>
 
@@ -25,11 +29,11 @@
         <!-- Batch Filter & Quick Search — compact -->
         <div class="row mb-2 g-2">
           <div class="col-md-5">
-            <div class="input-group input-group-sm shadow-sm">
-              <span class="input-group-text bg-dark text-white">
-                <i class="bi bi-filter"></i>&nbsp;Batch
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light text-secondary border-end-0 fw-semibold">
+                <i class="bi bi-funnel me-1 text-primary"></i>Batch
               </span>
-              <select id="agni_BatchFilter" class="form-select form-select-sm">
+              <select id="agni_BatchFilter" class="form-select form-select-sm border-start-0">
                 <option value="all">All Batches</option>
               </select>
               <button id="agni_ResetFilter" class="btn btn-outline-secondary btn-sm" type="button">
@@ -38,11 +42,11 @@
             </div>
           </div>
           <div class="col-md-4">
-            <div class="input-group input-group-sm shadow-sm">
-              <span class="input-group-text bg-secondary text-white">
-                <i class="bi bi-search"></i>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light text-secondary border-end-0">
+                <i class="bi bi-search text-muted"></i>
               </span>
-              <input type="text" id="agni_SearchInput" class="form-control form-control-sm" placeholder="Search batch or board...">
+              <input type="text" id="agni_SearchInput" class="form-control form-control-sm border-start-0" placeholder="Search batch or board...">
             </div>
           </div>
         </div>
@@ -85,7 +89,7 @@
 
       </div><!-- /modal-body -->
 
-      <div class="modal-footer py-2 bg-light">
+      <div class="modal-footer py-2 bg-light border-top">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
       </div>
 
@@ -99,25 +103,26 @@
 <div id="agni_RemarksPanel" style="
      position:fixed; top:0; right:-420px; width:400px; height:100%;
      z-index:1070; display:flex; flex-direction:column;
-     background:#fff; box-shadow:-4px 0 24px rgba(0,0,0,0.22);
+     background:#fff; box-shadow:-4px 0 24px rgba(0,0,0,0.12);
      transition: right 0.28s cubic-bezier(0.4,0,0.2,1);
-     overflow:hidden;">
+     overflow:hidden; border-left: 1px solid #e2e8f0;">
 
-  <!-- Panel header -->
-  <div style="background:linear-gradient(135deg,#1d3557,#457b9d);
-              color:#fff; padding:10px 16px;
+  <!-- Panel header (Light) -->
+  <div style="background:#f8fafc;
+              color:#1e293b; padding:12px 16px;
+              border-bottom:1px solid #e2e8f0;
               display:flex; align-items:center; justify-content:space-between;
               flex-shrink:0;">
     <div>
-      <div style="font-weight:700; font-size:0.92rem;">
-        <i class="bi bi-chat-square-text-fill me-1"></i>Remarks
+      <div style="font-weight:700; font-size:0.92rem; color:#1e293b;">
+        <i class="bi bi-chat-square-text-fill me-1 text-primary"></i>Remarks
       </div>
-      <div id="agni_RemarksMeta" style="opacity:0.75; font-size:0.73rem; margin-top:1px;"></div>
+      <div id="agni_RemarksMeta" style="color:#64748b; font-size:0.75rem; margin-top:2px;"></div>
     </div>
     <!-- plain button — no Bootstrap dismiss, just calls agni_closeRemarks() -->
     <button onclick="agni_closeRemarks()"
-            style="background:none; border:none; color:#fff; font-size:1.2rem;
-                   cursor:pointer; line-height:1; padding:4px 6px; opacity:0.85;"
+            style="background:none; border:none; color:#64748b; font-size:1.3rem;
+                   cursor:pointer; line-height:1; padding:2px 6px;"
             title="Close">&times;</button>
   </div>
 
@@ -130,66 +135,80 @@
 
 <!-- ===================== STYLES ===================== -->
 <style>
-  /* --- Table head --- */
+  /* --- Table head (Clean Modern Light) --- */
   .agni_tableHead tr:first-child th {
-    background: linear-gradient(135deg, #1d3557, #457b9d);
-    color: #fff;
-    font-size: 0.85rem;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
     padding: 10px 8px;
+    border: 1px solid #cbd5e1 !important;
   }
   .agni_tableHead tr:last-child th {
-    background: linear-gradient(135deg, #a8dadc, #f1faee);
-    color: #1d3557;
+    background: #f8fafc;
+    color: #475569;
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: 0.80rem;
     padding: 8px 6px;
+    border: 1px solid #cbd5e1 !important;
   }
 
   /* --- Body cells normal --- */
   #agni_TableBody td {
-    font-size: 0.9rem;
-    padding: 10px 8px;
+    font-size: 0.88rem;
+    padding: 9px 8px;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+    vertical-align: middle;
   }
 
   /* --- Row hover --- */
   #agni_Modal .table-hover tbody tr:hover {
-    background-color: #eef4ff !important;
+    background-color: #f1f5f9 !important;
   }
 
-  /* --- Row zebra --- */
-  .agni_row1 { background-color: #fffbf0 !important; }
-  .agni_row2 { background-color: #f0f8ff !important; }
-  .agni_row3 { background-color: #f0fff4 !important; }
-  .agni_row4 { background-color: #fff5f5 !important; }
-  .agni_row5 { background-color: #fafafa !important; }
+  /* --- Row zebra (light theme) --- */
+  .agni_row1 { background-color: #ffffff !important; }
+  .agni_row2 { background-color: #f8fafc !important; }
+  .agni_row3 { background-color: #f0fdf4 !important; }
+  .agni_row4 { background-color: #f8fafc !important; }
+  .agni_row5 { background-color: #ffffff !important; }
 
-  /* --- View Remarks button --- */
+  /* --- View Remarks button (Light Theme) --- */
   .agni_viewRemarksBtn {
-    border: none;
-    background: linear-gradient(135deg, #1d3557, #457b9d);
-    color: #fff;
-    border-radius: 5px;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 6px;
     padding: 4px 10px;
     font-size: 0.76rem;
     font-weight: 600;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    transition: opacity 0.15s;
+    gap: 6px;
+    transition: all 0.15s ease-in-out;
     white-space: nowrap;
   }
-  .agni_viewRemarksBtn:hover { opacity: 0.82; }
+  .agni_viewRemarksBtn:hover {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #93c5fd;
+  }
   .agni_viewRemarksBtn.agni_disabled {
-    background: #e9ecef;
-    color: #adb5bd;
+    background: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #e2e8f0;
     cursor: not-allowed;
     pointer-events: none;
   }
   .agni_countPill {
-    background: rgba(255,255,255,0.25);
+    background: #dbeafe;
+    color: #1e40af;
     border-radius: 99px;
-    padding: 1px 6px;
+    padding: 1px 7px;
     font-size: 0.72rem;
     font-weight: 700;
   }
@@ -342,8 +361,31 @@
     });
   }
 
+  /* ── Helper to update timestamp ──────────────────── */
+  function agni_updateLastTimestamp(ts) {
+    if (!ts) return;
+    document.querySelectorAll('.agni-last-updated-text, #agniLastUpdatedTimestamp').forEach(function (el) {
+      el.textContent = ts;
+    });
+  }
+
+  /* ── Fetch Last Updated ───────────────────────────── */
+  window.agni_fetchLastUpdated = function () {
+    fetch('/agni/get_last_updated')
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.status === 'success' && res.last_updated && res.last_updated !== 'N/A') {
+          agni_updateLastTimestamp(res.last_updated);
+        }
+      })
+      .catch(function () {});
+  };
+
   /* ── Modal open listener ──────────────────────────── */
   document.getElementById('agni_Modal')?.addEventListener('shown.bs.modal', function () {
+    if (typeof window.agni_fetchLastUpdated === 'function') {
+      window.agni_fetchLastUpdated();
+    }
     if (agni_isLoading) return;
     agni_loadData();
   });
@@ -353,11 +395,15 @@
     agni_isLoading = true;
     agni_showSpinner();
     Promise.all([
-      fetch('/agni/get_batches').then(r => r.json()),
-      fetch('/agni/get_all_agniveers').then(r => r.json())
+      fetch('/agni/get_batches').then(function (r) { return r.json(); }),
+      fetch('/agni/get_all_agniveers').then(function (r) { return r.json(); }),
+      fetch('/agni/get_last_updated').then(function (r) { return r.json(); }).catch(function () { return null; })
     ])
-    .then(function ([batches, records]) {
+    .then(function ([batches, records, lastUp]) {
       agni_allData   = records || [];
+      if (lastUp && lastUp.last_updated && lastUp.last_updated !== 'N/A') {
+        agni_updateLastTimestamp(lastUp.last_updated);
+      }
       agni_populateBatchFilter(batches);
       agni_isLoaded  = true;
       agni_isLoading = false;
@@ -463,7 +509,7 @@
            </button>`;
       return `
         <tr class="agni_row${(i % 5) + 1}">
-          <td><span class="badge bg-primary">${p.batch}</span></td>
+          <td><span class="badge" style="background:#e0f2fe; color:#0369a1; border:1px solid #bae6fd; font-weight:600; font-size:0.8rem; padding:4px 8px;">${p.batch}</span></td>
           <td>${agni_fmtMY(p.DOE)}</td>
           <td>${agni_fmtMY(p.TOE)}</td>
           <td>${p.strength}</td>
@@ -543,9 +589,9 @@
   function agni_testCell(date, status) {
     if (!date) return '<span class="text-muted">—</span>';
     const badge = status === 1
-      ? '<span class="badge bg-success ms-1">✓</span>'
-      : '<span class="badge bg-warning text-dark ms-1">P</span>';
-    return `<strong>${agni_fmtMY(date)}</strong>${badge}`;
+      ? '<span class="badge" style="background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; font-weight:700; margin-left:4px;">✓</span>'
+      : '<span class="badge" style="background:#fef3c7; color:#b45309; border:1px solid #fde68a; font-weight:700; margin-left:4px;">P</span>';
+    return `<span class="fw-semibold">${agni_fmtMY(date)}</span>${badge}`;
   }
 
   /* ── Spinner / Error ──────────────────────────────── */

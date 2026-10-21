@@ -647,6 +647,13 @@
             onclick="openStatisticsModal()">
             <i class="fas fa-chart-bar me-1"></i> View Statistics
           </button>
+          <button class="btn btn-light btn-sm fw-bold rounded-pill px-3 py-1 ms-1 shadow-sm d-inline-flex align-items-center"
+            style="font-size: 0.78rem;"
+            onclick="openStatisticsModal()"
+            id="projdashTotalWorthBtn"
+            title="Total Projects Worth — View Cost Statistics">
+            <i class="fas fa-coins text-warning me-1"></i> Total Projects Worth : <span id="projdashTotalWorthValue" class="text-success fw-bold ms-1">₹ 0</span>
+          </button>
         </div>
 
         <!-- Compact Header Stats -->
@@ -967,6 +974,16 @@
     document.getElementById('projdashTotalCount').textContent = total;
     document.getElementById('projdashActiveCount').textContent = active;
     document.getElementById('projdashCompletedCount').textContent = completed;
+
+    const totalWorth = allProjectsData.reduce((sum, p) => {
+      const c = parseFloat(p.cost);
+      return sum + (isNaN(c) ? 0 : c);
+    }, 0);
+
+    const worthEl = document.getElementById('projdashTotalWorthValue');
+    if (worthEl) {
+      worthEl.textContent = formatProjectCurrency(totalWorth);
+    }
   }
 
   function getProjectProgress(stage) {

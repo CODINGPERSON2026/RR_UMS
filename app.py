@@ -460,7 +460,69 @@ def mt():
     ]
 
     return render_template('mt/mtView.html', vehicles=vehicles, drivers=drivers, maintenance=maintenance)
-    
+
+@app.route('/api/vms/data', methods=['GET'])
+def api_vms_data():
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"success": False, "error": "Database connection failed"}), 500
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # 1. Regimental MT vehicles
+        cursor.execute("SELECT * FROM Vehicle_detail ORDER BY vehicle_no ASC")
+        mt_vehicles = cursor.fetchall() or []
+        
+        # 2. Personnel private vehicles
+        cursor.execute("""
+            SELECT army_number, name, rank, company, vehicle_reg_no, vehicle_model, vehicle_purchase_date, vehicle_agif 
+            FROM personnel 
+            WHERE vehicle_reg_no IS NOT NULL AND TRIM(vehicle_reg_no) != ''
+            ORDER BY rank ASC, name ASC
+        """)
+        personal_vehicles = cursor.fetchall() or []
+
+        # Convert date objects to string for JSON serialization
+        for pv in personal_vehicles:
+            if pv.get('vehicle_purchase_date'):
+                pv['vehicle_purchase_date'] = str(pv['vehicle_purchase_date'])
+
+        # Stats
+        total_mt = len(mt_vehicles)
+        total_qty = sum(int(v.get('quantity') or 1) for v in mt_vehicles)
+        bp_count = sum(1 for v in mt_vehicles if str(v.get('bullet_proof') or '').upper() == 'Y')
+        total_dist = sum(int(v.get('dist_travelled') or 0) for v in mt_vehicles)
+        total_personal = len(personal_vehicles)
+
+        return jsonify({
+            "success": True,
+            "mt_vehicles": mt_vehicles,
+            "personal_vehicles": personal_vehicles,
+            "stats": {
+                "total_vehicles": total_mt,
+                "total_quantity": total_qty,
+                "bp_count": bp_count,
+                "total_dist": total_dist,
+                "total_personal": total_personal
+            }
+        })
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "mt_vehicles": [],
+            "personal_vehicles": [],
+            "stats": {
+                "total_vehicles": 0,
+                "total_quantity": 0,
+                "bp_count": 0,
+                "total_dist": 0,
+                "total_personal": 0
+            }
+        })
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/personal_info')
 def personal_info():
     return redirect('/personnel_information')
@@ -1627,6 +1689,11 @@ def assigned_alarm():
         if not user:
             return jsonify({"status": "error", "message": "Unauthorized", "rows": []}), 401
         user_company = user.get('company', '')
+        user_role = (user.get('role') or '').upper()
+
+        r_clean = (user_role or '').lower().replace(' ', '').replace('_', '').replace('-', '')
+        if 'onco' in (user_role or '').lower() or r_clean in ('1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco'):
+            return jsonify({"status": "success", "rows": []})
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -1645,15 +1712,15 @@ def assigned_alarm():
         FROM assigned_det ad
         LEFT JOIN dets d ON ad.det_id = d.det_id
         JOIN personnel p ON ad.army_number = p.army_number
-        WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
+        WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
           AND ad.det_status = 1
           AND p.detachment_status = 1
         '''
 
         params = []
 
-        # Apply company filter if user is not Admin
-        if user_company != "Admin":
+        # Apply company filter if user is not Admin or leadership
+        if user_company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
             query += " AND p.company = %s"
             params.append(user_company)
 
@@ -2333,7 +2400,7 @@ def dashboard_summary():
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
             JOIN personnel p ON ad.army_number = p.army_number
-            WHERE DATEDIFF(NOW(), ad.assigned_on) > 5
+            WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
               AND ad.det_status = 1
               AND p.detachment_status = 1
               ''' + (f" AND p.company = %s" if company != "Admin" else "") + '''
@@ -2342,6 +2409,7 @@ def dashboard_summary():
             (company,) if company != "Admin" else ()
         )
         assigned_alarm_rows = cursor.fetchall()
+        detachment_alarm_count = len(assigned_alarm_rows)
 
         # 6️⃣ Sensitive Personnel Count & 3-Month Inactivity Alarm Count (Optimized Batch Query)
         if company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
@@ -2395,7 +2463,8 @@ def dashboard_summary():
                 (SELECT COUNT(*) FROM dues_in) AS dues_in,
                 (SELECT MAX(created_at) FROM dues_in) AS dues_in_last_created,
                 (SELECT COUNT(*) FROM dues_out) AS dues_out,
-                (SELECT MAX(created_at) FROM dues_out) AS dues_out_last_created
+                (SELECT MAX(created_at) FROM dues_out) AS dues_out_last_created,
+                (SELECT MAX(created_at) FROM assistant_test) AS agniveer_last_created
         """)
         misc_counts = cursor.fetchone() or {}
         boards_count = misc_counts.get('boards_count', 0)
@@ -2408,6 +2477,8 @@ def dashboard_summary():
         dues_out = misc_counts.get('dues_out', 0)
         do_last_created = misc_counts.get('dues_out_last_created')
         dues_out_last_updated = do_last_created.strftime("%d/%m/%Y %I:%M:%S %p") if do_last_created else "N/A"
+        agni_last_created = misc_counts.get('agniveer_last_created')
+        agniveer_last_updated = agni_last_created.strftime("%d/%m/%Y %I:%M:%S %p") if agni_last_created else "N/A"
 
         # 8️⃣ TD Attachments Count
         cursor.execute(
@@ -2432,6 +2503,15 @@ def dashboard_summary():
         cursor.execute(course_query, course_params)
         courses_result = cursor.fetchone()
         courses_count = courses_result['count'] if courses_result else 0
+        try:
+            cursor.execute("SELECT MAX(updated_at) as last_updated FROM candidate_on_courses")
+            c_row = cursor.fetchone()
+            c_last = c_row['last_updated'] if c_row else None
+            if not c_last:
+                c_last = datetime.now()
+            courses_last_updated = c_last.strftime("%d/%m/%Y %I:%M:%S %p") if hasattr(c_last, 'strftime') else str(c_last)
+        except Exception:
+            courses_last_updated = datetime.now().strftime("%d/%m/%Y %I:%M:%S %p")
 
         # 🔟 Loans Count
         cursor.execute(
@@ -2521,6 +2601,7 @@ def dashboard_summary():
             "projects": projects,
             "boards_count": boards_count, 
             "assigned_alarm": assigned_alarm_rows,
+            "detachment_alarm_count": detachment_alarm_count,
             "sensitive_count": sensitive_count,
             "sensitive_alarm_count": sensitive_alarm_count,
             "attachment_count": td_attachments,
@@ -2536,7 +2617,9 @@ def dashboard_summary():
             "dues_out_last_updated": dues_out_last_updated,
             "parade_last_updated": parade_last_updated,
             "roll_call_last_timestamp": roll_call_last_timestamp,
-            "detachment_last_updated": detachment_last_updated
+            "detachment_last_updated": detachment_last_updated,
+            "agniveer_last_updated": agniveer_last_updated,
+            "courses_last_updated": courses_last_updated
         }
 
         # Store in 10-second cache
@@ -2918,8 +3001,14 @@ def get_co_all_dashboard_data(date_str):
         cursor.execute(f"""
             SELECT 
                 company,
+                (IFNULL(offr_posted_str, 0) + IFNULL(attOffr_posted_str, 0)) as officers_posted,
+                (IFNULL(offr_present_unit, 0) + IFNULL(attOffr_present_unit, 0)) as officers_present,
                 (IFNULL(offr_present_unit, 0) + IFNULL(attOffr_present_unit, 0)) as officers,
+                (IFNULL(jco_posted_str, 0) + IFNULL(jcoEre_posted_str, 0) + IFNULL(attJco_posted_str, 0)) as jcos_posted,
+                (IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0) + IFNULL(attJco_present_unit, 0)) as jcos_present,
                 (IFNULL(jco_present_unit, 0) + IFNULL(jcoEre_present_unit, 0) + IFNULL(attJco_present_unit, 0)) as jcos,
+                (IFNULL(or_posted_str, 0) + IFNULL(orEre_posted_str, 0) + IFNULL(oaOr_posted_str, 0) + IFNULL(attOr_posted_str, 0)) as other_ranks_posted,
+                (IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0) + IFNULL(oaOr_present_unit, 0) + IFNULL(attOr_present_unit, 0)) as other_ranks_present,
                 (IFNULL(or_present_unit, 0) + IFNULL(orEre_present_unit, 0) + IFNULL(oaOr_present_unit, 0) + IFNULL(attOr_present_unit, 0)) as other_ranks
             FROM parade_state_daily
             WHERE report_date = %s {company_filter}
@@ -2950,12 +3039,22 @@ def get_co_all_dashboard_data(date_str):
 )
         
         for row in manpower_data:
-            row['total'] = (row['officers'] or 0) + (row['jcos'] or 0) + (row['other_ranks'] or 0)
+            row['total_posted'] = (row.get('officers_posted') or 0) + (row.get('jcos_posted') or 0) + (row.get('other_ranks_posted') or 0)
+            row['total_present'] = (row.get('officers_present') or 0) + (row.get('jcos_present') or 0) + (row.get('other_ranks_present') or 0)
+            row['total'] = row['total_present']
         
-        total_officers = sum(row['officers'] or 0 for row in manpower_data)
-        total_jcos = sum(row['jcos'] or 0 for row in manpower_data)
-        total_other_ranks = sum(row['other_ranks'] or 0 for row in manpower_data)
-        total_manpower = total_officers + total_jcos + total_other_ranks
+        total_officers_posted = sum(row.get('officers_posted') or 0 for row in manpower_data)
+        total_officers_present = sum(row.get('officers_present') or 0 for row in manpower_data)
+        total_jcos_posted = sum(row.get('jcos_posted') or 0 for row in manpower_data)
+        total_jcos_present = sum(row.get('jcos_present') or 0 for row in manpower_data)
+        total_other_ranks_posted = sum(row.get('other_ranks_posted') or 0 for row in manpower_data)
+        total_other_ranks_present = sum(row.get('other_ranks_present') or 0 for row in manpower_data)
+        total_posted = total_officers_posted + total_jcos_posted + total_other_ranks_posted
+        total_present = total_officers_present + total_jcos_present + total_other_ranks_present
+        total_officers = total_officers_present
+        total_jcos = total_jcos_present
+        total_other_ranks = total_other_ranks_present
+        total_manpower = total_present
 
         # Get last updated timestamp from parade_state_daily
         cursor.execute(f"""
@@ -3006,6 +3105,14 @@ def get_co_all_dashboard_data(date_str):
                 'manpower': {
                     'by_company': manpower_data,
                     'total': {
+                        'officers_posted': total_officers_posted,
+                        'officers_present': total_officers_present,
+                        'jcos_posted': total_jcos_posted,
+                        'jcos_present': total_jcos_present,
+                        'other_ranks_posted': total_other_ranks_posted,
+                        'other_ranks_present': total_other_ranks_present,
+                        'total_posted': total_posted,
+                        'total_present': total_present,
                         'officers': total_officers,
                         'jcos': total_jcos,
                         'other_ranks': total_other_ranks,
@@ -4026,7 +4133,15 @@ def update_project_full():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-    
+@app.route('/api/courses/last-updated', methods=['GET'])
+def get_courses_last_updated_api():
+    try:
+        from blueprints.oncourses import get_courses_last_updated
+        return get_courses_last_updated()
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e), 'last_updated': 'N/A'}), 500
+
+
 @app.route('/api/get-all-courses', methods=['GET'])
 def get_courses():
     user = require_login()
@@ -4853,8 +4968,15 @@ def get_assigned_alarm():
     if not user:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
-    company = user['company']
+    company = user.get('company', '')
+    user_role = (user.get('role') or '').upper()
     
+    r_clean = (user_role or '').lower().replace(' ', '').replace('_', '').replace('-', '')
+    if 'onco' in (user_role or '').lower() or r_clean in ('1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco'):
+        if cursor: cursor.close()
+        if conn: conn.close()
+        return jsonify({"status": "success", "rows": []})
+
     try:
         query = '''
             SELECT 
@@ -4870,12 +4992,12 @@ def get_assigned_alarm():
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
             JOIN personnel p ON ad.army_number = p.army_number
-            WHERE DATEDIFF(NOW(), ad.assigned_on) > 90
+            WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
               AND p.detachment_status = 1
               AND ad.det_status = 1
         '''
         params = []
-        if company != "Admin":
+        if company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
             query += " AND p.company = %s"
             params.append(company)
         

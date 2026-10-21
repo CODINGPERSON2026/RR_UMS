@@ -1200,6 +1200,14 @@
       </a>
       {% endif %}
 
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER', 'ADMIN', 'SUPERADMIN'] %}
+      <a class="nav-link vms-nav-link" href="javascript:void(0)" onclick="openVmsModal()" data-tiptext="VMS">
+        <span class="nav-icon"><i class="fas fa-truck-moving"></i></span>
+        <span class="nav-label-text">VMS</span>
+        <span class="nav-tooltip">VMS</span>
+      </a>
+      {% endif %}
+
 
 
 
@@ -1661,6 +1669,38 @@
 
   <!-- HRMS Chatbot JS -->
   <script src="{{ url_for('static', filename='chatbot/chatbot.js') }}"></script>
+
+  <!-- Global VMS Modal Trigger Script -->
+  <script>
+    function openVmsModal() {
+      var modalEl = document.getElementById('vmsModal');
+      if (modalEl) {
+        var modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.show();
+        if (typeof window.vmsLoadData === 'function') {
+          window.vmsLoadData();
+        }
+      } else {
+        // If not on a page with vmsModal, navigate to dashboard with ?open_vms=1
+        window.location.href = '/?open_vms=1';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('open_vms') === '1') {
+          setTimeout(function() {
+            openVmsModal();
+            try {
+              var cleanUrl = window.location.pathname;
+              window.history.replaceState({}, document.title, cleanUrl);
+            } catch(e) {}
+          }, 300);
+        }
+      } catch (err) {}
+    });
+  </script>
 
   {% block extra_js %}{% endblock %}
 

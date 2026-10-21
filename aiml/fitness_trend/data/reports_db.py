@@ -86,6 +86,21 @@ def ensure_ai_fitness_reports_table():
         except Exception:
             pass
 
+        # Sync existing fitness_status based on military overweight criteria (Unfit starting from 11% overweight)
+        try:
+            cursor.execute("""
+                UPDATE ai_fitness_reports 
+                SET fitness_status = CASE 
+                    WHEN ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0 THEN 'Unfit'
+                    WHEN ideal_weight_kg > 0 THEN 'Healthy'
+                    ELSE 'Not Tested'
+                END
+                WHERE actual_weight_kg IS NOT NULL AND ideal_weight_kg IS NOT NULL
+            """)
+            conn.commit()
+        except Exception as sync_e:
+            logger.warning(f"Note: Could not run fitness status batch sync: {sync_e}")
+
         logger.info("Table `ai_fitness_reports` verified/initialized with UNIQUE army_number successfully.")
         return True
     except Error as e:
@@ -531,20 +546,18 @@ def fetch_reports_paginated(search_query="", company="", status="", from_date=No
     effective_status = status.strip() if (status and str(status).strip()) else ''
     if effective_status and effective_status.lower() != 'all':
         st_lower = effective_status.lower()
-        if st_lower in ('fit', 'fit only', 'fit_only'):
-            where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%combat%' OR LOWER(fitness_status) LIKE '%ready%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR LOWER(fitness_status) = 'fit' OR fitness_score >= 70)")
+        if st_lower in ('fit', 'fit only', 'fit_only', 'healthy', 'healthy only'):
+            where_clauses.append("(ideal_weight_kg IS NOT NULL AND ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) < 11.0)")
         elif st_lower in ('unfit', 'unfit only', 'unfit_only'):
-            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR (fitness_score IS NOT NULL AND fitness_score < 70))")
+            where_clauses.append("(ideal_weight_kg IS NOT NULL AND ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0)")
         elif st_lower in ('not tested', 'untested', 'not_tested'):
-            where_clauses.append("(fitness_status IS NULL OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR LOWER(fitness_status) LIKE '%insufficient%' OR fitness_score IS NULL)")
+            where_clauses.append("(actual_weight_kg IS NULL OR ideal_weight_kg IS NULL OR ideal_weight_kg <= 0)")
         elif st_lower in ('unfit_and_untested', 'unfit & untested', 'unfit not tested', 'unfit and not tested'):
-            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR (fitness_score IS NOT NULL AND fitness_score < 70) OR fitness_score IS NULL)")
-        elif 'healthy' in st_lower or 'good' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70)")
-        elif 'improvement' in st_lower or 'overweight' in st_lower or 'moderate' in st_lower or 'average' in st_lower or 'satisfactory' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70))")
-        elif 'risk' in st_lower or 'underweight' in st_lower or 'poor' in st_lower:
-            where_clauses.append("(LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%poor%' OR (fitness_score IS NOT NULL AND fitness_score < 50))")
+            where_clauses.append("((ideal_weight_kg IS NOT NULL AND ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0) OR actual_weight_kg IS NULL OR ideal_weight_kg IS NULL OR ideal_weight_kg <= 0)")
+        elif 'improvement' in st_lower or 'needs imp' in st_lower:
+            where_clauses.append("(ideal_weight_kg IS NOT NULL AND ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) <= 20.0)")
+        elif 'risk' in st_lower:
+            where_clauses.append("(ideal_weight_kg IS NOT NULL AND ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) > 20.0)")
         else:
             where_clauses.append("fitness_status LIKE %s")
             params.append(f"%{status.strip()}%")
@@ -670,11 +683,11 @@ def fetch_dynamic_report_stats():
         stats_sql = """
             SELECT
                 COUNT(*) AS total_reports,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%healthy%' OR LOWER(fitness_status) LIKE '%good%' OR LOWER(fitness_status) LIKE '%optimal%' OR LOWER(fitness_status) LIKE '%excellent%' OR fitness_score >= 70 THEN 1 ELSE 0 END) AS healthy,
-                SUM(CASE WHEN (LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%moderate%' OR LOWER(fitness_status) LIKE '%average%' OR LOWER(fitness_status) LIKE '%satisfactory%' OR (fitness_score >= 50 AND fitness_score < 70)) AND NOT (LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%at-risk%') THEN 1 ELSE 0 END) AS needs_improvement,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%underweight%' OR LOWER(fitness_status) LIKE '%poor%' OR (fitness_score IS NOT NULL AND fitness_score < 50) THEN 1 ELSE 0 END) AS at_risk,
-                SUM(CASE WHEN LOWER(fitness_status) LIKE '%risk%' OR LOWER(fitness_status) LIKE '%unfit%' OR LOWER(fitness_status) LIKE '%poor%' OR LOWER(fitness_status) LIKE '%fail%' OR LOWER(fitness_status) LIKE '%lmc%' OR LOWER(fitness_status) LIKE '%improvement%' OR LOWER(fitness_status) LIKE '%needs imp%' OR LOWER(fitness_status) LIKE '%overweight%' OR LOWER(fitness_status) LIKE '%underweight%' OR (fitness_score IS NOT NULL AND fitness_score < 70) THEN 1 ELSE 0 END) AS unfit,
-                SUM(CASE WHEN fitness_status IS NULL OR LOWER(fitness_status) LIKE '%untested%' OR LOWER(fitness_status) LIKE '%not tested%' OR LOWER(fitness_status) LIKE '%insufficient%' OR fitness_score IS NULL THEN 1 ELSE 0 END) AS not_tested,
+                SUM(CASE WHEN ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) < 11.0 THEN 1 ELSE 0 END) AS healthy,
+                SUM(CASE WHEN ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) <= 20.0 THEN 1 ELSE 0 END) AS needs_improvement,
+                SUM(CASE WHEN ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) > 20.0 THEN 1 ELSE 0 END) AS at_risk,
+                SUM(CASE WHEN ideal_weight_kg > 0 AND ROUND(((actual_weight_kg - ideal_weight_kg) / ideal_weight_kg) * 100.0, 2) >= 11.0 THEN 1 ELSE 0 END) AS unfit,
+                SUM(CASE WHEN actual_weight_kg IS NULL OR ideal_weight_kg IS NULL OR ideal_weight_kg <= 0 THEN 1 ELSE 0 END) AS not_tested,
                 AVG(fitness_score) AS avg_score,
                 SUM(CASE WHEN DATE(generated_at) = CURDATE() THEN 1 ELSE 0 END) AS today_count,
                 SUM(CASE WHEN MONTH(generated_at) = MONTH(CURDATE()) AND YEAR(generated_at) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS month_count
@@ -863,17 +876,28 @@ def _format_report_summary(row):
     d['army_number'] = d.get('army_number') or 'N/A'
     d['name'] = d.get('name') or 'N/A'
     d['rank'] = d.get('rank') or 'N/A'
-    raw_fit_st = str(d.get('fitness_status') or 'N/A').strip()
-    low_st = raw_fit_st.lower()
-    sc = d.get('fitness_score')
-    if 'untested' in low_st or 'not tested' in low_st or 'insufficient' in low_st:
+
+    # Military Weight Status Rule: Unfit ONLY if overweight starting from 11% (including 11%)
+    act_wt = d.get('actual_weight_kg')
+    ideal_wt = d.get('ideal_weight_kg')
+    dev_pct = None
+    if act_wt is not None and ideal_wt is not None:
+        try:
+            f_act = float(act_wt)
+            f_ideal = float(ideal_wt)
+            if f_ideal > 0:
+                dev_pct = round(((f_act - f_ideal) / f_ideal) * 100.0, 2)
+        except (ValueError, TypeError):
+            pass
+
+    if act_wt is None or ideal_wt is None or float(ideal_wt or 0) <= 0:
         d['fitness_status'] = 'Not Tested'
-    elif 'healthy' in low_st or 'combat' in low_st or 'ready' in low_st or 'good' in low_st or (sc is not None and sc >= 70 and 'risk' not in low_st and 'unfit' not in low_st and 'improv' not in low_st):
-        d['fitness_status'] = 'Healthy'
-    elif 'improve' in low_st or 'needs imp' in low_st or 'risk' in low_st or 'unfit' in low_st or (sc is not None and sc < 70):
+    elif dev_pct is not None and dev_pct >= 11.0:
         d['fitness_status'] = 'Unfit'
     else:
-        d['fitness_status'] = raw_fit_st or 'N/A'
+        d['fitness_status'] = 'Healthy'
+
+    d['weight_deviation_percent'] = dev_pct
     d['report_generated'] = bool(d.get('report_generated', True))
 
     return d

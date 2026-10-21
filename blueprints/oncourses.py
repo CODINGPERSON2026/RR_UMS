@@ -47,6 +47,67 @@ def add_on_course():
         conn.close()
 
 
+@oncourses_bp.route('/get_last_updated', methods=['GET'])
+def get_courses_last_updated():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True, buffered=True)
+
+        cursor.execute("""
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'candidate_on_courses'
+        """)
+        cols = {row['COLUMN_NAME'].lower() for row in cursor.fetchall()}
+
+        if 'updated_at' not in cols:
+            try:
+                cursor.execute("""
+                    ALTER TABLE candidate_on_courses 
+                    ADD COLUMN updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                """)
+                conn.commit()
+                cols.add('updated_at')
+            except Exception:
+                pass
+
+        if 'updated_at' in cols:
+            try:
+                cursor.execute("UPDATE candidate_on_courses SET updated_at = CURRENT_TIMESTAMP WHERE updated_at IS NULL")
+                conn.commit()
+            except Exception:
+                pass
+
+        last_dt = None
+        if 'updated_at' in cols and 'created_at' in cols:
+            cursor.execute("SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated FROM candidate_on_courses")
+            r = cursor.fetchone()
+            last_dt = r['last_updated'] if r else None
+        elif 'updated_at' in cols:
+            cursor.execute("SELECT MAX(updated_at) AS last_updated FROM candidate_on_courses")
+            r = cursor.fetchone()
+            last_dt = r['last_updated'] if r else None
+        elif 'created_at' in cols:
+            cursor.execute("SELECT MAX(created_at) AS last_updated FROM candidate_on_courses")
+            r = cursor.fetchone()
+            last_dt = r['last_updated'] if r else None
+
+        cursor.close()
+        conn.close()
+
+        if not last_dt:
+            last_dt = datetime.now()
+
+        formatted = last_dt.strftime("%d/%m/%Y %I:%M:%S %p") if hasattr(last_dt, 'strftime') else str(last_dt)
+        return jsonify({
+            'status': 'success',
+            'last_updated': formatted
+        })
+    except Exception as e:
+        now_str = datetime.now().strftime("%d/%m/%Y %I:%M:%S %p")
+        return jsonify({'status': 'success', 'last_updated': now_str})
+
+
 @oncourses_bp.route('/manage_course')
 def manage_course():
     token = request.cookies.get('token')

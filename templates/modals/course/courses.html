@@ -298,9 +298,12 @@
         <button class="cm-close-btn" id="cmCloseBtn" aria-label="Close"><i class="fas fa-times"></i></button>
       </div>
     </div>
-    <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-      <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-        <i class="fas fa-user-shield me-1"></i> UPDATED BY TRGJCO
+    <div class="text-center py-2 d-flex justify-content-center align-items-center gap-2 flex-wrap" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+      <span class="badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+        <i class="fas fa-user-shield me-1 text-primary"></i> UPDATED BY TRGJCO
+      </span>
+      <span class="badge" id="cmLastUpdatedBadge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+        <i class="fas fa-clock me-1 text-primary"></i> LAST UPDATED: <span id="cmLastUpdatedTimestamp" class="courses-last-updated-text">--</span>
       </span>
     </div>
 
@@ -375,9 +378,48 @@
   var paginationEl = document.getElementById('cmPagination');
   var totalCount   = document.getElementById('cmTotalCount');
 
+  function updateCoursesLastTimestamp(ts) {
+    if (!ts) return;
+    document.querySelectorAll('.courses-last-updated-text, #cmLastUpdatedTimestamp').forEach(function (el) {
+      el.textContent = ts;
+    });
+  }
+
+  window.fetchCoursesLastUpdated = function () {
+    fetch('/oncourses/get_last_updated')
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (res && res.last_updated && res.last_updated !== 'N/A') {
+          updateCoursesLastTimestamp(res.last_updated);
+        } else {
+          tryFallback();
+        }
+      })
+      .catch(function () {
+        tryFallback();
+      });
+
+    function tryFallback() {
+      fetch('/api/courses/last-updated')
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          if (res && res.last_updated && res.last_updated !== 'N/A') {
+            updateCoursesLastTimestamp(res.last_updated);
+          }
+        })
+        .catch(function () {});
+    }
+  };
+
+  // Immediate fetch on script load
+  window.fetchCoursesLastUpdated();
+
   function openModal() {
     overlay.classList.add('cm-active');
     document.body.style.overflow = 'hidden';
+    if (typeof window.fetchCoursesLastUpdated === 'function') {
+      window.fetchCoursesLastUpdated();
+    }
     loadCourses();
   }
   function closeModal() {
@@ -395,6 +437,9 @@
   if (openBtn) openBtn.addEventListener('click', openModal);
 
   function loadCourses() {
+    if (typeof window.fetchCoursesLastUpdated === 'function') {
+      window.fetchCoursesLastUpdated();
+    }
     if (allData.length) return;
     fetch('/api/get-all-courses')
       .then(function (r) { return r.json(); })

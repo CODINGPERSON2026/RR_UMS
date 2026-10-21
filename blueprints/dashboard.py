@@ -59,16 +59,18 @@ def get_detachment_details():
             query += " AND a.det_id = %s"
             params.append(det_id)
             
-        # Apply min_days filter
+        # Apply min_days filter (starting from min_days, including min_days)
         if min_days > 0:
-            query += " AND DATEDIFF(CURDATE(), a.assigned_on) > %s"
+            query += " AND DATEDIFF(CURDATE(), a.assigned_on) >= %s"
             params.append(min_days)
 
-        # ---------- COMPANY FILTER (Admin bypass) ----------
-        
-        if user['company'] != "Admin" and user['company'] !='Center':
+        # ---------- COMPANY FILTER (Admin / CO / Leadership bypass) ----------
+        role = (user.get('role') or '').upper()
+        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
             query += " AND p.company = %s"
             params.append(user['company'])
+
+        query += " ORDER BY days_on_det DESC"
 
         cursor.execute(query, params)
         data = cursor.fetchall()
@@ -76,7 +78,7 @@ def get_detachment_details():
         # Last updated timestamp from assigned_det table (assigned_on column)
         last_assigned_query = "SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det"
         last_assigned_params = []
-        if user['company'] != "Admin" and user['company'] != 'Center':
+        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
             last_assigned_query = """
                 SELECT MAX(a.assigned_on) AS last_assigned_on
                 FROM assigned_det a

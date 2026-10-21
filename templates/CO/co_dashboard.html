@@ -1465,10 +1465,10 @@ STATUS COLORS
 
     <!-- ACTION BAR -->
     <div class="action-bar" id="actionBar">
-
+<!-- 
       <button class="ab-btn ab-primary" id="openCalendar">
         <i class="fa fa-calendar"></i>UPCOMING EVENTS
-      </button>
+      </button> -->
 
       <!-- <button class="ab-btn ab-primary honours-board-btn" id="openBoard" type="button" onclick="openHonoursBoard()">
         <span class="honours-icon">&#127942;</span>
@@ -1480,9 +1480,9 @@ STATUS COLORS
         <span class="bdg" id="coRejectedCount" style="display: none">0</span>
       </button>
 
-      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+      <!-- <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
         ADD EVENT
-      </button>
+      </button> -->
 
       <button class="ab-btn ab-blue" id="chatBtn">
         <i class="fab fa-facebook-messenger" style="font-size: 12px"></i>
@@ -1490,19 +1490,14 @@ STATUS COLORS
         <span class="bdg" id="unreadBadge" style="display: none">0</span>
       </button>
 
-      {% if role in ['2IC','CO'] %}
-      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn">
-        LEAVE REQUEST
-        <span class="bdg" id="leaveRequestBadge" style="display: none">0</span>
-      </button>
-      {% endif %}
+
 
       <div class="ab-spacer"></div>
 
-      <div class="schedule-actionbar-container" onclick="new bootstrap.Modal(document.getElementById('scheduleModal')).show()" style="cursor:pointer">
+      <!-- <div class="schedule-actionbar-container" onclick="new bootstrap.Modal(document.getElementById('scheduleModal')).show()" style="cursor:pointer">
         <span class="schedule-actionbar-label"><i class="fa fa-calendar-check"></i> Schedule:</span>
         <div id="scheduleSlider" class="schedule-actionbar-strip"></div>
-      </div>
+      </div> -->
     </div>
 
     <!-- MAIN TWO-COLUMN LAYOUT -->
@@ -1528,7 +1523,7 @@ STATUS COLORS
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
         <div class="sc-label">
-          <span class="sc-label-text">ROLLCALL SM PTS</span>
+          <span class="sc-label-text">ROLLCALL PTS</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1544,9 +1539,9 @@ STATUS COLORS
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
         </div>
       </div>
-      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" data-min-days="90" style="cursor: pointer;">
         <div class="sc-label">
-          <span class="sc-label-text">Detachment</span>
+          <span class="sc-label-text">Det Alarms</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1631,9 +1626,9 @@ STATUS COLORS
       {% endif %}
       {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
-      <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Joinee Company Recommendation Insights">
+      <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Arrival Recommendation Insights">
         <div class="sc-label">
-          <span class="sc-label-text"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+          <span class="sc-label-text"><i class="fas fa-brain text-primary me-1"></i> AI NEW ARRIVAL</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -2069,6 +2064,8 @@ STATUS COLORS
     });
   }
 
+  window.isCODashboard = true;
+
   function safeSet(id, val) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -2212,7 +2209,8 @@ STATUS COLORS
       safeSet("totalCoursesDone", data.courses_count);
       safeSet("interview-Count", iv.pending_count);
       safeSet("total-count", iv.total_count);
-      safeSet("locationCount", data.detachments != null ? data.detachments : 0);
+      var detAlarmCnt = data.detachment_alarm_count != null ? data.detachment_alarm_count : (data.assigned_alarm ? data.assigned_alarm.length : (data.detachments != null ? data.detachments : 0));
+      safeSet("locationCount", detAlarmCnt);
       safeSet("sensitive-count", data.sensitive_count);
       var sensBadge = document.getElementById("sensitive-alarm-badge");
       if (sensBadge) {
@@ -2255,6 +2253,16 @@ STATUS COLORS
       if (data.dues_out_last_updated) {
         document.querySelectorAll('.dues-out-last-updated-text, #duesOutLastUpdatedTimestamp').forEach(function(el) {
           el.textContent = data.dues_out_last_updated;
+        });
+      }
+      if (data.agniveer_last_updated) {
+        document.querySelectorAll('.agni-last-updated-text, #agniLastUpdatedTimestamp').forEach(function(el) {
+          el.textContent = data.agniveer_last_updated;
+        });
+      }
+      if (data.courses_last_updated) {
+        document.querySelectorAll('.courses-last-updated-text, #cmLastUpdatedTimestamp').forEach(function(el) {
+          el.textContent = data.courses_last_updated;
         });
       }
     } catch (e) {
@@ -3087,6 +3095,7 @@ STATUS COLORS
 <script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %}false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% include 'modals/vms/vms_modal.html' %}
 {% endif %}
 
 {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}

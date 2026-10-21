@@ -36,8 +36,56 @@ def get_batches():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@agniveer_bp.route('/get_last_updated', methods=['GET'])
+def get_agniveer_last_updated():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True, buffered=True)
 
-@agniveer_bp.route('/api/assistant-test', methods=['POST'])
+        # Check if updated_at column exists in assistant_test
+        cursor.execute("""
+            SELECT COLUMN_NAME 
+            FROM INFORMATION_SCHEMA.COLUMNS 
+            WHERE TABLE_NAME = 'assistant_test' AND COLUMN_NAME = 'updated_at'
+        """)
+        has_updated_at = cursor.fetchone() is not None
+
+        if not has_updated_at:
+            try:
+                cursor.execute("""
+                    ALTER TABLE assistant_test 
+                    ADD COLUMN updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                """)
+                conn.commit()
+                has_updated_at = True
+            except Exception:
+                pass
+
+        if has_updated_at:
+            cursor.execute("SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated FROM assistant_test")
+        else:
+            cursor.execute("SELECT MAX(created_at) AS last_updated FROM assistant_test")
+
+        row = cursor.fetchone()
+        last_dt = row['last_updated'] if row else None
+
+        if not last_dt:
+            cursor.execute("SELECT MAX(created_at) AS last_updated FROM personnel WHERE `rank` = 'Agniveer'")
+            p_row = cursor.fetchone()
+            last_dt = p_row['last_updated'] if p_row else None
+
+        cursor.close()
+        conn.close()
+
+        formatted = last_dt.strftime("%d/%m/%Y %I:%M:%S %p") if last_dt else "N/A"
+        return jsonify({
+            'status': 'success',
+            'last_updated': formatted
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'error': str(e), 'last_updated': 'N/A'}), 500
+
+
 def save_assistant_test():
     try:
         data = request.json

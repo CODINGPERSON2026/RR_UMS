@@ -367,6 +367,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   }
 
+  function checkIsCoDashboard() {
+    return Boolean(
+      window.isCODashboard ||
+      document.getElementById("metricsGrid") ||
+      document.querySelector("#viewDetailsBtn[data-min-days='90']")
+    );
+  }
+
   /* ================= LOAD PERSONNEL ================= */
 
   async function loadDetPersonnelUniqueScope() {
@@ -379,8 +387,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
 
+      const isCoDash = checkIsCoDashboard();
+      const url = isCoDash ? "/stats/get_detachment_details?min_days=90" : "/stats/get_detachment_details";
+
       const responseUniqueScope =
-        await fetch("/stats/get_detachment_details");
+        await fetch(url);
 
       const resultUniqueScope =
         await responseUniqueScope.json();
@@ -395,6 +406,29 @@ document.addEventListener("DOMContentLoaded", function () {
         (resultUniqueScope && Array.isArray(resultUniqueScope.data))
           ? resultUniqueScope.data
           : [];
+
+      if (isCoDash) {
+        detFetchedDataUniqueScope = detFetchedDataUniqueScope.filter(
+          item => (Number(item.days_on_det) || 0) >= 90
+        );
+        const titleEl = detModalElementUniqueScope.querySelector(".modal-title");
+        if (titleEl) {
+          titleEl.innerHTML = `<span style="color:#dc3545;margin-right:6px;">⚠️</span> Detachment Alarms (90 Days & Above)`;
+        }
+        const countLabelEl = detModalElementUniqueScope.querySelector(".count-label");
+        if (countLabelEl) {
+          countLabelEl.textContent = "Alarm Count";
+        }
+      } else {
+        const titleEl = detModalElementUniqueScope.querySelector(".modal-title");
+        if (titleEl) {
+          titleEl.textContent = "Detachment Details";
+        }
+        const countLabelEl = detModalElementUniqueScope.querySelector(".count-label");
+        if (countLabelEl) {
+          countLabelEl.textContent = "Total Count";
+        }
+      }
 
       /* ================= COMPANY FILTER ================= */
 
@@ -482,6 +516,13 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
+    const isCoDash = checkIsCoDashboard();
+    if (isCoDash) {
+      filteredDataUniqueScope = filteredDataUniqueScope.filter(
+        item => (Number(item.days_on_det) || 0) >= 90
+      );
+    }
+
     /* ================= COUNT ================= */
 
     detCountBadgeUniqueScope.textContent =
@@ -494,7 +535,7 @@ document.addEventListener("DOMContentLoaded", function () {
       detTableBodyUniqueScope.innerHTML = `
         <tr>
           <td colspan="7" class="text-center text-muted py-4">
-            <i class="fas fa-info-circle me-1"></i> No detachment records available
+            <i class="fas fa-info-circle me-1"></i> ${isCoDash ? 'No detachment alarm records (90+ days) available' : 'No detachment records available'}
           </td>
         </tr>
       `;

@@ -360,23 +360,31 @@
       const height = (row.height_cm !== null && row.height_cm !== undefined) ? `${Number(row.height_cm).toFixed(1)} cm` : 'N/A';
       const weight = (row.actual_weight_kg !== null && row.actual_weight_kg !== undefined) ? `${Number(row.actual_weight_kg).toFixed(1)} kg` : 'N/A';
       
-      // Fitness Status Badge
-      const statusRaw = row.fitness_status || 'Unknown';
+      // Fitness Status Badge (Unfit ONLY if overweight starting from 11%)
+      const actWt = (row.actual_weight_kg !== null && row.actual_weight_kg !== undefined) ? Number(row.actual_weight_kg) : null;
+      const idealWt = (row.ideal_weight_kg !== null && row.ideal_weight_kg !== undefined) ? Number(row.ideal_weight_kg) : null;
+      let devPct = (row.weight_deviation_percent !== null && row.weight_deviation_percent !== undefined) ? Number(row.weight_deviation_percent) : null;
+      if (devPct === null && actWt !== null && idealWt !== null && idealWt > 0) {
+        devPct = Number((((actWt - idealWt) / idealWt) * 100).toFixed(2));
+      }
+
+      const isUnfit = (devPct !== null && devPct >= 11.0);
       let badgeClass = 'status-badge';
       let statusIcon = 'fa-info-circle';
-      const sLower = statusRaw.toLowerCase();
-      const scoreNum = (row.fitness_score !== null && row.fitness_score !== undefined) ? Number(row.fitness_score) : null;
-      if (sLower.includes('healthy') || sLower.includes('ready') || sLower.includes('good') || sLower.includes('combat') || (scoreNum !== null && scoreNum >= 70 && !sLower.includes('risk') && !sLower.includes('improve'))) {
-        badgeClass += ' healthy';
-        statusIcon = 'fa-check-circle';
-      } else if (sLower.includes('risk') || sLower.includes('poor') || sLower.includes('critical') || sLower.includes('fail') || (scoreNum !== null && scoreNum < 50)) {
+      let statusDisplay = 'Healthy';
+
+      if (actWt === null || idealWt === null || idealWt <= 0) {
+        badgeClass += ' untested';
+        statusIcon = 'fa-question-circle';
+        statusDisplay = 'Not Tested';
+      } else if (isUnfit) {
         badgeClass += ' at-risk';
         statusIcon = 'fa-times-circle';
-      } else if (sLower.includes('improve') || sLower.includes('moderate') || sLower.includes('average') || sLower.includes('satisfactory') || sLower.includes('sat') || (scoreNum !== null && scoreNum >= 50 && scoreNum < 70)) {
-        badgeClass += ' needs-imp';
-        statusIcon = 'fa-exclamation-circle';
+        statusDisplay = `Unfit (+${devPct.toFixed(1)}%)`;
       } else {
-        badgeClass += ' needs-imp';
+        badgeClass += ' healthy';
+        statusIcon = 'fa-check-circle';
+        statusDisplay = devPct !== null && devPct > 0 ? `Healthy (+${devPct.toFixed(1)}%)` : 'Healthy';
       }
 
       // Fitness Score
@@ -408,7 +416,7 @@
           <td>${age}</td>
           <td>${height}</td>
           <td>${weight}</td>
-          <td><span class="${badgeClass}"><i class="fas ${statusIcon}"></i> ${escapeHtml(statusRaw)}</span></td>
+          <td><span class="${badgeClass}"><i class="fas ${statusIcon}"></i> ${escapeHtml(statusDisplay)}</span></td>
           <td class="text-center">${scoreHtml}</td>
           <td class="text-center">${genBadge}</td>
           <td class="text-nowrap small text-muted">${escapeHtml(genAt)}</td>

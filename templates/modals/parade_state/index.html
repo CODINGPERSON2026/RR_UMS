@@ -339,30 +339,39 @@
         text-align: center;
     }
 
-    .co-table#coManpowerTable th:nth-child(1),
-    .co-table#coManpowerTable td:nth-child(1) {
-        width: 30%;
-        min-width: 100px;
+    .co-table#coManpowerTable th,
+    .co-table#coManpowerTable td {
+        text-align: center;
+        padding: 6px 4px;
+        font-size: 11px;
     }
 
-    .co-table#coManpowerTable th:nth-child(2),
+    .co-table#coManpowerTable td:nth-child(1),
+    .co-table#coManpowerTable th:first-child {
+        width: 16%;
+        min-width: 80px;
+        text-align: left;
+        font-weight: 600;
+    }
+
     .co-table#coManpowerTable td:nth-child(2),
-    .co-table#coManpowerTable th:nth-child(3),
     .co-table#coManpowerTable td:nth-child(3),
-    .co-table#coManpowerTable th:nth-child(4),
-    .co-table#coManpowerTable td:nth-child(4) {
-        width: 15%;
-        min-width: 50px;
+    .co-table#coManpowerTable td:nth-child(4),
+    .co-table#coManpowerTable td:nth-child(5),
+    .co-table#coManpowerTable td:nth-child(6),
+    .co-table#coManpowerTable td:nth-child(7) {
+        width: 12%;
+        min-width: 45px;
         text-align: center;
     }
 
-    .co-table#coManpowerTable th:nth-child(5),
-    .co-table#coManpowerTable td:nth-child(5) {
-        width: 15%;
+    .co-table#coManpowerTable td:nth-child(8) {
+        width: 12%;
         min-width: 50px;
         text-align: center;
         font-weight: 600;
         color: #111827;
+        background-color: #f8fafc;
     }
 
     /* Officer & JCO Leave Table column widths */
@@ -1107,18 +1116,25 @@
                 <div class="co-table-container">
                     <table class="co-table" id="coManpowerTable">
                         <thead>
-                            <tr
-                                style="background: linear-gradient(90deg, #1e3c72, #2a5298); color: white; text-align: center;">
-                                <th style="padding: 10px 6px; border: 1px solid #ddd; color: white;">Company</th>
-                                <th style="padding: 10px 6px; border: 1px solid #ddd; color: white;">Officers</th>
-                                <th style="padding: 10px 6px; border: 1px solid #ddd; color: white;">JCOs</th>
-                                <th style="padding: 10px 6px; border: 1px solid #ddd; color: white;">Other Ranks</th>
-                                <th style="padding: 10px 6px; border: 1px solid #ddd; color: white;">Total</th>
+                            <tr style="background: linear-gradient(90deg, #1e3c72, #2a5298); color: white; text-align: center;">
+                                <th rowspan="2" style="padding: 8px 6px; border: 1px solid rgba(255,255,255,0.2); color: white; vertical-align: middle;">Company</th>
+                                <th colspan="2" style="padding: 6px 4px; border: 1px solid rgba(255,255,255,0.2); color: white;">Officers</th>
+                                <th colspan="2" style="padding: 6px 4px; border: 1px solid rgba(255,255,255,0.2); color: white;">JCOs</th>
+                                <th colspan="2" style="padding: 6px 4px; border: 1px solid rgba(255,255,255,0.2); color: white;">Other Ranks</th>
+                                <th rowspan="2" style="padding: 8px 6px; border: 1px solid rgba(255,255,255,0.2); color: white; vertical-align: middle;">Total</th>
+                            </tr>
+                            <tr style="background: linear-gradient(90deg, #24427d, #325ba6); color: white; text-align: center;">
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Posted</th>
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Present</th>
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Posted</th>
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Present</th>
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Posted</th>
+                                <th style="padding: 5px 4px; border: 1px solid rgba(255,255,255,0.2); color: white; font-size: 10px;">Present</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td colspan="5" style="text-align:center;padding:20px;color:#999;">Select a date to view
+                                <td colspan="8" style="text-align:center;padding:20px;color:#999;">Select a date to view
                                     data</td>
                             </tr>
                         </tbody>
@@ -1600,7 +1616,7 @@
             document.querySelector('#coLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
             document.querySelector('#coOfficerLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
             document.querySelector('#coJcoLeaveTable tbody').innerHTML = _noDataRow(4, null, text);
-            document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(5, null, text);
+            document.querySelector('#coManpowerTable tbody').innerHTML = _noDataRow(8, null, text);
         }
 
         // ── Render empty state overlay on Chart canvas when no data found ──────────
@@ -1808,7 +1824,7 @@
                 manpowerTbody.innerHTML = '';
 
                 if (!coData.manpower?.by_company?.length) {
-                    manpowerTbody.innerHTML = _noDataRow(5, selectedDate);
+                    manpowerTbody.innerHTML = _noDataRow(8, selectedDate);
                     if (coManpowerChartInstance) { coManpowerChartInstance.destroy(); coManpowerChartInstance = null; }
                     coManpowerChartInstance = renderEmptyChart('coManpowerChart', selectedDate);
                 } else {
@@ -1816,30 +1832,36 @@
 
                     coData.manpower.by_company.forEach(row => {
                         mpLabels.push(row.company.toUpperCase());
-                        totalData.push(row.total || 0);
-                        officersData.push(row.officers || 0);
-                        jcosData.push(row.jcos || 0);
-                        orData.push(row.other_ranks || 0);
+                        totalData.push(row.total_present ?? row.total ?? 0);
+                        officersData.push(row.officers_present ?? row.officers ?? 0);
+                        jcosData.push(row.jcos_present ?? row.jcos ?? 0);
+                        orData.push(row.other_ranks_present ?? row.other_ranks ?? 0);
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td><strong>${row.company.toUpperCase()}</strong></td>
-                            <td>${row.officers || 0}</td>
-                            <td>${row.jcos || 0}</td>
-                            <td>${row.other_ranks || 0}</td>
-                            <td><strong>${row.total || 0}</strong></td>`;
+                            <td>${row.officers_posted ?? 0}</td>
+                            <td>${row.officers_present ?? row.officers ?? 0}</td>
+                            <td>${row.jcos_posted ?? 0}</td>
+                            <td>${row.jcos_present ?? row.jcos ?? 0}</td>
+                            <td>${row.other_ranks_posted ?? 0}</td>
+                            <td>${row.other_ranks_present ?? row.other_ranks ?? 0}</td>
+                            <td><strong>${row.total_present ?? row.total ?? 0}</strong></td>`;
                         manpowerTbody.appendChild(tr);
                     });
 
-                    const mTot = coData.manpower.total;
+                    const mTot = coData.manpower.total || {};
                     const totalMpTr = document.createElement('tr');
                     totalMpTr.className = 'total-row';
                     totalMpTr.innerHTML = `
                         <td><strong>TOTAL</strong></td>
-                        <td>${mTot.officers}</td>
-                        <td>${mTot.jcos}</td>
-                        <td>${mTot.other_ranks}</td>
-                        <td><strong>${mTot.total}</strong></td>`;
+                        <td>${mTot.officers_posted ?? 0}</td>
+                        <td>${mTot.officers_present ?? mTot.officers ?? 0}</td>
+                        <td>${mTot.jcos_posted ?? 0}</td>
+                        <td>${mTot.jcos_present ?? mTot.jcos ?? 0}</td>
+                        <td>${mTot.other_ranks_posted ?? 0}</td>
+                        <td>${mTot.other_ranks_present ?? mTot.other_ranks ?? 0}</td>
+                        <td><strong>${mTot.total_present ?? mTot.total ?? 0}</strong></td>`;
                     manpowerTbody.appendChild(totalMpTr);
 
                     updateManpowerChart(mpLabels, totalData, officersData, jcosData, orData);

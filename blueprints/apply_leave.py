@@ -504,46 +504,70 @@ def get_leave_requests():
 
     cursor = None
     user = require_login()
-    current_user_role = user['role']
-    current_user_company = user['company']
+    current_user_role = (user.get('role') or '').strip()
+    current_user_company = (user.get('company') or '').strip()
 
     request_status = f'Pending at {current_user_role}'
 
     try:
         cursor = conn.cursor(dictionary=True)
-        # =========================
-        # CASE 1: NORMAL ROLES
-        # =========================
-        if current_user_role != '2IC' and current_user_role != 'CO' and current_user_role != 'Subedar Major':
 
+        # =========================
+        # CASE 1: CO ROLE (Sees ALL pending leave requests across all companies)
+        # =========================
+        if current_user_role == 'CO':
             query = '''
                 SELECT 
                     l.id,
                     l.name,
                     l.army_number,
+                    COALESCE(p.company, l.company) AS company,
                     p.rank,
-                    l.company,
                     l.leave_type,
                     l.leave_days,
                     l.request_status,
                     l.remarks,
                     l.created_at
                 FROM leave_status_info l
-                LEFT JOIN personnel p ON l.army_number = p.army_number
-                WHERE l.request_sent_to = %s 
-                AND l.request_status = %s
-                AND l.company = %s
+                LEFT JOIN personnel p 
+                    ON l.army_number = p.army_number
+                WHERE l.request_status LIKE %s
                 ORDER BY l.created_at DESC
             '''
+            cursor.execute(query, ('Pending%',))
 
-            cursor.execute(query, (
-                current_user_role,
-                request_status,
-                current_user_company
-            ))
+        # =========================
+        # CASE 2: ONCO ROLE (Sees all pending leave requests for company / all)
+        # =========================
+        elif current_user_role == 'ONCO':
+            query = '''
+                SELECT 
+                    l.id,
+                    l.name,
+                    l.army_number,
+                    COALESCE(p.company, l.company) AS company,
+                    p.rank,
+                    l.leave_type,
+                    l.leave_days,
+                    l.request_status,
+                    l.remarks,
+                    l.created_at
+                FROM leave_status_info l
+                LEFT JOIN personnel p 
+                    ON l.army_number = p.army_number
+                WHERE l.request_status LIKE %s
+            '''
+            params = ['Pending%']
+            if current_user_company and current_user_company.upper() not in ('ADMIN', 'ALL', 'CENTER'):
+                query += ' AND (LOWER(TRIM(l.company)) = LOWER(TRIM(%s)) OR LOWER(TRIM(p.company)) = LOWER(TRIM(%s)))'
+                params.extend([current_user_company, current_user_company])
+            query += ' ORDER BY l.created_at DESC'
+            cursor.execute(query, tuple(params))
 
-        elif current_user_role == '2IC' or current_user_role == 'CO' or current_user_role == 'Subedar Major':
-
+        # =========================
+        # CASE 3: 2IC or Subedar Major
+        # =========================
+        elif current_user_role in ('2IC', 'Subedar Major'):
             query = '''
                 SELECT 
                     l.id,
@@ -563,10 +587,38 @@ def get_leave_requests():
                 AND l.request_status = %s
                 ORDER BY l.created_at DESC
             '''
-
             cursor.execute(query, (
                 current_user_role,
                 request_status
+            ))
+
+        # =========================
+        # CASE 4: NORMAL ROLES
+        # =========================
+        else:
+            query = '''
+                SELECT 
+                    l.id,
+                    l.name,
+                    l.army_number,
+                    p.rank,
+                    l.company,
+                    l.leave_type,
+                    l.leave_days,
+                    l.request_status,
+                    l.remarks,
+                    l.created_at
+                FROM leave_status_info l
+                LEFT JOIN personnel p ON l.army_number = p.army_number
+                WHERE l.request_sent_to = %s 
+                AND l.request_status = %s
+                AND l.company = %s
+                ORDER BY l.created_at DESC
+            '''
+            cursor.execute(query, (
+                current_user_role,
+                request_status,
+                current_user_company
             ))
 
         rows = cursor.fetchall() if cursor else []

@@ -125,7 +125,7 @@ def analyze_personnel_fitness(army_number, goal="Overall Fitness", regenerate=Fa
         'ideal_weight_kg': features.get('ideal_weight_kg'),
         'bmi': features.get('bmi'),
         'fitness_score': prediction.get('fitness_score'),
-        'fitness_status': prediction.get('category_label'),
+        'fitness_status': 'Unfit' if (features.get('weight_deviation_percent') is not None and float(features.get('weight_deviation_percent')) >= 11.0) else 'Healthy',
         'prediction_result': prediction,
         'recommendations': recommendations,
         'diet_recommendations': recommendations.get('diet'),
@@ -248,15 +248,20 @@ def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"
         )
 
         score = prediction.get('fitness_score')
-        status_label = prediction.get('category_label', '')
-        st_lower = str(status_label).lower()
 
-        # Determine Unfit vs Fit
-        is_unfit = False
-        if score is None or score < 70:
-            is_unfit = True
-        elif any(k in st_lower for k in ('risk', 'unfit', 'poor', 'fail', 'lmc', 'improvement', 'needs imp', 'overweight', 'underweight')):
-            is_unfit = True
+        # Determine Unfit vs Fit: ONLY if weight status & difference overweight is starting from 11% (including 11%)
+        dev_pct = features.get('weight_deviation_percent')
+        if dev_pct is None and features.get('ideal_weight_kg') and features.get('actual_weight_kg'):
+            try:
+                ideal_w = float(features.get('ideal_weight_kg'))
+                actual_w = float(features.get('actual_weight_kg'))
+                if ideal_w > 0:
+                    dev_pct = round(((actual_w - ideal_w) / ideal_w) * 100.0, 2)
+            except Exception:
+                dev_pct = None
+
+        is_unfit = (dev_pct is not None and float(dev_pct) >= 11.0)
+        status_label = 'Unfit' if is_unfit else 'Healthy'
 
         if is_unfit:
             unfit_count += 1
@@ -269,7 +274,8 @@ def calculate_all_individuals_fitness(goal="Overall Fitness", language="English"
                 'fitness_status': status_label,
                 'bmi': features.get('bmi'),
                 'actual_weight_kg': features.get('actual_weight_kg'),
-                'ideal_weight_kg': features.get('ideal_weight_kg')
+                'ideal_weight_kg': features.get('ideal_weight_kg'),
+                'weight_deviation_percent': dev_pct
             })
         else:
             fit_count += 1

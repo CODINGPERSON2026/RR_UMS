@@ -183,9 +183,13 @@
 
 <!-- ================= ALARM BADGE ================= -->
 
-<span id="alarmAlert" class="alarm-gradient d-none" style="cursor:pointer;">
-    🔔 You have 0 Detachment alarm(s)!
+{% set r_alarm_clean = (role or session.get('role', ''))|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+{% set is_alarm_onco = ('onco' in (role or session.get('role', ''))|lower) or (r_alarm_clean in ['1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco']) %}
+{% if not is_alarm_onco %}
+<span id="alarmAlert" class="alert-gradient d-none" style="cursor:pointer; background: linear-gradient(135deg, #dc2626, #991b1b) !important; margin-right: 6px;">
+    ⚠️ Detachment Alarms (> 90 Days)
 </span>
+{% endif %}
 
 <!-- ================= DET ALARM MODAL ================= -->
 
@@ -207,7 +211,7 @@
 
             <h5 class="modal-title mb-0">
 
-              ⚠️ Detachment Alarm — Over 90 Days
+              ⚠️ Detachment Alarm — 90 Days & Above
 
             </h5>
 
@@ -344,11 +348,29 @@ document.addEventListener("DOMContentLoaded", function () {
   let alarmFetchedData = [];
 
   const userCompanyStr = "{{ user_company | default('') }}".trim();
-  const isNonAdminCoy = userCompanyStr && !["ADMIN", "ALL", "CENTER"].includes(userCompanyStr.toUpperCase());
+  const userRoleStr = "{{ role | default(session.get('role', '')) }}".trim().toUpperCase();
+  const rCleanJs = userRoleStr.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const isOncoRoleJs = rCleanJs.includes("onco") || ["1coyonco", "2coyonco", "3coyonco", "coyonco", "hqcoyonco", "comnonco"].includes(rCleanJs);
+
+  if (isOncoRoleJs) {
+    const alarmAlertEl = document.getElementById("alarmAlert");
+    if (alarmAlertEl) {
+      alarmAlertEl.classList.add("d-none");
+      alarmAlertEl.style.setProperty("display", "none", "important");
+    }
+    const detModalScopeEl = document.getElementById("detAlarmModalScope");
+    if (detModalScopeEl) {
+      detModalScopeEl.remove();
+    }
+  }
+
+  const isLeadership = ["CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"].includes(userRoleStr);
+  const isNonAdminCoy = !isLeadership && Boolean(userCompanyStr) && !["ADMIN", "ALL", "CENTER"].includes(userCompanyStr.toUpperCase());
 
   /* ================= CHECK ALARM COUNT ================= */
 
   async function showAssignedAlarms() {
+    if (isOncoRoleJs) return;
     try {
       const res = await fetch('/api/assigned_alarm');
       if (!res.ok) throw new Error("Network error");
@@ -366,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (cnt > 0) {
           alarmAlert.classList.remove("d-none");
           alarmAlert.classList.add("alert-pulse");
-          alarmAlert.innerText = `🔔 You have ${cnt} Detachment alarm(s)!`;
+          alarmAlert.innerText = `⚠️ ${cnt} Detachment Alarm${cnt > 1 ? 's' : ''} (> 90 Days)`;
         } else {
           alarmAlert.classList.add("d-none");
           alarmAlert.classList.remove("alert-pulse");
@@ -380,6 +402,7 @@ document.addEventListener("DOMContentLoaded", function () {
         alarmAlert.classList.add("d-none");
       }
     }
+  }
   window.showAssignedDetachmentAlarms = showAssignedAlarms;
   window.showAssignedAlarms = showAssignedAlarms;
 
@@ -589,7 +612,7 @@ document.addEventListener("DOMContentLoaded", function () {
       alarmTableBody.innerHTML = `
         <tr>
           <td colspan="7" class="text-center py-4">
-            No personnel found over 90 days
+            No personnel found 90 days and above
           </td>
         </tr>
       `;
@@ -599,7 +622,7 @@ document.addEventListener("DOMContentLoaded", function () {
       filteredData.forEach(row => {
 
         const dangerClass =
-          row.days_on_det > 90
+          row.days_on_det >= 90
             ? "detAlarmDangerDays"
             : "";
 

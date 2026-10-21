@@ -325,11 +325,11 @@
 
             <!-- Tabs -->
             <div class="leave-tabs">
-              <button class="leave-tab-btn active" data-tab="approved" onclick="switchTab('approved')">
+              <button class="leave-tab-btn active" id="tab-btn-approved" data-tab="approved" onclick="switchTab('approved')">
                 <i class="bi bi-check-circle-fill"></i> Approved
                 <span class="tab-badge" id="approved-count">0</span>
               </button>
-              <button class="leave-tab-btn" data-tab="pending" onclick="switchTab('pending')">
+              <button class="leave-tab-btn" id="tab-btn-pending" data-tab="pending" onclick="switchTab('pending')">
                 <i class="bi bi-clock-fill"></i> Pending
                 <span class="tab-badge" id="pending-count">0</span>
               </button>
@@ -427,7 +427,7 @@
 
   
   <script>
-    const API_URL = 'apply_leave/api/leaves';
+    const API_URL = '/apply_leave/api/leaves';
     let allData = { approved: [], pending: [] };
     let currentTab = 'approved';
     let modalInstance = null;
@@ -624,7 +624,19 @@
       document.getElementById('pending-count').textContent = allData.pending.length;
 
       const total = allData.approved.length + allData.pending.length;
-      document.getElementById('modalSubtitle').textContent = `${total} total records • Company`;
+      const approvedBtn = document.getElementById('tab-btn-approved');
+      if (approvedBtn && approvedBtn.style.display === 'none') {
+        document.getElementById('modalSubtitle').textContent = `${allData.pending.length} pending records • Company`;
+      } else {
+        document.getElementById('modalSubtitle').textContent = `${total} total records • Company`;
+      }
+
+      const oncoBdg = document.getElementById('oncoPendingLeaveBadge');
+      if (oncoBdg) {
+        const pCnt = allData.pending ? allData.pending.length : 0;
+        oncoBdg.textContent = pCnt;
+        oncoBdg.style.display = pCnt > 0 ? 'inline-flex' : 'none';
+      }
 
       document.getElementById('footer-meta').innerHTML = `Last synced <strong>${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</strong>`;
 
@@ -633,15 +645,44 @@
       renderTable('pending', allData.pending);
     }
 
-    function openLeaveModal() {
+    let isOnlyPendingMode = false;
+
+    function openLeaveModal(defaultTab = 'approved', onlyPending = false) {
+      isOnlyPendingMode = onlyPending;
       const el = document.getElementById('leaveModal');
       modalInstance = new bootstrap.Modal(el, { backdrop: true });
+
+      const approvedBtn = document.getElementById('tab-btn-approved');
+      const pendingBtn = document.getElementById('tab-btn-pending');
+      const modalTitle = document.getElementById('leaveModalLabel');
+
+      if (onlyPending) {
+        if (approvedBtn) approvedBtn.style.display = 'none';
+        if (modalTitle) modalTitle.textContent = 'All Pending Leaves';
+        currentTab = 'pending';
+      } else {
+        if (approvedBtn) approvedBtn.style.display = '';
+        if (modalTitle) modalTitle.textContent = 'Leave Status';
+        currentTab = defaultTab;
+      }
+
       modalInstance.show();
+      switchTab(currentTab);
       fetchLeaves();
     }
 
+    function openAllPendingLeavesModal() {
+      openLeaveModal('pending', true);
+    }
+    window.openLeaveModal = openLeaveModal;
+    window.openAllPendingLeavesModal = openAllPendingLeavesModal;
+
     function closeLeaveModal() {
       if (modalInstance) modalInstance.hide();
+      const approvedBtn = document.getElementById('tab-btn-approved');
+      if (approvedBtn) approvedBtn.style.display = '';
+      const modalTitle = document.getElementById('leaveModalLabel');
+      if (modalTitle) modalTitle.textContent = 'Leave Status';
     }
 
     function exportCSV() {

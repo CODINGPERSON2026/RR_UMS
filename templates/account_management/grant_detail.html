@@ -154,7 +154,7 @@
             <td>{{ a.created_at.strftime("%d/%m/%Y") if a.created_at else '-' }}</td>
             {% if role != 'CO' %}
             <td>
-              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditAllocModal({{ a.id }}, {{ a.amount or 0 }}, "{{ a.remarks or '' }}")'>Edit</button>
+              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditAllocModal({{ a.id }}, {{ a.amount or 0 }}, {{ (a.remarks or "")|tojson }})'>Edit</button>
               <button class="btn btn-sm btn-danger" onclick='deleteAlloc({{ a.id }})'>Delete</button>
             </td>
             {% endif %}
@@ -197,7 +197,7 @@
             <td>{{ e.created_at.strftime("%d/%m/%Y") }}</td>
             {% if role != 'CO' %}
             <td>
-              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditExpModal({{ e.id }}, {{ e.amount or 0 }}, "{{ e.remarks or '' }}")'>Edit</button>
+              <button class="btn btn-sm btn-warning text-dark me-1" onclick='openEditExpModal({{ e.id }}, {{ e.amount or 0 }}, {{ (e.remarks or "")|tojson }})'>Edit</button>
               <button class="btn btn-sm btn-danger" onclick='deleteExp({{ e.id }})'>Delete</button>
             </td>
             {% endif %}
@@ -449,7 +449,7 @@ function submitEditGrantDetail(e) {
 function openEditAllocModal(id, amount, remarks) {
   document.getElementById("editAllocId").value = id;
   document.getElementById("editAllocAmount").value = amount;
-  document.getElementById("editAllocRemarks").value = remarks;
+  document.getElementById("editAllocRemarks").value = remarks || '';
   new bootstrap.Modal(document.getElementById("editAllocModal")).show();
 }
 
@@ -521,7 +521,7 @@ document.getElementById("addExpForm")
 function openEditExpModal(id, amount, remarks) {
   document.getElementById("editExpId").value = id;
   document.getElementById("editExpAmount").value = amount;
-  document.getElementById("editExpRemarks").value = remarks;
+  document.getElementById("editExpRemarks").value = remarks || '';
   new bootstrap.Modal(document.getElementById("editExpModal")).show();
 }
 

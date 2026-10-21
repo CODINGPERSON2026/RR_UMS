@@ -312,9 +312,10 @@ def add_allocation(grant_id):
 @accounts_bp.route("/grants/<int:grant_id>/add-exp", methods=["POST"])
 def add_expenditure(grant_id):
 
-    data = request.get_json()
+    data = request.get_json() or {}
     amount = float(data.get("amount") or 0)
-    fy = get_financial_year()
+    remarks = (data.get("remarks") or "").strip()
+    fy = request.args.get("fy") or data.get("financial_year") or get_financial_year()
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -345,9 +346,9 @@ def add_expenditure(grant_id):
         })
 
     cursor.execute("""
-        INSERT INTO expenditures (grant_id, amount, financial_year)
-        VALUES (%s, %s, %s)
-    """, (grant_id, amount, fy))
+        INSERT INTO expenditures (grant_id, amount, remarks, financial_year)
+        VALUES (%s, %s, %s, %s)
+    """, (grant_id, amount, remarks, fy))
 
     conn.commit()
     cursor.close()

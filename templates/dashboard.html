@@ -420,7 +420,11 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
-      {% include 'modals/alarm/alarm.html' %}
+      {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% set is_onco_role = ('onco' in (role or '')|lower) or (r_clean in ['1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco']) %}
+      {% if not is_onco_role %}
+        {% include 'modals/alarm/alarm.html' %}
+      {% endif %}
       {% include 'modals/alarm/attachment_alarm.html' %}
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
@@ -444,7 +448,7 @@
       {% endif %}
 
       <!-- AI Company Readiness Button -->
-      {% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', 'coyonco', 'onco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', 'ONCO', 'CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+      {% if role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] %}
         <button type="button" class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Readiness Analytics &amp; Comparative Telemetry">
           AI COMPANY READINESS
         </button>
@@ -478,7 +482,7 @@
       </button>
       {%endif%}
 
-      {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO FAULT REPAIR','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] %}
+      {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO FAULT REPAIR','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] %}
       <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
         ROLL CALL POINTS
       </button>
@@ -504,7 +508,14 @@
       </button>
       {% endif %}
 
-      {% if role|trim in ['JCO RPNA','NCO COMN','NCO QRT','NCO CHQ','NCO IT','NCO SIGCEN','JCO MW','NCO MW','NCO LRW','NCO MCCS','NCO FAULT REPAIR','NCO RHQ','NCO TM','NCO IT','NCO RHQ','NCO MT','NCO RPNA','NCO QM','NCO SYSTEM','JCO SYSTEM','SEC JCO','JCO FAULT REPAIR','JCO LRW','JCO CHQ','JCO IT','JCO MT','JCO RHQ','JCO MCCS','JCO QM','S/JCO','ONCO','OC','2IC','JCO QRT','JCO TM','JCO COMN','JCO SIGCEN','JCO SYS','JCO DET','NCO DET','NCO SYS','Subedar Major','PA'] %}
+      {% if role == 'ONCO' %}
+      <button class="ab-btn ab-primary position-relative" id="oncoAllPendingLeavesBtn" onclick="openAllPendingLeavesModal()" title="View All Pending Leaves">
+        ALL PENDING LEAVES
+        <span class="bdg" id="oncoPendingLeaveBadge" style="display:none">0</span>
+      </button>
+      {% endif %}
+
+      {% if role|trim in ['JCO RPNA','NCO COMN','NCO QRT','NCO CHQ','NCO IT','NCO SIGCEN','JCO MW','NCO MW','NCO LRW','NCO MCCS','NCO FAULT REPAIR','NCO RHQ','NCO TM','NCO IT','NCO RHQ','NCO MT','NCO RPNA','NCO QM','NCO SYSTEM','JCO SYSTEM','SEC JCO','JCO FAULT REPAIR','JCO LRW','JCO CHQ','JCO IT','JCO MT','JCO RHQ','JCO MCCS','JCO QM','S/JCO','OC','2IC','JCO QRT','JCO TM','JCO COMN','JCO SIGCEN','JCO SYS','JCO DET','NCO DET','NCO SYS','Subedar Major','PA'] %}
       <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn">
         LEAVE REQUESTS
         <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
@@ -661,8 +672,8 @@
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      <div class="sc" style="cursor: pointer" id="card-ai-insights-dash" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Joinee Company Recommendation Insights">
-        <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI Joinee Insights</span>
+      <div class="sc" style="cursor: pointer" id="card-ai-insights-dash" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Arrival Recommendation Insights">
+        <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> AI NEW ARRIVAL</span>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count-dash"><span class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
@@ -1078,6 +1089,14 @@
       var cnt = (d.data || []).length;
       var bdg = document.getElementById("leaveRequestBadge");
       if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
+    } catch (e) {}
+
+    try {
+      var r2 = await fetch("/apply_leave/api/leaves");
+      var d2 = await r2.json();
+      var pCnt = (d2.pending || []).length;
+      var oncoBdg = document.getElementById("oncoPendingLeaveBadge");
+      if (oncoBdg) { oncoBdg.textContent = pCnt; oncoBdg.style.display = pCnt > 0 ? "inline-flex" : "none"; }
     } catch (e) {}
   }
 
@@ -1608,6 +1627,7 @@
 {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
+{% include 'modals/vms/vms_modal.html' %}
 {% endif %}
 
 {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}

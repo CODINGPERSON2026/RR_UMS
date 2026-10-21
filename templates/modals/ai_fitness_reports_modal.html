@@ -575,55 +575,31 @@ const FitnessModalController = (function() {
         : null;
       const score = scoreVal !== null ? `${scoreVal.toFixed(0)}%` : '--';
 
-      const statusRaw = (r.fitness_status || '').trim();
-      const sLower = statusRaw.toLowerCase();
-      let statusBadge = '';
+      const actWt = (r.actual_weight_kg !== null && r.actual_weight_kg !== undefined) ? Number(r.actual_weight_kg) : null;
+      const idealWt = (r.ideal_weight_kg !== null && r.ideal_weight_kg !== undefined) ? Number(r.ideal_weight_kg) : null;
+      let devPct = (r.weight_deviation_percent !== null && r.weight_deviation_percent !== undefined) ? Number(r.weight_deviation_percent) : null;
+      if (devPct === null && actWt !== null && idealWt !== null && idealWt > 0) {
+        devPct = Number((((actWt - idealWt) / idealWt) * 100).toFixed(2));
+      }
 
-      if (
-        sLower.includes('untested') ||
-        sLower.includes('not tested') ||
-        sLower.includes('insufficient')
-      ) {
-        statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-question-circle me-1"></i>Not Tested</span>';
-      } else if (
-        sLower.includes('healthy') ||
-        sLower.includes('ready') ||
-        sLower.includes('good') ||
-        sLower.includes('excellent') ||
-        sLower.includes('optimal') ||
-        sLower.includes('combat') ||
-        (sLower === 'normal') ||
-        (scoreVal !== null && scoreVal >= 70 && !sLower.includes('risk') && !sLower.includes('unfit') && !sLower.includes('improve'))
-      ) {
-        statusBadge = '<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Healthy</span>';
-      } else if (
-        sLower.includes('unfit') ||
-        sLower.includes('improve') ||
-        sLower.includes('needs imp') ||
-        sLower.includes('risk') ||
-        sLower.includes('poor') ||
-        sLower.includes('critical') ||
-        sLower.includes('danger') ||
-        sLower.includes('fail') ||
-        sLower.includes('lmc') ||
-        sLower.includes('moderate') ||
-        sLower.includes('average') ||
-        sLower.includes('satisfactory') ||
-        sLower.includes('sat') ||
-        sLower.includes('fair') ||
-        sLower.includes('overweight') ||
-        sLower.includes('underweight') ||
-        (scoreVal !== null && scoreVal < 70)
-      ) {
-        statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times-circle me-1"></i>Unfit</span>';
-      } else if (scoreVal !== null) {
-        if (scoreVal >= 70) {
-          statusBadge = '<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Healthy</span>';
-        } else {
-          statusBadge = '<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times-circle me-1"></i>Unfit</span>';
+      // Military Weight Status Rule: Unfit ONLY if overweight starting from 11% (including 11%)
+      const isUnfit = (devPct !== null && devPct >= 11.0);
+
+      // In Unfit view, enforce showing only soldiers whose overweight is >= 11%
+      if (state.status && state.status.toLowerCase().includes('unfit')) {
+        if (!isUnfit) {
+          return;
         }
-      } else {
+      }
+
+      let statusBadge = '';
+      if (actWt === null || idealWt === null || idealWt <= 0) {
         statusBadge = '<span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-question-circle me-1"></i>Not Tested</span>';
+      } else if (isUnfit) {
+        statusBadge = `<span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times-circle me-1"></i>Unfit (+${devPct.toFixed(1)}%)</span>`;
+      } else {
+        const pctLabel = (devPct !== null && devPct > 0) ? ` (+${devPct.toFixed(1)}%)` : '';
+        statusBadge = `<span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-circle me-1"></i>Healthy${pctLabel}</span>`;
       }
 
       const dateDisplay = formatDateTime12Hr(r.date_time_12hr || r.generated_at_str || r.generated_at || r.updated_at);
