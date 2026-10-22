@@ -1539,9 +1539,9 @@ STATUS COLORS
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
         </div>
       </div>
-      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" data-min-days="90" style="cursor: pointer;">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
         <div class="sc-label">
-          <span class="sc-label-text">Det Alarms</span>
+          <span class="sc-label-text">Detachment</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
@@ -1583,7 +1583,7 @@ STATUS COLORS
         </div>
         <div class="sc-right">
           <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-updater"><i class="fa fa-user-shield"></i> ACCT JCO</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> COY O NCO</span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#projDash_modal">
@@ -1632,7 +1632,7 @@ STATUS COLORS
         </div>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-updater"><i class="fa fa-user-shield"></i> 2IC / ADJ</span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> 2IC / ADJT</span>
         </div>
       </div>
 
@@ -2209,8 +2209,7 @@ STATUS COLORS
       safeSet("totalCoursesDone", data.courses_count);
       safeSet("interview-Count", iv.pending_count);
       safeSet("total-count", iv.total_count);
-      var detAlarmCnt = data.detachment_alarm_count != null ? data.detachment_alarm_count : (data.assigned_alarm ? data.assigned_alarm.length : (data.detachments != null ? data.detachments : 0));
-      safeSet("locationCount", detAlarmCnt);
+      safeSet("locationCount", data.detachments != null ? data.detachments : 0);
       safeSet("sensitive-count", data.sensitive_count);
       var sensBadge = document.getElementById("sensitive-alarm-badge");
       if (sensBadge) {

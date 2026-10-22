@@ -1,455 +1,320 @@
-<!-- ===================== VMS (VEHICLE MANAGEMENT SYSTEM) MODAL ===================== -->
+<!-- ==================== VMS MODAL ==================== -->
 <div class="modal fade" id="vmsModal" tabindex="-1" aria-labelledby="vmsModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen modal-dialog-scrollable">
-    <div class="modal-content overflow-hidden border-0 shadow-lg">
-      
-      <!-- HEADER — Modern Light Executive Theme -->
-      <div class="modal-header bg-white border-bottom d-flex justify-content-between align-items-center py-2 px-3">
-        <h6 class="modal-title fw-bold text-dark mb-0 d-flex align-items-center gap-2" id="vmsModalLabel">
-          <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3" style="width: 32px; height: 32px; font-size: 15px;">
-            <i class="fas fa-truck-moving"></i>
-          </span>
-          <span style="letter-spacing: 0.5px;">VEHICLE MANAGEMENT SYSTEM (VMS)</span>
-        </h6>
-        <div class="d-flex gap-2 align-items-center">
-          <a href="/mt" class="btn btn-sm btn-outline-primary fw-semibold d-inline-flex align-items-center gap-1 shadow-none" target="_blank" title="Go to Full MT Dashboard">
-            <i class="fas fa-external-link-alt"></i> MT System
-          </a>
-          <button type="button" class="btn btn-sm btn-outline-secondary fw-semibold d-inline-flex align-items-center gap-1 shadow-none" onclick="vmsPrintReport()">
-            <i class="fas fa-print"></i> Print
-          </button>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" style="max-width: 95vw;">
+    <div class="modal-content shadow-lg border-0 rounded-4 overflow-hidden">
+      <!-- Modal Header -->
+      <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a8a, #3b82f6); padding: 12px 24px;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="fa-solid fa-truck-moving fs-5"></i>
+          <h5 class="modal-title fw-bold mb-0" id="vmsModalLabel">15 CORPS ENGG SIGNAL REGT MT MGT — VMS Dashboard</h5>
         </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
 
-      <!-- SUB-HEADER BADGE STRIP -->
-      <div class="text-center py-2 d-flex justify-content-center align-items-center gap-2 flex-wrap" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-        <span class="badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fas fa-shield-alt me-1 text-primary"></i> 15 CESR MT &amp; TRANSPORT REGISTRY
-        </span>
-        <span class="badge" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; font-size: 12px; font-weight: 700; padding: 5px 16px; border-radius: 30px; letter-spacing: 0.5px;">
-          <i class="fas fa-clock me-1 text-primary"></i> STATUS: <span id="vmsStatusTimestamp" class="text-success fw-bold">LIVE FLEET</span>
-        </span>
-      </div>
-
-      <!-- MODAL BODY -->
-      <div class="modal-body p-3" style="background: #f1f5f9;">
-
-        <!-- KPI SUMMARY CARDS -->
-        <div class="row g-2 mb-3">
-          <div class="col-6 col-md-3 col-xl">
-            <div class="p-3 bg-white rounded-3 border shadow-sm d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                <i class="fas fa-truck"></i>
-              </div>
-              <div>
-                <div class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Regimental Fleet</div>
-                <div class="h4 fw-bold mb-0 text-dark" id="vmsKpiTotalVehicles">--</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="p-3 bg-white rounded-3 border shadow-sm d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center bg-info bg-opacity-10 text-info" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                <i class="fas fa-layer-group"></i>
-              </div>
-              <div>
-                <div class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Total Quantity</div>
-                <div class="h4 fw-bold mb-0 text-dark" id="vmsKpiTotalQty">--</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="p-3 bg-white rounded-3 border shadow-sm d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center bg-danger bg-opacity-10 text-danger" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                <i class="fas fa-shield-virus"></i>
-              </div>
-              <div>
-                <div class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Bullet Proof (B.P.)</div>
-                <div class="h4 fw-bold mb-0 text-danger" id="vmsKpiBpCount">--</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="p-3 bg-white rounded-3 border shadow-sm d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              <div>
-                <div class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Total Dist (Km)</div>
-                <div class="h4 fw-bold mb-0 text-success" id="vmsKpiTotalDist">--</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3 col-xl">
-            <div class="p-3 bg-white rounded-3 border shadow-sm d-flex align-items-center gap-3">
-              <div class="rounded-circle d-flex align-items-center justify-content-center bg-warning bg-opacity-10 text-warning" style="width: 44px; height: 44px; font-size: 1.25rem;">
-                <i class="fas fa-car-side"></i>
-              </div>
-              <div>
-                <div class="text-muted small fw-semibold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Personnel Private</div>
-                <div class="h4 fw-bold mb-0 text-dark" id="vmsKpiPersonalCount">--</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MAIN CARD -->
-        <div class="card border-0 shadow-sm rounded-3 overflow-hidden bg-white">
-          
-          <!-- TABS & CONTROLS -->
-          <div class="card-header bg-white border-bottom p-3">
-            <div class="row g-2 align-items-center justify-content-between">
-              
-              <!-- Tab navigation -->
-              <div class="col-md-auto">
-                <ul class="nav nav-pills" id="vmsTabs" role="tablist">
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-bold py-1 px-3 d-flex align-items-center gap-2" id="vms-regimental-tab" data-bs-toggle="pill" data-bs-target="#vms-regimental-content" type="button" role="tab" style="font-size: 0.85rem;">
-                      <i class="fas fa-truck"></i> Regimental Fleet (<span id="vmsTabCountReg">0</span>)
-                    </button>
-                  </li>
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-bold py-1 px-3 d-flex align-items-center gap-2" id="vms-personal-tab" data-bs-toggle="pill" data-bs-target="#vms-personal-content" type="button" role="tab" style="font-size: 0.85rem;">
-                      <i class="fas fa-car"></i> Personnel Registered (<span id="vmsTabCountPersonal">0</span>)
-                    </button>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- Filters & Search -->
-              <div class="col-md-auto d-flex gap-2 flex-wrap align-items-center">
-                <!-- Type Filter -->
-                <select id="vmsTypeFilter" class="form-select form-select-sm" style="width: 140px; font-size: 0.82rem;">
-                  <option value="all">All Types</option>
-                  <option value="GYPSY">GYPSY</option>
-                  <option value="ALS">ALS</option>
-                  <option value="Motorcycle">Motorcycle</option>
-                  <option value="Scorpio">Scorpio</option>
-                  <option value="Fortuner">Fortuner</option>
-                </select>
-
-                <!-- BP Filter -->
-                <select id="vmsBpFilter" class="form-select form-select-sm" style="width: 130px; font-size: 0.82rem;">
-                  <option value="all">All Armor</option>
-                  <option value="Y">B.P. Only</option>
-                  <option value="N">Non-B.P.</option>
-                </select>
-
-                <!-- Search Input -->
-                <div class="input-group input-group-sm" style="width: 220px;">
-                  <span class="input-group-text bg-light text-secondary border-end-0">
-                    <i class="fas fa-search"></i>
-                  </span>
-                  <input type="text" id="vmsSearchInput" class="form-control border-start-0" placeholder="Search vehicle..." style="font-size: 0.82rem;">
+      <!-- Modal Body -->
+      <div class="modal-body p-4 bg-light">
+        <!-- MT Gate Role Station Command Banner -->
+        {% set user_role = (role or (session.get('role') if session else ''))|upper %}
+        {% if user_role in ['MAINGATE', 'MTGATE', 'MT GATE'] %}
+        <div class="card border shadow-sm rounded-4 mb-4 bg-white">
+          <div class="card-body py-2 px-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary text-white p-2 rounded-circle shadow-sm"><i
+                    class="fa-solid fa-shield-halved"></i></span>
+                <div>
+                  <span class="fw-bold text-dark small">MT Gate Station &bull; Surveillance & Access Dashboard</span>
+                  <span class="badge bg-success-subtle text-success border border-success-subtle ms-2"
+                    style="font-size: 0.7rem;"><span class="pulse-dot pulse-green"></span>OPERATIONAL</span>
                 </div>
-
-                <button class="btn btn-sm btn-outline-secondary" type="button" onclick="vmsResetFilters()" title="Reset Filters">
-                  <i class="fas fa-redo"></i>
-                </button>
               </div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <a href="javascript:void(0)" class="btn btn-sm btn-primary shadow-sm fw-semibold">
+                  <i class="fa-solid fa-door-open me-1"></i>Open Gate Control Center
+                </a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-outline-secondary fw-semibold">
+                  <i class="fa-solid fa-book me-1"></i>Movement Register
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
 
+        <!-- Top Section: Two Big Counts (Symmetrically Aligned 50/50 Hero Cards) -->
+        <div class="row g-4 mb-4">
+          <!-- OUT VEHICLES CARD -->
+          <div class="col-12 col-md-6">
+            <div class="card border shadow-sm rounded-4 h-100 text-center bg-white"
+              style="border-top: 5px solid #dc2626 !important; background: linear-gradient(180deg, #fffafa 0%, #ffffff 100%);">
+              <a href="javascript:void(0)"
+                class="card-body p-4 text-decoration-none d-flex flex-column align-items-center justify-content-center">
+                <div class="fw-bold text-danger my-1" id="stat-vehicles-outside"
+                  style="font-size: 5.5rem; line-height: 1; letter-spacing: -0.04em; font-family: system-ui, -apple-system, sans-serif;">
+                  {{ vehicles_outside|default(0) }}
+                </div>
+                <div class="text-muted small mt-2">
+                  <i class="fa-solid fa-circle text-danger me-1" style="font-size: 0.45rem; vertical-align: middle;"></i>
+                  Currently outside MT Garage
+                </div>
+              </a>
             </div>
           </div>
 
-          <!-- TAB CONTENT PANELS -->
-          <div class="tab-content" id="vmsTabContent">
-            
-            <!-- PANEL 1: REGIMENTAL FLEET -->
-            <div class="tab-pane fade show active" id="vms-regimental-content" role="tabpanel">
-              <div class="table-responsive" style="max-height: calc(100vh - 350px); min-height: 280px;">
-                <table class="table table-hover table-bordered align-middle text-center mb-0" id="vmsRegimentalTable">
-                  <thead class="sticky-top" style="background: #f8fafc; font-size: 0.82rem; letter-spacing: 0.5px; z-index: 10;">
-                    <tr class="text-uppercase text-secondary">
-                      <th style="width: 50px;">#</th>
-                      <th>Vehicle No</th>
-                      <th>Type</th>
-                      <th>Class</th>
-                      <th>Detailment</th>
-                      <th>Distance Travelled</th>
-                      <th>Quantity</th>
-                      <th>Bullet Proof (B.P.)</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody id="vmsRegimentalTbody" style="font-size: 0.85rem;">
-                    <tr>
-                      <td colspan="9" class="py-5 text-muted">
-                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                        Loading Regimental Fleet Data...
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- PANEL 2: PERSONNEL PRIVATE VEHICLES -->
-            <div class="tab-pane fade" id="vms-personal-content" role="tabpanel">
-              <div class="table-responsive" style="max-height: calc(100vh - 350px); min-height: 280px;">
-                <table class="table table-hover table-bordered align-middle text-center mb-0" id="vmsPersonalTable">
-                  <thead class="sticky-top" style="background: #f8fafc; font-size: 0.82rem; letter-spacing: 0.5px; z-index: 10;">
-                    <tr class="text-uppercase text-secondary">
-                      <th style="width: 50px;">#</th>
-                      <th>Army No</th>
-                      <th>Rank &amp; Name</th>
-                      <th>Company</th>
-                      <th>Vehicle Reg No</th>
-                      <th>Model / Make</th>
-                      <th>Purchase Date</th>
-                      <th>AGIF Purchase</th>
-                    </tr>
-                  </thead>
-                  <tbody id="vmsPersonalTbody" style="font-size: 0.85rem;">
-                    <tr>
-                      <td colspan="8" class="py-5 text-muted">
-                        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                        Loading Personnel Vehicles...
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- FOOTER / RECORD COUNTER -->
-          <div class="card-footer bg-light border-top py-2 px-3 d-flex justify-content-between align-items-center flex-wrap" style="font-size: 0.82rem;">
-            <div class="text-muted">
-              Showing <span id="vmsVisibleCount" class="fw-bold text-dark">0</span> vehicles
-            </div>
-            <div class="d-flex align-items-center gap-2">
-              <span class="badge bg-secondary bg-opacity-10 text-secondary border">Vehicle Management System v2.0</span>
+          <!-- IN VEHICLES CARD -->
+          <div class="col-12 col-md-6">
+            <div class="card border shadow-sm rounded-4 h-100 text-center bg-white"
+              style="border-top: 5px solid #16a34a !important; background: linear-gradient(180deg, #f7fdf9 0%, #ffffff 100%);">
+              <a href="javascript:void(0)"
+                class="card-body p-4 text-decoration-none d-flex flex-column align-items-center justify-content-center">
+                <div class="fw-bold text-success my-1" id="stat-vehicles-inside"
+                  style="font-size: 5.5rem; line-height: 1; letter-spacing: -0.04em; font-family: system-ui, -apple-system, sans-serif;">
+                  {{ vehicles_inside|default(0) }}
+                </div>
+                <div class="text-muted small mt-2">
+                  <i class="fa-solid fa-circle text-success me-1" style="font-size: 0.45rem; vertical-align: middle;"></i>
+                  Stationed inside MT Garage
+                </div>
+              </a>
             </div>
           </div>
-
         </div>
 
-      </div>
+        <!-- Fleet Status Summary & Live Tag Scan Bar -->
+        <div class="d-flex flex-wrap justify-content-center align-items-center gap-3 mb-4">
+          <a href="javascript:void(0)"
+            class="card border shadow-sm rounded-pill px-4 py-2 bg-white d-inline-flex flex-row align-items-center gap-2 text-decoration-none">
+            <i class="fa-solid fa-car text-primary"></i>
+            <span class="text-muted small fw-semibold">All Vehicles:</span>
+            <strong class="text-dark font-monospace fs-6" id="stat-total-vehicles">{{ total_vehicles|default('-') }}</strong>
+          </a>
 
+          <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white border" style="max-width: 320px;">
+            <input type="text" id="manual-scan-uid" class="form-control font-monospace border-0 px-3 py-2 small"
+              placeholder="Enter Tag UID (e.g. A37F291C)" onkeypress="if(event.key === 'Enter') triggerManualTestScan()">
+            <button class="btn btn-primary px-3 fw-semibold border-0" type="button" onclick="triggerManualTestScan()">
+              <i class="fa-solid fa-bolt me-1"></i>Scan Tag
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Activity Live Feed Table -->
+        <div class="card border shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+          <div
+            class="card-header bg-white py-3 px-4 d-flex flex-wrap justify-content-between align-items-center gap-2 border-bottom">
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2 shadow-sm" style="font-size: 0.8rem;">
+                <span class="pulse-dot pulse-green"></span>
+                <span class="fw-bold" style="letter-spacing: 0.04em;">LIVE ACTIVITY FEED</span>
+              </span>
+              <i id="activity-sync-icon" class="fa-solid fa-arrows-rotate text-muted" style="font-size: 0.85rem;"></i>
+            </div>
+            <div class="btn-group btn-group-sm p-1 bg-light rounded-pill border" role="group" id="activity-filter-group">
+              <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 active fw-semibold shadow-sm"
+                id="filter-btn-all" onclick="setActivityFilter('ALL')">
+                <i class="fa-solid fa-arrows-left-right me-1"></i>All IN & OUT
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none rounded-pill px-3 fw-semibold"
+                id="filter-btn-out" onclick="setActivityFilter('OUT')">
+                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Only OUT
+              </button>
+              <button type="button" class="btn btn-sm btn-link text-success text-decoration-none rounded-pill px-3 fw-semibold"
+                id="filter-btn-in" onclick="setActivityFilter('IN')">
+                <i class="fa-solid fa-arrow-right-to-bracket me-1"></i>Only IN
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light small text-uppercase text-secondary border-bottom">
+                <tr>
+                  <th class="ps-4 py-3" style="width: 25%;">Rank / Driver Name</th>
+                  <th class="py-3" style="width: 20%;">Vehicle Number</th>
+                  <th class="py-3 text-center" style="width: 14%;">Out Time</th>
+                  <th class="py-3 text-center" style="width: 14%;">Entry Time</th>
+                  <th class="py-3 text-center" style="width: 13%;">Total Out</th>
+                  <th class="text-end pe-4 py-3" style="width: 14%;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="activity-feed-body" style="transition: opacity 0.15s ease;">
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <i class="fa-solid fa-clock-rotate-left me-1"></i>No gate activity recorded.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ===================== VMS JAVASCRIPT ===================== -->
 <script>
-(function() {
-  var vmsDataCache = {
-    mt_vehicles: [],
-    personal_vehicles: [],
-    stats: {}
-  };
+  let currentActivityFilter = 'ALL';
+  let lastActivityHtml = '';
+  let isFetchingActivity = false;
+  let isFetchingStats = false;
+
+  function setActivityFilter(filter) {
+    if (currentActivityFilter === filter) return;
+    currentActivityFilter = filter;
+    lastActivityHtml = ''; // force re-render on explicit filter click
+    const btnAll = document.getElementById('filter-btn-all');
+    const btnOut = document.getElementById('filter-btn-out');
+    const btnIn = document.getElementById('filter-btn-in');
+
+    if (btnAll) {
+      btnAll.className = filter === 'ALL'
+        ? 'btn btn-sm btn-primary rounded-pill px-3 active fw-semibold shadow-sm'
+        : 'btn btn-sm btn-link text-secondary text-decoration-none rounded-pill px-3 fw-semibold';
+    }
+    if (btnOut) {
+      btnOut.className = filter === 'OUT'
+        ? 'btn btn-sm btn-danger rounded-pill px-3 active fw-semibold shadow-sm text-white'
+        : 'btn btn-sm btn-link text-danger text-decoration-none rounded-pill px-3 fw-semibold';
+    }
+    if (btnIn) {
+      btnIn.className = filter === 'IN'
+        ? 'btn btn-sm btn-success rounded-pill px-3 active fw-semibold shadow-sm text-white'
+        : 'btn btn-sm btn-link text-success text-decoration-none rounded-pill px-3 fw-semibold';
+    }
+
+    fetchActivity(true);
+  }
+
+  async function fetchStats() {
+    if (isFetchingStats) return;
+    isFetchingStats = true;
+    try {
+      const res = await fetch('/api/dashboard/stats');
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) {
+          const formattedVal = val !== undefined && val !== null ? String(val) : '-';
+          if (el.textContent.trim() !== formattedVal) {
+            el.textContent = formattedVal;
+          }
+        }
+      };
+
+      setVal('stat-total-vehicles', data.total_vehicles);
+      setVal('stat-vehicles-inside', data.vehicles_inside);
+      setVal('stat-vehicles-outside', data.vehicles_outside);
+      setVal('stat-pill-outside', data.vehicles_outside);
+      setVal('stat-pill-inside', data.vehicles_inside);
+    } catch (e) {
+      // Endpoint may not be active; suppress error
+    } finally {
+      isFetchingStats = false;
+    }
+  }
+
+  async function fetchActivity(isFilterSwitch = false) {
+    if (isFetchingActivity) return;
+    isFetchingActivity = true;
+    const tbody = document.getElementById('activity-feed-body');
+    const syncIcon = document.getElementById('activity-sync-icon');
+
+    if (syncIcon) syncIcon.classList.add('fa-spin');
+    if (isFilterSwitch && tbody) tbody.style.opacity = '0.35';
+
+    try {
+      const res = await fetch(`/api/dashboard/recent_activity?filter=${currentActivityFilter}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      if (!tbody) return;
+      if (!Array.isArray(data) || data.length === 0) {
+        const emptyHtml = '<tr><td colspan="6" class="text-center text-muted py-4"><i class="fa-solid fa-clock-rotate-left me-1"></i>No gate activity recorded.</td></tr>';
+        if (lastActivityHtml !== emptyHtml) {
+          tbody.innerHTML = emptyHtml;
+          lastActivityHtml = emptyHtml;
+        }
+        return;
+      }
+
+      const newHtml = data.map(item => {
+        let displayName = item.driver_name || 'Unassigned';
+        let rankBadge = '';
+        if (item.driver_rank) {
+          rankBadge = `<span class="badge bg-secondary-subtle text-dark border border-secondary-subtle px-2 py-0.5 font-monospace" style="font-size: 0.72rem; font-weight: 700;">${item.driver_rank}</span>`;
+          if (displayName.toLowerCase().startsWith(item.driver_rank.toLowerCase())) {
+            displayName = displayName.substring(item.driver_rank.length).trim();
+          }
+        }
+
+        return `
+      <tr>
+        <td class="ps-4 py-3">
+          <div class="fw-semibold text-dark d-flex align-items-center flex-wrap gap-1">
+            <i class="fa-solid fa-id-badge text-primary me-1"></i>
+            ${rankBadge}<span>${displayName}</span>
+          </div>
+          ${item.driver_mobile ? `<small class="text-muted d-block mt-1 font-monospace" style="font-size: 0.78rem;"><i class="fa-solid fa-phone me-1 text-secondary"></i>${item.driver_mobile}</small>` : ''}
+        </td>
+        <td class="py-3">
+          <div class="fw-bold font-monospace text-dark fs-6">${item.vehicle_number}</div>
+          <span class="badge bg-light text-secondary border mt-1">${item.vehicle_type || 'Vehicle'}</span>
+        </td>
+        <td class="py-3 text-center">
+          ${item.out_time && item.out_time !== '-'
+            ? `<span class="badge bg-danger-subtle text-danger border border-danger-subtle font-monospace py-1 px-2 fw-bold"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i>${item.out_time}</span>`
+            : `<span class="text-muted font-monospace">-</span>`}
+        </td>
+        <td class="py-3 text-center">
+          ${item.entry_time === 'Still Outside'
+            ? `<span class="badge bg-warning text-dark border border-warning-subtle py-1 px-2 fw-semibold"><i class="fa-solid fa-clock me-1"></i>Still Outside</span>`
+            : (item.entry_time && item.entry_time !== '-'
+              ? `<span class="badge bg-success-subtle text-success border border-success-subtle font-monospace py-1 px-2 fw-bold"><i class="fa-solid fa-arrow-right-to-bracket me-1"></i>${item.entry_time}</span>`
+              : `<span class="text-muted font-monospace">-</span>`)}
+        </td>
+        <td class="py-3 text-center">
+          <span class="badge bg-light text-dark border font-monospace px-2 py-1"><i class="fa-regular fa-clock me-1 text-primary"></i>${item.total_out || '-'}</span>
+        </td>
+        <td class="text-end pe-4 py-3">
+          <span class="badge ${item.badge_class || 'bg-secondary'} px-3 py-1 shadow-sm fw-semibold">${item.event || '-'}</span>
+        </td>
+      </tr>
+    `;
+      }).join('');
+
+      // Diff check: only replace DOM if rows actually changed!
+      if (lastActivityHtml !== newHtml) {
+        tbody.innerHTML = newHtml;
+        lastActivityHtml = newHtml;
+      }
+    } catch (e) {
+      // Suppress error if API endpoint not present
+    } finally {
+      isFetchingActivity = false;
+      if (tbody) tbody.style.opacity = '1';
+      if (syncIcon) syncIcon.classList.remove('fa-spin');
+    }
+  }
+
+  function triggerManualTestScan() {
+    const input = document.getElementById('manual-scan-uid');
+    if (!input || !input.value.trim()) return;
+    alert('Scanning Tag UID: ' + input.value.trim());
+    input.value = '';
+  }
 
   window.vmsLoadData = function() {
-    fetch('/api/vms/data')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        if (data && data.success) {
-          vmsDataCache.mt_vehicles = data.mt_vehicles || [];
-          vmsDataCache.personal_vehicles = data.personal_vehicles || [];
-          vmsDataCache.stats = data.stats || {};
-          
-          vmsUpdateKpis(data.stats);
-          vmsPopulateTypeOptions(vmsDataCache.mt_vehicles);
-          vmsRenderTables();
-        } else {
-          vmsRenderEmpty('Failed to load fleet records.');
-        }
-      })
-      .catch(function(err) {
-        console.error('Error fetching VMS data:', err);
-        vmsRenderEmpty('Error loading VMS data.');
-      });
+    fetchStats();
+    fetchActivity();
   };
 
-  function vmsUpdateKpis(stats) {
-    if (!stats) return;
-    var elTotalVehicles = document.getElementById('vmsKpiTotalVehicles');
-    var elTotalQty = document.getElementById('vmsKpiTotalQty');
-    var elBpCount = document.getElementById('vmsKpiBpCount');
-    var elTotalDist = document.getElementById('vmsKpiTotalDist');
-    var elPersonalCount = document.getElementById('vmsKpiPersonalCount');
-
-    if (elTotalVehicles) elTotalVehicles.textContent = stats.total_vehicles || 0;
-    if (elTotalQty) elTotalQty.textContent = stats.total_quantity || 0;
-    if (elBpCount) elBpCount.textContent = stats.bp_count || 0;
-    if (elTotalDist) elTotalDist.textContent = (stats.total_dist || 0).toLocaleString() + ' km';
-    if (elPersonalCount) elPersonalCount.textContent = stats.total_personal || 0;
-
-    var tabReg = document.getElementById('vmsTabCountReg');
-    var tabPers = document.getElementById('vmsTabCountPersonal');
-    if (tabReg) tabReg.textContent = (vmsDataCache.mt_vehicles || []).length;
-    if (tabPers) tabPers.textContent = (vmsDataCache.personal_vehicles || []).length;
-  }
-
-  function vmsPopulateTypeOptions(vehicles) {
-    var select = document.getElementById('vmsTypeFilter');
-    if (!select) return;
-    var types = {};
-    (vehicles || []).forEach(function(v) {
-      if (v.type && v.type.trim()) {
-        types[v.type.trim()] = true;
-      }
-    });
-
-    var currentVal = select.value;
-    select.innerHTML = '<option value="all">All Types</option>';
-    Object.keys(types).sort().forEach(function(t) {
-      var opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      select.appendChild(opt);
-    });
-    select.value = currentVal || 'all';
-  }
-
-  function vmsRenderTables() {
-    var searchVal = (document.getElementById('vmsSearchInput') ? document.getElementById('vmsSearchInput').value : '').toLowerCase().trim();
-    var typeVal = (document.getElementById('vmsTypeFilter') ? document.getElementById('vmsTypeFilter').value : 'all');
-    var bpVal = (document.getElementById('vmsBpFilter') ? document.getElementById('vmsBpFilter').value : 'all');
-
-    // 1. Filter Regimental
-    var filteredMt = (vmsDataCache.mt_vehicles || []).filter(function(v) {
-      if (typeVal !== 'all' && (v.type || '').trim().toLowerCase() !== typeVal.toLowerCase()) return false;
-      if (bpVal !== 'all') {
-        var isBp = ((v.bullet_proof || '').toUpperCase() === 'Y');
-        if (bpVal === 'Y' && !isBp) return false;
-        if (bpVal === 'N' && isBp) return false;
-      }
-      if (searchVal) {
-        var match = (v.vehicle_no || '').toLowerCase().includes(searchVal) ||
-                    (v.type || '').toLowerCase().includes(searchVal) ||
-                    (v.class || '').toLowerCase().includes(searchVal) ||
-                    (v.detailment || '').toLowerCase().includes(searchVal);
-        if (!match) return false;
-      }
-      return true;
-    });
-
-    var mtTbody = document.getElementById('vmsRegimentalTbody');
-    if (mtTbody) {
-      if (filteredMt.length === 0) {
-        mtTbody.innerHTML = '<tr><td colspan="9" class="py-4 text-muted"><i class="fas fa-search me-1"></i> No regimental vehicles matching criteria.</td></tr>';
-      } else {
-        var html = '';
-        filteredMt.forEach(function(v, idx) {
-          var isBp = ((v.bullet_proof || '').toUpperCase() === 'Y');
-          var bpBadge = isBp
-            ? '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger fw-bold"><i class="fas fa-shield-alt me-1"></i> B.P.</span>'
-            : '<span class="badge bg-secondary bg-opacity-10 text-secondary border">NON-B.P.</span>';
-
-          var dist = v.dist_travelled ? Number(v.dist_travelled).toLocaleString() + ' km' : '0 km';
-
-          html += '<tr>' +
-            '<td class="text-muted fw-semibold">' + (idx + 1) + '</td>' +
-            '<td class="fw-bold text-dark font-monospace">' + (v.vehicle_no || '-') + '</td>' +
-            '<td><span class="badge bg-primary bg-opacity-10 text-primary fw-bold">' + (v.type || '-') + '</span></td>' +
-            '<td>' + (v.class || '-') + '</td>' +
-            '<td class="fw-semibold text-start px-3">' + (v.detailment || '<span class="text-muted">Unassigned</span>') + '</td>' +
-            '<td class="font-monospace text-end px-3">' + dist + '</td>' +
-            '<td class="fw-bold">' + (v.quantity || 1) + '</td>' +
-            '<td>' + bpBadge + '</td>' +
-            '<td><span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="fas fa-check-circle me-1"></i> Active</span></td>' +
-          '</tr>';
-        });
-        mtTbody.innerHTML = html;
-      }
-    }
-
-    // 2. Filter Personal Vehicles
-    var filteredPersonal = (vmsDataCache.personal_vehicles || []).filter(function(p) {
-      if (searchVal) {
-        var match = (p.army_number || '').toLowerCase().includes(searchVal) ||
-                    (p.name || '').toLowerCase().includes(searchVal) ||
-                    (p.rank || '').toLowerCase().includes(searchVal) ||
-                    (p.company || '').toLowerCase().includes(searchVal) ||
-                    (p.vehicle_reg_no || '').toLowerCase().includes(searchVal) ||
-                    (p.vehicle_model || '').toLowerCase().includes(searchVal);
-        if (!match) return false;
-      }
-      return true;
-    });
-
-    var pTbody = document.getElementById('vmsPersonalTbody');
-    if (pTbody) {
-      if (filteredPersonal.length === 0) {
-        pTbody.innerHTML = '<tr><td colspan="8" class="py-4 text-muted"><i class="fas fa-search me-1"></i> No personnel vehicles registered.</td></tr>';
-      } else {
-        var pHtml = '';
-        filteredPersonal.forEach(function(p, idx) {
-          var agifBadge = ((p.vehicle_agif || '').toLowerCase() === 'yes')
-            ? '<span class="badge bg-success bg-opacity-10 text-success border border-success">Yes (AGIF)</span>'
-            : '<span class="badge bg-light text-muted border">No</span>';
-
-          pHtml += '<tr>' +
-            '<td class="text-muted fw-semibold">' + (idx + 1) + '</td>' +
-            '<td class="font-monospace fw-semibold text-primary">' + (p.army_number || '-') + '</td>' +
-            '<td class="fw-bold text-dark text-start px-3">' + (p.rank || '') + ' ' + (p.name || '-') + '</td>' +
-            '<td><span class="badge bg-secondary bg-opacity-10 text-secondary">' + (p.company || '-') + '</span></td>' +
-            '<td class="fw-bold font-monospace text-dark">' + (p.vehicle_reg_no || '-') + '</td>' +
-            '<td>' + (p.vehicle_model || '-') + '</td>' +
-            '<td>' + (p.vehicle_purchase_date || '-') + '</td>' +
-            '<td>' + agifBadge + '</td>' +
-          '</tr>';
-        });
-        pTbody.innerHTML = pHtml;
-      }
-    }
-
-    // Update count display based on active tab
-    var isRegActive = document.getElementById('vms-regimental-tab') && document.getElementById('vms-regimental-tab').classList.contains('active');
-    var visibleCountEl = document.getElementById('vmsVisibleCount');
-    if (visibleCountEl) {
-      visibleCountEl.textContent = isRegActive ? filteredMt.length : filteredPersonal.length;
-    }
-  }
-
-  function vmsRenderEmpty(msg) {
-    var mtTbody = document.getElementById('vmsRegimentalTbody');
-    if (mtTbody) mtTbody.innerHTML = '<tr><td colspan="9" class="py-4 text-danger">' + msg + '</td></tr>';
-    var pTbody = document.getElementById('vmsPersonalTbody');
-    if (pTbody) pTbody.innerHTML = '<tr><td colspan="8" class="py-4 text-danger">' + msg + '</td></tr>';
-  }
-
-  window.vmsResetFilters = function() {
-    var searchInput = document.getElementById('vmsSearchInput');
-    var typeFilter = document.getElementById('vmsTypeFilter');
-    var bpFilter = document.getElementById('vmsBpFilter');
-    if (searchInput) searchInput.value = '';
-    if (typeFilter) typeFilter.value = 'all';
-    if (bpFilter) bpFilter.value = 'all';
-    vmsRenderTables();
-  };
-
-  window.vmsPrintReport = function() {
-    window.print();
-  };
-
-  // Event Listeners on filters
-  document.addEventListener('DOMContentLoaded', function() {
-    var searchInput = document.getElementById('vmsSearchInput');
-    var typeFilter = document.getElementById('vmsTypeFilter');
-    var bpFilter = document.getElementById('vmsBpFilter');
-    var modalEl = document.getElementById('vmsModal');
-
-    if (searchInput) searchInput.addEventListener('input', vmsRenderTables);
-    if (typeFilter) typeFilter.addEventListener('change', vmsRenderTables);
-    if (bpFilter) bpFilter.addEventListener('change', vmsRenderTables);
-
-    var tabLinks = document.querySelectorAll('#vmsTabs button[data-bs-toggle="pill"]');
-    tabLinks.forEach(function(tab) {
-      tab.addEventListener('shown.bs.tab', function() {
-        vmsRenderTables();
-      });
-    });
-
-    if (modalEl) {
-      modalEl.addEventListener('show.bs.modal', function() {
+  document.addEventListener('DOMContentLoaded', () => {
+    var vmsEl = document.getElementById('vmsModal');
+    if (vmsEl) {
+      vmsEl.addEventListener('show.bs.modal', function () {
         window.vmsLoadData();
       });
     }
   });
-
-})();
 </script>
