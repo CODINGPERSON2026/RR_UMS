@@ -537,6 +537,37 @@ def get_leave_requests():
             cursor.execute(query, ('Pending%',))
 
         # =========================
+        # CASE 1B: 2IC ROLE (Sees ONLY JCOs' pending leave requests across all companies)
+        # =========================
+        elif current_user_role == '2IC':
+            query = '''
+                SELECT 
+                    l.id,
+                    l.name,
+                    l.army_number,
+                    COALESCE(p.company, l.company) AS company,
+                    COALESCE(p.rank, l.rank) AS `rank`,
+                    l.leave_type,
+                    l.leave_days,
+                    l.request_status,
+                    l.remarks,
+                    l.created_at
+                FROM leave_status_info l
+                LEFT JOIN personnel p 
+                    ON l.army_number = p.army_number
+                WHERE l.request_status LIKE %s
+                  AND (
+                    COALESCE(p.rank, l.rank) IN ('Subedar', 'Naib Subedar', 'Subedar Major')
+                    OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%SUBEDAR%%'
+                    OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%SUB%%'
+                    OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%JCO%%'
+                    OR UPPER(TRIM(l.army_number)) LIKE 'JC%%'
+                  )
+                ORDER BY l.created_at DESC
+            '''
+            cursor.execute(query, ('Pending%',))
+
+        # =========================
         # CASE 2: ONCO ROLE (Sees all pending leave requests for company / all)
         # =========================
         elif current_user_role == 'ONCO':
@@ -565,9 +596,9 @@ def get_leave_requests():
             cursor.execute(query, tuple(params))
 
         # =========================
-        # CASE 3: 2IC or Subedar Major
+        # CASE 3: Subedar Major
         # =========================
-        elif current_user_role in ('2IC', 'Subedar Major'):
+        elif current_user_role == 'Subedar Major':
             query = '''
                 SELECT 
                     l.id,
@@ -1423,8 +1454,18 @@ select section from personnel where army_number = %s
     try:
         status_pattern = "%Rejected at%"
 
-        # 2IC → can see all companies
-        if role in ['OC','2IC','CO','Subedar Major']:
+        # 2IC → can see all companies, but only JCOs
+        if role == '2IC':
+            query += """ AND (
+                COALESCE(p.rank, l.rank) IN ('Subedar', 'Naib Subedar', 'Subedar Major')
+                OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%SUBEDAR%%'
+                OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%SUB%%'
+                OR UPPER(COALESCE(p.rank, l.rank)) LIKE '%%JCO%%'
+                OR UPPER(TRIM(l.army_number)) LIKE 'JC%%'
+            ) ORDER BY l.updated_at DESC"""
+            cursor.execute(query, (status_pattern,))
+
+        elif role in ['OC','CO','Subedar Major']:
             query += " ORDER BY l.updated_at DESC"
             cursor.execute(query, (status_pattern,))
 
@@ -1515,7 +1556,7 @@ def undo_reject_leave():
 @leave_bp.route("/rejected_leaves", methods=["GET"])
 def co_rejected_leaves():
     user = require_login()  # get current logged-in user
-    if user['role'] != 'CO':
+    if not user or (user.get('role') or '').strip() not in ['CO', '2IC']:
         return jsonify({"message": "Unauthorized"}), 403
 
     conn = get_db_connection()
@@ -1526,22 +1567,31 @@ def co_rejected_leaves():
     try:
         cursor = conn.cursor(dictionary=True)
         # Fetch leaves that were rejected
-        cursor.execute("""
+        role = (user.get('role') or '').strip()
+        query = """
             SELECT 
                 p.rank,
                 lsi.id,
-               lsi.army_number,
+                lsi.army_number,
                 p.name,
                 lsi.leave_type,
                 lsi.leave_days,
                 lsi.reject_reason,
                 lsi.request_status,
                 lsi.updated_at
-                    
-            FROM leave_status_info as lsi left join personnel as p  on lsi.army_number =   p.army_number
-            WHERE lsi.request_status = 'Rejected at OC' OR lsi.request_status = 'Rejected at 2iC'  
-            ORDER BY lsi.updated_at DESC
-        """)
+            FROM leave_status_info as lsi left join personnel as p on lsi.army_number = p.army_number
+            WHERE (lsi.request_status = 'Rejected at OC' OR lsi.request_status = 'Rejected at 2iC' OR lsi.request_status = 'Rejected at 2IC')
+        """
+        if role == '2IC':
+            query += """ AND (
+                COALESCE(p.rank, lsi.rank) IN ('Subedar', 'Naib Subedar', 'Subedar Major')
+                OR UPPER(COALESCE(p.rank, lsi.rank)) LIKE '%%SUBEDAR%%'
+                OR UPPER(COALESCE(p.rank, lsi.rank)) LIKE '%%SUB%%'
+                OR UPPER(COALESCE(p.rank, lsi.rank)) LIKE '%%JCO%%'
+                OR UPPER(TRIM(lsi.army_number)) LIKE 'JC%%'
+            )"""
+        query += " ORDER BY lsi.updated_at DESC"
+        cursor.execute(query)
         leaves = cursor.fetchall()
         return jsonify({"data": leaves}), 200
 
@@ -2390,7 +2440,7 @@ def download_leave_certificate(leave_id):
 @leave_bp.route("/get_leave_for_co/<int:leave_id>", methods=["GET"])
 def get_leave(leave_id):
     user = require_login()
-    if user['role'] != 'CO':
+    if not user or (user.get('role') or '').strip() not in ['CO', '2IC']:
         return jsonify({"message": "Unauthorized"}), 403
 
     conn = get_db_connection()

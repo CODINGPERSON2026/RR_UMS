@@ -1475,6 +1475,13 @@ STATUS COLORS
         <span class="honours-text">HONOURS BOARD</span>
       </button> -->
 
+      {% if role in ['CO', '2IC'] %}
+      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn" data-bs-toggle="modal" data-bs-target="#leaveRequestsModal" onclick="openLeaveRequestsModal()">
+        LEAVE REQUESTS
+        <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
+      </button>
+      {% endif %}
+
       <button class="ab-btn ab-danger" data-bs-toggle="modal" data-bs-target="#coRejectedModal" id="rejectedBtn">
         REJECTED LEAVES
         <span class="bdg" id="coRejectedCount" style="display: none">0</span>
@@ -2146,6 +2153,21 @@ STATUS COLORS
       var cnt = (d.data || []).length, bdg = document.getElementById("leaveRequestBadge");
       if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
     } catch (e) { }
+  }
+
+  /* ── open leave requests modal ── */
+  function openLeaveRequestsModal() {
+    if (typeof window.unpackDeferredModals === 'function') {
+      window.unpackDeferredModals();
+    }
+    var modalEl = document.getElementById("leaveRequestsModal");
+    if (modalEl && window.bootstrap) {
+      var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    }
+    if (typeof loadLeaveRequests === 'function') {
+      loadLeaveRequests();
+    }
   }
 
   /* ── load company interview count ── */

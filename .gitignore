@@ -1,9 +1,15 @@
-# .gitignore
+
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Virtual environments
+umsvenv/
+venv/
+
+# Environment variables
 .env
 
-# .gitignore
-__pycache__/
-*.pyc
-.env
+# Offline Python packages
+offline_pakages/
+offline_packages/

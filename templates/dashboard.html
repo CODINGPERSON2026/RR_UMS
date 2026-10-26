@@ -835,7 +835,7 @@
       {% include 'modals/add_honours_entry/h_entry.html' %}
     {% endif %}
 
-    {% if role == 'CO' %}
+    {% if role in ['CO', '2IC'] %}
       {% include 'modals/leaverequest/co-rejected-view.html' %}
     {% endif %}
 
