@@ -349,6 +349,18 @@
     background: rgba(0, 132, 255, 0.15);
   }
 
+  .ab-green {
+    background: rgba(25, 135, 84, 0.08);
+    border-color: rgba(25, 135, 84, 0.35);
+    color: #198754;
+    text-decoration: none;
+  }
+
+  .ab-green:hover {
+    background: rgba(25, 135, 84, 0.15);
+    color: #198754;
+  }
+
   .ab-spacer {
     flex: 1;
     min-width: 8px;
@@ -1600,6 +1612,14 @@ STATUS COLORS
         <div class="sc-right">
           <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> PROJECT JCO</span>
+        </div>
+      </div>
+      <div class="sc" style="cursor: pointer" onclick="window.location.href='/account/'">
+        <div class="sc-label">
+          <span class="sc-label-text">Accounts</span>
+        </div>
+        <div class="sc-right" style="align-self: stretch; justify-content: flex-end;">
+          <span class="sc-updater"><i class="fa fa-user-circle"></i> ACCOUNTS CLK</span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">

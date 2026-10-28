@@ -1235,13 +1235,7 @@
       </a>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] %}
-      <a class="nav-link {% if '/account' in request.path %}active{% endif %}" href="/account" data-tiptext="Account Management">
-        <span class="nav-icon"><i class="fas fa-file-invoice-dollar"></i></span>
-        <span class="nav-label-text">Account Management</span>
-        <span class="nav-tooltip">Accounts</span>
-      </a>
-      {% endif %}
+
 
       <!-- HR Section -->
       {% if role in ['NCO COMN', 'NCO QRT', 'SEC JCO', 'Subedar Major', 'NCO CHQ', 'NCO IT', 'NCO FAULT REPAIR', 'NCO SIGCEN', 'NCO COMN', 'NCO MW', 'NCO MCCS', 'SEC JCO', 'JCO FAULT REPAIR', 'S/JCO', 'OC', 'NCO CHQ', 'JCO CHQ', 'NCO JCO', 'NCO LRW',
