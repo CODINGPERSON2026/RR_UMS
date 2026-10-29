@@ -51,6 +51,7 @@ app.register_blueprint(chatbot_bp)
 app.register_blueprint(company_rec_bp)
 app.register_blueprint(fitness_trend_bp)
 app.register_blueprint(ai_company_readiness_bp)
+app.register_blueprint(pending_cases_bp)
 
 
 @app.template_filter('format_date')

@@ -1,0 +1,322 @@
+<!-- PENDING CASES MODAL -->
+<style>
+  #pendingCasesModal .modal-dialog {
+    max-width: 1250px;
+    width: 98vw;
+  }
+  #pendingCasesModal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+    background: var(--card-bg-solid, #fff);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .pc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 22px;
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    color: white;
+    flex-shrink: 0;
+  }
+  .pc-header h5 { margin: 0; font-size: 1.3rem; font-weight: 800; letter-spacing: 0.5px; }
+  .pc-last-updated { font-size: 0.75rem; opacity: 0.9; margin-top: 3px; font-weight: 500; }
+  .pc-body {
+    padding: 14px 16px 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  /* Scrollable table wrapper — shows all 30 rows */
+  .pc-table-scroll {
+    overflow-y: auto;
+    overflow-x: auto;
+    flex: 1;
+    min-height: 0;
+    max-height: calc(92vh - 140px);
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+  }
+  .pc-table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .pc-table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+  .pc-table-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+  .pc-table-scroll::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+  #pendingCasesTable { font-size: 12.5px; margin-bottom: 0; }
+  #pendingCasesTable thead th {
+    background: #1e3a8a;
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+    padding: 9px 10px;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  #pendingCasesTable thead th:nth-child(2) { text-align: left; }
+  #pendingCasesTable tbody tr { vertical-align: middle; }
+  #pendingCasesTable tbody td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    text-align: center;
+    white-space: nowrap;
+  }
+  #pendingCasesTable tbody td:nth-child(2) { text-align: left; font-weight: 600; white-space: nowrap; }
+  #pendingCasesTable tbody tr:hover { background: rgba(37,99,235,0.05); }
+  /* Sticky total footer */
+  #pendingCasesTable tfoot tr td {
+    position: sticky;
+    bottom: 0;
+    background: #1e3a8a !important;
+    color: white !important;
+    font-weight: 800;
+    font-size: 12px;
+    border: none !important;
+    z-index: 1;
+  }
+  .pc-edit-btn {
+    border: none; background: rgba(37,99,235,0.1); color: #2563eb;
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 11px; transition: all 0.15s;
+  }
+  .pc-edit-btn:hover { background: #2563eb; color: white; }
+  .pc-save-btn {
+    border: none; background: rgba(22,163,74,0.15); color: #16a34a;
+    border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 11px; margin-right: 4px; font-weight: 700;
+  }
+  .pc-save-btn:hover { background: #16a34a; color: white; }
+  .pc-cancel-btn {
+    border: none; background: rgba(220,53,69,0.12); color: #dc3545;
+    border-radius: 6px; padding: 4px 9px; cursor: pointer; font-size: 11px; font-weight: 700;
+  }
+  .pc-cancel-btn:hover { background: #dc3545; color: white; }
+  .pc-num-input { width: 68px; border: 1px solid #3b82f6; border-radius: 4px; padding: 2px 5px; font-size: 12px; text-align: center; font-weight: 600; }
+  .pc-rem-input { width: 140px; border: 1px solid #3b82f6; border-radius: 4px; padding: 2px 6px; font-size: 12px; }
+  .pc-dt-cell { font-size: 11px; color: #475569; white-space: nowrap; font-weight: 500; }
+</style>
+
+<div class="modal fade" id="pendingCasesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="pc-header">
+        <div>
+          <h5><i class="fa fa-folder-open me-2"></i>PENDING CASES</h5>
+          <div class="pc-last-updated" id="pcLastUpdated">Last Updated: &mdash;</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="pc-body">
+        <div class="pc-table-scroll">
+          <table class="table table-sm table-bordered" id="pendingCasesTable">
+            <thead>
+              <tr>
+                <th>Ser<br>No</th>
+                <th>Type of Case</th>
+                <th>Pending Cas<br>of Last Week</th>
+                <th>Recd Cas<br>Current Week</th>
+                <th>Pub<br>This Week</th>
+                <th>Under<br>Prog</th>
+                <th>Remarks</th>
+                <th>Date &amp; Time</th>
+                <th class="pc-action-col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="pcTableBody">
+              <tr><td colspan="9" class="text-center py-4">
+                <span class="val-dots"><span></span><span></span><span></span></span>
+              </td></tr>
+            </tbody>
+            <tfoot>
+              <tr id="pcTotalRow">
+                <td colspan="2" style="text-align:right; background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none;">TOTAL</td>
+                <td id="pcTotPending" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotRecd"    style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotPub"     style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotUnder"   style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td style="background:#1e3a8a; color:white; border:none;"></td>
+                <td style="background:#1e3a8a; color:white; border:none;"></td>
+                <td class="pc-action-col" style="background:#1e3a8a; color:white; border:none;"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  {% set r_clean = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+  const PC_CAN_EDIT = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'ADJUTANT', 'ACCOUNT OFFICER', 'ACCOUNTS OFFICER', 'ACCOUNT JCO', 'ACCOUNTS JCO', 'ACCOUNT CLK', 'ACCOUNTS CLK', 'ADMIN', 'SUPERADMIN']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'ADJUTANT', 'ACCOUNTOFFICER', 'ACCOUNTSOFFICER', 'ACCOUNTJCO', 'ACCOUNTSJCO', 'ACCOUNTCLK', 'ACCOUNTSCLK', 'ADMIN', 'SUPERADMIN'] else 'false' }};
+  let pcData = [];
+
+  document.getElementById('pendingCasesModal').addEventListener('show.bs.modal', function() {
+    loadPendingCases();
+  });
+
+  function loadPendingCases() {
+    fetch('/pending_cases/get')
+      .then(r => r.json())
+      .then(res => {
+        if (!res || !res.success) return;
+        pcData = res.data || [];
+        window.renderTable(pcData);
+        updateLastUpdated(pcData);
+      })
+      .catch(err => console.error('Failed to load pending cases:', err));
+  }
+
+  function updateLastUpdated(data) {
+    let latestRow = null;
+    let maxTs = -1;
+    (data || []).forEach(row => {
+      const ts = Number(row.updated_at_ts) || 0;
+      if (ts > maxTs && row.updated_at) {
+        maxTs = ts;
+        latestRow = row;
+      }
+    });
+    const headerEl = document.getElementById('pcLastUpdated');
+    if (headerEl) {
+      headerEl.textContent = latestRow && latestRow.updated_at
+        ? 'Last Updated: ' + latestRow.updated_at
+        : 'Last Updated: \u2014';
+    }
+  }
+
+  /* Exposed so inline handlers can cancel edit cleanly */
+  window.pcCancelEdit = function() {
+    window.renderTable(pcData);
+  };
+
+  /* Exposed to window so onclick handlers can re-render safely */
+  window.renderTable = function renderTable(data) {
+    const tbody = document.getElementById('pcTableBody');
+    if (!tbody) return;
+    let totPending = 0, totRecd = 0, totPub = 0, totUnder = 0;
+
+    const rows = (data || []).map((row, idx) => {
+      totPending += (row.pending_last_week  || 0);
+      totRecd    += (row.recd_current_week  || 0);
+      totPub     += (row.pub_this_week      || 0);
+      totUnder   += (row.under_prog         || 0);
+
+      const actionCell = PC_CAN_EDIT
+        ? `<button class="pc-edit-btn" onclick="pcStartEdit(${row.id})" title="Edit Row"><i class="fa fa-edit"></i> Edit</button>`
+        : '';
+
+      const dtDisplay = row.updated_at
+        ? `<span class="pc-dt-cell">${escHtml(row.updated_at)}</span>`
+        : '<span class="pc-dt-cell" style="color:#94a3b8;">&mdash;</span>';
+
+      return `<tr id="pcRow_${row.id}" data-id="${row.id}">
+        <td>${idx + 1}</td>
+        <td>${escHtml(row.type_of_case)}</td>
+        <td id="pcPending_${row.id}">${row.pending_last_week || 0}</td>
+        <td id="pcRecd_${row.id}">${row.recd_current_week || 0}</td>
+        <td id="pcPub_${row.id}">${row.pub_this_week || 0}</td>
+        <td id="pcUnder_${row.id}">${row.under_prog || 0}</td>
+        <td id="pcRem_${row.id}">${escHtml(row.remarks || '')}</td>
+        <td id="pcDt_${row.id}">${dtDisplay}</td>
+        ${PC_CAN_EDIT ? `<td id="pcAct_${row.id}">${actionCell}</td>` : ''}
+      </tr>`;
+    }).join('');
+
+    tbody.innerHTML = rows;
+
+    document.getElementById('pcTotPending').textContent = totPending;
+    document.getElementById('pcTotRecd').textContent    = totRecd;
+    document.getElementById('pcTotPub').textContent     = totPub;
+    document.getElementById('pcTotUnder').textContent   = totUnder;
+
+    document.querySelectorAll('.pc-action-col').forEach(el => {
+      el.style.display = PC_CAN_EDIT ? '' : 'none';
+    });
+  };
+
+  window.pcHandleKey = function(e, id) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      window.pcSaveRow(id);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      window.pcCancelEdit();
+    }
+  };
+
+  window.pcStartEdit = function(id) {
+    const row = (pcData || []).find(r => r.id === id);
+    if (!row) return;
+    document.getElementById('pcPending_' + id).innerHTML = `<input class="pc-num-input" id="ei_pending_${id}" value="${row.pending_last_week || 0}" type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+    document.getElementById('pcRecd_'   + id).innerHTML = `<input class="pc-num-input" id="ei_recd_${id}"    value="${row.recd_current_week || 0}" type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+    document.getElementById('pcPub_'    + id).innerHTML = `<input class="pc-num-input" id="ei_pub_${id}"     value="${row.pub_this_week || 0}"      type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+    document.getElementById('pcUnder_'  + id).innerHTML = `<input class="pc-num-input" id="ei_under_${id}"   value="${row.under_prog || 0}"          type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+    document.getElementById('pcRem_'    + id).innerHTML = `<input class="pc-rem-input" id="ei_rem_${id}"     value="${escHtml(row.remarks || '')}" onkeydown="pcHandleKey(event, ${id})">`;
+    document.getElementById('pcAct_'    + id).innerHTML = `
+      <button class="pc-save-btn"   onclick="pcSaveRow(${id})"><i class="fa fa-check"></i> Save</button>
+      <button class="pc-cancel-btn" onclick="pcCancelEdit()"><i class="fa fa-times"></i></button>`;
+  };
+
+  window.pcSaveRow = function(id) {
+    const pInput = document.getElementById('ei_pending_' + id);
+    const rInput = document.getElementById('ei_recd_' + id);
+    const pubInput = document.getElementById('ei_pub_' + id);
+    const uInput = document.getElementById('ei_under_' + id);
+    const remInput = document.getElementById('ei_rem_' + id);
+    if (!pInput || !rInput || !pubInput || !uInput || !remInput) return;
+
+    const payload = {
+      pending_last_week: parseInt(pInput.value, 10) || 0,
+      recd_current_week: parseInt(rInput.value, 10) || 0,
+      pub_this_week:     parseInt(pubInput.value, 10) || 0,
+      under_prog:        parseInt(uInput.value, 10) || 0,
+      remarks:           remInput.value.trim()
+    };
+
+    fetch(`/pending_cases/update/${id}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success) {
+        const row = (pcData || []).find(r => r.id === id);
+        if (row) {
+          Object.assign(row, payload);
+          if (res.updated_at) row.updated_at = res.updated_at;
+          if (res.updated_at_ts) row.updated_at_ts = res.updated_at_ts;
+        }
+        window.renderTable(pcData);
+        updateLastUpdated(pcData);
+      } else {
+        alert('Error: ' + (res && res.message ? res.message : 'Save failed'));
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Network error while saving');
+    });
+  };
+
+  function escHtml(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;');
+  }
+})();
+</script>

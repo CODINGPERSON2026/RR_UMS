@@ -1622,6 +1622,14 @@ STATUS COLORS
           <span class="sc-updater"><i class="fa fa-user-circle"></i> ACCOUNTS CLK</span>
         </div>
       </div>
+      <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal">
+        <div class="sc-label">
+          <span class="sc-label-text">Pending Cases</span>
+        </div>
+        <div class="sc-right" style="align-self: stretch; justify-content: flex-end;">
+          <span class="sc-updater"><i class="fa fa-folder-open"></i> ACCT CLK</span>
+        </div>
+      </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
         <div class="sc-label">
           <span class="sc-label-text">Dues In</span>
@@ -1859,6 +1867,7 @@ STATUS COLORS
     <!-- ALL POPUP MODALS (Deferred parsing for instant initial page rendering) -->
     <template id="deferredModalContainer">
       {% include 'modals/Projects/modal.html' %}
+      {% include 'modals/pending_cases_modal.html' %}
       {% include 'modals/calender/calender.html' %}
       {% include 'modals/detachmentModal/detachment.html' %}
       {% include 'modals/personnelModal/personal_modal.html' %}
