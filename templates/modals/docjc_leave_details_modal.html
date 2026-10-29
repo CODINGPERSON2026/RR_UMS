@@ -1,0 +1,1215 @@
+<!-- DOC / ONCO Leave Details Modal -->
+<style>
+  #docjcLeaveModal .modal-dialog {
+    max-width: 96vw;
+    width: 1280px;
+    margin: 1.5rem auto;
+  }
+  #docjcLeaveModal .modal-content {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22);
+    overflow: hidden;
+    font-family: inherit;
+    background: #ffffff;
+  }
+  .dj-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: white;
+    padding: 14px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dj-header h5 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dj-stats-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 11px;
+    flex-wrap: wrap;
+  }
+  .dj-stat-pill {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 2.5px 9px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .dj-stat-pill.pill-active {
+    background: #16a34a;
+    border-color: #15803d;
+  }
+  .dj-stat-pill.pill-done {
+    background: #059669;
+    border-color: #047857;
+  }
+  .dj-stat-pill.pill-balance {
+    background: #d97706;
+    border-color: #b45309;
+  }
+  .dj-stat-pill.pill-inactive {
+    background: #64748b;
+    border-color: #475569;
+  }
+  .dj-stat-pill.pill-sync {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.45);
+    font-weight: 700;
+  }
+  .dj-body {
+    padding: 16px 20px;
+    background: #f8fafc;
+  }
+  /* Filters Bar */
+  .dj-filter-bar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .dj-filter-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+    display: block;
+  }
+  /* Table styling */
+  .dj-table-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    overflow: hidden;
+  }
+  .dj-table-scroll {
+    max-height: 520px;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+  #docjcLeaveTable {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+  }
+  #docjcLeaveTable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 10px 10px;
+    border: none;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  #docjcLeaveTable thead th:nth-child(4) { text-align: left; }
+  #docjcLeaveTable tbody tr {
+    transition: background 0.15s;
+    vertical-align: middle;
+  }
+  #docjcLeaveTable tbody tr:hover {
+    background: rgba(37, 99, 235, 0.05);
+  }
+  #docjcLeaveTable tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: center;
+    vertical-align: middle;
+    color: #334155;
+    white-space: nowrap;
+  }
+  #docjcLeaveTable tbody td:nth-child(4) {
+    text-align: left;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  /* Badge styles */
+  .dj-badge-army {
+    font-family: monospace;
+    font-weight: 700;
+    color: #1e3a8a;
+    font-size: 12px;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+  }
+  .dj-badge-rank {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .dj-badge-company {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .dj-badge-ltype {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+  }
+  .dj-days-val {
+    font-weight: 700;
+    color: #1e3a8a;
+    font-size: 13px;
+  }
+  .dj-dates-sub {
+    font-size: 10px;
+    color: #64748b;
+    display: block;
+    margin-top: 1px;
+  }
+  /* Action Buttons for ONCO & DOC */
+  .dj-act-btn-group {
+    display: inline-flex;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .dj-act-btn {
+    border: none;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    background: #ffffff;
+    color: #64748b;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .dj-act-btn:hover {
+    background: #f1f5f9;
+  }
+  /* ONCO Selected States */
+  .dj-act-btn.btn-active.is-selected {
+    background: #16a34a !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .dj-act-btn.btn-inactive.is-selected {
+    background: #475569 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  /* DOC Selected States */
+  .dj-act-btn.btn-done.is-selected {
+    background: #059669 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .dj-act-btn.btn-balance.is-selected {
+    background: #d97706 !important;
+    color: #ffffff !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  }
+  .dj-act-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  /* Readonly status badges */
+  .dj-ro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .dj-ro-badge.ro-active {
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+  }
+  .dj-ro-badge.ro-inactive {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+  }
+  .dj-ro-badge.ro-done {
+    background: #dcfce7;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+  }
+  .dj-ro-badge.ro-balance {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid #fde68a;
+  }
+  .dj-ro-badge.ro-pending {
+    background: #f8fafc;
+    color: #94a3b8;
+    border: 1px dashed #cbd5e1;
+  }
+  /* Delete button */
+  .dj-del-btn {
+    padding: 3px 7px;
+    font-size: 11px;
+    border-radius: 5px;
+    transition: all 0.15s ease;
+  }
+  .dj-del-btn:hover {
+    background: #dc3545;
+    color: white;
+  }
+  /* Footer */
+  .dj-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12px;
+    color: #64748b;
+  }
+  /* Toast Notification */
+  .dj-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1e293b;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    font-size: 12px;
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+  }
+  .dj-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Suggestions dropdown for autocomplete */
+  .dj-suggestions-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    z-index: 1090;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+  }
+  .dj-suggestion-item {
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .dj-suggestion-item:hover {
+    background: #eff6ff;
+  }
+</style>
+
+<!-- Main Leave Details Modal -->
+<div class="modal fade" id="docjcLeaveModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Modal Header -->
+      <div class="dj-header">
+        <div>
+          <h5>
+            <i class="fas fa-calendar-alt"></i>
+            <span id="djModalMainTitle">DOC LEAVE DETAILS</span>
+          </h5>
+          <div class="dj-stats-pills">
+            <span class="dj-stat-pill" id="djPillTotal">Total: 0</span>
+            <span class="dj-stat-pill pill-active" id="djPillOncoActive" title="ONCO Active &rarr; Increments Pending Cas of Last Week"><i class="fa fa-check-circle"></i> ONCO Active: 0</span>
+            <span class="dj-stat-pill pill-done" id="djPillDocDone" title="DOC DONE &rarr; Updates Pub This Week"><i class="fa fa-check-double"></i> DOC Done: 0</span>
+            <span class="dj-stat-pill pill-balance" id="djPillDocBalance" title="DOC BALANCE &rarr; Updates Under PROG"><i class="fa fa-hourglass-half"></i> DOC Balance: 0</span>
+            <span class="dj-stat-pill pill-sync" id="djPillPart2Sync" title="Values in PART-II Status for LVE">
+              <i class="fa fa-sync-alt me-1"></i>PART-II LVE &rarr; Pending: 0 | Recd: 0 | Total: 0 | Pub: 0 | Under PROG: 0
+            </span>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Button to fill table (Shown to ONCO / Admin) -->
+          <button type="button" class="btn btn-sm btn-light text-primary fw-bold" id="djBtnAddEntry" style="display:none;" onclick="djOpenAddEntryModal()">
+            <i class="fa fa-plus-circle me-1"></i>+ Add Leave Entry
+          </button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="dj-body">
+        
+        <!-- Filter Controls -->
+        <div class="dj-filter-bar">
+          <div class="row g-2 align-items-end">
+            <!-- Company Filter -->
+            <div class="col-md-3 col-sm-6">
+              <label class="dj-filter-label"><i class="fa fa-building me-1"></i>Company</label>
+              <select id="djFilterCompany" class="form-select form-select-sm" onchange="djApplyFilters()">
+                <option value="">All Companies</option>
+              </select>
+            </div>
+
+            <!-- Leave Type Filter -->
+            <div class="col-md-3 col-sm-6">
+              <label class="dj-filter-label"><i class="fa fa-tag me-1"></i>Leave Type</label>
+              <select id="djFilterLeaveType" class="form-select form-select-sm" onchange="djApplyFilters()">
+                <option value="">All Leave Types</option>
+                <option value="AL">AL (Annual Leave)</option>
+                <option value="PAL">PAL (Part Annual Leave)</option>
+                <option value="PTL">PTL (Part Temp Leave)</option>
+                <option value="BAL">BAL (Balance Annual)</option>
+                <option value="CL">CL (Casual Leave)</option>
+                <option value="SL">SL (Sick Leave)</option>
+                <option value="AAL">AAL (Agniveer Annual)</option>
+              </select>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="col-md-2 col-sm-6">
+              <label class="dj-filter-label"><i class="fa fa-toggle-on me-1"></i>Status</label>
+              <select id="djFilterStatus" class="form-select form-select-sm" onchange="djApplyFilters()">
+                <option value="">All Status</option>
+                <option value="onco_active">ONCO: Active</option>
+                <option value="onco_inactive">ONCO: Inactive</option>
+                <option value="doc_done">DOC: DONE</option>
+                <option value="doc_balance">DOC: BALANCE</option>
+                <option value="unmarked">Unmarked / None</option>
+              </select>
+            </div>
+
+            <!-- Search Box -->
+            <div class="col-md-3 col-sm-6">
+              <label class="dj-filter-label"><i class="fa fa-search me-1"></i>Search</label>
+              <input type="text" id="djFilterSearch" class="form-control form-select-sm" placeholder="Search army no, name, rank..." oninput="djApplyFilters()">
+            </div>
+
+            <!-- Reset Button -->
+            <div class="col-md-1 col-sm-12 text-end">
+              <button class="btn btn-outline-secondary btn-sm w-100" type="button" onclick="djResetFilters()" title="Reset Filters">
+                <i class="fa fa-undo"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="dj-table-container">
+          <div class="dj-table-scroll">
+            <table class="table" id="docjcLeaveTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px;">Sno.</th>
+                  <th>Army Number</th>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Company</th>
+                  <th>Leave Type</th>
+                  <th>Days</th>
+                  <th style="min-width: 130px;">ONCO Action</th>
+                  <th style="min-width: 140px;">DOC Action</th>
+                  <th style="width: 50px;">Delete</th>
+                </tr>
+              </thead>
+              <tbody id="docjcLeaveTableBody">
+                <tr>
+                  <td colspan="10" class="text-center py-4">
+                    <span class="spinner-border spinner-border-sm text-primary me-2"></span>
+                    Loading leave records...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Footer Count -->
+          <div class="dj-footer">
+            <span id="djRecordCount">Showing 0 records</span>
+            <span class="text-muted" id="djFooterHint"><i class="fa fa-info-circle me-1"></i><strong>DOCJC &amp; ONCO</strong> Leave Management System</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add Leave Entry (For ONCO / Admin) -->
+<div class="modal fade" id="addDocLeaveEntryModal" tabindex="-1" aria-hidden="true" style="z-index: 1070;">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
+    <div class="modal-content" style="border-radius:12px; overflow:hidden;">
+      <div class="modal-header bg-primary text-white py-2 px-3">
+        <h6 class="modal-title fw-bold mb-0"><i class="fa fa-plus-circle me-1"></i> Fill DOC Leave Details (ONCO)</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="addDocLeaveForm" onsubmit="djSubmitAddLeave(event)">
+        <div class="modal-body p-3" style="font-size:13px;">
+          <!-- Army Number with autocomplete -->
+          <div class="mb-2 position-relative">
+            <label class="form-label fw-bold mb-1">Army Number <span class="text-danger">*</span></label>
+            <input type="text" id="af_army_number" class="form-control form-control-sm" placeholder="e.g. 15720931K" required autocomplete="off" oninput="djAutocompleteArmy(this.value)">
+            <div id="djArmySuggestions" class="dj-suggestions-box"></div>
+            <small class="text-muted" style="font-size:10px;">Type to autofill Name, Rank, and Company</small>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label fw-bold mb-1">Rank</label>
+              <input type="text" id="af_rank" class="form-control form-control-sm" placeholder="e.g. HAV / NK" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold mb-1">Name <span class="text-danger">*</span></label>
+              <input type="text" id="af_name" class="form-control form-control-sm" placeholder="Full Name" required>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label fw-bold mb-1">Company <span class="text-danger">*</span></label>
+              <select id="af_company" class="form-select form-select-sm" required>
+                <option value="HQ Company">HQ Company</option>
+                <option value="COMN Company">COMN Company</option>
+                <option value="3 Company">3 Company</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-bold mb-1">Leave Type <span class="text-danger">*</span></label>
+              <select id="af_leave_type" class="form-select form-select-sm" required>
+                <option value="AL">AL (Annual Leave)</option>
+                <option value="PAL">PAL (Part Annual Leave)</option>
+                <option value="PTL">PTL (Part Temp Leave)</option>
+                <option value="BAL">BAL (Balance Annual)</option>
+                <option value="CL">CL (Casual Leave)</option>
+                <option value="SL">SL (Sick Leave)</option>
+                <option value="AAL">AAL (Agniveer Annual)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-4">
+              <label class="form-label fw-bold mb-1">Days <span class="text-danger">*</span></label>
+              <input type="number" id="af_days" class="form-control form-control-sm" placeholder="e.g. 10" min="1" required>
+            </div>
+            <div class="col-4">
+              <label class="form-label fw-bold mb-1">From Date</label>
+              <input type="date" id="af_from_date" class="form-control form-control-sm">
+            </div>
+            <div class="col-4">
+              <label class="form-label fw-bold mb-1">To Date</label>
+              <input type="date" id="af_to_date" class="form-control form-control-sm">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer py-2 px-3 bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm fw-bold" id="af_submit_btn">
+            <i class="fa fa-save me-1"></i>Save Leave Entry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Toast -->
+<div id="djToast" class="dj-toast">
+  <i class="fa fa-check-circle text-success fs-6"></i>
+  <span id="djToastMsg">Updated successfully</span>
+</div>
+
+<script>
+(function() {
+  let docjcRawLeaves = [];
+  let docjcFilteredLeaves = [];
+  let docjcOncoActiveCount = 0;
+  let docjcDocDoneCount = 0;
+  let docjcDocBalanceCount = 0;
+  let docjcLveRow = null;
+  let isUserOnco = false;
+  let isUserDoc = false;
+  let currentUserRole = '';
+  let userCompany = '';
+
+  function normalizeCompany(c) {
+    return String(c || '').toLowerCase().replace(/[\s\-_]/g, '');
+  }
+
+  // Open modal trigger
+  window.openDocjcLeaveModal = function() {
+    const el = document.getElementById('docjcLeaveModal');
+    if (!el) return;
+    const modal = bootstrap.Modal.getOrCreateInstance(el);
+    modal.show();
+    loadDocjcLeaves();
+  };
+
+  // Close suggestions on outside click
+  document.addEventListener('click', function(e) {
+    const sug = document.getElementById('djArmySuggestions');
+    if (sug && !sug.contains(e.target) && e.target.id !== 'af_army_number') {
+      sug.style.display = 'none';
+    }
+  });
+
+  function loadDocjcLeaves() {
+    fetch('/apply_leave/api/docjc_leaves')
+      .then(r => r.json())
+      .then(res => {
+        if (!res || !res.success) return;
+        docjcRawLeaves = res.data || [];
+        docjcOncoActiveCount = res.onco_active_count || 0;
+        docjcDocDoneCount = res.doc_done_count || 0;
+        docjcDocBalanceCount = res.doc_balance_count || 0;
+        docjcLveRow = res.lve_row || null;
+        isUserOnco = !!res.is_onco;
+        isUserDoc = !!res.is_doc;
+        currentUserRole = res.current_role || '';
+        userCompany = res.user_company || '';
+
+        // Configure header according to role
+        const titleEl = document.getElementById('djModalMainTitle');
+        const addBtn = document.getElementById('djBtnAddEntry');
+        const hintEl = document.getElementById('djFooterHint');
+
+        if (isUserOnco && !isUserDoc) {
+          if (addBtn) addBtn.style.display = '';
+          const coyBadge = userCompany ? `<span class="badge bg-warning text-dark ms-2" style="font-size:11px;"><i class="fa fa-building me-1"></i>${esc(userCompany)}</span>` : '';
+          if (titleEl) titleEl.innerHTML = `DOC LEAVE DETAILS <span class="badge bg-light text-primary ms-2" style="font-size:11px;">ONCO ACCESS</span>${coyBadge}`;
+          if (hintEl) {
+            hintEl.innerHTML = `<i class="fa fa-pencil-alt me-1"></i><strong>ONCO${userCompany ? ' (' + esc(userCompany) + ')' : ''}</strong>: You can only update leaves of your company. Set <strong>Active</strong> (updates Recd Cas Current Week in PART-II) or <strong>Inactive</strong>.`;
+          }
+        } else if (isUserDoc && !isUserOnco) {
+          if (addBtn) addBtn.style.display = 'none';
+          if (titleEl) titleEl.textContent = 'DOC LEAVE DETAILS';
+          if (hintEl) hintEl.innerHTML = `<i class="fa fa-clipboard-check me-1"></i><strong>DOCJC</strong>: Set <strong>DONE</strong> (updates Pub This Week) or <strong>BALANCE</strong> (updates Under PROG). You can delete rows.`;
+        } else {
+          // Admin / Full Access
+          if (addBtn) addBtn.style.display = '';
+          if (titleEl) titleEl.innerHTML = `DOC LEAVE DETAILS <span class="badge bg-light text-primary ms-2" style="font-size:11px;">FULL ACCESS</span>`;
+          if (hintEl) hintEl.innerHTML = `<i class="fa fa-info-circle me-1"></i><strong>Full Access</strong>: ONCO (Active/Inactive), DOC (DONE/BALANCE), Add &amp; Delete entries.`;
+        }
+
+        populateCompanyFilter(res.companies || []);
+        updateStatsDisplay();
+        djApplyFilters();
+      })
+      .catch(err => {
+        console.error('Failed to load leaves:', err);
+        const tbody = document.getElementById('docjcLeaveTableBody');
+        if (tbody) tbody.innerHTML = `<tr><td colspan="10" class="text-danger py-4 text-center">Failed to load leaves data.</td></tr>`;
+      });
+  }
+
+  function populateCompanyFilter(companies) {
+    const select = document.getElementById('djFilterCompany');
+    if (!select) return;
+    const curVal = select.value;
+    select.innerHTML = '<option value="">All Companies</option>';
+    (companies || []).forEach(c => {
+      if (!c) return;
+      const opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c.toUpperCase();
+      select.appendChild(opt);
+    });
+    if (curVal) select.value = curVal;
+  }
+
+  function updateStatsDisplay() {
+    const pTotal = document.getElementById('djPillTotal');
+    const pOncoAct = document.getElementById('djPillOncoActive');
+    const pDocDone = document.getElementById('djPillDocDone');
+    const pDocBal = document.getElementById('djPillDocBalance');
+    const pSync = document.getElementById('djPillPart2Sync');
+
+    if (pTotal) pTotal.textContent = `Total: ${docjcRawLeaves.length}`;
+    if (pOncoAct) pOncoAct.innerHTML = `<i class="fa fa-check-circle"></i> ONCO Active: ${docjcOncoActiveCount}`;
+    if (pDocDone) pDocDone.innerHTML = `<i class="fa fa-check-double"></i> DOC Done: ${docjcDocDoneCount}`;
+    if (pDocBal) pDocBal.innerHTML = `<i class="fa fa-hourglass-half"></i> DOC Balance: ${docjcDocBalanceCount}`;
+
+    if (pSync && docjcLveRow) {
+      const pend = docjcLveRow.pending_last_week || 0;
+      const recd = docjcLveRow.recd_current_week || 0;
+      const pub = docjcLveRow.pub_this_week || 0;
+      const under = docjcLveRow.under_prog || 0;
+      const tot = docjcLveRow.total_cases || 0;
+      pSync.innerHTML = `<i class="fa fa-sync-alt me-1"></i>PART-II LVE &rarr; Pending: <strong>${pend}</strong> | Recd: <strong>${recd}</strong> | Total: <strong>${tot}</strong> | Pub: <strong>${pub}</strong> | Under PROG: <strong>${under}</strong>`;
+    }
+  }
+
+  window.djApplyFilters = function() {
+    const compVal = (document.getElementById('djFilterCompany')?.value || '').toLowerCase().trim();
+    const typeVal = (document.getElementById('djFilterLeaveType')?.value || '').toUpperCase().trim();
+    const statVal = (document.getElementById('djFilterStatus')?.value || '').toLowerCase().trim();
+    const searchVal = (document.getElementById('djFilterSearch')?.value || '').toLowerCase().trim();
+
+    docjcFilteredLeaves = docjcRawLeaves.filter(row => {
+      // Company match
+      if (compVal) {
+        const rowComp = (row.company || '').toLowerCase();
+        if (!rowComp.includes(compVal)) return false;
+      }
+      // Leave Type match (AL, PAL, PTL, BAL, CL, SL, AAL)
+      if (typeVal) {
+        const rowType = (row.leave_type || '').toUpperCase();
+        if (typeVal === 'AL' && !rowType.includes('AL')) return false;
+        else if (typeVal === 'PAL' && !rowType.includes('PAL') && !rowType.includes('PL')) return false;
+        else if (typeVal === 'PTL' && !rowType.includes('PTL')) return false;
+        else if (typeVal === 'BAL' && !rowType.includes('BAL')) return false;
+        else if (typeVal === 'CL' && !rowType.includes('CL')) return false;
+        else if (typeVal === 'SL' && !rowType.includes('SL') && !rowType.includes('SICK')) return false;
+        else if (typeVal === 'AAL' && !rowType.includes('AAL')) return false;
+      }
+      // Status match (onco_active, onco_inactive, doc_done, doc_balance, unmarked)
+      if (statVal) {
+        const oncoStat = (row.onco_status || '').toLowerCase();
+        const docStat = (row.doc_status || '').toLowerCase();
+        if (statVal === 'onco_active' && oncoStat !== 'active') return false;
+        if (statVal === 'onco_inactive' && oncoStat !== 'inactive') return false;
+        if (statVal === 'doc_done' && docStat !== 'done') return false;
+        if (statVal === 'doc_balance' && docStat !== 'balance') return false;
+        if (statVal === 'unmarked' && (oncoStat !== '' || docStat !== '')) return false;
+      }
+      // Search match (name, army_number, rank)
+      if (searchVal) {
+        const name = (row.name || '').toLowerCase();
+        const armyNo = (row.army_number || '').toLowerCase();
+        const rank = (row.rank || '').toLowerCase();
+        if (!name.includes(searchVal) && !armyNo.includes(searchVal) && !rank.includes(searchVal)) return false;
+      }
+      return true;
+    });
+
+    renderDocjcTable(docjcFilteredLeaves);
+  };
+
+  window.djResetFilters = function() {
+    const fComp = document.getElementById('djFilterCompany');
+    const fType = document.getElementById('djFilterLeaveType');
+    const fStat = document.getElementById('djFilterStatus');
+    const fSrch = document.getElementById('djFilterSearch');
+    if (fComp) fComp.value = '';
+    if (fType) fType.value = '';
+    if (fStat) fStat.value = '';
+    if (fSrch) fSrch.value = '';
+    djApplyFilters();
+  };
+
+  /* Render Table with Columns:
+     SNO, ARMY NUMBER, RANK, NAME, COMPANY, LEAVE TYPE, DAYS, ONCO ACTION, DOC ACTION, DELETE */
+  function renderDocjcTable(data) {
+    const tbody = document.getElementById('docjcLeaveTableBody');
+    const countEl = document.getElementById('djRecordCount');
+    if (!tbody) return;
+
+    if (countEl) {
+      countEl.textContent = `Showing ${data.length} of ${docjcRawLeaves.length} records`;
+    }
+
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No matching leave records found.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = data.map((row, idx) => {
+      const onco = (row.onco_status || '').toLowerCase();
+      const isOncoActive = onco === 'active';
+      const isOncoInactive = onco === 'inactive';
+
+      const doc = (row.doc_status || '').toLowerCase();
+      const isDocDone = doc === 'done';
+      const isDocBalance = doc === 'balance';
+
+      const dateStr = (row.from_date && row.to_date)
+        ? `<span class="dj-dates-sub">${esc(row.from_date)} &ndash; ${esc(row.to_date)}</span>`
+        : '';
+
+      // Respective Company ONCO Access Check
+      const canOncoManage = (row.can_onco_update !== undefined)
+        ? !!row.can_onco_update
+        : (!userCompany || normalizeCompany(userCompany) === normalizeCompany(row.company));
+
+      // 1. ONCO Action Column
+      let oncoCellHtml = '';
+      if (isUserOnco) {
+        if (canOncoManage) {
+          oncoCellHtml = `
+            <div class="dj-act-btn-group" id="djOncoGrp_${row.id}">
+              <button type="button" class="dj-act-btn btn-active ${isOncoActive ? 'is-selected' : ''}" 
+                      onclick="djSetOncoAction(${row.id}, 'active')" 
+                      title="Active &rarr; Updates Recd Cas Current Week in PART-II (LVE)">
+                <i class="fa fa-check"></i> Active
+              </button>
+              <button type="button" class="dj-act-btn btn-inactive ${isOncoInactive ? 'is-selected' : ''}" 
+                      onclick="djSetOncoAction(${row.id}, 'inactive')" 
+                      title="Mark Inactive">
+                <i class="fa fa-times"></i> Inactive
+              </button>
+            </div>
+          `;
+        } else {
+          // Locked for other companies' ONCOs
+          if (isOncoActive) {
+            oncoCellHtml = `<span class="dj-ro-badge ro-active" title="Only ${esc(row.company || 'Other')} ONCO can change this"><i class="fa fa-lock me-1"></i>Active</span>`;
+          } else if (isOncoInactive) {
+            oncoCellHtml = `<span class="dj-ro-badge ro-inactive" title="Only ${esc(row.company || 'Other')} ONCO can change this"><i class="fa fa-lock me-1"></i>Inactive</span>`;
+          } else {
+            oncoCellHtml = `<span class="badge bg-light text-secondary border" title="Only ${esc(row.company || 'Other')} ONCO can update this leave"><i class="fa fa-lock me-1"></i>${esc(row.company || 'Other')} ONCO</span>`;
+          }
+        }
+      } else {
+        if (isOncoActive) {
+          oncoCellHtml = `<span class="dj-ro-badge ro-active" title="Marked Active by ONCO"><i class="fa fa-check-circle"></i> Active</span>`;
+        } else if (isOncoInactive) {
+          oncoCellHtml = `<span class="dj-ro-badge ro-inactive" title="Marked Inactive by ONCO"><i class="fa fa-times-circle"></i> Inactive</span>`;
+        } else {
+          oncoCellHtml = `<span class="dj-ro-badge ro-pending" title="Unmarked by ONCO">&mdash;</span>`;
+        }
+      }
+
+      // 2. DOC Action Column
+      let docCellHtml = '';
+      if (isUserDoc) {
+        docCellHtml = `
+          <div class="dj-act-btn-group" id="djDocGrp_${row.id}">
+            <button type="button" class="dj-act-btn btn-done ${isDocDone ? 'is-selected' : ''}" 
+                    onclick="djSetDocAction(${row.id}, 'done')" 
+                    title="DONE &rarr; Updates Pub This Week in PART-II">
+              <i class="fa fa-check-double"></i> DONE
+            </button>
+            <button type="button" class="dj-act-btn btn-balance ${isDocBalance ? 'is-selected' : ''}" 
+                    onclick="djSetDocAction(${row.id}, 'balance')" 
+                    title="BALANCE &rarr; Updates Under PROG in PART-II">
+              <i class="fa fa-hourglass-half"></i> BALANCE
+            </button>
+          </div>
+        `;
+      } else {
+        if (isDocDone) {
+          docCellHtml = `<span class="dj-ro-badge ro-done" title="Marked DONE by DOCJC"><i class="fa fa-check-double"></i> DONE</span>`;
+        } else if (isDocBalance) {
+          docCellHtml = `<span class="dj-ro-badge ro-balance" title="Marked BALANCE by DOCJC"><i class="fa fa-hourglass-half"></i> BALANCE</span>`;
+        } else {
+          docCellHtml = `<span class="dj-ro-badge ro-pending" title="Unmarked by DOCJC">&mdash;</span>`;
+        }
+      }
+
+      // 3. Delete Button Column (Available to DOC & ONCO of respective company with confirmation alert)
+      let deleteCellHtml = '';
+      if (isUserDoc || (isUserOnco && canOncoManage)) {
+        deleteCellHtml = `
+          <button type="button" class="btn btn-outline-danger btn-sm dj-del-btn" 
+                  onclick="djDeleteLeave(${row.id})" 
+                  title="Delete this leave entry">
+            <i class="fa fa-trash-alt"></i>
+          </button>
+        `;
+      } else {
+        deleteCellHtml = `<span class="text-muted" style="font-size:10px;" title="Cannot delete: Belongs to ${esc(row.company || 'other company')}">&mdash;</span>`;
+      }
+
+      return `
+        <tr id="djRow_${row.id}">
+          <td>${idx + 1}</td>
+          <td><span class="dj-badge-army">${esc(row.army_number)}</span></td>
+          <td><span class="dj-badge-rank">${esc(row.rank || 'Personnel')}</span></td>
+          <td><div class="fw-bold">${esc(row.name)}</div></td>
+          <td><span class="dj-badge-company">${esc(row.company || '&mdash;')}</span></td>
+          <td><span class="dj-badge-ltype">${esc(row.leave_type || 'AL')}</span></td>
+          <td>
+            <span class="dj-days-val">${row.leave_days || 0} Days</span>
+            ${dateStr}
+          </td>
+          <td>${oncoCellHtml}</td>
+          <td>${docCellHtml}</td>
+          <td>${deleteCellHtml}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ONCO Action: Active / Inactive */
+  window.djSetOncoAction = function(leaveId, targetStatus) {
+    if (!isUserOnco) {
+      alert('Only ONCO role can set Active or Inactive.');
+      return;
+    }
+
+    const row = docjcRawLeaves.find(r => r.id === leaveId);
+    if (!row) return;
+
+    const canOncoManage = (row.can_onco_update !== undefined) 
+      ? !!row.can_onco_update 
+      : (!userCompany || normalizeCompany(userCompany) === normalizeCompany(row.company));
+    if (isUserOnco && !isUserDoc && !canOncoManage) {
+      alert(`Access denied: Only ${row.company || 'respective'} ONCO can update this leave.`);
+      return;
+    }
+
+    const currentStatus = (row.onco_status || '').toLowerCase();
+    const newStatus = (currentStatus === targetStatus) ? '' : targetStatus;
+
+    const grp = document.getElementById('djOncoGrp_' + leaveId);
+    if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    fetch('/apply_leave/api/update_onco_leave_action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leave_id: leaveId, status: newStatus })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success) {
+        row.onco_status = res.onco_status;
+        docjcOncoActiveCount = res.onco_active_count;
+        if (res.lve_row) docjcLveRow = res.lve_row;
+
+        updateStatsDisplay();
+
+        if (grp) {
+          const btnAct = grp.querySelector('.btn-active');
+          const btnInact = grp.querySelector('.btn-inactive');
+          if (btnAct) {
+            btnAct.disabled = false;
+            btnAct.classList.toggle('is-selected', res.onco_status === 'active');
+          }
+          if (btnInact) {
+            btnInact.disabled = false;
+            btnInact.classList.toggle('is-selected', res.onco_status === 'inactive');
+          }
+        }
+
+        const label = res.onco_status ? res.onco_status.toUpperCase() : 'UNMARKED';
+        showToast(`ONCO status set to <strong>${label}</strong>. PART-II LVE Recd: <strong>${docjcLveRow ? docjcLveRow.recd_current_week : 0}</strong>, Total: <strong>${docjcLveRow ? docjcLveRow.total_cases : 0}</strong>`);
+      } else {
+        alert('Error: ' + (res && res.message ? res.message : 'Failed to update ONCO status'));
+        if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = false);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Network error while updating ONCO action');
+      if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = false);
+    });
+  };
+
+  /* DOC Action: DONE / BALANCE */
+  window.djSetDocAction = function(leaveId, targetStatus) {
+    if (!isUserDoc) {
+      alert('Only DOC / DOCJC role can set DONE or BALANCE.');
+      return;
+    }
+
+    const row = docjcRawLeaves.find(r => r.id === leaveId);
+    if (!row) return;
+
+    const currentStatus = (row.doc_status || '').toLowerCase();
+    const newStatus = (currentStatus === targetStatus) ? '' : targetStatus;
+
+    const grp = document.getElementById('djDocGrp_' + leaveId);
+    if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = true);
+
+    fetch('/apply_leave/api/update_doc_leave_action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leave_id: leaveId, status: newStatus })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success) {
+        row.doc_status = res.doc_status;
+        docjcDocDoneCount = res.doc_done_count;
+        docjcDocBalanceCount = res.doc_balance_count;
+        if (res.lve_row) docjcLveRow = res.lve_row;
+
+        updateStatsDisplay();
+
+        if (grp) {
+          const btnDone = grp.querySelector('.btn-done');
+          const btnBal = grp.querySelector('.btn-balance');
+          if (btnDone) {
+            btnDone.disabled = false;
+            btnDone.classList.toggle('is-selected', res.doc_status === 'done');
+          }
+          if (btnBal) {
+            btnBal.disabled = false;
+            btnBal.classList.toggle('is-selected', res.doc_status === 'balance');
+          }
+        }
+
+        const label = res.doc_status ? res.doc_status.toUpperCase() : 'UNMARKED';
+        const pub = docjcLveRow ? docjcLveRow.pub_this_week : 0;
+        const under = docjcLveRow ? docjcLveRow.under_prog : 0;
+        showToast(`DOC status set to <strong>${label}</strong>. PART-II LVE Pub: <strong>${pub}</strong>, Under PROG: <strong>${under}</strong>`);
+      } else {
+        alert('Error: ' + (res && res.message ? res.message : 'Failed to update DOC status'));
+        if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = false);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Network error while updating DOC action');
+      if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = false);
+    });
+  };
+
+  /* Delete Leave Entry (For DOC & ONCO of respective company with Confirmation Alert) */
+  window.djDeleteLeave = function(leaveId) {
+    if (!isUserOnco && !isUserDoc) {
+      alert('You do not have permission to delete leave entries.');
+      return;
+    }
+
+    const row = docjcRawLeaves.find(r => r.id === leaveId);
+    if (!row) return;
+
+    const canOncoManage = (row.can_onco_update !== undefined) 
+      ? !!row.can_onco_update 
+      : (!userCompany || normalizeCompany(userCompany) === normalizeCompany(row.company));
+    if (isUserOnco && !isUserDoc && !canOncoManage) {
+      alert(`Access denied: Only ${row.company || 'respective'} ONCO can delete this leave.`);
+      return;
+    }
+
+    const personName = `${row.name} (${row.army_number})`;
+    
+    // Confirmation alert
+    if (!confirm(`Are you sure you want to delete the leave entry for ${personName}?\nThis will permanently remove the record and update PART-II Status.`)) {
+      return;
+    }
+
+    fetch('/apply_leave/api/delete_doc_leave', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leave_id: leaveId })
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success) {
+        docjcRawLeaves = docjcRawLeaves.filter(r => r.id !== leaveId);
+        docjcOncoActiveCount = res.onco_active_count || 0;
+        docjcDocDoneCount = res.doc_done_count || 0;
+        docjcDocBalanceCount = res.doc_balance_count || 0;
+        if (res.lve_row) docjcLveRow = res.lve_row;
+
+        updateStatsDisplay();
+        djApplyFilters();
+        showToast(`Leave entry for <strong>${esc(personName)}</strong> deleted successfully.`);
+      } else {
+        alert('Error: ' + (res && res.message ? res.message : 'Failed to delete leave entry'));
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Network error while deleting leave entry');
+    });
+  };
+
+  /* Open Add Entry Modal (For ONCO) */
+  window.djOpenAddEntryModal = function() {
+    const el = document.getElementById('addDocLeaveEntryModal');
+    if (!el) return;
+    document.getElementById('addDocLeaveForm').reset();
+    document.getElementById('djArmySuggestions').style.display = 'none';
+
+    // If ONCO, preselect their company
+    if (isUserOnco && !isUserDoc && userCompany) {
+      const coySelect = document.getElementById('af_company');
+      if (coySelect) {
+        for (let i = 0; i < coySelect.options.length; i++) {
+          if (normalizeCompany(coySelect.options[i].value) === normalizeCompany(userCompany)) {
+            coySelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(el);
+    modal.show();
+  };
+
+  /* Autocomplete Army Number from personnel */
+  let armyDebounceTimer = null;
+  window.djAutocompleteArmy = function(query) {
+    clearTimeout(armyDebounceTimer);
+    const box = document.getElementById('djArmySuggestions');
+    if (!box) return;
+    const q = query.trim();
+    if (q.length < 2) {
+      box.style.display = 'none';
+      return;
+    }
+    armyDebounceTimer = setTimeout(() => {
+      fetch(`/apply_leave/api/search_personnel_by_army?army_number=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(res => {
+          if (!res || !res.success || !res.data || res.data.length === 0) {
+            box.style.display = 'none';
+            return;
+          }
+          box.innerHTML = res.data.map(p => `
+            <div class="dj-suggestion-item" onclick="djSelectPersonnel('${esc(p.army_number)}', '${esc(p.name)}', '${esc(p.rank || '')}', '${esc(p.company || '')}')">
+              <strong>${esc(p.army_number)}</strong> &mdash; ${esc(p.rank || '')} ${esc(p.name)} (${esc(p.company || '')})
+            </div>
+          `).join('');
+          box.style.display = 'block';
+        })
+        .catch(() => { box.style.display = 'none'; });
+    }, 200);
+  };
+
+  window.djSelectPersonnel = function(armyNo, name, rank, company) {
+    document.getElementById('af_army_number').value = armyNo;
+    document.getElementById('af_name').value = name;
+    document.getElementById('af_rank').value = rank || 'Personnel';
+    if (company) {
+      const compSelect = document.getElementById('af_company');
+      if (compSelect) {
+        let matched = false;
+        for (let opt of compSelect.options) {
+          if (opt.value.toLowerCase() === company.toLowerCase()) {
+            compSelect.value = opt.value;
+            matched = true;
+            break;
+          }
+        }
+        if (!matched) {
+          const newOpt = document.createElement('option');
+          newOpt.value = company;
+          newOpt.textContent = company;
+          compSelect.appendChild(newOpt);
+          compSelect.value = company;
+        }
+      }
+    }
+    document.getElementById('djArmySuggestions').style.display = 'none';
+  };
+
+  /* Submit Add Leave Entry (ONCO) */
+  window.djSubmitAddLeave = function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('af_submit_btn');
+    if (btn) btn.disabled = true;
+
+    const payload = {
+      army_number: document.getElementById('af_army_number').value.trim(),
+      rank: document.getElementById('af_rank').value.trim(),
+      name: document.getElementById('af_name').value.trim(),
+      company: document.getElementById('af_company').value.trim(),
+      leave_type: document.getElementById('af_leave_type').value.trim(),
+      leave_days: parseInt(document.getElementById('af_days').value, 10) || 0,
+      from_date: document.getElementById('af_from_date').value,
+      to_date: document.getElementById('af_to_date').value
+    };
+
+    fetch('/apply_leave/api/add_doc_leave', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (btn) btn.disabled = false;
+      if (res && res.success && res.data) {
+        // Prepend new record
+        docjcRawLeaves.unshift(res.data);
+        updateStatsDisplay();
+        djApplyFilters();
+
+        // Close modal
+        const addModalEl = document.getElementById('addDocLeaveEntryModal');
+        if (addModalEl) {
+          const modalInst = bootstrap.Modal.getInstance(addModalEl);
+          if (modalInst) modalInst.hide();
+        }
+
+        showToast(`Leave entry for <strong>${esc(res.data.name)}</strong> (${esc(res.data.army_number)}) added successfully.`);
+      } else {
+        alert('Error: ' + (res && res.message ? res.message : 'Failed to add leave entry'));
+      }
+    })
+    .catch(err => {
+      if (btn) btn.disabled = false;
+      console.error(err);
+      alert('Network error while saving leave entry');
+    });
+  };
+
+  function showToast(msg) {
+    const toast = document.getElementById('djToast');
+    const toastMsg = document.getElementById('djToastMsg');
+    if (!toast || !toastMsg) return;
+    toastMsg.innerHTML = msg;
+    toast.classList.add('show');
+    clearTimeout(window._djToastTimeout);
+    window._djToastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 4000);
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+})();
+</script>

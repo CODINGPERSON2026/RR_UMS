@@ -1092,6 +1092,41 @@ def recommend_leave():
                 updated_at = NOW()
             WHERE id = %s
         """, (send_request_to, request_status, leave_id))
+
+        if request_status == 'Approved':
+            try:
+                # Once OC sanctions leave, ensure it is added to doc_leave_details for the respective company ONCO
+                cursor.execute("SELECT company, `rank` FROM personnel WHERE army_number = %s", (leave['army_number'],))
+                p_info = cursor.fetchone()
+                p_coy = (p_info.get('company') if p_info else None) or leave.get('company') or 'HQ Company'
+                p_rnk = (p_info.get('rank') if p_info else None) or 'Personnel'
+
+                cursor.execute("""
+                    SELECT id FROM doc_leave_details 
+                    WHERE army_number = %s AND from_date = %s
+                    LIMIT 1
+                """, (leave['army_number'], leave['from_date']))
+                if not cursor.fetchone():
+                    cursor.execute("""
+                        INSERT INTO doc_leave_details (
+                            army_number, `rank`, name, company, leave_type, leave_days,
+                            from_date, to_date, onco_status, doc_status, action_status,
+                            created_by, created_at
+                        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, '', '', '', %s, NOW())
+                    """, (
+                        leave['army_number'],
+                        p_rnk,
+                        leave['name'],
+                        p_coy,
+                        leave['leave_type'] or 'AL',
+                        leave['leave_days'] or 1,
+                        leave['from_date'],
+                        leave['to_date'],
+                        f"OC Sanction ({current_user_role})"
+                    ))
+            except Exception as d_err:
+                print("Auto-insert into doc_leave_details error:", d_err)
+
         conn.commit()
 
         return jsonify({"message": "Leave recommended successfully"}), 200
@@ -2833,4 +2868,485 @@ def get_leave_balance():
             if 'cursor' in locals():
                 cursor.close()
             conn.close()
+
+
+import datetime
+
+def check_weekly_rollover_leave(cursor, conn):
+    try:
+        now = datetime.datetime.now()
+        iso = now.isocalendar()
+        current_week_str = f"{iso[0]}-W{iso[1]:02d}"
+
+        cursor.execute("SELECT setting_value FROM system_settings WHERE setting_key = 'last_part2_rollover_week'")
+        row = cursor.fetchone()
+        last_week_str = row['setting_value'] if row else None
+
+        if not last_week_str or last_week_str == '0':
+            cursor.execute("INSERT INTO system_settings (setting_key, setting_value) VALUES ('last_part2_rollover_week', %s) ON DUPLICATE KEY UPDATE setting_value = %s", (current_week_str, current_week_str))
+            conn.commit()
+            return
+
+        if last_week_str != current_week_str:
+            # Sunday 11:59 PM passed, Monday 12:00 AM arrived:
+            # "once it is 12:00 AM MONDAY make 0 Under PROG add them to PEnding Last Week"
+            cursor.execute("""
+                UPDATE pending_cases
+                SET pending_last_week = pending_last_week + under_prog,
+                    under_prog = 0,
+                    recd_current_week = 0,
+                    pub_this_week = 0,
+                    total_cases = pending_last_week + under_prog,
+                    updated_at = NOW(),
+                    updated_by = 'SYSTEM ROLLOVER'
+            """)
+            cursor.execute("""
+                UPDATE doc_leave_details
+                SET onco_status = 'active',
+                    doc_status = ''
+                WHERE doc_status = 'balance'
+            """)
+            cursor.execute("UPDATE system_settings SET setting_value = %s WHERE setting_key = 'last_part2_rollover_week'", (current_week_str,))
+            conn.commit()
+    except Exception as e:
+        print("Weekly rollover check error:", e)
+
+
+def normalize_company(c):
+    if not c:
+        return ''
+    return str(c).strip().lower().replace(' ', '').replace('_', '').replace('-', '')
+
+
+@leave_bp.route('/api/docjc_leaves', methods=['GET'])
+def get_docjc_leaves():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        check_weekly_rollover_leave(cursor, conn)
+
+        cursor.execute("""
+            SELECT id,
+                   army_number,
+                   `rank`,
+                   name,
+                   company,
+                   leave_type,
+                   leave_days,
+                   COALESCE(onco_status, '') AS onco_status,
+                   COALESCE(doc_status, '') AS doc_status,
+                   from_date,
+                   to_date,
+                   created_by,
+                   DATE_FORMAT(created_at, '%d/%m/%Y %h:%i %p') AS created_at
+            FROM doc_leave_details
+            ORDER BY id DESC
+        """)
+        leaves = cursor.fetchall()
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+        onco_active_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
+        doc_done_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
+        doc_balance_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT DISTINCT company FROM doc_leave_details WHERE company IS NOT NULL AND company != '' ORDER BY company ASC")
+        companies = [r['company'] for r in cursor.fetchall()]
+
+        cursor.execute("""
+            SELECT id, type_of_case, pending_last_week, recd_current_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   pub_this_week, under_prog, updated_at
+            FROM pending_cases
+            WHERE id = 16 OR type_of_case = 'Lve'
+            LIMIT 1
+        """)
+        lve_row = cursor.fetchone()
+
+        user_role = (user.get('role') or '').upper().strip()
+        r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+        is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
+        is_onco = 'ONCO' in user_role or 'ONCO' in r_clean or is_admin
+        is_doc = 'DOC' in user_role or 'DOC' in r_clean or is_admin
+        user_company = user.get('company') or ''
+        user_comp_norm = normalize_company(user_company)
+
+        # Respective company ONCO access check:
+        for l in leaves:
+            row_comp_norm = normalize_company(l.get('company'))
+            l['can_onco_update'] = bool(is_admin or (is_onco and (not user_comp_norm or user_comp_norm == row_comp_norm)))
+
+        return jsonify({
+            "success": True,
+            "data": leaves,
+            "onco_active_count": onco_active_count,
+            "doc_done_count": doc_done_count,
+            "doc_balance_count": doc_balance_count,
+            "companies": companies,
+            "lve_row": lve_row,
+            "can_fill": is_onco,
+            "is_onco": is_onco,
+            "is_doc": is_doc,
+            "current_role": user_role,
+            "user_company": user_company
+        })
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@leave_bp.route('/api/update_onco_leave_action', methods=['POST'])
+def update_onco_leave_action():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    user_role = (user.get('role') or '').upper().strip()
+    r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+    is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
+    if 'ONCO' not in user_role and 'ONCO' not in r_clean and not is_admin:
+        return jsonify({"success": False, "message": "Only ONCO can toggle Active / Inactive"}), 403
+
+    data = request.get_json() or {}
+    leave_id = data.get('leave_id')
+    new_status = (data.get('status') or '').strip().lower()
+    
+    if not leave_id or new_status not in ['active', 'inactive', '']:
+        return jsonify({"success": False, "message": "Invalid leave_id or status"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # "once OC sanctions leave only their respective company ONCO's can update their respective OC Sanctioned Leaves"
+        user_company = user.get('company')
+        if not is_admin and user_company:
+            cursor.execute("SELECT company FROM doc_leave_details WHERE id = %s", (leave_id,))
+            row_comp = cursor.fetchone()
+            if row_comp and row_comp.get('company'):
+                if normalize_company(row_comp['company']) != normalize_company(user_company):
+                    return jsonify({
+                        "success": False,
+                        "message": f"Unauthorized: Only {row_comp['company']} ONCO can update this leave"
+                    }), 403
+
+        cursor.execute("UPDATE doc_leave_details SET onco_status = %s WHERE id = %s", (new_status, leave_id))
+
+        # "when onco clciked on active update in PEdnding cases of LVE of column Recd Cas Current Week not in Pending Cas of Last Week only for LVE"
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+        onco_active_count = cursor.fetchone()['c']
+
+        user_name = user.get('name') or user.get('username') or user.get('role') or 'ONCO'
+
+        cursor.execute("SELECT id, pending_last_week, pub_this_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        lve_ex = cursor.fetchone()
+        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
+        pub_val = lve_ex['pub_this_week'] if lve_ex else 0
+        tot_cases = max(0, (pend_val + onco_active_count) - pub_val)
+
+        cursor.execute("""
+            UPDATE pending_cases
+            SET recd_current_week = %s,
+                total_cases = %s,
+                updated_by = %s,
+                updated_at = NOW()
+            WHERE id = 16 OR type_of_case = 'Lve'
+        """, (onco_active_count, tot_cases, user_name))
+        conn.commit()
+
+        cursor.execute("""
+            SELECT id, type_of_case, pending_last_week, recd_current_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   pub_this_week, under_prog,
+                   DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
+            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+        """)
+        updated_lve = cursor.fetchone()
+
+        return jsonify({
+            "success": True,
+            "leave_id": leave_id,
+            "onco_status": new_status,
+            "onco_active_count": onco_active_count,
+            "lve_row": updated_lve
+        })
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@leave_bp.route('/api/update_doc_leave_action', methods=['POST'])
+def update_doc_leave_action():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+    
+    user_role = (user.get('role') or '').upper().strip()
+    r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+    if 'DOC' not in user_role and 'DOC' not in r_clean and r_clean not in ['ADMIN', 'SUPERADMIN']:
+        return jsonify({"success": False, "message": "Only DOC / DOCJC role can set DONE or BALANCE"}), 403
+
+    data = request.get_json() or {}
+    leave_id = data.get('leave_id')
+    new_status = (data.get('status') or '').strip().lower()
+    
+    if not leave_id or new_status not in ['done', 'balance', '']:
+        return jsonify({"success": False, "message": "Invalid leave_id or status"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("UPDATE doc_leave_details SET doc_status = %s WHERE id = %s", (new_status, leave_id))
+
+        # "if DOC cliked on DONE .... update in Pub This Week inisde LVE"
+        # "else DOC clicked on Balance update in Under Prog inse LVE"
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
+        doc_done_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
+        doc_balance_count = cursor.fetchone()['c']
+
+        user_name = user.get('name') or user.get('username') or user.get('role') or 'DOCJC'
+
+        cursor.execute("SELECT id, pending_last_week, recd_current_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        lve_ex = cursor.fetchone()
+        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
+        recd_val = lve_ex['recd_current_week'] if lve_ex else 0
+        tot_cases = max(0, (pend_val + recd_val) - doc_done_count)
+
+        cursor.execute("""
+            UPDATE pending_cases
+            SET pub_this_week = %s,
+                under_prog = %s,
+                total_cases = %s,
+                updated_by = %s,
+                updated_at = NOW()
+            WHERE id = 16 OR type_of_case = 'Lve'
+        """, (doc_done_count, doc_balance_count, tot_cases, user_name))
+        conn.commit()
+
+        cursor.execute("""
+            SELECT id, type_of_case, pending_last_week, recd_current_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   pub_this_week, under_prog,
+                   DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
+            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+        """)
+        updated_lve = cursor.fetchone()
+
+        return jsonify({
+            "success": True,
+            "leave_id": leave_id,
+            "doc_status": new_status,
+            "doc_done_count": doc_done_count,
+            "doc_balance_count": doc_balance_count,
+            "lve_row": updated_lve
+        })
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@leave_bp.route('/api/delete_doc_leave', methods=['POST'])
+def delete_doc_leave():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    user_role = (user.get('role') or '').upper().strip()
+    r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+    is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
+    is_onco = 'ONCO' in user_role or 'ONCO' in r_clean
+    is_doc = 'DOC' in user_role or 'DOC' in r_clean
+    if not (is_onco or is_doc or is_admin):
+        return jsonify({"success": False, "message": "Unauthorized to delete leave entry"}), 403
+
+    data = request.get_json() or {}
+    leave_id = data.get('leave_id')
+    if not leave_id:
+        return jsonify({"success": False, "message": "Missing leave_id"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        # Check company restriction for ONCO
+        user_company = user.get('company')
+        if is_onco and not is_admin and not is_doc and user_company:
+            cursor.execute("SELECT company FROM doc_leave_details WHERE id = %s", (leave_id,))
+            row_comp = cursor.fetchone()
+            if row_comp and row_comp.get('company'):
+                if normalize_company(row_comp['company']) != normalize_company(user_company):
+                    return jsonify({
+                        "success": False,
+                        "message": f"Unauthorized: Only {row_comp['company']} ONCO can delete this leave"
+                    }), 403
+
+        cursor.execute("DELETE FROM doc_leave_details WHERE id = %s", (leave_id,))
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+        onco_active_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
+        doc_done_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
+        doc_balance_count = cursor.fetchone()['c']
+
+        cursor.execute("SELECT id, pending_last_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        lve_ex = cursor.fetchone()
+        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
+        tot_cases = max(0, (pend_val + onco_active_count) - doc_done_count)
+
+        user_name = user.get('name') or user.get('username') or user.get('role') or 'USER'
+        cursor.execute("""
+            UPDATE pending_cases
+            SET recd_current_week = %s,
+                pub_this_week = %s,
+                under_prog = %s,
+                total_cases = %s,
+                updated_by = %s,
+                updated_at = NOW()
+            WHERE id = 16 OR type_of_case = 'Lve'
+        """, (onco_active_count, doc_done_count, doc_balance_count, tot_cases, user_name))
+        conn.commit()
+
+        cursor.execute("""
+            SELECT id, type_of_case, pending_last_week, recd_current_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   pub_this_week, under_prog,
+                   DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
+            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+        """)
+        updated_lve = cursor.fetchone()
+
+        return jsonify({
+            "success": True,
+            "message": "Leave entry deleted successfully",
+            "leave_id": leave_id,
+            "onco_active_count": onco_active_count,
+            "doc_done_count": doc_done_count,
+            "doc_balance_count": doc_balance_count,
+            "lve_row": updated_lve
+        })
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@leave_bp.route('/api/add_doc_leave', methods=['POST'])
+def add_doc_leave():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    user_role = (user.get('role') or '').upper().strip()
+    r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+    is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
+    is_onco = 'ONCO' in user_role or 'ONCO' in r_clean
+    if not is_onco and not is_admin and r_clean not in ['DOCJC', 'DOC']:
+        return jsonify({"success": False, "message": "Only ONCO has access to fill DOC leave table"}), 403
+
+    data = request.get_json() or {}
+    army_number = str(data.get('army_number') or '').strip().upper()
+    name = str(data.get('name') or '').strip()
+    rank = str(data.get('rank') or '').strip()
+    company = str(data.get('company') or '').strip()
+    leave_type = str(data.get('leave_type') or 'AL').strip().upper()
+    leave_days = int(data.get('leave_days') or 0)
+    from_date = str(data.get('from_date') or '').strip()
+    to_date = str(data.get('to_date') or '').strip()
+
+    user_company = user.get('company')
+    if is_onco and not is_admin and user_company:
+        company = user_company  # enforce ONCO's respective company
+
+    if not army_number or not name or leave_days <= 0:
+        return jsonify({"success": False, "message": "Army number, Name, and Days are required"}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        user_name = user.get('name') or user.get('username') or user.get('role') or 'ONCO'
+        cursor.execute("""
+            INSERT INTO doc_leave_details (
+                army_number, `rank`, name, company, leave_type, leave_days,
+                from_date, to_date, onco_status, doc_status, action_status, created_by, created_at
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, '', '', '', %s, NOW())
+        """, (
+            army_number,
+            rank or 'Personnel',
+            name,
+            company or 'HQ Company',
+            leave_type,
+            leave_days,
+            from_date or None,
+            to_date or None,
+            user_name
+        ))
+        conn.commit()
+        new_id = cursor.lastrowid
+
+        cursor.execute("""
+            SELECT id, army_number, `rank`, name, company, leave_type, leave_days,
+                   onco_status, doc_status, from_date, to_date, created_by,
+                   DATE_FORMAT(created_at, '%d/%m/%Y %h:%i %p') AS created_at
+            FROM doc_leave_details WHERE id = %s
+        """, (new_id,))
+        new_row = cursor.fetchone()
+
+        return jsonify({"success": True, "message": "Leave entry added successfully", "data": new_row})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@leave_bp.route('/api/search_personnel_by_army', methods=['GET'])
+def search_personnel_by_army():
+    user = require_login()
+    if not user:
+        return jsonify({"success": False, "message": "Unauthorized"}), 401
+
+    query = request.args.get('army_number', '').strip()
+    if not query:
+        return jsonify({"success": False, "data": []})
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT army_number, name, `rank`, company
+            FROM personnel
+            WHERE army_number LIKE %s OR name LIKE %s
+            LIMIT 10
+        """, (f"%{query}%", f"%{query}%"))
+        rows = cursor.fetchall()
+        return jsonify({"success": True, "data": rows})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
 

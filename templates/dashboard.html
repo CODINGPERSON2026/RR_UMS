@@ -748,17 +748,28 @@
       </div>
       {% endif %}
 
-      {# ── CO INTERVIEW CARD (COMMENTED OUT) ──
-      {% if role in ['CO','2IC','ADJUTANT','COMMANDING OFFICER'] or (role and role|upper in ['CO','2IC','ADJUTANT','COMMANDING OFFICER']) %}
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
-        <span class="sc-label">CO Interview</span>
+      {% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% set is_docjc = (role and role|upper in ['DOCJC', 'DOC JC', 'DOC_JC']) or r_clean_dash == 'DOCJC' %}
+      {% set is_onco = ('ONCO' in (role or '')|upper) or ('ONCO' in r_clean_dash) %}
+      {% set is_auth = (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'SECOND IN COMMAND', 'ADJUTANT']) or r_clean_dash in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] %}
+
+      {% if is_docjc or is_auth %}
+      <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal" title="PART-II STATUS">
+        <span class="sc-label">PART-II STATUS</span>
         <div class="sc-right">
-          <span class="sc-val" id="co-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-sub">Pending</span>
+          <span class="sc-val"><i class="fa fa-folder-open" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {% endif %}
-      ── #}
+
+      {% if is_docjc or is_onco %}
+      <div class="sc" style="cursor: pointer" onclick="openDocjcLeaveModal()" title="Leave Details">
+        <span class="sc-label">Leave Details</span>
+        <div class="sc-right">
+          <span class="sc-val"><i class="fas fa-calendar-alt" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+        </div>
+      </div>
+      {% endif %}
 
     </div>
     <!-- /statsGrid -->
@@ -812,6 +823,8 @@
     {% include 'modals/messenger/modal.html' %}
     {% include 'modals/Sanctioned_leaves/sanction_leave_modal.html' %}
     {% include 'modals/company_interview/modal.html' %}
+    {% include 'modals/pending_cases_modal.html' %}
+    {% include 'modals/docjc_leave_details_modal.html' %}
     {# {% include 'modals/co_interview/modal.html' %} #}
 
     {% if role in ['O CENTRE NCO'] %}

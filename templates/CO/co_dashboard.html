@@ -183,19 +183,22 @@
     flex: 1;
     max-width: 40px;
     border-radius: 6px 6px 0 0;
-    background: linear-gradient(
-      90deg,
-      rgba(226, 232, 240, 0.6) 0%,
-      rgba(241, 245, 249, 0.95) 50%,
-      rgba(226, 232, 240, 0.6) 100%
-    );
+    background: linear-gradient(90deg,
+        rgba(226, 232, 240, 0.6) 0%,
+        rgba(241, 245, 249, 0.95) 50%,
+        rgba(226, 232, 240, 0.6) 100%);
     background-size: 200% 100%;
     animation: skeletonShimmer 1.3s infinite linear;
   }
 
   @keyframes skeletonShimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
   }
 
   /* =========================================================
@@ -247,7 +250,7 @@
   .db-wrap {
     width: 100%;
     overflow-x: hidden;
-    
+
   }
 
   /* =========================================================
@@ -547,8 +550,8 @@
     letter-spacing: 0.55px;
     text-transform: uppercase;
     color: var(--text-secondary, #888);
-    background: var(--nav-link-hover-bg, rgba(0,0,0,0.04));
-    border: 1px solid var(--border-color, rgba(0,0,0,0.1));
+    background: var(--nav-link-hover-bg, rgba(0, 0, 0, 0.04));
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
     border-radius: 3px;
     padding: 1px 5px;
     line-height: 1.4;
@@ -578,7 +581,8 @@
     gap: 3px;
   }
 
-  .sc-badge, .card-corner-badge {
+  .sc-badge,
+  .card-corner-badge {
     display: inline-block;
     font-size: 9px;
     font-weight: 700;
@@ -594,7 +598,8 @@
     transition: all 0.2s ease;
   }
 
-  .sc:hover .sc-badge, .chart-row-card:hover .card-corner-badge {
+  .sc:hover .sc-badge,
+  .chart-row-card:hover .card-corner-badge {
     background: var(--primary-color, #2563eb);
     color: #ffffff;
     border-color: var(--primary-color, #2563eb);
@@ -655,7 +660,8 @@
     position: relative;
     width: 100%;
     min-width: 0;
-    height: 300px; /* Aligned with Honours Board card */
+    height: 300px;
+    /* Aligned with Honours Board card */
     overflow: hidden;
   }
 
@@ -828,6 +834,7 @@
     .metrics-grid {
       grid-template-columns: repeat(4, 1fr);
     }
+
     .db-main-layout {
       grid-template-columns: 1fr;
       gap: 16px;
@@ -838,6 +845,7 @@
     .metrics-grid {
       grid-template-columns: repeat(3, 1fr);
     }
+
     .db-main-layout {
       grid-template-columns: 1fr;
       gap: 16px;
@@ -887,7 +895,8 @@
     }
 
     .sc-label {
-      font-size: 9px; /* Reduced to fit 2-column grid on mobile */
+      font-size: 9px;
+      /* Reduced to fit 2-column grid on mobile */
     }
 
     .sc-val {
@@ -1253,6 +1262,7 @@ STATUS COLORS
     margin-left: auto;
     overflow: hidden;
   }
+
   .schedule-actionbar-container {
     display: flex;
     align-items: center;
@@ -1301,9 +1311,11 @@ STATUS COLORS
     width: 100%;
     min-width: 200px;
   }
+
   .schedule-actionbar-strip::-webkit-scrollbar {
     display: none;
   }
+
   .schedule-actionbar-slide {
     position: absolute;
     inset: 0;
@@ -1318,19 +1330,23 @@ STATUS COLORS
     -ms-overflow-style: none;
     padding-right: 8px;
   }
+
   .schedule-actionbar-slide::-webkit-scrollbar {
     display: none;
   }
+
   .schedule-actionbar-slide.active {
     opacity: 1;
     transform: translateY(0);
     z-index: 2;
   }
+
   .schedule-actionbar-slide.exit {
     opacity: 0;
     transform: translateY(-100%);
     z-index: 1;
   }
+
   .s-badge {
     font-size: 9px;
     font-weight: 800;
@@ -1339,14 +1355,57 @@ STATUS COLORS
     text-transform: uppercase;
     flex-shrink: 0;
   }
-  .status-upcoming { background: rgba(13, 110, 253, 0.1); color: var(--primary-color); }
-  .status-ongoing { background: rgba(22, 163, 74, 0.1); color: #16a34a; }
-  .status-active { background: rgba(34, 197, 94, 0.15); color: #16a34a; font-weight: 800; }
-  .status-next { background: rgba(37, 99, 235, 0.15); color: #2563eb; font-weight: 800; }
-  .status-done { background: rgba(100, 116, 139, 0.15); color: #64748b; }
-  .s-time { font-size: 10.5px; font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
-  .s-title { font-size: 10.5px; font-weight: 700; color: var(--text-primary); white-space: nowrap; }
-  .s-loc { font-size: 10px; font-weight: 600; color: var(--text-secondary); white-space: nowrap; opacity: 0.85; flex-shrink: 0; }
+
+  .status-upcoming {
+    background: rgba(13, 110, 253, 0.1);
+    color: var(--primary-color);
+  }
+
+  .status-ongoing {
+    background: rgba(22, 163, 74, 0.1);
+    color: #16a34a;
+  }
+
+  .status-active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #16a34a;
+    font-weight: 800;
+  }
+
+  .status-next {
+    background: rgba(37, 99, 235, 0.15);
+    color: #2563eb;
+    font-weight: 800;
+  }
+
+  .status-done {
+    background: rgba(100, 116, 139, 0.15);
+    color: #64748b;
+  }
+
+  .s-time {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  .s-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+  }
+
+  .s-loc {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+
   .schedule-actionbar-slide .s-badge {
     font-size: 8px;
     font-weight: 800;
@@ -1355,21 +1414,26 @@ STATUS COLORS
     border-radius: 4px;
     background: var(--border-color);
   }
+
   .schedule-actionbar-slide .s-badge.status-ongoing {
     background: rgba(22, 163, 74, 0.1);
     color: #16a34a;
   }
+
   .schedule-actionbar-slide .s-badge.status-upcoming {
     background: rgba(37, 99, 235, 0.1);
     color: var(--primary-color);
   }
+
   .schedule-actionbar-slide .s-time {
     color: var(--text-primary);
     opacity: 0.8;
   }
+
   .schedule-actionbar-slide .s-title {
     color: var(--text-primary);
   }
+
   .schedule-actionbar-slide .s-loc {
     color: var(--text-secondary);
     font-size: 9.5px;
@@ -1385,6 +1449,7 @@ STATUS COLORS
     margin-bottom: 24px;
     align-items: stretch;
   }
+
   .graphs-column-wrap {
     min-width: 0;
     display: flex;
@@ -1392,10 +1457,12 @@ STATUS COLORS
     justify-content: space-between;
     gap: 8px;
   }
+
   .honours-column-wrap {
     min-width: 0;
     height: 100%;
   }
+
   .honours-column-wrap .hb-card {
     height: 100%;
     box-sizing: border-box;
@@ -1405,6 +1472,7 @@ STATUS COLORS
     .graphs-honours-row {
       grid-template-columns: 1fr;
     }
+
     .schedule-actionbar-container {
       max-width: 100%;
       width: 100%;
@@ -1477,7 +1545,7 @@ STATUS COLORS
 
     <!-- ACTION BAR -->
     <div class="action-bar" id="actionBar">
-<!-- 
+      <!-- 
       <button class="ab-btn ab-primary" id="openCalendar">
         <i class="fa fa-calendar"></i>UPCOMING EVENTS
       </button> -->
@@ -1487,12 +1555,6 @@ STATUS COLORS
         <span class="honours-text">HONOURS BOARD</span>
       </button> -->
 
-      {% if role in ['CO', '2IC'] %}
-      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn" data-bs-toggle="modal" data-bs-target="#leaveRequestsModal" onclick="openLeaveRequestsModal()">
-        LEAVE REQUESTS
-        <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
-      </button>
-      {% endif %}
 
       <button class="ab-btn ab-danger" data-bs-toggle="modal" data-bs-target="#coRejectedModal" id="rejectedBtn">
         REJECTED LEAVES
@@ -1527,7 +1589,8 @@ STATUS COLORS
           <span class="sc-label-text">PARADE STATE</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="mainPower"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> CENTRE ONCO</span>
         </div>
       </div>
@@ -1536,7 +1599,8 @@ STATUS COLORS
           <span class="sc-label-text">On Course</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="totalCoursesDone"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
         </div>
       </div>
@@ -1545,7 +1609,8 @@ STATUS COLORS
           <span class="sc-label-text">ROLLCALL PTS</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="center-roll-points"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> SM</span>
         </div>
       </div>
@@ -1554,16 +1619,19 @@ STATUS COLORS
           <span class="sc-label-text">TD / ATTCH</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="attachment-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
         </div>
       </div>
-      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope"
+        style="cursor: pointer;">
         <div class="sc-label">
           <span class="sc-label-text">Detachment</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="locationCount"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
         </div>
       </div>
@@ -1572,7 +1640,8 @@ STATUS COLORS
           <span class="sc-label-text">Agniveer Str</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="agniveer_count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
         </div>
       </div>
@@ -1582,7 +1651,8 @@ STATUS COLORS
           <span class="sc-label-text">Agniveer Leave</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="onleave_leave"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="onleave_leave"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
         </div>
       </div>
@@ -1592,7 +1662,8 @@ STATUS COLORS
           <span class="sc-label-text">Domain Spl</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="duty-search-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> DUTY CLK</span>
         </div>
       </div>
@@ -1601,7 +1672,8 @@ STATUS COLORS
           <span class="sc-label-text">Loans</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="active-loan-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY O NCO</span>
         </div>
       </div>
@@ -1610,7 +1682,8 @@ STATUS COLORS
           <span class="sc-label-text">Projects</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="get_projects_count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> PROJECT JCO</span>
         </div>
       </div>
@@ -1624,10 +1697,10 @@ STATUS COLORS
       </div>
       <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal">
         <div class="sc-label">
-          <span class="sc-label-text">Pending Cases</span>
+          <span class="sc-label-text">PART-II STATUS</span>
         </div>
         <div class="sc-right" style="align-self: stretch; justify-content: flex-end;">
-          <span class="sc-updater"><i class="fa fa-folder-open"></i> ACCT CLK</span>
+          <span class="sc-updater"><i class="fa fa-folder-open"></i> DOCJC</span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
@@ -1635,7 +1708,8 @@ STATUS COLORS
           <span class="sc-label-text">Dues In</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="dues_in_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="dues_in_count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> POSTING CLK</span>
         </div>
       </div>
@@ -1644,7 +1718,8 @@ STATUS COLORS
           <span class="sc-label-text">Dues Out</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="dues_out_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="dues_out_count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> POSTING CLK</span>
         </div>
       </div>
@@ -1654,40 +1729,53 @@ STATUS COLORS
           <span class="sc-label-text">Sensitive Indl</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="sensitive-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> OC</span>
         </div>
       </div>
       {% endif %}
       {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
-      <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="AI New Arrival Recommendation Insights">
+      <div class="sc" style="cursor: pointer" id="card-ai-insights" data-bs-toggle="modal"
+        data-bs-target="#aiJoineeInsightsModal"
+        onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();"
+        title="AI New Arrival Recommendation Insights">
         <div class="sc-label">
           <span class="sc-label-text"><i class="fas fa-brain text-primary me-1"></i> AI NEW ARRIVAL</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="ai-insights-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="ai-insights-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> 2IC / ADJT</span>
         </div>
       </div>
 
-      <div class="sc" style="cursor: pointer;" id="card-ai-fitness-reports" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();" title="AI Individual Fitness Reports & Operational Readiness">
+      <div class="sc" style="cursor: pointer;" id="card-ai-fitness-reports" data-bs-toggle="modal"
+        data-bs-target="#aiFitnessReportsModal"
+        onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();"
+        title="AI Individual Fitness Reports & Operational Readiness">
         <div class="sc-label">
           <span class="sc-label-text"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="co-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="co-fit-total"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fas fa-robot"></i> AI SYSTEM</span>
         </div>
       </div>
 
       {# ── AI COMPANY READINESS CARD (COMMENTED OUT FOR NOW) ──
-      <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();" title="AI Company Operational Readiness Assessment">
+      <div class="sc" style="cursor: pointer;" id="card-ai-company-readiness" data-bs-toggle="modal"
+        data-bs-target="#aiCompanyReadinessModal"
+        onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();"
+        title="AI Company Operational Readiness Assessment">
         <div class="sc-label">
           <span class="sc-label-text"><i class="fas fa-shield-alt text-primary me-1"></i> AI Company Readiness</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="co-readiness-val"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="co-readiness-val"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fas fa-robot"></i> AI SYSTEM</span>
         </div>
       </div>
@@ -1698,31 +1786,37 @@ STATUS COLORS
           <span class="sc-label-text">OC Interview</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="company-interview-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <div style="display: inline-flex; align-items: center; gap: 5px;">
-            <span class="sc-sub" style="margin: 0; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;">Pending</span>
+            <span class="sc-sub"
+              style="margin: 0; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;">Pending</span>
             <span class="sc-updater"><i class="fa fa-user-shield"></i> OC</span>
           </div>
         </div>
       </div>
 
       {# ── CO INTERVIEW CARD (COMMENTED OUT) ──
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;" title="CO Interview Pending Register">
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT',
+      'COMMANDING OFFICER']) %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#coInterviewModal" style="cursor: pointer;"
+        title="CO Interview Pending Register">
         <div class="sc-label">
           <span class="sc-label-text">CO Interview</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="co-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="co-interview-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <div style="display: inline-flex; align-items: center; gap: 5px;">
-            <span class="sc-sub" style="margin: 0; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;">Pending</span>
+            <span class="sc-sub"
+              style="margin: 0; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;">Pending</span>
             <span class="sc-updater"><i class="fa fa-user-shield"></i> CO</span>
           </div>
         </div>
       </div>
       {% endif %}
       ── #}
-      
+
     </div>
 
     <!-- SECTION 2: GRAPHS & APPRECIATION WALL -->
@@ -1759,7 +1853,8 @@ STATUS COLORS
                     <h6 style="margin-bottom:0;">Posted Strength</h6>
                     <div style="display:flex;align-items:center;gap:8px;">
                       <span class="card-corner-badge">ONCO</span>
-                      <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                      <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);font-size:12px">Total:
+                        --</span>
                     </div>
                   </div>
                   <div class="chart-canvas-wrap" style="position: relative;">
@@ -1811,7 +1906,8 @@ STATUS COLORS
                     <h6 style="margin-bottom:0;">Detachment Stats</h6>
                     <div style="display:flex;align-items:center;gap:8px;">
                       <span class="card-corner-badge">ONCO</span>
-                      <span id="detachmentTotal" style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
+                      <span id="detachmentTotal"
+                        style="font-weight:600;color:var(--primary-color);font-size:12px">Total: --</span>
                     </div>
                   </div>
                   <div class="chart-canvas-wrap"><canvas id="detachmentChart"></canvas></div>
@@ -1908,9 +2004,12 @@ STATUS COLORS
             <h5 class="modal-title">Man Power</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-          <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-            <span class="badge shadow-sm" id="manpowerLastUpdatedBadge" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-              <i class="fa fa-clock me-1"></i> LAST UPDATED: <span id="manpowerLastUpdatedTimestamp" class="manpower-last-updated-text">--</span>
+          <div class="text-center py-2"
+            style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+            <span class="badge shadow-sm" id="manpowerLastUpdatedBadge"
+              style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+              <i class="fa fa-clock me-1"></i> LAST UPDATED: <span id="manpowerLastUpdatedTimestamp"
+                class="manpower-last-updated-text">--</span>
             </span>
           </div>
           <div class="modal-body">
@@ -1919,7 +2018,7 @@ STATUS COLORS
         </div>
       </div>
     </div>
-{% include 'images_section/section.html' %}
+    {% include 'images_section/section.html' %}
   </div>
 </div>
 <!-- /db-wrap -->
@@ -2010,7 +2109,7 @@ STATUS COLORS
           badge = "Completed";
           statusCls = "done";
         }
-        
+
         return `
           <div class="schedule-actionbar-slide ${index === featuredIndex ? 'active' : ''}">
             <span class="s-badge status-${statusCls}">${badge}</span>
@@ -2031,7 +2130,7 @@ STATUS COLORS
             slides[prevIdx].classList.add("exit");
             setTimeout((el) => { if (el) el.classList.remove("exit"); }, 500, slides[prevIdx]);
           }
-          
+
           tickerPos = (tickerPos + 1) % tickerIndices.length;
           const nextIdx = tickerIndices[tickerPos];
           if (slides[nextIdx]) {
@@ -2242,7 +2341,7 @@ STATUS COLORS
     fetch('/api/ai/company-recommendation/insights-count')
       .then(function (r) { return r.json(); })
       .then(function (d) { if (d && d.success) safeSet("ai-insights-count", d.total_count); })
-      .catch(function () {});
+      .catch(function () { });
 
     if (typeof showAssignedAttachmentAlarms === 'function') showAssignedAttachmentAlarms();
     if (typeof showAssignedDetachmentAlarms === 'function') showAssignedDetachmentAlarms();
@@ -2281,37 +2380,37 @@ STATUS COLORS
       safeSet("dues_in_count", data.dues_in);
       safeSet("dues_out_count", data.dues_out);
       if (data.parade_last_updated) {
-        document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.parade_last_updated;
         });
       }
       if (data.roll_call_last_timestamp) {
-        document.querySelectorAll('.rollcall-last-updated-text, #rollCallLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.rollcall-last-updated-text, #rollCallLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.roll_call_last_timestamp;
         });
       }
       if (data.detachment_last_updated) {
-        document.querySelectorAll('.detachment-last-updated-text, #detachmentLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.detachment-last-updated-text, #detachmentLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.detachment_last_updated;
         });
       }
       if (data.dues_in_last_updated) {
-        document.querySelectorAll('.dues-in-last-updated-text, #duesInLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.dues-in-last-updated-text, #duesInLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.dues_in_last_updated;
         });
       }
       if (data.dues_out_last_updated) {
-        document.querySelectorAll('.dues-out-last-updated-text, #duesOutLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.dues-out-last-updated-text, #duesOutLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.dues_out_last_updated;
         });
       }
       if (data.agniveer_last_updated) {
-        document.querySelectorAll('.agni-last-updated-text, #agniLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.agni-last-updated-text, #agniLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.agniveer_last_updated;
         });
       }
       if (data.courses_last_updated) {
-        document.querySelectorAll('.courses-last-updated-text, #cmLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.courses-last-updated-text, #cmLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.courses_last_updated;
         });
       }
@@ -2322,17 +2421,17 @@ STATUS COLORS
     }
   }
 
-  window.fetchManpowerLastUpdated = async function(dateStr) {
+  window.fetchManpowerLastUpdated = async function (dateStr) {
     try {
       var url = dateStr ? '/api/parade-state/last-updated?date=' + encodeURIComponent(dateStr) : '/api/parade-state/last-updated';
       var res = await fetch(url);
       var json = await res.json();
       if (json && json.success && json.formatted) {
-        document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp').forEach(function(el) {
+        document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = json.formatted;
         });
       }
-    } catch(e) {
+    } catch (e) {
       console.warn('Error fetching manpower last updated:', e);
     }
   };
@@ -2504,7 +2603,7 @@ STATUS COLORS
     if (chartInstance) {
       try {
         chartInstance.destroy();
-      } catch (e) {}
+      } catch (e) { }
     }
     var canvas = document.getElementById(canvasId);
     if (canvas) {
@@ -2579,19 +2678,19 @@ STATUS COLORS
 
       if (chart.canvas.id === 'bharosaChart' && index < 0) {
         ctx.save();
-        
+
         ctx.font = "bold 11px sans-serif";
         ctx.fillStyle = getThemeColor('--primary-color', '#2563eb');
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("HAPPY: " + chart.data.datasets[0].data[0] + "%", x, y - 9);
-        
+
         ctx.font = "bold 11px sans-serif";
         ctx.fillStyle = getThemeColor('--danger-color', '#dc2626');
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("UNHAPPY: " + chart.data.datasets[0].data[1] + "%", x, y + 9);
-        
+
         ctx.restore();
         return;
       }
@@ -2632,7 +2731,7 @@ STATUS COLORS
       ctx.fillStyle = color;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      
+
       var displayVal = chart.canvas.id === 'bharosaChart' ? val + "%" : val;
       ctx.fillText(displayVal, x, y + 9);
 
@@ -2766,7 +2865,7 @@ STATUS COLORS
               },
               tooltip: {
                 callbacks: {
-                  label: function() { return "No active detachments"; }
+                  label: function () { return "No active detachments"; }
                 }
               }
             }
@@ -3046,7 +3145,7 @@ STATUS COLORS
     loadUnfitTrend("ALL");
     loadFitUnfitChart("All");
     loadBharosaChart("ALL");
-    
+
     /* ── Graph Tab Switching logic ── */
     function goChart(i) {
       var chartInner = document.getElementById("chartsScrollInner");
@@ -3092,7 +3191,7 @@ STATUS COLORS
         }
       });
     });
-    
+
     var htmlEl = document.documentElement;
     if (htmlEl) {
       observer.observe(htmlEl, { attributes: true, attributeFilter: ["data-theme"], attributeOldValue: true });
@@ -3103,11 +3202,11 @@ STATUS COLORS
       c.classList.add("visible");
     });
 
-    {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+    {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or(role and role | upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
     // Fetch live aggregate stats for executive AI Fitness Reports card
     fetch('/fitness/api/reports/stats')
-      .then(function(res) { return res.ok ? res.json() : null; })
-      .then(function(data) {
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
         if (data && data.success && data.stats) {
           var s = data.stats;
           var totalEl = document.getElementById('co-fit-total');
@@ -3120,12 +3219,12 @@ STATUS COLORS
           if (riskEl) riskEl.textContent = s.at_risk_count || 0;
         }
       })
-      .catch(function(err) { console.warn('Could not load AI fitness stats:', err); });
+      .catch(function (err) { console.warn('Could not load AI fitness stats:', err); });
     {% endif %}
 
     fetch('/ai-company-readiness/api/dashboard')
-      .then(function(res) { return res.ok ? res.json() : null; })
-      .then(function(data) {
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
         var d = data ? (data.dashboard || data.data) : null;
         if (d) {
           window.modalReadinessCache = d;
@@ -3135,26 +3234,31 @@ STATUS COLORS
           }
         }
       })
-      .catch(function(err) { console.warn('Could not load AI company readiness stats:', err); });
+      .catch(function (err) { console.warn('Could not load AI company readiness stats:', err); });
   });
 </script>
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
-<script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %}false{% endif %};</script>
+<script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %} false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
 {% include 'modals/vms/vms_modal.html' %}
 {% endif %}
 
-{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco',
+'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO',
+'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2
+COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_company_readiness_modal.html' %}
 {% include 'modals/ai_company_readiness_retrain_modal.html' %}
 {% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
 
-{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and
+role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', 'COMN
+COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% endif %}
 
