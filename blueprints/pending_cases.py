@@ -259,12 +259,18 @@ def check_weekly_rollover(cursor, conn):
                     updated_by = 'SYSTEM ROLLOVER'
             """)
 
-            # 4. Doc leave balance cases carry forward into new week as active
+            # 4. On Monday rollover, delete all completed (DONE) leaves from doc_leave_details table
+            cursor.execute("""
+                DELETE FROM doc_leave_details
+                WHERE LOWER(TRIM(doc_status)) = 'done'
+            """)
+
+            # 4b. Ensure remaining uncompleted pending leaves carry forward into the new week as active
             cursor.execute("""
                 UPDATE doc_leave_details
                 SET onco_status = 'active',
                     doc_status = ''
-                WHERE LOWER(doc_status) = 'balance'
+                WHERE LOWER(TRIM(doc_status)) != 'done'
             """)
 
             # 4b. Reset company recd counts to 0 for the new week
@@ -637,16 +643,27 @@ def onco_update_pending_case(row_id):
             return jsonify({'success': False, 'message': 'LVE case cannot be edited manually by ONCO. It is managed via Leave Details.'}), 400
 
         data = request.get_json() or {}
-        recd_count = max(0, int(data.get('recd_count') or 0))
+        mode = str(data.get('mode') or 'add').strip().lower()
+        input_val = int(data.get('recd_count') or 0)
         remark_text = str(data.get('remarks') or '').strip()
         user_name = user.get('name') or user.get('username') or f"ONCO ({user_company})"
+
+        # Fetch current count for this company to support cumulative addition (update by 5, then update 10 -> total 15)
+        cursor.execute("SELECT recd_count FROM pending_cases_company_recd WHERE case_id = %s AND company = %s", (row_id, user_company))
+        cur_row = cursor.fetchone()
+        cur_recd = int(cur_row['recd_count'] or 0) if cur_row else 0
+
+        if mode == 'set':
+            new_company_recd = max(0, input_val)
+        else:
+            new_company_recd = max(0, cur_recd + input_val)
 
         # 1. Upsert company recd count for this case
         cursor.execute("""
             INSERT INTO pending_cases_company_recd (case_id, company, recd_count, updated_by, updated_at)
             VALUES (%s, %s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE recd_count = VALUES(recd_count), updated_by = VALUES(updated_by), updated_at = NOW()
-        """, (row_id, user_company, recd_count, user_name))
+        """, (row_id, user_company, new_company_recd, user_name))
 
         # 2. Sum up values RECD THIS WEEK provided by all ONCOs
         cursor.execute("SELECT COALESCE(SUM(recd_count), 0) AS total_recd FROM pending_cases_company_recd WHERE case_id = %s", (row_id,))
@@ -689,7 +706,7 @@ def onco_update_pending_case(row_id):
             FROM pending_cases WHERE id = %s
         """, (row_id,))
         updated_row = cursor.fetchone()
-        updated_row['my_company_recd'] = recd_count
+        updated_row['my_company_recd'] = new_company_recd
 
         cursor.execute("SELECT company, recd_count FROM pending_cases_company_recd WHERE case_id = %s", (row_id,))
         comp_rows = cursor.fetchall()
@@ -710,7 +727,7 @@ def onco_update_pending_case(row_id):
         return jsonify({
             'success': True,
             'row': updated_row,
-            'my_company_recd': recd_count,
+            'my_company_recd': new_company_recd,
             'remarks_list': row_remarks,
             'remarks_count': len(row_remarks)
         })

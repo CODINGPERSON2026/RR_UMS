@@ -657,19 +657,25 @@
       const tCount = pCount + rCount;
       const uCount = (row.under_prog !== undefined && row.under_prog !== null) ? Number(row.under_prog) : Math.max(0, tCount - pubCount);
 
-      // Combined sum across all ONCOs is displayed to all ONCOs and DOCJC (e.g. 5+10+20 = 35)
-      const recdCellVal = rCount;
+      // "3coyonco can update count 5 but no other onco can see instead 3coyonco can see itself count not of others only in DOCJC can see sum of 3 nco's count"
+      const oncoRecdVal = (row.my_company_recd !== undefined) ? Number(row.my_company_recd) : 0;
+      const recdCellVal = IS_ONCO_ROLE ? oncoRecdVal : rCount;
 
       totPending += pCount;
-      totRecd    += rCount;
+      totRecd    += IS_ONCO_ROLE ? oncoRecdVal : rCount;
       totPub     += pubCount;
       totTotal   += tCount;
       totUnder   += uCount;
 
-      let breakdownTip = `Total: ${rCount}`;
-      if (row.company_recd_map && Object.keys(row.company_recd_map).length > 0) {
-        const parts = Object.entries(row.company_recd_map).map(([c, cnt]) => `${c}: ${cnt}`);
-        breakdownTip += ` (${parts.join(', ')})`;
+      let breakdownTip = '';
+      if (IS_ONCO_ROLE) {
+        breakdownTip = `${escHtml(USER_COMPANY || 'My Company')}: ${oncoRecdVal}`;
+      } else {
+        breakdownTip = `Total: ${rCount}`;
+        if (row.company_recd_map && Object.keys(row.company_recd_map).length > 0) {
+          const parts = Object.entries(row.company_recd_map).map(([c, cnt]) => `${c}: ${cnt}`);
+          breakdownTip += ` (${parts.join(', ')})`;
+        }
       }
 
       const isLveCase = (row.type_of_case || '').toLowerCase().trim() === 'lve';
@@ -754,6 +760,28 @@
     }
   };
 
+  window.pcToggleOncoMode = function(id) {
+    const modeInp = document.getElementById('ei_onco_mode_' + id);
+    const prefixEl = document.getElementById('pcPrefix_' + id);
+    const valInp = document.getElementById('ei_onco_val_' + id);
+    const linkEl = document.getElementById('pcModeLink_' + id);
+    const curEl = document.getElementById('ei_onco_cur_' + id);
+    const curVal = curEl ? curEl.textContent.trim() : '0';
+    if (!modeInp) return;
+
+    if (modeInp.value === 'add') {
+      modeInp.value = 'set';
+      if (prefixEl) { prefixEl.textContent = '='; prefixEl.className = 'text-primary fw-bold'; }
+      if (valInp) { valInp.placeholder = 'Set total'; valInp.value = curVal; valInp.select(); }
+      if (linkEl) { linkEl.textContent = '+ Add Count'; }
+    } else {
+      modeInp.value = 'add';
+      if (prefixEl) { prefixEl.textContent = '+'; prefixEl.className = 'text-success fw-bold'; }
+      if (valInp) { valInp.placeholder = 'Add count'; valInp.value = ''; valInp.focus(); }
+      if (linkEl) { linkEl.textContent = 'Set Total'; }
+    }
+  };
+
   window.pcRecalcTotal = function(id) {
     const pInp = document.getElementById('ei_pending_' + id);
     const rInp = document.getElementById('ei_recd_' + id);
@@ -791,13 +819,19 @@
         alert('LVE received cases are updated automatically via Leave Details and cannot be edited manually.');
         return;
       }
-      const myRecd = (row.my_company_recd !== undefined) ? row.my_company_recd : 0;
-      const totalRecd = (row.recd_current_week || 0);
+      const myRecd = (row.my_company_recd !== undefined) ? Number(row.my_company_recd) : 0;
       document.getElementById('pcType_' + id).innerHTML = `${escHtml(row.type_of_case)}`;
       document.getElementById('pcRecd_' + id).innerHTML = `
-        <div class="d-flex flex-column align-items-center">
-          <input type="number" id="ei_onco_recd_${id}" value="${myRecd}" min="0" class="form-control form-control-sm text-center fw-bold" style="width:75px; padding:2px 4px; height:28px;" title="Set count for ${escHtml(USER_COMPANY || 'your company')} (Current: ${myRecd}, Total all coys: ${totalRecd})" onkeydown="pcHandleKey(event, ${id})">
-          <small class="text-muted" style="font-size:9px; margin-top:2px; line-height:1;" title="Your company: ${escHtml(USER_COMPANY)}">${escHtml(USER_COMPANY || 'My Coy')} count</small>
+        <div class="d-flex flex-column align-items-center" style="min-width:115px;">
+          <div class="d-flex align-items-center justify-content-between w-100 px-1" style="font-size:10px; color:#475569;">
+            <span>Current: <strong class="text-primary" id="ei_onco_cur_${id}">${myRecd}</strong></span>
+            <a href="javascript:void(0)" onclick="pcToggleOncoMode(${id})" id="pcModeLink_${id}" style="font-size:9px; text-decoration:none; color:#2563eb;" title="Switch between adding to count or setting total directly">Set Total</a>
+          </div>
+          <div class="d-flex align-items-center gap-1 mt-1 w-100 justify-content-center">
+            <span id="pcPrefix_${id}" class="text-success fw-bold" style="font-size:13px;">+</span>
+            <input type="number" id="ei_onco_val_${id}" placeholder="Add count" class="form-control form-control-sm text-center fw-bold" style="width:75px; height:28px; padding:2px;" onkeydown="pcHandleKey(event, ${id})">
+          </div>
+          <input type="hidden" id="ei_onco_mode_${id}" value="add">
         </div>
       `;
       document.getElementById('pcRem_' + id).innerHTML = `<input class="pc-rem-input" id="ei_rem_${id}" value="" placeholder="Add remark..." style="width:100%; min-width:120px;" onkeydown="pcHandleKey(event, ${id})">`;
@@ -808,8 +842,8 @@
         </div>
       `;
       setTimeout(() => {
-        const inp = document.getElementById('ei_onco_recd_' + id);
-        if (inp) { inp.focus(); inp.select(); }
+        const inp = document.getElementById('ei_onco_val_' + id);
+        if (inp) { inp.focus(); }
       }, 50);
       return;
     } else if (IS_REMARK_ONLY_ROLE) {
@@ -854,15 +888,18 @@
 
     let payload = {};
     if (IS_ONCO_ROLE) {
-      const recdInput = document.getElementById('ei_onco_recd_' + id);
+      const valInput = document.getElementById('ei_onco_val_' + id);
+      const modeInput = document.getElementById('ei_onco_mode_' + id);
       const remVal = remInput ? remInput.value.trim() : '';
-      const recdVal = recdInput ? (parseInt(recdInput.value, 10) || 0) : 0;
+      const mode = modeInput ? modeInput.value : 'add';
+      const numVal = valInput ? (parseInt(valInput.value, 10) || 0) : 0;
 
       fetch(`/pending_cases/onco_update/${id}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          recd_count: recdVal,
+          recd_count: numVal,
+          mode: mode,
           remarks: remVal
         })
       })

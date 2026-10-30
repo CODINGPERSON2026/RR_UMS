@@ -2931,9 +2931,9 @@ def get_docjc_leaves():
             doc_done_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'done')
             doc_balance_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'balance')
         elif is_doc:
-            # DOCJC login: fetch ONLY those whose leave is marked as Active
-            leaves = [l for l in leaves if (l.get('onco_status') or '').strip().lower() == 'active']
-            onco_active_count = len(leaves)
+            # DOCJC login: fetch all active pending leaves and completed leaves
+            leaves = [l for l in leaves if (l.get('onco_status') or '').strip().lower() == 'active' or (l.get('doc_status') or '').strip().lower() == 'done']
+            onco_active_count = sum(1 for l in leaves if (l.get('onco_status') or '').strip().lower() == 'active')
             doc_done_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'done')
             doc_balance_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'balance')
         else:
@@ -3027,13 +3027,20 @@ def update_onco_leave_action():
 
         cursor.execute("UPDATE doc_leave_details SET onco_status = %s WHERE id = %s", (new_status, leave_id))
 
-        # Recd cases for LVE = count of Active leaves
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
-        onco_active_count = cursor.fetchone()['c']
+        # Recd cases for LVE = count of Active leaves received this week
+        now_dt = datetime.datetime.now()
+        week_start_dt = (now_dt - datetime.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        cursor.execute("""
+            SELECT COUNT(*) AS c 
+            FROM doc_leave_details 
+            WHERE LOWER(onco_status) = 'active'
+              AND created_at >= %s
+        """, (week_start_dt,))
+        lve_recd_this_week = cursor.fetchone()['c']
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'ONCO'
 
-        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (onco_active_count, user_name))
+        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (lve_recd_this_week, user_name))
         conn.commit()
 
         from blueprints.pending_cases import sync_lve_case_status
@@ -3177,11 +3184,18 @@ def delete_doc_leave():
 
         cursor.execute("DELETE FROM doc_leave_details WHERE id = %s", (leave_id,))
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
-        onco_active_count = cursor.fetchone()['c']
+        now_dt = datetime.datetime.now()
+        week_start_dt = (now_dt - datetime.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        cursor.execute("""
+            SELECT COUNT(*) AS c 
+            FROM doc_leave_details 
+            WHERE LOWER(onco_status) = 'active'
+              AND created_at >= %s
+        """, (week_start_dt,))
+        lve_recd_this_week = cursor.fetchone()['c']
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'USER'
-        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (onco_active_count, user_name))
+        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (lve_recd_this_week, user_name))
         conn.commit()
 
         from blueprints.pending_cases import sync_lve_case_status, get_lve_docjc_published_count
