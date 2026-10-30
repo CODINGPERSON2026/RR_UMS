@@ -2870,51 +2870,12 @@ def get_leave_balance():
             conn.close()
 
 
-import datetime
-
 def check_weekly_rollover_leave(cursor, conn):
     try:
-        from blueprints.pending_cases import ensure_default_cases
+        from blueprints.pending_cases import ensure_default_cases, check_weekly_rollover, sync_lve_case_status
         ensure_default_cases(cursor, conn)
-        now = datetime.datetime.now()
-        iso = now.isocalendar()
-        current_week_str = f"{iso[0]}-W{iso[1]:02d}"
-
-        cursor.execute("SELECT setting_value FROM system_settings WHERE setting_key = 'last_part2_rollover_week'")
-        row = cursor.fetchone()
-        last_week_str = row['setting_value'] if row else None
-
-        if not last_week_str or last_week_str == '0':
-            cursor.execute("INSERT INTO system_settings (setting_key, setting_value) VALUES ('last_part2_rollover_week', %s) ON DUPLICATE KEY UPDATE setting_value = %s", (current_week_str, current_week_str))
-            conn.commit()
-            return
-
-        if last_week_str != current_week_str:
-            # Monday 12:00 AM rollover:
-            # new pending_last_week = old pending_last_week + old under_prog
-            # total_cases = new pending (since recd resets to 0)
-            # under_prog = total_cases - pub = new_pending - 0 = new_pending
-            # recd_current_week = 0, pub_this_week = 0
-            # Monday 12:00 AM rollover:
-            # reset Under PROG to 0 and if it contains any count add that count to pending Last week
-            cursor.execute("""
-                UPDATE pending_cases
-                SET total_cases = pending_last_week + under_prog,
-                    pending_last_week = pending_last_week + under_prog,
-                    under_prog = 0,
-                    recd_current_week = 0,
-                    pub_this_week = 0,
-                    updated_at = NOW(),
-                    updated_by = 'SYSTEM ROLLOVER'
-            """)
-            cursor.execute("""
-                UPDATE doc_leave_details
-                SET onco_status = 'active',
-                    doc_status = ''
-                WHERE doc_status = 'balance'
-            """)
-            cursor.execute("UPDATE system_settings SET setting_value = %s WHERE setting_key = 'last_part2_rollover_week'", (current_week_str,))
-            conn.commit()
+        check_weekly_rollover(cursor, conn)
+        sync_lve_case_status(cursor, conn)
     except Exception as e:
         print("Weekly rollover check error:", e)
 
@@ -2969,6 +2930,12 @@ def get_docjc_leaves():
             onco_active_count = sum(1 for l in leaves if (l.get('onco_status') or '').lower() == 'active')
             doc_done_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'done')
             doc_balance_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'balance')
+        elif is_doc:
+            # DOCJC login: fetch ONLY those whose leave is marked as Active
+            leaves = [l for l in leaves if (l.get('onco_status') or '').strip().lower() == 'active']
+            onco_active_count = len(leaves)
+            doc_done_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'done')
+            doc_balance_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'balance')
         else:
             cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
             onco_active_count = cursor.fetchone()['c']
@@ -2978,6 +2945,10 @@ def get_docjc_leaves():
 
             cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
             doc_balance_count = cursor.fetchone()['c']
+
+        from blueprints.pending_cases import sync_lve_case_status, get_lve_docjc_published_count
+        sync_lve_case_status(cursor, conn)
+        doc_done_count = get_lve_docjc_published_count(cursor)
 
         cursor.execute("SELECT DISTINCT company FROM doc_leave_details WHERE company IS NOT NULL AND company != '' ORDER BY company ASC")
         companies = [r['company'] for r in cursor.fetchall()]
@@ -3056,29 +3027,17 @@ def update_onco_leave_action():
 
         cursor.execute("UPDATE doc_leave_details SET onco_status = %s WHERE id = %s", (new_status, leave_id))
 
-        # "when onco clciked on active update in PEdnding cases of LVE of column Recd Cas Current Week not in Pending Cas of Last Week only for LVE"
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+        # Recd cases for LVE = count of Active leaves
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
         onco_active_count = cursor.fetchone()['c']
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'ONCO'
 
-        cursor.execute("SELECT id, pending_last_week, pub_this_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
-        lve_ex = cursor.fetchone()
-        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
-        pub_val = lve_ex['pub_this_week'] if lve_ex else 0
-        tot_cases = pend_val + onco_active_count
-        under_val = max(0, tot_cases - pub_val)
-
-        cursor.execute("""
-            UPDATE pending_cases
-            SET recd_current_week = %s,
-                total_cases = %s,
-                under_prog = %s,
-                updated_by = %s,
-                updated_at = NOW()
-            WHERE type_of_case = 'Lve'
-        """, (onco_active_count, tot_cases, under_val, user_name))
+        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (onco_active_count, user_name))
         conn.commit()
+
+        from blueprints.pending_cases import sync_lve_case_status
+        sync_lve_case_status(cursor, conn)
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
@@ -3126,35 +3085,35 @@ def update_doc_leave_action():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("UPDATE doc_leave_details SET doc_status = %s WHERE id = %s", (new_status, leave_id))
-
-        # "if DOC cliked on DONE .... update in Pub This Week inisde LVE"
-        # "else DOC clicked on Balance update in Under Prog inse LVE"
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
-        doc_done_count = cursor.fetchone()['c']
-
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
-        doc_balance_count = cursor.fetchone()['c']
-
         user_name = user.get('name') or user.get('username') or user.get('role') or 'DOCJC'
+        user_role = (user.get('role') or '').strip()
 
-        cursor.execute("SELECT id, pending_last_week, recd_current_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
-        lve_ex = cursor.fetchone()
-        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
-        recd_val = lve_ex['recd_current_week'] if lve_ex else 0
-        tot_cases = pend_val + recd_val
-        under_val = max(0, tot_cases - doc_done_count)
-
-        cursor.execute("""
-            UPDATE pending_cases
-            SET pub_this_week = %s,
-                under_prog = %s,
-                total_cases = %s,
-                updated_by = %s,
-                updated_at = NOW()
-            WHERE type_of_case = 'Lve'
-        """, (doc_done_count, under_val, tot_cases, user_name))
+        if new_status == 'done':
+            cursor.execute("""
+                UPDATE doc_leave_details 
+                SET doc_status = %s,
+                    published_by = %s,
+                    published_role = %s,
+                    published_at = NOW()
+                WHERE id = %s
+            """, (new_status, user_name, user_role, leave_id))
+        else:
+            cursor.execute("""
+                UPDATE doc_leave_details 
+                SET doc_status = %s,
+                    published_by = NULL,
+                    published_role = NULL,
+                    published_at = NULL
+                WHERE id = %s
+            """, (new_status, leave_id))
         conn.commit()
+
+        from blueprints.pending_cases import sync_lve_case_status, get_lve_docjc_published_count
+        sync_lve_case_status(cursor, conn)
+
+        doc_done_count = get_lve_docjc_published_count(cursor)
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(doc_status) = 'balance'")
+        doc_balance_count = cursor.fetchone()['c']
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
@@ -3218,33 +3177,19 @@ def delete_doc_leave():
 
         cursor.execute("DELETE FROM doc_leave_details WHERE id = %s", (leave_id,))
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
         onco_active_count = cursor.fetchone()['c']
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
-        doc_done_count = cursor.fetchone()['c']
-
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
-        doc_balance_count = cursor.fetchone()['c']
-
-        cursor.execute("SELECT id, pending_last_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
-        lve_ex = cursor.fetchone()
-        pend_val = lve_ex['pending_last_week'] if lve_ex else 0
-        tot_cases = pend_val + onco_active_count
-        under_val = max(0, tot_cases - doc_done_count)
-
         user_name = user.get('name') or user.get('username') or user.get('role') or 'USER'
-        cursor.execute("""
-            UPDATE pending_cases
-            SET recd_current_week = %s,
-                pub_this_week = %s,
-                under_prog = %s,
-                total_cases = %s,
-                updated_by = %s,
-                updated_at = NOW()
-            WHERE type_of_case = 'Lve'
-        """, (onco_active_count, doc_done_count, under_val, tot_cases, user_name))
+        cursor.execute("UPDATE pending_cases SET recd_current_week = %s, updated_by = %s, updated_at = NOW() WHERE type_of_case = 'Lve'", (onco_active_count, user_name))
         conn.commit()
+
+        from blueprints.pending_cases import sync_lve_case_status, get_lve_docjc_published_count
+        sync_lve_case_status(cursor, conn)
+
+        doc_done_count = get_lve_docjc_published_count(cursor)
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(doc_status) = 'balance'")
+        doc_balance_count = cursor.fetchone()['c']
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,

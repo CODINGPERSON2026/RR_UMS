@@ -315,11 +315,11 @@
               <tr>
                 <th>Ser<br>No</th>
                 <th>Type of Case</th>
-                <th>Pending Case<br>Last Week</th>
-                <th>Recd Cas<br>Current Week</th>
-                <th>Total<br>Cases</th>
-                <th>Published<br>This Week</th>
-                <th>Under<br>Prog</th>
+                <th class="pc-col-full">Pending Case<br>Last Week</th>
+                <th class="pc-col-recd">Recd Cases<br>This Week</th>
+                <th class="pc-col-full">Total<br>Cases</th>
+                <th class="pc-col-pub">Published<br>This Week</th>
+                <th class="pc-col-full">Under<br>Prog</th>
                 <th>Remarks</th>
                 <th>Date &amp; Time</th>
                 <th class="pc-action-col">Action</th>
@@ -333,11 +333,11 @@
             <tfoot>
               <tr id="pcTotalRow">
                 <td colspan="2" style="text-align:right; background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none;">TOTAL</td>
-                <td id="pcTotPending" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
-                <td id="pcTotRecd"    style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
-                <td id="pcTotTotal"   style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
-                <td id="pcTotPub"     style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
-                <td id="pcTotUnder"   style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotPending" class="pc-col-full" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotRecd"    class="pc-col-recd" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotTotal"   class="pc-col-full" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotPub"     class="pc-col-pub"  style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
+                <td id="pcTotUnder"   class="pc-col-full" style="background:#1e3a8a; color:white; font-weight:800; font-size:12px; border:none; text-align:center;">0</td>
                 <td style="background:#1e3a8a; color:white; border:none;"></td>
                 <td style="background:#1e3a8a; color:white; border:none;"></td>
                 <td class="pc-action-col" style="background:#1e3a8a; color:white; border:none;"></td>
@@ -376,7 +376,9 @@
 (function() {
   {% set r_clean = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
   const CURRENT_ROLE = '{{ (role or "Authority")|upper|trim }}';
-  const PC_CAN_EDIT = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'ADJUTANT', 'ACCOUNT OFFICER', 'ACCOUNTS OFFICER', 'ACCOUNT JCO', 'ACCOUNTS JCO', 'ACCOUNT CLK', 'ACCOUNTS CLK', 'ADMIN', 'SUPERADMIN', 'DOCJC']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'ADJUTANT', 'ACCOUNTOFFICER', 'ACCOUNTSOFFICER', 'ACCOUNTJCO', 'ACCOUNTSJCO', 'ACCOUNTCLK', 'ACCOUNTSCLK', 'ADMIN', 'SUPERADMIN', 'DOCJC'] else 'false' }};
+  let IS_ONCO_ROLE = {{ 'true' if ('ONCO' in (role or '')|upper or 'ONCO' in r_clean) else 'false' }};
+  let USER_COMPANY = '{{ (session.get("company") or "")|replace("'", "\\'") }}';
+  const PC_CAN_EDIT = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'ADJUTANT', 'ACCOUNT OFFICER', 'ACCOUNTS OFFICER', 'ACCOUNT JCO', 'ACCOUNTS JCO', 'ACCOUNT CLK', 'ACCOUNTS CLK', 'ADMIN', 'SUPERADMIN', 'DOCJC']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'ADJUTANT', 'ACCOUNTOFFICER', 'ACCOUNTSOFFICER', 'ACCOUNTJCO', 'ACCOUNTSJCO', 'ACCOUNTCLK', 'ACCOUNTSCLK', 'ADMIN', 'SUPERADMIN', 'DOCJC'] or ('ONCO' in (role or '')|upper or 'ONCO' in r_clean) else 'false' }};
   const IS_REMARK_ONLY_ROLE = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', 'COMMANDINGOFFICER', '2IC', 'SECOND IN COMMAND', 'SECONDINCOMMAND', 'ADJUTANT']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] else 'false' }};
   const IS_DOCJC_ROLE = {{ 'true' if (role and ('DOC' in role|upper or 'DOCJC' in role|upper)) or 'DOC' in r_clean else 'false' }};
 
@@ -462,6 +464,10 @@
           pcData = buildDefaultCaseRows();
         } else {
           pcData = res.data;
+        }
+        if (res.is_onco !== undefined) {
+          IS_ONCO_ROLE = !!res.is_onco;
+          if (res.user_company) USER_COMPANY = res.user_company;
         }
         window.renderTable(pcData);
         updateLastUpdated(pcData);
@@ -651,15 +657,32 @@
       const tCount = pCount + rCount;
       const uCount = (row.under_prog !== undefined && row.under_prog !== null) ? Number(row.under_prog) : Math.max(0, tCount - pubCount);
 
+      // Combined sum across all ONCOs is displayed to all ONCOs and DOCJC (e.g. 5+10+20 = 35)
+      const recdCellVal = rCount;
+
       totPending += pCount;
       totRecd    += rCount;
       totPub     += pubCount;
       totTotal   += tCount;
       totUnder   += uCount;
 
+      let breakdownTip = `Total: ${rCount}`;
+      if (row.company_recd_map && Object.keys(row.company_recd_map).length > 0) {
+        const parts = Object.entries(row.company_recd_map).map(([c, cnt]) => `${c}: ${cnt}`);
+        breakdownTip += ` (${parts.join(', ')})`;
+      }
+
+      const isLveCase = (row.type_of_case || '').toLowerCase().trim() === 'lve';
       let actionCell = '';
       if (PC_CAN_EDIT) {
-        if (IS_REMARK_ONLY_ROLE) {
+        if (IS_ONCO_ROLE) {
+          // "in action they can edit all Tpe of cases except LVE"
+          if (isLveCase) {
+            actionCell = `<span class="badge bg-light text-muted border" style="font-size:10px;" title="LVE received cases are managed automatically via Leave Details"><i class="fa fa-lock me-1"></i>LVE Auto</span>`;
+          } else {
+            actionCell = `<button class="pc-edit-btn" onclick="pcStartEdit(${row.id})" title="Update Recd Cases This Week for ${escHtml(USER_COMPANY || 'Company')}"><i class="fa fa-edit me-1"></i>Edit</button>`;
+          }
+        } else if (IS_REMARK_ONLY_ROLE) {
           actionCell = `<button class="pc-co-btn" onclick="pcStartEdit(${row.id})" title="Add / View Remark for ${CURRENT_ROLE}"><i class="fa fa-comment-dots me-1"></i>Add Remark</button>`;
         } else {
           actionCell = `<button class="pc-edit-btn" onclick="pcStartEdit(${row.id})" title="Edit Row"><i class="fa fa-edit me-1"></i>Edit</button>`;
@@ -681,12 +704,12 @@
 
       return `<tr id="pcRow_${row.id}" data-id="${row.id}">
         <td>${idx + 1}</td>
-        <td>${escHtml(row.type_of_case)}</td>
-        <td id="pcPending_${row.id}">${pCount}</td>
-        <td id="pcRecd_${row.id}">${rCount}</td>
-        <td id="pcTotal_${row.id}" style="font-weight:700; color:#1e3a8a;">${tCount}</td>
-        <td id="pcPub_${row.id}">${pubCount}</td>
-        <td id="pcUnder_${row.id}">${uCount}</td>
+        <td id="pcType_${row.id}">${escHtml(row.type_of_case)}</td>
+        <td id="pcPending_${row.id}" class="pc-col-full">${pCount}</td>
+        <td id="pcRecd_${row.id}" class="pc-col-recd" style="font-weight:700; color:#1e3a8a; text-align:center;" title="${escHtml(breakdownTip)}">${recdCellVal}</td>
+        <td id="pcTotal_${row.id}" class="pc-col-full" style="font-weight:700; color:#1e3a8a;">${tCount}</td>
+        <td id="pcPub_${row.id}" class="pc-col-pub">${pubCount}</td>
+        <td id="pcUnder_${row.id}" class="pc-col-full">${uCount}</td>
         <td id="pcRem_${row.id}">${remBadgeHtml}</td>
         <td id="pcDt_${row.id}">${dtDisplay}</td>
         ${PC_CAN_EDIT ? `<td id="pcAct_${row.id}">${actionCell}</td>` : ''}
@@ -703,6 +726,18 @@
 
     document.querySelectorAll('.pc-action-col').forEach(el => {
       el.style.display = PC_CAN_EDIT ? '' : 'none';
+    });
+    // Hide full columns for ONCO:
+    document.querySelectorAll('.pc-col-full').forEach(el => {
+      el.style.display = IS_ONCO_ROLE ? 'none' : '';
+    });
+    // Hide Published This Week for ONCO:
+    document.querySelectorAll('.pc-col-pub').forEach(el => {
+      el.style.display = IS_ONCO_ROLE ? 'none' : '';
+    });
+    // Ensure Recd Cases This Week is visible:
+    document.querySelectorAll('.pc-col-recd').forEach(el => {
+      el.style.display = '';
     });
   };
 
@@ -750,7 +785,34 @@
     const pubCount = (row.pub_this_week || 0);
     const tCount = pCount + rCount;
 
-    if (IS_REMARK_ONLY_ROLE) {
+    if (IS_ONCO_ROLE) {
+      const isLveCase = (row.type_of_case || '').toLowerCase().trim() === 'lve';
+      if (isLveCase) {
+        alert('LVE received cases are updated automatically via Leave Details and cannot be edited manually.');
+        return;
+      }
+      const myRecd = (row.my_company_recd !== undefined) ? row.my_company_recd : 0;
+      const totalRecd = (row.recd_current_week || 0);
+      document.getElementById('pcType_' + id).innerHTML = `${escHtml(row.type_of_case)}`;
+      document.getElementById('pcRecd_' + id).innerHTML = `
+        <div class="d-flex flex-column align-items-center">
+          <input type="number" id="ei_onco_recd_${id}" value="${myRecd}" min="0" class="form-control form-control-sm text-center fw-bold" style="width:75px; padding:2px 4px; height:28px;" title="Set count for ${escHtml(USER_COMPANY || 'your company')} (Current: ${myRecd}, Total all coys: ${totalRecd})" onkeydown="pcHandleKey(event, ${id})">
+          <small class="text-muted" style="font-size:9px; margin-top:2px; line-height:1;" title="Your company: ${escHtml(USER_COMPANY)}">${escHtml(USER_COMPANY || 'My Coy')} count</small>
+        </div>
+      `;
+      document.getElementById('pcRem_' + id).innerHTML = `<input class="pc-rem-input" id="ei_rem_${id}" value="" placeholder="Add remark..." style="width:100%; min-width:120px;" onkeydown="pcHandleKey(event, ${id})">`;
+      document.getElementById('pcAct_' + id).innerHTML = `
+        <div class="d-flex align-items-center justify-content-center gap-1">
+          <button class="pc-save-btn" onclick="pcSaveRow(${id})"><i class="fa fa-check me-1"></i>Save</button>
+          <button class="pc-cancel-btn" onclick="pcCancelEdit()"><i class="fa fa-times"></i></button>
+        </div>
+      `;
+      setTimeout(() => {
+        const inp = document.getElementById('ei_onco_recd_' + id);
+        if (inp) { inp.focus(); inp.select(); }
+      }, 50);
+      return;
+    } else if (IS_REMARK_ONLY_ROLE) {
       // Numbers are LOCKED for CO, 2IC, ADJUTANT roles — only Remark is editable
       document.getElementById('pcPending_' + id).innerHTML = `<span class="pc-locked-val" title="Locked for ${CURRENT_ROLE}: Counts managed by DOCJC">${pCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span>`;
       document.getElementById('pcRecd_'   + id).innerHTML = `<span class="pc-locked-val" title="Locked for ${CURRENT_ROLE}: Counts managed by DOCJC">${rCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span>`;
@@ -791,7 +853,41 @@
     if (!remInput) return;
 
     let payload = {};
-    if (IS_REMARK_ONLY_ROLE) {
+    if (IS_ONCO_ROLE) {
+      const recdInput = document.getElementById('ei_onco_recd_' + id);
+      const remVal = remInput ? remInput.value.trim() : '';
+      const recdVal = recdInput ? (parseInt(recdInput.value, 10) || 0) : 0;
+
+      fetch(`/pending_cases/onco_update/${id}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          recd_count: recdVal,
+          remarks: remVal
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.success) {
+          const row = (pcData || []).find(r => r.id === id);
+          if (row) {
+            if (res.row) Object.assign(row, res.row);
+            row.my_company_recd = res.my_company_recd;
+            if (res.remarks_list) row.remarks_list = res.remarks_list;
+            if (res.remarks_count !== undefined) row.remarks_count = res.remarks_count;
+          }
+          window.renderTable(pcData);
+          updateLastUpdated(pcData);
+        } else {
+          alert('Error: ' + (res && res.message ? res.message : 'Failed to update company recd cases'));
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Network error while saving');
+      });
+      return;
+    } else if (IS_REMARK_ONLY_ROLE) {
       payload = {
         remarks: remInput.value.trim()
       };

@@ -628,12 +628,12 @@
           const coyBadge = userCompany ? `<span class="badge bg-warning text-dark ms-2" style="font-size:11px;"><i class="fa fa-building me-1"></i>${esc(userCompany)}</span>` : '';
           if (titleEl) titleEl.innerHTML = `DOC LEAVE DETAILS <span class="badge bg-light text-primary ms-2" style="font-size:11px;">ONCO ACCESS</span>${coyBadge}`;
           if (hintEl) {
-            hintEl.innerHTML = `<i class="fa fa-pencil-alt me-1"></i><strong>ONCO${userCompany ? ' (' + esc(userCompany) + ')' : ''}</strong>: You can only update leaves of your company. Set <strong>Active</strong> (updates Recd Cas Current Week in PART-II) or <strong>Inactive</strong>.`;
+            hintEl.innerHTML = `<i class="fa fa-pencil-alt me-1"></i><strong>ONCO${userCompany ? ' (' + esc(userCompany) + ')' : ''}</strong>: You can only update leaves of your company. Click <strong>Active</strong> to activate (once active, it remains activated).`;
           }
         } else if (isUserDoc && !isUserOnco) {
           if (addBtn) addBtn.style.display = 'none';
           if (titleEl) titleEl.textContent = 'DOC LEAVE DETAILS';
-          if (hintEl) hintEl.innerHTML = `<i class="fa fa-clipboard-check me-1"></i><strong>DOCJC</strong>: Set <strong>DONE</strong> (updates Pub This Week) or <strong>BALANCE</strong> (updates Under PROG). You can delete rows.`;
+          if (hintEl) hintEl.innerHTML = `<i class="fa fa-clipboard-check me-1"></i><strong>DOCJC</strong>: Set <strong>DONE</strong> (updates Pub This Week in PART-II). You can delete rows.`;
         } else {
           // Admin / Full Access
           if (addBtn) addBtn.style.display = 'none';
@@ -818,26 +818,32 @@
       let oncoCellHtml = '';
       if (isUserOnco) {
         if (canOncoManage) {
-          oncoCellHtml = `
-            <div class="dj-act-btn-group" id="djOncoGrp_${row.id}">
-              <button type="button" class="dj-act-btn btn-active ${isOncoActive ? 'is-selected' : ''}" 
-                      onclick="djSetOncoAction(${row.id}, 'active')" 
-                      title="Active &rarr; Updates Recd Cas Current Week in PART-II (LVE)">
-                <i class="fa fa-check"></i> Active
-              </button>
-              <button type="button" class="dj-act-btn btn-inactive ${isOncoInactive ? 'is-selected' : ''}" 
-                      onclick="djSetOncoAction(${row.id}, 'inactive')" 
-                      title="Mark Inactive">
-                <i class="fa fa-times"></i> Inactive
-              </button>
-            </div>
-          `;
+          if (isOncoActive) {
+            // Once clicked on active it remains activated and cannot be changed
+            oncoCellHtml = `
+              <div class="dj-act-btn-group" id="djOncoGrp_${row.id}">
+                <button type="button" class="dj-act-btn btn-active is-selected" disabled 
+                        style="opacity:1; cursor:default; pointer-events:none;" 
+                        title="Active (Permanently activated)">
+                  <i class="fa fa-check"></i> Active
+                </button>
+              </div>
+            `;
+          } else {
+            oncoCellHtml = `
+              <div class="dj-act-btn-group" id="djOncoGrp_${row.id}">
+                <button type="button" class="dj-act-btn btn-active" 
+                        onclick="djSetOncoAction(${row.id}, 'active')" 
+                        title="Active &rarr; Updates Recd Cas Current Week in PART-II (LVE)">
+                  <i class="fa fa-check"></i> Active
+                </button>
+              </div>
+            `;
+          }
         } else {
           // Locked for other companies' ONCOs
           if (isOncoActive) {
             oncoCellHtml = `<span class="dj-ro-badge ro-active" title="Only ${esc(row.company || 'Other')} ONCO can change this"><i class="fa fa-lock me-1"></i>Active</span>`;
-          } else if (isOncoInactive) {
-            oncoCellHtml = `<span class="dj-ro-badge ro-inactive" title="Only ${esc(row.company || 'Other')} ONCO can change this"><i class="fa fa-lock me-1"></i>Inactive</span>`;
           } else {
             oncoCellHtml = `<span class="badge bg-light text-secondary border" title="Only ${esc(row.company || 'Other')} ONCO can update this leave"><i class="fa fa-lock me-1"></i>${esc(row.company || 'Other')} ONCO</span>`;
           }
@@ -845,14 +851,12 @@
       } else {
         if (isOncoActive) {
           oncoCellHtml = `<span class="dj-ro-badge ro-active" title="Marked Active by ONCO"><i class="fa fa-check-circle"></i> Active</span>`;
-        } else if (isOncoInactive) {
-          oncoCellHtml = `<span class="dj-ro-badge ro-inactive" title="Marked Inactive by ONCO"><i class="fa fa-times-circle"></i> Inactive</span>`;
         } else {
           oncoCellHtml = `<span class="dj-ro-badge ro-pending" title="Unmarked by ONCO">&mdash;</span>`;
         }
       }
 
-      // 2. DOC Action Column
+      // 2. DOC Action Column (BALANCE completely removed)
       let docCellHtml = '';
       if (isUserDoc) {
         docCellHtml = `
@@ -862,18 +866,11 @@
                     title="DONE &rarr; Updates Pub This Week in PART-II">
               <i class="fa fa-check-double"></i> DONE
             </button>
-            <button type="button" class="dj-act-btn btn-balance ${isDocBalance ? 'is-selected' : ''}" 
-                    onclick="djSetDocAction(${row.id}, 'balance')" 
-                    title="BALANCE &rarr; Updates Under PROG in PART-II">
-              <i class="fa fa-hourglass-half"></i> BALANCE
-            </button>
           </div>
         `;
       } else {
         if (isDocDone) {
           docCellHtml = `<span class="dj-ro-badge ro-done" title="Marked DONE by DOCJC"><i class="fa fa-check-double"></i> DONE</span>`;
-        } else if (isDocBalance) {
-          docCellHtml = `<span class="dj-ro-badge ro-balance" title="Marked BALANCE by DOCJC"><i class="fa fa-hourglass-half"></i> BALANCE</span>`;
         } else {
           docCellHtml = `<span class="dj-ro-badge ro-pending" title="Unmarked by DOCJC">&mdash;</span>`;
         }
@@ -931,7 +928,11 @@
     }
 
     const currentStatus = (row.onco_status || '').toLowerCase();
-    const newStatus = (currentStatus === targetStatus) ? '' : targetStatus;
+    if (currentStatus === 'active') {
+      // Once active, it remains activated and cannot be changed
+      return;
+    }
+    const newStatus = 'active';
 
     const grp = document.getElementById('djOncoGrp_' + leaveId);
     if (grp) grp.querySelectorAll('button').forEach(b => b.disabled = true);
@@ -952,14 +953,10 @@
 
         if (grp) {
           const btnAct = grp.querySelector('.btn-active');
-          const btnInact = grp.querySelector('.btn-inactive');
           if (btnAct) {
-            btnAct.disabled = false;
-            btnAct.classList.toggle('is-selected', res.onco_status === 'active');
-          }
-          if (btnInact) {
-            btnInact.disabled = false;
-            btnInact.classList.toggle('is-selected', res.onco_status === 'inactive');
+            btnAct.disabled = true;
+            btnAct.style.pointerEvents = 'none';
+            btnAct.classList.add('is-selected');
           }
         }
 
@@ -1010,14 +1007,9 @@
 
         if (grp) {
           const btnDone = grp.querySelector('.btn-done');
-          const btnBal = grp.querySelector('.btn-balance');
           if (btnDone) {
             btnDone.disabled = false;
             btnDone.classList.toggle('is-selected', res.doc_status === 'done');
-          }
-          if (btnBal) {
-            btnBal.disabled = false;
-            btnBal.classList.toggle('is-selected', res.doc_status === 'balance');
           }
         }
 

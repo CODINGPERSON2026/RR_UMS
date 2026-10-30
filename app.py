@@ -4214,8 +4214,22 @@ WHERE interview_status = 1
 
 # kunba interview timing     
 
+def auto_weekly_part2_rollover_job():
+    try:
+        from blueprints.pending_cases import check_weekly_rollover
+        conn = get_db_connection()
+        if conn:
+            cursor = conn.cursor(dictionary=True)
+            check_weekly_rollover(cursor, conn)
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        print("[Auto Rollover Job Exception]:", e)
+
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=reset_interview_status, trigger="interval", minutes=10)
+scheduler.add_job(func=auto_weekly_part2_rollover_job, trigger="cron", day_of_week="mon", hour=0, minute=0)
+scheduler.add_job(func=auto_weekly_part2_rollover_job, trigger="interval", minutes=10)
 scheduler.start()
 
 # AGNIVEER DATA FATCH WITH TABLE STARTING CODE++++++++++++++++++++++++++++++++++++++++++++++++++++

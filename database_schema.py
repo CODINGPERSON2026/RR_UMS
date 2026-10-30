@@ -210,6 +210,17 @@ def ensure_all_tables(conn=None, verbose=True):
             except Exception as seed_err:
                 pass
 
+        # Ensure doc_leave_details has publication tracking columns
+        try:
+            cursor.execute("SHOW COLUMNS FROM doc_leave_details LIKE 'published_by'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_by VARCHAR(100) DEFAULT NULL")
+                cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_role VARCHAR(100) DEFAULT NULL")
+                cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_at DATETIME DEFAULT NULL")
+                conn.commit()
+        except Exception:
+            pass
+
         if verbose:
             _log(f"[Database Init] Finished: {created_count} table(s) created, {error_count} error(s).")
 

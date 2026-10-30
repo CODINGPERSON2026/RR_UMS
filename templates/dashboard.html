@@ -753,7 +753,7 @@
       {% set is_onco = ('ONCO' in (role or '')|upper) or ('ONCO' in r_clean_dash) %}
       {% set is_auth = (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'SECOND IN COMMAND', 'ADJUTANT']) or r_clean_dash in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] %}
 
-      {% if is_docjc or is_auth %}
+      {% if is_docjc or is_auth or is_onco %}
       <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal" title="PART-II STATUS">
         <span class="sc-label">PART-II STATUS</span>
         <div class="sc-right">
