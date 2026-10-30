@@ -2874,6 +2874,8 @@ import datetime
 
 def check_weekly_rollover_leave(cursor, conn):
     try:
+        from blueprints.pending_cases import ensure_default_cases
+        ensure_default_cases(cursor, conn)
         now = datetime.datetime.now()
         iso = now.isocalendar()
         current_week_str = f"{iso[0]}-W{iso[1]:02d}"
@@ -2888,15 +2890,20 @@ def check_weekly_rollover_leave(cursor, conn):
             return
 
         if last_week_str != current_week_str:
-            # Sunday 11:59 PM passed, Monday 12:00 AM arrived:
-            # "once it is 12:00 AM MONDAY make 0 Under PROG add them to PEnding Last Week"
+            # Monday 12:00 AM rollover:
+            # new pending_last_week = old pending_last_week + old under_prog
+            # total_cases = new pending (since recd resets to 0)
+            # under_prog = total_cases - pub = new_pending - 0 = new_pending
+            # recd_current_week = 0, pub_this_week = 0
+            # Monday 12:00 AM rollover:
+            # reset Under PROG to 0 and if it contains any count add that count to pending Last week
             cursor.execute("""
                 UPDATE pending_cases
-                SET pending_last_week = pending_last_week + under_prog,
+                SET total_cases = pending_last_week + under_prog,
+                    pending_last_week = pending_last_week + under_prog,
                     under_prog = 0,
                     recd_current_week = 0,
                     pub_this_week = 0,
-                    total_cases = pending_last_week + under_prog,
                     updated_at = NOW(),
                     updated_by = 'SYSTEM ROLLOVER'
             """)
@@ -2948,35 +2955,44 @@ def get_docjc_leaves():
         """)
         leaves = cursor.fetchall()
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
-        onco_active_count = cursor.fetchone()['c']
+        user_role = (user.get('role') or '').upper().strip()
+        r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+        is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
+        is_onco = ('ONCO' in user_role or 'ONCO' in r_clean) and not is_admin
+        is_doc = ('DOC' in user_role or 'DOC' in r_clean) and not is_admin
+        user_company = user.get('company') or ''
+        user_comp_norm = normalize_company(user_company)
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
-        doc_done_count = cursor.fetchone()['c']
+        # If user is ONCO (or has a company set and not doc/admin), only show their respective company's leaves:
+        if (is_onco or (user_comp_norm and not is_doc and not is_admin)):
+            leaves = [l for l in leaves if normalize_company(l.get('company')) == user_comp_norm]
+            onco_active_count = sum(1 for l in leaves if (l.get('onco_status') or '').lower() == 'active')
+            doc_done_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'done')
+            doc_balance_count = sum(1 for l in leaves if (l.get('doc_status') or '').lower() == 'balance')
+        else:
+            cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE onco_status = 'active'")
+            onco_active_count = cursor.fetchone()['c']
 
-        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
-        doc_balance_count = cursor.fetchone()['c']
+            cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'done'")
+            doc_done_count = cursor.fetchone()['c']
+
+            cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
+            doc_balance_count = cursor.fetchone()['c']
 
         cursor.execute("SELECT DISTINCT company FROM doc_leave_details WHERE company IS NOT NULL AND company != '' ORDER BY company ASC")
         companies = [r['company'] for r in cursor.fetchall()]
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
-                   pub_this_week, under_prog, updated_at
+                   (pending_last_week + recd_current_week) AS total_cases,
+                   pub_this_week,
+                   under_prog,
+                   updated_at
             FROM pending_cases
-            WHERE id = 16 OR type_of_case = 'Lve'
+            WHERE type_of_case = 'Lve'
             LIMIT 1
         """)
         lve_row = cursor.fetchone()
-
-        user_role = (user.get('role') or '').upper().strip()
-        r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
-        is_admin = r_clean in ['ADMIN', 'SUPERADMIN']
-        is_onco = 'ONCO' in user_role or 'ONCO' in r_clean or is_admin
-        is_doc = 'DOC' in user_role or 'DOC' in r_clean or is_admin
-        user_company = user.get('company') or ''
-        user_comp_norm = normalize_company(user_company)
 
         # Respective company ONCO access check:
         for l in leaves:
@@ -3046,28 +3062,31 @@ def update_onco_leave_action():
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'ONCO'
 
-        cursor.execute("SELECT id, pending_last_week, pub_this_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        cursor.execute("SELECT id, pending_last_week, pub_this_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
         lve_ex = cursor.fetchone()
         pend_val = lve_ex['pending_last_week'] if lve_ex else 0
         pub_val = lve_ex['pub_this_week'] if lve_ex else 0
-        tot_cases = max(0, (pend_val + onco_active_count) - pub_val)
+        tot_cases = pend_val + onco_active_count
+        under_val = max(0, tot_cases - pub_val)
 
         cursor.execute("""
             UPDATE pending_cases
             SET recd_current_week = %s,
                 total_cases = %s,
+                under_prog = %s,
                 updated_by = %s,
                 updated_at = NOW()
-            WHERE id = 16 OR type_of_case = 'Lve'
-        """, (onco_active_count, tot_cases, user_name))
+            WHERE type_of_case = 'Lve'
+        """, (onco_active_count, tot_cases, under_val, user_name))
         conn.commit()
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
-                   pub_this_week, under_prog,
+                   (pending_last_week + recd_current_week) AS total_cases,
+                   pub_this_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS under_prog,
                    DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
-            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+            FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1
         """)
         updated_lve = cursor.fetchone()
 
@@ -3119,11 +3138,12 @@ def update_doc_leave_action():
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'DOCJC'
 
-        cursor.execute("SELECT id, pending_last_week, recd_current_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        cursor.execute("SELECT id, pending_last_week, recd_current_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
         lve_ex = cursor.fetchone()
         pend_val = lve_ex['pending_last_week'] if lve_ex else 0
         recd_val = lve_ex['recd_current_week'] if lve_ex else 0
-        tot_cases = max(0, (pend_val + recd_val) - doc_done_count)
+        tot_cases = pend_val + recd_val
+        under_val = max(0, tot_cases - doc_done_count)
 
         cursor.execute("""
             UPDATE pending_cases
@@ -3132,16 +3152,17 @@ def update_doc_leave_action():
                 total_cases = %s,
                 updated_by = %s,
                 updated_at = NOW()
-            WHERE id = 16 OR type_of_case = 'Lve'
-        """, (doc_done_count, doc_balance_count, tot_cases, user_name))
+            WHERE type_of_case = 'Lve'
+        """, (doc_done_count, under_val, tot_cases, user_name))
         conn.commit()
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
-                   pub_this_week, under_prog,
+                   (pending_last_week + recd_current_week) AS total_cases,
+                   pub_this_week,
+                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS under_prog,
                    DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
-            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+            FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1
         """)
         updated_lve = cursor.fetchone()
 
@@ -3206,10 +3227,11 @@ def delete_doc_leave():
         cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE doc_status = 'balance'")
         doc_balance_count = cursor.fetchone()['c']
 
-        cursor.execute("SELECT id, pending_last_week FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1")
+        cursor.execute("SELECT id, pending_last_week FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1")
         lve_ex = cursor.fetchone()
         pend_val = lve_ex['pending_last_week'] if lve_ex else 0
-        tot_cases = max(0, (pend_val + onco_active_count) - doc_done_count)
+        tot_cases = pend_val + onco_active_count
+        under_val = max(0, tot_cases - doc_done_count)
 
         user_name = user.get('name') or user.get('username') or user.get('role') or 'USER'
         cursor.execute("""
@@ -3220,16 +3242,16 @@ def delete_doc_leave():
                 total_cases = %s,
                 updated_by = %s,
                 updated_at = NOW()
-            WHERE id = 16 OR type_of_case = 'Lve'
-        """, (onco_active_count, doc_done_count, doc_balance_count, tot_cases, user_name))
+            WHERE type_of_case = 'Lve'
+        """, (onco_active_count, doc_done_count, under_val, tot_cases, user_name))
         conn.commit()
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   (pending_last_week + recd_current_week) AS total_cases,
                    pub_this_week, under_prog,
                    DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at
-            FROM pending_cases WHERE id = 16 OR type_of_case = 'Lve' LIMIT 1
+            FROM pending_cases WHERE type_of_case = 'Lve' LIMIT 1
         """)
         updated_lve = cursor.fetchone()
 

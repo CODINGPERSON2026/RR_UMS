@@ -1,4 +1,7 @@
-from imports import *
+import datetime
+from flask import Blueprint, jsonify, request
+from db_config import get_db_connection
+from middleware import require_login
 
 pending_cases_bp = Blueprint('pending_cases_bp', __name__, url_prefix='/pending_cases')
 
@@ -10,6 +13,86 @@ ALLOWED_ROLES = [
 ]
 
 import datetime
+
+DEFAULT_CASE_TYPES = [
+    (1, 'Posting IN'),
+    (2, 'Posting OUT'),
+    (3, 'Pension Out'),
+    (4, 'TPTL'),
+    (5, 'Lve'),
+    (6, 'TFRGTH'),
+    (7, 'HRA'),
+    (8, 'RUMCIG'),
+    (9, 'PRPLVE/JRNYD'),
+    (10, 'Medal'),
+    (11, 'Med Cat'),
+    (12, 'CEA'),
+    (13, 'Marriage/Divorce'),
+    (14, 'Change of Name'),
+    (15, 'Birth'),
+    (16, 'Demise'),
+    (17, 'Civ Edn/MILEDN'),
+    (18, 'ACCLVE'),
+    (19, 'UID/PAN'),
+    (20, 'Jt Acct'),
+    (21, 'OPTFIX'),
+    (22, 'PFWDL'),
+    (23, 'Mobile No/Email'),
+    (24, 'Change Address'),
+    (25, 'Injury Report'),
+    (26, 'Hosp Adm/Tfr/Disch'),
+    (27, 'PROVFS'),
+    (28, 'LTC'),
+    (29, 'RISK'),
+    (30, 'HAUCA')
+]
+
+def ensure_default_cases(cursor, conn):
+    """
+    Guarantees all 30 standard case types exist in pending_cases.
+    If the table is truncated or has no data, re-populates all 30 rows with default 0s.
+    If any individual case types are missing, inserts them with default 0s.
+    """
+    try:
+        cursor.execute("SELECT COUNT(*) AS cnt FROM pending_cases")
+        row = cursor.fetchone()
+        cnt = (row['cnt'] if row else 0) or 0
+        if cnt == 0:
+            cursor.executemany("""
+                INSERT INTO pending_cases (id, type_of_case, pending_last_week, recd_current_week, pub_this_week, total_cases, under_prog, sort_order, updated_at)
+                VALUES (%s, %s, 0, 0, 0, 0, 0, %s, NOW())
+            """, [(cid, cname, cid) for cid, cname in DEFAULT_CASE_TYPES])
+            conn.commit()
+        else:
+            cursor.execute("SELECT id, LOWER(TRIM(type_of_case)) as norm_name FROM pending_cases")
+            existing_rows = cursor.fetchall()
+            existing_names = {r['norm_name'] for r in existing_rows if r.get('norm_name')}
+            existing_ids = {r['id'] for r in existing_rows if r.get('id')}
+
+            added = False
+            for cid, cname in DEFAULT_CASE_TYPES:
+                if cname.strip().lower() not in existing_names:
+                    if cid not in existing_ids:
+                        cursor.execute("""
+                            INSERT INTO pending_cases (id, type_of_case, pending_last_week, recd_current_week, pub_this_week, total_cases, under_prog, sort_order, updated_at)
+                            VALUES (%s, %s, 0, 0, 0, 0, 0, %s, NOW())
+                        """, (cid, cname, cid))
+                    else:
+                        cursor.execute("""
+                            INSERT INTO pending_cases (type_of_case, pending_last_week, recd_current_week, pub_this_week, total_cases, under_prog, sort_order, updated_at)
+                            VALUES (%s, 0, 0, 0, 0, 0, %s, NOW())
+                        """, (cname, cid))
+                    added = True
+            # Sync sort_order to ensure Lve is always at sno. 5th
+            for s_idx, (cid, cname) in enumerate(DEFAULT_CASE_TYPES, start=1):
+                cursor.execute(
+                    "UPDATE pending_cases SET sort_order = %s WHERE LOWER(TRIM(type_of_case)) = %s",
+                    (s_idx, cname.strip().lower())
+                )
+            conn.commit()
+    except Exception as e:
+        print("ensure_default_cases error:", e)
+
 
 def check_weekly_rollover(cursor, conn):
     try:
@@ -27,15 +110,21 @@ def check_weekly_rollover(cursor, conn):
             return
 
         if last_week_str != current_week_str:
-            # Sunday 11:59 PM passed, Monday 12:00 AM arrived:
-            # "once it is 12:00 AM MONDAY make 0 Under PROG add them to PEnding Last Week"
+            # Monday 12:00 AM rollover:
+            # Under PROG count gets added to Pending Last Week
+            # Under PROG resets to 0
+            # recd_current_week = 0, pub_this_week = 0
+            # total_cases = new pending_last_week (since recd = 0)
+            # under_prog = total_cases - pub = new_pending - 0 = new_pending
+            # Monday 12:00 AM rollover:
+            # reset Under PROG to 0 and if it contains any count add that count to pending Last week
             cursor.execute("""
                 UPDATE pending_cases
-                SET pending_last_week = pending_last_week + under_prog,
+                SET total_cases = pending_last_week + under_prog,
+                    pending_last_week = pending_last_week + under_prog,
                     under_prog = 0,
                     recd_current_week = 0,
                     pub_this_week = 0,
-                    total_cases = pending_last_week + under_prog,
                     updated_at = NOW(),
                     updated_by = 'SYSTEM ROLLOVER'
             """)
@@ -58,15 +147,17 @@ def get_pending_cases():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
+        ensure_default_cases(cursor, conn)
         check_weekly_rollover(cursor, conn)
 
         # 5th Position for TOTAL CASES next to Current Week:
         # 1: id/sort, 2: type_of_case, 3: pending_last_week, 4: recd_current_week, 5: total_cases, 6: pub_this_week, 7: under_prog
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   (pending_last_week + recd_current_week) AS total_cases,
                    pub_this_week,
-                   under_prog, remarks, updated_by,
+                   under_prog,
+                   remarks, updated_by,
                    DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at,
                    UNIX_TIMESTAMP(updated_at) AS updated_at_ts
             FROM pending_cases
@@ -125,6 +216,7 @@ def update_pending_case(row_id):
     is_docjc_role = ('DOC' in role or 'DOC' in r_clean) and r_clean not in ['ADMIN', 'SUPERADMIN']
 
     try:
+        ensure_default_cases(cursor, conn)
         remark_text = str(data.get('remarks') or '').strip()
         user_role_label = user.get('role') or 'Authority'
         user_name = user.get('name') or user.get('username') or user_role_label
@@ -144,34 +236,38 @@ def update_pending_case(row_id):
                     WHERE id = %s
                 """, (remark_text, user_name, row_id))
         elif is_docjc_role:
-            # For DOCJC: pending_last_week, recd_current_week, and total_cases are locked / auto-calculated
+            # DOCJC can edit: recd_current_week, pub_this_week
+            # total_cases = pending_last_week + recd_current_week  (auto)
+            # under_prog  = total_cases - pub_this_week            (auto)
             if remark_text:
                 cursor.execute("""
                     INSERT INTO pending_case_remarks (case_id, remark, remarked_by, remarked_by_role, created_at)
                     VALUES (%s, %s, %s, %s, NOW())
                 """, (row_id, remark_text, user_name, user_role_label))
 
-            cursor.execute("SELECT pending_last_week, recd_current_week FROM pending_cases WHERE id = %s", (row_id,))
+            cursor.execute("SELECT pending_last_week FROM pending_cases WHERE id = %s", (row_id,))
             ex = cursor.fetchone()
             p_val = ex['pending_last_week'] if ex else 0
-            r_val = ex['recd_current_week'] if ex else 0
+            r_val = int(data.get('recd_current_week') or 0)
             pub_val = int(data.get('pub_this_week') or 0)
-            tot_val = max(0, (p_val + r_val) - pub_val)
-            under_val = int(data.get('under_prog') or 0)
+            tot_val = p_val + r_val
+            under_val = max(0, tot_val - pub_val)
 
             cursor.execute("""
                 UPDATE pending_cases
-                SET pub_this_week = %s,
-                    under_prog = %s,
+                SET recd_current_week = %s,
+                    pub_this_week = %s,
                     total_cases = %s,
+                    under_prog = %s,
                     remarks = COALESCE(NULLIF(%s, ''), remarks),
                     updated_by = %s,
                     updated_at = NOW()
                 WHERE id = %s
             """, (
+                r_val,
                 pub_val,
-                under_val,
                 tot_val,
+                under_val,
                 remark_text,
                 user_name,
                 row_id
@@ -186,7 +282,7 @@ def update_pending_case(row_id):
             p_val = int(data.get('pending_last_week') or 0)
             r_val = int(data.get('recd_current_week') or 0)
             pub_val = int(data.get('pub_this_week') or 0)
-            tot_val = max(0, (p_val + r_val) - pub_val)
+            tot_val = p_val + r_val
             under_val = int(data.get('under_prog') or 0)
 
             cursor.execute("""
@@ -214,9 +310,10 @@ def update_pending_case(row_id):
 
         cursor.execute("""
             SELECT id, type_of_case, pending_last_week, recd_current_week,
-                   GREATEST(0, (pending_last_week + recd_current_week) - pub_this_week) AS total_cases,
+                   (pending_last_week + recd_current_week) AS total_cases,
                    pub_this_week,
-                   under_prog, remarks, updated_by,
+                   under_prog,
+                   remarks, updated_by,
                    DATE_FORMAT(updated_at, '%d %b %Y %h:%i %p') AS updated_at,
                    UNIX_TIMESTAMP(updated_at) AS updated_at_ts
             FROM pending_cases WHERE id = %s
@@ -273,6 +370,7 @@ def add_pending_case_remark(row_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
+        ensure_default_cases(cursor, conn)
         user_role_label = user.get('role') or 'Authority'
         user_name = user.get('name') or user.get('username') or user_role_label
 

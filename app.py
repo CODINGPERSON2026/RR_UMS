@@ -15,6 +15,10 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
+# Auto-verify and create all missing database tables at runtime
+from database_schema import ensure_all_tables
+ensure_all_tables(verbose=True)
+
 @app.after_request
 def add_security_headers(response):
     # Do not prevent caching for static files (CSS, JS, images, fonts)
@@ -168,7 +172,8 @@ def admin_login():
          return "Database connection failed", 500
     cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM users WHERE email=%s AND password=%s", (email, password))
+    # Allow login by email OR username
+    cursor.execute("SELECT * FROM users WHERE (email=%s OR username=%s) AND password=%s", (email, email, password))
     user = cursor.fetchone()
 
     if not user:

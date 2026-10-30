@@ -10,6 +10,7 @@
     box-shadow: 0 20px 50px rgba(0,0,0,0.25);
     overflow: hidden;
     background: var(--card-bg-solid, #fff);
+    min-height: 540px;
     max-height: 92vh;
     display: flex;
     flex-direction: column;
@@ -31,14 +32,14 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-height: 0;
+    min-height: 460px;
   }
   /* Scrollable table wrapper — shows all 30 rows */
   .pc-table-scroll {
     overflow-y: auto;
     overflow-x: auto;
     flex: 1;
-    min-height: 0;
+    min-height: 400px;
     max-height: calc(92vh - 140px);
     border: 1px solid #e2e8f0;
     border-radius: 8px;
@@ -314,10 +315,10 @@
               <tr>
                 <th>Ser<br>No</th>
                 <th>Type of Case</th>
-                <th>Pending Cas<br>of Last Week</th>
+                <th>Pending Case<br>Last Week</th>
                 <th>Recd Cas<br>Current Week</th>
                 <th>Total<br>Cases</th>
-                <th>Pub<br>This Week</th>
+                <th>Published<br>This Week</th>
                 <th>Under<br>Prog</th>
                 <th>Remarks</th>
                 <th>Date &amp; Time</th>
@@ -378,7 +379,34 @@
   const PC_CAN_EDIT = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'ADJUTANT', 'ACCOUNT OFFICER', 'ACCOUNTS OFFICER', 'ACCOUNT JCO', 'ACCOUNTS JCO', 'ACCOUNT CLK', 'ACCOUNTS CLK', 'ADMIN', 'SUPERADMIN', 'DOCJC']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'ADJUTANT', 'ACCOUNTOFFICER', 'ACCOUNTSOFFICER', 'ACCOUNTJCO', 'ACCOUNTSJCO', 'ACCOUNTCLK', 'ACCOUNTSCLK', 'ADMIN', 'SUPERADMIN', 'DOCJC'] else 'false' }};
   const IS_REMARK_ONLY_ROLE = {{ 'true' if (role and role|upper in ['CO', 'COMMANDING OFFICER', 'COMMANDINGOFFICER', '2IC', 'SECOND IN COMMAND', 'SECONDINCOMMAND', 'ADJUTANT']) or r_clean in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] else 'false' }};
   const IS_DOCJC_ROLE = {{ 'true' if (role and ('DOC' in role|upper or 'DOCJC' in role|upper)) or 'DOC' in r_clean else 'false' }};
-  let pcData = [];
+
+  const DEFAULT_CASE_NAMES = [
+    'Posting IN', 'Posting OUT', 'Pension Out', 'TPTL', 'Lve', 'TFRGTH', 'HRA', 'RUMCIG',
+    'PRPLVE/JRNYD', 'Medal', 'Med Cat', 'CEA', 'Marriage/Divorce', 'Change of Name',
+    'Birth', 'Demise', 'Civ Edn/MILEDN', 'ACCLVE', 'UID/PAN', 'Jt Acct',
+    'OPTFIX', 'PFWDL', 'Mobile No/Email', 'Change Address', 'Injury Report',
+    'Hosp Adm/Tfr/Disch', 'PROVFS', 'LTC', 'RISK', 'HAUCA'
+  ];
+
+  function buildDefaultCaseRows() {
+    return DEFAULT_CASE_NAMES.map((name, index) => ({
+      id: index + 1,
+      type_of_case: name,
+      pending_last_week: 0,
+      recd_current_week: 0,
+      total_cases: 0,
+      pub_this_week: 0,
+      under_prog: 0,
+      remarks: '',
+      remarks_list: [],
+      remarks_count: 0,
+      updated_by: null,
+      updated_at: null,
+      updated_at_ts: null
+    }));
+  }
+
+  let pcData = buildDefaultCaseRows();
 
   document.getElementById('pendingCasesModal').addEventListener('show.bs.modal', function() {
     loadPendingCases();
@@ -430,12 +458,21 @@
     fetch('/pending_cases/get')
       .then(r => r.json())
       .then(res => {
-        if (!res || !res.success) return;
-        pcData = res.data || [];
+        if (!res || !res.success || !Array.isArray(res.data) || res.data.length === 0) {
+          pcData = buildDefaultCaseRows();
+        } else {
+          pcData = res.data;
+        }
         window.renderTable(pcData);
         updateLastUpdated(pcData);
       })
-      .catch(err => console.error('Failed to load pending cases:', err));
+      .catch(err => {
+        console.error('Failed to load pending cases:', err);
+        if (!pcData || pcData.length === 0) {
+          pcData = buildDefaultCaseRows();
+          window.renderTable(pcData);
+        }
+      });
   }
 
   function updateLastUpdated(data) {
@@ -601,14 +638,18 @@
   window.renderTable = function renderTable(data) {
     const tbody = document.getElementById('pcTableBody');
     if (!tbody) return;
+    if (!data || data.length === 0) {
+      data = buildDefaultCaseRows();
+      pcData = data;
+    }
     let totPending = 0, totRecd = 0, totPub = 0, totTotal = 0, totUnder = 0;
 
     const rows = (data || []).map((row, idx) => {
       const pCount = (row.pending_last_week || 0);
       const rCount = (row.recd_current_week || 0);
       const pubCount = (row.pub_this_week || 0);
-      const tCount = Math.max(0, (pCount + rCount) - pubCount);
-      const uCount = (row.under_prog || 0);
+      const tCount = pCount + rCount;
+      const uCount = (row.under_prog !== undefined && row.under_prog !== null) ? Number(row.under_prog) : Math.max(0, tCount - pubCount);
 
       totPending += pCount;
       totRecd    += rCount;
@@ -665,6 +706,9 @@
     });
   };
 
+  // Immediate initial render so the table never shrinks or flashes empty
+  window.renderTable(pcData);
+
   window.pcHandleKey = function(e, id) {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -681,13 +725,18 @@
     const pubInp = document.getElementById('ei_pub_' + id);
     const tInp = document.getElementById('ei_total_' + id);
     const tDisp = document.getElementById('ei_total_disp_' + id);
-    if (pInp && rInp && pubInp) {
+    const uInp = document.getElementById('ei_under_' + id);
+    const uDisp = document.getElementById('ei_under_disp_' + id);
+    if (pInp && rInp) {
       const p = parseInt(pInp.value, 10) || 0;
       const r = parseInt(rInp.value, 10) || 0;
-      const pub = parseInt(pubInp.value, 10) || 0;
-      const tot = Math.max(0, (p + r) - pub);
+      const pub = pubInp ? (parseInt(pubInp.value, 10) || 0) : 0;
+      const tot = p + r;
+      const underProg = Math.max(0, tot - pub);
       if (tInp) tInp.value = tot;
       if (tDisp) tDisp.innerHTML = `${tot} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i>`;
+      if (uInp) uInp.value = underProg;
+      if (uDisp) uDisp.innerHTML = `${underProg} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i>`;
     }
   };
 
@@ -699,7 +748,7 @@
     const pCount = (row.pending_last_week || 0);
     const rCount = (row.recd_current_week || 0);
     const pubCount = (row.pub_this_week || 0);
-    const tCount = Math.max(0, (pCount + rCount) - pubCount);
+    const tCount = pCount + rCount;
 
     if (IS_REMARK_ONLY_ROLE) {
       // Numbers are LOCKED for CO, 2IC, ADJUTANT roles — only Remark is editable
@@ -713,17 +762,17 @@
       // "lock columns for DOCJC Pending Cas of Last Week, Recd Cas Current Week, Total Cases"
       document.getElementById('pcPending_' + id).innerHTML = `<span class="pc-locked-val" title="Locked for DOCJC">${pCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_pending_${id}" value="${pCount}">`;
       document.getElementById('pcRecd_'   + id).innerHTML = `<span class="pc-locked-val" title="Locked for DOCJC">${rCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_recd_${id}" value="${rCount}">`;
-      document.getElementById('pcTotal_'  + id).innerHTML = `<span class="pc-locked-val" id="ei_total_disp_${id}" style="font-weight:700; color:#1e3a8a;" title="Locked for DOCJC: (Pending + Recd) - Pub">${tCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_total_${id}" value="${tCount}">`;
+      document.getElementById('pcTotal_'  + id).innerHTML = `<span class="pc-locked-val" id="ei_total_disp_${id}" style="font-weight:700; color:#1e3a8a;" title="Locked for DOCJC: Pending + Recd">${tCount} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_total_${id}" value="${tCount}">`;
       document.getElementById('pcPub_'    + id).innerHTML = `<input class="pc-num-input" id="ei_pub_${id}"     value="${pubCount}" type="number" min="0" oninput="pcRecalcTotal(${id})" onkeydown="pcHandleKey(event, ${id})">`;
-      document.getElementById('pcUnder_'  + id).innerHTML = `<input class="pc-num-input" id="ei_under_${id}"   value="${row.under_prog || 0}" type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+      document.getElementById('pcUnder_'  + id).innerHTML = `<span class="pc-locked-val" id="ei_under_disp_${id}" title="Under Prog = Total Cases - Published This Week">${Math.max(0, tCount - pubCount)} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_under_${id}" value="${Math.max(0, tCount - pubCount)}">`;
       document.getElementById('pcRem_'    + id).innerHTML = `<input class="pc-rem-input" id="ei_rem_${id}"     value="" placeholder="Add remark..." onkeydown="pcHandleKey(event, ${id})">`;
     } else {
       // Admin: Full edit capability for all fields
       document.getElementById('pcPending_' + id).innerHTML = `<input class="pc-num-input" id="ei_pending_${id}" value="${pCount}" type="number" min="0" oninput="pcRecalcTotal(${id})" onkeydown="pcHandleKey(event, ${id})">`;
       document.getElementById('pcRecd_'   + id).innerHTML = `<input class="pc-num-input" id="ei_recd_${id}"    value="${rCount}" type="number" min="0" oninput="pcRecalcTotal(${id})" onkeydown="pcHandleKey(event, ${id})">`;
-      document.getElementById('pcTotal_'  + id).innerHTML = `<input class="pc-num-input" id="ei_total_${id}"   value="${tCount}" type="number" min="0" readonly style="font-weight:700; color:#1e3a8a; background:#f1f5f9; cursor:not-allowed;" title="Total Cases = (Pending + Recd) - Pub" onkeydown="pcHandleKey(event, ${id})">`;
+      document.getElementById('pcTotal_'  + id).innerHTML = `<input class="pc-num-input" id="ei_total_${id}"   value="${tCount}" type="number" min="0" readonly style="font-weight:700; color:#1e3a8a; background:#f1f5f9; cursor:not-allowed;" title="Total Cases = Pending + Recd" onkeydown="pcHandleKey(event, ${id})">`;
       document.getElementById('pcPub_'    + id).innerHTML = `<input class="pc-num-input" id="ei_pub_${id}"     value="${pubCount}" type="number" min="0" oninput="pcRecalcTotal(${id})" onkeydown="pcHandleKey(event, ${id})">`;
-      document.getElementById('pcUnder_'  + id).innerHTML = `<input class="pc-num-input" id="ei_under_${id}"   value="${row.under_prog || 0}" type="number" min="0" onkeydown="pcHandleKey(event, ${id})">`;
+      document.getElementById('pcUnder_'  + id).innerHTML = `<span class="pc-locked-val" id="ei_under_disp_${id}" title="Under Prog = Total Cases - Published This Week">${Math.max(0, tCount - pubCount)} <i class="fa fa-lock" style="font-size:9px; opacity:0.6;"></i></span><input type="hidden" id="ei_under_${id}" value="${Math.max(0, tCount - pubCount)}">`;
       document.getElementById('pcRem_'    + id).innerHTML = `<input class="pc-rem-input" id="ei_rem_${id}"     value="" placeholder="Add remark..." onkeydown="pcHandleKey(event, ${id})">`;
     }
 
@@ -754,7 +803,7 @@
       const pVal = pInput ? (parseInt(pInput.value, 10) || 0) : 0;
       const rVal = rInput ? (parseInt(rInput.value, 10) || 0) : 0;
       const pubVal = pubInput ? (parseInt(pubInput.value, 10) || 0) : 0;
-      const tVal = Math.max(0, (pVal + rVal) - pubVal);
+      const tVal = pVal + rVal;
       payload = {
         pending_last_week: pVal,
         recd_current_week: rVal,

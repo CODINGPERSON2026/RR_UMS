@@ -382,10 +382,6 @@
           </div>
         </div>
         <div class="d-flex align-items-center gap-2">
-          <!-- Button to fill table (Shown to ONCO / Admin) -->
-          <button type="button" class="btn btn-sm btn-light text-primary fw-bold" id="djBtnAddEntry" style="display:none;" onclick="djOpenAddEntryModal()">
-            <i class="fa fa-plus-circle me-1"></i>+ Add Leave Entry
-          </button>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
       </div>
@@ -397,7 +393,7 @@
         <div class="dj-filter-bar">
           <div class="row g-2 align-items-end">
             <!-- Company Filter -->
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-2 col-sm-6">
               <label class="dj-filter-label"><i class="fa fa-building me-1"></i>Company</label>
               <select id="djFilterCompany" class="form-select form-select-sm" onchange="djApplyFilters()">
                 <option value="">All Companies</option>
@@ -433,7 +429,7 @@
             </div>
 
             <!-- Search Box -->
-            <div class="col-md-3 col-sm-6">
+            <div class="col-md-4 col-sm-6">
               <label class="dj-filter-label"><i class="fa fa-search me-1"></i>Search</label>
               <input type="text" id="djFilterSearch" class="form-control form-select-sm" placeholder="Search army no, name, rank..." oninput="djApplyFilters()">
             </div>
@@ -460,8 +456,8 @@
                   <th>Company</th>
                   <th>Leave Type</th>
                   <th>Days</th>
-                  <th style="min-width: 130px;">ONCO Action</th>
-                  <th style="min-width: 140px;">DOC Action</th>
+                  <th style="min-width: 130px;" id="djThOncoAction">ONCO Action</th>
+                  <th style="min-width: 140px;" id="djThDocAction">DOC Action</th>
                   <th style="width: 50px;">Delete</th>
                 </tr>
               </thead>
@@ -628,7 +624,7 @@
         const hintEl = document.getElementById('djFooterHint');
 
         if (isUserOnco && !isUserDoc) {
-          if (addBtn) addBtn.style.display = '';
+          if (addBtn) addBtn.style.display = 'none';
           const coyBadge = userCompany ? `<span class="badge bg-warning text-dark ms-2" style="font-size:11px;"><i class="fa fa-building me-1"></i>${esc(userCompany)}</span>` : '';
           if (titleEl) titleEl.innerHTML = `DOC LEAVE DETAILS <span class="badge bg-light text-primary ms-2" style="font-size:11px;">ONCO ACCESS</span>${coyBadge}`;
           if (hintEl) {
@@ -640,13 +636,30 @@
           if (hintEl) hintEl.innerHTML = `<i class="fa fa-clipboard-check me-1"></i><strong>DOCJC</strong>: Set <strong>DONE</strong> (updates Pub This Week) or <strong>BALANCE</strong> (updates Under PROG). You can delete rows.`;
         } else {
           // Admin / Full Access
-          if (addBtn) addBtn.style.display = '';
+          if (addBtn) addBtn.style.display = 'none';
           if (titleEl) titleEl.innerHTML = `DOC LEAVE DETAILS <span class="badge bg-light text-primary ms-2" style="font-size:11px;">FULL ACCESS</span>`;
           if (hintEl) hintEl.innerHTML = `<i class="fa fa-info-circle me-1"></i><strong>Full Access</strong>: ONCO (Active/Inactive), DOC (DONE/BALANCE), Add &amp; Delete entries.`;
         }
 
         populateCompanyFilter(res.companies || []);
         updateStatsDisplay();
+
+        // Configure column visibility based on role:
+        // Screenshot-1 (DOC view): remove ONCO Action column
+        // Screenshot-2 (ONCO view): remove DOC Action column
+        const thOnco = document.getElementById('djThOncoAction');
+        const thDoc = document.getElementById('djThDocAction');
+        if (isUserDoc && !isUserOnco) {
+          if (thOnco) thOnco.style.display = 'none';
+          if (thDoc) thDoc.style.display = '';
+        } else if (isUserOnco && !isUserDoc) {
+          if (thDoc) thDoc.style.display = 'none';
+          if (thOnco) thOnco.style.display = '';
+        } else {
+          if (thOnco) thOnco.style.display = '';
+          if (thDoc) thDoc.style.display = '';
+        }
+
         djApplyFilters();
       })
       .catch(err => {
@@ -694,13 +707,18 @@
   }
 
   window.djApplyFilters = function() {
-    const compVal = (document.getElementById('djFilterCompany')?.value || '').toLowerCase().trim();
+    const compEl = document.getElementById('djFilterCompany');
+    const compVal = (compEl ? compEl.value : '').toLowerCase().trim();
     const typeVal = (document.getElementById('djFilterLeaveType')?.value || '').toUpperCase().trim();
     const statVal = (document.getElementById('djFilterStatus')?.value || '').toLowerCase().trim();
     const searchVal = (document.getElementById('djFilterSearch')?.value || '').toLowerCase().trim();
 
     docjcFilteredLeaves = docjcRawLeaves.filter(row => {
-      // Company match
+      // If user is ONCO (e.g. 3 Company), ensure only user company leaves show
+      if (isUserOnco && !isUserDoc && userCompany) {
+        if (normalizeCompany(row.company) !== normalizeCompany(userCompany)) return false;
+      }
+      // Company match if company filter element is present
       if (compVal) {
         const rowComp = (row.company || '').toLowerCase();
         if (!rowComp.includes(compVal)) return false;
@@ -736,7 +754,7 @@
       return true;
     });
 
-    renderDocjcTable(docjcFilteredLeaves);
+    renderDocjcTable(docjcFilteredLeaves, searchVal);
   };
 
   window.djResetFilters = function() {
@@ -753,7 +771,7 @@
 
   /* Render Table with Columns:
      SNO, ARMY NUMBER, RANK, NAME, COMPANY, LEAVE TYPE, DAYS, ONCO ACTION, DOC ACTION, DELETE */
-  function renderDocjcTable(data) {
+  function renderDocjcTable(data, searchTerm) {
     const tbody = document.getElementById('docjcLeaveTableBody');
     const countEl = document.getElementById('djRecordCount');
     if (!tbody) return;
@@ -776,8 +794,19 @@
       const isDocDone = doc === 'done';
       const isDocBalance = doc === 'balance';
 
+      // Format dates to short readable format (e.g., "30 Sep 2026")
+      function djFormatDate(d) {
+        if (!d) return '';
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return esc(d);
+        const dd = dt.getDate();
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const mm = months[dt.getMonth()];
+        const yy = dt.getFullYear();
+        return dd + ' ' + mm + ' ' + yy;
+      }
       const dateStr = (row.from_date && row.to_date)
-        ? `<span class="dj-dates-sub">${esc(row.from_date)} &ndash; ${esc(row.to_date)}</span>`
+        ? `<span class="dj-dates-sub">${djFormatDate(row.from_date)} &ndash; ${djFormatDate(row.to_date)}</span>`
         : '';
 
       // Respective Company ONCO Access Check
@@ -867,17 +896,16 @@
       return `
         <tr id="djRow_${row.id}">
           <td>${idx + 1}</td>
-          <td><span class="dj-badge-army">${esc(row.army_number)}</span></td>
-          <td><span class="dj-badge-rank">${esc(row.rank || 'Personnel')}</span></td>
-          <td><div class="fw-bold">${esc(row.name)}</div></td>
-          <td><span class="dj-badge-company">${esc(row.company || '&mdash;')}</span></td>
+          <td><span class="dj-badge-army">${searchTerm ? highlightMatch(row.army_number, searchTerm) : esc(row.army_number)}</span></td>
+          <td><span class="dj-badge-rank">${searchTerm ? highlightMatch(row.rank || 'Personnel', searchTerm) : esc(row.rank || 'Personnel')}</span></td>
+          <td><div class="fw-bold">${searchTerm ? highlightMatch(row.name, searchTerm) : esc(row.name)}</div></td>
+          <td><span class="dj-badge-company">${searchTerm ? highlightMatch(row.company || '', searchTerm) : esc(row.company || '&mdash;')}</span></td>
           <td><span class="dj-badge-ltype">${esc(row.leave_type || 'AL')}</span></td>
           <td>
             <span class="dj-days-val">${row.leave_days || 0} Days</span>
-            ${dateStr}
           </td>
-          <td>${oncoCellHtml}</td>
-          <td>${docCellHtml}</td>
+          <td class="dj-col-onco-action" ${(!isUserDoc || isUserOnco) ? '' : 'style="display:none;"'}>${oncoCellHtml}</td>
+          <td class="dj-col-doc-action" ${(!isUserOnco || isUserDoc) ? '' : 'style="display:none;"'}>${docCellHtml}</td>
           <td>${deleteCellHtml}</td>
         </tr>
       `;
@@ -1210,6 +1238,14 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  function highlightMatch(text, searchTerm) {
+    if (!searchTerm || !text) return esc(text);
+    var escaped = esc(String(text));
+    var safe = esc(searchTerm).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    var regex = new RegExp('(' + safe + ')', 'gi');
+    return escaped.replace(regex, '<mark style="background:#fde68a;padding:0 2px;border-radius:2px;">$1</mark>');
   }
 })();
 </script>
