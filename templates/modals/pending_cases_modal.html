@@ -469,14 +469,14 @@
           IS_ONCO_ROLE = !!res.is_onco;
           if (res.user_company) USER_COMPANY = res.user_company;
         }
-        window.renderTable(pcData);
+        window.renderPendingCasesTable(pcData);
         updateLastUpdated(pcData);
       })
       .catch(err => {
         console.error('Failed to load pending cases:', err);
         if (!pcData || pcData.length === 0) {
           pcData = buildDefaultCaseRows();
-          window.renderTable(pcData);
+          window.renderPendingCasesTable(pcData);
         }
       });
   }
@@ -501,7 +501,7 @@
 
   /* Exposed so inline handlers can cancel edit cleanly */
   window.pcCancelEdit = function() {
-    window.renderTable(pcData);
+    window.renderPendingCasesTable(pcData);
   };
 
   /* Open / Toggle Floating Remarks Dropdown */
@@ -627,7 +627,7 @@
           if (res.updated_at_ts) row.updated_at_ts = res.updated_at_ts;
           renderDropdownRemarksList(row);
         }
-        window.renderTable(pcData);
+        window.renderPendingCasesTable(pcData);
         updateLastUpdated(pcData);
       } else {
         alert('Error: ' + (res && res.message ? res.message : 'Failed to post remark'));
@@ -641,7 +641,7 @@
   };
 
   /* Exposed to window so onclick handlers can re-render safely */
-  window.renderTable = function renderTable(data) {
+  window.renderPendingCasesTable = function renderPendingCasesTable(data) {
     const tbody = document.getElementById('pcTableBody');
     if (!tbody) return;
     if (!data || data.length === 0) {
@@ -748,7 +748,7 @@
   };
 
   // Immediate initial render so the table never shrinks or flashes empty
-  window.renderTable(pcData);
+  window.renderPendingCasesTable(pcData);
 
   window.pcHandleKey = function(e, id) {
     if (e.key === 'Enter') {
@@ -913,7 +913,7 @@
             if (res.remarks_list) row.remarks_list = res.remarks_list;
             if (res.remarks_count !== undefined) row.remarks_count = res.remarks_count;
           }
-          window.renderTable(pcData);
+          window.renderPendingCasesTable(pcData);
           updateLastUpdated(pcData);
         } else {
           alert('Error: ' + (res && res.message ? res.message : 'Failed to update company recd cases'));
@@ -967,7 +967,7 @@
           if (res.remarks_list) row.remarks_list = res.remarks_list;
           if (res.remarks_count !== undefined) row.remarks_count = res.remarks_count;
         }
-        window.renderTable(pcData);
+        window.renderPendingCasesTable(pcData);
         updateLastUpdated(pcData);
       } else {
         alert('Error: ' + (res && res.message ? res.message : 'Save failed'));

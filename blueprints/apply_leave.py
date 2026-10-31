@@ -2699,33 +2699,54 @@ def get_leaves():
         if not user or not isinstance(user, dict):
             return jsonify({"error": "Unauthorized"}), 401
 
-        current_company = user['company']
+        current_company = (user.get('company') or '').strip()
+        user_role = (user.get('role') or '').upper().strip()
+        r_clean = user_role.replace(' ', '').replace('_', '').replace('-', '')
+        is_all_company = r_clean in ['ADMIN', 'SUPERADMIN', 'CO', '2IC', 'ADJUTANT', 'DOCJC'] or current_company.lower() in ['admin', 'all', 'center']
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Approved
-        cursor.execute("""
-            SELECT *
-            FROM leave_status_info
-            WHERE request_status = 'Approved' AND company = %s
-            ORDER BY created_at DESC
-        """, (current_company,))
-        approved = cursor.fetchall()
+        if is_all_company:
+            # Approved
+            cursor.execute("""
+                SELECT *
+                FROM leave_status_info
+                WHERE request_status = 'Approved'
+                ORDER BY created_at DESC
+            """)
+            approved = cursor.fetchall()
 
-        # Pending
-        cursor.execute("""
-            SELECT *
-            FROM leave_status_info
-            WHERE request_status LIKE '%Pending%' AND company = %s
-            ORDER BY created_at DESC
-        """, (current_company,))
-        pending = cursor.fetchall()
+            # Pending
+            cursor.execute("""
+                SELECT *
+                FROM leave_status_info
+                WHERE request_status LIKE '%Pending%'
+                ORDER BY created_at DESC
+            """)
+            pending = cursor.fetchall()
+        else:
+            # Approved
+            cursor.execute("""
+                SELECT *
+                FROM leave_status_info
+                WHERE request_status = 'Approved' AND LOWER(company) = LOWER(%s)
+                ORDER BY created_at DESC
+            """, (current_company,))
+            approved = cursor.fetchall()
+
+            # Pending
+            cursor.execute("""
+                SELECT *
+                FROM leave_status_info
+                WHERE request_status LIKE '%Pending%' AND LOWER(company) = LOWER(%s)
+                ORDER BY created_at DESC
+            """, (current_company,))
+            pending = cursor.fetchall()
 
         cursor.close()
         conn.close()
 
-        # ✅ FIX HERE
         approved = serialize_dates(approved)
         pending  = serialize_dates(pending)
 
@@ -3027,9 +3048,14 @@ def update_onco_leave_action():
 
         cursor.execute("UPDATE doc_leave_details SET onco_status = %s WHERE id = %s", (new_status, leave_id))
 
+        # Overall active count for UI badge
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
+        onco_active_count = cursor.fetchone()['c']
+
         # Recd cases for LVE = count of Active leaves received this week
-        now_dt = datetime.datetime.now()
-        week_start_dt = (now_dt - datetime.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        import datetime as _dt_module
+        now_dt = _dt_module.datetime.now()
+        week_start_dt = (now_dt - _dt_module.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
         cursor.execute("""
             SELECT COUNT(*) AS c 
             FROM doc_leave_details 
@@ -3184,8 +3210,13 @@ def delete_doc_leave():
 
         cursor.execute("DELETE FROM doc_leave_details WHERE id = %s", (leave_id,))
 
-        now_dt = datetime.datetime.now()
-        week_start_dt = (now_dt - datetime.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+        # Overall active count for UI badge
+        cursor.execute("SELECT COUNT(*) AS c FROM doc_leave_details WHERE LOWER(onco_status) = 'active'")
+        onco_active_count = cursor.fetchone()['c']
+
+        import datetime as _dt_module
+        now_dt = _dt_module.datetime.now()
+        week_start_dt = (now_dt - _dt_module.timedelta(days=now_dt.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
         cursor.execute("""
             SELECT COUNT(*) AS c 
             FROM doc_leave_details 

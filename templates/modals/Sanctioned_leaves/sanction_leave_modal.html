@@ -299,8 +299,6 @@
     .leave-module .av3 { background: #fce7f3; color: #9d174d; }
     .leave-module .av4 { background: #dbeafe; color: #1e40af; }
   </style>
-</head>
-<body>
 
   <div class="leave-module">
     <!-- MODAL -->
@@ -325,11 +323,11 @@
 
             <!-- Tabs -->
             <div class="leave-tabs">
-              <button class="leave-tab-btn active" id="tab-btn-approved" data-tab="approved" onclick="switchTab('approved')">
+              <button class="leave-tab-btn active" id="tab-btn-approved" data-tab="approved" onclick="switchLeaveModalTab('approved')">
                 <i class="bi bi-check-circle-fill"></i> Approved
                 <span class="tab-badge" id="approved-count">0</span>
               </button>
-              <button class="leave-tab-btn" id="tab-btn-pending" data-tab="pending" onclick="switchTab('pending')">
+              <button class="leave-tab-btn" id="tab-btn-pending" data-tab="pending" onclick="switchLeaveModalTab('pending')">
                 <i class="bi bi-clock-fill"></i> Pending
                 <span class="tab-badge" id="pending-count">0</span>
               </button>
@@ -345,7 +343,7 @@
                 <div class="search-wrap" style="position: relative; width: 320px;">
                   <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
                   <input type="text" class="form-control ps-5" placeholder="Search by name or type…" 
-                         oninput="filterTable('approved', this.value)" id="search-approved">
+                         oninput="filterLeaveModalTable('approved', this.value)" id="search-approved">
                 </div>
                 <div class="result-count text-muted small" id="rc-approved">— records</div>
               </div>
@@ -381,7 +379,7 @@
                 <div class="search-wrap" style="position: relative; width: 320px;">
                   <i class="bi bi-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6b7280;"></i>
                   <input type="text" class="form-control ps-5" placeholder="Search by name or type…" 
-                         oninput="filterTable('pending', this.value)" id="search-pending">
+                         oninput="filterLeaveModalTable('pending', this.value)" id="search-pending">
                 </div>
                 <div class="result-count text-muted small" id="rc-pending">— records</div>
               </div>
@@ -415,7 +413,7 @@
           <!-- Footer -->
           <div class="modal-footer">
             <div class="footer-meta text-muted small" id="footer-meta">Last synced just now</div>
-            <button class="btn btn-primary btn-sm px-4" onclick="exportCSV()">
+            <button class="btn btn-primary btn-sm px-4" onclick="exportLeaveModalCSV()">
               <i class="bi bi-download me-2"></i> Export CSV
             </button>
           </div>
@@ -434,24 +432,25 @@
 
     const AVATAR_COLORS = ['av0', 'av1', 'av2', 'av3', 'av4'];
 
-    function initials(name = '') {
-      return name.trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
+    function initials(name) {
+      if (!name || typeof name !== 'string') return '?';
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return '?';
+      return parts.slice(0, 2).map(w => w[0]).join('').toUpperCase() || '?';
     }
 
     function daysBetween(d1, d2) {
       try {
-        if (!d1 || !d2 || d1 === '–' || d2 === '–') return '–';
+        if (!d1 || !d2 || d1 === '-' || d2 === '-' || d1 === '–' || d2 === '–') return '-';
         const parse = s => {
           if (!s) return null;
           if (s instanceof Date) return s;
           const str = String(s).trim();
-          // Support DD/MM/YYYY or DD-MM-YYYY
           const dmyMatch = str.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/);
           if (dmyMatch) {
             const [, d, m, y] = dmyMatch;
             return new Date(Number(y), Number(m) - 1, Number(d));
           }
-          // Support YYYY-MM-DD or YYYY/MM/DD
           const ymdMatch = str.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$/);
           if (ymdMatch) {
             const [, y, m, d] = ymdMatch;
@@ -464,185 +463,221 @@
         const dt1 = parse(d1);
         const dt2 = parse(d2);
         if (!dt1 || !dt2 || isNaN(dt1.getTime()) || isNaN(dt2.getTime())) {
-          return '–';
+          return '-';
         }
         const diffDays = Math.round(Math.abs(dt2 - dt1) / 86400000) + 1;
-        return isNaN(diffDays) ? '–' : diffDays;
-      } catch {
-        return '–';
+        return isNaN(diffDays) ? '-' : diffDays;
+      } catch (e) {
+        return '-';
       }
     }
 
     function buildApprovedRow(r) {
-      const name = r.employee_name || r.name || 'Unknown';
-      const empId = r.employee_id || r.emp_id || '';
-      const armyNumber = r.army_number || empId; // fallback if not present
-      const ltype = r.leave_type || r.type || '–';
-      const from = r.from_date || r.start_date || '–';
-      const to = r.to_date || r.end_date || '–';
-      const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-      const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
-        ? r.leave_days
-        : ((from !== '–' && to !== '–') ? daysBetween(from, to) : '–');
-      const get_leave_id = r.id;
-    
-      return `
-        <tr data-search="${(name + ltype).toLowerCase()}">
-          <td>
-            <div class="emp-cell">
-              <div class="emp-avatar ${avClass}">${initials(name)}</div>
-              <div>
-                <div class="emp-name">${name}</div>
-                ${empId ? `<div class="emp-id">#${empId}</div>` : ''}
+      try {
+        const rawName = r.employee_name || r.name || 'Unknown';
+        const name = String(rawName).trim();
+        const rank = r.rank ? String(r.rank).trim() + ' ' : '';
+        const armyNumber = r.army_number || r.employee_id || r.emp_id || '';
+        const ltype = r.leave_type || r.type || '-';
+        const from = r.from_date || r.start_date || '-';
+        const to = r.to_date || r.end_date || '-';
+        const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+        const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
+          ? r.leave_days
+          : ((from !== '-' && to !== '-') ? daysBetween(from, to) : '-');
+        const get_leave_id = r.id;
+
+        return `
+          <tr data-search="${(name + ' ' + armyNumber + ' ' + ltype).toLowerCase()}">
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar ${avClass}">${initials(name)}</div>
+                <div>
+                  <div class="emp-name">${rank}${name}</div>
+                  ${armyNumber ? `<div class="emp-id">#${armyNumber}</div>` : ''}
+                </div>
               </div>
-            </div>
-          </td>
-          <td><span class="badge-pill badge-type">${ltype}</span></td>
-          <td><div class="date-range"><span>${from}</span><span class="date-arrow">→</span><span>${to}</span></div></td>
-          <td><strong>${days}</strong><small class="text-muted"> days</small></td>
-          <td><span class="badge-pill badge-approved"><i class="bi bi-check-circle"></i> Approved</span></td>
-    
-          <!-- NEW COLUMN -->
-         
-<td>
-    <button class="btn btn-sm btn-outline-primary"
-        onclick="downloadCertificate('${get_leave_id}')"
-        title="Download Certificate">
-        <i class="fa-solid fa-download"></i>
-    </button>
-</td>
-        </tr>`;
+            </td>
+            <td><span class="badge-pill badge-type">${ltype}</span></td>
+            <td><div class="date-range"><span>${from}</span><span class="date-arrow">→</span><span>${to}</span></div></td>
+            <td><strong>${days}</strong><small class="text-muted"> days</small></td>
+            <td><span class="badge-pill badge-approved"><i class="bi bi-check-circle"></i> Approved</span></td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary"
+                  onclick="downloadLeaveCertificate('${get_leave_id}')"
+                  title="Download Certificate">
+                  <i class="fa-solid fa-download"></i>
+              </button>
+            </td>
+          </tr>`;
+      } catch (err) {
+        console.error('buildApprovedRow error:', err, r);
+        return '';
+      }
     }
 
     function buildPendingRow(r) {
-      const name = r.employee_name || r.name || 'Unknown';
-      const empId = r.employee_id || r.emp_id || '';
-      const ltype = r.leave_type || r.type || '–';
-      const from = r.from_date || r.start_date || '–';
-      const to = r.to_date || r.end_date || '–';
-      const pendingAt = r.request_status || 'Pending';
-      const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
-      const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
-        ? r.leave_days
-        : ((from !== '–' && to !== '–') ? daysBetween(from, to) : '–');
+      try {
+        const rawName = r.employee_name || r.name || 'Unknown';
+        const name = String(rawName).trim();
+        const rank = r.rank ? String(r.rank).trim() + ' ' : '';
+        const armyNumber = r.army_number || r.employee_id || r.emp_id || '';
+        const ltype = r.leave_type || r.type || '-';
+        const from = r.from_date || r.start_date || '-';
+        const to = r.to_date || r.end_date || '-';
+        const pendingAt = r.request_status || 'Pending';
+        const avClass = AVATAR_COLORS[(name.charCodeAt(0) || 0) % AVATAR_COLORS.length];
+        const days = (r.leave_days !== null && r.leave_days !== undefined && r.leave_days !== '' && !isNaN(r.leave_days))
+          ? r.leave_days
+          : ((from !== '-' && to !== '-') ? daysBetween(from, to) : '-');
 
-      return `
-        <tr data-search="${(name + ltype + pendingAt).toLowerCase()}">
-          <td>
-            <div class="emp-cell">
-              <div class="emp-avatar ${avClass}">${initials(name)}</div>
-              <div>
-                <div class="emp-name">${name}</div>
-                ${empId ? `<div class="emp-id">#${empId}</div>` : ''}
+        return `
+          <tr data-search="${(name + ' ' + armyNumber + ' ' + ltype + ' ' + pendingAt).toLowerCase()}">
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar ${avClass}">${initials(name)}</div>
+                <div>
+                  <div class="emp-name">${rank}${name}</div>
+                  ${armyNumber ? `<div class="emp-id">#${armyNumber}</div>` : ''}
+                </div>
               </div>
-            </div>
-          </td>
-          <td><span class="badge-pill badge-type">${ltype}</span></td>
-          <td><div class="date-range"><span>${from}</span><span class="date-arrow">→</span><span>${to}</span></div></td>
-          <td><strong>${days}</strong><small class="text-muted"> days</small></td>
-          <td><span class="pending-at-chip"><i class="bi bi-hourglass-split"></i> ${pendingAt}</span></td>
-        </tr>`;
+            </td>
+            <td><span class="badge-pill badge-type">${ltype}</span></td>
+            <td><div class="date-range"><span>${from}</span><span class="date-arrow">→</span><span>${to}</span></div></td>
+            <td><strong>${days}</strong><small class="text-muted"> days</small></td>
+            <td><span class="pending-at-chip"><i class="bi bi-hourglass-split"></i> ${pendingAt}</span></td>
+          </tr>`;
+      } catch (err) {
+        console.error('buildPendingRow error:', err, r);
+        return '';
+      }
     }
 
-    function renderTable(type, rows) {
+    function renderSanctionLeaveTable(type, rows) {
       const tbody = document.getElementById(`tbody-${type}`);
       const table = document.getElementById(`table-${type}`);
       const spinner = document.getElementById(`spinner-${type}`);
       const empty = document.getElementById(`empty-${type}`);
       const rc = document.getElementById(`rc-${type}`);
 
-      spinner.style.display = 'none';
+      if (spinner) spinner.style.display = 'none';
 
       if (!rows || rows.length === 0) {
-        table.style.display = 'none';
-        empty.style.display = 'block';
-        rc.textContent = '0 records';
+        if (table) table.style.display = 'none';
+        if (empty) empty.style.display = 'block';
+        if (rc) rc.textContent = '0 records';
+        if (tbody) tbody.innerHTML = '';
         return;
       }
 
-      tbody.innerHTML = rows.map(r => type === 'approved' ? buildApprovedRow(r) : buildPendingRow(r)).join('');
-      table.style.display = 'table';
-      empty.style.display = 'none';
-      rc.textContent = `${rows.length} record${rows.length !== 1 ? 's' : ''}`;
+      try {
+        const rowsHtml = rows.map(r => type === 'approved' ? buildApprovedRow(r) : buildPendingRow(r)).join('');
+        if (tbody) tbody.innerHTML = rowsHtml;
+        if (table) table.style.display = 'table';
+        if (empty) empty.style.display = 'none';
+        if (rc) rc.textContent = `${rows.length} record${rows.length !== 1 ? 's' : ''}`;
+      } catch (err) {
+        console.error(`Error rendering table for ${type}:`, err);
+        if (table) table.style.display = 'table';
+        if (empty) empty.style.display = 'none';
+      }
     }
 
-    function filterTable(type, query) {
+    function filterLeaveModalTable(type, query) {
       const tbody = document.getElementById(`tbody-${type}`);
+      if (!tbody) return;
       const rows = tbody.querySelectorAll('tr');
-      const q = query.toLowerCase().trim();
+      const q = (query || '').toLowerCase().trim();
       let visible = 0;
 
       rows.forEach(tr => {
-        const match = !q || tr.dataset.search.includes(q);
+        const match = !q || (tr.dataset.search && tr.dataset.search.includes(q));
         tr.style.display = match ? '' : 'none';
         if (match) visible++;
       });
 
-      document.getElementById(`rc-${type}`).textContent = `${visible} record${visible !== 1 ? 's' : ''}`;
+      const rc = document.getElementById(`rc-${type}`);
+      if (rc) rc.textContent = `${visible} record${visible !== 1 ? 's' : ''}`;
 
       const empty = document.getElementById(`empty-${type}`);
       const table = document.getElementById(`table-${type}`);
-      empty.style.display = visible === 0 ? 'block' : 'none';
-      table.style.display = visible === 0 ? 'none' : 'table';
+      if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+      if (table) table.style.display = visible === 0 ? 'none' : 'table';
     }
 
-    function switchTab(tab) {
+    function switchLeaveModalTab(tab) {
       currentTab = tab;
 
-      // Toggle tab buttons
       document.querySelectorAll('.leave-tab-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.tab === tab);
       });
 
-      // Toggle panels - This was the main fix
       document.querySelectorAll('.tab-panel').forEach(panel => {
         panel.classList.toggle('active', panel.id === `panel-${tab}`);
       });
     }
 
     async function fetchLeaves() {
+      const spApproved = document.getElementById('spinner-approved');
+      const spPending = document.getElementById('spinner-pending');
+      const tbApproved = document.getElementById('table-approved');
+      const tbPending = document.getElementById('table-pending');
+      const emApproved = document.getElementById('empty-approved');
+      const emPending = document.getElementById('empty-pending');
+
+      if (spApproved) spApproved.style.display = 'block';
+      if (spPending) spPending.style.display = 'block';
+      if (tbApproved) tbApproved.style.display = 'none';
+      if (tbPending) tbPending.style.display = 'none';
+      if (emApproved) emApproved.style.display = 'none';
+      if (emPending) emPending.style.display = 'none';
+
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error('API error');
+        const res = await fetch(API_URL + '?_t=' + Date.now());
+        if (!res.ok) throw new Error('API error: ' + res.status);
         allData = await res.json();
       } catch (err) {
-        console.warn("Using fallback data:", err);
-        allData = {
-          approved: [
-            { employee_name: 'Aisha Mir', employee_id: 'EMP001', leave_type: 'Annual Leave', from_date: '01-04-2026', to_date: '03-04-2026' },
-            { employee_name: 'Rohan Sharma', employee_id: 'EMP002', leave_type: 'Sick Leave', from_date: '05-04-2026', to_date: '05-04-2026' },
-            { employee_name: 'Sara Khan', employee_id: 'EMP004', leave_type: 'Maternity', from_date: '10-03-2026', to_date: '09-04-2026' },
-          ],
-          pending: [
-            { employee_name: 'Umar Farooq', employee_id: 'EMP003', leave_type: 'Casual Leave', from_date: '17-04-2026', to_date: '18-04-2026', request_status: 'Pending Approval' },
-            { employee_name: 'Zara Sheikh', employee_id: 'EMP007', leave_type: 'Sick Leave', from_date: '19-04-2026', to_date: '19-04-2026', request_status: 'Pending Manager' },
-          ]
-        };
+        console.warn("fetchLeaves error:", err);
       }
 
-      document.getElementById('approved-count').textContent = allData.approved.length;
-      document.getElementById('pending-count').textContent = allData.pending.length;
+      const approvedList = (allData && Array.isArray(allData.approved)) ? allData.approved : [];
+      const pendingList = (allData && Array.isArray(allData.pending)) ? allData.pending : [];
 
-      const total = allData.approved.length + allData.pending.length;
+      const appCntEl = document.getElementById('approved-count');
+      const pendCntEl = document.getElementById('pending-count');
+      if (appCntEl) appCntEl.textContent = approvedList.length;
+      if (pendCntEl) pendCntEl.textContent = pendingList.length;
+
+      const total = approvedList.length + pendingList.length;
       const approvedBtn = document.getElementById('tab-btn-approved');
-      if (approvedBtn && approvedBtn.style.display === 'none') {
-        document.getElementById('modalSubtitle').textContent = `${allData.pending.length} pending records • Company`;
-      } else {
-        document.getElementById('modalSubtitle').textContent = `${total} total records • Company`;
+      const subTitleEl = document.getElementById('modalSubtitle');
+      if (subTitleEl) {
+        if (approvedBtn && approvedBtn.style.display === 'none') {
+          subTitleEl.textContent = `${pendingList.length} pending records • Company`;
+        } else {
+          subTitleEl.textContent = `${total} total records • Company`;
+        }
       }
 
       const oncoBdg = document.getElementById('oncoPendingLeaveBadge');
       if (oncoBdg) {
-        const pCnt = allData.pending ? allData.pending.length : 0;
-        oncoBdg.textContent = pCnt;
-        oncoBdg.style.display = pCnt > 0 ? 'inline-flex' : 'none';
+        oncoBdg.textContent = pendingList.length;
+        oncoBdg.style.display = pendingList.length > 0 ? 'inline-flex' : 'none';
       }
 
-      document.getElementById('footer-meta').innerHTML = `Last synced <strong>${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</strong>`;
+      const metaEl = document.getElementById('footer-meta');
+      if (metaEl) {
+        metaEl.innerHTML = `Last synced <strong>${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</strong>`;
+      }
 
-      // Render both tables once
-      renderTable('approved', allData.approved);
-      renderTable('pending', allData.pending);
+      // Render the currently active tab first so UI responds immediately
+      if (currentTab === 'pending') {
+        try { renderSanctionLeaveTable('pending', pendingList); } catch (e) { console.error('Error rendering pending table:', e); }
+        try { renderSanctionLeaveTable('approved', approvedList); } catch (e) { console.error('Error rendering approved table:', e); }
+      } else {
+        try { renderSanctionLeaveTable('approved', approvedList); } catch (e) { console.error('Error rendering approved table:', e); }
+        try { renderSanctionLeaveTable('pending', pendingList); } catch (e) { console.error('Error rendering pending table:', e); }
+      }
     }
 
     let isOnlyPendingMode = false;
@@ -650,7 +685,11 @@
     function openLeaveModal(defaultTab = 'approved', onlyPending = false) {
       isOnlyPendingMode = onlyPending;
       const el = document.getElementById('leaveModal');
-      modalInstance = new bootstrap.Modal(el, { backdrop: true });
+      if (!el) return;
+
+      if (window.bootstrap && bootstrap.Modal) {
+        modalInstance = bootstrap.Modal.getOrCreateInstance(el, { backdrop: true });
+      }
 
       const approvedBtn = document.getElementById('tab-btn-approved');
       const pendingBtn = document.getElementById('tab-btn-pending');
@@ -666,8 +705,8 @@
         currentTab = defaultTab;
       }
 
-      modalInstance.show();
-      switchTab(currentTab);
+      if (modalInstance) modalInstance.show();
+      switchLeaveModalTab(currentTab);
       fetchLeaves();
     }
 
@@ -685,7 +724,7 @@
       if (modalTitle) modalTitle.textContent = 'Leave Status';
     }
 
-    function exportCSV() {
+    function exportLeaveModalCSV() {
       const rows = allData[currentTab];
       if (!rows || rows.length === 0) {
         alert('No data to export.');
@@ -705,10 +744,15 @@
       link.click();
     }
 
-    // For testing - remove comment if you want auto open
-    // window.onload = () => openLeaveModal();
-function downloadCertificate(get_leave_id) {
-    window.open(`/apply_leave/download_certificate/${get_leave_id}?t=${Date.now()}`, '_blank');
-}
+    function downloadLeaveCertificate(get_leave_id) {
+      window.open(`/apply_leave/download_certificate/${get_leave_id}?t=${Date.now()}`, '_blank');
+    }
+
+    // Global aliases for convenience
+    window.renderSanctionLeaveTable = renderSanctionLeaveTable;
+    window.filterLeaveModalTable = filterLeaveModalTable;
+    window.switchLeaveModalTab = switchLeaveModalTab;
+    window.exportLeaveModalCSV = exportLeaveModalCSV;
+    window.downloadLeaveCertificate = downloadLeaveCertificate;
+    window.closeLeaveModal = closeLeaveModal;
   </script>
-</body>
