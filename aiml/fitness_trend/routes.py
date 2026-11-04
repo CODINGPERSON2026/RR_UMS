@@ -371,7 +371,7 @@ def export_fitness_pdf_api():
             recommendations=result['recommendations'],
             progression_data=result['progression'],
             client_ip=client_ip,
-            watermark_text="UMS 15 CESR",
+            watermark_text="UMS RR",
             language=language
         )
     except Exception as e:
@@ -428,7 +428,7 @@ def download_fitness_pdf(army_number):
         recommendations=result['recommendations'],
         progression_data=result['progression'],
         client_ip=client_ip,
-        watermark_text="UMS 15 CESR",
+        watermark_text="UMS RR",
         language=lang
     )
     
@@ -723,7 +723,7 @@ def api_export_directory_pdf():
     watermarked_pdf = overlay_watermark_on_pdf(
         raw_pdf_stream,
         client_ip=client_ip,
-        watermark_text="UMS 15 CESR"
+        watermark_text="UMS RR"
     )
 
     as_attachment = request.args.get("download", "1").lower() in ("1", "true", "yes")
@@ -838,7 +838,7 @@ def download_saved_report_pdf(report_id):
         recommendations=recommendations,
         progression_data=progression,
         client_ip=client_ip,
-        watermark_text="UMS 15 CESR",
+        watermark_text="UMS RR",
         language=lang
     )
 

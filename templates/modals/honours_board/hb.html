@@ -18,7 +18,7 @@
 
     <div class="hb-header-actions">
       <div class="hb-counter" id="hbCounter">
-        <span class="curr">01</span><span class="sep">/</span><span class="total">07</span>
+        <span class="curr">00</span><span class="sep">/</span><span class="total">00</span>
       </div>
       <div class="hb-nav-btns">
         <button class="hb-nav-btn" id="prevBtn" type="button" title="Previous Citation" aria-label="Previous">
@@ -710,104 +710,15 @@
       try {
         const response = await fetch("/stats/get_honours_board");
         const json = await response.json();
-        if (json.status === "success" && json.data && json.data.length > 0) {
+        if (json.status === "success" && Array.isArray(json.data) && json.data.length > 0) {
           entries = json.data;
         } else {
-          setDummyEntries();
+          entries = [];
         }
       } catch (e) {
         console.error("Failed to load honours board from DB", e);
-        setDummyEntries();
+        entries = [];
       }
-    }
-
-    function setDummyEntries() {
-      entries = [
-        {
-          id: 1,
-          army_number: "A4203079F",
-          name: "Roshan Kesharwani",
-          rank: "AGV",
-          company: "COMN",
-          appreciation_type: "Service",
-          medal_icon: "fa-solid fa-award",
-          commendation: "Yeh jawan TTC trade ka hai. Yeh jawan IT clerk ka duty badi ruchi aur lagan ke saath kar raha hai. Saath hi Coy dwara diye gaye har kaam ko niyam aur nishtha se nibhata hai.",
-          appreciation_date: "04-08-2026",
-          image: "/static/dummy/1coy/Roshan.jpg"
-        },
-        {
-          id: 2,
-          army_number: "15718083X",
-          name: "N B Chakravorty",
-          rank: "Hav",
-          company: "COMN",
-          appreciation_type: "Excellence",
-          medal_icon: "fa-solid fa-gem",
-          commendation: "Yeh jawan TTC trade ka hai. Yeh jawan abhi CHQ sec me karya rat hai aur proj clk ka duty badi hi kushalta se kar raha hai. Saath hi is jawan ne Coy ke anya karyon mai bhi mahatvapoorna bhumika nibhata hai.",
-          appreciation_date: "05-08-2026",
-          image: "/static/dummy/1coy/Chakravorty.jpg"
-        },
-        {
-          id: 3,
-          army_number: "15744869F",
-          name: "D K Trivedi",
-          rank: "NK",
-          company: "COMN",
-          appreciation_type: "Teamwork",
-          medal_icon: "fa-solid fa-user-shield",
-          commendation: "Yeh jawan abhi MCCS sec me karya rat hai tatha apne tradework ke sath MCCS shift mech ki duty bahut hi kushalta ke saath kar raha hai.",
-          appreciation_date: "06-08-2026",
-          image: "/static/dummy/1coy/Trivedi.jpg"
-        },
-        {
-          id: 4,
-          army_number: "1574959ZX",
-          name: "Sarkat SK",
-          rank: "LNK",
-          company: "3 Coy",
-          appreciation_type: "Leadership",
-          medal_icon: "fa-solid fa-crown",
-          commendation: "Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath team netritva karne ka gun bhi rakhta hai. Lagbhag 1 mahine is jawan ne svc bn ke saath sys NCO ki duty bhi bahut achhe tarike se nibhayi hai.",
-          appreciation_date: "08-08-2026",
-          image: "/static/dummy/1coy/Sarkat.jpg"
-        },
-        {
-          id: 5,
-          army_number: "A4353984F",
-          name: "Bhosale Rahul G",
-          rank: "AGV",
-          company: "3 Coy",
-          appreciation_type: "Innovation",
-          medal_icon: "fa-solid fa-fire",
-          commendation: "Yeh jawan DMV trade ka hai. Yeh jawan ek bahumukhi pratibhawan jawan hai. Yeh jawan apne trade work ke saath-saath mess sec ki duty bahut hi achhe tarike se nibha raha hai. Yeh jawan Coy ke anya karyon mein bhi badh chadh kar hissa leta hai.",
-          appreciation_date: "09-08-2026",
-          image: "/static/dummy/1coy/Rahul.jpg"
-        },
-        {
-          id: 6,
-          army_number: "A4351180N",
-          name: "Mohan Sarma",
-          rank: "AGV",
-          company: "HQ Coy",
-          appreciation_type: "Discipline",
-          medal_icon: "fa-solid fa-shield-halved",
-          commendation: "Yeh jawan OCC trade ka hai. Yeh jawan abhi posting clk ka duty bahut hi achhe tarike se nibha raha hai tatha FS check me apna dayitva nibhata hai.",
-          appreciation_date: "10-08-2026",
-          image: "/static/dummy/1coy/Mohan.jpg"
-        },
-        {
-          id: 7,
-          army_number: "A4204917X",
-          name: "Pali Rohit Sharad",
-          rank: "AGV",
-          company: "HQ Coy",
-          appreciation_type: "Excellence",
-          medal_icon: "fa-solid fa-star",
-          commendation: "Yeh jawan DMV trade ka hai. Yeh jawan MT sec mai karyarat hai. Apne trade work ke saath-saath admin branch me bhi karya rat hai tatha vehicle maintenance me bhi apna aham yogdan de raha hai.",
-          appreciation_date: "10-08-2026",
-          image: "/static/dummy/1coy/Rohit.jpg"
-        }
-      ];
     }
 
     function getCategoryClass(type) {
@@ -835,8 +746,14 @@
     function renderAllSlides() {
       if (!track) return;
       if (entries.length === 0) {
-        track.innerHTML = `<div class="hb-loading"><span>No appreciation entries found.</span></div>`;
+        track.innerHTML = `<div class="hb-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:180px; color:var(--text-secondary,#64748b); gap:8px;">
+          <i class="fa-solid fa-award" style="font-size:28px; opacity:0.35;"></i>
+          <span>No appreciation entries found.</span>
+        </div>`;
         if (dotsWrap) dotsWrap.innerHTML = "";
+        if (counterEl) counterEl.innerHTML = `<span class="curr">00</span><span class="sep">/</span><span class="total">00</span>`;
+        resetProgress();
+        stopAutoScroll();
         return;
       }
 
@@ -984,6 +901,7 @@
     function startAutoScroll() {
       stopAutoScroll();
       resetProgress();
+      if (entries.length <= 1) return;
 
       const stepTime = 100;
       const stepInc = (stepTime / DURATION) * 100;
@@ -1067,4 +985,4 @@
       }
     });
   })();
-</script>
+</script>

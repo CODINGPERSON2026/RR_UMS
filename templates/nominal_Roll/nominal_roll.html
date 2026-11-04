@@ -254,7 +254,7 @@
   </div>
   <div style="text-align: right;">
     <span id="nr-topbar-title" style="display: block; line-height: 1.2;">Nominal Roll</span>
-    <span id="nr-topbar-unit">15 CESR &bull; INTERNAL USE</span>
+    <span id="nr-topbar-unit">RR &bull; INTERNAL USE</span>
   </div>
 </div>
 
@@ -322,7 +322,7 @@
 
 <!-- TABLE -->
 <div id="nr-table-wrap">
-  <div class="nr-print-title">NOMINAL ROLL &mdash; 15 CORPS ENGINEERING SIGNAL REGIMENT</div>
+  <div class="nr-print-title">NOMINAL ROLL &mdash; RR</div>
   <table id="nr-table">
     <thead>
       <tr>
@@ -378,7 +378,7 @@
           <span style="background:#fff; color:#059669; width:30px; height:30px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">P</span>
           <div>
             <h5 class="modal-title text-white mb-0" style="font-size:16px; font-weight:700; letter-spacing:0.5px;">Individual Full Month Date Sheet (Days 1 to 31)</h5>
-            <small style="color: rgba(255,255,255,0.85); font-size:11px;">15 CESR &bull; Daily Attendance Matrix & Duty Status Tracker</small>
+            <small style="color: rgba(255,255,255,0.85); font-size:11px;">RR &bull; Daily Attendance Matrix & Duty Status Tracker</small>
           </div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" style="filter: brightness(0) invert(1);"></button>
@@ -834,7 +834,7 @@
             row.mobile_number || '—',
             row.onleave_status ? 'On Leave' : (row.detachment_status ? 'On Det' : (row.oncourse_status ? 'On Course' : (row.td_status ? 'On TD' : 'Present')))
         ]);
-        filename = '15CESR_NominalRoll_' + ts + '.csv';
+        filename = 'RR_NominalRoll_' + ts + '.csv';
     } else {
         headers = ['S.No', 'Army Number', 'Rank', 'Name', 'Company', 'Section', 'Leave Type', 'Duration', 'From', 'To', 'Status'];
         rows = sortedData.map((row, i) => [
@@ -850,7 +850,7 @@
             row.to_date,
             row.request_status
         ]);
-        filename = '15CESR_LeaveHistory_' + ts + '.csv';
+        filename = 'RR_LeaveHistory_' + ts + '.csv';
     }
 
     const csvContent = [headers, ...rows]
@@ -884,7 +884,7 @@
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const yyyy = now.getFullYear();
     const printTimeStr = `${dd}/${mm}/${yyyy} ` + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    const watermarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280"><g transform="rotate(-35 230 140)"><text x="230" y="95" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="rgba(80,100,160,0.12)" text-anchor="middle" letter-spacing="3">15 CORPS ENGG SIG REGT</text><text x="230" y="122" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="rgba(40,60,120,0.14)" text-anchor="middle" letter-spacing="2">IP ${clientIp}</text><text x="230" y="146" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="rgba(80,100,160,0.11)" text-anchor="middle" letter-spacing="1">${printTimeStr}</text></g></svg>`;
+    const watermarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="460" height="280"><g transform="rotate(-35 230 140)"><text x="230" y="95" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="rgba(80,100,160,0.12)" text-anchor="middle" letter-spacing="3">RR</text><text x="230" y="122" font-family="Arial,sans-serif" font-size="16" font-weight="900" fill="rgba(40,60,120,0.14)" text-anchor="middle" letter-spacing="2">IP ${clientIp}</text><text x="230" y="146" font-family="Arial,sans-serif" font-size="11" font-weight="600" fill="rgba(80,100,160,0.11)" text-anchor="middle" letter-spacing="1">${printTimeStr}</text></g></svg>`;
     const bgUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(watermarkSvg);
 
     if (viewMode === 'nominal') {
@@ -962,7 +962,7 @@
       }
     </style></head><body>
     <div class="watermark-overlay"></div>
-    <h2>15 CORPS ENGINEERING SIGNAL REGIMENT - ${title.toUpperCase()}</h2>
+    <h2>RR - ${title.toUpperCase()}</h2>
     <div class="meta-bar">
       <span><strong>Printed from IP:</strong> ${clientIp}</span>
       <span><strong>Date:</strong> ${printTimeStr}</span>
@@ -1318,7 +1318,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `15CESR_Monthly_Date_Sheet_1-31_${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `RR_Monthly_Date_Sheet_1-31_${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1362,7 +1362,7 @@
         .legend-print { display: flex; gap: 12px; font-size: 8.5px; font-weight: 700; margin-top: 6px; justify-content: center; }
       </style></head><body>
       <div class="hdr">
-        <h2>15 CORPS ENGINEERING SIGNAL REGIMENT</h2>
+        <h2>RR</h2>
         <h4>INDIVIDUAL FULL MONTH DATE SHEET (DAYS 1 TO 31) &mdash; ${monthName.toUpperCase()}</h4>
       </div>
       <div class="meta">

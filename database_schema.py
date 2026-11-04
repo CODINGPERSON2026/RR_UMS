@@ -51,6 +51,8 @@ def register_table(table_name: str, create_sql: str):
     clean_name = table_name.strip('`').strip().lower()
     _REGISTERED_TABLES[clean_name] = create_sql.strip()
 
+register_table('det_td_alarm_days', 'CREATE TABLE IF NOT EXISTS `det_td_alarm_days` (alarm_name VARCHAR(50) NOT NULL PRIMARY KEY, days INT NOT NULL DEFAULT 90, updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, updated_by VARCHAR(50) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;')
+
 
 def load_sql_files():
     """
@@ -304,3 +306,4 @@ if __name__ == '__main__':
         _log(f"Total defined table files: {len(schemas)}")
         ensure_all_tables(verbose=True)
         _log("==================================================")
+

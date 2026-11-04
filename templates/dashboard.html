@@ -420,12 +420,9 @@
 
     <!-- ===== ALARMS SECTION (NAVBAR -> ALARMS -> ACTION BUTTONS -> CARDS) ===== -->
     <div style="margin-bottom: 8px">
-      {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-      {% set is_onco_role = ('onco' in (role or '')|lower) or (r_clean in ['1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco']) %}
-      {% if not is_onco_role %}
-        {% include 'modals/alarm/alarm.html' %}
-      {% endif %}
+      {% include 'modals/alarm/alarm.html' %}
       {% include 'modals/alarm/attachment_alarm.html' %}
+      {% include 'modals/alarm/edit_det_td_modal.html' %}
       {% if role in ['JCO','S/JCO'] %}
         {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
@@ -519,6 +516,13 @@
       <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn">
         LEAVE REQUESTS
         <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
+      </button>
+      {% endif %}
+
+      {% set r_act_clean = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_act_clean in ['S/JCO', 'SJCO', 'ADMIN', 'CO', '2IC', 'SUBMAJOR', 'SUBEDARMAJOR'] %}
+      <button class="ab-btn ab-primary" type="button" data-bs-toggle="modal" data-bs-target="#editDetTdModal" title="Edit Detachment & Attachment Alarm Days">
+        <i class="fa-solid fa-sliders" style="font-size:11px"></i> EDIT DET/TD
       </button>
       {% endif %}
 

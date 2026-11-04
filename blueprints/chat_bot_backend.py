@@ -649,6 +649,8 @@ def execute_query(query_type, params=None):
             return response
             
         elif query_type == "overdue_detachment":
+            from db_config import get_alarm_thresholds
+            det_thresh = get_alarm_thresholds(conn).get('detachment_alarm', 60)
             cursor.execute("""
                 SELECT p.name, p.army_number, d.det_name, ad.assigned_on,
                        DATEDIFF(NOW(), ad.assigned_on) as days
@@ -656,14 +658,14 @@ def execute_query(query_type, params=None):
                 JOIN personnel p ON ad.army_number = p.army_number
                 JOIN dets d ON ad.det_id = d.det_id
                 WHERE ad.det_status = 1
-                AND DATEDIFF(NOW(), ad.assigned_on) >= 90
+                AND DATEDIFF(NOW(), ad.assigned_on) >= %s
                 ORDER BY days DESC
                 LIMIT 10
-            """)
+            """, (det_thresh,))
             results = cursor.fetchall()
             if not results:
-                return "No overdue detachments (>=90 days)"
-            response = "Overdue detachments (>=90 days):\n"
+                return f"No overdue detachments (>={det_thresh} days)"
+            response = f"Overdue detachments (>={det_thresh} days):\n"
             for row in results:
                 response += f"• {row['name']} ({row['army_number']})\n"
                 response += f"  Location: {row['det_name']}, Duration: {row['days']} days\n"

@@ -1528,13 +1528,14 @@ STATUS COLORS
       </div>
     </div>
 
-    {% set header = "15 CORPS ENGINEERING SIGNAL REGIMENT" %}
+    {% set header = "RR" %}
     {% set subscript = 'Welcome ' ~ role ~ ' ' ~ current_user_name %}
     {% include 'navbar/navbar.html' %}
 
     <div style="margin-bottom: 8px">
       {% include 'modals/alarm/alarm.html' %}
       {% include 'modals/alarm/attachment_alarm.html' %}
+      {% include 'modals/alarm/edit_det_td_modal.html' %}
       {% include 'modals/alarm/leave_alarm.html' %}
       {% include 'modals/alarm/agniveer_test_alarms.html' %}
       {% include 'modals/alarm/event_alarm.html' %}
@@ -1560,7 +1561,7 @@ STATUS COLORS
         REJECTED LEAVES
         <span class="bdg" id="coRejectedCount" style="display: none">0</span>
       </button>
-
+      
       <!-- <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
         ADD EVENT
       </button> -->

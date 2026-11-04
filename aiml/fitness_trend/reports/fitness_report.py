@@ -103,7 +103,7 @@ def get_regiment_banner_uri():
 
         # Check navbar config for dynamic overrides
         navbar_cfg_file = os.path.join(static_dir, "uploads", "navbar", "config.json")
-        header_text = "15 CORPS UNIT MANAGEMENT SYSTEM"
+        header_text = "RR UNIT MANAGEMENT SYSTEM"
         left_logo_file = os.path.join(static_dir, "image_for_login_page", "rt.jpg")
         right_logo_file = os.path.join(static_dir, "image_for_login_page", "chinar.jpg")
 
@@ -215,7 +215,7 @@ def get_regiment_banner_uri():
                 meta_font = ImageFont.load_default()
 
             sub_text = "PERSONAL FITNESS REPORT"
-            meta_text = "15 CORPS UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL"
+            meta_text = "RR UNIT MANAGEMENT SYSTEM • OFFICIAL MILITARY RECORD • CONFIDENTIAL"
 
             # Draw Title
             t_box = draw_b.textbbox((0, 0), header_text, font=title_font)
@@ -271,7 +271,7 @@ def build_structured_fitness_report(soldier_features, prediction_result, recomme
 
     # Section 1: Header / Cover
     header = {
-        "title": "15 CORPS UNIT MANAGEMENT SYSTEM",
+        "title": "RR UNIT MANAGEMENT SYSTEM",
         "report_title": "PERSONAL FITNESS REPORT",
         "report_id": report_id,
         "date": timestamp_str,
@@ -586,7 +586,7 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
         progression=t_report.get('progression', progression_data),
         labels=labels,
         client_ip=client_ip,
-        watermark_text="UMS 15 CESR",
+        watermark_text="UMS RR",
         watermark_datetime=watermark_datetime,
         show_html_watermark=True,
         lang=target_lang,
@@ -602,7 +602,7 @@ def generate_fitness_html_report(soldier_features, prediction_result, recommenda
     return rendered_html
 
 
-def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_text="UMS 15 CESR"):
+def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_text="UMS RR"):
     """
     Overlays a clear, single diagonal military watermark on top of each page of the generated PDF using ReportLab and pypdf.
     Includes Unit Name, IP Address, and Date & Time stamp (in 12-hour format) centered on each page.
@@ -671,7 +671,7 @@ def overlay_watermark_on_pdf(base_pdf_stream, client_ip="127.0.0.1", watermark_t
         return base_pdf_stream
 
 
-def generate_fitness_pdf_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1", watermark_text="UMS 15 CESR", lang="en", language=None):
+def generate_fitness_pdf_report(soldier_features, prediction_result, recommendations, progression_data, client_ip="127.0.0.1", watermark_text="UMS RR", lang="en", language=None):
     """
     Generates a high-quality PDF binary stream with AI prediction, recommendations, progression,
     and an official 'UNIT MANAGEMENT SYSTEM' with IP address watermark.

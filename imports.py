@@ -24,7 +24,7 @@ import mysql.connector
 from mysql.connector import Error
 import mysql
 
-from db_config import get_db_connection
+from db_config import get_db_connection, get_alarm_thresholds, set_alarm_threshold
 import re
 import json
 import os

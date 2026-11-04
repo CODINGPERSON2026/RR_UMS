@@ -1199,7 +1199,7 @@
             <div class="company-filter">
                 <label for="company-select">FILTER BY COMPANY:</label>
                 <select id="company-select" class="company-select">
-                    <option value="All">15 CESR</option>
+                    <option value="All">RR</option>
                 </select>
                 <script>
                     // Pass company and role from template to JavaScript
@@ -1255,7 +1255,7 @@
                     <h2 id="total-count">—</h2>
                     <p>Total Personnel</p>
                 </div>
-                <div id="company-badge" class="company-badge">15 CESR</div>
+                <div id="company-badge" class="company-badge">RR</div>
             </div>
         </div>
         <div class="card card-success">
@@ -1929,7 +1929,7 @@ async function fetchSummary(company = "All") {
     const badge = document.getElementById("company-badge");
     if (badge) {
         if (company === "All") {
-            badge.textContent = "15 CESR";
+            badge.textContent = "RR";
         } else {
             const num = company.match(/\d+/);
             badge.textContent = num ? `${num[0]} Company` : company;

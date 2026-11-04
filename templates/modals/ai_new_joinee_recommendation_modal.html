@@ -3263,7 +3263,11 @@
           const u = r.querySelector('input[name="unit[]"]')?.value?.trim();
           const f = r.querySelector('input[name="unitFrom[]"]')?.value?.trim();
           const t = r.querySelector('input[name="unitTo[]"]')?.value?.trim();
-          const d = r.querySelector('select[name="unitDuty[]"]')?.value?.trim();
+          let d = r.querySelector('select[name="unitDuty[]"]')?.value?.trim();
+          const otherDuty = r.querySelector('.unit-duty-other')?.value?.trim();
+          if (d === 'OTHER' && otherDuty) {
+            d = otherDuty.toUpperCase();
+          }
           if (u || f || t || d) {
             validMainUnits.push({ unit: u || '', from: f || '', to: t || '', duty: d || 'GENERAL' });
           }
@@ -5960,6 +5964,7 @@
           <option value="STOREMAN">STOREMAN</option>
           <option value="NODE">NODE</option>
           <option value="DUTY DVR MTNCO">DUTY DVR MTNCO</option>
+          <option value="OTHER">OTHER</option>
         `;
 
         tbody.innerHTML = '';

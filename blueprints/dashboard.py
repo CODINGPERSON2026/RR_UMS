@@ -1,5 +1,5 @@
 from imports import *
-from db_config  import get_db_connection
+from db_config import get_db_connection, get_alarm_thresholds
 dashboard_bp =  Blueprint('dasboard',__name__,url_prefix='/stats')
 
 
@@ -30,6 +30,8 @@ def get_detachment_details():
     det_id = request.args.get("det_id")  # optional
     min_days = request.args.get("min_days", 0, type=int) # optional filter
     conn = get_db_connection()
+    if min_days <= 0:
+        min_days = get_alarm_thresholds(conn).get('detachment_alarm', 60)
     cursor = conn.cursor(dictionary=True)
 
     # Get logged in user
@@ -66,7 +68,7 @@ def get_detachment_details():
 
         # ---------- COMPANY FILTER (Admin / CO / Leadership bypass) ----------
         role = (user.get('role') or '').upper()
-        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
+        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR"):
             query += " AND p.company = %s"
             params.append(user['company'])
 
@@ -292,7 +294,7 @@ def assigned_attachment_alarm():
 
     role = (user.get('role') or '').upper()
     user_company = user.get('company') or ''
-    privileged = ['CO', '2IC', 'ADJUTANT', 'ADMIN', 'COMMANDING OFFICER']
+    privileged = ['CO', '2IC', 'ADJUTANT', 'ADMIN', 'COMMANDING OFFICER', 'S/JCO', 'SJCO', 'SUBEDAR MAJOR', 'SUBMAJOR']
 
     conn = get_db_connection()
     if not conn:
@@ -301,6 +303,7 @@ def assigned_attachment_alarm():
     cursor = None
     try:
         cursor = conn.cursor(dictionary=True)
+        attach_limit = get_alarm_thresholds(conn).get('attachment_alarm', 80)
         query = """
             SELECT
                 t.id,
@@ -315,9 +318,9 @@ def assigned_attachment_alarm():
                 COALESCE(t.remarks, '') AS remarks
             FROM td_table t
             LEFT JOIN personnel p ON p.army_number = t.army_number
-            WHERE t.td_date <= NOW() - INTERVAL 180 DAY
+            WHERE t.td_date <= NOW() - INTERVAL %s DAY
         """
-        params = []
+        params = [attach_limit]
         if user_company != "Admin" and role not in privileged:
             query += " AND (COALESCE(t.company, p.company) = %s)"
             params.append(user_company)
@@ -332,7 +335,8 @@ def assigned_attachment_alarm():
 
         return jsonify({
             "count": len(rows),
-            "rows": rows
+            "rows": rows,
+            "threshold_days": attach_limit
         })
 
     except Exception as e:

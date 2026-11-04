@@ -2204,14 +2204,20 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   function getUnitDutySelectHtml(selectedVal = '') {
+    const sNorm = String(selectedVal || '').trim().toUpperCase();
+    const isStandard = DUTY_OPTIONS.includes(sNorm);
+    const isOther = (sNorm === 'OTHER') || (!isStandard && sNorm !== '');
+    const otherVal = isOther && sNorm !== 'OTHER' ? sNorm : '';
+
     let html = `<select class="form-select form-select-sm unit-input" name="unitDuty[]">`;
     html += `<option value="">-- SELECT DUTY / DOMAIN --</option>`;
-    const sNorm = String(selectedVal || '').trim().toUpperCase();
     DUTY_OPTIONS.forEach(opt => {
       const isSel = (opt === sNorm) ? 'selected' : '';
       html += `<option value="${esc(opt)}" ${isSel}>${esc(opt)}</option>`;
     });
+    html += `<option value="OTHER" ${isOther ? 'selected' : ''}>OTHER</option>`;
     html += `</select>`;
+    html += `<input type="text" class="form-control form-control-sm mt-1 unit-input unit-duty-other" placeholder="Specify Duty" value="${esc(otherVal)}" style="${isOther ? 'display: block;' : 'display: none;'} text-transform: uppercase;" />`;
     return html;
   }
 
@@ -2518,6 +2524,58 @@ document.addEventListener("DOMContentLoaded", function () {
   // Wire up Add Row buttons
   document.getElementById("addCourseRow").addEventListener("click", addCourseRow);
   document.getElementById("addUnitRow").addEventListener("click", addUnitRow);
+
+
+
+  const updateUnitsTableEl = document.getElementById("unitsTable");
+
+  if (updateUnitsTableEl) {
+
+    updateUnitsTableEl.addEventListener("change", function (e) {
+
+      if (e.target && e.target.name === "unitDuty[]") {
+
+        const select = e.target;
+
+        const tr = select.closest("tr");
+
+        const otherInput = tr ? tr.querySelector(".unit-duty-other") : null;
+
+        if (otherInput) {
+
+          if (select.value === "OTHER") {
+
+            otherInput.style.display = "block";
+
+            otherInput.focus();
+
+          } else {
+
+            otherInput.style.display = "none";
+
+            otherInput.value = "";
+
+          }
+
+        }
+
+      }
+
+    });
+
+
+
+    updateUnitsTableEl.addEventListener("input", function (e) {
+
+      if (e.target && e.target.classList.contains("unit-duty-other")) {
+
+        e.target.value = e.target.value.toUpperCase();
+
+      }
+
+    });
+
+  }
   document.getElementById("addLoanRow").addEventListener("click", addLoanRow);
   document.getElementById("addPunishmentRow").addEventListener("click", addPunishmentRow);
   document.getElementById("addDetailedCourseRow").addEventListener("click", addDetailedCourseRow);
@@ -2757,14 +2815,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function collectTableData(tableId, fieldNames) {
     const table = document.getElementById(tableId);
+    if (!table) return [];
     const rows  = table.querySelectorAll("tbody tr");
     const data  = [];
     rows.forEach(row => {
-      const inputs  = row.querySelectorAll("input, select, textarea");
       const rowData = {};
-      inputs.forEach((input, idx) => {
-        if (fieldNames[idx]) rowData[fieldNames[idx]] = input.value;
-      });
+      if (tableId === "unitsTable") {
+        const unitInput = row.querySelector('input[name="unit[]"]');
+        const unitFromInput = row.querySelector('input[name="unitFrom[]"]');
+        const unitToInput = row.querySelector('input[name="unitTo[]"]');
+        const dutySelect = row.querySelector('select[name="unitDuty[]"]');
+        const dutyOtherInput = row.querySelector('.unit-duty-other');
+
+        let dutyVal = dutySelect ? dutySelect.value.trim() : "";
+        if (dutyVal === "OTHER" && dutyOtherInput) {
+          const customVal = dutyOtherInput.value.trim();
+          dutyVal = customVal ? customVal.toUpperCase() : "OTHER";
+        }
+
+        rowData.unit = unitInput ? unitInput.value.trim() : "";
+        rowData.unitFrom = unitFromInput ? unitFromInput.value : "";
+        rowData.unitTo = unitToInput ? unitToInput.value : "";
+        rowData.unitDuty = dutyVal;
+      } else {
+        const inputs  = row.querySelectorAll("input, select, textarea");
+        inputs.forEach((input, idx) => {
+          if (fieldNames[idx]) rowData[fieldNames[idx]] = input.value;
+        });
+      }
       if (Object.values(rowData).some(v => v !== '')) data.push(rowData);
     });
     return data;

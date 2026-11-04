@@ -1686,6 +1686,66 @@ def daily_event():
 # ===============================================
 
 
+@app.route('/api/alarm_days', methods=['GET', 'POST'])
+def api_alarm_days():
+    """
+    Get or update configured threshold days for Detachment and Attachment/TD alarms.
+    Restricted to S/JCO (and Admin/Command).
+    """
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+
+    if request.method == 'GET':
+        thresholds = get_alarm_thresholds()
+        return jsonify({"status": "success", "thresholds": thresholds})
+
+    # POST: Update thresholds
+    user_role = str(user.get('role', '')).upper().strip().replace(' ', '')
+    allowed_roles = ['S/JCO', 'SJCO', 'ADMIN', 'CO', '2IC', 'SUBMAJOR', 'SUBEDARMAJOR']
+    if user_role not in allowed_roles:
+        return jsonify({
+            "status": "error",
+            "message": "Access denied. Only S/JCO (or Admin) can modify DET/TD alarm days."
+        }), 403
+
+    data = request.get_json(silent=True) or request.form
+    det_days = data.get('detachment_alarm')
+    attach_days = data.get('attachment_alarm')
+
+    try:
+        det_val = int(det_days) if det_days is not None else None
+        attach_val = int(attach_days) if attach_days is not None else None
+    except (ValueError, TypeError):
+        return jsonify({"status": "error", "message": "Threshold days must be valid numbers."}), 400
+
+    if (det_val is not None and det_val < 1) or (attach_val is not None and attach_val < 1):
+        return jsonify({"status": "error", "message": "Threshold days must be at least 1 day."}), 400
+
+    username = user.get('username') or user.get('name') or user.get('role')
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({"status": "error", "message": "Database connection error."}), 500
+
+    try:
+        if det_val is not None:
+            set_alarm_threshold('detachment_alarm', det_val, updated_by=username, existing_conn=conn)
+        if attach_val is not None:
+            set_alarm_threshold('attachment_alarm', attach_val, updated_by=username, existing_conn=conn)
+
+        updated_thresholds = get_alarm_thresholds(conn)
+        return jsonify({
+            "status": "success",
+            "message": "DET/TD alarm thresholds updated successfully.",
+            "thresholds": updated_thresholds
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Failed to save thresholds: {str(e)}"}), 500
+    finally:
+        if conn:
+            conn.close()
+
+
 @app.route('/api/assigned_alarm')
 def assigned_alarm():
     conn = None
@@ -1693,16 +1753,16 @@ def assigned_alarm():
     try:
         user = require_login()  # Get logged-in user
         if not user:
-            return jsonify({"status": "error", "message": "Unauthorized", "rows": []}), 401
+            return jsonify({"status": "error", "message": "Unauthorized", "rows": [], "threshold_days": 60}), 401
         user_company = user.get('company', '')
         user_role = (user.get('role') or '').upper()
 
-        r_clean = (user_role or '').lower().replace(' ', '').replace('_', '').replace('-', '')
-        if 'onco' in (user_role or '').lower() or r_clean in ('1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco'):
-            return jsonify({"status": "success", "rows": []})
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+
+        thresholds = get_alarm_thresholds(conn)
+        det_threshold = thresholds.get('detachment_alarm', 60)
 
         query = '''
         SELECT 
@@ -1718,15 +1778,15 @@ def assigned_alarm():
         FROM assigned_det ad
         LEFT JOIN dets d ON ad.det_id = d.det_id
         JOIN personnel p ON ad.army_number = p.army_number
-        WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
+        WHERE DATEDIFF(NOW(), ad.assigned_on) >= %s
           AND ad.det_status = 1
           AND p.detachment_status = 1
         '''
 
-        params = []
+        params = [det_threshold]
 
         # Apply company filter if user is not Admin or leadership
-        if user_company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
+        if user_company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR"):
             query += " AND p.company = %s"
             params.append(user_company)
 
@@ -1734,7 +1794,7 @@ def assigned_alarm():
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
-        return jsonify({"status": "success", "rows": rows})
+        return jsonify({"status": "success", "rows": rows, "threshold_days": det_threshold})
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
@@ -2391,6 +2451,8 @@ def dashboard_summary():
         projects = projects_result['count'] if projects_result else 0
 
         # 5️⃣ Assigned Alarm
+        alarm_thresholds = get_alarm_thresholds(conn)
+        det_limit = alarm_thresholds.get('detachment_alarm', 60)
         cursor.execute(
             '''
             SELECT 
@@ -2406,13 +2468,13 @@ def dashboard_summary():
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
             JOIN personnel p ON ad.army_number = p.army_number
-            WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
+            WHERE DATEDIFF(NOW(), ad.assigned_on) >= %s
               AND ad.det_status = 1
               AND p.detachment_status = 1
-              ''' + (f" AND p.company = %s" if company != "Admin" else "") + '''
+              ''' + (f" AND p.company = %s" if (company != "Admin" and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else "") + '''
             ORDER BY ad.assigned_on ASC;
             ''',
-            (company,) if company != "Admin" else ()
+            (det_limit, company) if (company != "Admin" and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else (det_limit,)
         )
         assigned_alarm_rows = cursor.fetchall()
         detachment_alarm_count = len(assigned_alarm_rows)
@@ -4991,13 +5053,9 @@ def get_assigned_alarm():
     company = user.get('company', '')
     user_role = (user.get('role') or '').upper()
     
-    r_clean = (user_role or '').lower().replace(' ', '').replace('_', '').replace('-', '')
-    if 'onco' in (user_role or '').lower() or r_clean in ('1coyonco', '2coyonco', '3coyonco', 'onco', 'coyonco', 'hqcoyonco', 'comnonco'):
-        if cursor: cursor.close()
-        if conn: conn.close()
-        return jsonify({"status": "success", "rows": []})
 
     try:
+        det_limit = get_alarm_thresholds(conn).get('detachment_alarm', 60)
         query = '''
             SELECT 
                 ad.army_number, 
@@ -5012,12 +5070,12 @@ def get_assigned_alarm():
             FROM assigned_det ad
             LEFT JOIN dets d ON ad.det_id = d.det_id
             JOIN personnel p ON ad.army_number = p.army_number
-            WHERE DATEDIFF(NOW(), ad.assigned_on) >= 90
+            WHERE DATEDIFF(NOW(), ad.assigned_on) >= %s
               AND p.detachment_status = 1
               AND ad.det_status = 1
         '''
-        params = []
-        if company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
+        params = [det_limit]
+        if company not in ("Admin", "Center", "All") and user_role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR"):
             query += " AND p.company = %s"
             params.append(company)
         
@@ -6022,7 +6080,7 @@ from werkzeug.utils import secure_filename
 NAVBAR_CONFIG_FILE = os.path.join(app.static_folder, 'uploads', 'navbar', 'config.json')
 
 DEFAULT_NAVBAR_CONFIG = {
-    "header_text": "15 CORPS ENGINEERING SIGNAL REGIMENT",
+    "header_text": "RR",
     "show_left_logo": True,
     "show_right_logo": True,
     "left_logo": "/static/image_for_login_page/rt.jpg",
