@@ -3027,6 +3027,29 @@ LOCK TABLES `weight_info` WRITE;
 /*!40000 ALTER TABLE `weight_info` DISABLE KEYS */;
 /*!40000 ALTER TABLE `weight_info` ENABLE KEYS */;
 UNLOCK TABLES;
+--
+-- Table structure for table `drone_wpn`
+--
+
+DROP TABLE IF EXISTS `drone_wpn`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `drone_wpn` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `auth_individuals` varchar(255) DEFAULT '0',
+  `held` int NOT NULL DEFAULT '0',
+  `present_in_unit` int NOT NULL DEFAULT '0',
+  `on_leave` int NOT NULL DEFAULT '0',
+  `company` varchar(100) DEFAULT NULL,
+  `created_by` varchar(100) DEFAULT NULL,
+  `updated_by` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

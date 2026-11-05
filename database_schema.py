@@ -52,6 +52,8 @@ def register_table(table_name: str, create_sql: str):
     _REGISTERED_TABLES[clean_name] = create_sql.strip()
 
 register_table('det_td_alarm_days', 'CREATE TABLE IF NOT EXISTS `det_td_alarm_days` (alarm_name VARCHAR(50) NOT NULL PRIMARY KEY, days INT NOT NULL DEFAULT 90, updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, updated_by VARCHAR(50) DEFAULT NULL) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;')
+register_table('drone_wpn', 'CREATE TABLE IF NOT EXISTS `drone_wpn` (`id` INT NOT NULL AUTO_INCREMENT, `name` VARCHAR(255) NOT NULL, `auth_individuals` VARCHAR(255) DEFAULT \'0\', `held` INT NOT NULL DEFAULT 0, `present_in_unit` INT NOT NULL DEFAULT 0, `on_leave` INT NOT NULL DEFAULT 0, `company` VARCHAR(100) DEFAULT NULL, `created_by` VARCHAR(100) DEFAULT NULL, `updated_by` VARCHAR(100) DEFAULT NULL, `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;')
+
 
 
 def load_sql_files():
@@ -219,6 +221,15 @@ def ensure_all_tables(conn=None, verbose=True):
                 cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_by VARCHAR(100) DEFAULT NULL")
                 cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_role VARCHAR(100) DEFAULT NULL")
                 cursor.execute("ALTER TABLE doc_leave_details ADD COLUMN published_at DATETIME DEFAULT NULL")
+                conn.commit()
+        except Exception:
+            pass
+
+        # Ensure drone_wpn has auth_individuals column
+        try:
+            cursor.execute("SHOW COLUMNS FROM `drone_wpn` LIKE 'auth_individuals'")
+            if not cursor.fetchone():
+                cursor.execute("ALTER TABLE `drone_wpn` ADD COLUMN `auth_individuals` VARCHAR(255) DEFAULT '0' AFTER `name`")
                 conn.commit()
         except Exception:
             pass

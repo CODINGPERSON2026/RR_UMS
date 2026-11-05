@@ -68,3 +68,5 @@ from aiml.ai_company_readiness.routes import ai_company_readiness_bp
 
 
 from blueprints.pending_cases import pending_cases_bp
+from blueprints.drone_wpn import drone_wpn_bp
+

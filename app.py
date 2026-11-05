@@ -56,6 +56,8 @@ app.register_blueprint(company_rec_bp)
 app.register_blueprint(fitness_trend_bp)
 app.register_blueprint(ai_company_readiness_bp)
 app.register_blueprint(pending_cases_bp)
+app.register_blueprint(drone_wpn_bp)
+
 
 
 @app.template_filter('format_date')
@@ -2651,8 +2653,17 @@ def dashboard_summary():
         count_of_agniveer = agniveer_res.get('agniveer_count', 0)
         count_of_agniveer_leave = agniveer_res.get('agniveer_leave_count', 0)
 
+        # Drone / Wpn Held Count
+        try:
+            cursor.execute("SELECT COALESCE(SUM(held), 0) AS total_held FROM drone_wpn")
+            d_row = cursor.fetchone()
+            drone_wpn_held = d_row['total_held'] if d_row else 0
+        except Exception:
+            drone_wpn_held = 0
+
         # Build response JSON
         response_payload = {
+            "drone_wpn_held": drone_wpn_held,
             "status": "success",
             "detachments": detachments,
             "tasks": {

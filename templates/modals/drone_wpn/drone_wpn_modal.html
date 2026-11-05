@@ -1,0 +1,973 @@
+<!-- DRONE / WPN MANAGEMENT MODAL FOR ONCO -->
+<style>
+  #droneWpnModal .modal-dialog {
+    max-width: 1200px;
+    width: 96vw;
+  }
+  #droneWpnModal .modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    background: var(--card-bg-solid, #ffffff);
+    min-height: 520px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dwm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff;
+    flex-shrink: 0;
+  }
+  .dwm-header h5 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dwm-subtitle {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-top: 2px;
+    font-weight: 500;
+  }
+
+  .dwm-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dwm-body {
+    padding: 18px 22px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #f8fafc;
+  }
+
+  /* Add Form Card */
+  .dwm-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+  .dwm-card-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .dwm-card-title i {
+    color: #2563eb;
+  }
+
+  /* Form Inputs */
+  .dwm-form-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .dwm-input {
+    border: 1.5px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.85rem;
+    color: #1e293b;
+    transition: all 0.2s ease;
+    background: #ffffff;
+    width: 100%;
+  }
+  .dwm-input:focus {
+    border-color: #2563eb;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+
+  /* Mini Stat Cards */
+  .dwm-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .dwm-stat-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  }
+  .dwm-stat-info h6 {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .dwm-stat-info .dwm-stat-num {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-top: 2px;
+  }
+  .dwm-stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+  }
+  .dwm-icon-blue { background: #eff6ff; color: #2563eb; }
+  .dwm-icon-cyan { background: #ecfeff; color: #0891b2; }
+  .dwm-icon-emerald { background: #ecfdf5; color: #059669; }
+  .dwm-icon-amber { background: #fffbeb; color: #d97706; }
+  .dwm-icon-indigo { background: #eef2ff; color: #4f46e5; }
+
+  /* Table styling */
+  .dwm-table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+  }
+  .dwm-table-toolbar {
+    padding: 10px 14px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dwm-search-box {
+    position: relative;
+    max-width: 320px;
+    flex: 1;
+  }
+  .dwm-search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 0.85rem;
+  }
+  .dwm-search-input {
+    padding-left: 32px !important;
+    height: 34px;
+    font-size: 0.82rem;
+  }
+
+  .dwm-table-scroll {
+    overflow-x: auto;
+    max-height: 380px;
+  }
+  .dwm-table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .dwm-table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+  .dwm-table-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
+  #droneWpnTable {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 0.85rem;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  #droneWpnTable thead th {
+    background: #1e3a8a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 12px;
+    vertical-align: middle;
+    text-align: center;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  #droneWpnTable thead th:nth-child(2) {
+    text-align: left;
+  }
+  #droneWpnTable tbody td {
+    padding: 9px 12px;
+    vertical-align: middle;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+  }
+  #droneWpnTable tbody td:nth-child(2) {
+    text-align: left;
+    font-weight: 600;
+  }
+  #droneWpnTable tbody tr:hover td {
+    background: #f8fafc;
+  }
+  #droneWpnTable tfoot td {
+    background: #eff6ff;
+    font-weight: 800;
+    color: #1e3a8a;
+    padding: 10px 12px;
+    text-align: center;
+    border-top: 2px solid #93c5fd;
+    font-size: 0.85rem;
+  }
+  #droneWpnTable tfoot td:nth-child(2) {
+    text-align: left;
+  }
+
+  /* Inline editing inputs */
+  .dwm-inline-input {
+    width: 75px;
+    padding: 4px 6px;
+    font-size: 0.82rem;
+    text-align: center;
+    border: 1.5px solid #3b82f6;
+    border-radius: 6px;
+    background: #ffffff;
+  }
+  .dwm-inline-input-text {
+    width: 100%;
+    min-width: 130px;
+    text-align: left;
+    padding: 4px 8px;
+  }
+
+  .dwm-action-btn {
+    border: none;
+    background: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .dwm-btn-edit { color: #2563eb; background: #eff6ff; }
+  .dwm-btn-edit:hover { background: #2563eb; color: #ffffff; }
+  .dwm-btn-delete { color: #dc2626; background: #fef2f2; }
+  .dwm-btn-delete:hover { background: #dc2626; color: #ffffff; }
+  .dwm-btn-save { color: #059669; background: #ecfdf5; }
+  .dwm-btn-save:hover { background: #059669; color: #ffffff; }
+  .dwm-btn-cancel { color: #64748b; background: #f1f5f9; }
+  .dwm-btn-cancel:hover { background: #64748b; color: #ffffff; }
+
+  /* Notification banner inside modal */
+  #dwmAlertBanner {
+    display: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    animation: fadeIn 0.3s ease;
+  }
+  #dwmAlertBanner.alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; display: flex; }
+  #dwmAlertBanner.alert-danger { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; display: flex; }
+
+  .dwm-badge-count {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .dwm-badge-auth { background: #e0e7ff; color: #3730a3; }
+  .dwm-badge-held { background: #dbeafe; color: #1e40af; }
+  .dwm-badge-present { background: #dcfce7; color: #166534; }
+  .dwm-badge-leave { background: #fef3c7; color: #92400e; }
+</style>
+
+<div class="modal fade" id="droneWpnModal" tabindex="-1" aria-labelledby="droneWpnModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Modal Header -->
+      <div class="dwm-header">
+        <div>
+          <h5 id="droneWpnModalLabel">
+            <i class="fas fa-crosshairs"></i>
+            DRONE / WPN STATE MANAGEMENT
+          </h5>
+          <div class="dwm-subtitle">
+            Manage Equipment Name, Authorized Individuals, Held Strength, Present in Unit, and On Leave status
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="dwm-badge"><i class="fas fa-user-shield me-1"></i> ONCO ACCESS</span>
+          {% if user_company %}
+          <span class="dwm-badge" style="background: rgba(255,255,255,0.15);"><i class="fas fa-building me-1"></i> {{ user_company }}</span>
+          {% endif %}
+          <button type="button" class="btn-close btn-close-white ms-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="dwm-body">
+        
+        <!-- Live Alert Banner -->
+        <div id="dwmAlertBanner">
+          <span id="dwmAlertIcon"><i class="fas fa-check-circle"></i></span>
+          <span id="dwmAlertMsg" class="flex-grow-1"></span>
+          <button type="button" class="btn-close btn-sm" onclick="hideDwmAlert()"></button>
+        </div>
+
+        <!-- Add Form Card (NAME & AUTH_INDIVIDUALS as separate columns) -->
+        <div class="dwm-card">
+          <div class="dwm-card-title">
+            <i class="fas fa-plus-circle"></i> Add New Drone / Weapon Entry
+          </div>
+          <form id="dwmAddForm" onsubmit="handleDwmAddSubmit(event)">
+            <div class="row g-2 align-items-end">
+              <div class="col-lg-3 col-md-3 col-12">
+                <label class="dwm-form-label" for="dwmInputName">
+                  NAME <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="dwmInputName"
+                  class="dwm-input"
+                  placeholder="e.g. Micro UAV / Sniper Rifle"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-lg-3 col-md-3 col-12">
+                <label class="dwm-form-label" for="dwmInputAuthIndl">
+                  AUTH INDIVIDUALS <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="dwmInputAuthIndl"
+                  class="dwm-input"
+                  placeholder="e.g. 4 or Drone Team"
+                  required
+                  autocomplete="off"
+                />
+              </div>
+              <div class="col-lg-2 col-md-2 col-4">
+                <label class="dwm-form-label" for="dwmInputHeld">HELD</label>
+                <input
+                  type="number"
+                  id="dwmInputHeld"
+                  class="dwm-input text-center"
+                  min="0"
+                  value="0"
+                  required
+                />
+              </div>
+              <div class="col-lg-2 col-md-2 col-4">
+                <label class="dwm-form-label" for="dwmInputPresent">PRESENT IN UNIT</label>
+                <input
+                  type="number"
+                  id="dwmInputPresent"
+                  class="dwm-input text-center"
+                  min="0"
+                  value="0"
+                  required
+                />
+              </div>
+              <div class="col-lg-1 col-md-1 col-4">
+                <label class="dwm-form-label" for="dwmInputOnLeave">ON LEAVE</label>
+                <input
+                  type="number"
+                  id="dwmInputOnLeave"
+                  class="dwm-input text-center"
+                  min="0"
+                  value="0"
+                  required
+                />
+              </div>
+              <div class="col-lg-1 col-md-1 col-12 text-end">
+                <button type="submit" class="btn btn-primary btn-sm w-100" id="dwmBtnAdd" style="height: 38px; border-radius: 8px; font-weight: 700;">
+                  <i class="fas fa-plus"></i> ADD
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Mini Stats Summary Cards -->
+        <div class="dwm-stats-grid">
+          <div class="dwm-stat-card">
+            <div class="dwm-stat-info">
+              <h6>Total Categories</h6>
+              <div class="dwm-stat-num" id="dwmTotalCategories">0</div>
+            </div>
+            <div class="dwm-stat-icon dwm-icon-indigo">
+              <i class="fas fa-layer-group"></i>
+            </div>
+          </div>
+          <div class="dwm-stat-card">
+            <div class="dwm-stat-info">
+              <h6>Auth Individuals</h6>
+              <div class="dwm-stat-num" id="dwmTotalAuth" style="color: #4f46e5;">0</div>
+            </div>
+            <div class="dwm-stat-icon dwm-icon-cyan">
+              <i class="fas fa-users-gear"></i>
+            </div>
+          </div>
+          <div class="dwm-stat-card">
+            <div class="dwm-stat-info">
+              <h6>Total Held</h6>
+              <div class="dwm-stat-num" id="dwmTotalHeld" style="color: #2563eb;">0</div>
+            </div>
+            <div class="dwm-stat-icon dwm-icon-blue">
+              <i class="fas fa-boxes-stacked"></i>
+            </div>
+          </div>
+          <div class="dwm-stat-card">
+            <div class="dwm-stat-info">
+              <h6>Present in Unit</h6>
+              <div class="dwm-stat-num" id="dwmTotalPresent" style="color: #059669;">0</div>
+            </div>
+            <div class="dwm-stat-icon dwm-icon-emerald">
+              <i class="fas fa-user-check"></i>
+            </div>
+          </div>
+          <div class="dwm-stat-card">
+            <div class="dwm-stat-info">
+              <h6>On Leave</h6>
+              <div class="dwm-stat-num" id="dwmTotalOnLeave" style="color: #d97706;">0</div>
+            </div>
+            <div class="dwm-stat-icon dwm-icon-amber">
+              <i class="fas fa-person-walking-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="dwm-table-wrapper">
+          <div class="dwm-table-toolbar">
+            <div class="dwm-search-box">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                id="dwmSearchInput"
+                class="form-control form-control-sm dwm-search-input"
+                placeholder="Search by name or auth individuals..."
+                oninput="filterDwmTable()"
+              />
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm"
+                onclick="loadDroneWpnData()"
+                title="Refresh Table"
+                style="border-radius: 6px; font-weight: 600;"
+              >
+                <i class="fas fa-rotate me-1" id="dwmRefreshIcon"></i> Refresh
+              </button>
+            </div>
+          </div>
+
+          <div class="dwm-table-scroll">
+            <table class="table table-hover" id="droneWpnTable">
+              <thead>
+                <tr>
+                  <th style="width: 45px;">#</th>
+                  <th>NAME</th>
+                  <th>AUTH INDIVIDUALS</th>
+                  <th style="width: 100px;">HELD</th>
+                  <th style="width: 130px;">PRESENT IN UNIT</th>
+                  <th style="width: 100px;">ON LEAVE</th>
+                  <th style="width: 110px;">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody id="droneWpnTableBody">
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Loading Drone / Wpn records...
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot id="droneWpnTableFoot" style="display: none;">
+                <tr>
+                  <td></td>
+                  <td><strong>TOTAL</strong></td>
+                  <td id="footTotalAuth">0</td>
+                  <td id="footTotalHeld">0</td>
+                  <td id="footTotalPresent">0</td>
+                  <td id="footTotalOnLeave">0</td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer py-2 px-3 bg-light d-flex justify-content-between align-items-center">
+        <small class="text-muted" id="dwmLastUpdatedInfo">
+          <i class="far fa-clock me-1"></i> Data synced in real-time
+        </small>
+        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="font-weight: 600; border-radius: 6px;">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let gDwmItems = [];
+  let gDwmEditingId = null;
+
+  function showDwmAlert(msg, type = 'success') {
+    const banner = document.getElementById('dwmAlertBanner');
+    const msgEl = document.getElementById('dwmAlertMsg');
+    const iconEl = document.getElementById('dwmAlertIcon');
+    if (!banner || !msgEl) return;
+
+    banner.className = type === 'success' ? 'alert-success' : 'alert-danger';
+    iconEl.innerHTML = type === 'success' 
+      ? '<i class="fas fa-check-circle"></i>' 
+      : '<i class="fas fa-exclamation-triangle"></i>';
+    msgEl.textContent = msg;
+
+    setTimeout(() => {
+      hideDwmAlert();
+    }, 4500);
+  }
+
+  function hideDwmAlert() {
+    const banner = document.getElementById('dwmAlertBanner');
+    if (banner) {
+      banner.style.display = 'none';
+      banner.className = '';
+    }
+  }
+
+  // Load records from backend
+  async function loadDroneWpnData() {
+    const tbody = document.getElementById('droneWpnTableBody');
+    const tfoot = document.getElementById('droneWpnTableFoot');
+    const refreshIcon = document.getElementById('dwmRefreshIcon');
+
+    if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+    try {
+      const res = await fetch('/drone_wpn/api/list');
+      const data = await res.json();
+
+      if (!data.success) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> ${data.message || 'Error loading records'}</td></tr>`;
+        if (tfoot) tfoot.style.display = 'none';
+        return;
+      }
+
+      gDwmItems = data.data || [];
+      updateDwmStats(data.totals);
+      renderDwmTable(gDwmItems);
+
+      const lastUpInfo = document.getElementById('dwmLastUpdatedInfo');
+      if (lastUpInfo) {
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        lastUpInfo.innerHTML = `<i class="far fa-clock me-1"></i> Last refreshed at ${now}`;
+      }
+    } catch (err) {
+      console.error('[DroneWpn] Fetch error:', err);
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Failed to connect to server.</td></tr>`;
+      }
+    } finally {
+      if (refreshIcon) refreshIcon.classList.remove('fa-spin');
+    }
+  }
+
+  function updateDwmStats(totals) {
+    const totalCount = totals ? totals.count : gDwmItems.length;
+    const totalAuth = totals ? totals.auth_individuals : gDwmItems.reduce((acc, cur) => acc + (parseInt(cur.auth_individuals) || 0), 0);
+    const totalHeld = totals ? totals.held : gDwmItems.reduce((acc, cur) => acc + (parseInt(cur.held) || 0), 0);
+    const totalPresent = totals ? totals.present_in_unit : gDwmItems.reduce((acc, cur) => acc + (parseInt(cur.present_in_unit) || 0), 0);
+    const totalOnLeave = totals ? totals.on_leave : gDwmItems.reduce((acc, cur) => acc + (parseInt(cur.on_leave) || 0), 0);
+
+    const elCount = document.getElementById('dwmTotalCategories');
+    const elAuth = document.getElementById('dwmTotalAuth');
+    const elHeld = document.getElementById('dwmTotalHeld');
+    const elPresent = document.getElementById('dwmTotalPresent');
+    const elLeave = document.getElementById('dwmTotalOnLeave');
+
+    if (elCount) elCount.textContent = totalCount;
+    if (elAuth) elAuth.textContent = totalAuth;
+    if (elHeld) elHeld.textContent = totalHeld;
+    if (elPresent) elPresent.textContent = totalPresent;
+    if (elLeave) elLeave.textContent = totalOnLeave;
+
+    const footAuth = document.getElementById('footTotalAuth');
+    const footHeld = document.getElementById('footTotalHeld');
+    const footPresent = document.getElementById('footTotalPresent');
+    const footLeave = document.getElementById('footTotalOnLeave');
+    if (footAuth) footAuth.textContent = totalAuth;
+    if (footHeld) footHeld.textContent = totalHeld;
+    if (footPresent) footPresent.textContent = totalPresent;
+    if (footLeave) footLeave.textContent = totalOnLeave;
+  }
+
+  // Render table rows with separate NAME and AUTH INDIVIDUALS
+  function renderDwmTable(items) {
+    const tbody = document.getElementById('droneWpnTableBody');
+    const tfoot = document.getElementById('droneWpnTableFoot');
+    if (!tbody) return;
+
+    if (!items || items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center py-4 text-muted">
+            <i class="fas fa-folder-open me-2 fa-2x d-block mb-2 text-secondary opacity-50"></i>
+            No Drone / Weapon records found. Add a new record above to get started.
+          </td>
+        </tr>`;
+      if (tfoot) tfoot.style.display = 'none';
+      return;
+    }
+
+    if (tfoot) tfoot.style.display = 'table-footer-group';
+
+    let html = '';
+    items.forEach((item, idx) => {
+      const isEditing = gDwmEditingId === item.id;
+
+      if (isEditing) {
+        html += `
+          <tr id="dwmRow_${item.id}" class="table-primary">
+            <td>${idx + 1}</td>
+            <td>
+              <input 
+                type="text" 
+                id="dwmEditName_${item.id}" 
+                class="dwm-inline-input dwm-inline-input-text" 
+                value="${escapeHtml(item.name || '')}" 
+                placeholder="Name"
+                required
+              />
+            </td>
+            <td>
+              <input 
+                type="text" 
+                id="dwmEditAuthIndl_${item.id}" 
+                class="dwm-inline-input dwm-inline-input-text" 
+                value="${escapeHtml(item.auth_individuals || '0')}" 
+                placeholder="Auth Individuals"
+                required
+              />
+            </td>
+            <td>
+              <input 
+                type="number" 
+                id="dwmEditHeld_${item.id}" 
+                class="dwm-inline-input" 
+                min="0" 
+                value="${item.held || 0}"
+              />
+            </td>
+            <td>
+              <input 
+                type="number" 
+                id="dwmEditPresent_${item.id}" 
+                class="dwm-inline-input" 
+                min="0" 
+                value="${item.present_in_unit || 0}"
+              />
+            </td>
+            <td>
+              <input 
+                type="number" 
+                id="dwmEditOnLeave_${item.id}" 
+                class="dwm-inline-input" 
+                min="0" 
+                value="${item.on_leave || 0}"
+              />
+            </td>
+            <td>
+              <button 
+                type="button" 
+                class="dwm-action-btn dwm-btn-save me-1" 
+                onclick="saveDwmEdit(${item.id})" 
+                title="Save Changes"
+              >
+                <i class="fas fa-check"></i>
+              </button>
+              <button 
+                type="button" 
+                class="dwm-action-btn dwm-btn-cancel" 
+                onclick="cancelDwmEdit()" 
+                title="Cancel"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      } else {
+        html += `
+          <tr id="dwmRow_${item.id}">
+            <td class="text-muted">${idx + 1}</td>
+            <td>
+              <div class="fw-bold text-dark">${escapeHtml(item.name || '')}</div>
+              ${item.company ? `<span class="badge bg-light text-secondary border" style="font-size: 0.68rem; font-weight: 500;">${escapeHtml(item.company)}</span>` : ''}
+            </td>
+            <td>
+              <span class="dwm-badge-count dwm-badge-auth">${escapeHtml(item.auth_individuals || '0')}</span>
+            </td>
+            <td>
+              <span class="dwm-badge-count dwm-badge-held">${item.held || 0}</span>
+            </td>
+            <td>
+              <span class="dwm-badge-count dwm-badge-present">${item.present_in_unit || 0}</span>
+            </td>
+            <td>
+              <span class="dwm-badge-count dwm-badge-leave">${item.on_leave || 0}</span>
+            </td>
+            <td>
+              <button 
+                type="button" 
+                class="dwm-action-btn dwm-btn-edit me-1" 
+                onclick="startDwmEdit(${item.id})" 
+                title="Edit Entry"
+              >
+                <i class="fas fa-pen"></i>
+              </button>
+              <button 
+                type="button" 
+                class="dwm-action-btn dwm-btn-delete" 
+                onclick="deleteDwmItem(${item.id}, '${escapeJs(item.name || '')}')" 
+                title="Delete Entry"
+              >
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  // Filter table by search input
+  function filterDwmTable() {
+    const q = (document.getElementById('dwmSearchInput')?.value || '').trim().toLowerCase();
+    if (!q) {
+      renderDwmTable(gDwmItems);
+      return;
+    }
+    const filtered = gDwmItems.filter(item => 
+      (item.name || '').toLowerCase().includes(q) || 
+      (item.auth_individuals || '').toLowerCase().includes(q)
+    );
+    renderDwmTable(filtered);
+  }
+
+  // Handle Add Form Submission
+  async function handleDwmAddSubmit(event) {
+    event.preventDefault();
+    const btn = document.getElementById('dwmBtnAdd');
+    const nameInput = document.getElementById('dwmInputName');
+    const authInput = document.getElementById('dwmInputAuthIndl');
+    const heldInput = document.getElementById('dwmInputHeld');
+    const presentInput = document.getElementById('dwmInputPresent');
+    const onLeaveInput = document.getElementById('dwmInputOnLeave');
+
+    const name = (nameInput?.value || '').trim();
+    if (!name) {
+      showDwmAlert('Please enter Name', 'danger');
+      return;
+    }
+
+    const auth_individuals = (authInput?.value || '').trim() || '0';
+    const held = parseInt(heldInput?.value || 0, 10);
+    const present_in_unit = parseInt(presentInput?.value || 0, 10);
+    const on_leave = parseInt(onLeaveInput?.value || 0, 10);
+
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    }
+
+    try {
+      const res = await fetch('/drone_wpn/api/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, auth_individuals, held, present_in_unit, on_leave })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showDwmAlert(data.message || 'Record added successfully!', 'success');
+        // Reset form
+        nameInput.value = '';
+        authInput.value = '';
+        heldInput.value = '0';
+        presentInput.value = '0';
+        onLeaveInput.value = '0';
+        nameInput.focus();
+        await loadDroneWpnData();
+      } else {
+        showDwmAlert(data.message || 'Failed to add record', 'danger');
+      }
+    } catch (err) {
+      console.error('[DroneWpn] Add error:', err);
+      showDwmAlert('Server error while adding record', 'danger');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-plus"></i> ADD';
+      }
+    }
+  }
+
+  // Start inline editing
+  function startDwmEdit(id) {
+    gDwmEditingId = id;
+    renderDwmTable(gDwmItems);
+    setTimeout(() => {
+      const editInput = document.getElementById(`dwmEditName_${id}`);
+      if (editInput) editInput.focus();
+    }, 50);
+  }
+
+  // Cancel inline editing
+  function cancelDwmEdit() {
+    gDwmEditingId = null;
+    renderDwmTable(gDwmItems);
+  }
+
+  // Save inline editing
+  async function saveDwmEdit(id) {
+    const nameInput = document.getElementById(`dwmEditName_${id}`);
+    const authInput = document.getElementById(`dwmEditAuthIndl_${id}`);
+    const heldInput = document.getElementById(`dwmEditHeld_${id}`);
+    const presentInput = document.getElementById(`dwmEditPresent_${id}`);
+    const onLeaveInput = document.getElementById(`dwmEditOnLeave_${id}`);
+
+    const name = (nameInput?.value || '').trim();
+    if (!name) {
+      showDwmAlert('Name cannot be empty', 'danger');
+      return;
+    }
+
+    const auth_individuals = (authInput?.value || '').trim() || '0';
+    const held = parseInt(heldInput?.value || 0, 10);
+    const present_in_unit = parseInt(presentInput?.value || 0, 10);
+    const on_leave = parseInt(onLeaveInput?.value || 0, 10);
+
+    try {
+      const res = await fetch(`/drone_wpn/api/update/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, auth_individuals, held, present_in_unit, on_leave })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showDwmAlert(data.message || 'Record updated successfully!', 'success');
+        gDwmEditingId = null;
+        await loadDroneWpnData();
+      } else {
+        showDwmAlert(data.message || 'Failed to update record', 'danger');
+      }
+    } catch (err) {
+      console.error('[DroneWpn] Update error:', err);
+      showDwmAlert('Server error while updating record', 'danger');
+    }
+  }
+
+  // Delete an item
+  async function deleteDwmItem(id, name) {
+    const confirmed = confirm(`Are you sure you want to delete "${name}" from Drone/Wpn state?`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/drone_wpn/api/delete/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showDwmAlert(data.message || 'Record deleted successfully!', 'success');
+        if (gDwmEditingId === id) gDwmEditingId = null;
+        await loadDroneWpnData();
+      } else {
+        showDwmAlert(data.message || 'Failed to delete record', 'danger');
+      }
+    } catch (err) {
+      console.error('[DroneWpn] Delete error:', err);
+      showDwmAlert('Server error while deleting record', 'danger');
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+  }
+
+  function escapeJs(str) {
+    return (str || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('droneWpnModal');
+    if (modalEl) {
+      modalEl.addEventListener('shown.bs.modal', function () {
+        loadDroneWpnData();
+        const nameInput = document.getElementById('dwmInputName');
+        if (nameInput) nameInput.focus();
+      });
+    }
+  });
+</script>

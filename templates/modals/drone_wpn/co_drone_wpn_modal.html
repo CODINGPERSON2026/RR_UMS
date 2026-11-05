@@ -1,0 +1,541 @@
+<!-- CO / 2IC / ADJT DRONE & WPN STATE MODAL WITH MINIMAL HEADER FILTER & SEARCH -->
+<style>
+  #coDroneWpnModal .modal-dialog {
+    max-width: 1250px;
+    width: 96vw;
+  }
+  #coDroneWpnModal .modal-content {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    background: var(--card-bg-solid, #ffffff);
+    min-height: 480px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .co-dwm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%);
+    color: #ffffff;
+    flex-shrink: 0;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .co-dwm-header h5 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .co-dwm-role-pill {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Minimal header controls */
+  .co-dwm-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .co-dwm-hdr-select {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    height: 34px !important;
+    padding: 2px 28px 2px 12px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  .co-dwm-hdr-select:focus {
+    border-color: #3b82f6 !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+  }
+
+  .co-dwm-hdr-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .co-dwm-hdr-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b !important;
+    font-size: 13px !important;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .co-dwm-hdr-input {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    height: 34px !important;
+    padding: 4px 12px 4px 34px !important;
+    font-size: 0.82rem !important;
+    width: 220px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: width 0.2s ease, border-color 0.2s ease;
+  }
+  .co-dwm-hdr-input::placeholder {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+  .co-dwm-hdr-input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+    outline: none;
+    width: 270px;
+  }
+
+  .co-dwm-body {
+    padding: 14px 18px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc;
+  }
+
+  /* Table styling */
+  .co-dwm-table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .co-dwm-table-header-info {
+    padding: 8px 14px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .co-dwm-active-filter-badge {
+    font-size: 0.74rem;
+    font-weight: 700;
+    background: #e0e7ff;
+    color: #3730a3;
+    padding: 2px 10px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .co-dwm-table-scroll {
+    overflow-x: auto;
+    max-height: calc(90vh - 170px);
+  }
+  .co-dwm-table-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .co-dwm-table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+  .co-dwm-table-scroll::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+
+  #coDroneWpnTable {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 0.86rem;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  #coDroneWpnTable thead th {
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 10px 14px;
+    vertical-align: middle;
+    text-align: center;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    white-space: nowrap;
+  }
+  #coDroneWpnTable thead th:nth-child(2) {
+    text-align: left;
+  }
+  #coDroneWpnTable tbody td {
+    padding: 10px 14px;
+    vertical-align: middle;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    color: #1e293b;
+  }
+  #coDroneWpnTable tbody td:nth-child(2) {
+    text-align: left;
+    font-weight: 700;
+  }
+  #coDroneWpnTable tbody tr:hover td {
+    background: #f1f5f9;
+  }
+  #coDroneWpnTable tfoot td {
+    background: #e0f2fe;
+    font-weight: 800;
+    color: #0369a1;
+    padding: 11px 14px;
+    text-align: center;
+    border-top: 2px solid #7dd3fc;
+    font-size: 0.88rem;
+  }
+  #coDroneWpnTable tfoot td:nth-child(2) {
+    text-align: left;
+  }
+
+  .co-badge-count {
+    display: inline-block;
+    padding: 2px 11px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+  .co-badge-auth { background: #e0e7ff; color: #3730a3; }
+  .co-badge-held { background: #dbeafe; color: #1e40af; }
+  .co-badge-present { background: #dcfce7; color: #166534; }
+  .co-badge-leave { background: #fef3c7; color: #92400e; }
+  .co-badge-coy { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600; font-size: 0.72rem; }
+</style>
+
+<div class="modal fade" id="coDroneWpnModal" tabindex="-1" aria-labelledby="coDroneWpnModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <!-- Minimal Modal Header with Company Filter & Search -->
+      <div class="co-dwm-header">
+        <div class="d-flex align-items-center gap-2">
+          <h5 id="coDroneWpnModalLabel">
+            <i class="fas fa-crosshairs"></i>
+            DRONE & WPN STATE REGISTER
+          </h5>
+          {% if role %}
+          <span class="co-dwm-role-pill"><i class="fas fa-shield-halved me-1"></i> {{ role }}</span>
+          {% endif %}
+        </div>
+
+        <div class="co-dwm-header-controls">
+          <!-- Company Filter Dropdown -->
+          <select id="coDwmCompanyFilter" class="form-select form-select-sm co-dwm-hdr-select" onchange="onCoDwmCompanyFilterChange()" title="Filter by Company">
+            <option value="ALL">All Companies</option>
+            <option value="COMN Company">COMN Company</option>
+            <option value="3 Company">3 Company</option>
+            <option value="HQ Company">HQ Company</option>
+          </select>
+
+          <!-- Search with Visible Icon -->
+          <div class="co-dwm-hdr-search">
+            <i class="fa-solid fa-magnifying-glass co-dwm-hdr-search-icon"></i>
+            <input
+              type="text"
+              id="coDwmSearchInput"
+              class="form-control form-control-sm co-dwm-hdr-input"
+              placeholder="Search drone / wpn..."
+              autocomplete="off"
+              oninput="filterCoDwmTable()"
+            />
+          </div>
+
+          <!-- Close button -->
+          <button type="button" class="btn-close btn-close-white ms-1" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="co-dwm-body">
+
+        <!-- Data Table Card -->
+        <div class="co-dwm-table-wrapper">
+          <div class="co-dwm-table-header-info">
+            <span class="co-dwm-active-filter-badge" id="coDwmActiveFilterBadge">
+              <i class="fas fa-building"></i> Company: All Companies
+            </span>
+            <small class="text-muted" id="coDwmRowCountInfo">0 entries displayed</small>
+          </div>
+
+          <div class="co-dwm-table-scroll">
+            <table class="table table-hover" id="coDroneWpnTable">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">#</th>
+                  <th>NAME</th>
+                  <th>AUTH INDIVIDUALS</th>
+                  <th style="width: 110px;">HELD</th>
+                  <th style="width: 140px;">PRESENT IN UNIT</th>
+                  <th style="width: 110px;">ON LEAVE</th>
+                  <th style="width: 150px;">COMPANY</th>
+                  <th style="width: 150px;">LAST UPDATED</th>
+                </tr>
+              </thead>
+              <tbody id="coDroneWpnTableBody">
+                <tr>
+                  <td colspan="8" class="text-center py-4 text-muted">
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                    Loading Drone / Wpn records...
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot id="coDroneWpnTableFoot" style="display: none;">
+                <tr>
+                  <td></td>
+                  <td><strong>TOTAL</strong></td>
+                  <td id="coFootTotalAuth">0</td>
+                  <td id="coFootTotalHeld">0</td>
+                  <td id="coFootTotalPresent">0</td>
+                  <td id="coFootTotalOnLeave">0</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer py-2 px-3 bg-light d-flex justify-content-between align-items-center">
+        <small class="text-muted" id="coDwmLastSyncText">
+          <i class="far fa-clock me-1"></i> Data synced in real-time
+        </small>
+        <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="font-weight: 600; border-radius: 6px;">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  let gCoDwmItems = [];
+
+  function openCoDroneWpnModal() {
+    loadCoDroneWpnData();
+  }
+
+  async function loadCoDroneWpnData() {
+    const tbody = document.getElementById('coDroneWpnTableBody');
+    const tfoot = document.getElementById('coDroneWpnTableFoot');
+    const companySelect = document.getElementById('coDwmCompanyFilter');
+
+    const selectedCoy = companySelect ? companySelect.value : 'ALL';
+    const url = selectedCoy && selectedCoy !== 'ALL' 
+      ? `/drone_wpn/api/list?company=${encodeURIComponent(selectedCoy)}` 
+      : '/drone_wpn/api/list';
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!data.success) {
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger"><i class="fas fa-exclamation-circle me-1"></i> ${data.message || 'Error loading records'}</td></tr>`;
+        }
+        if (tfoot) tfoot.style.display = 'none';
+        return;
+      }
+
+      gCoDwmItems = data.data || [];
+
+      // Populate distinct companies into dropdown if available
+      if (data.companies && companySelect) {
+        syncCoDwmCompanyDropdown(data.companies, selectedCoy);
+      }
+
+      updateCoDwmStats(data.totals);
+      renderCoDwmTable(gCoDwmItems);
+
+      const lastSync = document.getElementById('coDwmLastSyncText');
+      if (lastSync) {
+        const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        lastSync.innerHTML = `<i class="far fa-clock me-1"></i> Last refreshed at ${now}`;
+      }
+    } catch (err) {
+      console.error('[CoDroneWpn] Fetch error:', err);
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-1"></i> Failed to connect to server.</td></tr>`;
+      }
+    }
+  }
+
+  function syncCoDwmCompanyDropdown(companies, selectedCoy) {
+    const sel = document.getElementById('coDwmCompanyFilter');
+    if (!sel) return;
+
+    const existingVals = Array.from(sel.options).map(o => o.value);
+    companies.forEach(c => {
+      if (c && !existingVals.includes(c)) {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+      }
+    });
+
+    if (selectedCoy) sel.value = selectedCoy;
+  }
+
+  function onCoDwmCompanyFilterChange() {
+    const companySelect = document.getElementById('coDwmCompanyFilter');
+    const selectedCoy = companySelect ? companySelect.value : 'ALL';
+    
+    const badge = document.getElementById('coDwmActiveFilterBadge');
+    if (badge) {
+      badge.innerHTML = `<i class="fas fa-building"></i> Company: ${escapeHtml(selectedCoy === 'ALL' ? 'All Companies' : selectedCoy)}`;
+    }
+
+    loadCoDroneWpnData();
+  }
+
+  function updateCoDwmStats(totals) {
+    const totalAuth = totals ? totals.auth_individuals : gCoDwmItems.reduce((acc, cur) => acc + (parseInt(cur.auth_individuals) || 0), 0);
+    const totalHeld = totals ? totals.held : gCoDwmItems.reduce((acc, cur) => acc + (parseInt(cur.held) || 0), 0);
+    const totalPresent = totals ? totals.present_in_unit : gCoDwmItems.reduce((acc, cur) => acc + (parseInt(cur.present_in_unit) || 0), 0);
+    const totalOnLeave = totals ? totals.on_leave : gCoDwmItems.reduce((acc, cur) => acc + (parseInt(cur.on_leave) || 0), 0);
+
+    const footAuth = document.getElementById('coFootTotalAuth');
+    const footHeld = document.getElementById('coFootTotalHeld');
+    const footPresent = document.getElementById('coFootTotalPresent');
+    const footLeave = document.getElementById('coFootTotalOnLeave');
+    if (footAuth) footAuth.textContent = totalAuth;
+    if (footHeld) footHeld.textContent = totalHeld;
+    if (footPresent) footPresent.textContent = totalPresent;
+    if (footLeave) footLeave.textContent = totalOnLeave;
+
+    const dashHeld = document.getElementById('drone-wpn-held-count');
+    if (dashHeld && totals) {
+      dashHeld.textContent = totalHeld;
+    }
+  }
+
+  function renderCoDwmTable(items) {
+    const tbody = document.getElementById('coDroneWpnTableBody');
+    const tfoot = document.getElementById('coDroneWpnTableFoot');
+    const rowInfo = document.getElementById('coDwmRowCountInfo');
+    if (!tbody) return;
+
+    if (rowInfo) rowInfo.textContent = `${items ? items.length : 0} entries displayed`;
+
+    if (!items || items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-4 text-muted">
+            <i class="fas fa-folder-open me-2 fa-2x d-block mb-2 text-secondary opacity-50"></i>
+            No Drone / Weapon records found for the selected company filter.
+          </td>
+        </tr>`;
+      if (tfoot) tfoot.style.display = 'none';
+      return;
+    }
+
+    if (tfoot) tfoot.style.display = 'table-footer-group';
+
+    let html = '';
+    items.forEach((item, idx) => {
+      html += `
+        <tr>
+          <td class="text-muted fw-bold">${idx + 1}</td>
+          <td>
+            <div class="fw-bold text-dark">${escapeHtml(item.name || '')}</div>
+          </td>
+          <td>
+            <span class="co-badge-count co-badge-auth">${escapeHtml(item.auth_individuals || '0')}</span>
+          </td>
+          <td>
+            <span class="co-badge-count co-badge-held">${item.held || 0}</span>
+          </td>
+          <td>
+            <span class="co-badge-count co-badge-present">${item.present_in_unit || 0}</span>
+          </td>
+          <td>
+            <span class="co-badge-count co-badge-leave">${item.on_leave || 0}</span>
+          </td>
+          <td>
+            <span class="badge co-badge-coy">${escapeHtml(item.company || 'Unit / All')}</span>
+          </td>
+          <td class="text-muted" style="font-size: 0.8rem; font-weight: 500;">
+            ${escapeHtml(item.formatted_updated_at || '-')}
+          </td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  function filterCoDwmTable() {
+    const q = (document.getElementById('coDwmSearchInput')?.value || '').trim().toLowerCase();
+    if (!q) {
+      renderCoDwmTable(gCoDwmItems);
+      return;
+    }
+    const filtered = gCoDwmItems.filter(item => 
+      (item.name || '').toLowerCase().includes(q) || 
+      (item.auth_individuals || '').toLowerCase().includes(q) ||
+      (item.company || '').toLowerCase().includes(q)
+    );
+    renderCoDwmTable(filtered);
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const modalEl = document.getElementById('coDroneWpnModal');
+    if (modalEl) {
+      modalEl.addEventListener('shown.bs.modal', function () {
+        loadCoDroneWpnData();
+      });
+    }
+
+    fetch('/drone_wpn/api/list')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.success && d.totals) {
+          const dashHeld = document.getElementById('drone-wpn-held-count');
+          if (dashHeld) dashHeld.textContent = d.totals.held != null ? d.totals.held : 0;
+        }
+      })
+      .catch(e => {
+        const dashHeld = document.getElementById('drone-wpn-held-count');
+        if (dashHeld) dashHeld.textContent = '0';
+      });
+  });
+</script>

@@ -1743,7 +1743,7 @@ STATUS COLORS
         onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();"
         title="AI New Arrival Recommendation Insights">
         <div class="sc-label">
-          <span class="sc-label-text"><i class="fas fa-brain text-primary me-1"></i> AI NEW ARRIVAL</span>
+          <span class="sc-label-text">AI NEW ARRIVAL</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="ai-insights-count"><span
@@ -1757,7 +1757,7 @@ STATUS COLORS
         onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();"
         title="AI Individual Fitness Reports & Operational Readiness">
         <div class="sc-label">
-          <span class="sc-label-text"><i class="fas fa-heartbeat text-danger me-1"></i> AI Fitness Reports</span>
+          <span class="sc-label-text">AI Fitness Reports</span>
         </div>
         <div class="sc-right">
           <span class="sc-val" id="co-fit-total"><span
@@ -1782,6 +1782,23 @@ STATUS COLORS
       </div>
       ── #}
       {% endif %}
+      {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in ['CO', '2IC', 'ADJUTANT', 'ADJT'] %}
+      <div class="sc" style="cursor: pointer;" id="card-drone-wpn" data-bs-toggle="modal"
+        data-bs-target="#coDroneWpnModal"
+        onclick="if(typeof openCoDroneWpnModal==='function') openCoDroneWpnModal();"
+        title="Drone & Weapon State Register">
+        <div class="sc-label">
+          <span class="sc-label-text">Drone / Wpn</span>
+        </div>
+        <div class="sc-right">
+          <span class="sc-val" id="drone-wpn-held-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-updater"><i class="fa fa-user-shield"></i> ONCO</span>
+        </div>
+      </div>
+      {% endif %}
+
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
         <div class="sc-label">
           <span class="sc-label-text">OC Interview</span>
@@ -2380,6 +2397,7 @@ STATUS COLORS
       safeSet("onleave_leave", data.agniveer_on_leave);
       safeSet("dues_in_count", data.dues_in);
       safeSet("dues_out_count", data.dues_out);
+      safeSet("drone-wpn-held-count", data.drone_wpn_held != null ? data.drone_wpn_held : 0);
       if (data.parade_last_updated) {
         document.querySelectorAll('.manpower-last-updated-text, #manpowerLastUpdatedTimestamp').forEach(function (el) {
           el.textContent = data.parade_last_updated;
@@ -3241,11 +3259,12 @@ STATUS COLORS
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
+{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in ['CO', '2IC', 'ADJUTANT', 'ADJT'] %}
 <script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %} false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
 {% include 'modals/vms/vms_modal.html' %}
+{% include 'modals/drone_wpn/co_drone_wpn_modal.html' %}
 {% endif %}
 
 {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco',
