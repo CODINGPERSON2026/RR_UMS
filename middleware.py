@@ -1,7 +1,7 @@
 from flask import Flask, redirect, request, session
 import jwt
 
-JWT_SECRET = "MY_SUPER_SECRET_KEY_123"      # change this later
+JWT_SECRET = "MY_SUPER_SECRET_KEY_123_4567890123"      # 32+ bytes for HMAC-SHA256
 JWT_ALGO = "HS256"
 
 def require_login():

@@ -1702,13 +1702,13 @@ def api_alarm_days():
         thresholds = get_alarm_thresholds()
         return jsonify({"status": "success", "thresholds": thresholds})
 
-    # POST: Update thresholds
-    user_role = str(user.get('role', '')).upper().strip().replace(' ', '')
-    allowed_roles = ['S/JCO', 'SJCO', 'ADMIN', 'CO', '2IC', 'SUBMAJOR', 'SUBEDARMAJOR']
+    # POST: Update thresholds - restricted strictly to O CENTRE NCO
+    user_role = str(user.get('role', '')).upper().strip().replace(' ', '').replace('_', '').replace('-', '')
+    allowed_roles = ['OCENTRENCO', 'OCENTERNCO']
     if user_role not in allowed_roles:
         return jsonify({
             "status": "error",
-            "message": "Access denied. Only S/JCO (or Admin) can modify DET/TD alarm days."
+            "message": "Access denied. Only O CENTRE NCO can modify DET/TD alarm days."
         }), 403
 
     data = request.get_json(silent=True) or request.form
@@ -2653,9 +2653,9 @@ def dashboard_summary():
         count_of_agniveer = agniveer_res.get('agniveer_count', 0)
         count_of_agniveer_leave = agniveer_res.get('agniveer_leave_count', 0)
 
-        # Drone / Wpn Held Count
+        # Drone / Wpn Held Count (Total active assignments)
         try:
-            cursor.execute("SELECT COALESCE(SUM(held), 0) AS total_held FROM drone_wpn")
+            cursor.execute("SELECT COUNT(*) AS total_held FROM drone_wpn_assignment")
             d_row = cursor.fetchone()
             drone_wpn_held = d_row['total_held'] if d_row else 0
         except Exception:

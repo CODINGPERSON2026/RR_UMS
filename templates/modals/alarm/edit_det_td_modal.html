@@ -1,8 +1,8 @@
-<!-- ================= EDIT DET/TD ALARM DAYS (FOR ROLE S/JCO) ================= -->
+<!-- ================= EDIT DET/TD ALARM DAYS (FOR ROLE O CENTRE NCO) ================= -->
 
 {% set u_role_raw = (role or (current_user.role if current_user else '') or session.get('role', ''))|string %}
 {% set u_role_clean = u_role_raw|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% set is_sjco_or_admin = (u_role_clean in ['S/JCO', 'SJCO', 'ADMIN', 'CO', '2IC', 'SUBMAJOR', 'SUBEDARMAJOR']) %}
+{% set is_ocentrenco = (u_role_clean in ['OCENTRENCO', 'OCENTERNCO'] or u_role_raw|upper in ['O CENTRE NCO', 'O CENTER NCO']) %}
 
 <!-- Modal Dialog -->
 <div class="modal fade" id="editDetTdModal" tabindex="-1" aria-labelledby="editDetTdModalLabel" aria-hidden="true" style="z-index: 1065;">
@@ -17,7 +17,7 @@
           </div>
           <div>
             <h5 class="modal-title mb-0 fw-bold" id="editDetTdModalLabel" style="font-size: 1.05rem;">Edit DET/TD Alarm Days</h5>
-            <small class="text-white-50" style="font-size: 0.75rem;">Configured Thresholds &bull; S/JCO Authority</small>
+            <small class="text-white-50" style="font-size: 0.75rem;">Configured Thresholds &bull; O CENTRE NCO Authority</small>
           </div>
         </div>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>

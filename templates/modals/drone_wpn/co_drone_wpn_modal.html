@@ -229,6 +229,67 @@
   .co-badge-present { background: #dcfce7; color: #166534; }
   .co-badge-leave { background: #fef3c7; color: #92400e; }
   .co-badge-coy { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-weight: 600; font-size: 0.72rem; }
+
+  /* View Button in Table */
+  .co-btn-view {
+    border: 1.5px solid #2563eb;
+    background: #ffffff;
+    color: #2563eb;
+    border-radius: 6px;
+    padding: 3px 12px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .co-btn-view:hover {
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  }
+
+  /* CO View Assigned Personnel Popup */
+  #coDwmViewAssignedModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.65);
+    z-index: 1070;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  #coDwmViewAssignedModal.active {
+    display: flex;
+  }
+  .co-dwm-view-card {
+    background: #ffffff;
+    border-radius: 14px;
+    width: 820px;
+    max-width: 95vw;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 88vh;
+  }
+  .co-dwm-view-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+    color: #ffffff;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .co-dwm-view-body {
+    padding: 16px 20px;
+    overflow-y: auto;
+    background: #f8fafc;
+  }
 </style>
 
 <div class="modal fade" id="coDroneWpnModal" tabindex="-1" aria-labelledby="coDroneWpnModalLabel" aria-hidden="true">
@@ -251,9 +312,6 @@
           <!-- Company Filter Dropdown -->
           <select id="coDwmCompanyFilter" class="form-select form-select-sm co-dwm-hdr-select" onchange="onCoDwmCompanyFilterChange()" title="Filter by Company">
             <option value="ALL">All Companies</option>
-            <option value="COMN Company">COMN Company</option>
-            <option value="3 Company">3 Company</option>
-            <option value="HQ Company">HQ Company</option>
           </select>
 
           <!-- Search with Visible Icon -->
@@ -297,7 +355,7 @@
                   <th style="width: 140px;">PRESENT IN UNIT</th>
                   <th style="width: 110px;">ON LEAVE</th>
                   <th style="width: 150px;">COMPANY</th>
-                  <th style="width: 150px;">LAST UPDATED</th>
+                  <th style="width: 100px; text-align: center;">ASSIGNED</th>
                 </tr>
               </thead>
               <tbody id="coDroneWpnTableBody">
@@ -336,6 +394,51 @@
         </button>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- CO VIEW ASSIGNED PERSONNEL MODAL (POPUP) -->
+<div id="coDwmViewAssignedModal">
+  <div class="co-dwm-view-card">
+    <div class="co-dwm-view-header">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fas fa-users-gear fs-5"></i>
+        <span class="fs-6 fw-bold">Assigned Personnel</span>
+        <span class="badge bg-white text-primary fw-bold" id="coDwmViewEquipName"></span>
+        <span class="badge bg-light text-dark border" id="coDwmViewHeldBadge"></span>
+      </div>
+      <button type="button" class="btn-close btn-close-white" onclick="closeCoDwmViewAssignedModal()"></button>
+    </div>
+
+    <div class="co-dwm-view-body">
+      <!-- Assigned Soldiers Table -->
+      <div class="bg-white rounded-3 border overflow-hidden shadow-sm">
+        <div style="max-height: 420px; overflow-y: auto;">
+          <table class="table table-sm table-hover align-middle mb-0" id="coDwmViewPersonnelTable">
+            <thead class="table-light sticky-top">
+              <tr style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>RANK & NAME</th>
+                <th style="width: 140px;">ARMY NUMBER</th>
+                <th style="width: 130px;">COMPANY</th>
+                <th style="width: 140px;">ASSIGNED DATE</th>
+                <th style="width: 100px; text-align: center;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="coDwmViewAssignedTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-2 px-3 bg-light border-top d-flex justify-content-between align-items-center">
+      <small class="text-muted"><i class="far fa-clock me-1"></i> Leadership Review View</small>
+      <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" onclick="closeCoDwmViewAssignedModal()" style="border-radius: 6px;">
+        Close
+      </button>
     </div>
   </div>
 </div>
@@ -396,17 +499,28 @@
     const sel = document.getElementById('coDwmCompanyFilter');
     if (!sel) return;
 
-    const existingVals = Array.from(sel.options).map(o => o.value);
-    companies.forEach(c => {
-      if (c && !existingVals.includes(c)) {
-        const opt = document.createElement('option');
-        opt.value = c;
-        opt.textContent = c;
-        sel.appendChild(opt);
+    const currentVal = selectedCoy || sel.value || 'ALL';
+    const seen = new Set(['all']);
+    let html = '<option value="ALL">All Companies</option>';
+
+    (companies || []).forEach(c => {
+      const trimmed = (c || '').trim();
+      const lower = trimmed.toLowerCase();
+      if (trimmed && !seen.has(lower)) {
+        seen.add(lower);
+        html += `<option value="${escapeHtml(trimmed)}">${escapeHtml(trimmed)}</option>`;
       }
     });
 
-    if (selectedCoy) sel.value = selectedCoy;
+    sel.innerHTML = html;
+
+    // Restore selected value case-insensitively
+    for (let opt of sel.options) {
+      if (opt.value.toLowerCase() === currentVal.toLowerCase()) {
+        sel.value = opt.value;
+        break;
+      }
+    }
   }
 
   function onCoDwmCompanyFilterChange() {
@@ -466,11 +580,23 @@
 
     let html = '';
     items.forEach((item, idx) => {
+      let coyDisplay = 'Unit';
+      if (item.company && item.company !== 'Unit / All') {
+        coyDisplay = item.company;
+      } else if (item.assignments && item.assignments.length > 0) {
+        const coys = [...new Set(item.assignments.map(a => a.personnel_company).filter(Boolean))];
+        if (coys.length === 1) {
+          coyDisplay = coys[0];
+        } else if (coys.length > 1) {
+          coyDisplay = `${coys.length} Coys`;
+        }
+      }
+
       html += `
         <tr>
           <td class="text-muted fw-bold">${idx + 1}</td>
           <td>
-            <div class="fw-bold text-dark">${escapeHtml(item.name || '')}</div>
+            <div class="fw-bold text-dark fs-6">${escapeHtml(item.name || '')}</div>
           </td>
           <td>
             <span class="co-badge-count co-badge-auth">${escapeHtml(item.auth_individuals || '0')}</span>
@@ -485,16 +611,85 @@
             <span class="co-badge-count co-badge-leave">${item.on_leave || 0}</span>
           </td>
           <td>
-            <span class="badge co-badge-coy">${escapeHtml(item.company || 'Unit / All')}</span>
+            <span class="badge co-badge-coy">${escapeHtml(coyDisplay)}</span>
           </td>
-          <td class="text-muted" style="font-size: 0.8rem; font-weight: 500;">
-            ${escapeHtml(item.formatted_updated_at || '-')}
+          <td class="text-center">
+            <button 
+              type="button" 
+              class="co-btn-view" 
+              onclick="openCoDwmViewAssignedModal(${item.id})"
+              title="View Assigned Personnel for ${escapeHtml(item.name || '')}"
+            >
+              <i class="fas fa-eye"></i> VIEW
+            </button>
           </td>
         </tr>
       `;
     });
 
     tbody.innerHTML = html;
+  }
+
+  function openCoDwmViewAssignedModal(itemId) {
+    const item = gCoDwmItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const nameEl = document.getElementById('coDwmViewEquipName');
+    const badgeEl = document.getElementById('coDwmViewHeldBadge');
+    const tbody = document.getElementById('coDwmViewAssignedTableBody');
+
+    if (nameEl) nameEl.textContent = item.name || '';
+    if (badgeEl) badgeEl.textContent = `${item.held || item.assigned_count || 0} Held`;
+
+    if (!tbody) return;
+
+    const assignments = item.assignments || [];
+    if (assignments.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="text-center py-4 text-muted">
+            <i class="fas fa-folder-open me-2 fa-2x d-block mb-2 text-secondary opacity-50"></i>
+            No personnel assigned to this equipment.
+          </td>
+        </tr>`;
+    } else {
+      let rowsHtml = '';
+      assignments.forEach((a, idx) => {
+        const displayName = `${a.personnel_rank ? a.personnel_rank + ' ' : ''}${a.personnel_name || a.army_number}`.trim();
+        const statusBadge = a.onleave_status 
+          ? `<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>On Leave</span>`
+          : `<span class="badge bg-success"><i class="fas fa-check me-1"></i>Present</span>`;
+
+        rowsHtml += `
+          <tr>
+            <td class="text-muted fw-bold text-center">${idx + 1}</td>
+            <td>
+              <div class="fw-bold text-dark">${escapeHtml(displayName)}</div>
+            </td>
+            <td>
+              <span class="co-badge-count co-badge-held">${escapeHtml(a.army_number)}</span>
+            </td>
+            <td>
+              <span class="badge bg-light text-secondary border">${escapeHtml(a.personnel_company || 'Unit')}</span>
+            </td>
+            <td class="text-muted small fw-bold">
+              ${escapeHtml(a.formatted_assigned_on || a.assigned_on || '-')}
+            </td>
+            <td class="text-center">
+              ${statusBadge}
+            </td>
+          </tr>`;
+      });
+      tbody.innerHTML = rowsHtml;
+    }
+
+    const modal = document.getElementById('coDwmViewAssignedModal');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeCoDwmViewAssignedModal() {
+    const modal = document.getElementById('coDwmViewAssignedModal');
+    if (modal) modal.classList.remove('active');
   }
 
   function filterCoDwmTable() {
@@ -524,6 +719,23 @@
         loadCoDroneWpnData();
       });
     }
+
+    // Close popup on outside click
+    const coViewModal = document.getElementById('coDwmViewAssignedModal');
+    if (coViewModal) {
+      coViewModal.addEventListener('click', function (e) {
+        if (e.target === coViewModal) {
+          closeCoDwmViewAssignedModal();
+        }
+      });
+    }
+
+    // Close on escape key
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeCoDwmViewAssignedModal();
+      }
+    });
 
     fetch('/drone_wpn/api/list')
       .then(r => r.json())

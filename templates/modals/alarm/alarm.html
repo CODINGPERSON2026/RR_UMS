@@ -224,7 +224,7 @@
               ⚠️ Detachment Alarm — <span class="dynamic-det-alarm-days">60</span> Days & Above
               {% set u_role_raw = (role or (current_user.role if current_user else '') or session.get('role', ''))|string %}
               {% set u_role_clean = u_role_raw|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-              {% if u_role_clean in ['S/JCO', 'SJCO', 'ADMIN', 'CO', '2IC', 'SUBMAJOR', 'SUBEDARMAJOR'] %}
+              {% if u_role_clean in ['OCENTRENCO', 'OCENTERNCO'] or u_role_raw|upper in ['O CENTRE NCO', 'O CENTER NCO'] %}
               <button type="button" class="btn btn-sm btn-outline-light ms-2" style="font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 700;" onclick="bootstrap.Modal.getOrCreateInstance(document.getElementById('editDetTdModal')).show()">
                 <i class="fa-solid fa-sliders"></i> Edit Days
               </button>
