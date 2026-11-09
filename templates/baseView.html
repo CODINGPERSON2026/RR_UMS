@@ -525,6 +525,8 @@
     .sidebar {
       width: var(--sidebar-w);
       min-height: 100vh;
+      height: 100vh;
+      bottom: 0;
       background: var(--sidebar-background);
       border-right: 1px solid var(--sidebar-border);
       position: fixed;
@@ -1197,14 +1199,6 @@
         <span class="nav-icon"><i class="fas fa-users"></i></span>
         <span class="nav-label-text">Personnel Management</span>
         <span class="nav-tooltip">Personnel</span>
-      </a>
-      {% endif %}
-
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'OC', 'COMMANDING OFFICER', 'ADMIN', 'SUPERADMIN'] %}
-      <a class="nav-link vms-nav-link" href="javascript:void(0)" onclick="openVmsModal()" data-tiptext="VMS">
-        <span class="nav-icon"><i class="fas fa-truck-moving"></i></span>
-        <span class="nav-label-text">VMS</span>
-        <span class="nav-tooltip">VMS</span>
       </a>
       {% endif %}
 

@@ -125,20 +125,15 @@
             display: none;
         }
 
-        /* ── Change Password Link ── */
-        .change-pw-link {
+        /* ── Copyright Notice ── */
+        .copyright-notice {
             text-align: center;
-            margin-top: 18px;
+            margin-top: 22px;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
-
-        .change-pw-link a {
-            color: #1a73e8;
-            font-size: 14px;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .change-pw-link a:hover { text-decoration: underline; }
 
         /* ── Modal Overlay ── */
         .modal-overlay {
@@ -247,9 +242,9 @@
 
             <button id="loginBtn">LOGIN</button>
 
-            <!-- Change Password Link -->
-            <div class="change-pw-link">
-                <a id="openChangePw">🔑 Change Password</a>
+            <!-- Copyright Notice -->
+            <div class="copyright-notice">
+                Copyright (c) 2026, 15 CESR. All Rights Reserved.
             </div>
 
         </div>
@@ -343,11 +338,14 @@
 
         // ── Modal open / close ──
         const modal = document.getElementById("changePwModal");
+        const openChangePwBtn = document.getElementById("openChangePw");
 
-        document.getElementById("openChangePw").addEventListener("click", () => {
-            modal.classList.add("active");
-            clearCpMessages();
-        });
+        if (openChangePwBtn && modal) {
+            openChangePwBtn.addEventListener("click", () => {
+                modal.classList.add("active");
+                clearCpMessages();
+            });
+        }
 
         document.getElementById("closeModal").addEventListener("click", () => {
             modal.classList.remove("active");

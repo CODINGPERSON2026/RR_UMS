@@ -151,6 +151,102 @@
         background: #000;
         transform: scale(1.6);
     }
+
+    /* ===== WHOLE WIDTH FOOTER AFTER GALLERY ===== */
+    .whole-width-gallery-footer {
+        width: calc(100% + 28px);
+        margin-left: -14px;
+        margin-right: -14px;
+        margin-top: 40px;
+        margin-bottom: 0;
+        padding: 14px 0;
+        background: var(--card-bg-solid, #ffffff);
+        border-top: 1px solid var(--border-color, #e2e8f0);
+        overflow: hidden;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        user-select: none;
+        cursor: default;
+    }
+
+    [data-theme="dark"] .whole-width-gallery-footer {
+        background: #1e293b;
+        border-top-color: #334155;
+    }
+
+    .gallery-footer-ticker-track {
+        display: inline-flex;
+        white-space: nowrap;
+        width: max-content;
+        animation: footerMarqueeScroll 28s linear infinite;
+        will-change: transform;
+    }
+
+    .whole-width-gallery-footer:hover .gallery-footer-ticker-track {
+        animation-play-state: paused;
+    }
+
+    .gallery-footer-ticker-item {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary, #64748b);
+    }
+
+    [data-theme="dark"] .gallery-footer-ticker-item {
+        color: #94a3b8;
+    }
+
+    .ticker-dot {
+        margin: 0 36px;
+        color: var(--primary-color, #3b82f6);
+        opacity: 0.7;
+        font-size: 1rem;
+    }
+
+    @keyframes footerMarqueeScroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (min-width: 1600px) {
+        .whole-width-gallery-footer {
+            width: calc(100% + 36px);
+            margin-left: -18px;
+            margin-right: -18px;
+        }
+    }
+
+    @media (min-width: 1920px) {
+        .whole-width-gallery-footer {
+            width: calc(100% + 48px);
+            margin-left: -24px;
+            margin-right: -24px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .whole-width-gallery-footer {
+            width: calc(100% + 20px);
+            margin-left: -10px;
+            margin-right: -10px;
+            padding: 12px 0;
+        }
+        .gallery-footer-ticker-item {
+            font-size: 0.8rem;
+        }
+        .ticker-dot {
+            margin: 0 20px;
+        }
+    }
   </style>
   
   <section class="gallery-section">
@@ -167,6 +263,28 @@
       <div class="gallery-indicators" id="indicators"></div>
   
   </section>
+
+  <!-- ==================== WHOLE WIDTH FOOTER (AFTER GALLERY) ==================== -->
+  <footer class="whole-width-gallery-footer">
+    <div class="gallery-footer-ticker-track">
+      <div class="gallery-footer-ticker-item">
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+      </div>
+      <div class="gallery-footer-ticker-item">
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+        <span>Copyright (c) 2026, 15 CESR. All Rights Reserved.</span>
+        <span class="ticker-dot">&bull;</span>
+      </div>
+    </div>
+  </footer>
   
   <script>
   class AppleStyleCarousel {
