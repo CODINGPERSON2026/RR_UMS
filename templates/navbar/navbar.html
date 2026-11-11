@@ -2,7 +2,8 @@
 
 <style>
     /* ================= LIGHT THEME ================= */
-    .page-title, [data-theme="light"] .page-title {
+    .page-title,
+    [data-theme="light"] .page-title {
         height: 105px;
         background: linear-gradient(135deg, #3c425c 0%, #764ba2 100%) !important;
         color: white;
@@ -74,7 +75,7 @@
 
         color: #fff;
 
-        text-shadow: 0 0 8px rgba(255,255,255,0.6);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
 
         font-family: 'Courier New', monospace;
     }
@@ -100,6 +101,49 @@
     .org-logo:hover {
         transform: scale(1.05);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    /* RARE ONES Logo & Attribution */
+    .nav-left-brand,
+    #nav-left-logo-container {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        text-decoration: none !important;
+        gap: 3px;
+        flex-shrink: 0;
+    }
+
+    .nav-left-brand:hover {
+        text-decoration: none !important;
+    }
+
+    .nav-left-brand:hover .rare-logo {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .rare-logo {
+        width: 62px;
+        height: 62px;
+        padding: 5px;
+        border-radius: 14px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .rare-logo-subtext {
+        display: block;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+        text-transform: uppercase;
+        line-height: 1.1;
     }
 
     /* ================= SUBSCRIPT — OPTION 3 (frosted pill + avatar) ================= */
@@ -175,6 +219,15 @@
             height: 75px;
         }
 
+        .rare-logo {
+            width: 54px;
+            height: 54px;
+        }
+
+        .rare-logo-subtext {
+            font-size: 0.54rem;
+        }
+
         .title-section {
             order: 2;
         }
@@ -198,30 +251,31 @@
 
 {% set custom_bg_style = "" %}
 {% if navbar_config and navbar_config.bg_type == 'image' and navbar_config.bg_image %}
-    {% set custom_bg_style = "background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url('" ~ navbar_config.bg_image ~ "') center/cover no-repeat !important;" %}
+{% set custom_bg_style = "background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55)), url('" ~
+navbar_config.bg_image ~ "') center/cover no-repeat !important;" %}
 {% endif %}
 
 <div class="page-title" style="{{ custom_bg_style }}">
 
     <!-- LEFT LOGO -->
     {% if not navbar_config or navbar_config.show_left_logo != false %}
-    <a href="{{ url_for('history_15cesr') }}" class="logo-link" id="nav-left-logo-container">
+    <a href="{{ url_for('history_15cesr') }}" class="logo-link nav-left-brand" id="nav-left-logo-container">
         <img src="{{ navbar_config.left_logo if (navbar_config and navbar_config.left_logo) else '/static/image_for_login_page/rt.jpg' }}"
-             class="org-logo"
-             alt="15 CESR Logo"
-             id="nav-left-logo-img">
+            class="org-logo rare-logo" alt="15 CESR Logo" id="nav-left-logo-img">
+        <span class="rare-logo-subtext">DEVELOPED BY : 15CESR</span>
     </a>
     {% endif %}
 
     <div class="title-section">
 
-        <h3 class="fw-bold" id="nav-header-text">{% if navbar_config and 'header_text' in navbar_config %}{{ navbar_config.header_text }}{% else %}{{ header if header else '' }}{% endif %}</h3>
+        <h3 class="fw-bold" id="nav-header-text">{% if navbar_config and 'header_text' in navbar_config %}{{
+            navbar_config.header_text }}{% else %}{{ header if header else '' }}{% endif %}</h3>
 
         <!-- SUBSCRIPT — OPTION 3: frosted pill with avatar initials -->
         <div class="sub-3">
             <div class="sub-3-inner">
                 <span class="sub-3-greet">Welcome,</span>
-                
+
                 <span class="sub-3-name">{{ current_user_name }}</span>
             </div>
         </div>
@@ -232,14 +286,12 @@
     {% if not navbar_config or navbar_config.show_right_logo != false %}
     <a href="{{ url_for('history_15cor') }}" class="logo-link" id="nav-right-logo-container">
         <img src="{{ navbar_config.right_logo if (navbar_config and navbar_config.right_logo) else '/static/image_for_login_page/chinar.jpg' }}"
-             class="org-logo"
-             alt="15 COR Logo"
-             id="nav-right-logo-img">
+            class="org-logo" alt="15 COR Logo" id="nav-right-logo-img">
     </a>
     {% endif %}
 
 </div>
 
 <script>
-   
+
 </script>
