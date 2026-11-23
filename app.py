@@ -3802,7 +3802,14 @@ def get_parade_data_by_company(date_str, company):
                 row[f"firstTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['offr', 'jco', 'jcoEre', 'or', 'orEre'])
                 row[f"secondTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['oaOr', 'attSummary', 'attOffr', 'attJco', 'attOr'])
                 row[f"grandTotal_{col}"] = row[f"firstTotal_{col}"] + row[f"secondTotal_{col}"]
-        
+
+        # Convert database row back to frontend format
+        result = {
+            'date': row['report_date'],
+            'company': row['company'],
+            'data': {}
+        }
+
         for category in categories:
             category_data = []
             for col in column_names:

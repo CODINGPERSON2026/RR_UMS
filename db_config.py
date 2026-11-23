@@ -17,7 +17,7 @@ def get_db_config():
     if env_pass is None:
         env_pass = os.getenv('DB_PASS')
     if env_pass is None:
-        env_pass = 'qaz123QAZ!@#'
+        env_pass = 'yawar@123'
 
     return {
         'host': os.getenv('DB_HOST') or os.getenv('host') or 'localhost',
