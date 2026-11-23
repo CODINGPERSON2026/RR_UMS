@@ -229,13 +229,23 @@
 
   /* Fade-out animation when a row is deleted */
   @keyframes rowFadeOut {
-    from { opacity: 1; transform: scaleY(1); }
-    to   { opacity: 0; transform: scaleY(0); max-height: 0; padding: 0; }
+    from {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+
+    to {
+      opacity: 0;
+      transform: scaleY(0);
+      max-height: 0;
+      padding: 0;
+    }
   }
 
   tr.deleting {
     animation: rowFadeOut 0.3s ease forwards;
   }
+
   /* ===== END DELETE ROW STYLES ===== */
 
   .photo-upload-area {
@@ -359,7 +369,7 @@
 
   /* Action column header */
   .table th.action-col {
-    
+
     width: 80px;
     text-align: center;
   }
@@ -486,8 +496,13 @@
   }
 
   @keyframes fadeInOverlay {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   #customPopupBox {
@@ -503,13 +518,36 @@
   }
 
   @keyframes slideUp {
-    from { transform: translateY(40px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+    from {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
   }
 
-  #customPopupIcon  { font-size: 3rem; margin-bottom: 14px; display: block; }
-  #customPopupTitle { font-size: 1.25rem; font-weight: 700; margin-bottom: 8px; color: #222; }
-  #customPopupMsg   { font-size: 0.97rem; color: #555; margin-bottom: 24px; line-height: 1.5; }
+  #customPopupIcon {
+    font-size: 3rem;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  #customPopupTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #222;
+  }
+
+  #customPopupMsg {
+    font-size: 0.97rem;
+    color: #555;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
 
   #customPopupBtn {
     display: inline-block;
@@ -527,45 +565,113 @@
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
   }
 
-  #customPopupBox.popup-success { border-top: 5px solid #16a34a; }
-  #customPopupBox.popup-error   { border-top: 5px solid #dc2626; }
+  #customPopupBox.popup-success {
+    border-top: 5px solid #16a34a;
+  }
 
-  .popup-success #customPopupBtn { background: #16a34a; color: #fff; }
-  .popup-error   #customPopupBtn { background: #dc2626; color: #fff; }
-  .popup-success #customPopupIcon { color: #16a34a; }
-  .popup-error   #customPopupIcon { color: #dc2626; }
+  #customPopupBox.popup-error {
+    border-top: 5px solid #dc2626;
+  }
+
+  .popup-success #customPopupBtn {
+    background: #16a34a;
+    color: #fff;
+  }
+
+  .popup-error #customPopupBtn {
+    background: #dc2626;
+    color: #fff;
+  }
+
+  .popup-success #customPopupIcon {
+    color: #16a34a;
+  }
+
+  .popup-error #customPopupIcon {
+    color: #dc2626;
+  }
 
   /* ===== CONFIRM DELETE POPUP ===== */
   #confirmDeleteOverlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
     z-index: 100000;
     align-items: center;
     justify-content: center;
   }
-  #confirmDeleteOverlay.show { display: flex; }
+
+  #confirmDeleteOverlay.show {
+    display: flex;
+  }
+
   #confirmDeleteBox {
     background: #fff;
     border-radius: 14px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     padding: 32px 36px 24px;
     max-width: 400px;
     width: 90%;
     text-align: center;
     border-top: 5px solid #dc2626;
-    animation: slideUp 0.25s cubic-bezier(.22,1,.36,1);
+    animation: slideUp 0.25s cubic-bezier(.22, 1, .36, 1);
   }
-  #confirmDeleteBox .confirm-icon  { font-size: 2.5rem; color: #dc2626; margin-bottom: 12px; }
-  #confirmDeleteBox .confirm-title { font-size: 1.15rem; font-weight: 700; color: #222; margin-bottom: 8px; }
-  #confirmDeleteBox .confirm-msg   { font-size: 0.93rem; color: #666; margin-bottom: 22px; }
-  .confirm-btns { display: flex; gap: 12px; justify-content: center; }
-  .confirm-btns button { padding: 9px 28px; border: none; border-radius: 7px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-  #confirmDeleteYes { background: #dc2626; color: #fff; }
-  #confirmDeleteYes:hover { background: #a71d2a; transform: translateY(-1px); }
-  #confirmDeleteNo  { background: #e5e7eb; color: #333; }
-  #confirmDeleteNo:hover  { background: #d1d5db; transform: translateY(-1px); }
+
+  #confirmDeleteBox .confirm-icon {
+    font-size: 2.5rem;
+    color: #dc2626;
+    margin-bottom: 12px;
+  }
+
+  #confirmDeleteBox .confirm-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+  }
+
+  #confirmDeleteBox .confirm-msg {
+    font-size: 0.93rem;
+    color: #666;
+    margin-bottom: 22px;
+  }
+
+  .confirm-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  .confirm-btns button {
+    padding: 9px 28px;
+    border: none;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  #confirmDeleteYes {
+    background: #dc2626;
+    color: #fff;
+  }
+
+  #confirmDeleteYes:hover {
+    background: #a71d2a;
+    transform: translateY(-1px);
+  }
+
+  #confirmDeleteNo {
+    background: #e5e7eb;
+    color: #333;
+  }
+
+  #confirmDeleteNo:hover {
+    background: #d1d5db;
+    transform: translateY(-1px);
+  }
 </style>
 
 <!-- Main popup -->
@@ -583,7 +689,8 @@
   <div id="confirmDeleteBox">
     <div class="confirm-icon"><i class="fas fa-trash-alt"></i></div>
     <div class="confirm-title">Delete This Row?</div>
-    <div class="confirm-msg">This will permanently remove this record from the database. This action cannot be undone.</div>
+    <div class="confirm-msg">This will permanently remove this record from the database. This action cannot be undone.
+    </div>
     <div class="confirm-btns">
       <button id="confirmDeleteYes"><i class="fas fa-trash me-1"></i> Delete</button>
       <button id="confirmDeleteNo"><i class="fas fa-times me-1"></i> Cancel</button>
@@ -610,7 +717,7 @@
       window._popupOnClose = null;
     }
   }
-  document.getElementById('customPopupOverlay').addEventListener('click', function(e) {
+  document.getElementById('customPopupOverlay').addEventListener('click', function (e) {
     if (e.target === this) closePopup();
   });
 
@@ -619,11 +726,11 @@
     const overlay = document.getElementById('confirmDeleteOverlay');
     overlay.classList.add('show');
     // One-time click handlers
-    document.getElementById('confirmDeleteYes').onclick = function() {
+    document.getElementById('confirmDeleteYes').onclick = function () {
       overlay.classList.remove('show');
       onConfirm();
     };
-    document.getElementById('confirmDeleteNo').onclick = function() {
+    document.getElementById('confirmDeleteNo').onclick = function () {
       overlay.classList.remove('show');
     };
   }
@@ -659,8 +766,8 @@
           <div class="row align-items-end">
             <div class="col-md-8 mb-3">
               <label for="searchArmyNumber" class="form-label required">Enter Army Number</label>
-              <input type="text" class="form-control" id="searchArmyNumber"
-                placeholder="Enter army number to search..." required />
+              <input type="text" class="form-control" id="searchArmyNumber" placeholder="Enter army number to search..."
+                required />
               <div class="error-message" id="searchArmyNumber-error">Please enter a valid army number</div>
             </div>
             <div class="col-md-4 mb-3">
@@ -680,14 +787,14 @@
           <div class="info-box">
             <i class="fas fa-info-circle"></i> <strong>Update Mode:</strong> Modify the fields below and click
             "Update Personnel" to save changes. Use the <span style="color:#dc3545;font-weight:700;">
-            <i class="fas fa-trash-alt"></i> Delete</span> button on any row to remove that record immediately.
+              <i class="fas fa-trash-alt"></i> Delete</span> button on any row to remove that record immediately.
           </div>
 
           <!-- Progress Bar -->
           <div class="progress-container">
             <div class="progress" style="height: 10px">
-              <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20"
-                aria-valuemin="0" aria-valuemax="100"></div>
+              <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0"
+                aria-valuemax="100"></div>
             </div>
           </div>
 
@@ -697,32 +804,32 @@
 
             <ul class="nav nav-tabs mb-4" id="formTabs" role="tablist">
               <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="personal-tab" data-bs-toggle="tab"
-                  data-bs-target="#personal" type="button" role="tab">
+                <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal"
+                  type="button" role="tab">
                   <i class="fas fa-user"></i> Personal Details
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="courses-tab" data-bs-toggle="tab"
-                  data-bs-target="#courses" type="button" role="tab">
+                <button class="nav-link" id="courses-tab" data-bs-toggle="tab" data-bs-target="#courses" type="button"
+                  role="tab">
                   <i class="fas fa-graduation-cap"></i> Courses & Service
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="medical-tab" data-bs-toggle="tab"
-                  data-bs-target="#medical" type="button" role="tab">
+                <button class="nav-link" id="medical-tab" data-bs-toggle="tab" data-bs-target="#medical" type="button"
+                  role="tab">
                   <i class="fas fa-heartbeat"></i> Medical Details
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="family-tab" data-bs-toggle="tab"
-                  data-bs-target="#family" type="button" role="tab">
+                <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button"
+                  role="tab">
                   <i class="fas fa-users"></i> Family Details
                 </button>
               </li>
               <li class="nav-item" role="presentation">
-                <button class="nav-link" id="additional-tab" data-bs-toggle="tab"
-                  data-bs-target="#additional" type="button" role="tab">
+                <button class="nav-link" id="additional-tab" data-bs-toggle="tab" data-bs-target="#additional"
+                  type="button" role="tab">
                   <i class="fas fa-info-circle"></i> Additional Info
                 </button>
               </li>
@@ -749,7 +856,8 @@
                       <label for="armyNumber" class="form-label required">Army Number</label>
                       <input type="text" class="form-control" id="armyNumber" required readonly
                         style="background-color: #e9ecef;" />
-                      <div class="error-message" id="armyNumber-error">Only alphanumeric characters, hyphens, and underscores are allowed</div>
+                      <div class="error-message" id="armyNumber-error">Only alphanumeric characters, hyphens, and
+                        underscores are allowed</div>
                     </div>
                   </div>
                   <div class="row">
@@ -757,7 +865,6 @@
                       <label for="rank" class="form-label required">Rank</label>
                       <select class="form-select" id="rank" required>
                         <option value="" disabled selected>Select Rank</option>
-                        <option value="Agniveer">Agniveer</option>
                         <option value="Signal Man">Signal Man</option>
                         <option value="CFN">CFN</option>
                         <option value="L NK">L NK</option>
@@ -777,7 +884,8 @@
                     <div class="col-md-6 mb-3">
                       <label for="trade" class="form-label required">Trade</label>
                       <input type="text" class="form-control" id="trade" required />
-                      <div class="error-message" id="trade-error">Only letters, numbers, hyphens, and underscores are allowed</div>
+                      <div class="error-message" id="trade-error">Only letters, numbers, hyphens, and underscores are
+                        allowed</div>
                     </div>
 
                     <!-- Batch dropdown, hidden by default -->
@@ -821,16 +929,21 @@
                       <label for="bloodGroup" class="form-label required">Blood Group</label>
                       <select class="form-select" id="bloodGroup" required>
                         <option value="">Select</option>
-                        <option value="A+">A+</option><option value="A-">A-</option>
-                        <option value="B+">B+</option><option value="B-">B-</option>
-                        <option value="O+">O+</option><option value="O-">O-</option>
-                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
                       </select>
                     </div>
                     <div class="col-md-6 mb-3">
                       <label for="religion" class="form-label required">Religion</label>
                       <input type="text" class="form-control" id="religion" required />
-                      <div class="error-message" id="religion-error">Only letters, spaces, hyphens, and underscores are allowed</div>
+                      <div class="error-message" id="religion-error">Only letters, spaces, hyphens, and underscores are
+                        allowed</div>
                     </div>
                   </div>
                   <div class="row">
@@ -838,11 +951,13 @@
                       <label class="form-label required">Food Preference</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="foodPreference" id="veg" value="Vegetarian" required />
+                          <input class="form-check-input" type="radio" name="foodPreference" id="veg" value="Vegetarian"
+                            required />
                           <label class="form-check-label" for="veg">Vegetarian</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="foodPreference" id="nonVeg" value="Non-Vegetarian" />
+                          <input class="form-check-input" type="radio" name="foodPreference" id="nonVeg"
+                            value="Non-Vegetarian" />
                           <label class="form-check-label" for="nonVeg">Non-Vegetarian</label>
                         </div>
                       </div>
@@ -851,7 +966,8 @@
                       <label class="form-label required">Drinker</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="drinker" id="drinkerYes" value="Yes" required />
+                          <input class="form-check-input" type="radio" name="drinker" id="drinkerYes" value="Yes"
+                            required />
                           <label class="form-check-label" for="drinkerYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
@@ -864,9 +980,13 @@
                       <label for="company" class="form-label required">Company</label>
                       <select class="form-select" id="company" required>
                         <option value="">Select</option>
-                        <option value="COMN Company">COMN Company</option>
-                        <option value="3 Company">3 Company</option>
-                        <option value="HQ company">HQ company</option>
+                        <option value="A COY">A COY</option>
+                        <option value="B COY">B COY</option>
+                        <option value="C COY">C COY</option>
+                        <option value="D COY">D COY</option>
+                        <option value="E COY">E COY</option>
+                        <option value="F COY">F COY</option>
+                        <option value="HQ COY">HQ COY</option>
                       </select>
                     </div>
                   </div>
@@ -880,48 +1000,65 @@
                   <script>
                     // Map company to its sections
                     const companySections = {
-                      "COMN Company": [
-                        "SIGCEN",
-                        "FAULT REPAIR",
-                        "IT",
-                        "MCCS",
-                        "CHQ",
-                        "COMN"
+                      "A COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
                       ],
-                      "3 Company": [
-                        "DET",
-                        "System",
-                        "CHQ",
-                        "MT"
+                      "B COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
                       ],
-                      "HQ company": [
-                        "RHQ",
-                        "CHQ",
-                        "LRW",
-                        "QY",
-                        "RPNA",
-                        "MT",
-                        "QRT",
-                        "TM"
+                      "C COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
                       ],
-                      "HQ Company": [
-                        "RHQ",
-                        "CHQ",
-                        "LRW",
-                        "QY",
-                        "RPNA",
-                        "MT",
-                        "QRT",
-                        "TM"
+                      "D COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
+                      ],
+                      "E COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
+                      ],
+                      "F COY": [
+                        "PLATOON 1",
+                        "PLATOON 2",
+                        "PLATOON 3",
+                        "PLATOON 4"
+                      ],
+                      "HQ COY": [
+                        "SIG PLTN",
+                        "MT PLTN",
+                        "GHATAK PLTN",
+                        "BHQ SEC",
+                        "CO CAT",
+                        "2IC CAT",
+                        "FRI",
+                        "ORD",
+                        "RP SEC"
                       ]
                     };
 
                     function getNormalizedCompany(coy) {
                       if (!coy) return "";
-                      const clean = String(coy).trim().toLowerCase();
-                      if (clean.includes("hq")) return "HQ company";
-                      if (clean.includes("comn") || clean.includes("communication")) return "COMN Company";
-                      if (clean.includes("3") || clean.includes("third")) return "3 Company";
+                      const clean = String(coy).trim().toUpperCase();
+                      if (clean.includes("HQ")) return "HQ COY";
+                      if (clean.includes("A COY")) return "A COY";
+                      if (clean.includes("B COY")) return "B COY";
+                      if (clean.includes("C COY")) return "C COY";
+                      if (clean.includes("D COY")) return "D COY";
+                      if (clean.includes("E COY")) return "E COY";
+                      if (clean.includes("F COY")) return "F COY";
                       return coy;
                     }
 
@@ -941,6 +1078,15 @@
                         option.textContent = section;
                         sectionSelect.appendChild(option);
                       });
+                      if (typeof validateField === 'function') {
+                        validateField('section', sectionSelect.value);
+                      }
+                    });
+
+                    sectionSelect.addEventListener('change', function () {
+                      if (typeof validateField === 'function') {
+                        validateField('section', this.value);
+                      }
                     });
                   </script>
                   <div class="row">
@@ -962,11 +1108,13 @@
                       <label class="form-label required">Willing for Future Promotions</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="willingPromotions" id="willingYes" value="Yes" required />
+                          <input class="form-check-input" type="radio" name="willingPromotions" id="willingYes"
+                            value="Yes" required />
                           <label class="form-check-label" for="willingYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="willingPromotions" id="willingNo" value="No" />
+                          <input class="form-check-input" type="radio" name="willingPromotions" id="willingNo"
+                            value="No" />
                           <label class="form-check-label" for="willingNo">No</label>
                         </div>
                       </div>
@@ -1005,7 +1153,8 @@
                       <label class="form-label">Original Clothing Card Held</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="clothingCard" id="clothingYes" value="Yes" />
+                          <input class="form-check-input" type="radio" name="clothingCard" id="clothingYes"
+                            value="Yes" />
                           <label class="form-check-label" for="clothingYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
@@ -1140,7 +1289,8 @@
                         <option value="West Bengal">West Bengal</option>
                         <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
                         <option value="Chandigarh">Chandigarh</option>
-                        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
+                        <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and
+                          Diu</option>
                         <option value="Delhi">Delhi</option>
                         <option value="Jammu and Kashmir">Jammu and Kashmir</option>
                         <option value="Ladakh">Ladakh</option>
@@ -1206,13 +1356,19 @@
                   <h3 class="section-header"><i class="fas fa-graduation-cap"></i> Courses & Service Details</h3>
 
                   <!-- Army Courses Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-book"></i> Army Courses</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-book"></i> Army Courses
+                  </h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="coursesTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Course</th><th>From</th><th>To</th>
-                          <th>Institute</th><th>Grading</th><th>Remarks</th>
+                          <th>Sr No.</th>
+                          <th>Course</th>
+                          <th>From</th>
+                          <th>To</th>
+                          <th>Institute</th>
+                          <th>Grading</th>
+                          <th>Remarks</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -1222,12 +1378,16 @@
                   </div>
 
                   <!-- Units Served Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-map-marker-alt"></i> Unit Served</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-map-marker-alt"></i> Unit
+                    Served</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="unitsTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Unit</th><th>From</th><th>To</th>
+                          <th>Sr No.</th>
+                          <th>Unit</th>
+                          <th>From</th>
+                          <th>To</th>
                           <th>Duty Performed</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
@@ -1266,8 +1426,13 @@
                       <table class="table table-bordered" id="loansTable">
                         <thead class="table-light">
                           <tr>
-                            <th>Sr No.</th><th>Type of Loan</th><th>Total Amount</th>
-                            <th>Bank Details</th><th>EMI per Month</th><th>Pending</th><th>Remarks</th>
+                            <th>Sr No.</th>
+                            <th>Type of Loan</th>
+                            <th>Total Amount</th>
+                            <th>Bank Details</th>
+                            <th>EMI per Month</th>
+                            <th>Pending</th>
+                            <th>Remarks</th>
                             <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                           </tr>
                         </thead>
@@ -1278,13 +1443,17 @@
                   </div>
 
                   <!-- Punishment Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-gavel"></i> Punishment Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-gavel"></i> Punishment
+                    Details</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="punishmentTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Date</th><th>Punishment (Red/Black)</th>
-                          <th>AA Sec</th><th>Remarks</th>
+                          <th>Sr No.</th>
+                          <th>Date</th>
+                          <th>Punishment (Red/Black)</th>
+                          <th>AA Sec</th>
+                          <th>Remarks</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -1298,11 +1467,13 @@
                       <label class="form-label">Detailed in any Course</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="detailedCourse" id="detailedYes" value="Yes" />
+                          <input class="form-check-input" type="radio" name="detailedCourse" id="detailedYes"
+                            value="Yes" />
                           <label class="form-check-label" for="detailedYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="detailedCourse" id="detailedNo" value="No" />
+                          <input class="form-check-input" type="radio" name="detailedCourse" id="detailedNo"
+                            value="No" />
                           <label class="form-check-label" for="detailedNo">No</label>
                         </div>
                       </div>
@@ -1315,7 +1486,11 @@
                       <table class="table table-bordered" id="detailedCoursesTable">
                         <thead class="table-light">
                           <tr>
-                            <th>Sr No.</th><th>Course</th><th>From</th><th>To</th><th>Remarks</th>
+                            <th>Sr No.</th>
+                            <th>Course</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Remarks</th>
                             <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                           </tr>
                         </thead>
@@ -1326,12 +1501,16 @@
                   </div>
 
                   <!-- Leave Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-calendar-alt"></i> Leave Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-calendar-alt"></i> Leave
+                    Details</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="leaveTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Year</th><th>AL (Days)</th><th>CL (Days)</th>
+                          <th>Sr No.</th>
+                          <th>Year</th>
+                          <th>AL (Days)</th>
+                          <th>CL (Days)</th>
                           <th>AAL (Days)</th>
                           <th>Annual Leave (Agniveer only)</th>
                           <th>Remarks</th>
@@ -1351,13 +1530,15 @@
                   </div>
                   <div class="row">
                     <div class="col-md-12 mb-3">
-                      <label for="participationActivities" class="form-label">Participation in Game/Extra Curricular Activities</label>
+                      <label for="participationActivities" class="form-label">Participation in Game/Extra Curricular
+                        Activities</label>
                       <textarea class="form-control" id="participationActivities" rows="2"></textarea>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-md-12 mb-3">
-                      <label for="presentFamilyLocation" class="form-label">Present Location of Family/MD Accn Reqd</label>
+                      <label for="presentFamilyLocation" class="form-label">Present Location of Family/MD Accn
+                        Reqd</label>
                       <textarea class="form-control" id="presentFamilyLocation" rows="2"></textarea>
                     </div>
                   </div>
@@ -1405,7 +1586,8 @@
               <!-- ==================== MEDICAL DETAILS TAB ==================== -->
               <div class="tab-pane fade" id="medical" role="tabpanel">
                 <div class="info-box">
-                  <i class="fas fa-info-circle"></i> Please provide accurate medical information as per official records.
+                  <i class="fas fa-info-circle"></i> Please provide accurate medical information as per official
+                  records.
                 </div>
                 <div class="form-section">
                   <h3 class="section-header"><i class="fas fa-heartbeat"></i> Medical Details</h3>
@@ -1414,27 +1596,32 @@
                       <label class="form-label required">Status</label>
                       <div class="radio-group">
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="physicalStatus" id="shapeStatus" value="shape" checked />
+                          <input class="form-check-input" type="radio" name="physicalStatus" id="shapeStatus"
+                            value="shape" checked />
                           <label class="form-check-label" for="shapeStatus">Shape</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="physicalStatus" id="categoryStatus" value="category" />
+                          <input class="form-check-input" type="radio" name="physicalStatus" id="categoryStatus"
+                            value="category" />
                           <label class="form-check-label" for="categoryStatus">Category</label>
                         </div>
                       </div>
                       <div class="sub-radio-group" id="category-options" style="display:none; margin-top:10px;">
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="categoryType" id="permanentCategory" value="permanent" />
+                          <input class="form-check-input" type="radio" name="categoryType" id="permanentCategory"
+                            value="permanent" />
                           <label class="form-check-label" for="permanentCategory">Permanent</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="categoryType" id="temporaryCategory" value="temporary" />
+                          <input class="form-check-input" type="radio" name="categoryType" id="temporaryCategory"
+                            value="temporary" />
                           <label class="form-check-label" for="temporaryCategory">Temporary</label>
                         </div>
                       </div>
                       <div class="restrictions-group" id="restrictions-group" style="display:none; margin-top:15px;">
                         <label for="physicalRestrictions" class="form-label">Restrictions</label>
-                        <textarea class="form-control" id="physicalRestrictions" name="restrictions" rows="3" placeholder="Enter restrictions"></textarea>
+                        <textarea class="form-control" id="physicalRestrictions" name="restrictions" rows="3"
+                          placeholder="Enter restrictions"></textarea>
                       </div>
                     </div>
                   </div>
@@ -1478,7 +1665,8 @@
                     </div>
                     <div class="row">
                       <div class="col-md-12 mb-3">
-                        <label for="restrictions" class="form-label">Restriction Imposed on Duties/Employment as per Re-cat BD/Med BD</label>
+                        <label for="restrictions" class="form-label">Restriction Imposed on Duties/Employment as per
+                          Re-cat BD/Med BD</label>
                         <textarea class="form-control" id="restrictions" rows="3"></textarea>
                       </div>
                     </div>
@@ -1507,11 +1695,13 @@
               <!-- ==================== FAMILY DETAILS TAB ==================== -->
               <div class="tab-pane fade" id="family" role="tabpanel">
                 <div class="info-box">
-                  <i class="fas fa-info-circle"></i> Please provide complete and accurate family details as per official records.
+                  <i class="fas fa-info-circle"></i> Please provide complete and accurate family details as per official
+                  records.
                 </div>
                 <div class="form-section">
                   <h3 class="section-header"><i class="fas fa-users"></i> Family Details</h3>
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-user-friends"></i> Next of Kin Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-user-friends"></i> Next of
+                    Kin Details</h5>
                   <div class="row">
                     <div class="col-md-4 mb-3">
                       <label for="kinName" class="form-label">Name</label>
@@ -1548,13 +1738,17 @@
                   </div>
 
                   <!-- Family Members Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-home"></i> Family Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-home"></i> Family Details
+                  </h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="familyTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Relation</th><th>Name</th><th>Date of Birth</th>
-                          <th>UID No.</th><th>Pt-II Order</th>
+                          <th>Relation</th>
+                          <th>Name</th>
+                          <th>Date of Birth</th>
+                          <th>UID No.</th>
+                          <th>Pt-II Order</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -1564,13 +1758,18 @@
                   </div>
 
                   <!-- Children Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-child"></i> Children Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-child"></i> Children
+                    Details</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="childrenTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Name</th><th>Date of Birth</th>
-                          <th>Class</th><th>Pt-II Order</th><th>UID No.</th>
+                          <th>Sr No.</th>
+                          <th>Name</th>
+                          <th>Date of Birth</th>
+                          <th>Class</th>
+                          <th>Pt-II Order</th>
+                          <th>UID No.</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -1580,13 +1779,17 @@
                   </div>
 
                   <!-- Mobile Phones Table -->
-                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-mobile-alt"></i> NOK Mobile Phone Details</h5>
+                  <h5 class="mt-4 mb-3" style="color: var(--primary-color)"><i class="fas fa-mobile-alt"></i> NOK Mobile
+                    Phone Details</h5>
                   <div class="dynamic-table">
                     <table class="table table-bordered" id="mobileTable">
                       <thead class="table-light">
                         <tr>
-                          <th>Sr No.</th><th>Type</th><th>Number</th>
-                          <th>Service Provider</th><th>Remarks</th>
+                          <th>Sr No.</th>
+                          <th>Type</th>
+                          <th>Number</th>
+                          <th>Service Provider</th>
+                          <th>Remarks</th>
                           <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                         </tr>
                       </thead>
@@ -1600,7 +1803,8 @@
               <!-- ==================== ADDITIONAL INFO TAB ==================== -->
               <div class="tab-pane fade" id="additional" role="tabpanel">
                 <div class="info-box">
-                  <i class="fas fa-info-circle"></i> Please provide any additional information that may be relevant to your service record.
+                  <i class="fas fa-info-circle"></i> Please provide any additional information that may be relevant to
+                  your service record.
                 </div>
                 <div class="form-section">
                   <h3 class="section-header"><i class="fas fa-car"></i> Vehicle Details</h3>
@@ -1656,26 +1860,41 @@
                     <div class="col-md-12 mb-3">
                       <label class="form-label">Sports Played</label>
                       <div class="row">
-                        <div class="col-md-4 mb-2"><div class="form-check">
-                          <input class="form-check-input sports-checkbox" type="checkbox" id="football" name="sports" value="Football">
-                          <label class="form-check-label" for="football">Football</label>
-                        </div></div>
-                        <div class="col-md-4 mb-2"><div class="form-check">
-                          <input class="form-check-input sports-checkbox" type="checkbox" id="basketball" name="sports" value="Basketball">
-                          <label class="form-check-label" for="basketball">Basketball</label>
-                        </div></div>
-                        <div class="col-md-4 mb-2"><div class="form-check">
-                          <input class="form-check-input sports-checkbox" type="checkbox" id="volleyball" name="sports" value="Volleyball">
-                          <label class="form-check-label" for="volleyball">Volleyball</label>
-                        </div></div>
-                        <div class="col-md-4 mb-2"><div class="form-check">
-                          <input class="form-check-input sports-checkbox" type="checkbox" id="handball" name="sports" value="Handball">
-                          <label class="form-check-label" for="handball">Handball</label>
-                        </div></div>
-                        <div class="col-md-4 mb-2"><div class="form-check">
-                          <input class="form-check-input sports-checkbox" type="checkbox" id="hockey" name="sports" value="Hockey">
-                          <label class="form-check-label" for="hockey">Hockey</label>
-                        </div></div>
+                        <div class="col-md-4 mb-2">
+                          <div class="form-check">
+                            <input class="form-check-input sports-checkbox" type="checkbox" id="football" name="sports"
+                              value="Football">
+                            <label class="form-check-label" for="football">Football</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                          <div class="form-check">
+                            <input class="form-check-input sports-checkbox" type="checkbox" id="basketball"
+                              name="sports" value="Basketball">
+                            <label class="form-check-label" for="basketball">Basketball</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                          <div class="form-check">
+                            <input class="form-check-input sports-checkbox" type="checkbox" id="volleyball"
+                              name="sports" value="Volleyball">
+                            <label class="form-check-label" for="volleyball">Volleyball</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                          <div class="form-check">
+                            <input class="form-check-input sports-checkbox" type="checkbox" id="handball" name="sports"
+                              value="Handball">
+                            <label class="form-check-label" for="handball">Handball</label>
+                          </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                          <div class="form-check">
+                            <input class="form-check-input sports-checkbox" type="checkbox" id="hockey" name="sports"
+                              value="Hockey">
+                            <label class="form-check-label" for="hockey">Hockey</label>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1697,11 +1916,13 @@
                       <label class="form-label">Disability Child if any</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="disabilityChild" id="disabilityYes" value="Yes" />
+                          <input class="form-check-input" type="radio" name="disabilityChild" id="disabilityYes"
+                            value="Yes" />
                           <label class="form-check-label" for="disabilityYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="disabilityChild" id="disabilityNo" value="No" />
+                          <input class="form-check-input" type="radio" name="disabilityChild" id="disabilityNo"
+                            value="No" />
                           <label class="form-check-label" for="disabilityNo">No</label>
                         </div>
                       </div>
@@ -1710,11 +1931,13 @@
                       <label class="form-label">Marital Discord Case</label>
                       <div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="maritalDiscord" id="discordYes" value="Yes" />
+                          <input class="form-check-input" type="radio" name="maritalDiscord" id="discordYes"
+                            value="Yes" />
                           <label class="form-check-label" for="discordYes">Yes</label>
                         </div>
                         <div class="form-check form-check-inline">
-                          <input class="form-check-input" type="radio" name="maritalDiscord" id="discordNo" value="No" />
+                          <input class="form-check-input" type="radio" name="maritalDiscord" id="discordNo"
+                            value="No" />
                           <label class="form-check-label" for="discordNo">No</label>
                         </div>
                       </div>
@@ -1727,8 +1950,10 @@
                       <table class="table table-bordered" id="discordTable">
                         <thead class="table-light">
                           <tr>
-                            <th>Sr No.</th><th>Case No.</th>
-                            <th>Amount to be Paid</th><th>Sanction Letter No.</th>
+                            <th>Sr No.</th>
+                            <th>Case No.</th>
+                            <th>Amount to be Paid</th>
+                            <th>Sanction Letter No.</th>
                             <th class="action-col"><i class="fas fa-trash-alt"></i></th>
                           </tr>
                         </thead>
@@ -1789,7 +2014,8 @@
                   </div>
                   <div class="row">
                     <div class="col-md-12 mb-3">
-                      <label for="qualityPoints" class="form-label">Write any Five Points to Enhance Quality of Living Standard in Unit</label>
+                      <label for="qualityPoints" class="form-label">Write any Five Points to Enhance Quality of Living
+                        Standard in Unit</label>
                       <textarea class="form-control" id="qualityPoints" rows="4"></textarea>
                     </div>
                   </div>
@@ -1838,1016 +2064,1029 @@
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
 <script>
-// ========================================================================
-// UPDATE PAGE JAVASCRIPT
-// ========================================================================
+  // ========================================================================
+  // UPDATE PAGE JAVASCRIPT
+  // ========================================================================
 
-document.addEventListener("DOMContentLoaded", function () {
+  document.addEventListener("DOMContentLoaded", function () {
 
-  // ======================================================================
-  // VALIDATION SYSTEM (unchanged from original)
-  // ======================================================================
-  const validationRules = {
-    name:               { pattern: /^[a-zA-Z\s\-.'()]+$/,           required: true  },
-    armyNumber:         { pattern: /^[a-zA-Z0-9\-_\/]+$/,           required: true  },
-    rank:               { pattern: /^[a-zA-Z0-9\-_\s.()]+$/,        required: true  },
-    trade:              { pattern: /^[a-zA-Z0-9\-_\s.()\/]+$/,      required: true  },
-    religion:           { pattern: /^[a-zA-Z\s\-_]+$/,              required: true  },
-    homeState:          { pattern: /^[a-zA-Z\s\-_.']*$/,            required: true  },
-    height:             { pattern: /^[0-9]+(\.[0-9]{1,2})?$/,        required: true  },
-    weight:             { pattern: /^[0-9]+(\.[0-9]{1,2})?$/,        required: true  },
-    panCardNo:          { pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/,    required: false },
-    aadharCardNo:       { pattern: /^[0-9]{12}$/,                   required: false },
-    jointAccountNo:     { pattern: /^[0-9]{9,18}$/,                  required: false },
-    jointAccountIFSC:   { pattern: /^[A-Z]{4}0[A-Z0-9]{6}$/,        required: false },
-    kinAccountNo:       { pattern: /^[0-9]{9,18}$/,                  required: false },
-    kinIFSC:            { pattern: /^[A-Z]{4}0[A-Z0-9]{6}$/,        required: false },
-    distanceFromIB:     { pattern: /^[0-9]+(\.[0-9]{1,2})?$/,        required: false },
-    chest:              { pattern: /^[0-9]+(\.[0-9]{1,2})?$/,        required: false },
-    otherSports:        { pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$|^$/,   required: false },
-    section:{ pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$|^$/,   required: true }
-  };
+    // ======================================================================
+    // VALIDATION SYSTEM (unchanged from original)
+    // ======================================================================
+    const validationRules = {
+      name: { pattern: /^[a-zA-Z\s\-.'()]+$/, required: true },
+      armyNumber: { pattern: /^[a-zA-Z0-9\-_\/]+$/, required: true },
+      rank: { pattern: /^[a-zA-Z0-9\-_\s.()]+$/, required: true },
+      trade: { pattern: /^[a-zA-Z0-9\-_\s.()\/]+$/, required: true },
+      religion: { pattern: /^[a-zA-Z\s\-_]+$/, required: true },
+      homeState: { pattern: /^[a-zA-Z\s\-_.']*$/, required: true },
+      height: { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, required: true },
+      weight: { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, required: true },
+      panCardNo: { pattern: /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, required: false },
+      aadharCardNo: { pattern: /^[0-9]{12}$/, required: false },
+      jointAccountNo: { pattern: /^[0-9]{9,18}$/, required: false },
+      jointAccountIFSC: { pattern: /^[A-Z]{4}0[A-Z0-9]{6}$/, required: false },
+      kinAccountNo: { pattern: /^[0-9]{9,18}$/, required: false },
+      kinIFSC: { pattern: /^[A-Z]{4}0[A-Z0-9]{6}$/, required: false },
+      distanceFromIB: { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, required: false },
+      chest: { pattern: /^[0-9]+(\.[0-9]{1,2})?$/, required: false },
+      otherSports: { pattern: /^[a-zA-Z]+(,[a-zA-Z]+)*$|^$/, required: false },
+      section: { pattern: /^[a-zA-Z0-9\s\-_.()\/]+$/, message: 'Please select a valid section', required: true }
+    };
 
-  function validateField(fieldId, value) {
-    const rules = validationRules[fieldId];
-    if (!rules) return true;
-    const errorElement = document.getElementById(`${fieldId}-error`);
-    const field = document.getElementById(fieldId);
-    if (rules.required && (!value || value.trim() === '')) {
-      if (errorElement) { errorElement.textContent = 'This field is required'; errorElement.style.display = 'block'; }
-      if (field) { field.classList.add('is-invalid'); field.classList.remove('is-valid'); }
-      return false;
+    function validateField(fieldId, value) {
+      const rules = validationRules[fieldId];
+      if (!rules) return true;
+      const errorElement = document.getElementById(`${fieldId}-error`);
+      const field = document.getElementById(fieldId);
+      if (rules.required && (!value || value.trim() === '')) {
+        if (errorElement) { errorElement.textContent = 'This field is required'; errorElement.style.display = 'block'; }
+        if (field) { field.classList.add('is-invalid'); field.classList.remove('is-valid'); }
+        return false;
+      }
+      if (value && value.trim() !== '' && rules.pattern && !rules.pattern.test(value.trim())) {
+        if (errorElement) { errorElement.textContent = rules.message || 'Invalid format'; errorElement.style.display = 'block'; }
+        if (field) { field.classList.add('is-invalid'); field.classList.remove('is-valid'); }
+        return false;
+      }
+      if (errorElement) errorElement.style.display = 'none';
+      if (field) {
+        field.classList.remove('is-invalid');
+        if (value && value.trim() !== '') field.classList.add('is-valid');
+        else field.classList.remove('is-valid');
+      }
+      return true;
     }
-    if (value && value.trim() !== '' && rules.pattern && !rules.pattern.test(value.trim())) {
-      if (errorElement) { errorElement.textContent = rules.message || 'Invalid format'; errorElement.style.display = 'block'; }
-      if (field) { field.classList.add('is-invalid'); field.classList.remove('is-valid'); }
-      return false;
-    }
-    if (errorElement) errorElement.style.display = 'none';
-    if (field) {
-      field.classList.remove('is-invalid');
-      if (value && value.trim() !== '') field.classList.add('is-valid');
-      else field.classList.remove('is-valid');
-    }
-    return true;
-  }
 
-  function validateForm() {
-    let isValid = true;
+    function validateForm() {
+      let isValid = true;
+      Object.keys(validationRules).forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field && !validateField(fieldId, field.value)) isValid = false;
+      });
+      const requiredSelects = ['bloodGroup', 'company'];
+      requiredSelects.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.hasAttribute('required') && !el.value) {
+          el.classList.add('is-invalid'); isValid = false;
+        }
+      });
+      const requiredDates = ['dateOfEnrollment', 'dateOfBirth'];
+      requiredDates.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && !el.value) { el.classList.add('is-invalid'); isValid = false; }
+      });
+      return isValid;
+    }
+
     Object.keys(validationRules).forEach(fieldId => {
       const field = document.getElementById(fieldId);
-      if (field && !validateField(fieldId, field.value)) isValid = false;
-    });
-    const requiredSelects = ['bloodGroup', 'company'];
-    requiredSelects.forEach(id => {
-      const el = document.getElementById(id);
-      if (el && el.hasAttribute('required') && !el.value) {
-        el.classList.add('is-invalid'); isValid = false;
+      if (field) {
+        field.addEventListener('input', () => validateField(fieldId, field.value));
+        field.addEventListener('change', () => validateField(fieldId, field.value));
+        field.addEventListener('blur', () => validateField(fieldId, field.value));
       }
     });
-    const requiredDates = ['dateOfEnrollment', 'dateOfBirth'];
-    requiredDates.forEach(id => {
-      const el = document.getElementById(id);
-      if (el && !el.value) { el.classList.add('is-invalid'); isValid = false; }
-    });
-    return isValid;
-  }
 
-  Object.keys(validationRules).forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      field.addEventListener('input', () => validateField(fieldId, field.value));
-      field.addEventListener('blur',  () => validateField(fieldId, field.value));
-    }
-  });
+    // ======================================================================
+    // SEARCH FUNCTIONALITY
+    // ======================================================================
+    const searchInput = document.getElementById('searchArmyNumber');
+    const btnSearch = document.getElementById('btnSearchPersonnel');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const formContainer = document.getElementById('formContainer');
+    const updateForm = document.getElementById('updateArmyForm');
+    const btnCancel = document.getElementById('btnCancelUpdate');
 
-  // ======================================================================
-  // SEARCH FUNCTIONALITY
-  // ======================================================================
-  const searchInput   = document.getElementById('searchArmyNumber');
-  const btnSearch     = document.getElementById('btnSearchPersonnel');
-  const loadingSpinner = document.getElementById('loadingSpinner');
-  const formContainer = document.getElementById('formContainer');
-  const updateForm    = document.getElementById('updateArmyForm');
-  const btnCancel     = document.getElementById('btnCancelUpdate');
+    btnSearch.addEventListener('click', searchPersonnel);
+    searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') searchPersonnel(); });
 
-  btnSearch.addEventListener('click', searchPersonnel);
-  searchInput.addEventListener('keypress', e => { if (e.key === 'Enter') searchPersonnel(); });
-
-  async function searchPersonnel() {
-    const armyNumber = searchInput.value.trim();
-    if (!armyNumber) { alert('Please enter an army number'); return; }
-    loadingSpinner.style.display = 'block';
-    formContainer.style.display = 'none';
-    try {
-      const response = await fetch(`/personnel_information/api/personnel/search/${armyNumber}`);
-      const result   = await response.json();
-      loadingSpinner.style.display = 'none';
-      if (response.ok && result.success) {
-        populateForm(result.data);
-        formContainer.style.display = 'block';
-        document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
-      } else {
-        alert(result.message || 'Personnel not found');
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      alert('An error occurred while searching');
-      loadingSpinner.style.display = 'none';
-    }
-  }
-
-  // ======================================================================
-  // FORM POPULATION
-  // ======================================================================
-  function populateForm(data) {
-    const p = data.personnel;
-    document.getElementById('personnelId').value       = p.id;
-    document.getElementById('originalArmyNumber').value = p.army_number;
-
-    setValue('name', p.name); setValue('armyNumber', p.army_number);
-    setValue('rank', p.rank);
-    handleRankBatchToggle();
-    setValue('batch', p.batch);
-    setValue('trade', p.trade);
-    setValue('dateOfEnrollment', p.date_of_enrollment);
-    setValue('dateOfBirth', p.date_of_birth);
-    setValue('dateOfTOS', p.date_of_tos); setValue('dateOfTORS', p.date_of_tors);
-    setValue('bloodGroup', p.blood_group); setValue('religion', p.religion);
-    setValue('company', p.company);
-    document.getElementById("company").dispatchEvent(new Event('change') )
-    setValue('section',p.section)
-    setRadioValue('foodPreference', p.food_preference);
-    setRadioValue('drinker', p.drinker);
-    setRadioValue('willingPromotions', p.willing_promotions);
-    setRadioValue('clothingCard', p.clothing_card);
-    setRadioValue('borderArea', p.border_area);
-    setRadioValue('loan', p.loan);
-    setRadioValue('detailedCourse', p.detailed_course);
-    setRadioValue('medCat', p.med_cat);
-    setRadioValue('priorStation', p.prior_station);
-    setRadioValue('workedIT', p.worked_it);
-    setRadioValue('vehicleAGIF', p.vehicle_agif);
-    setRadioValue('disabilityChild', p.disability_child);
-    setRadioValue('maritalDiscord', p.marital_discord);
-    setRadioValue('bringFamily', p.bring_family);
-    setRadioValue('physicalStatus', p.physical_status || 'shape');
-    if (p.physical_status === 'category') setRadioValue('categoryType', p.category_type);
-    setValue('physicalRestrictions', p.physical_restrictions);
-    setValue('civQualifications', p.civ_qualifications);
-    setValue('decorationAwards', p.decoration_awards);
-    setValue('lackingQualifications', p.lacking_qualifications);
-    setValue('iCardNo', p.i_card_no); setValue('iCardDate', p.i_card_date);
-    setValue('iCardIssuedBy', p.i_card_issued_by);
-    setValue('bpetGrading', p.bpet_grading); setValue('pptGrading', p.ppt_grading);
-    setValue('bpetDate', p.bpet_date);
-    setValue('panCardNo', p.pan_card_no); setValue('panPartII', p.pan_part_ii);
-    setValue('aadharCardNo', p.aadhar_card_no); setValue('aadharPartII', p.aadhar_part_ii);
-    setValue('jointAccountNo', p.joint_account_no);
-    setValue('jointAccountBank', p.joint_account_bank);
-    setValue('jointAccountIFSC', p.joint_account_ifsc);
-    setValue('homeHouseNo', p.home_house_no); setValue('homeVillage', p.home_village);
-    setValue('homePhone', p.home_phone); setValue('homeTO', p.home_to);
-    setValue('homePO', p.home_po); setValue('homePS', p.home_ps);
-    setValue('homeTeh', p.home_teh); setValue('homeNRS', p.home_nrs);
-    setValue('homeNMH', p.home_nmh); setValue('homeDistrict', p.home_district);
-    setValue('homeState', p.home_state); setValue('distanceFromIB', p.distance_from_ib);
-    setValue('height', p.height); setValue('weight', p.weight);
-    setValue('chest', p.chest); setValue('identificationMarks', p.identification_marks);
-    setValue('courtCases', p.court_cases);
-    setValue('totalLeavesEncashed', p.total_leaves_encashed);
-    setValue('participationActivities', p.participation_activities);
-    setValue('presentFamilyLocation', p.present_family_location);
-    setValue('priorStationDate', p.prior_station_date);
-    setValue('workedUnitTenure', p.worked_unit_tenure);
-    setValue('lastRecatBDDate', p.last_recat_bd_date);
-    setValue('lastRecatBDAt', p.last_recat_bd_at);
-    setValue('nextRecatDue', p.next_recat_due);
-    setValue('medicalProblem', p.medical_problem);
-    setValue('restrictions', p.restrictions);
-    setValue('computerKnowledge', p.computer_knowledge);
-    setValue('itLiterature', p.it_literature);
-    setValue('kinName', p.kin_name); setValue('kinRelation', p.kin_relation);
-    setValue('kinMarriageDate', p.kin_marriage_date);
-    setValue('kinAccountNo', p.kin_account_no); setValue('kinBank', p.kin_bank);
-    setValue('kinIFSC', p.kin_ifsc); setValue('kinPartII', p.kin_part_ii);
-    setValue('vehicleRegNo', p.vehicle_reg_no); setValue('vehicleModel', p.vehicle_model);
-    setValue('vehiclePurchaseDate', p.vehicle_purchase_date);
-    setValue('drivingLicenseNo', p.driving_license_no);
-    setValue('licenseIssueDate', p.license_issue_date);
-    setValue('licenseExpiryDate', p.license_expiry_date);
-    populateSports(data.sports || []);
-    setValue('counselling', p.counselling);
-    setValue('folderPreparedOn', p.folder_prepared_on);
-    setValue('folderCheckedBy', p.folder_checked_by);
-    setValue('domesticIssues', p.domestic_issues);
-    setValue('otherRequests', p.other_requests);
-    setValue('familyMedicalIssues', p.family_medical_issues);
-    setValue('qualityPoints', p.quality_points);
-    setValue('strengths', p.strengths); setValue('weaknesses', p.weaknesses);
-
-    populateCourses(data.courses);
-    populateUnits(data.units);
-    populateLoans(data.loans);
-    populatePunishments(data.punishments);
-    populateDetailedCourses(data.detailed_courses);
-    populateLeaves(data.leaves);
-    populateFamily(data.family);
-    populateChildren(data.children);
-    populateMobiles(data.mobiles);
-    populateDiscordCases(data.discord_cases);
-    triggerConditionalSections();
-  }
-
-  function setValue(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.value = value || '';
-  }
-
-  function setRadioValue(name, value) {
-    if (value) {
-      const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-      if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
-    }
-  }
-
-  function populateSports(sportsList) {
-    document.querySelectorAll('.sports-checkbox').forEach(cb => cb.checked = false);
-    if (!sportsList || sportsList.length === 0) return;
-    sportsList.forEach(sportName => {
-      const cb = document.querySelector(`.sports-checkbox[value="${sportName}"]`);
-      if (cb) cb.checked = true;
-    });
-  }
-
-  // ======================================================================
-  // DELETE ROW HELPER
-  // Each row stores data-row-id (DB id) and data-table-name.
-  // New (unsaved) rows have no data-row-id; they are just removed from DOM.
-  // ======================================================================
-  function makeDeleteBtn() {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn-delete-row';
-    btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete';
-    btn.title = 'Delete this row';
-    btn.addEventListener('click', handleDeleteRow);
-    return btn;
-  }
-
-  async function handleDeleteRow(e) {
-    const btn   = e.currentTarget;
-    const row   = btn.closest('tr');
-    const rowId = row.dataset.rowId;
-    const table = row.dataset.tableName;
-
-    // New row (not yet saved) – just remove from DOM
-    if (!rowId) {
-      row.classList.add('deleting');
-      setTimeout(() => { row.remove(); renumberRows(row.closest('table')); }, 300);
-      return;
-    }
-
-    // Existing row – confirm then call API
-    showConfirmDelete(async () => {
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>...';
+    async function searchPersonnel() {
+      const armyNumber = searchInput.value.trim();
+      if (!armyNumber) { alert('Please enter an army number'); return; }
+      loadingSpinner.style.display = 'block';
+      formContainer.style.display = 'none';
       try {
-        const res  = await fetch(`/personnel_information/api/personnel/delete-row/${table}/${rowId}`, { method: 'DELETE' });
-        const data = await res.json();
-        if (res.ok && data.success) {
-          row.classList.add('deleting');
-          setTimeout(() => { row.remove(); renumberRows(row.closest('table')); }, 300);
-          showPopup('success', 'Deleted', 'Row removed successfully.');
+        const response = await fetch(`/personnel_information/api/personnel/search/${armyNumber}`);
+        const result = await response.json();
+        loadingSpinner.style.display = 'none';
+        if (response.ok && result.success) {
+          populateForm(result.data);
+          formContainer.style.display = 'block';
+          document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
         } else {
+          alert(result.message || 'Personnel not found');
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        alert('An error occurred while searching');
+        loadingSpinner.style.display = 'none';
+      }
+    }
+
+    // ======================================================================
+    // FORM POPULATION
+    // ======================================================================
+    function populateForm(data) {
+      const p = data.personnel;
+      document.getElementById('personnelId').value = p.id;
+      document.getElementById('originalArmyNumber').value = p.army_number;
+
+      setValue('name', p.name); setValue('armyNumber', p.army_number);
+      setValue('rank', p.rank);
+      handleRankBatchToggle();
+      setValue('batch', p.batch);
+      setValue('trade', p.trade);
+      setValue('dateOfEnrollment', p.date_of_enrollment);
+      setValue('dateOfBirth', p.date_of_birth);
+      setValue('dateOfTOS', p.date_of_tos); setValue('dateOfTORS', p.date_of_tors);
+      setValue('bloodGroup', p.blood_group); setValue('religion', p.religion);
+      setValue('company', p.company);
+      document.getElementById("company").dispatchEvent(new Event('change'))
+      setValue('section', p.section)
+      if (typeof validateField === 'function') {
+        validateField('section', p.section);
+      }
+      setRadioValue('foodPreference', p.food_preference);
+      setRadioValue('drinker', p.drinker);
+      setRadioValue('willingPromotions', p.willing_promotions);
+      setRadioValue('clothingCard', p.clothing_card);
+      setRadioValue('borderArea', p.border_area);
+      setRadioValue('loan', p.loan);
+      setRadioValue('detailedCourse', p.detailed_course);
+      setRadioValue('medCat', p.med_cat);
+      setRadioValue('priorStation', p.prior_station);
+      setRadioValue('workedIT', p.worked_it);
+      setRadioValue('vehicleAGIF', p.vehicle_agif);
+      setRadioValue('disabilityChild', p.disability_child);
+      setRadioValue('maritalDiscord', p.marital_discord);
+      setRadioValue('bringFamily', p.bring_family);
+      setRadioValue('physicalStatus', p.physical_status || 'shape');
+      if (p.physical_status === 'category') setRadioValue('categoryType', p.category_type);
+      setValue('physicalRestrictions', p.physical_restrictions);
+      setValue('civQualifications', p.civ_qualifications);
+      setValue('decorationAwards', p.decoration_awards);
+      setValue('lackingQualifications', p.lacking_qualifications);
+      setValue('iCardNo', p.i_card_no); setValue('iCardDate', p.i_card_date);
+      setValue('iCardIssuedBy', p.i_card_issued_by);
+      setValue('bpetGrading', p.bpet_grading); setValue('pptGrading', p.ppt_grading);
+      setValue('bpetDate', p.bpet_date);
+      setValue('panCardNo', p.pan_card_no); setValue('panPartII', p.pan_part_ii);
+      setValue('aadharCardNo', p.aadhar_card_no); setValue('aadharPartII', p.aadhar_part_ii);
+      setValue('jointAccountNo', p.joint_account_no);
+      setValue('jointAccountBank', p.joint_account_bank);
+      setValue('jointAccountIFSC', p.joint_account_ifsc);
+      setValue('homeHouseNo', p.home_house_no); setValue('homeVillage', p.home_village);
+      setValue('homePhone', p.home_phone); setValue('homeTO', p.home_to);
+      setValue('homePO', p.home_po); setValue('homePS', p.home_ps);
+      setValue('homeTeh', p.home_teh); setValue('homeNRS', p.home_nrs);
+      setValue('homeNMH', p.home_nmh); setValue('homeDistrict', p.home_district);
+      setValue('homeState', p.home_state); setValue('distanceFromIB', p.distance_from_ib);
+      setValue('height', p.height); setValue('weight', p.weight);
+      setValue('chest', p.chest); setValue('identificationMarks', p.identification_marks);
+      setValue('courtCases', p.court_cases);
+      setValue('totalLeavesEncashed', p.total_leaves_encashed);
+      setValue('participationActivities', p.participation_activities);
+      setValue('presentFamilyLocation', p.present_family_location);
+      setValue('priorStationDate', p.prior_station_date);
+      setValue('workedUnitTenure', p.worked_unit_tenure);
+      setValue('lastRecatBDDate', p.last_recat_bd_date);
+      setValue('lastRecatBDAt', p.last_recat_bd_at);
+      setValue('nextRecatDue', p.next_recat_due);
+      setValue('medicalProblem', p.medical_problem);
+      setValue('restrictions', p.restrictions);
+      setValue('computerKnowledge', p.computer_knowledge);
+      setValue('itLiterature', p.it_literature);
+      setValue('kinName', p.kin_name); setValue('kinRelation', p.kin_relation);
+      setValue('kinMarriageDate', p.kin_marriage_date);
+      setValue('kinAccountNo', p.kin_account_no); setValue('kinBank', p.kin_bank);
+      setValue('kinIFSC', p.kin_ifsc); setValue('kinPartII', p.kin_part_ii);
+      setValue('vehicleRegNo', p.vehicle_reg_no); setValue('vehicleModel', p.vehicle_model);
+      setValue('vehiclePurchaseDate', p.vehicle_purchase_date);
+      setValue('drivingLicenseNo', p.driving_license_no);
+      setValue('licenseIssueDate', p.license_issue_date);
+      setValue('licenseExpiryDate', p.license_expiry_date);
+      populateSports(data.sports || []);
+      setValue('counselling', p.counselling);
+      setValue('folderPreparedOn', p.folder_prepared_on);
+      setValue('folderCheckedBy', p.folder_checked_by);
+      setValue('domesticIssues', p.domestic_issues);
+      setValue('otherRequests', p.other_requests);
+      setValue('familyMedicalIssues', p.family_medical_issues);
+      setValue('qualityPoints', p.quality_points);
+      setValue('strengths', p.strengths); setValue('weaknesses', p.weaknesses);
+
+      populateCourses(data.courses);
+      populateUnits(data.units);
+      populateLoans(data.loans);
+      populatePunishments(data.punishments);
+      populateDetailedCourses(data.detailed_courses);
+      populateLeaves(data.leaves);
+      populateFamily(data.family);
+      populateChildren(data.children);
+      populateMobiles(data.mobiles);
+      populateDiscordCases(data.discord_cases);
+      triggerConditionalSections();
+    }
+
+    function setValue(id, value) {
+      const el = document.getElementById(id);
+      if (el) el.value = value || '';
+    }
+
+    function setRadioValue(name, value) {
+      if (value) {
+        const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
+      }
+    }
+
+    function populateSports(sportsList) {
+      document.querySelectorAll('.sports-checkbox').forEach(cb => cb.checked = false);
+      if (!sportsList || sportsList.length === 0) return;
+      sportsList.forEach(sportName => {
+        const cb = document.querySelector(`.sports-checkbox[value="${sportName}"]`);
+        if (cb) cb.checked = true;
+      });
+    }
+
+    // ======================================================================
+    // DELETE ROW HELPER
+    // Each row stores data-row-id (DB id) and data-table-name.
+    // New (unsaved) rows have no data-row-id; they are just removed from DOM.
+    // ======================================================================
+    function makeDeleteBtn() {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn-delete-row';
+      btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete';
+      btn.title = 'Delete this row';
+      btn.addEventListener('click', handleDeleteRow);
+      return btn;
+    }
+
+    async function handleDeleteRow(e) {
+      const btn = e.currentTarget;
+      const row = btn.closest('tr');
+      const rowId = row.dataset.rowId;
+      const table = row.dataset.tableName;
+
+      // New row (not yet saved) – just remove from DOM
+      if (!rowId) {
+        row.classList.add('deleting');
+        setTimeout(() => { row.remove(); renumberRows(row.closest('table')); }, 300);
+        return;
+      }
+
+      // Existing row – confirm then call API
+      showConfirmDelete(async () => {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>...';
+        try {
+          const res = await fetch(`/personnel_information/api/personnel/delete-row/${table}/${rowId}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            row.classList.add('deleting');
+            setTimeout(() => { row.remove(); renumberRows(row.closest('table')); }, 300);
+            showPopup('success', 'Deleted', 'Row removed successfully.');
+          } else {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete';
+            showPopup('error', 'Delete Failed', data.message || 'Could not delete this row.');
+          }
+        } catch (err) {
           btn.disabled = false;
           btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete';
-          showPopup('error', 'Delete Failed', data.message || 'Could not delete this row.');
+          showPopup('error', 'Error', 'Network error. Please try again.');
         }
-      } catch (err) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-trash-alt me-1"></i>Delete';
-        showPopup('error', 'Error', 'Network error. Please try again.');
-      }
-    });
-  }
-
-  function renumberRows(table) {
-    if (!table) return;
-    // Renumber first-column <td> only if it looks like a serial number (pure digit)
-    table.querySelectorAll('tbody tr').forEach((tr, idx) => {
-      const first = tr.querySelector('td:first-child');
-      if (first && /^\d+$/.test(first.textContent.trim())) {
-        first.textContent = idx + 1;
-      }
-    });
-  }
-
-  function actionCell(rowId, tableName) {
-    const td = document.createElement('td');
-    td.className = 'action-col';
-    const btn = makeDeleteBtn();
-    td.appendChild(btn);
-    // Store meta on the row (will be set right after this cell is added)
-    return { td, rowId, tableName };
-  }
-
-  // Helper: build a row <tr> and tag it
-  function buildRow(cells, rowId, tableName) {
-    const tr = document.createElement('tr');
-    if (rowId) tr.dataset.rowId = rowId;
-    tr.dataset.tableName = tableName;
-    cells.forEach(cell => tr.appendChild(cell));
-    const deleteTd = document.createElement('td');
-    deleteTd.className = 'action-col';
-    deleteTd.appendChild(makeDeleteBtn());
-    tr.appendChild(deleteTd);
-    return tr;
-  }
-
-  function td(content) {
-    const cell = document.createElement('td');
-    cell.innerHTML = content;
-    return cell;
-  }
-
-  // ======================================================================
-  // DYNAMIC TABLE POPULATION (with delete buttons & DB row IDs)
-  // ======================================================================
-  function populateCourses(courses) {
-    const tbody = document.querySelector('#coursesTable tbody');
-    tbody.innerHTML = '';
-    if (!courses || courses.length === 0) { addCourseRow(); return; }
-    courses.forEach((c, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm course-input" name="course[]" value="${esc(c.course)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="courseFrom[]" value="${esc(c.from_date)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="courseTo[]" value="${esc(c.to_date)}">`),
-        td(`<input type="text" class="form-control form-control-sm course-input" name="courseInstitute[]" value="${esc(c.institute)}">`),
-        td(`<input type="text" class="form-control form-control-sm course-input" name="courseGrading[]" value="${esc(c.grading)}">`),
-        td(`<input type="text" class="form-control form-control-sm course-input" name="courseRemarks[]" value="${esc(c.remarks)}">`)
-      ], c.id, 'courses');
-      tbody.appendChild(tr);
-    });
-  }
-
-  const DUTY_OPTIONS = [
-    "A-SIGMA CLERK", "ADM NCO", "ALL TRADESMEN", "BRANCH", "BUDDY", "CHM", "CLERK", "COMMUNICATION CLERK",
-    "CQMH", "DET 2IC", "DET COMMANDER", "DISPATCHER CLERK", "DRIVER", "FAULT CONTROL NCO", "GUEST ROOM NCO",
-    "HARDWARE TECH", "ICN", "JCO MESS CDR", "LINE MAN", "LRW NCO", "LRW OPERATOR", "MCCS EXCHANGE",
-    "MESS HAV", "MT NCO", "MULTIMEDIA", "NCO CHQ", "NCO COMN", "NCO IT", "NCO MCCS", "NCO SIGCEN",
-    "NETWORK NCO", "NFS", "O1", "O2", "O3", "OFFICE", "OPERATOR", "PA", "PART ONE CLERK",
-    "QRT COMMANDER", "QRT MEMBER", "QY NCO", "RADIO OPERATOR","RR", "RP NCO", "RUNNER",
-    "SERVER", "STORE MAN", "STRICT ORDERLY", "STRIP CLERK", "SYSTEM", "SYSTEM OPERATOR",
-    "TECH MECHANIC", "TM", "TM(DUTY EFS)", "TRG CLK", "VEHICLE MECHANIC", "WARRANT CLERK"
-  ];
-
-  function getUnitDutySelectHtml(selectedVal = '') {
-    const sNorm = String(selectedVal || '').trim().toUpperCase();
-    const isStandard = DUTY_OPTIONS.includes(sNorm);
-    const isOther = (sNorm === 'OTHER') || (!isStandard && sNorm !== '');
-    const otherVal = isOther && sNorm !== 'OTHER' ? sNorm : '';
-
-    let html = `<select class="form-select form-select-sm unit-input" name="unitDuty[]">`;
-    html += `<option value="">-- SELECT DUTY / DOMAIN --</option>`;
-    DUTY_OPTIONS.forEach(opt => {
-      const isSel = (opt === sNorm) ? 'selected' : '';
-      html += `<option value="${esc(opt)}" ${isSel}>${esc(opt)}</option>`;
-    });
-    html += `<option value="OTHER" ${isOther ? 'selected' : ''}>OTHER</option>`;
-    html += `</select>`;
-    html += `<input type="text" class="form-control form-control-sm mt-1 unit-input unit-duty-other" placeholder="Specify Duty" value="${esc(otherVal)}" style="${isOther ? 'display: block;' : 'display: none;'} text-transform: uppercase;" />`;
-    return html;
-  }
-
-  function populateUnits(units) {
-    const tbody = document.querySelector('#unitsTable tbody');
-    tbody.innerHTML = '';
-    if (!units || units.length === 0) { addUnitRow(); return; }
-    units.forEach((u, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]" value="${esc(u.unit)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]" value="${esc(u.from_date)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="unitTo[]" value="${esc(u.to_date)}">`),
-        td(getUnitDutySelectHtml(u.duty_performed))
-      ], u.id, 'units_served');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateLoans(loans) {
-    const tbody = document.querySelector('#loansTable tbody');
-    tbody.innerHTML = '';
-    if (!loans || loans.length === 0) { addLoanRow(); return; }
-    loans.forEach((l, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanType[]" value="${esc(l.loan_type)}">`),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanAmount[]" value="${esc(l.total_amount)}">`),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanBank[]" value="${esc(l.bank_details)}">`),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanEMI[]" value="${esc(l.emi_per_month)}">`),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanPending[]" value="${esc(l.pending)}">`),
-        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanRemarks[]" value="${esc(l.remarks)}">`)
-      ], l.id, 'loans');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populatePunishments(punishments) {
-    const tbody = document.querySelector('#punishmentTable tbody');
-    tbody.innerHTML = '';
-    if (!punishments || punishments.length === 0) { addPunishmentRow(); return; }
-    punishments.forEach((p, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="date" class="form-control form-control-sm" name="punishmentDate[]" value="${esc(p.punishment_date)}">`),
-        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishment[]" value="${esc(p.punishment)}">`),
-        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentAASec[]" value="${esc(p.aa_sec)}">`),
-        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentRemarks[]" value="${esc(p.remarks)}">`)
-      ], p.id, 'punishments');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateDetailedCourses(courses) {
-    const tbody = document.querySelector('#detailedCoursesTable tbody');
-    tbody.innerHTML = '';
-    if (!courses || courses.length === 0) { addDetailedCourseRow(); return; }
-    courses.forEach((c, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseName[]" value="${esc(c.course_name)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="detailedCourseFrom[]" value="${esc(c.from_date)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="detailedCourseTo[]" value="${esc(c.to_date)}">`),
-        td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseRemarks[]" value="${esc(c.remarks)}">`)
-      ], c.id, 'detailed_courses');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateLeaves(leaves) {
-    const tbody = document.querySelector('#leaveTable tbody');
-    tbody.innerHTML = '';
-    
-    if (!leaves || leaves.length === 0) { addLeaveRow(); return; }
-    leaves.forEach((l, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]" value="${esc(l.year)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]" value="${esc(l.AL)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]" value="${esc(l.CL)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]" value="${esc(l.AAL)}">`),
-        td(`<input type="number" class="form-control form-control-sm" name="leaveTotal[]" value="${l['Annual Leave']}">`),
-        td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]" value="${esc(l.remarks)}">`)
-      ], l.id, 'leave_details');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateFamily(family) {
-    const tbody = document.querySelector('#familyTable tbody');
-    tbody.innerHTML = '';
-    if (!family || family.length === 0) { addFamilyRow(); return; }
-    family.forEach(m => {
-      const tr = buildRow([
-        td(`<input type="text" class="form-control form-control-sm family-input" name="familyRelation[]" value="${esc(m.relation)}">`),
-        td(`<input type="text" class="form-control form-control-sm family-input" name="familyName[]" value="${esc(m.name)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="familyDOB[]" value="${esc(m.date_of_birth)}">`),
-        td(`<input type="text" class="form-control form-control-sm family-input" name="familyUID[]" value="${esc(m.uid_no)}">`),
-        td(`<input type="text" class="form-control form-control-sm family-input" name="familyPartII[]" value="${esc(m.part_ii_order)}">`)
-      ], m.id, 'family_members');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateChildren(children) {
-    const tbody = document.querySelector('#childrenTable tbody');
-    tbody.innerHTML = '';
-    if (!children || children.length === 0) { addChildRow(); return; }
-    children.forEach((c, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm children-input" name="childName[]" value="${esc(c.name)}">`),
-        td(`<input type="date" class="form-control form-control-sm" name="childDOB[]" value="${esc(c.date_of_birth)}">`),
-        td(`<input type="text" class="form-control form-control-sm children-input" name="childClass[]" value="${esc(c.class)}">`),
-        td(`<input type="text" class="form-control form-control-sm children-input" name="childPartII[]" value="${esc(c.part_ii_order)}">`),
-        td(`<input type="text" class="form-control form-control-sm children-input" name="childUID[]" value="${esc(c.uid_no)}">`)
-      ], c.id, 'children');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateMobiles(mobiles) {
-    const tbody = document.querySelector('#mobileTable tbody');
-    tbody.innerHTML = '';
-    if (!mobiles || mobiles.length === 0) { addMobileRow(); return; }
-    mobiles.forEach((m, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileType[]" value="${esc(m.type)}">`),
-        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileNumber[]" value="${esc(m.number)}">`),
-        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileProvider[]" value="${esc(m.service_provider)}">`),
-        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileRemarks[]" value="${esc(m.remarks)}">`)
-      ], m.id, 'mobile_phones');
-      tbody.appendChild(tr);
-    });
-  }
-
-  function populateDiscordCases(cases) {
-    const tbody = document.querySelector('#discordTable tbody');
-    tbody.innerHTML = '';
-    if (!cases || cases.length === 0) { addDiscordRow(); return; }
-    cases.forEach((c, i) => {
-      const tr = buildRow([
-        td(i + 1),
-        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordCaseNo[]" value="${esc(c.case_no)}">`),
-        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordAmount[]" value="${esc(c.amount_to_pay)}">`),
-        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordSanction[]" value="${esc(c.sanction_letter_no)}">`)
-      ], c.id, 'marital_discord_cases');
-      tbody.appendChild(tr);
-    });
-  }
-
-  // XSS-safe attribute escaping
-  function esc(v) { return (v == null ? '' : String(v)).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
-
-  function triggerConditionalSections() {
-    document.querySelectorAll('input[type="radio"]:checked').forEach(r => r.dispatchEvent(new Event('change')));
-    const physStatus = document.querySelector('input[name="physicalStatus"]:checked');
-    if (physStatus && physStatus.value === 'category') {
-      document.getElementById('category-options').style.display = 'block';
-      const catType = document.querySelector('input[name="categoryType"]:checked');
-      if (catType) document.getElementById('restrictions-group').style.display = 'block';
+      });
     }
-  }
 
-  // ======================================================================
-  // ADD ROW FUNCTIONS (new rows have no rowId so deleting removes DOM only)
-  // ======================================================================
-  function addCourseRow() {
-    const tbody = document.querySelector('#coursesTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm course-input" name="course[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="courseFrom[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="courseTo[]">`),
-      td(`<input type="text" class="form-control form-control-sm course-input" name="courseInstitute[]">`),
-      td(`<input type="text" class="form-control form-control-sm course-input" name="courseGrading[]">`),
-      td(`<input type="text" class="form-control form-control-sm course-input" name="courseRemarks[]">`)
-    ], null, 'courses');
-    tbody.appendChild(tr);
-  }
+    function renumberRows(table) {
+      if (!table) return;
+      // Renumber first-column <td> only if it looks like a serial number (pure digit)
+      table.querySelectorAll('tbody tr').forEach((tr, idx) => {
+        const first = tr.querySelector('td:first-child');
+        if (first && /^\d+$/.test(first.textContent.trim())) {
+          first.textContent = idx + 1;
+        }
+      });
+    }
 
-  function addUnitRow() {
-    const tbody = document.querySelector('#unitsTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="unitTo[]">`),
-      td(getUnitDutySelectHtml(''))
-    ], null, 'units_served');
-    tbody.appendChild(tr);
-  }
+    function actionCell(rowId, tableName) {
+      const td = document.createElement('td');
+      td.className = 'action-col';
+      const btn = makeDeleteBtn();
+      td.appendChild(btn);
+      // Store meta on the row (will be set right after this cell is added)
+      return { td, rowId, tableName };
+    }
 
-  function addLoanRow() {
-    const tbody = document.querySelector('#loansTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanType[]">`),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanAmount[]">`),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanBank[]">`),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanEMI[]">`),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanPending[]">`),
-      td(`<input type="text" class="form-control form-control-sm loan-input" name="loanRemarks[]">`)
-    ], null, 'loans');
-    tbody.appendChild(tr);
-  }
+    // Helper: build a row <tr> and tag it
+    function buildRow(cells, rowId, tableName) {
+      const tr = document.createElement('tr');
+      if (rowId) tr.dataset.rowId = rowId;
+      tr.dataset.tableName = tableName;
+      cells.forEach(cell => tr.appendChild(cell));
+      const deleteTd = document.createElement('td');
+      deleteTd.className = 'action-col';
+      deleteTd.appendChild(makeDeleteBtn());
+      tr.appendChild(deleteTd);
+      return tr;
+    }
 
-  function addPunishmentRow() {
-    const tbody = document.querySelector('#punishmentTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="date" class="form-control form-control-sm" name="punishmentDate[]">`),
-      td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishment[]">`),
-      td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentAASec[]">`),
-      td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentRemarks[]">`)
-    ], null, 'punishments');
-    tbody.appendChild(tr);
-  }
+    function td(content) {
+      const cell = document.createElement('td');
+      cell.innerHTML = content;
+      return cell;
+    }
 
-  function addDetailedCourseRow() {
-    const tbody = document.querySelector('#detailedCoursesTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseName[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="detailedCourseFrom[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="detailedCourseTo[]">`),
-      td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseRemarks[]">`)
-    ], null, 'detailed_courses');
-    tbody.appendChild(tr);
-  }
+    // ======================================================================
+    // DYNAMIC TABLE POPULATION (with delete buttons & DB row IDs)
+    // ======================================================================
+    function populateCourses(courses) {
+      const tbody = document.querySelector('#coursesTable tbody');
+      tbody.innerHTML = '';
+      if (!courses || courses.length === 0) { addCourseRow(); return; }
+      courses.forEach((c, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm course-input" name="course[]" value="${esc(c.course)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="courseFrom[]" value="${esc(c.from_date)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="courseTo[]" value="${esc(c.to_date)}">`),
+          td(`<input type="text" class="form-control form-control-sm course-input" name="courseInstitute[]" value="${esc(c.institute)}">`),
+          td(`<input type="text" class="form-control form-control-sm course-input" name="courseGrading[]" value="${esc(c.grading)}">`),
+          td(`<input type="text" class="form-control form-control-sm course-input" name="courseRemarks[]" value="${esc(c.remarks)}">`)
+        ], c.id, 'courses');
+        tbody.appendChild(tr);
+      });
+    }
 
-  function addLeaveRow() {
-    const tbody = document.querySelector('#leaveTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]">`),
-      td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]">`),
-      td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]">`),
-      td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]">`),
-      td(`<input type="number" class="form-control form-control-sm" name="leaveAnnualeave[]">`),
-      td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]">`)
-    ], null, 'leave_details');
-    tbody.appendChild(tr);
-  }
+    const DUTY_OPTIONS = [
+      "A-SIGMA CLERK", "ADM NCO", "ALL TRADESMEN", "BRANCH", "BUDDY", "CHM", "CLERK", "COMMUNICATION CLERK",
+      "CQMH", "DET 2IC", "DET COMMANDER", "DISPATCHER CLERK", "DRIVER", "FAULT CONTROL NCO", "GUEST ROOM NCO",
+      "HARDWARE TECH", "ICN", "JCO MESS CDR", "LINE MAN", "LRW NCO", "LRW OPERATOR", "MCCS EXCHANGE",
+      "MESS HAV", "MT NCO", "MULTIMEDIA", "NCO CHQ", "NCO COMN", "NCO IT", "NCO MCCS", "NCO SIGCEN",
+      "NETWORK NCO", "NFS", "O1", "O2", "O3", "OFFICE", "OPERATOR", "PA", "PART ONE CLERK",
+      "QRT COMMANDER", "QRT MEMBER", "QY NCO", "RADIO OPERATOR", "RR", "RP NCO", "RUNNER",
+      "SERVER", "STORE MAN", "STRICT ORDERLY", "STRIP CLERK", "SYSTEM", "SYSTEM OPERATOR",
+      "TECH MECHANIC", "TM", "TM(DUTY EFS)", "TRG CLK", "VEHICLE MECHANIC", "WARRANT CLERK"
+    ];
 
-  function addFamilyRow() {
-    const tbody = document.querySelector('#familyTable tbody');
-    const tr = buildRow([
-      td(`<input type="text" class="form-control form-control-sm family-input" name="familyRelation[]">`),
-      td(`<input type="text" class="form-control form-control-sm family-input" name="familyName[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="familyDOB[]">`),
-      td(`<input type="text" class="form-control form-control-sm family-input" name="familyUID[]">`),
-      td(`<input type="text" class="form-control form-control-sm family-input" name="familyPartII[]">`)
-    ], null, 'family_members');
-    tbody.appendChild(tr);
-  }
+    function getUnitDutySelectHtml(selectedVal = '') {
+      const sNorm = String(selectedVal || '').trim().toUpperCase();
+      const isStandard = DUTY_OPTIONS.includes(sNorm);
+      const isOther = (sNorm === 'OTHER') || (!isStandard && sNorm !== '');
+      const otherVal = isOther && sNorm !== 'OTHER' ? sNorm : '';
 
-  function addChildRow() {
-    const tbody = document.querySelector('#childrenTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm children-input" name="childName[]">`),
-      td(`<input type="date" class="form-control form-control-sm" name="childDOB[]">`),
-      td(`<input type="text" class="form-control form-control-sm children-input" name="childClass[]">`),
-      td(`<input type="text" class="form-control form-control-sm children-input" name="childPartII[]">`),
-      td(`<input type="text" class="form-control form-control-sm children-input" name="childUID[]">`)
-    ], null, 'children');
-    tbody.appendChild(tr);
-  }
+      let html = `<select class="form-select form-select-sm unit-input" name="unitDuty[]">`;
+      html += `<option value="">-- SELECT DUTY / DOMAIN --</option>`;
+      DUTY_OPTIONS.forEach(opt => {
+        const isSel = (opt === sNorm) ? 'selected' : '';
+        html += `<option value="${esc(opt)}" ${isSel}>${esc(opt)}</option>`;
+      });
+      html += `<option value="OTHER" ${isOther ? 'selected' : ''}>OTHER</option>`;
+      html += `</select>`;
+      html += `<input type="text" class="form-control form-control-sm mt-1 unit-input unit-duty-other" placeholder="Specify Duty" value="${esc(otherVal)}" style="${isOther ? 'display: block;' : 'display: none;'} text-transform: uppercase;" />`;
+      return html;
+    }
 
-  function addMobileRow() {
-    const tbody = document.querySelector('#mobileTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileType[]">`),
-      td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileNumber[]">`),
-      td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileProvider[]">`),
-      td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileRemarks[]">`)
-    ], null, 'mobile_phones');
-    tbody.appendChild(tr);
-  }
+    function populateUnits(units) {
+      const tbody = document.querySelector('#unitsTable tbody');
+      tbody.innerHTML = '';
+      if (!units || units.length === 0) { addUnitRow(); return; }
+      units.forEach((u, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]" value="${esc(u.unit)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]" value="${esc(u.from_date)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="unitTo[]" value="${esc(u.to_date)}">`),
+          td(getUnitDutySelectHtml(u.duty_performed))
+        ], u.id, 'units_served');
+        tbody.appendChild(tr);
+      });
+    }
 
-  function addDiscordRow() {
-    const tbody = document.querySelector('#discordTable tbody');
-    const n = tbody.rows.length + 1;
-    const tr = buildRow([
-      td(n),
-      td(`<input type="text" class="form-control form-control-sm discord-input" name="discordCaseNo[]">`),
-      td(`<input type="text" class="form-control form-control-sm discord-input" name="discordAmount[]">`),
-      td(`<input type="text" class="form-control form-control-sm discord-input" name="discordSanction[]">`)
-    ], null, 'marital_discord_cases');
-    tbody.appendChild(tr);
-  }
+    function populateLoans(loans) {
+      const tbody = document.querySelector('#loansTable tbody');
+      tbody.innerHTML = '';
+      if (!loans || loans.length === 0) { addLoanRow(); return; }
+      loans.forEach((l, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanType[]" value="${esc(l.loan_type)}">`),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanAmount[]" value="${esc(l.total_amount)}">`),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanBank[]" value="${esc(l.bank_details)}">`),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanEMI[]" value="${esc(l.emi_per_month)}">`),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanPending[]" value="${esc(l.pending)}">`),
+          td(`<input type="text" class="form-control form-control-sm loan-input" name="loanRemarks[]" value="${esc(l.remarks)}">`)
+        ], l.id, 'loans');
+        tbody.appendChild(tr);
+      });
+    }
 
-  // Wire up Add Row buttons
-  document.getElementById("addCourseRow").addEventListener("click", addCourseRow);
-  document.getElementById("addUnitRow").addEventListener("click", addUnitRow);
+    function populatePunishments(punishments) {
+      const tbody = document.querySelector('#punishmentTable tbody');
+      tbody.innerHTML = '';
+      if (!punishments || punishments.length === 0) { addPunishmentRow(); return; }
+      punishments.forEach((p, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="date" class="form-control form-control-sm" name="punishmentDate[]" value="${esc(p.punishment_date)}">`),
+          td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishment[]" value="${esc(p.punishment)}">`),
+          td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentAASec[]" value="${esc(p.aa_sec)}">`),
+          td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentRemarks[]" value="${esc(p.remarks)}">`)
+        ], p.id, 'punishments');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateDetailedCourses(courses) {
+      const tbody = document.querySelector('#detailedCoursesTable tbody');
+      tbody.innerHTML = '';
+      if (!courses || courses.length === 0) { addDetailedCourseRow(); return; }
+      courses.forEach((c, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseName[]" value="${esc(c.course_name)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="detailedCourseFrom[]" value="${esc(c.from_date)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="detailedCourseTo[]" value="${esc(c.to_date)}">`),
+          td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseRemarks[]" value="${esc(c.remarks)}">`)
+        ], c.id, 'detailed_courses');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateLeaves(leaves) {
+      const tbody = document.querySelector('#leaveTable tbody');
+      tbody.innerHTML = '';
+
+      if (!leaves || leaves.length === 0) { addLeaveRow(); return; }
+      leaves.forEach((l, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]" value="${esc(l.year)}">`),
+          td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]" value="${esc(l.AL)}">`),
+          td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]" value="${esc(l.CL)}">`),
+          td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]" value="${esc(l.AAL)}">`),
+          td(`<input type="number" class="form-control form-control-sm" name="leaveTotal[]" value="${l['Annual Leave']}">`),
+          td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]" value="${esc(l.remarks)}">`)
+        ], l.id, 'leave_details');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateFamily(family) {
+      const tbody = document.querySelector('#familyTable tbody');
+      tbody.innerHTML = '';
+      if (!family || family.length === 0) { addFamilyRow(); return; }
+      family.forEach(m => {
+        const tr = buildRow([
+          td(`<input type="text" class="form-control form-control-sm family-input" name="familyRelation[]" value="${esc(m.relation)}">`),
+          td(`<input type="text" class="form-control form-control-sm family-input" name="familyName[]" value="${esc(m.name)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="familyDOB[]" value="${esc(m.date_of_birth)}">`),
+          td(`<input type="text" class="form-control form-control-sm family-input" name="familyUID[]" value="${esc(m.uid_no)}">`),
+          td(`<input type="text" class="form-control form-control-sm family-input" name="familyPartII[]" value="${esc(m.part_ii_order)}">`)
+        ], m.id, 'family_members');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateChildren(children) {
+      const tbody = document.querySelector('#childrenTable tbody');
+      tbody.innerHTML = '';
+      if (!children || children.length === 0) { addChildRow(); return; }
+      children.forEach((c, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm children-input" name="childName[]" value="${esc(c.name)}">`),
+          td(`<input type="date" class="form-control form-control-sm" name="childDOB[]" value="${esc(c.date_of_birth)}">`),
+          td(`<input type="text" class="form-control form-control-sm children-input" name="childClass[]" value="${esc(c.class)}">`),
+          td(`<input type="text" class="form-control form-control-sm children-input" name="childPartII[]" value="${esc(c.part_ii_order)}">`),
+          td(`<input type="text" class="form-control form-control-sm children-input" name="childUID[]" value="${esc(c.uid_no)}">`)
+        ], c.id, 'children');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateMobiles(mobiles) {
+      const tbody = document.querySelector('#mobileTable tbody');
+      tbody.innerHTML = '';
+      if (!mobiles || mobiles.length === 0) { addMobileRow(); return; }
+      mobiles.forEach((m, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileType[]" value="${esc(m.type)}">`),
+          td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileNumber[]" value="${esc(m.number)}">`),
+          td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileProvider[]" value="${esc(m.service_provider)}">`),
+          td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileRemarks[]" value="${esc(m.remarks)}">`)
+        ], m.id, 'mobile_phones');
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateDiscordCases(cases) {
+      const tbody = document.querySelector('#discordTable tbody');
+      tbody.innerHTML = '';
+      if (!cases || cases.length === 0) { addDiscordRow(); return; }
+      cases.forEach((c, i) => {
+        const tr = buildRow([
+          td(i + 1),
+          td(`<input type="text" class="form-control form-control-sm discord-input" name="discordCaseNo[]" value="${esc(c.case_no)}">`),
+          td(`<input type="text" class="form-control form-control-sm discord-input" name="discordAmount[]" value="${esc(c.amount_to_pay)}">`),
+          td(`<input type="text" class="form-control form-control-sm discord-input" name="discordSanction[]" value="${esc(c.sanction_letter_no)}">`)
+        ], c.id, 'marital_discord_cases');
+        tbody.appendChild(tr);
+      });
+    }
+
+    // XSS-safe attribute escaping
+    function esc(v) { return (v == null ? '' : String(v)).replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+    function triggerConditionalSections() {
+      document.querySelectorAll('input[type="radio"]:checked').forEach(r => r.dispatchEvent(new Event('change')));
+      const physStatus = document.querySelector('input[name="physicalStatus"]:checked');
+      if (physStatus && physStatus.value === 'category') {
+        document.getElementById('category-options').style.display = 'block';
+        const catType = document.querySelector('input[name="categoryType"]:checked');
+        if (catType) document.getElementById('restrictions-group').style.display = 'block';
+      }
+    }
+
+    // ======================================================================
+    // ADD ROW FUNCTIONS (new rows have no rowId so deleting removes DOM only)
+    // ======================================================================
+    function addCourseRow() {
+      const tbody = document.querySelector('#coursesTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm course-input" name="course[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="courseFrom[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="courseTo[]">`),
+        td(`<input type="text" class="form-control form-control-sm course-input" name="courseInstitute[]">`),
+        td(`<input type="text" class="form-control form-control-sm course-input" name="courseGrading[]">`),
+        td(`<input type="text" class="form-control form-control-sm course-input" name="courseRemarks[]">`)
+      ], null, 'courses');
+      tbody.appendChild(tr);
+    }
+
+    function addUnitRow() {
+      const tbody = document.querySelector('#unitsTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm unit-input" name="unit[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="unitFrom[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="unitTo[]">`),
+        td(getUnitDutySelectHtml(''))
+      ], null, 'units_served');
+      tbody.appendChild(tr);
+    }
+
+    function addLoanRow() {
+      const tbody = document.querySelector('#loansTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanType[]">`),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanAmount[]">`),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanBank[]">`),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanEMI[]">`),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanPending[]">`),
+        td(`<input type="text" class="form-control form-control-sm loan-input" name="loanRemarks[]">`)
+      ], null, 'loans');
+      tbody.appendChild(tr);
+    }
+
+    function addPunishmentRow() {
+      const tbody = document.querySelector('#punishmentTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="date" class="form-control form-control-sm" name="punishmentDate[]">`),
+        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishment[]">`),
+        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentAASec[]">`),
+        td(`<input type="text" class="form-control form-control-sm punishment-input" name="punishmentRemarks[]">`)
+      ], null, 'punishments');
+      tbody.appendChild(tr);
+    }
+
+    function addDetailedCourseRow() {
+      const tbody = document.querySelector('#detailedCoursesTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseName[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="detailedCourseFrom[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="detailedCourseTo[]">`),
+        td(`<input type="text" class="form-control form-control-sm detailed-course-input" name="detailedCourseRemarks[]">`)
+      ], null, 'detailed_courses');
+      tbody.appendChild(tr);
+    }
+
+    function addLeaveRow() {
+      const tbody = document.querySelector('#leaveTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveYear[]">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveAL[]">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveCL[]">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveAAL[]">`),
+        td(`<input type="number" class="form-control form-control-sm" name="leaveAnnualeave[]">`),
+        td(`<input type="text" class="form-control form-control-sm leave-input" name="leaveRemarks[]">`)
+      ], null, 'leave_details');
+      tbody.appendChild(tr);
+    }
+
+    function addFamilyRow() {
+      const tbody = document.querySelector('#familyTable tbody');
+      const tr = buildRow([
+        td(`<input type="text" class="form-control form-control-sm family-input" name="familyRelation[]">`),
+        td(`<input type="text" class="form-control form-control-sm family-input" name="familyName[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="familyDOB[]">`),
+        td(`<input type="text" class="form-control form-control-sm family-input" name="familyUID[]">`),
+        td(`<input type="text" class="form-control form-control-sm family-input" name="familyPartII[]">`)
+      ], null, 'family_members');
+      tbody.appendChild(tr);
+    }
+
+    function addChildRow() {
+      const tbody = document.querySelector('#childrenTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm children-input" name="childName[]">`),
+        td(`<input type="date" class="form-control form-control-sm" name="childDOB[]">`),
+        td(`<input type="text" class="form-control form-control-sm children-input" name="childClass[]">`),
+        td(`<input type="text" class="form-control form-control-sm children-input" name="childPartII[]">`),
+        td(`<input type="text" class="form-control form-control-sm children-input" name="childUID[]">`)
+      ], null, 'children');
+      tbody.appendChild(tr);
+    }
+
+    function addMobileRow() {
+      const tbody = document.querySelector('#mobileTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileType[]">`),
+        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileNumber[]">`),
+        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileProvider[]">`),
+        td(`<input type="text" class="form-control form-control-sm mobile-input" name="mobileRemarks[]">`)
+      ], null, 'mobile_phones');
+      tbody.appendChild(tr);
+    }
+
+    function addDiscordRow() {
+      const tbody = document.querySelector('#discordTable tbody');
+      const n = tbody.rows.length + 1;
+      const tr = buildRow([
+        td(n),
+        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordCaseNo[]">`),
+        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordAmount[]">`),
+        td(`<input type="text" class="form-control form-control-sm discord-input" name="discordSanction[]">`)
+      ], null, 'marital_discord_cases');
+      tbody.appendChild(tr);
+    }
+
+    // Wire up Add Row buttons
+    document.getElementById("addCourseRow").addEventListener("click", addCourseRow);
+    document.getElementById("addUnitRow").addEventListener("click", addUnitRow);
 
 
 
-  const updateUnitsTableEl = document.getElementById("unitsTable");
+    const updateUnitsTableEl = document.getElementById("unitsTable");
 
-  if (updateUnitsTableEl) {
+    if (updateUnitsTableEl) {
 
-    updateUnitsTableEl.addEventListener("change", function (e) {
+      updateUnitsTableEl.addEventListener("change", function (e) {
 
-      if (e.target && e.target.name === "unitDuty[]") {
+        if (e.target && e.target.name === "unitDuty[]") {
 
-        const select = e.target;
+          const select = e.target;
 
-        const tr = select.closest("tr");
+          const tr = select.closest("tr");
 
-        const otherInput = tr ? tr.querySelector(".unit-duty-other") : null;
+          const otherInput = tr ? tr.querySelector(".unit-duty-other") : null;
 
-        if (otherInput) {
+          if (otherInput) {
 
-          if (select.value === "OTHER") {
+            if (select.value === "OTHER") {
 
-            otherInput.style.display = "block";
+              otherInput.style.display = "block";
 
-            otherInput.focus();
+              otherInput.focus();
 
-          } else {
+            } else {
 
-            otherInput.style.display = "none";
+              otherInput.style.display = "none";
 
-            otherInput.value = "";
+              otherInput.value = "";
+
+            }
 
           }
 
         }
 
-      }
-
-    });
-
-
-
-    updateUnitsTableEl.addEventListener("input", function (e) {
-
-      if (e.target && e.target.classList.contains("unit-duty-other")) {
-
-        e.target.value = e.target.value.toUpperCase();
-
-      }
-
-    });
-
-  }
-  document.getElementById("addLoanRow").addEventListener("click", addLoanRow);
-  document.getElementById("addPunishmentRow").addEventListener("click", addPunishmentRow);
-  document.getElementById("addDetailedCourseRow").addEventListener("click", addDetailedCourseRow);
-  document.getElementById("addLeaveRow").addEventListener("click", addLeaveRow);
-  document.getElementById("addFamilyRow").addEventListener("click", addFamilyRow);
-  document.getElementById("addChildRow").addEventListener("click", addChildRow);
-  document.getElementById("addMobileRow").addEventListener("click", addMobileRow);
-  document.getElementById("addDiscordRow").addEventListener("click", addDiscordRow);
-
-  // ======================================================================
-  // TAB NAVIGATION
-  // ======================================================================
-  const formTabs  = document.getElementById("formTabs");
-  const prevBtn   = document.getElementById("prevBtn");
-  const nextBtn   = document.getElementById("nextBtn");
-  const submitBtn = document.querySelector(".btn-submit");
-  const progressBar = document.querySelector(".progress-bar");
-  let currentTab = 0;
-  const tabs = document.querySelectorAll(".tab-pane");
-
-  function showTab(n) {
-    tabs.forEach(t => t.classList.remove("show", "active"));
-    tabs[n].classList.add("show", "active");
-    formTabs.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
-    formTabs.querySelectorAll(".nav-link")[n].classList.add("active");
-    const progress = ((n + 1) / tabs.length) * 100;
-    progressBar.style.width = `${progress}%`;
-    progressBar.setAttribute("aria-valuenow", progress);
-    prevBtn.style.display   = n === 0 ? "none" : "inline-block";
-    nextBtn.style.display   = n === tabs.length - 1 ? "none" : "inline-block";
-    submitBtn.style.display = n === tabs.length - 1 ? "inline-block" : "none";
-    currentTab = n;
-  }
-
-  prevBtn.addEventListener("click", () => { if (currentTab > 0) showTab(currentTab - 1); });
-  nextBtn.addEventListener("click", () => { if (currentTab < tabs.length - 1) showTab(currentTab + 1); });
-  showTab(0);
-
-  // ======================================================================
-  // CONDITIONAL SECTIONS
-  // ======================================================================
-  function toggleSection(triggerYesId, triggerNoId, sectionId) {
-    const yes = document.getElementById(triggerYesId);
-    const no  = document.getElementById(triggerNoId);
-    const sec = document.getElementById(sectionId);
-    if (!yes || !no || !sec) return;
-    const toggle = () => sec.style.display = yes.checked ? 'block' : 'none';
-    yes.addEventListener('change', toggle);
-    no.addEventListener('change',  toggle);
-  }
-
-  toggleSection('medCatYes',   'medCatNo',    'medCatDetails');
-  toggleSection('borderYes',   'borderNo',    'borderDistance');
-  toggleSection('loanYes',     'loanNo',      'loanDetails');
-  toggleSection('detailedYes', 'detailedNo',  'detailedCourseDetails');
-  toggleSection('discordYes',  'discordNo',   'maritalDiscordDetails');
-
-  const shapeStatus    = document.getElementById("shapeStatus");
-  const categoryStatus = document.getElementById("categoryStatus");
-  const categoryOptions  = document.getElementById("category-options");
-  const restrictionsGroup = document.getElementById("restrictions-group");
-  const permanentCategory = document.getElementById("permanentCategory");
-  const temporaryCategory = document.getElementById("temporaryCategory");
-
-  function togglePhysicalStatus() {
-    if (categoryStatus.checked) { categoryOptions.style.display = "block"; toggleCategoryType(); }
-    else { categoryOptions.style.display = "none"; restrictionsGroup.style.display = "none"; }
-  }
-  function toggleCategoryType() {
-    restrictionsGroup.style.display = (permanentCategory.checked || temporaryCategory.checked) ? "block" : "none";
-  }
-
-  shapeStatus.addEventListener("change",    togglePhysicalStatus);
-  categoryStatus.addEventListener("change", togglePhysicalStatus);
-  permanentCategory.addEventListener("change", toggleCategoryType);
-  temporaryCategory.addEventListener("change", toggleCategoryType);
-
-  // ======================================================================
-  // FORM SUBMISSION
-  // ======================================================================
-  updateForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    if (!validateForm()) {
-      const firstError = document.querySelector('.is-invalid');
-      if (firstError) {
-        const tabPane  = firstError.closest('.tab-pane');
-        if (tabPane) {
-          const idx = Array.from(document.querySelectorAll('.tab-pane')).indexOf(tabPane);
-          if (idx >= 0) showTab(idx);
-        }
-        let fieldName = 'this required field';
-        const container = firstError.closest('.mb-3, .col-md-4, .col-md-6, .col-md-3');
-        if (container) {
-          const label = container.querySelector('.form-label');
-          if (label) fieldName = '"' + label.textContent.replace(/\*/g, '').trim() + '"';
-        }
-        showPopup('error', 'Required Field Missing', 'Please enter ' + fieldName + ' first.', () => {
-          firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          if (firstError.tagName !== 'INPUT' || firstError.type !== 'radio') firstError.focus?.();
-        });
-      } else {
-        showPopup('error', 'Validation Error', 'Please fill all required fields before updating.');
-      }
-      return;
-    }
-
-    if (!confirm('Are you sure you want to update this personnel record?')) return;
-
-    const formData   = collectFormData();
-    const armyNumber = document.getElementById('originalArmyNumber').value;
-    const sBtn = updateForm.querySelector('.btn-submit');
-    const origText = sBtn.innerHTML;
-    sBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-    sBtn.disabled = true;
-
-    try {
-      const response = await fetch(`/personnel_information/api/personnel/update/${armyNumber}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
       });
-      const result = await response.json();
-      sBtn.innerHTML = origText; sBtn.disabled = false;
 
-      if (response.ok && result.success) {
-        showPopup('success', 'Data Updated Successfully!', 'Personnel record has been updated successfully.', () => {
-          formContainer.style.display = 'none';
-          searchInput.value = '';
-          updateForm.reset();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      } else {
-        showPopup('error', 'Update Failed', result.message || 'Failed to update personnel. Please try again.');
-      }
-    } catch (error) {
-      console.error('Update error:', error);
-      showPopup('error', 'Unexpected Error', 'An error occurred while updating. Please try again.');
-      sBtn.innerHTML = origText; sBtn.disabled = false;
-    }
-  });
 
-  btnCancel.addEventListener('click', function() {
-    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
-      formContainer.style.display = 'none';
-      searchInput.value = '';
-      updateForm.reset();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
 
-  function handleRankBatchToggle() {
-    const rankVal = document.getElementById('rank')?.value || '';
-    const batchContainer = document.getElementById('batch-container');
-    const batchSelect = document.getElementById('batch');
-    if (rankVal.trim().toLowerCase() === 'agniveer') {
-      if (batchContainer) batchContainer.style.display = 'block';
-      if (batchSelect) batchSelect.required = true;
-    } else {
-      if (batchContainer) batchContainer.style.display = 'none';
-      if (batchSelect) {
-        batchSelect.required = false;
-        batchSelect.value = '';
-      }
-    }
-  }
+      updateUnitsTableEl.addEventListener("input", function (e) {
 
-  const rankSelectEl = document.getElementById('rank');
-  if (rankSelectEl) {
-    rankSelectEl.addEventListener('change', handleRankBatchToggle);
-  }
+        if (e.target && e.target.classList.contains("unit-duty-other")) {
 
-  // ======================================================================
-  // COLLECT FORM DATA
-  // ======================================================================
-  function collectFormData() {
-    const g  = id => document.getElementById(id)?.value || '';
-    const gr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
-    return {
-      name: g('name'), armyNumber: g('armyNumber'), rank: g('rank'), batch: g('batch') || null, trade: g('trade'),
-      dateOfEnrollment: g('dateOfEnrollment'), dateOfBirth: g('dateOfBirth'),
-      dateOfTOS: g('dateOfTOS'), dateOfTORS: g('dateOfTORS'),
-      bloodGroup: g('bloodGroup'), religion: g('religion'),
-      foodPreference: gr('foodPreference'), drinker: gr('drinker'), company: g('company'),
-      civQualifications: g('civQualifications'), decorationAwards: g('decorationAwards'),
-      lackingQualifications: g('lackingQualifications'), willingPromotions: gr('willingPromotions'),
-      iCardNo: g('iCardNo'), iCardDate: g('iCardDate'), iCardIssuedBy: g('iCardIssuedBy'),
-      bpetGrading: g('bpetGrading'), pptGrading: g('pptGrading'), bpetDate: g('bpetDate'),
-      clothingCard: gr('clothingCard'), panCardNo: g('panCardNo'), panPartII: g('panPartII'),
-      aadharCardNo: g('aadharCardNo'), aadharPartII: g('aadharPartII'),
-      jointAccountNo: g('jointAccountNo'), jointAccountBank: g('jointAccountBank'),
-      jointAccountIFSC: g('jointAccountIFSC'), homeHouseNo: g('homeHouseNo'),
-      homeVillage: g('homeVillage'), homePhone: g('homePhone'), homeTO: g('homeTO'),
-      homePO: g('homePO'), homePS: g('homePS'), homeTeh: g('homeTeh'),
-      homeNRS: g('homeNRS'), homeNMH: g('homeNMH'), homeDistrict: g('homeDistrict'),
-      homeState: g('homeState'), borderArea: gr('borderArea'),
-      distanceFromIB: g('distanceFromIB'), height: g('height'), weight: g('weight'),
-      chest: g('chest'), identificationMarks: g('identificationMarks'),
-      physicalStatus: gr('physicalStatus') || 'shape',
-      categoryType: gr('categoryType'), physicalRestrictions: g('physicalRestrictions'),
-      courtCases: g('courtCases'), loan: gr('loan'),
-      totalLeavesEncashed: g('totalLeavesEncashed'),
-      participationActivities: g('participationActivities'),
-      presentFamilyLocation: g('presentFamilyLocation'),
-      priorStation: gr('priorStation'), priorStationDate: g('priorStationDate'),
-      workedIT: gr('workedIT'), workedUnitTenure: g('workedUnitTenure'),
-      detailedCourse: gr('detailedCourse'), medCat: gr('medCat'),
-      lastRecatBDDate: g('lastRecatBDDate'), lastRecatBDAt: g('lastRecatBDAt'),
-      nextRecatDue: g('nextRecatDue'), medicalProblem: g('medicalProblem'),
-      restrictions: g('restrictions'), computerKnowledge: g('computerKnowledge'),
-      itLiterature: g('itLiterature'), kinName: g('kinName'), kinRelation: g('kinRelation'),
-      kinMarriageDate: g('kinMarriageDate'), kinAccountNo: g('kinAccountNo'),
-      kinBank: g('kinBank'), kinIFSC: g('kinIFSC'), kinPartII: g('kinPartII'),
-      vehicleRegNo: g('vehicleRegNo'), vehicleModel: g('vehicleModel'),
-      vehiclePurchaseDate: g('vehiclePurchaseDate'), vehicleAGIF: gr('vehicleAGIF'),
-      drivingLicenseNo: g('drivingLicenseNo'), licenseIssueDate: g('licenseIssueDate'),
-      licenseExpiryDate: g('licenseExpiryDate'), disabilityChild: gr('disabilityChild'),
-      maritalDiscord: gr('maritalDiscord'), counselling: g('counselling'),
-      folderPreparedOn: g('folderPreparedOn'), folderCheckedBy: g('folderCheckedBy'),
-      bringFamily: gr('bringFamily'), domesticIssues: g('domesticIssues'),
-      otherRequests: g('otherRequests'), familyMedicalIssues: g('familyMedicalIssues'),
-      qualityPoints: g('qualityPoints'), strengths: g('strengths'), weaknesses: g('weaknesses'),
-      batch: g('batch'), section: g('section'),
-      sports: [...document.querySelectorAll('.sports-checkbox:checked')].map(cb => cb.value),
-      otherSports: g('otherSports'),
-      courses:         collectTableData('coursesTable',         ['course','courseFrom','courseTo','courseInstitute','courseGrading','courseRemarks']),
-      units:           collectTableData('unitsTable',           ['unit','unitFrom','unitTo','unitDuty']),
-      loans:           collectTableData('loansTable',           ['loanType','loanAmount','loanBank','loanEMI','loanPending','loanRemarks']),
-      punishments:     collectTableData('punishmentTable',      ['punishmentDate','punishment','punishmentAASec','punishmentRemarks']),
-      detailedCourses: collectTableData('detailedCoursesTable', ['detailedCourseName','detailedCourseFrom','detailedCourseTo','detailedCourseRemarks']),
-      leaves:          collectTableData('leaveTable',           ['leaveYear','leaveAL','leaveCL','leaveAAL','leaveAnnualeave','leavePL']),
-      family:          collectTableData('familyTable',          ['familyRelation','familyName','familyDOB','familyUID','familyPartII']),
-      children:        collectTableData('childrenTable',        ['childName','childDOB','childClass','childPartII','childUID']),
-      mobiles:         collectTableData('mobileTable',          ['mobileType','mobileNumber','mobileProvider','mobileRemarks']),
-      discordCases:    collectTableData('discordTable',         ['discordCaseNo','discordAmount','discordSanction'])
-    };
-  }
+          e.target.value = e.target.value.toUpperCase();
 
-  function collectTableData(tableId, fieldNames) {
-    const table = document.getElementById(tableId);
-    if (!table) return [];
-    const rows  = table.querySelectorAll("tbody tr");
-    const data  = [];
-    rows.forEach(row => {
-      const rowData = {};
-      if (tableId === "unitsTable") {
-        const unitInput = row.querySelector('input[name="unit[]"]');
-        const unitFromInput = row.querySelector('input[name="unitFrom[]"]');
-        const unitToInput = row.querySelector('input[name="unitTo[]"]');
-        const dutySelect = row.querySelector('select[name="unitDuty[]"]');
-        const dutyOtherInput = row.querySelector('.unit-duty-other');
-
-        let dutyVal = dutySelect ? dutySelect.value.trim() : "";
-        if (dutyVal === "OTHER" && dutyOtherInput) {
-          const customVal = dutyOtherInput.value.trim();
-          dutyVal = customVal ? customVal.toUpperCase() : "OTHER";
         }
 
-        rowData.unit = unitInput ? unitInput.value.trim() : "";
-        rowData.unitFrom = unitFromInput ? unitFromInput.value : "";
-        rowData.unitTo = unitToInput ? unitToInput.value : "";
-        rowData.unitDuty = dutyVal;
-      } else {
-        const inputs  = row.querySelectorAll("input, select, textarea");
-        inputs.forEach((input, idx) => {
-          if (fieldNames[idx]) rowData[fieldNames[idx]] = input.value;
-        });
-      }
-      if (Object.values(rowData).some(v => v !== '')) data.push(rowData);
-    });
-    return data;
-  }
+      });
 
-}); // end DOMContentLoaded
+    }
+    document.getElementById("addLoanRow").addEventListener("click", addLoanRow);
+    document.getElementById("addPunishmentRow").addEventListener("click", addPunishmentRow);
+    document.getElementById("addDetailedCourseRow").addEventListener("click", addDetailedCourseRow);
+    document.getElementById("addLeaveRow").addEventListener("click", addLeaveRow);
+    document.getElementById("addFamilyRow").addEventListener("click", addFamilyRow);
+    document.getElementById("addChildRow").addEventListener("click", addChildRow);
+    document.getElementById("addMobileRow").addEventListener("click", addMobileRow);
+    document.getElementById("addDiscordRow").addEventListener("click", addDiscordRow);
+
+    // ======================================================================
+    // TAB NAVIGATION
+    // ======================================================================
+    const formTabs = document.getElementById("formTabs");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const submitBtn = document.querySelector(".btn-submit");
+    const progressBar = document.querySelector(".progress-bar");
+    let currentTab = 0;
+    const tabs = document.querySelectorAll(".tab-pane");
+
+    function showTab(n) {
+      tabs.forEach(t => t.classList.remove("show", "active"));
+      tabs[n].classList.add("show", "active");
+      formTabs.querySelectorAll(".nav-link").forEach(b => b.classList.remove("active"));
+      formTabs.querySelectorAll(".nav-link")[n].classList.add("active");
+      const progress = ((n + 1) / tabs.length) * 100;
+      progressBar.style.width = `${progress}%`;
+      progressBar.setAttribute("aria-valuenow", progress);
+      prevBtn.style.display = n === 0 ? "none" : "inline-block";
+      nextBtn.style.display = n === tabs.length - 1 ? "none" : "inline-block";
+      submitBtn.style.display = n === tabs.length - 1 ? "inline-block" : "none";
+      currentTab = n;
+    }
+
+    prevBtn.addEventListener("click", () => { if (currentTab > 0) showTab(currentTab - 1); });
+    nextBtn.addEventListener("click", () => { if (currentTab < tabs.length - 1) showTab(currentTab + 1); });
+    showTab(0);
+
+    // Add click handlers to tab buttons for manual tab switching (fallback)
+    const tabButtons = formTabs.querySelectorAll(".nav-link");
+    tabButtons.forEach((button, index) => {
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+        showTab(index);
+      });
+    });
+
+    // ======================================================================
+    // CONDITIONAL SECTIONS
+    // ======================================================================
+    function toggleSection(triggerYesId, triggerNoId, sectionId) {
+      const yes = document.getElementById(triggerYesId);
+      const no = document.getElementById(triggerNoId);
+      const sec = document.getElementById(sectionId);
+      if (!yes || !no || !sec) return;
+      const toggle = () => sec.style.display = yes.checked ? 'block' : 'none';
+      yes.addEventListener('change', toggle);
+      no.addEventListener('change', toggle);
+    }
+
+    toggleSection('medCatYes', 'medCatNo', 'medCatDetails');
+    toggleSection('borderYes', 'borderNo', 'borderDistance');
+    toggleSection('loanYes', 'loanNo', 'loanDetails');
+    toggleSection('detailedYes', 'detailedNo', 'detailedCourseDetails');
+    toggleSection('discordYes', 'discordNo', 'maritalDiscordDetails');
+
+    const shapeStatus = document.getElementById("shapeStatus");
+    const categoryStatus = document.getElementById("categoryStatus");
+    const categoryOptions = document.getElementById("category-options");
+    const restrictionsGroup = document.getElementById("restrictions-group");
+    const permanentCategory = document.getElementById("permanentCategory");
+    const temporaryCategory = document.getElementById("temporaryCategory");
+
+    function togglePhysicalStatus() {
+      if (categoryStatus.checked) { categoryOptions.style.display = "block"; toggleCategoryType(); }
+      else { categoryOptions.style.display = "none"; restrictionsGroup.style.display = "none"; }
+    }
+    function toggleCategoryType() {
+      restrictionsGroup.style.display = (permanentCategory.checked || temporaryCategory.checked) ? "block" : "none";
+    }
+
+    shapeStatus.addEventListener("change", togglePhysicalStatus);
+    categoryStatus.addEventListener("change", togglePhysicalStatus);
+    permanentCategory.addEventListener("change", toggleCategoryType);
+    temporaryCategory.addEventListener("change", toggleCategoryType);
+
+    // ======================================================================
+    // FORM SUBMISSION
+    // ======================================================================
+    updateForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      if (!validateForm()) {
+        const firstError = document.querySelector('.is-invalid');
+        if (firstError) {
+          const tabPane = firstError.closest('.tab-pane');
+          if (tabPane) {
+            const idx = Array.from(document.querySelectorAll('.tab-pane')).indexOf(tabPane);
+            if (idx >= 0) showTab(idx);
+          }
+          let fieldName = 'this required field';
+          const container = firstError.closest('.mb-3, .col-md-4, .col-md-6, .col-md-3');
+          if (container) {
+            const label = container.querySelector('.form-label');
+            if (label) fieldName = '"' + label.textContent.replace(/\*/g, '').trim() + '"';
+          }
+          showPopup('error', 'Required Field Missing', 'Please enter ' + fieldName + ' first.', () => {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (firstError.tagName !== 'INPUT' || firstError.type !== 'radio') firstError.focus?.();
+          });
+        } else {
+          showPopup('error', 'Validation Error', 'Please fill all required fields before updating.');
+        }
+        return;
+      }
+
+      if (!confirm('Are you sure you want to update this personnel record?')) return;
+
+      const formData = collectFormData();
+      const armyNumber = document.getElementById('originalArmyNumber').value;
+      const sBtn = updateForm.querySelector('.btn-submit');
+      const origText = sBtn.innerHTML;
+      sBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      sBtn.disabled = true;
+
+      try {
+        const response = await fetch(`/personnel_information/api/personnel/update/${armyNumber}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const result = await response.json();
+        sBtn.innerHTML = origText; sBtn.disabled = false;
+
+        if (response.ok && result.success) {
+          showPopup('success', 'Data Updated Successfully!', 'Personnel record has been updated successfully.', () => {
+            formContainer.style.display = 'none';
+            searchInput.value = '';
+            updateForm.reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        } else {
+          showPopup('error', 'Update Failed', result.message || 'Failed to update personnel. Please try again.');
+        }
+      } catch (error) {
+        console.error('Update error:', error);
+        showPopup('error', 'Unexpected Error', 'An error occurred while updating. Please try again.');
+        sBtn.innerHTML = origText; sBtn.disabled = false;
+      }
+    });
+
+    btnCancel.addEventListener('click', function () {
+      if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+        formContainer.style.display = 'none';
+        searchInput.value = '';
+        updateForm.reset();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    function handleRankBatchToggle() {
+      const rankVal = document.getElementById('rank')?.value || '';
+      const batchContainer = document.getElementById('batch-container');
+      const batchSelect = document.getElementById('batch');
+      if (rankVal.trim().toLowerCase() === 'agniveer') {
+        if (batchContainer) batchContainer.style.display = 'block';
+        if (batchSelect) batchSelect.required = true;
+      } else {
+        if (batchContainer) batchContainer.style.display = 'none';
+        if (batchSelect) {
+          batchSelect.required = false;
+          batchSelect.value = '';
+        }
+      }
+    }
+
+    const rankSelectEl = document.getElementById('rank');
+    if (rankSelectEl) {
+      rankSelectEl.addEventListener('change', handleRankBatchToggle);
+    }
+
+    // ======================================================================
+    // COLLECT FORM DATA
+    // ======================================================================
+    function collectFormData() {
+      const g = id => document.getElementById(id)?.value || '';
+      const gr = name => document.querySelector(`input[name="${name}"]:checked`)?.value || '';
+      return {
+        name: g('name'), armyNumber: g('armyNumber'), rank: g('rank'), batch: g('batch') || null, trade: g('trade'),
+        dateOfEnrollment: g('dateOfEnrollment'), dateOfBirth: g('dateOfBirth'),
+        dateOfTOS: g('dateOfTOS'), dateOfTORS: g('dateOfTORS'),
+        bloodGroup: g('bloodGroup'), religion: g('religion'),
+        foodPreference: gr('foodPreference'), drinker: gr('drinker'), company: g('company'),
+        civQualifications: g('civQualifications'), decorationAwards: g('decorationAwards'),
+        lackingQualifications: g('lackingQualifications'), willingPromotions: gr('willingPromotions'),
+        iCardNo: g('iCardNo'), iCardDate: g('iCardDate'), iCardIssuedBy: g('iCardIssuedBy'),
+        bpetGrading: g('bpetGrading'), pptGrading: g('pptGrading'), bpetDate: g('bpetDate'),
+        clothingCard: gr('clothingCard'), panCardNo: g('panCardNo'), panPartII: g('panPartII'),
+        aadharCardNo: g('aadharCardNo'), aadharPartII: g('aadharPartII'),
+        jointAccountNo: g('jointAccountNo'), jointAccountBank: g('jointAccountBank'),
+        jointAccountIFSC: g('jointAccountIFSC'), homeHouseNo: g('homeHouseNo'),
+        homeVillage: g('homeVillage'), homePhone: g('homePhone'), homeTO: g('homeTO'),
+        homePO: g('homePO'), homePS: g('homePS'), homeTeh: g('homeTeh'),
+        homeNRS: g('homeNRS'), homeNMH: g('homeNMH'), homeDistrict: g('homeDistrict'),
+        homeState: g('homeState'), borderArea: gr('borderArea'),
+        distanceFromIB: g('distanceFromIB'), height: g('height'), weight: g('weight'),
+        chest: g('chest'), identificationMarks: g('identificationMarks'),
+        physicalStatus: gr('physicalStatus') || 'shape',
+        categoryType: gr('categoryType'), physicalRestrictions: g('physicalRestrictions'),
+        courtCases: g('courtCases'), loan: gr('loan'),
+        totalLeavesEncashed: g('totalLeavesEncashed'),
+        participationActivities: g('participationActivities'),
+        presentFamilyLocation: g('presentFamilyLocation'),
+        priorStation: gr('priorStation'), priorStationDate: g('priorStationDate'),
+        workedIT: gr('workedIT'), workedUnitTenure: g('workedUnitTenure'),
+        detailedCourse: gr('detailedCourse'), medCat: gr('medCat'),
+        lastRecatBDDate: g('lastRecatBDDate'), lastRecatBDAt: g('lastRecatBDAt'),
+        nextRecatDue: g('nextRecatDue'), medicalProblem: g('medicalProblem'),
+        restrictions: g('restrictions'), computerKnowledge: g('computerKnowledge'),
+        itLiterature: g('itLiterature'), kinName: g('kinName'), kinRelation: g('kinRelation'),
+        kinMarriageDate: g('kinMarriageDate'), kinAccountNo: g('kinAccountNo'),
+        kinBank: g('kinBank'), kinIFSC: g('kinIFSC'), kinPartII: g('kinPartII'),
+        vehicleRegNo: g('vehicleRegNo'), vehicleModel: g('vehicleModel'),
+        vehiclePurchaseDate: g('vehiclePurchaseDate'), vehicleAGIF: gr('vehicleAGIF'),
+        drivingLicenseNo: g('drivingLicenseNo'), licenseIssueDate: g('licenseIssueDate'),
+        licenseExpiryDate: g('licenseExpiryDate'), disabilityChild: gr('disabilityChild'),
+        maritalDiscord: gr('maritalDiscord'), counselling: g('counselling'),
+        folderPreparedOn: g('folderPreparedOn'), folderCheckedBy: g('folderCheckedBy'),
+        bringFamily: gr('bringFamily'), domesticIssues: g('domesticIssues'),
+        otherRequests: g('otherRequests'), familyMedicalIssues: g('familyMedicalIssues'),
+        qualityPoints: g('qualityPoints'), strengths: g('strengths'), weaknesses: g('weaknesses'),
+        batch: g('batch'), section: g('section'),
+        sports: [...document.querySelectorAll('.sports-checkbox:checked')].map(cb => cb.value),
+        otherSports: g('otherSports'),
+        courses: collectTableData('coursesTable', ['course', 'courseFrom', 'courseTo', 'courseInstitute', 'courseGrading', 'courseRemarks']),
+        units: collectTableData('unitsTable', ['unit', 'unitFrom', 'unitTo', 'unitDuty']),
+        loans: collectTableData('loansTable', ['loanType', 'loanAmount', 'loanBank', 'loanEMI', 'loanPending', 'loanRemarks']),
+        punishments: collectTableData('punishmentTable', ['punishmentDate', 'punishment', 'punishmentAASec', 'punishmentRemarks']),
+        detailedCourses: collectTableData('detailedCoursesTable', ['detailedCourseName', 'detailedCourseFrom', 'detailedCourseTo', 'detailedCourseRemarks']),
+        leaves: collectTableData('leaveTable', ['leaveYear', 'leaveAL', 'leaveCL', 'leaveAAL', 'leaveAnnualeave', 'leavePL']),
+        family: collectTableData('familyTable', ['familyRelation', 'familyName', 'familyDOB', 'familyUID', 'familyPartII']),
+        children: collectTableData('childrenTable', ['childName', 'childDOB', 'childClass', 'childPartII', 'childUID']),
+        mobiles: collectTableData('mobileTable', ['mobileType', 'mobileNumber', 'mobileProvider', 'mobileRemarks']),
+        discordCases: collectTableData('discordTable', ['discordCaseNo', 'discordAmount', 'discordSanction'])
+      };
+    }
+
+    function collectTableData(tableId, fieldNames) {
+      const table = document.getElementById(tableId);
+      if (!table) return [];
+      const rows = table.querySelectorAll("tbody tr");
+      const data = [];
+      rows.forEach(row => {
+        const rowData = {};
+        if (tableId === "unitsTable") {
+          const unitInput = row.querySelector('input[name="unit[]"]');
+          const unitFromInput = row.querySelector('input[name="unitFrom[]"]');
+          const unitToInput = row.querySelector('input[name="unitTo[]"]');
+          const dutySelect = row.querySelector('select[name="unitDuty[]"]');
+          const dutyOtherInput = row.querySelector('.unit-duty-other');
+
+          let dutyVal = dutySelect ? dutySelect.value.trim() : "";
+          if (dutyVal === "OTHER" && dutyOtherInput) {
+            const customVal = dutyOtherInput.value.trim();
+            dutyVal = customVal ? customVal.toUpperCase() : "OTHER";
+          }
+
+          rowData.unit = unitInput ? unitInput.value.trim() : "";
+          rowData.unitFrom = unitFromInput ? unitFromInput.value : "";
+          rowData.unitTo = unitToInput ? unitToInput.value : "";
+          rowData.unitDuty = dutyVal;
+        } else {
+          const inputs = row.querySelectorAll("input, select, textarea");
+          inputs.forEach((input, idx) => {
+            if (fieldNames[idx]) rowData[fieldNames[idx]] = input.value;
+          });
+        }
+        if (Object.values(rowData).some(v => v !== '')) data.push(rowData);
+      });
+      return data;
+    }
+
+  }); // end DOMContentLoaded
 </script>
 {% endblock %}

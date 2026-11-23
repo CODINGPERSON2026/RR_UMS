@@ -4,7 +4,10 @@ Converts SHAP force factors and feature importances into clear, military-grade n
 STRICTLY TRADE-FREE: Trade is never referenced, calculated, or outputted in explanations.
 """
 
-import shap
+try:
+    import shap
+except Exception:
+    shap = None
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Any, Optional

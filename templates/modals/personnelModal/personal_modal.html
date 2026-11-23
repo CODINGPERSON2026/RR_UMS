@@ -10,10 +10,28 @@
 
       <div class="modal-body">
 
-        <!-- Search -->
-        <div class="d-flex mb-3">
-          <input type="text" id="searchInput" class="form-control me-2" placeholder="Enter army number">
-          <button class="btn btn-success" id="searchBtn">Search</button>
+        <!-- Company & Search Row -->
+        <div class="row g-2 mb-3">
+          <div class="col-md-5">
+            <label class="form-label mb-1" style="font-size: 13px; font-weight: 600;">Filter by Company</label>
+            <select id="personalCoyFilter" class="form-select">
+              <option value="">All Companies</option>
+              <option value="A COY">A COY</option>
+              <option value="B COY">B COY</option>
+              <option value="C COY">C COY</option>
+              <option value="D COY">D COY</option>
+              <option value="E COY">E COY</option>
+              <option value="F COY">F COY</option>
+              <option value="HQ COY">HQ COY</option>
+            </select>
+          </div>
+          <div class="col-md-7">
+            <label class="form-label mb-1" style="font-size: 13px; font-weight: 600;">Search Army Number / Name</label>
+            <div class="d-flex">
+              <input type="text" id="searchInput" class="form-control me-2" placeholder="Enter army number">
+              <button class="btn btn-success" id="searchBtn" type="button"><i class="fas fa-search me-1"></i>Search</button>
+            </div>
+          </div>
         </div>
 
         <p id="warningMessage" style="font-weight:bold;font-size:16px;"></p>
@@ -31,7 +49,7 @@
         </div>
 
         <!-- Location Dropdown -->
-        <div class="mb-3" id="locationBox">
+        <div class="mb-3" id="locationBox" style="display: none;">
           <label class="form-label">Select Location</label>
           <select id="locationDropdown" class="form-select"></select>
         </div>
@@ -67,15 +85,18 @@
           <table class="table table-bordered">
             <thead class="table-light">
               <tr>
-                <th>Select</th>
+                <th style="width: 50px;">Select</th>
                 <th>Army Number</th>
                 <th>Rank</th>
                 <th>Name</th>
                 <th>Trade</th>
                 <th>Coy</th>
+                <th>Status</th>
               </tr>
             </thead>
-            <tbody id="personnelTableBody"></tbody>
+            <tbody id="personnelTableBody">
+              <tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-search me-1"></i> Please enter Army Number or Name to search personnel.</td></tr>
+            </tbody>
           </table>
         </div>
 
@@ -105,6 +126,7 @@ var personnelTableBody = document.getElementById('personnelTableBody');
 var assignBtn = document.getElementById('assignBtn');
 var postingInputBox = document.getElementById('postingInputBox');
 var postingInput = document.getElementById('postingInput');
+var personalCoyFilter = document.getElementById('personalCoyFilter');
 
 // ACTION CHANGE
 // ACTION CHANGE
@@ -165,8 +187,18 @@ actionSelect.addEventListener("change", async function () {
     }
 });
 
-// LOAD DETACHMENTS ON MODAL OPEN
+// LOAD DETACHMENTS ON MODAL OPEN (DO NOT AUTO-FETCH PERSONNEL)
 document.getElementById('personnelModal')?.addEventListener('shown.bs.modal', async () => {
+    // Keep locationBox visible only if detachment action is active
+    if (locationBox) {
+        locationBox.style.display = (actionSelect && actionSelect.value === "det") ? "block" : "none";
+    }
+
+    // Set initial prompt to require search criteria
+    if (personnelTableBody && (!searchInput || !searchInput.value.trim())) {
+        personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-search me-1"></i> Please enter Army Number or Name to search personnel.</td></tr>';
+    }
+
     try {
         const res = await fetch('/get_locations');
         
@@ -184,8 +216,8 @@ document.getElementById('personnelModal')?.addEventListener('shown.bs.modal', as
             warningMessage.style.color = "red";
             dropdown.innerHTML = '<option value="">Error loading locations</option>';
         } else {
-            dropdown.innerHTML = locations
-                .map(l => `<option value="${l.det_id}">${l.det_name}</option>`).join('');
+            dropdown.innerHTML = '<option value="">-- Select Location --</option>' + (Array.isArray(locations) ? locations
+                .map(l => `<option value="${l.det_id}">${l.det_name}</option>`).join('') : '');
         }
     } catch (error) {
         console.error('Error loading locations:', error);
@@ -196,54 +228,71 @@ document.getElementById('personnelModal')?.addEventListener('shown.bs.modal', as
 // CLEAR ON MODAL CLOSE
 document.getElementById('personnelModal')?.addEventListener('hidden.bs.modal', () => {
     // Clear all fields
-    searchInput.value = '';
-    actionSelect.value = '';
-    warningMessage.innerText = '';
-    personnelTableBody.innerHTML = '';
+    if (searchInput) searchInput.value = '';
+    if (personalCoyFilter) personalCoyFilter.value = '';
+    if (actionSelect) actionSelect.value = '';
+    if (warningMessage) warningMessage.innerText = '';
+    if (personnelTableBody) {
+        personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-search me-1"></i> Please enter Army Number or Name to search personnel.</td></tr>';
+    }
     selectedPersonnel.clear();
-    assignBtn.disabled = true;
+    if (assignBtn) assignBtn.disabled = true;
     
-    // Reset visibility
-    locationBox.style.display = "block";
-    remarksBox.style.display = "none";
-    tdFields.style.display = "none";
-    otherFields.style.display = "none";
-    tdLocation.value = '';
-    tdAuthority.value = '';
-    remarksInput.value = '';
+    // Reset visibility (keep locationBox hidden until det action chosen)
+    if (locationBox) locationBox.style.display = "none";
+    if (postingInputBox) postingInputBox.style.display = "none";
+    if (remarksBox) remarksBox.style.display = "none";
+    if (tdFields) tdFields.style.display = "none";
+    if (otherFields) otherFields.style.display = "none";
+    if (tdLocation) tdLocation.value = '';
+    if (tdAuthority) tdAuthority.value = '';
+    if (remarksInput) remarksInput.value = '';
+    if (postingInput) postingInput.value = '';
 });
 
-// SEARCH
-document.getElementById('searchBtn')?.addEventListener('click', async () => {
-  const query = searchInput.value.trim();
-  warningMessage.innerText = "";
-  assignBtn.disabled = true;
-  personnelTableBody.innerHTML = "";
+// UNIFIED SEARCH & COMPANY FILTER
+async function performPersonnelSearch() {
+  const query = searchInput ? searchInput.value.trim() : "";
+  const coy = personalCoyFilter ? personalCoyFilter.value.trim() : "";
+  if (warningMessage) warningMessage.innerText = "";
+  if (assignBtn) assignBtn.disabled = selectedPersonnel.size === 0;
 
+  // Only fetch when army number or name is provided
   if (!query) {
-      warningMessage.innerText = "Please enter Army Number";
-      warningMessage.style.color = "red";
-      return;
+    if (personnelTableBody) {
+      personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-search me-1"></i> Please enter Army Number or Name to search personnel.</td></tr>';
+    }
+    if (warningMessage) {
+      warningMessage.innerText = "Please enter Army Number or Name to search";
+      warningMessage.style.color = "#dc3545";
+    }
+    return;
+  }
+
+  if (personnelTableBody) {
+    personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Searching personnel records...</td></tr>';
   }
 
   try {
       const res = await fetch('/search_personnel', {
           method: 'POST',
           headers: {'Content-Type':'application/x-www-form-urlencoded'},
-          body: `army_number=${encodeURIComponent(query)}`
+          body: `army_number=${encodeURIComponent(query)}&company=${encodeURIComponent(coy)}`
       });
 
       // Handle authentication errors
       if (res.status === 401) {
           warningMessage.innerText = "Please login again";
           warningMessage.style.color = "red";
+          if (personnelTableBody) personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-lock me-1"></i> Authentication required. Please login again.</td></tr>';
           return;
       }
 
-      // Handle forbidden access (different company)
+      // Handle forbidden access
       if (res.status === 403) {
           warningMessage.innerText = "Access denied - Personnel not in your company";
           warningMessage.style.color = "red";
+          if (personnelTableBody) personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-ban me-1"></i> Access denied.</td></tr>';
           return;
       }
 
@@ -253,12 +302,14 @@ document.getElementById('searchBtn')?.addEventListener('click', async () => {
       if (personnel.error) {
           warningMessage.innerText = personnel.error;
           warningMessage.style.color = "red";
+          if (personnelTableBody) personnelTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-danger"><i class="fas fa-exclamation-triangle me-1"></i> ${personnel.error}</td></tr>`;
           return;
       }
 
       if (!personnel || personnel.length === 0) {
-          warningMessage.innerText = "Army number not found in your company";
-          warningMessage.style.color = "red";
+          warningMessage.innerText = "No personnel found matching criteria";
+          warningMessage.style.color = "#dc3545";
+          if (personnelTableBody) personnelTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-muted"><i class="fas fa-users-slash me-1"></i> No personnel found matching criteria</td></tr>';
           return;
       }
 
@@ -268,51 +319,82 @@ document.getElementById('searchBtn')?.addEventListener('click', async () => {
       // Clear table
       personnelTableBody.innerHTML = "";
 
-      // Populate table
+      let availCount = 0;
+      // Populate table with status
       personnel.forEach(p => {
+        let isAvail = true;
+        let badge = '<span class="badge bg-success">Available</span>';
+        if (p.leave_status) {
+          isAvail = false;
+          badge = '<span class="badge bg-warning text-dark">On Leave</span>';
+        } else if (p.course_status) {
+          isAvail = false;
+          badge = '<span class="badge bg-info text-dark">On Course</span>';
+        } else if (p.det_status) {
+          isAvail = false;
+          badge = '<span class="badge bg-primary">On Detachment</span>';
+        } else if (p.td_status) {
+          isAvail = false;
+          badge = '<span class="badge bg-secondary">On TD</span>';
+        } else if (p.posting_status) {
+          isAvail = false;
+          badge = '<span class="badge bg-danger">Posted Out</span>';
+        }
+        if (isAvail) availCount++;
+
         personnelTableBody.innerHTML += `
           <tr>
-            <td><input type="checkbox" class="personnel-checkbox" data-id="${p.army_number}" ${selectedPersonnel.has(p.army_number)?"checked":""}></td>
-            <td>${p.army_number}</td>
-            <td>${p.rank}</td>
-            <td>${p.name}</td>
-            <td>${p.trade}</td>
-            <td>${p.company}</td>
+            <td class="text-center">
+              <input type="checkbox" class="personnel-checkbox" data-id="${p.army_number}" ${selectedPersonnel.has(p.army_number)?"checked":""}>
+            </td>
+            <td><strong>${p.army_number}</strong></td>
+            <td>${p.rank || ''}</td>
+            <td>${p.name || ''}</td>
+            <td>${p.trade || ''}</td>
+            <td><span class="badge bg-light text-dark border">${p.company || ''}</span></td>
+            <td>${badge}</td>
           </tr>`;
       });
 
-      // Check personnel availability
-      const p = personnel[0];
-
-      let reason = "";
-      
-      if (p.leave_status) {
-          reason = "Oops! This personnel is currently on Leave.";
-      } else if (p.course_status) {
-          reason = "Oops! This personnel is currently attending a Course.";
-      } else if (p.det_status) {
-          reason = "Oops! This personnel is currently on Detachment.";
-      } else if (p.td_status) {
-          reason = "Oops! This personnel is currently on Temporary Duty (TD).";
-      } else if (p.posting_status) {
-          reason = "Oops! This personnel has been Posted Out.";
+      if (personnel.length === 1) {
+        const p = personnel[0];
+        if (p.det_status) {
+          warningMessage.innerText = "Personnel is currently on Detachment (selectable to reassign)";
+          warningMessage.style.color = "#0d6efd";
+        } else if (p.td_status) {
+          warningMessage.innerText = "Personnel is currently on TD (selectable to reassign)";
+          warningMessage.style.color = "#0d6efd";
+        } else if (p.course_status) {
+          warningMessage.innerText = "Personnel is currently on Course";
+          warningMessage.style.color = "#e67e22";
+        } else if (p.leave_status) {
+          warningMessage.innerText = "Personnel is currently on Leave";
+          warningMessage.style.color = "#e67e22";
+        } else if (p.posting_status) {
+          warningMessage.innerText = "Personnel is Posted Out";
+          warningMessage.style.color = "#dc3545";
+        } else {
+          warningMessage.innerText = "Personnel is Available";
+          warningMessage.style.color = "green";
+        }
+      } else {
+        warningMessage.innerText = `Showing ${personnel.length} personnel (${availCount} available)`;
+        warningMessage.style.color = "#0d6efd";
       }
-      
-      if (reason) {
-          warningMessage.innerText = reason;
-          warningMessage.style.color = "red";
-          assignBtn.disabled = true;
-          return;
-      }
-
-      warningMessage.innerText = "Personnel is Available";
-      warningMessage.style.color = "green";
-      assignBtn.disabled = false;
 
   } catch (error) {
       console.error('Search error:', error);
       warningMessage.innerText = "Error searching personnel";
       warningMessage.style.color = "red";
+  }
+}
+
+document.getElementById('searchBtn')?.addEventListener('click', performPersonnelSearch);
+personalCoyFilter?.addEventListener('change', performPersonnelSearch);
+searchInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    performPersonnelSearch();
   }
 });
 
@@ -331,6 +413,14 @@ document.addEventListener('change', e => {
   }
 });
 
+function displayStatusNotice(message, color) {
+    if (typeof showStatusModal === 'function') {
+        showStatusModal(message, color, 2500);
+    } else {
+        alert(message);
+    }
+}
+
 // SUBMIT ASSIGNMENT
 assignBtn.addEventListener('click', async () => {
     let remarks = "";
@@ -341,51 +431,45 @@ assignBtn.addEventListener('click', async () => {
 
     // Validate action
     if (!action) {
-        showStatusModal("Please select an action first", "Red", 2500);
+        displayStatusNotice("Please select an action first", "Red");
         return;
     }
 
     // Validate based on action type
     if (action === "TD") {
-        const loc = tdLocation.value.trim();
-        const auth = tdAuthority.value.trim();
+        const loc = tdLocation ? tdLocation.value.trim() : '';
+        const auth = tdAuthority ? tdAuthority.value.trim() : '';
         if (!loc || !auth) {
-            showStatusModal("Please enter TD Location and Authority", "Red", 2500);
+            displayStatusNotice("Please enter TD Location and Authority", "Red");
             return;
         }
         remarks = `Location: ${loc}, Authority: ${auth}`;
 
     } else if (action === "any_other") {
-        remarks = remarksInput.value.trim();
+        remarks = remarksInput ? remarksInput.value.trim() : '';
         if (!remarks) {
-            showStatusModal("Please enter Remarks", "Red", 2500);
+            displayStatusNotice("Please enter Remarks", "Red");
             return;
         }
 
-    }
-    else if (action === "posting") {
-
-        remarks = postingInput.value.trim();
-    
+    } else if (action === "posting") {
+        remarks = postingInput ? postingInput.value.trim() : '';
         if (!remarks) {
-            showStatusModal("Please enter Posting Location", "Red", 2500);
+            displayStatusNotice("Please enter Posting Location", "Red");
             return;
         }
-    
-    } 
 
-
-     else {
-        remarks = dropdown.value;
+    } else {
+        remarks = dropdown ? dropdown.value : '';
         if (!remarks) {
-            showStatusModal("Please select a Location", "Red", 2500);
+            displayStatusNotice("Please select a Location", "Red");
             return;
         }
     }
 
     // Validate selection
     if (selectedPersonnel.size === 0) {
-        showStatusModal("Please select at least one personnel", "Red", 2500);
+        displayStatusNotice("Please select at least one personnel", "Red");
         return;
     }
 
@@ -412,58 +496,35 @@ assignBtn.addEventListener('click', async () => {
 
         // Handle responses
         if (res.status === 401) {
-            showStatusModal("Please login again", "Red", 2500);
+            displayStatusNotice("Please login again", "Red");
             return;
         }
 
-        if (res.status === 403) {
-            showStatusModal(`Error: ${data.error}`, "Red", 2500);
-            return;
-        }
-
-        if (res.status === 400) {
-            showStatusModal(`Error: ${data.error}`, "Red", 2500);
+        if (res.status === 403 || res.status === 400) {
+            displayStatusNotice(`Error: ${data.error || 'Request failed'}`, "Red");
             return;
         }
 
         if (res.ok) {
-            showStatusModal(`Personnel ${data.message}`, "Green", 2500);
+            displayStatusNotice(`Personnel ${data.message || 'assigned successfully'}`, "#34a853");
             // Close modal and refresh after delay
             setTimeout(() => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('personnelModal'));
-                modal.hide();
+                const modalEl = document.getElementById('personnelModal');
+                if (modalEl && window.bootstrap) {
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
                 location.reload();
-            }, 2500);
+            }, 1500);
         } else {
-            showStatusModal(`Error: ${data.error || 'Unknown error'}`, "Red", 2500);
+            displayStatusNotice(`Error: ${data.error || 'Unknown error'}`, "#dc3545");
         }
 
     } catch (error) {
         console.error('Assignment error:', error);
         assignBtn.disabled = false;
         assignBtn.innerHTML = 'Assign Selected';
-        showStatusModal("Network error. Please try again.", "Red", 2500);
-    }
-});
-
-// Utility function to show status modal
-function showStatusModal(message, color, duration) {
-    // You can implement this based on your existing modal system
-    // If you have a toast or notification system, use that instead
-    alert(message); // Temporary - replace with your modal/toast
-    
-    // Or if you have a custom modal:
-    // const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
-    // document.getElementById('statusMessage').textContent = message;
-    // document.getElementById('statusMessage').style.color = color;
-    // statusModal.show();
-    // setTimeout(() => statusModal.hide(), duration);
-}
-
-// Optional: Press Enter to search
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        document.getElementById('searchBtn').click();
+        displayStatusNotice("Network error. Please try again.", "#dc3545");
     }
 });
 </script>

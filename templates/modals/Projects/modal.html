@@ -1038,7 +1038,8 @@
       const progressBarGrad = accentGrad;
 
       const userRole = "{{ role | default(session.get('role', '')) }}".toUpperCase();
-      const canEditProjects = ['PROJECT OFFICER', 'PROJECT JCO', 'CO', '2IC', 'ADJUTANT', 'ADMIN', 'OC'].includes(userRole);
+      const userName = "{{ session.get('username', '') }}".toLowerCase();
+      const canEditProjects = ['PROJECT OFFICER', 'PROJECT JCO', 'CO', '2IC', 'ADJUTANT', 'ADMIN', 'OC', 'BNWR', 'BN WR'].includes(userRole) || userName === 'bnwr';
 
       return `
         <div class="projdash-single-card" onclick="openProjectPopup(${p.id})">

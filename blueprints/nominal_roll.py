@@ -7,6 +7,19 @@ nominal_bp = Blueprint("nominal_bp", __name__, url_prefix="/Nominal_Roll")
 
 JCO_RANKS = ('Subedar Major', 'Subedar', 'Naib Subedar')
 
+def is_privileged_role(role, user=None):
+    r = (role or '').strip().upper()
+    priv = ['CO', '2IC', 'ADJUTANT', 'SUBEDAR MAJOR', 'CLERK', 'ADMIN', 'O CENTRE NCO', 'BNWR', 'BN WR', 'HEAD CLK']
+    if r in priv:
+        return True
+    if user:
+        uname = (user.get('username') or '').lower().replace(' ', '')
+        uemail = (user.get('email') or '').lower().replace(' ', '')
+        ucoy = (user.get('company') or '').strip()
+        if uname in ['bnwr', 'admin', 'co', 'adjt'] or uemail in ['bnwr', 'admin', 'co', 'adjt'] or ucoy in ['Admin', 'Center', 'All']:
+            return True
+    return False
+
 
 @nominal_bp.route('/')
 def nominal():
@@ -111,7 +124,7 @@ def get_personnel():
         batch       = request.args.get('batch',   'ALL')
 
         # Restriction logic
-        if current_user_role not in ['CO', '2IC', 'ADJUTANT', 'Subedar Major', 'clerk', 'admin', 'O CENTRE NCO']:
+        if not is_privileged_role(current_user_role, user):
             if current_user_company:
                 company = current_user_company
 
@@ -251,7 +264,7 @@ def get_filters():
         conn   = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        if current_user_role not in ['CO', '2IC', 'ADJUTANT', 'Subedar Major', 'clerk', 'admin', 'O CENTRE NCO'] and current_user_company:
+        if not is_privileged_role(current_user_role, user) and current_user_company:
             companies = [current_user_company.upper()]
         else:
             cursor.execute("SELECT DISTINCT UPPER(company) AS company FROM personnel WHERE company IS NOT NULL ORDER BY company")
@@ -326,7 +339,7 @@ def search_personnel():
         """
         params = [f"%{query_str}%", f"%{query_str}%"]
 
-        if current_user_role not in ['CO', '2IC', 'ADJUTANT', 'Subedar Major', 'clerk', 'admin', 'O CENTRE NCO'] and current_user_company:
+        if not is_privileged_role(current_user_role, user) and current_user_company:
             sql += " AND UPPER(company) = %s"
             params.append(current_user_company.upper())
 
@@ -360,7 +373,7 @@ def get_leave_history():
         query_str = request.args.get('q', '').strip()
 
         # Restriction logic
-        if current_user_role not in ['CO', '2IC', 'ADJUTANT', 'Subedar Major', 'clerk', 'admin', 'O CENTRE NCO']:
+        if not is_privileged_role(current_user_role, user):
             if current_user_company:
                 company = current_user_company
 
@@ -445,7 +458,7 @@ def get_monthly_sheet():
         month_end = date(year, month, num_days)
         today_date = now.date()
 
-        if current_user_role not in ['CO', '2IC', 'ADJUTANT', 'Subedar Major', 'clerk', 'admin', 'O CENTRE NCO']:
+        if not is_privileged_role(current_user_role, user):
             if current_user_company:
                 company = current_user_company
 

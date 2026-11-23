@@ -517,8 +517,8 @@
         </div>
       </div>
 
-      <!-- Company Pending Breakdown Bar (Visible for Admin in Pending Tab) -->
-      <div id="ciCompanyBreakdownStrip" class="ci-coy-breakdown-strip" style="display: none;"></div>
+      <!-- Company Pending Breakdown Bar (Hidden as per user request to use top-right dropdown instead) -->
+      <div id="ciCompanyBreakdownStrip" class="ci-coy-breakdown-strip" style="display: none !important;"></div>
 
       <!-- Body -->
       <div class="modal-body" id="ciBody">
@@ -651,35 +651,37 @@
     }
   }
 
-  /* ── Populate Company Dropdown (Case-Insensitive & Deduplicated) ── */
+  /* ── Populate Company Dropdown (Standard 7 Companies + Any Custom) ── */
   function ciPopulateCompanyDropdown() {
     var select = document.getElementById('ciCompanyFilter');
     if (!select) return;
 
     var currentVal = (select.value || '').toLowerCase().trim();
+    var baseCoys = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
     var companiesMap = new Map();
+
+    baseCoys.forEach(function(c) {
+      companiesMap.set(c.toLowerCase(), c);
+    });
 
     ciPendingRows.concat(ciCompletedRows).forEach(function(r) {
       if (r.company && String(r.company).trim()) {
         var raw = String(r.company).trim();
         var key = raw.toLowerCase();
-
-        var display = raw.split(/\s+/).map(function(word) {
-          if (word === word.toLowerCase()) {
-            return word.charAt(0).toUpperCase() + word.slice(1);
-          }
-          return word;
-        }).join(' ');
-
         if (!companiesMap.has(key)) {
-          companiesMap.set(key, display);
-        } else if (raw !== raw.toLowerCase()) {
-          companiesMap.set(key, display);
+          companiesMap.set(key, raw);
         }
       }
     });
 
-    var sortedKeys = Array.from(companiesMap.keys()).sort();
+    var sortedKeys = Array.from(companiesMap.keys()).sort(function(a, b) {
+      var idxA = baseCoys.map(function(x){ return x.toLowerCase(); }).indexOf(a);
+      var idxB = baseCoys.map(function(x){ return x.toLowerCase(); }).indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    });
 
     select.innerHTML = '<option value="">All Companies</option>' +
       sortedKeys.map(function(k) {
@@ -751,57 +753,13 @@
     ciRenderCompanyBreakdown();
   };
 
-  /* ── Render Company Breakdown Pills for Admin (Pending Tab) ── */
+  /* ── Render Company Breakdown Pills for Admin (Pending Tab) - Hushed as dropdown is preferred ── */
   function ciRenderCompanyBreakdown() {
     var strip = document.getElementById('ciCompanyBreakdownStrip');
-    if (!strip) return;
-
-    if (!ciIsAdmin || ciCurrentTab !== 'pending') {
+    if (strip) {
       strip.style.display = 'none';
-      return;
+      strip.innerHTML = '';
     }
-
-    strip.style.display = 'flex';
-
-    var coyMap = new Map();
-    var totalPending = ciPendingRows.length;
-
-    ciPendingRows.forEach(function(r) {
-      if (r.company && String(r.company).trim()) {
-        var raw = String(r.company).trim();
-        var key = raw.toLowerCase();
-
-        var display = raw.split(/\s+/).map(function(w) {
-          return w.charAt(0).toUpperCase() + w.slice(1);
-        }).join(' ');
-
-        if (!coyMap.has(key)) {
-          coyMap.set(key, { display: display, count: 1 });
-        } else {
-          coyMap.get(key).count++;
-        }
-      }
-    });
-
-    var select = document.getElementById('ciCompanyFilter');
-    var activeVal = (select ? select.value : '').toLowerCase().trim();
-
-    var html = '<button type="button" class="ci-coy-pill ' + (!activeVal ? 'active' : '') + '" onclick="ciSelectCompanyPill(\'\')">' +
-      '<span>All Companies</span>' +
-      '<span class="ci-coy-count">' + totalPending + '</span>' +
-      '</button>';
-
-    var sortedKeys = Array.from(coyMap.keys()).sort();
-    sortedKeys.forEach(function(k) {
-      var item = coyMap.get(k);
-      var isActive = (activeVal === k);
-      html += '<button type="button" class="ci-coy-pill ' + (isActive ? 'active' : '') + '" onclick="ciSelectCompanyPill(\'' + esc(k) + '\')">' +
-        '<span>🏢 ' + esc(item.display) + '</span>' +
-        '<span class="ci-coy-count">' + item.count + '</span>' +
-        '</button>';
-    });
-
-    strip.innerHTML = html;
   }
 
   window.ciSelectCompanyPill = function(coyKey) {

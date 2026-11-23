@@ -5792,9 +5792,13 @@
 
     let topCoyDisplay = topCoy || '';
     const cleanCoy = String(topCoy || '').trim().toUpperCase();
-    if (cleanCoy.includes('COMN') || cleanCoy.includes('COMMUNICATION')) topCoyDisplay = 'COMN Company';
-    else if (cleanCoy.includes('HQ')) topCoyDisplay = 'HQ company';
-    else if (cleanCoy.includes('3') || cleanCoy.includes('THIRD')) topCoyDisplay = '3 Company';
+    if (cleanCoy.includes('A COY') || cleanCoy.includes('A')) topCoyDisplay = 'A COY';
+    else if (cleanCoy.includes('B COY') || cleanCoy.includes('B')) topCoyDisplay = 'B COY';
+    else if (cleanCoy.includes('C COY') || cleanCoy.includes('C')) topCoyDisplay = 'C COY';
+    else if (cleanCoy.includes('D COY') || cleanCoy.includes('D')) topCoyDisplay = 'D COY';
+    else if (cleanCoy.includes('E COY') || cleanCoy.includes('E')) topCoyDisplay = 'E COY';
+    else if (cleanCoy.includes('F COY') || cleanCoy.includes('F')) topCoyDisplay = 'F COY';
+    else if (cleanCoy.includes('HQ')) topCoyDisplay = 'HQ COY';
 
     // 1. Switch to Personal Details tab first so inputs are visible
     const personalTabBtn = document.getElementById('personal-tab');

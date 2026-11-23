@@ -698,7 +698,7 @@ def fetch_dynamic_report_stats():
         row = cursor.fetchone() or {}
 
         # Distinct companies strictly restricted to the 3 designated unit companies
-        VALID_COMPANIES = ['3 Company', 'COMN Company', 'HQ company']
+        VALID_COMPANIES = ['A COY', 'B COY', 'C COY', 'D COY', 'E COY', 'F COY', 'HQ COY']
         cursor.execute("""
             SELECT DISTINCT company FROM ai_fitness_reports
             WHERE company IS NOT NULL AND company != ''

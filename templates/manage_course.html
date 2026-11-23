@@ -554,8 +554,10 @@
 
   // ── POPULATE COMPANY FILTER ──
   function populateCompanyFilter(courses) {
-    const companies = [...new Set(courses.map(c => c.company).filter(c => c && c !== '—'))].sort();
+    const baseCompanies = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
+    const companies = [...new Set([...courses.map(c => c.company).filter(c => c && c !== '—'), ...baseCompanies])].sort();
     const sel = document.getElementById('companyFilter');
+    sel.innerHTML = '<option value="">ALL COMPANIES</option>';
     companies.forEach(coy => {
       const opt = document.createElement('option');
       opt.value = coy;

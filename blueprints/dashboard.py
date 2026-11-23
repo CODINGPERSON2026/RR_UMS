@@ -28,10 +28,14 @@ def get_all_dets():
 @dashboard_bp.route('/get_detachment_details')
 def get_detachment_details():
     det_id = request.args.get("det_id")  # optional
-    min_days = request.args.get("min_days", 0, type=int) # optional filter
+    min_days_param = request.args.get("min_days") # optional filter: only filter if explicitly passed
     conn = get_db_connection()
-    if min_days <= 0:
-        min_days = get_alarm_thresholds(conn).get('detachment_alarm', 60)
+    min_days = None
+    if min_days_param is not None and str(min_days_param).strip() != '':
+        try:
+            min_days = int(min_days_param)
+        except ValueError:
+            min_days = None
     cursor = conn.cursor(dictionary=True)
 
     # Get logged in user
@@ -47,6 +51,7 @@ def get_detachment_details():
                 p.army_number, 
                 p.rank, 
                 p.company, 
+                a.det_id,
                 d.det_name,
                 DATEDIFF(CURDATE(), a.assigned_on) AS days_on_det
             FROM assigned_det a
@@ -61,14 +66,21 @@ def get_detachment_details():
             query += " AND a.det_id = %s"
             params.append(det_id)
             
-        # Apply min_days filter (starting from min_days, including min_days)
-        if min_days > 0:
+        # Apply min_days filter only if explicitly provided and > 0
+        if min_days is not None and min_days > 0:
             query += " AND DATEDIFF(CURDATE(), a.assigned_on) >= %s"
             params.append(min_days)
 
-        # ---------- COMPANY FILTER (Admin / CO / Leadership bypass) ----------
-        role = (user.get('role') or '').upper()
-        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR"):
+        # ---------- COMPANY FILTER (Admin / CO / Leadership / ONCO bypass) ----------
+        role = (user.get('role') or '').upper().strip()
+        role_clean = role.replace(' ', '').replace('_', '').replace('-', '')
+        user_coy = (user.get('company') or '').strip()
+        is_battalion = (
+            user_coy in ("Admin", "Center", "All", "BNWR", "BN WR") or
+            role in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR", "O CENTRE NCO", "ONCO", "BNWR", "BN WR", "SM", "HEAD CLK", "PA", "ACCTJCO", "ACCOUNT JCO") or
+            role_clean in ("CO", "2IC", "ADJUTANT", "COMMANDINGOFFICER", "ADMIN", "SUPERADMIN", "SJCO", "SUBEDARMAJOR", "SUBMAJOR", "OCENTRENCO", "OCENTERNCO", "ONCO", "BNWR", "SM")
+        )
+        if not is_battalion:
             query += " AND p.company = %s"
             params.append(user['company'])
 
@@ -80,7 +92,7 @@ def get_detachment_details():
         # Last updated timestamp from assigned_det table (assigned_on column)
         last_assigned_query = "SELECT MAX(assigned_on) AS last_assigned_on FROM assigned_det"
         last_assigned_params = []
-        if user.get('company') not in ("Admin", "Center", "All") and role not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN"):
+        if not is_battalion:
             last_assigned_query = """
                 SELECT MAX(a.assigned_on) AS last_assigned_on
                 FROM assigned_det a
@@ -224,46 +236,45 @@ def attachment_details():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
 
-    # role = user.get("role")
-    company = user.get("company")
+    role = (user.get("role") or "").upper().strip()
+    role_clean = role.replace(" ", "").replace("_", "").replace("-", "")
+    company = (user.get("company") or "").strip()
+    is_battalion = (
+        company in ("Admin", "Center", "All", "BNWR", "BN WR") or
+        role in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR", "O CENTRE NCO", "ONCO", "BNWR", "BN WR", "SM", "HEAD CLK", "PA", "ACCTJCO", "ACCOUNT JCO") or
+        role_clean in ("CO", "2IC", "ADJUTANT", "COMMANDINGOFFICER", "ADMIN", "SUPERADMIN", "SJCO", "SUBEDARMAJOR", "SUBMAJOR", "OCENTRENCO", "OCENTERNCO", "ONCO", "BNWR", "SM")
+    )
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
-        if company == "Admin":
-            cursor.execute("""
-                SELECT
-                    t.id,
-                    t.company,
-                    t.army_number,
-                    p.rank,
-                    p.name,
-                    t.location,
-                    t.authority,
-                    t.td_date
-                FROM td_table t
-                LEFT JOIN personnel p
-                    ON p.army_number = t.army_number
-                ORDER BY t.td_date DESC
-            """)
-        else:
-            cursor.execute("""
-                SELECT
-                    t.id,
-                    t.company,
-                    t.army_number,
-                    p.rank,
-                    p.name,
-                    t.location,
-                    t.authority,
-                    t.td_date
-                FROM td_table t
-                LEFT JOIN personnel p
-                    ON p.army_number = t.army_number
-                WHERE t.company = %s
-                ORDER BY t.td_date DESC
-            """, (company,))
+        query = """
+            SELECT
+                t.id,
+                COALESCE(p.company, t.company) AS company,
+                t.army_number,
+                p.rank,
+                p.name,
+                t.location,
+                t.authority,
+                t.td_date
+            FROM td_table t
+            JOIN personnel p
+                ON p.army_number = t.army_number
+            INNER JOIN (
+                SELECT army_number, MAX(id) AS max_id
+                FROM td_table
+                GROUP BY army_number
+            ) latest_td ON latest_td.max_id = t.id
+            WHERE p.td_status = 1
+        """
+        params = []
+        if not is_battalion:
+            query += " AND (p.company = %s OR t.company = %s)"
+            params.extend([company, company])
+        query += " ORDER BY t.td_date DESC"
 
+        cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
         # ✅ FORCE JSON SAFE DATE
         for r in rows:
@@ -292,9 +303,18 @@ def assigned_attachment_alarm():
     if not user:
         return jsonify({"error": "Unauthorized"}), 401
 
-    role = (user.get('role') or '').upper()
-    user_company = user.get('company') or ''
-    privileged = ['CO', '2IC', 'ADJUTANT', 'ADMIN', 'COMMANDING OFFICER', 'S/JCO', 'SJCO', 'SUBEDAR MAJOR', 'SUBMAJOR']
+    role = (user.get('role') or '').upper().strip()
+    role_clean = role.replace(" ", "").replace("_", "").replace("-", "")
+    user_company = (user.get('company') or '').strip()
+    privileged = [
+        'CO', '2IC', 'ADJUTANT', 'ADMIN', 'COMMANDING OFFICER', 'S/JCO', 'SJCO',
+        'SUBEDAR MAJOR', 'SUBMAJOR', 'O CENTRE NCO', 'ONCO', 'BNWR', 'BN WR', 'SM', 'HEAD CLK', 'PA'
+    ]
+    is_battalion = (
+        user_company in ("Admin", "Center", "All", "BNWR", "BN WR") or
+        role in privileged or
+        role_clean in ("CO", "2IC", "ADJUTANT", "COMMANDINGOFFICER", "ADMIN", "SUPERADMIN", "SJCO", "SUBEDARMAJOR", "SUBMAJOR", "OCENTRENCO", "OCENTERNCO", "ONCO", "BNWR", "SM")
+    )
 
     conn = get_db_connection()
     if not conn:
@@ -321,7 +341,7 @@ def assigned_attachment_alarm():
             WHERE t.td_date <= NOW() - INTERVAL %s DAY
         """
         params = [attach_limit]
-        if user_company != "Admin" and role not in privileged:
+        if not is_battalion:
             query += " AND (COALESCE(t.company, p.company) = %s)"
             params.append(user_company)
 

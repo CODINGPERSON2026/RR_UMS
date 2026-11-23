@@ -237,9 +237,13 @@
           <div class="col-md-4">
             <select id="companyFilter" class="form-select form-select-lg">
               <option value="">All Companies</option>
-              <option value="COMN Company">COMN Company</option>
-              <option value="3 company">3 Company</option>
-              <option value="HQ company">HQ Company</option>
+              <option value="A COY">A COY</option>
+              <option value="B COY">B COY</option>
+              <option value="C COY">C COY</option>
+              <option value="D COY">D COY</option>
+              <option value="E COY">E COY</option>
+              <option value="F COY">F COY</option>
+              <option value="HQ COY">HQ COY</option>
             </select>
           </div>
           <div class="col-md-4 d-flex align-items-center">
@@ -512,32 +516,12 @@ function applyFilters() {
     );
   }
 
-  /* ── Split: 3 Company vs everything else ── */
-  const mainData  = filtered.filter(row => !is3Company(row));
-  const coy3Data  = filtered.filter(row =>  is3Company(row));
-
-  renderTable1(mainData,  'pendingInterviewTable',  false);
-  renderTable1(coy3Data,  'company3InterviewTable', true);
-
-  /* Show/hide 3 Company section based on data or filter */
-  const show3Section =
-    !company ||                                          // no filter → always show both
-    (company && company.toLowerCase().includes('3'));    // or specifically filtering 3 Coy
-
-  document.getElementById('company3Section').classList.toggle('d-none', coy3Data.length === 0 && !show3Section);
-
-  /* Always show 3 Company section if there is data */
-  if (coy3Data.length > 0) {
-    document.getElementById('company3Section').classList.remove('d-none');
-  }
-
-  /* Hide main section only when filtering exclusively on 3 Company */
-  if (company && company.toLowerCase().includes('3')) {
-    document.getElementById('mainCompaniesSection').classList.add('d-none');
-    document.getElementById('company3Section').classList.remove('d-none');
-  } else {
-    document.getElementById('mainCompaniesSection').classList.remove('d-none');
-  }
+  /* ── Render all rows uniformly in main table ── */
+  renderTable1(filtered, 'pendingInterviewTable', false);
+  const coy3Sec = document.getElementById('company3Section');
+  if (coy3Sec) coy3Sec.classList.add('d-none');
+  const mainSec = document.getElementById('mainCompaniesSection');
+  if (mainSec) mainSec.classList.remove('d-none');
 }
 
 /* ================= RENDER ================= */

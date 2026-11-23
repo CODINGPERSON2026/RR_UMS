@@ -563,21 +563,26 @@
     {% set subscript = "Add Personnel → Update Personnel → View Personnel" %}
     {% include 'navbar/navbar.html' %}
 
-    {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO
-CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM'] %}
     <div class="page-header">
 
       <div class="header-right">
 
-        <a href="/personnel_information" class="header-link">Dashboard</a>
-        <a href="/personnel_information/add-personnel" class="header-link">Add Personnel</a>
-        <a href="/personnel_information/update-personnel" class="header-link">Update Personnel</a>
-        <a href="/personnel_information/delete-personnel" class="header-link">Delete Personnel</a>
+        <a href="/personnel_information" class="header-link">
+          <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a href="/personnel_information/add-personnel" class="header-link">
+          <i class="fas fa-user-plus"></i> Add Personnel
+        </a>
+        <a href="/personnel_information/update-personnel" class="header-link">
+          <i class="fas fa-user-edit"></i> Update Personnel
+        </a>
+        <a href="/personnel_information/delete-personnel" class="header-link">
+          <i class="fas fa-user-minus"></i> Delete Personnel
+        </a>
 
       </div>
 
     </div>
-    {% endif %}
   </div>
 
   <!-- Dashboard Header -->
@@ -645,9 +650,13 @@ CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','
             <div class="filter-controls">
               <select class="company-select" id="modalCompanyFilter">
                 <option value="all">All Companies</option>
-                <option value="COMN Company">COMN Company</option>
-                <option value="3 Company">3 Company</option>
-                <option value="HQ company">HQ company</option>
+                <option value="A COY">A COY</option>
+                <option value="B COY">B COY</option>
+                <option value="C COY">C COY</option>
+                <option value="D COY">D COY</option>
+                <option value="E COY">E COY</option>
+                <option value="F COY">F COY</option>
+                <option value="HQ COY">HQ COY</option>
               </select>
               <div class="results-count">
                 Showing: <span id="modalVisibleCount">0</span> records

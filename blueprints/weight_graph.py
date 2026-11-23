@@ -25,12 +25,20 @@ def get_graph_personnel():
     fit_unfit_filter = request.args.get('fitUnfitFilter', 'Fit').strip()
     safe_category_filter = request.args.get('safeCategoryFilter', 'shape').strip()
 
-    # Admin check: if user is not Admin/2IC/Center, lock company to user_company
-    ADMIN_ROLES = ["Admin", "2IC", "Center"]
-    if user_company and user_company not in ADMIN_ROLES:
+    # Admin check: if user is not Admin/2IC/Center/O CENTRE NCO/BNWR, lock company to user_company
+    ADMIN_ROLES = ["ADMIN", "2IC", "CENTER", "BNWR", "BN WR", "CO", "ADJUTANT", "SUBEDAR MAJOR", "SUBEDARMAJOR", "O CENTRE NCO", "OCENTRENCO", "ONCO"]
+    user_coy_clean = user_company.upper().replace(' ', '').replace('_', '').replace('-', '')
+    user_role_clean = (user.get('role', '') or '').strip().upper().replace(' ', '').replace('_', '').replace('-', '') if (user and isinstance(user, dict)) else ''
+    admin_clean = [r.replace(' ', '').replace('_', '').replace('-', '') for r in ADMIN_ROLES]
+
+    is_admin = (not user_company) or (user_coy_clean in admin_clean) or (user_role_clean in admin_clean)
+    if not is_admin:
         effective_company = user_company
     else:
         effective_company = req_company
+
+    if effective_company and effective_company.upper() in ['CENTER', 'ADMIN', 'ALL']:
+        effective_company = "All"
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)

@@ -569,7 +569,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Company</label>
-                        <input type="text" id="editPrjCompany" class="form-control" placeholder="e.g. COMN Company">
+                        <input type="text" id="editPrjCompany" class="form-control" placeholder="e.g. A COY">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label fw-semibold">Stage</label>
@@ -708,41 +708,57 @@ function formatCurrency(val) {
 
 // ── LOAD HEADS ──
 async function loadHeads() {
+    let heads = [];
     try {
         const res = await fetch('/get_project_heads');
-        const heads = await res.json();
-
-        // Filter dropdown
-        const filterDropdown = document.getElementById("headFilter");
-        if (filterDropdown) {
-            filterDropdown.innerHTML = '<option value="all">All Heads</option>';
-            heads.forEach(h => {
-                const name = h.head_name || h;
-                filterDropdown.innerHTML += `<option value="${name}">${name}</option>`;
-            });
-        }
-
-        // Create modal dropdown
-        const modalDropdown = document.getElementById("newPrjHead") || document.getElementById("newPrjOwner");
-        if (modalDropdown) {
-            modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
-            heads.forEach(h => {
-                const name = h.head_name || h;
-                modalDropdown.innerHTML += `<option value="${name}">${name}</option>`;
-            });
-        }
-
-        // Edit modal dropdown
-        const editDropdown = document.getElementById("editPrjHead");
-        if (editDropdown) {
-            editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
-            heads.forEach(h => {
-                const name = h.head_name || h;
-                editDropdown.innerHTML += `<option value="${name}">${name}</option>`;
-            });
-        }
+        heads = await res.json();
     } catch (e) {
         console.error('Error loading heads:', e);
+    }
+
+    if (!Array.isArray(heads) || heads.length === 0) {
+        const defaultHeads = [
+            "PROJECT OFFICER", "PROJECT JCO", "CO", "2IC", "ADJUTANT",
+            "OC", "Subedar Major", "Civil Works", "IT & Communication",
+            "Electrical Works", "Security & Surveillance", "Infrastructure", "General & Admin"
+        ];
+        heads = defaultHeads.map(d => ({ head_name: d }));
+    }
+
+    // Filter dropdown
+    const filterDropdown = document.getElementById("headFilter");
+    if (filterDropdown) {
+        const curVal = filterDropdown.value;
+        filterDropdown.innerHTML = '<option value="all">All Heads</option>';
+        heads.forEach(h => {
+            const name = h.head_name || h;
+            filterDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+        });
+        if (curVal) filterDropdown.value = curVal;
+    }
+
+    // Create modal dropdown
+    const modalDropdown = document.getElementById("newPrjHead") || document.getElementById("newPrjOwner");
+    if (modalDropdown) {
+        const curVal = modalDropdown.value;
+        modalDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+        heads.forEach(h => {
+            const name = h.head_name || h;
+            modalDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+        });
+        if (curVal) modalDropdown.value = curVal;
+    }
+
+    // Edit modal dropdown
+    const editDropdown = document.getElementById("editPrjHead");
+    if (editDropdown) {
+        const curVal = editDropdown.value;
+        editDropdown.innerHTML = '<option value="">-- Select Head --</option>';
+        heads.forEach(h => {
+            const name = h.head_name || h;
+            editDropdown.innerHTML += `<option value="${name}">${name}</option>`;
+        });
+        if (curVal) editDropdown.value = curVal;
     }
 }
 
@@ -937,8 +953,8 @@ async function updateStage(stage) {
 }
 
 // ── OPEN CREATE MODAL ──
-function openCreateProjectModal() {
-    loadHeads();
+async function openCreateProjectModal() {
+    await loadHeads();
     const bomSec = document.getElementById('bomSection');
     if (bomSec) bomSec.classList.add('d-none');
     const bomBody = document.getElementById('bomTableBody');

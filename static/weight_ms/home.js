@@ -85,13 +85,14 @@ async function loadCompanies() {
       
       // If user is OC, show only their company
       // Otherwise show all companies
+      const ALL_COMPANIES = ['A COY', 'B COY', 'C COY', 'D COY', 'E COY', 'F COY', 'HQ COY'];
       let companiesToShow = [];
-      if (normalizedUserCompany && (normalizedUserCompany === 'COMN Company' || normalizedUserCompany === '3 Company' || normalizedUserCompany === 'HQ company')) {
+      if (normalizedUserCompany && ALL_COMPANIES.includes(normalizedUserCompany)) {
           // Show only the user's company
           companiesToShow = [normalizedUserCompany];
       } else {
           // Show all companies (for Admin, CO, etc.)
-          companiesToShow = ['COMN Company', '3 Company', 'HQ company'];
+          companiesToShow = ALL_COMPANIES;
       }
       
       companiesToShow.forEach(companyName => {

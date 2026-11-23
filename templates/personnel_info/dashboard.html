@@ -469,26 +469,28 @@
   {% include 'navbar/navbar.html' %}
 </br>
 
-{% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO
-CHQ','SEC JCO','JCO FAULT REPAIR','S/JCO','OC','NCO CHQ','JCO CHQ','ONCO','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM'] %}
-<div class="page-header">
+  <div class="page-header">
 
-    <div class="header-right ">
-      <a href="/personnel_information" class="header-link">Dashboard</a>
+    <div class="header-right">
+      <a href="/personnel_information" class="header-link">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+      </a>
     </div>
 
-
-    <div class="header-right ">
-
-      <a href="/personnel_information/add-personnel" class="header-link">Add Personnel</a>
-      <a href="/personnel_information/update-personnel" class="header-link">Update Personnel</a>
-      <a href="/personnel_information/delete-personnel" class="header-link">Delete Personnel</a>
+    <div class="header-right">
+      <a href="/personnel_information/add-personnel" class="header-link">
+        <i class="fas fa-user-plus"></i> Add Personnel
+      </a>
+      <a href="/personnel_information/update-personnel" class="header-link">
+        <i class="fas fa-user-edit"></i> Update Personnel
+      </a>
+      <a href="/personnel_information/delete-personnel" class="header-link">
+        <i class="fas fa-user-minus"></i> Delete Personnel
+      </a>
       <a href="/settings" class="header-link"><i class="fas fa-cog"></i> Settings</a>
-
     </div>
     
   </div>
-  {% endif %}
 </div>
 </br>
 <div class="dashboard-container">

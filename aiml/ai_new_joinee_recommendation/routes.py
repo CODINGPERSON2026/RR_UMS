@@ -39,7 +39,10 @@ from aiml.ai_new_joinee_recommendation.recommendation import (
     load_model_artifacts
 )
 from aiml.ai_new_joinee_recommendation.explainability import generate_domain_and_contrastive_explainability
-from aiml.ai_new_joinee_recommendation.training import run_training_pipeline
+try:
+    from aiml.ai_new_joinee_recommendation.training import run_training_pipeline
+except Exception:
+    run_training_pipeline = None
 
 company_rec_bp = Blueprint(
     "company_rec_bp",
@@ -50,7 +53,10 @@ company_rec_bp = Blueprint(
 
 # Allowed executive roles for recommendations
 AUTHORIZED_DECISION_ROLES = ["CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN"]
-AUTHORIZED_VIEW_ROLES = ["CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN"]
+AUTHORIZED_VIEW_ROLES = [
+    "CO", "ADJUTANT", "2IC", "ADMIN", "COMMANDING OFFICER", "SUPER ADMIN",
+    "O CENTRE NCO", "ONCO", "BNWR", "BN WR", "SM", "SUBEDAR MAJOR"
+]
 
 # Rank synonym mapping for normalization & queries
 RANK_SYNONYM_MAP = {
@@ -238,18 +244,26 @@ def check_view_authorization(user: Optional[Dict[str, Any]] = None) -> bool:
     if not auth_user:
         return False
     role = str(auth_user.get("role", "")).strip().upper()
-    if role in AUTHORIZED_VIEW_ROLES:
+    role_clean = role.replace(" ", "").replace("_", "").replace("-", "")
+    coy = str(auth_user.get("company", "")).strip().upper()
+    if role in AUTHORIZED_VIEW_ROLES or role_clean in ["OCENTRENCO", "OCENTERNCO", "ONCO", "BNWR", "SM", "SUBEDARMAJOR", "ADMIN", "CO", "2IC", "ADJUTANT"]:
+        return True
+    if coy in ["ADMIN", "CENTER", "ALL", "BNWR", "BN WR"]:
         return True
     return check_executive_authorization(auth_user)
 
 
 def check_predict_authorization(user: Optional[Dict[str, Any]] = None) -> bool:
-    """Check if authenticated user can run AI New Joinee prediction (1coyonco, 2coyonco)."""
+    """Check if authenticated user can run AI New Joinee prediction (1coyonco, 2coyonco, onco, etc.)."""
     auth_user = get_current_authenticated_user(user)
     if not auth_user:
         return False
     role = str(auth_user.get("role", "")).strip().lower().replace(" ", "").replace("_", "").replace("-", "")
-    return role in ["1coyonco", "2coyonco", "onco", "coyonco", "admin", "co", "2ic", "adjutant", "commandingofficer"]
+    coy = str(auth_user.get("company", "")).strip().lower()
+    return (
+        role in ["1coyonco", "2coyonco", "onco", "coyonco", "admin", "co", "2ic", "adjutant", "commandingofficer", "ocentrenco", "ocenternco", "bnwr"] or
+        coy in ["admin", "center", "all", "bnwr"]
+    )
 
 
 def sync_dues_in_recommendations(cursor=None, conn=None) -> int:

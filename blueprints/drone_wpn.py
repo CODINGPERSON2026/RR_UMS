@@ -213,15 +213,25 @@ def get_drone_wpn_list():
             if raw_c:
                 key = raw_c.lower()
                 if key not in company_map:
-                    if key == 'hq company':
-                        company_map[key] = 'HQ Company'
-                    elif key == 'comn company':
-                        company_map[key] = 'COMN Company'
+                    if key == 'hq coy':
+                        company_map[key] = 'HQ COY'
+                    elif key == 'a coy':
+                        company_map[key] = 'A COY'
+                    elif key == 'b coy':
+                        company_map[key] = 'B COY'
+                    elif key == 'c coy':
+                        company_map[key] = 'C COY'
+                    elif key == 'd coy':
+                        company_map[key] = 'D COY'
+                    elif key == 'e coy':
+                        company_map[key] = 'E COY'
+                    elif key == 'f coy':
+                        company_map[key] = 'F COY'
                     else:
                         company_map[key] = raw_c.title() if raw_c.islower() else raw_c
 
         # Ensure standard unit companies exist
-        standard_defaults = ['COMN Company', '3 Company', 'HQ Company']
+        standard_defaults = ['A COY', 'B COY', 'C COY', 'D COY', 'E COY', 'F COY', 'HQ COY']
         for sdc in standard_defaults:
             if sdc.lower() not in company_map:
                 company_map[sdc.lower()] = sdc

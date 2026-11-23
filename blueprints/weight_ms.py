@@ -70,6 +70,8 @@ def get_ideal_weight(age, height_cm, cursor):
 
 
 def compute_authorization(company=None):
+    if company and company.strip().upper() in ['CENTER', 'ADMIN', 'ALL']:
+        company = "All"
     connection = get_db_connection()
     if not connection:
         return []
@@ -365,6 +367,8 @@ def add_user():
 def api_summary():
     auto_save_monthly_unfit()
     company = request.args.get('company', 'All')
+    if company and company.strip().upper() in ['CENTER', 'ADMIN', 'ALL']:
+        company = "All"
     data = compute_authorization(company)
     total = len(data)
     unFit = sum(1 for d in data if d['status'] == "UnFit")
@@ -379,6 +383,8 @@ def api_summary():
 @weight_ms.route('/api/unauthorized')
 def api_unFit():
     company = request.args.get('company', 'All')
+    if company and company.strip().upper() in ['CENTER', 'ADMIN', 'ALL']:
+        company = "All"
     data = compute_authorization(company)
     unFit = [d for d in data if d['status'] == "UnFit"]
     return jsonify({"count": len(unFit), "rows": unFit})
@@ -386,6 +392,8 @@ def api_unFit():
 @weight_ms.route('/api/authorized')
 def api_Fit():
     company = request.args.get('company', 'All')
+    if company and company.strip().upper() in ['CENTER', 'ADMIN', 'ALL']:
+        company = "All"
     data = compute_authorization(company)
     Fit = [d for d in data if d['status'] == "Fit"]
     return jsonify({"count": len(Fit), "rows": Fit})
@@ -772,9 +780,13 @@ def unfit_graph():
 
 COMPANIES = [
     "All",
-    "COMN Company",
-    "3 Company",
-    "HQ company"
+    "A COY",
+    "B COY",
+    "C COY",
+    "D COY",
+    "E COY",
+    "F COY",
+    "HQ COY"
 ]
 
 # def auto_save_monthly_unfit():

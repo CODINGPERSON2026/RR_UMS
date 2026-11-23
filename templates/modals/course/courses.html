@@ -314,6 +314,13 @@
       </div>
       <select class="cm-filter-select" id="cmCompanyFilter">
         <option value="">All Companies</option>
+        <option value="A COY">A COY</option>
+        <option value="B COY">B COY</option>
+        <option value="C COY">C COY</option>
+        <option value="D COY">D COY</option>
+        <option value="E COY">E COY</option>
+        <option value="F COY">F COY</option>
+        <option value="HQ COY">HQ COY</option>
       </select>
       <button class="cm-export-btn" id="cmExportBtn">
         <i class="fas fa-download"></i> Export CSV
@@ -440,12 +447,14 @@
     if (typeof window.fetchCoursesLastUpdated === 'function') {
       window.fetchCoursesLastUpdated();
     }
-    if (allData.length) return;
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:3rem;font-size:.85rem;color:var(--text-muted);"><div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>Loading candidates on courses...</td></tr>';
+    }
     fetch('/api/get-all-courses')
       .then(function (r) { return r.json(); })
       .then(function (data) {
-        allData = data;
-        populateCompanyFilter(data);
+        allData = Array.isArray(data) ? data : [];
+        populateCompanyFilter(allData);
         applyFilters();
       })
       .catch(function () {
@@ -454,13 +463,24 @@
   }
 
   function populateCompanyFilter(data) {
-    var seen = {}, companies = [];
-    data.forEach(function (r) {
-      if (r.company && !seen[r.company]) { seen[r.company] = 1; companies.push(r.company); }
+    var baseCompanies = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
+    var seen = {};
+    baseCompanies.forEach(function (c) { seen[c.toLowerCase()] = 1; });
+    (data || []).forEach(function (r) {
+      if (r.company && !seen[r.company.toLowerCase()]) {
+        seen[r.company.toLowerCase()] = 1;
+        baseCompanies.push(r.company);
+      }
     });
-    companies.sort().forEach(function (c) {
-      var o = document.createElement('option'); o.value = c; o.textContent = c; filterEl.appendChild(o);
+    var currentVal = filterEl.value;
+    filterEl.innerHTML = '<option value="">All Companies</option>';
+    baseCompanies.forEach(function (c) {
+      var o = document.createElement('option');
+      o.value = c;
+      o.textContent = c;
+      filterEl.appendChild(o);
     });
+    if (currentVal) filterEl.value = currentVal;
   }
 
   function applyFilters() {
@@ -472,7 +492,8 @@
         (r.rank           || '').toLowerCase().indexOf(q) > -1 ||
         (r.course_name    || '').toLowerCase().indexOf(q) > -1 ||
         (r.institute_name || '').toLowerCase().indexOf(q) > -1;
-      return ms && (!companyFilter || r.company === companyFilter);
+      var matchCompany = !companyFilter || (r.company && r.company.trim().toLowerCase() === companyFilter.trim().toLowerCase());
+      return ms && matchCompany;
     });
     if (sortCol) doSort();
     currentPage = 1;

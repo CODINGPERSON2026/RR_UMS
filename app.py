@@ -385,6 +385,20 @@ def change_password():
     finally:
         cursor.close()
         conn.close()
+
+def is_battalion_user(user):
+    """Return True if user has battalion-wide visibility across all companies."""
+    if not user:
+        return False
+    company = (user.get('company') or '').strip().upper()
+    role = (user.get('role') or '').strip().upper()
+    username = (user.get('username') or '').strip().lower()
+    return (
+        company in ['ADMIN', 'CENTER', 'ALL', 'BNWR', 'BN WR'] or
+        role in ['ADMIN', 'CO', '2IC', 'ADJUTANT', 'SUBEDAR MAJOR', 'SM', 'BNWR', 'BN WR', 'O CENTRE NCO', 'ONCO', 'HEAD CLK', 'PA', 'ACCTJCO', 'ACCOUNT JCO'] or
+        username in ['admin', 'co', 'adjt', 'bnwr', 'ocennco']
+    )
+
 @app.route('/')
 def dashboard():
     user = require_login()
@@ -395,11 +409,10 @@ def dashboard():
     user_company = user['company']
     role = user['role']
     welcome_msg = f'Welcome {role} , {subscript}'
-    if user_company == 'Admin':
-        return render_template('CO/co_dashboard.html', role = role,user_company=user_company)
+    if user_company == 'Admin' or role in ['CO', 'ACCTJCO', 'ACCOUNT JCO', 'BNWR', 'BN WR'] or (user.get('username') or '').lower() in ['bnwr', 'acctjco']:
+        return render_template('CO/co_dashboard.html', role=role, user_company=user_company)
     else:
-        return render_template('dashboard.html', role = role,user_company=user_company)
-
+        return render_template('dashboard.html', role=role, user_company=user_company)
 
 @app.route('/api/dashboard_heading')
 def dashboard_heading():
@@ -557,13 +570,13 @@ def search_person():
     if not user:
         return jsonify({'error': 'Authentication required'}), 401
     
-    user_company = user.get('company')
-    if not user_company:
-        return jsonify({'error': 'User company not found'}), 400
+    user_company = (user.get('company') or 'Admin').strip()
 
     if request.method == 'POST':
-        query = request.form.get('army_number')  # ✅ CORRECT
+        query = (request.form.get('army_number') or request.args.get('army_number') or '').strip()
+        req_coy = (request.form.get('company') or request.args.get('company') or '').strip()
         
+        # Enforce search criteria: only fetch when Army Number or Name is provided
         if not query:
             return jsonify([])
 
@@ -574,6 +587,20 @@ def search_person():
         cursor = None
         try:
             cursor = conn.cursor(dictionary=True)
+
+            current_role = (user.get('role') or '').strip()
+            username_clean = (user.get('username') or '').lower().replace(' ', '')
+            email_clean = (user.get('email') or '').lower().replace(' ', '')
+            company_clean = (user_company or '').strip()
+            r_clean = current_role.upper().replace(' ', '').replace('_', '').replace('-', '')
+
+            is_all_company = (
+                company_clean in ['Admin', 'Center', 'All', 'BNWR', 'BN WR'] or
+                r_clean in ['SUBEDARMAJOR', 'SM', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'HEADCLK', 'PA', 'ADMIN', 'OCENTRENCO', 'OCENTERNCO', 'ACCTJCO', 'ACCOUNTJCO', 'ONCO', 'OC'] or
+                current_role in ['Subedar Major', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'BN WR', 'HEAD CLK', 'PA', 'Admin', 'O CENTRE NCO', 'ONCO', 'OC'] or
+                username_clean in ['bnwr', 'admin', 'co', 'adjt'] or
+                email_clean in ['bnwr', 'admin', 'co', 'adjt']
+            )
 
             get_query = """
                     SELECT 
@@ -588,16 +615,31 @@ def search_person():
                         oncourse_status AS course_status,
                         td_status
                     FROM personnel
-                    WHERE army_number = %s
+                    WHERE 1=1
                 """
-            current_role = user['role']
-            if current_role == 'Subedar Major':
-                cursor.execute(get_query,(query,))  # Added company filter
-            else:
-                get_query += 'AND company = %s'
-                cursor.execute(get_query,(query,user_company))
+            params = []
 
+            if not query:
+                get_query += " AND LOWER(TRIM(`rank`)) NOT IN ('agniveer', 'agnl', 'agni', 'agv', 'agn')"
+
+            if query:
+                get_query += " AND (TRIM(army_number) = TRIM(%s) OR TRIM(army_number) LIKE %s OR LOWER(name) LIKE %s)"
+                params.extend([query, f"%{query}%", f"%{query.lower()}%"])
+
+            # Company filter logic
+            if req_coy and req_coy.lower() not in ['all', 'all companies', '']:
+                get_query += " AND TRIM(company) = TRIM(%s)"
+                params.append(req_coy)
+            elif not is_all_company:
+                if company_clean and company_clean not in ['Admin', 'Center', 'All']:
+                    get_query += " AND TRIM(company) = TRIM(%s)"
+                    params.append(company_clean)
+
+            get_query += " ORDER BY company, `rank`, name LIMIT 100"
+
+            cursor.execute(get_query, tuple(params))
             results = cursor.fetchall()
+
             return jsonify(results)
         except Exception as e:
             return jsonify({"error": str(e)}), 500
@@ -928,9 +970,7 @@ def assign_personnel():
     if not user:
         return jsonify({'error': 'Authentication required'}), 401
 
-    user_company = user.get('company')
-    if not user_company:
-        return jsonify({'error': 'User company not found'}), 400
+    user_company = (user.get('company') or 'Admin').strip()
 
     personnel_ids = data.get('army_number', [])
     action_type = data.get('status', '').lower()
@@ -942,58 +982,72 @@ def assign_personnel():
     conn = get_db_connection()
     conn.start_transaction()  # ✅ Explicit Transaction Start
     cursor = conn.cursor(dictionary=True)
-    user_role = user['role']
+    user_role = (user.get('role') or '').strip()
+    username_clean = (user.get('username') or '').lower().replace(' ', '')
+    email_clean = (user.get('email') or '').lower().replace(' ', '')
+    company_clean = (user_company or '').strip()
+    r_clean = user_role.upper().replace(' ', '').replace('_', '').replace('-', '')
+
+    is_all_company = (
+        company_clean in ['Admin', 'Center', 'All', 'BNWR', 'BN WR'] or
+        r_clean in ['SUBEDARMAJOR', 'SM', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'HEADCLK', 'PA', 'ADMIN', 'OCENTRENCO', 'OCENTERNCO', 'ACCTJCO', 'ACCOUNTJCO', 'ONCO', 'OC'] or
+        user_role in ['Subedar Major', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'BN WR', 'HEAD CLK', 'PA', 'Admin', 'O CENTRE NCO', 'ONCO', 'OC'] or
+        username_clean in ['bnwr', 'admin', 'co', 'adjt'] or
+        email_clean in ['bnwr', 'admin', 'co', 'adjt']
+    )
+
     try:
         # 🔐 Lock rows to prevent race condition
-        placeholders = ', '.join(['%s'] * len(personnel_ids))
+        cleaned_pids = [str(p).strip() for p in personnel_ids]
+        placeholders = ', '.join(['%s'] * len(cleaned_pids))
 
-        if user_role == "Subedar Major":
-            # 🚀 Admin-level access (no company restriction)
+        if is_all_company:
+            # 🚀 Admin/BN-level access (no company restriction)
             verify_query = f"""
-                SELECT army_number, detachment_status, posting_status, td_status
+                SELECT army_number, company, detachment_status, posting_status, td_status
                 FROM personnel
-                WHERE army_number IN ({placeholders})
+                WHERE TRIM(army_number) IN ({placeholders})
                 FOR UPDATE
             """
-            cursor.execute(verify_query, tuple(personnel_ids))
+            cursor.execute(verify_query, tuple(cleaned_pids))
         else:
             # 🔒 Normal users (company restricted)
             verify_query = f"""
-                SELECT army_number, detachment_status, posting_status, td_status
+                SELECT army_number, company, detachment_status, posting_status, td_status
                 FROM personnel
-                WHERE army_number IN ({placeholders})
-                AND company = %s
+                WHERE TRIM(army_number) IN ({placeholders})
+                AND TRIM(company) = TRIM(%s)
                 FOR UPDATE
             """
-            cursor.execute(verify_query, tuple(personnel_ids) + (user_company,))
+            cursor.execute(verify_query, tuple(cleaned_pids) + (company_clean,))
 
         rows = cursor.fetchall()
 
-        if len(rows) != len(personnel_ids):
+        if len(rows) != len(cleaned_pids):
             conn.rollback()
             return jsonify({"error": "Some personnel not found in your company"}), 403
+
+        p_coy_map = {str(r['army_number']).strip(): (r.get('company') or user_company) for r in rows}
 
         # 🔎 Validate status before assignment
         for status in rows:
             pid = status['army_number']
-            
-
-            if action_type == "det" and status['detachment_status'] == 1:
-                conn.rollback()
-                return jsonify({"error": f"{pid} is already in Detachment"}), 400
 
             if action_type == "posting" and status['posting_status'] == 1:
                 conn.rollback()
                 return jsonify({"error": f"{pid} is already Posted"}), 400
 
-            if action_type == "td" and status['td_status'] == 1:
-                conn.rollback()
-                return jsonify({"error": f"{pid} is already on TD"}), 400
-
         # ✅ Perform Assignment
-        for pid in personnel_ids:
+        for pid in cleaned_pids:
 
             if action_type == "det":
+                # Close prior detachment if reassigning
+                cursor.execute("""
+                    UPDATE assigned_det
+                    SET det_status = 0, det_removed_date = NOW()
+                    WHERE TRIM(army_number) = TRIM(%s) AND det_status = 1
+                """, (pid,))
+
                 cursor.execute("""
                     INSERT INTO assigned_det (army_number, det_id)
                     VALUES (%s, %s)
@@ -1001,11 +1055,18 @@ def assign_personnel():
 
                 cursor.execute("""
                     UPDATE personnel 
-                    SET detachment_status = 1
-                    WHERE army_number = %s
+                    SET detachment_status = 1, td_status = 0
+                    WHERE TRIM(army_number) = TRIM(%s)
                 """, (pid,))
 
             elif action_type == "posting":
+                # Close prior detachment or TD if posting
+                cursor.execute("""
+                    UPDATE assigned_det
+                    SET det_status = 0, det_removed_date = NOW()
+                    WHERE TRIM(army_number) = TRIM(%s) AND det_status = 1
+                """, (pid,))
+
                 cursor.execute("""
                     INSERT INTO posting_details_table
                     (army_number, location_posted_to, posting_date)
@@ -1014,20 +1075,26 @@ def assign_personnel():
 
                 cursor.execute("""
                     DELETE FROM company_interview
-                    WHERE army_number = %s
+                    WHERE TRIM(army_number) = TRIM(%s)
                 """, (pid,))
 
                 cursor.execute("""
                     DELETE FROM weight_info
-                    WHERE army_number = %s
+                    WHERE TRIM(army_number) = TRIM(%s)
                 """, (pid,))
 
                 cursor.execute("""
                     DELETE FROM personnel
-                    WHERE army_number = %s
+                    WHERE TRIM(army_number) = TRIM(%s)
                 """, (pid,))
 
             elif action_type == "td":
+                # Close prior detachment if assigning to TD
+                cursor.execute("""
+                    UPDATE assigned_det
+                    SET det_status = 0, det_removed_date = NOW()
+                    WHERE TRIM(army_number) = TRIM(%s) AND det_status = 1
+                """, (pid,))
 
                 td_location = ""
                 td_authority = ""
@@ -1037,6 +1104,7 @@ def assign_personnel():
                     td_location = parts[0].replace("Location:", "").strip()
                     td_authority = parts[1].replace("Authority:", "").strip()
 
+                p_coy = p_coy_map.get(str(pid).strip(), user_company)
                 cursor.execute("""
                     INSERT INTO td_table
                     (
@@ -1053,13 +1121,13 @@ def assign_personnel():
                     remarks,
                     td_location,
                     td_authority,
-                    user_company
+                    p_coy
                 ))
 
                 cursor.execute("""
                     UPDATE personnel 
-                    SET td_status = 1
-                    WHERE army_number = %s
+                    SET td_status = 1, detachment_status = 0
+                    WHERE TRIM(army_number) = TRIM(%s)
                 """, (pid,))
 
         # ✅ Commit Only If Everything Successful
@@ -1616,7 +1684,7 @@ def company_status():
         overall["company"] = "15 XYZ"
         data.append(overall)
 
-        companies = ["COMN Company", "3 company", "HQ company"]
+        companies = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"]
         sql_with_where = rank_sql + " WHERE company = %s"
 
         for company in companies:
@@ -2077,19 +2145,69 @@ def get_cost_by_head():
 
 @app.route('/get_project_heads')
 def get_project_heads():
+    heads = []
+    seen = set()
+    conn = None
+    cursor = None
     try:
-     
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True) 
-        cursor.execute("SELECT id, head_name FROM project_heads ORDER BY head_name")
-        heads = cursor.fetchall()
+        if conn:
+            cursor = conn.cursor(dictionary=True)
+            # 1. From project_heads table if any
+            try:
+                cursor.execute("SELECT head_name FROM project_heads WHERE head_name IS NOT NULL AND TRIM(head_name) != '' ORDER BY head_name")
+                for r in cursor.fetchall():
+                    val = (r.get('head_name') or '').strip()
+                    if val and val.lower() not in seen:
+                        seen.add(val.lower())
+                        heads.append(val)
+            except Exception:
+                pass
 
-        cursor.close()
-        conn.close()
-        return jsonify(heads)  # Returns: [{"id": 1, "head_name": "Civil Works"}, ...]
+            # 2. From distinct head in projects table
+            try:
+                cursor.execute("SELECT DISTINCT head FROM projects WHERE head IS NOT NULL AND TRIM(head) != '' ORDER BY head")
+                for r in cursor.fetchall():
+                    val = (r.get('head') or '').strip()
+                    if val and val.lower() not in seen:
+                        seen.add(val.lower())
+                        heads.append(val)
+            except Exception:
+                pass
 
+            # 3. From users roles
+            try:
+                cursor.execute("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND TRIM(role) != '' ORDER BY role")
+                for r in cursor.fetchall():
+                    val = (r.get('role') or '').strip()
+                    if val and val.lower() not in seen:
+                        seen.add(val.lower())
+                        heads.append(val)
+            except Exception:
+                pass
     except Exception as e:
-        return jsonify([]), 500
+        pass
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
+
+    # 4. Standard default heads
+    default_heads = [
+        "PROJECT OFFICER", "PROJECT JCO", "CO", "2IC", "ADJUTANT",
+        "OC", "Subedar Major", "Civil Works", "IT & Communication",
+        "Electrical Works", "Security & Surveillance", "Infrastructure", "General & Admin"
+    ]
+    for dh in default_heads:
+        if dh.lower() not in seen:
+            seen.add(dh.lower())
+            heads.append(dh)
+
+    result = [{"id": i + 1, "head_name": h} for i, h in enumerate(heads)]
+    return jsonify(result)
 
 
 @app.route("/get_projects_count", methods=["GET"])
@@ -2251,8 +2369,8 @@ def get_projects():
         """
         params = []
 
-        # Apply company filter if not Admin; PROJECT JCO and PROJECT OFFICER see all projects
-        if company != "Admin" and role not in ('PROJECT JCO', 'PROJECT OFFICER'):
+        # Apply company filter if not Admin; PROJECT JCO, PROJECT OFFICER and BNWR see all projects
+        if company != "Admin" and role not in ('PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR') and (user.get('username') or '').lower() != 'bnwr':
             project_query += " WHERE company = %s"
             params.append(company)
 
@@ -2299,6 +2417,7 @@ def dashboard_summary():
     current_user = user['army_number']
     company = user['company']
     role = user['role']
+    is_battalion = is_battalion_user(user)
     
     # 0️⃣ Check 10-second cache
     import time
@@ -2322,8 +2441,8 @@ def dashboard_summary():
             FROM personnel p
             INNER JOIN assigned_det ad ON p.army_number = ad.army_number
             WHERE p.detachment_status = 1 AND ad.det_status = 1
-            """ + (f" AND p.company = %s" if company != "Admin" else ""),
-            (company,) if company != "Admin" else ()
+            """ + (f" AND p.company = %s" if (not is_battalion) else ""),
+            (company,) if (not is_battalion) else ()
         )
         detachment_result = cursor.fetchone()
         detachments = detachment_result['count'] if detachment_result else 0
@@ -2334,8 +2453,8 @@ def dashboard_summary():
             SELECT MAX(ad.assigned_on) AS last_assigned_on
             FROM assigned_det ad
             INNER JOIN personnel p ON p.army_number = ad.army_number
-            """ + (f" WHERE p.company = %s" if company != "Admin" else ""),
-            (company,) if company != "Admin" else ()
+            """ + (f" WHERE p.company = %s" if (not is_battalion) else ""),
+            (company,) if (not is_battalion) else ()
         )
         det_last_row = cursor.fetchone()
         det_last_dt = det_last_row['last_assigned_on'] if det_last_row else None
@@ -2348,7 +2467,7 @@ def dashboard_summary():
         # 2️⃣ Manpower Count
         date_query = """SELECT report_date as max_date FROM parade_state_daily WHERE report_date = CURRENT_DATE"""
         date_params = []
-        if company != "Admin":
+        if not is_battalion:
             date_query += " AND company = %s"
             date_params.append(company)
         
@@ -2373,7 +2492,7 @@ def dashboard_summary():
                 WHERE report_date = %s
             """
             params = [latest_date]
-            if company != "Admin":
+            if not is_battalion:
                 query += " AND company = %s"
                 params.append(company)
             
@@ -2382,7 +2501,13 @@ def dashboard_summary():
         else:
             manpower_result = None
 
-        if manpower_result and manpower_result['total'] is not None:
+        has_manpower_data = manpower_result and (
+            (manpower_result.get("officerCount") or 0) > 0 or 
+            (manpower_result.get("jcoCount") or 0) > 0 or 
+            (manpower_result.get("orCount") or 0) > 0
+        )
+
+        if has_manpower_data:
             manpower = {
                 "total": int(manpower_result["total"] or 0),
                 "jcoCount": int(manpower_result["jcoCount"] or 0),
@@ -2390,14 +2515,42 @@ def dashboard_summary():
                 "orCount": int(manpower_result["orCount"] or 0)
             }
         else:
-            manpower = {"total": 0, "jcoCount": 0, "officerCount": 0, "orCount": 0}
+            fb_mp_query = """
+                SELECT 
+                    SUM(CASE WHEN `rank` IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC') THEN 1 ELSE 0 END) as officerCount,
+                    SUM(CASE WHEN `rank` IN ('Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) as jcoCount,
+                    SUM(CASE WHEN `rank` NOT IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC', 'Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) as orCount
+                FROM personnel
+                WHERE 1=1
+            """
+            fb_mp_params = []
+            if not is_battalion:
+                fb_mp_query += " AND company = %s"
+                fb_mp_params.append(company)
+
+            cursor.execute(fb_mp_query, fb_mp_params)
+            fb_mp_res = cursor.fetchone()
+            if fb_mp_res:
+                officerCount = int(fb_mp_res["officerCount"] or 0)
+                jcoCount = int(fb_mp_res["jcoCount"] or 0)
+                orCount = int(fb_mp_res["orCount"] or 0)
+                total = officerCount + jcoCount + orCount
+            else:
+                officerCount = jcoCount = orCount = total = 0
+
+            manpower = {
+                "total": total,
+                "jcoCount": jcoCount,
+                "officerCount": officerCount,
+                "orCount": orCount
+            }
         
         # Parade State Last Updated Timestamp
         cursor.execute("""
             SELECT MAX(COALESCE(updated_at, created_at)) AS last_updated
             FROM parade_state_daily
-        """ + (f" WHERE company = %s" if company != "Admin" else ""),
-        (company,) if company != "Admin" else ())
+        """ + (f" WHERE company = %s" if (not is_battalion) else ""),
+        (company,) if (not is_battalion) else ())
         ps_last_up = cursor.fetchone()
         parade_last_updated = ps_last_up['last_updated'].strftime("%d/%m/%Y %I:%M:%S %p") if (ps_last_up and ps_last_up.get('last_updated')) else "N/A"
 
@@ -2432,7 +2585,7 @@ def dashboard_summary():
                 WHERE `rank` IN ('AGNIVEER', 'Signal Man', 'L NK', 'NK','CFN', 'HAV','LOC NK','L HAV','CHM','RHM','LOC HAV','CQMH')
             """
             params = []
-            if company != "Admin":
+            if not is_battalion:
                 query += " AND company = %s"
                 params.append(company)
             cursor.execute(query, params)
@@ -2445,7 +2598,7 @@ def dashboard_summary():
         # 4️⃣ Projects Count
         project_query = "SELECT COUNT(*) AS count FROM projects WHERE 1=1"
         project_params = []
-        if company != "Admin":
+        if not is_battalion:
             project_query += " AND company = %s"
             project_params.append(company)
         cursor.execute(project_query, project_params)
@@ -2473,16 +2626,16 @@ def dashboard_summary():
             WHERE DATEDIFF(NOW(), ad.assigned_on) >= %s
               AND ad.det_status = 1
               AND p.detachment_status = 1
-              ''' + (f" AND p.company = %s" if (company != "Admin" and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else "") + '''
+              ''' + (f" AND p.company = %s" if (not is_battalion and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else "") + '''
             ORDER BY ad.assigned_on ASC;
             ''',
-            (det_limit, company) if (company != "Admin" and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else (det_limit,)
+            (det_limit, company) if (not is_battalion and role.upper() not in ("CO", "2IC", "ADJUTANT", "COMMANDING OFFICER", "ADMIN", "SUPERADMIN", "S/JCO", "SJCO", "SUBEDAR MAJOR", "SUBMAJOR")) else (det_limit,)
         )
         assigned_alarm_rows = cursor.fetchall()
         detachment_alarm_count = len(assigned_alarm_rows)
 
         # 6️⃣ Sensitive Personnel Count & 3-Month Inactivity Alarm Count (Optimized Batch Query)
-        if company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
+        if is_battalion or company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]:
             cursor.execute("""
                 SELECT s.army_number, s.marked_on
                 FROM sensitive_marking s
@@ -2553,8 +2706,8 @@ def dashboard_summary():
         # 8️⃣ TD Attachments Count
         cursor.execute(
             "SELECT COUNT(*) AS count FROM personnel WHERE td_status = 1" +
-            (f" AND company = %s" if company != "Admin" else ""),
-            (company,) if company != "Admin" else ()
+            (f" AND company = %s" if (not is_battalion) else ""),
+            (company,) if (not is_battalion) else ()
         )
         td_result = cursor.fetchone()
         td_attachments = td_result['count'] if td_result else 0
@@ -2567,7 +2720,7 @@ def dashboard_summary():
             WHERE 1=1 AND CURDATE() BETWEEN c.course_starting_date AND c.course_end_date
         """
         course_params = []
-        if company != "Admin":
+        if not is_battalion:
             course_query += " AND p.company = %s"
             course_params.append(company)
         cursor.execute(course_query, course_params)
@@ -2589,8 +2742,8 @@ def dashboard_summary():
             SELECT COUNT(*) AS count
             FROM loans l
             LEFT JOIN personnel p ON l.army_number = p.army_number
-            ''' + (f" WHERE p.company = %s" if company != "Admin" else ""),
-            (company,) if company != "Admin" else ()
+            ''' + (f" WHERE p.company = %s" if (not is_battalion) else ""),
+            (company,) if (not is_battalion) else ()
         )
         loan_result = cursor.fetchone()
         loan_count = loan_result['count'] if loan_result else 0
@@ -2627,7 +2780,7 @@ def dashboard_summary():
             WHERE u.duty_performed IS NOT NULL AND u.duty_performed != ''
         """
         duty_params = []
-        if company != "Admin":
+        if not is_battalion:
             duty_query += " AND p.company = %s"
             duty_params.append(company)
         
@@ -2954,10 +3107,72 @@ def get_parade_state(date_str):
                 row['original_date'] = row['report_date']
                 row['report_date'] = date_str
             else:
-                return jsonify({
-                    'success': False,
-                    'message': 'No data found for this date or previous day'
-                }), 404
+                cursor.execute("""
+                    SELECT 
+                        `rank`,
+                        IFNULL(onleave_status, 0) as onleave_status,
+                        IFNULL(oncourse_status, 0) as oncourse_status,
+                        IFNULL(detachment_status, 0) as detachment_status,
+                        IFNULL(td_status, 0) as td_status
+                    FROM personnel
+                    WHERE company = %s
+                """, (company,))
+                coy_p_rows = cursor.fetchall()
+                if coy_p_rows:
+                    row = {
+                        'report_date': date_str,
+                        'company': company,
+                        'is_previous_day_template': False
+                    }
+                    all_cats = [
+                        'offr', 'jco', 'jcoEre', 'or', 'orEre',
+                        'firstTotal',
+                        'oaOr', 'attSummary', 'attOffr', 'attJco', 'attOr',
+                        'secondTotal',
+                        'grandTotal'
+                    ]
+                    col_names = [
+                        'auth', 'hs', 'posted_str', 'lve', 'course', 'det', 'mh',
+                        'sick_lve', 'ex', 'td', 'att', 'awl_osl_jc', 'trout_det',
+                        'present_det', 'present_unit', 'dues_in', 'dues_out'
+                    ]
+                    for cat in all_cats:
+                        for col in col_names:
+                            row[f"{cat}_{col}"] = 0
+
+                    officer_ranks = {'LIEUTENANT', 'CAPTAIN', 'MAJOR', 'LIEUTENANT COLONEL', 'COLONEL', 'BRIGADIER', 'MAJOR GENERAL', 'LIEUTENANT GENERAL', 'GENERAL', 'OC'}
+                    jco_ranks = {'SUBEDAR', 'NAIB SUBEDAR', 'SUBEDAR MAJOR', 'JCO', 'NB SUB', 'SUB', 'SM'}
+
+                    for p in coy_p_rows:
+                        r_clean = (p.get('rank') or '').strip().upper()
+                        if r_clean in officer_ranks:
+                            cat = 'offr'
+                        elif r_clean in jco_ranks:
+                            cat = 'jco'
+                        else:
+                            cat = 'or'
+                        row[f"{cat}_posted_str"] += 1
+                        if p.get('onleave_status'): row[f"{cat}_lve"] += 1
+                        if p.get('oncourse_status'): row[f"{cat}_course"] += 1
+                        if p.get('detachment_status'):
+                            row[f"{cat}_det"] += 1
+                            row[f"{cat}_present_det"] += 1
+                        if p.get('td_status'): row[f"{cat}_td"] += 1
+
+                    for cat in ['offr', 'jco', 'or']:
+                        t_out = sum(row[f"{cat}_{c}"] for c in ['lve', 'course', 'det', 'mh', 'sick_lve', 'ex', 'td', 'att', 'awl_osl_jc'])
+                        row[f"{cat}_trout_det"] = t_out
+                        row[f"{cat}_present_unit"] = max(0, row[f"{cat}_posted_str"] - t_out)
+
+                    for col in col_names:
+                        row[f"firstTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['offr', 'jco', 'jcoEre', 'or', 'orEre'])
+                        row[f"secondTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['oaOr', 'attSummary', 'attOffr', 'attJco', 'attOr'])
+                        row[f"grandTotal_{col}"] = row[f"firstTotal_{col}"] + row[f"secondTotal_{col}"]
+                else:
+                    return jsonify({
+                        'success': False,
+                        'message': 'No data found for this date or previous day'
+                    }), 404
         
         # Convert database row back to frontend format
         result = {
@@ -3027,10 +3242,12 @@ def test_auth():
 def get_co_all_dashboard_data(date_str):
     """Get all CO dashboard data in a single request for a specific date"""
     user = require_login()
+    if not user:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
     
     role = user.get('role', '')
-    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'Admin', 'Subedar Major']
-    if role not in allowed_roles:
+    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'O CENTRE NCO', 'Admin', 'Subedar Major', 'SM', 'BNWR', 'BN WR', 'SUPERADMIN']
+    if role not in allowed_roles and not is_battalion_user(user):
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
     
     conn = get_db_connection()
@@ -3096,10 +3313,99 @@ def get_co_all_dashboard_data(date_str):
         manpower_data = cursor.fetchall()
         
         if not parade_summary or parade_summary['company_count'] == 0:
-            return jsonify({
-                'success': False,
-                'message': 'No data found for this date'
-            }), 200
+            fb_coy_filter = ""
+            fb_params = []
+            if role == 'OC':
+                fb_coy_filter = " AND company = %s"
+                fb_params.append(user.get('company'))
+
+            cursor.execute(f"""
+                SELECT 
+                    company,
+                    SUM(CASE WHEN `rank` IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC') THEN 1 ELSE 0 END) AS officers_posted,
+                    SUM(CASE WHEN `rank` IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC') AND detachment_status = 0 AND td_status = 0 AND onleave_status = 0 AND oncourse_status = 0 THEN 1 ELSE 0 END) AS officers_present,
+                    SUM(CASE WHEN `rank` IN ('Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) AS jcos_posted,
+                    SUM(CASE WHEN `rank` IN ('Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') AND detachment_status = 0 AND td_status = 0 AND onleave_status = 0 AND oncourse_status = 0 THEN 1 ELSE 0 END) AS jcos_present,
+                    SUM(CASE WHEN `rank` NOT IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC', 'Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) AS other_ranks_posted,
+                    SUM(CASE WHEN `rank` NOT IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC', 'Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') AND detachment_status = 0 AND td_status = 0 AND onleave_status = 0 AND oncourse_status = 0 THEN 1 ELSE 0 END) AS other_ranks_present,
+                    SUM(CASE WHEN onleave_status = 1 AND `rank` NOT IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC', 'Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) AS or_on_leave,
+                    SUM(CASE WHEN onleave_status = 1 AND `rank` IN ('Lieutenant', 'Captain', 'Major', 'Lieutenant Colonel', 'Colonel', 'Brigadier', 'Major General', 'Lieutenant General', 'General', 'OC') THEN 1 ELSE 0 END) AS offr_on_leave,
+                    SUM(CASE WHEN onleave_status = 1 AND `rank` IN ('Subedar', 'Naib Subedar', 'Subedar Major', 'JCO') THEN 1 ELSE 0 END) AS jco_on_leave,
+                    SUM(CASE WHEN detachment_status = 1 OR td_status = 1 OR onleave_status = 1 OR oncourse_status = 1 THEN 1 ELSE 0 END) AS total_out,
+                    COUNT(*) AS total_strength
+                FROM personnel
+                WHERE company IS NOT NULL AND company != '' {fb_coy_filter}
+                GROUP BY company
+                ORDER BY company
+            """, tuple(fb_params))
+            fb_rows = cursor.fetchall()
+
+            if fb_rows:
+                leave_data = []
+                manpower_data = []
+                for r in fb_rows:
+                    coy = r['company']
+                    or_tot = int(r['other_ranks_posted'] or 0)
+                    or_lve = int(r['or_on_leave'] or 0)
+                    or_pct = round((or_lve / or_tot * 100), 2) if or_tot > 0 else 0
+                    off_tot = int(r['officers_posted'] or 0)
+                    off_lve = int(r['offr_on_leave'] or 0)
+                    off_pct = round((off_lve / off_tot * 100), 2) if off_tot > 0 else 0
+                    jc_tot = int(r['jcos_posted'] or 0)
+                    jc_lve = int(r['jco_on_leave'] or 0)
+                    jc_pct = round((jc_lve / jc_tot * 100), 2) if jc_tot > 0 else 0
+
+                    leave_data.append({
+                        'company': coy,
+                        'on_leave': or_lve,
+                        'total_strength': or_tot,
+                        'officer_on_leave': off_lve,
+                        'total_officer_strength': off_tot,
+                        'officer_leave_percentage': off_pct,
+                        'jco_on_leave': jc_lve,
+                        'total_jco_strength': jc_tot,
+                        'jco_leave_percentage': jc_pct,
+                        'leave_percentage': or_pct
+                    })
+
+                    off_post = int(r['officers_posted'] or 0)
+                    off_pres = int(r['officers_present'] or 0)
+                    jc_post = int(r['jcos_posted'] or 0)
+                    jc_pres = int(r['jcos_present'] or 0)
+                    or_post = int(r['other_ranks_posted'] or 0)
+                    or_pres = int(r['other_ranks_present'] or 0)
+                    tot_post = off_post + jc_post + or_post
+                    tot_pres = off_pres + jc_pres + or_pres
+
+                    manpower_data.append({
+                        'company': coy,
+                        'officers_posted': off_post,
+                        'officers_present': off_pres,
+                        'officers': off_pres,
+                        'jcos_posted': jc_post,
+                        'jcos_present': jc_pres,
+                        'jcos': jc_pres,
+                        'other_ranks_posted': or_post,
+                        'other_ranks_present': or_pres,
+                        'other_ranks': or_pres,
+                        'total_posted': tot_post,
+                        'total_present': tot_pres,
+                        'total': tot_pres
+                    })
+
+                parade_summary = {
+                    'total_posted_str': sum(r['total_posted'] for r in manpower_data),
+                    'present_unit': sum(r['total_present'] for r in manpower_data),
+                    'total_out': sum(int(r['total_out'] or 0) for r in fb_rows),
+                    'total_lve': sum(int(r['or_on_leave'] or 0) for r in fb_rows),
+                    'company_count': len(fb_rows),
+                    'report_date': date_str
+                }
+            else:
+                return jsonify({
+                    'success': False,
+                    'message': 'No data found for this date'
+                }), 200
         
         # Update totals to use leave (lve) instead of total out (trout_det)
         total_on_leave = sum(row['on_leave'] or 0 for row in leave_data)  #acctually its only calculating how many are OR ON LEAVE NOT TOTAL
@@ -3217,10 +3523,12 @@ def get_co_all_dashboard_data(date_str):
 @app.route('/api/co-dashboard/parade-table/<date_str>', methods=['GET'])
 def get_co_aggregated_parade_table(date_str):
     """Get aggregated parade state data from all companies for CO view"""
-    user = require_login()
+    user = require_login() or get_current_user()
+    if not user:
+        return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 401
     role = user.get('role', '')
-    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'Admin', 'Subedar Major']
-    if role not in allowed_roles:
+    allowed_roles = ['CO', '2IC', 'ADJUTANT', 'OC', 'ONCO', 'O CENTRE NCO', 'Admin', 'Subedar Major', 'SM', 'BNWR', 'BN WR', 'SUPERADMIN']
+    if role not in allowed_roles and not is_battalion_user(user):
         return jsonify({'success': False, 'error': 'Unauthorized - access denied'}), 403
     
     conn = get_db_connection()
@@ -3240,12 +3548,6 @@ def get_co_aggregated_parade_table(date_str):
         """, tuple(params))
         
         companies_data = cursor.fetchall()
-        
-        if not companies_data:
-            return jsonify({
-                'success': False,
-                'message': 'No data found for this date'
-            }), 404
         
         aggregated = {
             'date': date_str,
@@ -3267,17 +3569,94 @@ def get_co_aggregated_parade_table(date_str):
         for category in all_categories:
             aggregated['data'][category] = [0] * 17
         
-        for company_row in companies_data:
-            for category in all_categories:
-                for i, col_name in enumerate(column_names):
-                    db_column = f"{category}_{col_name}"
-                    if db_column in company_row:
-                        aggregated['data'][category][i] += (company_row[db_column] or 0)
+        if companies_data:
+            for company_row in companies_data:
+                for category in all_categories:
+                    for i, col_name in enumerate(column_names):
+                        db_column = f"{category}_{col_name}"
+                        if db_column in company_row:
+                            aggregated['data'][category][i] += (company_row[db_column] or 0)
+            companies_count = len(companies_data)
+        else:
+            # Fallback to computing live aggregated table from personnel table
+            fb_coy_filter = ""
+            fb_params = []
+            if role == 'OC':
+                fb_coy_filter = " AND company = %s"
+                fb_params.append(user.get('company'))
+
+            cursor.execute(f"""
+                SELECT 
+                    `rank`,
+                    company,
+                    IFNULL(onleave_status, 0) as onleave_status,
+                    IFNULL(oncourse_status, 0) as oncourse_status,
+                    IFNULL(detachment_status, 0) as detachment_status,
+                    IFNULL(td_status, 0) as td_status
+                FROM personnel
+                WHERE company IS NOT NULL AND company != '' {fb_coy_filter}
+            """, tuple(fb_params))
+            p_rows = cursor.fetchall()
+
+            if not p_rows:
+                return jsonify({
+                    'success': False,
+                    'message': 'No data found for this date'
+                }), 404
+
+            officer_ranks = {'LIEUTENANT', 'CAPTAIN', 'MAJOR', 'LIEUTENANT COLONEL', 'COLONEL', 'BRIGADIER', 'MAJOR GENERAL', 'LIEUTENANT GENERAL', 'GENERAL', 'OC'}
+            jco_ranks = {'SUBEDAR', 'NAIB SUBEDAR', 'SUBEDAR MAJOR', 'JCO', 'NB SUB', 'SUB', 'SM'}
+
+            for p in p_rows:
+                r_clean = (p.get('rank') or '').strip().upper()
+                if r_clean in officer_ranks:
+                    cat = 'offr'
+                elif r_clean in jco_ranks:
+                    cat = 'jco'
+                else:
+                    cat = 'or'
+
+                # Col 2: posted_str
+                aggregated['data'][cat][2] += 1
+
+                # Col 3: lve
+                if p.get('onleave_status'):
+                    aggregated['data'][cat][3] += 1
+                # Col 4: course
+                if p.get('oncourse_status'):
+                    aggregated['data'][cat][4] += 1
+                # Col 5: det, Col 13: present_det
+                if p.get('detachment_status'):
+                    aggregated['data'][cat][5] += 1
+                    aggregated['data'][cat][13] += 1
+                # Col 9: td
+                if p.get('td_status'):
+                    aggregated['data'][cat][9] += 1
+
+            for cat in ['offr', 'jco', 'or']:
+                t_out = sum(aggregated['data'][cat][idx] for idx in [3, 4, 5, 6, 7, 8, 9, 10, 11])
+                aggregated['data'][cat][12] = t_out
+                aggregated['data'][cat][14] = max(0, aggregated['data'][cat][2] - t_out)
+
+            first_cats = ['offr', 'jco', 'jcoEre', 'or', 'orEre']
+            for col_idx in range(17):
+                aggregated['data']['firstTotal'][col_idx] = sum(aggregated['data'][c][col_idx] for c in first_cats)
+
+            second_cats = ['oaOr', 'attSummary', 'attOffr', 'attJco', 'attOr']
+            for col_idx in range(17):
+                aggregated['data']['secondTotal'][col_idx] = sum(aggregated['data'][c][col_idx] for c in second_cats)
+
+            for col_idx in range(17):
+                aggregated['data']['grandTotal'][col_idx] = (
+                    aggregated['data']['firstTotal'][col_idx] + aggregated['data']['secondTotal'][col_idx]
+                )
+
+            companies_count = len(set(p.get('company') for p in p_rows if p.get('company')))
         
         return jsonify({
             'success': True,
             'data': aggregated,
-            'companies_count': len(companies_data)
+            'companies_count': companies_count
         })
         
     except Exception as e:
@@ -3357,24 +3736,6 @@ def get_parade_data_by_company(date_str, company):
         
         row = cursor.fetchone()
         
-        if not row:
-            return jsonify({
-                'success': True,
-                'data': {
-                    'date': date_str,
-                    'company': company,
-                    'data': {}
-                },
-                'is_empty': True
-            }), 200
-        
-        # Convert database row to frontend format
-        result = {
-            'date': row['report_date'],
-            'company': row['company'],
-            'data': {}
-        }
-        
         categories = [
             'offr', 'jco', 'jcoEre', 'or', 'orEre',
             'firstTotal',
@@ -3388,6 +3749,59 @@ def get_parade_data_by_company(date_str, company):
             'sick_lve', 'ex', 'td', 'att', 'awl_osl_jc', 'trout_det',
             'present_det', 'present_unit', 'dues_in', 'dues_out'
         ]
+
+        if not row:
+            cursor.execute("""
+                SELECT 
+                    `rank`,
+                    IFNULL(onleave_status, 0) as onleave_status,
+                    IFNULL(oncourse_status, 0) as oncourse_status,
+                    IFNULL(detachment_status, 0) as detachment_status,
+                    IFNULL(td_status, 0) as td_status
+                FROM personnel
+                WHERE company = %s
+            """, (company,))
+            coy_p_rows = cursor.fetchall()
+            if not coy_p_rows:
+                return jsonify({
+                    'success': True,
+                    'data': {
+                        'date': date_str,
+                        'company': company,
+                        'data': {}
+                    },
+                    'is_empty': True
+                }), 200
+
+            row = {'report_date': date_str, 'company': company}
+            for cat in categories:
+                for col in column_names:
+                    row[f"{cat}_{col}"] = 0
+            officer_ranks = {'LIEUTENANT', 'CAPTAIN', 'MAJOR', 'LIEUTENANT COLONEL', 'COLONEL', 'BRIGADIER', 'MAJOR GENERAL', 'LIEUTENANT GENERAL', 'GENERAL', 'OC'}
+            jco_ranks = {'SUBEDAR', 'NAIB SUBEDAR', 'SUBEDAR MAJOR', 'JCO', 'NB SUB', 'SUB', 'SM'}
+
+            for p in coy_p_rows:
+                r_clean = (p.get('rank') or '').strip().upper()
+                if r_clean in officer_ranks: cat = 'offr'
+                elif r_clean in jco_ranks: cat = 'jco'
+                else: cat = 'or'
+                row[f"{cat}_posted_str"] += 1
+                if p.get('onleave_status'): row[f"{cat}_lve"] += 1
+                if p.get('oncourse_status'): row[f"{cat}_course"] += 1
+                if p.get('detachment_status'):
+                    row[f"{cat}_det"] += 1
+                    row[f"{cat}_present_det"] += 1
+                if p.get('td_status'): row[f"{cat}_td"] += 1
+
+            for cat in ['offr', 'jco', 'or']:
+                t_out = sum(row[f"{cat}_{c}"] for c in ['lve', 'course', 'det', 'mh', 'sick_lve', 'ex', 'td', 'att', 'awl_osl_jc'])
+                row[f"{cat}_trout_det"] = t_out
+                row[f"{cat}_present_unit"] = max(0, row[f"{cat}_posted_str"] - t_out)
+
+            for col in column_names:
+                row[f"firstTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['offr', 'jco', 'jcoEre', 'or', 'orEre'])
+                row[f"secondTotal_{col}"] = sum(row[f"{c}_{col}"] for c in ['oaOr', 'attSummary', 'attOffr', 'attJco', 'attOr'])
+                row[f"grandTotal_{col}"] = row[f"firstTotal_{col}"] + row[f"secondTotal_{col}"]
         
         for category in categories:
             category_data = []
@@ -4120,7 +4534,7 @@ def api_get_projects():
         """
         params = []
 
-        if company != "Admin" and role != 'PROJECT JCO' and role != 'PROJECT OFFICER':
+        if company != "Admin" and role not in ('PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR') and (user.get('username') or '').lower() != 'bnwr':
             query += " WHERE company = %s"
             params.append(company)
 
@@ -4228,28 +4642,58 @@ def get_courses():
         return jsonify([])
 
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    if not conn:
+        return jsonify([])
 
-    cursor.execute("""
-        SELECT 
-            coc.army_number,
-            p.name,
-            p.rank,
-            p.company,
-            coc.course_name,
-            DATE_FORMAT(coc.course_starting_date, '%d/%m/%Y') AS from_date,
-            DATE_FORMAT(coc.course_end_date, '%d/%m/%Y') AS to_date,
-            coc.institute_name
-        FROM candidate_on_courses coc
-        LEFT JOIN personnel p 
-            ON coc.army_number = p.army_number where coc.status = 'Active' AND CURDATE() BETWEEN course_starting_date AND course_end_date;
-    """)
-  
-    data = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    cursor = None
+    try:
+        cursor = conn.cursor(dictionary=True)
+        user_company = (user.get('company') or 'Admin').strip()
+        current_role = (user.get('role') or '').strip()
+        r_clean = current_role.upper().replace(' ', '').replace('_', '').replace('-', '')
+        username_clean = (user.get('username') or '').lower().replace(' ', '')
 
-    return jsonify(data)
+        is_all_company = (
+            user_company in ['Admin', 'Center', 'All', 'BNWR', 'BN WR'] or
+            r_clean in ['SUBEDARMAJOR', 'SM', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'HEADCLK', 'PA', 'ADMIN', 'OCENTRENCO', 'OCENTERNCO', 'ACCTJCO', 'ACCOUNTJCO', 'ONCO', 'OC', 'TRGJCO', 'TRAININGJCO'] or
+            current_role in ['Subedar Major', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'BN WR', 'HEAD CLK', 'PA', 'Admin', 'O CENTRE NCO', 'ONCO', 'OC', 'TRG JCO'] or
+            username_clean in ['bnwr', 'admin', 'co', 'adjt', 'trgjco']
+        )
+
+        query = """
+            SELECT 
+                coc.army_number,
+                COALESCE(p.name, '') AS name,
+                COALESCE(p.rank, '') AS `rank`,
+                COALESCE(p.company, '') AS company,
+                coc.course_name,
+                DATE_FORMAT(coc.course_starting_date, '%d/%m/%Y') AS from_date,
+                DATE_FORMAT(coc.course_end_date, '%d/%m/%Y') AS to_date,
+                coc.institute_name
+            FROM candidate_on_courses coc
+            LEFT JOIN personnel p 
+                ON TRIM(coc.army_number) = TRIM(p.army_number)
+            WHERE (CURDATE() BETWEEN coc.course_starting_date AND coc.course_end_date OR LOWER(coc.status) = 'active')
+              AND (coc.status IS NULL OR LOWER(coc.status) NOT IN ('inactive', 'deleted', 'cancelled'))
+        """
+        params = []
+        if not is_all_company and user_company not in ['Admin', 'Center', 'All']:
+            query += " AND (p.company = %s OR p.company IS NULL)"
+            params.append(user_company)
+
+        query += " ORDER BY coc.course_starting_date DESC"
+        cursor.execute(query, tuple(params))
+        data = cursor.fetchall()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify([])
+    finally:
+        if cursor:
+            try: cursor.close()
+            except Exception: pass
+        if conn:
+            try: conn.close()
+            except Exception: pass
 
 
 @app.route('/account/departments/all_transactions')
@@ -4486,7 +4930,7 @@ def get_detachments_count():
     WHERE p.detachment_status = 1
       AND ad.det_status = 1"""
         params = []
-        if company != "Admin":
+        if not is_battalion_user(user):
             query += " AND company = %s"
             params.append(company)
         
@@ -4545,7 +4989,7 @@ def get_duty_count():
                OR (p.section IS NOT NULL AND p.section != ''))
         """
         params = []
-        if company != "Admin":
+        if not is_battalion_user(user):
             query += " AND p.company = %s"
             params.append(company)
         
@@ -4581,7 +5025,7 @@ def get_manpower_data():
         # Get the latest reporting date
         date_query = "SELECT MAX(report_date) as max_date FROM parade_state_daily"
         date_params = []
-        if company != "Admin":
+        if not is_battalion_user(user):
             date_query += " WHERE company = %s"
             date_params.append(company)
         
@@ -4606,7 +5050,7 @@ def get_manpower_data():
                 WHERE report_date = %s
             """
             params = [latest_date]
-            if company != "Admin":
+            if not is_battalion_user(user):
                 query += " AND company = %s"
                 params.append(company)
             
@@ -4638,7 +5082,7 @@ def get_manpower_data():
                 WHERE 1=1
             """
             fallback_params = []
-            if company != "Admin":
+            if not is_battalion_user(user):
                 fallback_query += " AND company = %s"
                 fallback_params.append(company)
             
@@ -4709,7 +5153,7 @@ def get_interview_data():
                 WHERE `rank` NOT IN ('Naib Subedar', 'Subedar', 'Sub Maj', 'Subedar Major')
             """
             params = []
-            if company != "Admin":
+            if not is_battalion_user(user):
                 query += " AND company = %s"
                 params.append(company)
             cursor.execute(query, params)
@@ -4746,7 +5190,7 @@ def get_attachments_count():
     try:
         query = "SELECT COUNT(*) AS count FROM personnel WHERE td_status = 1"
         params = []
-        if company != "Admin":
+        if not is_battalion_user(user):
             query += " AND company = %s"
             params.append(company)
         
@@ -4787,10 +5231,10 @@ def get_agniveer_count():
         """
         params = []
 
-        privileged_roles = ['Admin', 'CO', '2IC', 'ADJUTANT', 'TRGJCO','Subedar Major']
+        privileged_roles = ['Admin', 'CO', '2IC', 'ADJUTANT', 'TRGJCO','Subedar Major', 'O CENTRE NCO', 'ONCO', 'BNWR', 'BN WR']
 
         # Company restriction
-        if company != "Admin" and role not in privileged_roles:
+        if not is_battalion_user(user) and role not in privileged_roles:
             query += " AND company = %s"
             params.append(company)
 
@@ -4828,7 +5272,8 @@ def get_projects_count():
     try:
         query = "SELECT COUNT(*) AS count FROM projects WHERE 1=1"
         params = []
-        if company != "Admin":
+        user_role = user.get('role') or ''
+        if not is_battalion_user(user) and user_role not in ('PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR') and (user.get('username') or '').lower() != 'bnwr':
             query += " AND company = %s"
             params.append(company)
         
@@ -4870,7 +5315,7 @@ def get_sensitive_count():
             JOIN personnel p ON s.army_number = p.army_number
         """
         params = []
-        if not (company == "Admin" or role in ["Admin", "admin", "CO", "2IC", "ADJUTANT"]):
+        if not is_battalion_user(user):
             query += " WHERE p.company = %s"
             params.append(company)
 
@@ -4890,42 +5335,42 @@ def get_sensitive_count():
         conn.close()
 
 # ========== 8. LOANS COUNT ==========
-    @app.route('/api/dashboard/loans', methods=['GET'])
-    def get_loans_count():
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-        user = require_login()
-        if not user:
-            return jsonify({"status": "error", "message": "Unauthorized"}), 401
+@app.route('/api/dashboard/loans', methods=['GET'])
+def get_loans_count():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    user = require_login()
+    if not user:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    company = user['company']
+    
+    try:
+        query = """
+            SELECT COUNT(*) AS count
+            FROM loans l
+            LEFT JOIN personnel p ON l.army_number = p.army_number
+            WHERE 1=1
+        """
+        params = []
+        if not is_battalion_user(user):
+            query += " AND p.company = %s"
+            params.append(company)
         
-        company = user['company']
+        cursor.execute(query, params)
+        result = cursor.fetchone()
+        count = result['count'] if result else 0
         
-        try:
-            query = """
-                SELECT COUNT(*) AS count
-                FROM loans l
-                LEFT JOIN personnel p ON l.army_number = p.army_number
-                WHERE 1=1
-            """
-            params = []
-            if company != "Admin":
-                query += " AND p.company = %s"
-                params.append(company)
-            
-            cursor.execute(query, params)
-            result = cursor.fetchone()
-            count = result['count'] if result else 0
-            
-            return jsonify({
-                "status": "success",
-                "count": count
-            }), 200
-            
-        except Exception as e:
-            return jsonify({"status": "error", "message": "Internal Server Error"}), 500
-        finally:
-            cursor.close()
-            conn.close()
+        return jsonify({
+            "status": "success",
+            "count": count
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"status": "error", "message": "Internal Server Error"}), 500
+    finally:
+        cursor.close()
+        conn.close()
 # ========== 9. COURSES COUNT ==========
 @app.route('/api/dashboard/courses', methods=['GET'])
 def get_courses_count():
@@ -4945,7 +5390,7 @@ def get_courses_count():
             WHERE 1=1 AND CURDATE() BETWEEN c.course_starting_date AND c.course_end_date
         """
         params = []
-        if company != "Admin":
+        if not is_battalion_user(user):
             query += " AND p.company = %s"
             params.append(company)
         
@@ -6487,7 +6932,7 @@ def get_posted_strength():
                 `rank`, 
                 COUNT(*) AS count
             FROM personnel
-            WHERE 1=1
+            WHERE 1=1 AND LOWER(TRIM(`rank`)) NOT IN ('agniveer', 'agnl', 'agni', 'agv', 'agn')
         """
 
         params = []

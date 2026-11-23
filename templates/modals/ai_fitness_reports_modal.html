@@ -140,9 +140,13 @@
 
             <select id="fitnessCompanyFilterUniqueScope" class="form-select form-select-sm" style="width: 170px;">
               <option value="">All Companies</option>
-              <option value="3 Company">3 Company</option>
-              <option value="COMN Company">COMN Company</option>
-              <option value="HQ company">HQ company</option>
+              <option value="A COY">A COY</option>
+              <option value="B COY">B COY</option>
+              <option value="C COY">C COY</option>
+              <option value="D COY">D COY</option>
+              <option value="E COY">E COY</option>
+              <option value="F COY">F COY</option>
+              <option value="HQ COY">HQ COY</option>
             </select>
 
             <select id="fitnessStatusFilterUniqueScope" class="form-select form-select-sm" style="width: 140px; font-weight: 600; color: #dc2626; background-color: #fef2f2; border-color: #fca5a5;">
@@ -434,7 +438,7 @@ const FitnessModalController = (function() {
 
         // Populate company filter if empty, strictly enforcing the 3 companies
         const compSelect = document.getElementById('fitnessCompanyFilterUniqueScope');
-        const ALLOWED_COMPANIES = ['3 Company', 'COMN Company', 'HQ company'];
+        const ALLOWED_COMPANIES = ['A COY', 'B COY', 'C COY', 'D COY', 'E COY', 'F COY', 'HQ COY'];
         if (compSelect) {
           const currentVal = compSelect.value;
           compSelect.innerHTML = '<option value="">All Companies</option>';

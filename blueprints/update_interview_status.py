@@ -442,9 +442,18 @@ def get_company_interview_pending():
     cursor = conn.cursor(dictionary=True)
 
     try:
-        is_admin_view = (coy_to_check.upper() in ['ADMIN', 'ALL']) or (role in ['CO', '2IC', 'ADJUTANT'])
+        battalion_roles = ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER', 'ADMIN', 'BNWR', 'BN WR', 'O CENTRE NCO', 'ONCO', 'SUBEDAR MAJOR', 'SM', 'HEAD CLK', 'PA', 'ACCTJCO', 'ACCOUNT JCO']
+        battalion_coys = ['ADMIN', 'ALL', 'CENTER', 'BNWR', 'BN WR']
+        is_battalion_user = (role in battalion_roles) or (user_coy.upper() in battalion_coys)
+        is_admin_view = is_battalion_user or (coy_to_check.upper() in battalion_coys)
 
-        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT']:
+        filter_coy = None
+        if req_coy and req_coy.upper() not in battalion_coys:
+            filter_coy = req_coy
+        elif not is_battalion_user and user_coy.upper() not in battalion_coys:
+            filter_coy = user_coy
+
+        if filter_coy:
             cursor.execute("""
                 SELECT
                     p.army_number,
@@ -464,7 +473,7 @@ def get_company_interview_pending():
                 )
                 AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
                 ORDER BY p.`rank`, p.name
-            """, (coy_to_check,))
+            """, (filter_coy,))
             pending_rows = cursor.fetchall()
 
             cursor.execute("""
@@ -483,7 +492,7 @@ def get_company_interview_pending():
                   AND ci.interview_done_on > DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
                   AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
                 ORDER BY ci.interview_done_on DESC, p.`rank`, p.name
-            """, (coy_to_check,))
+            """, (filter_coy,))
             completed_rows = cursor.fetchall()
         else:
             cursor.execute("""
@@ -572,7 +581,17 @@ def get_company_interview_count():
     cursor = None
     try:
         cursor = conn.cursor()
-        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT']:
+        battalion_roles = ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER', 'ADMIN', 'BNWR', 'BN WR', 'O CENTRE NCO', 'ONCO', 'SUBEDAR MAJOR', 'SM', 'HEAD CLK', 'PA', 'ACCTJCO', 'ACCOUNT JCO']
+        battalion_coys = ['ADMIN', 'ALL', 'CENTER', 'BNWR', 'BN WR']
+        is_battalion_user = (role in battalion_roles) or (user_coy.upper() in battalion_coys)
+
+        filter_coy = None
+        if req_coy and req_coy.upper() not in battalion_coys:
+            filter_coy = req_coy
+        elif not is_battalion_user and user_coy.upper() not in battalion_coys:
+            filter_coy = user_coy
+
+        if filter_coy:
             cursor.execute("""
                 SELECT COUNT(*)
                 FROM personnel p
@@ -583,10 +602,10 @@ def get_company_interview_count():
                     OR (ci.interview_status = 1 AND ci.interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH))
                 )
                 AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
-            """, (coy_to_check,))
+            """, (filter_coy,))
             pending = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM personnel WHERE LOWER(TRIM(company)) = LOWER(TRIM(%s))", (coy_to_check,))
+            cursor.execute("SELECT COUNT(*) FROM personnel WHERE LOWER(TRIM(company)) = LOWER(TRIM(%s))", (filter_coy,))
             total = cursor.fetchone()[0]
         else:
             cursor.execute("""
@@ -702,9 +721,18 @@ def get_co_interview_pending():
     cursor = conn.cursor(dictionary=True)
 
     try:
-        is_admin_view = (coy_to_check.upper() in ['ADMIN', 'ALL']) or (role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'])
+        battalion_roles = ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER', 'ADMIN', 'BNWR', 'BN WR', 'O CENTRE NCO', 'ONCO', 'SUBEDAR MAJOR', 'SM', 'HEAD CLK', 'PA', 'ACCTJCO', 'ACCOUNT JCO']
+        battalion_coys = ['ADMIN', 'ALL', 'CENTER', 'BNWR', 'BN WR']
+        is_battalion_user = (role in battalion_roles) or (user_coy.upper() in battalion_coys)
+        is_admin_view = is_battalion_user or (coy_to_check.upper() in battalion_coys)
 
-        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']:
+        filter_coy = None
+        if req_coy and req_coy.upper() not in battalion_coys:
+            filter_coy = req_coy
+        elif not is_battalion_user and user_coy.upper() not in battalion_coys:
+            filter_coy = user_coy
+
+        if filter_coy:
             cursor.execute("""
                 SELECT
                     p.army_number,
@@ -724,7 +752,7 @@ def get_co_interview_pending():
                 )
                 AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
                 ORDER BY p.`rank`, p.name
-            """, (coy_to_check,))
+            """, (filter_coy,))
             pending_rows = cursor.fetchall()
 
             cursor.execute("""
@@ -743,7 +771,7 @@ def get_co_interview_pending():
                   AND ci.co_interview_done_on > DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
                   AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
                 ORDER BY ci.co_interview_done_on DESC, p.`rank`, p.name
-            """, (coy_to_check,))
+            """, (filter_coy,))
             completed_rows = cursor.fetchall()
         else:
             cursor.execute("""
@@ -831,7 +859,17 @@ def get_co_interview_count():
     cursor = None
     try:
         cursor = conn.cursor()
-        if coy_to_check and coy_to_check.upper() not in ['ADMIN', 'ALL'] and role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']:
+        battalion_roles = ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER', 'ADMIN', 'BNWR', 'BN WR', 'O CENTRE NCO', 'ONCO', 'SUBEDAR MAJOR', 'SM', 'HEAD CLK', 'PA', 'ACCTJCO', 'ACCOUNT JCO']
+        battalion_coys = ['ADMIN', 'ALL', 'CENTER', 'BNWR', 'BN WR']
+        is_battalion_user = (role in battalion_roles) or (user_coy.upper() in battalion_coys)
+
+        filter_coy = None
+        if req_coy and req_coy.upper() not in battalion_coys:
+            filter_coy = req_coy
+        elif not is_battalion_user and user_coy.upper() not in battalion_coys:
+            filter_coy = user_coy
+
+        if filter_coy:
             cursor.execute("""
                 SELECT COUNT(*)
                 FROM personnel p
@@ -842,10 +880,10 @@ def get_co_interview_count():
                     OR (ci.co_interview_status = 1 AND ci.co_interview_done_on <= DATE_SUB(CURDATE(), INTERVAL 6 MONTH))
                 )
                 AND LOWER(TRIM(p.company)) = LOWER(TRIM(%s))
-            """, (coy_to_check,))
+            """, (filter_coy,))
             pending = cursor.fetchone()[0]
 
-            cursor.execute("SELECT COUNT(*) FROM personnel WHERE LOWER(TRIM(company)) = LOWER(TRIM(%s))", (coy_to_check,))
+            cursor.execute("SELECT COUNT(*) FROM personnel WHERE LOWER(TRIM(company)) = LOWER(TRIM(%s))", (filter_coy,))
             total = cursor.fetchone()[0]
         else:
             cursor.execute("""

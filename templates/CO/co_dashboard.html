@@ -1537,7 +1537,6 @@ STATUS COLORS
       {% include 'modals/alarm/attachment_alarm.html' %}
       {% include 'modals/alarm/edit_det_td_modal.html' %}
       {% include 'modals/alarm/leave_alarm.html' %}
-      {% include 'modals/alarm/agniveer_test_alarms.html' %}
       {% include 'modals/alarm/event_alarm.html' %}
       {% if role in ['CO', '2IC', 'ADJUTANT', 'OC'] %}
       {% include 'modals/alarm/sensitive_alarm.html' %}
@@ -1557,11 +1556,20 @@ STATUS COLORS
       </button> -->
 
 
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#personnelModal" title="Assign Personnel">
+        <i class="fas fa-user-plus" style="font-size: 11px"></i> ASSIGN PERSONNEL
+      </button>
+
+      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn" onclick="openLeaveRequestsModal()" title="Leave Requests">
+        <i class="fas fa-file-signature" style="font-size: 11px"></i> LEAVE REQUESTS
+        <span class="bdg" id="leaveRequestBadge" style="display: none">0</span>
+      </button>
+
       <button class="ab-btn ab-danger" data-bs-toggle="modal" data-bs-target="#coRejectedModal" id="rejectedBtn">
         REJECTED LEAVES
         <span class="bdg" id="coRejectedCount" style="display: none">0</span>
       </button>
-      
+
       <!-- <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
         ADD EVENT
       </button> -->
@@ -1585,12 +1593,13 @@ STATUS COLORS
     <!-- MAIN TWO-COLUMN LAYOUT -->
     <!-- SECTION 1: METRICS GRID -->
     <div class="metrics-grid stagger-children" id="metricsGrid">
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal" title="Officers – JCOs – Other Ranks">
         <div class="sc-label">
           <span class="sc-label-text">PARADE STATE</span>
+          <span class="sc-subtext" style="display: block; font-size: 10px; color: #64748b; font-weight: 600; margin-top: 1px;">Offr &ndash; JCO &ndash; OR</span>
         </div>
         <div class="sc-right">
-          <span class="sc-val" id="mainPower"><span
+          <span class="sc-val" id="mainPower" title="Officers – JCOs – Other Ranks"><span
               class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-updater"><i class="fa fa-user-shield"></i> CENTRE ONCO</span>
         </div>
@@ -1636,28 +1645,7 @@ STATUS COLORS
           <span class="sc-updater"><i class="fa fa-user-shield"></i> COY ONCO</span>
         </div>
       </div>
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal" id="card-agniveer" style="cursor: pointer">
-        <div class="sc-label">
-          <span class="sc-label-text">Agniveer Str</span>
-        </div>
-        <div class="sc-right">
-          <span class="sc-val" id="agniveer_count"><span
-              class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
-        </div>
-      </div>
-      {% if role in ['YAWAR'] %}
-      <div class="sc" id="agniveer_on_leave" style="cursor: pointer">
-        <div class="sc-label">
-          <span class="sc-label-text">Agniveer Leave</span>
-        </div>
-        <div class="sc-right">
-          <span class="sc-val" id="onleave_leave"><span
-              class="val-dots"><span></span><span></span><span></span></span></span>
-          <span class="sc-updater"><i class="fa fa-user-shield"></i> TRG JCO</span>
-        </div>
-      </div>
-      {% endif %}
+
       <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
         <div class="sc-label">
           <span class="sc-label-text">Domain Spl</span>
@@ -1688,14 +1676,18 @@ STATUS COLORS
           <span class="sc-updater"><i class="fa fa-user-shield"></i> PROJECT JCO</span>
         </div>
       </div>
+
+      {% if role in ['YAWAR','ACCTJCO','ACCOUNT JCO','CO','ONCO'] or (role and role|upper|replace(' ', '') in
+      ['ACCTJCO','ACCOUNTJCO']) %}
       <div class="sc" style="cursor: pointer" onclick="window.location.href='/account/'">
         <div class="sc-label">
-          <span class="sc-label-text">Accounts</span>
+          <span class="sc-label-text">Accounts </span>
         </div>
         <div class="sc-right" style="align-self: stretch; justify-content: flex-end;">
           <span class="sc-updater"><i class="fa fa-user-circle"></i> ACCOUNTS CLK</span>
         </div>
       </div>
+      {% endif %}
       <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal">
         <div class="sc-label">
           <span class="sc-label-text">PART-II STATUS</span>
@@ -1783,10 +1775,10 @@ STATUS COLORS
       ── #}
       {% endif %}
       {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-      {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in ['CO', '2IC', 'ADJUTANT', 'ADJT'] %}
+      {% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in
+      ['CO', '2IC', 'ADJUTANT', 'ADJT'] %}
       <div class="sc" style="cursor: pointer;" id="card-drone-wpn" data-bs-toggle="modal"
-        data-bs-target="#coDroneWpnModal"
-        onclick="if(typeof openCoDroneWpnModal==='function') openCoDroneWpnModal();"
+        data-bs-target="#coDroneWpnModal" onclick="if(typeof openCoDroneWpnModal==='function') openCoDroneWpnModal();"
         title="Drone & Weapon State Register">
         <div class="sc-label">
           <span class="sc-label-text">Drone / Wpn</span>
@@ -1853,9 +1845,13 @@ STATUS COLORS
           <div class="chart-filter-wrap">
             <select id="companyFilter" class="form-select form-select-sm">
               <option value="ALL">All Companies</option>
-              <option value="COMN Company">COMN Company</option>
-              <option value="3 Company">3 Company</option>
-              <option value="HQ Company">HQ Company</option>
+              <option value="A COY">A COY</option>
+              <option value="B COY">B COY</option>
+              <option value="C COY">C COY</option>
+              <option value="D COY">D COY</option>
+              <option value="E COY">E COY</option>
+              <option value="F COY">F COY</option>
+              <option value="HQ COY">HQ COY</option>
             </select>
           </div>
         </div>
@@ -2001,9 +1997,6 @@ STATUS COLORS
       {% include 'modals/adduser/user.html' %}
       {% include 'modals/oncourses/modal.html' %}
       {% include 'modals/leaverequest/co-rejected-view.html' %}
-      {% include 'modals/alarm/agniveer_test_alarms.html' %}
-      {% include 'modals/agniveer/modal.html' %}
-      {% include 'modals/agniveer/on_leave.html' %}
       {% include 'modals/messenger/modal.html' %}
       {% include 'modals/ollama/ollama.html' %}
       {% include 'modals/ADD-DUES-IN/modal.html' %}
@@ -2372,6 +2365,10 @@ STATUS COLORS
       var data = await res.json(), mp = data.manpower || {}, iv = data.interview || {};
       safeSet("mainPower",
         (mp.officerCount || 0) + " \u2013 " + (mp.jcoCount || 0) + " \u2013 " + (mp.orCount || 0));
+      var mpEl = document.getElementById("mainPower");
+      if (mpEl) {
+        mpEl.title = "Officers: " + (mp.officerCount || 0) + " | JCOs: " + (mp.jcoCount || 0) + " | Other Ranks: " + (mp.orCount || 0) + " | Total: " + (mp.total || 0);
+      }
       safeSet("attachment-count", data.attachment_count != null ? data.attachment_count : 0);
       safeSet("duty-search-count", data.duty_count);
       safeSet("totalCoursesDone", data.courses_count);
@@ -3259,7 +3256,8 @@ STATUS COLORS
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
 {% set r_clean_co = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in ['CO', '2IC', 'ADJUTANT', 'ADJT'] %}
+{% if r_clean_co in ['CO', '2IC', 'ADJUTANT', 'ADJT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or role in ['CO',
+'2IC', 'ADJUTANT', 'ADJT'] %}
 <script>window.isCoDashboard = {% if r_clean_co in ['CO', 'COMMANDINGOFFICER'] %}true{% else %} false{% endif %};</script>
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}

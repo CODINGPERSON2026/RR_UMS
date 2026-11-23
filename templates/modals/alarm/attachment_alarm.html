@@ -206,7 +206,8 @@ function populateAttachCompanyFilter() {
         select.disabled = true;
     } else {
         select.disabled = false;
-        const companies = Array.from(new Set(attachAlarmFetchedData.map(i => i.company).filter(Boolean)));
+        const baseCompanies = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
+        const companies = Array.from(new Set([...attachAlarmFetchedData.map(i => i.company).filter(Boolean), ...baseCompanies]));
         select.innerHTML = '<option value="">All Companies</option>' + 
             companies.map(c => `<option value="${c}">${c}</option>`).join('');
     }

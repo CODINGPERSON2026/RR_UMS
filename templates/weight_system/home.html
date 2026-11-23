@@ -1448,8 +1448,8 @@
             btn.innerHTML = '<i class="fas fa-chevron-up"></i>';
         }
     });
-const ADMIN_ROLES = ["Admin", "2IC", "Center"];
-const ALL_COMPANIES = ["COMN Company", "3 Company", "HQ company"];
+const ADMIN_ROLES = ["Admin", "2IC", "Center", "BNWR", "BN WR", "CO", "ADJUTANT", "Subedar Major", "O CENTRE NCO", "OCENTRENCO", "ONCO"];
+const ALL_COMPANIES = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
 const ROWS_PER_PAGE = 10;
 
 let fitCount = 0;
@@ -1457,6 +1457,7 @@ let unFitCount = 0;
 let safeCount = 0;
 let categoryCount = 0;
 let currentCompany = "All";
+window.currentCompany = currentCompany;
 let tableData = [];
 let displayedData = [];
 let currentStatusClass = "";
@@ -1547,9 +1548,13 @@ function loadCompanies() {
     if (!companySelect) return;
 
     const userCompany = window.userCompanyFromTemplate || null;
+    const userRole = (window.userRoleFromTemplate || '').trim();
     companySelect.innerHTML = "";
 
-    const isAdmin = !userCompany || ADMIN_ROLES.includes(userCompany);
+    const cleanRole = userRole.toUpperCase().replace(/[\s_\-]/g, '');
+    const isBnWr = cleanRole === 'BNWR' || (window.currentUsername || '').toLowerCase().replace(/[\s_\-]/g, '') === 'bnwr';
+    const isCenterNco = cleanRole === 'OCENTRENCO' || cleanRole === 'ONCO';
+    const isAdmin = !userCompany || ADMIN_ROLES.some(r => r.toLowerCase() === (userCompany || '').toLowerCase()) || ['ADMIN', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'SUBEDARMAJOR', 'OCENTRENCO', 'ONCO'].includes(cleanRole) || isBnWr || isCenterNco;
 
     if (isAdmin) {
         // "All Companies" as first/default option
@@ -1568,6 +1573,7 @@ function loadCompanies() {
         companySelect.disabled = false;
         companySelect.value = "All";
         currentCompany = "All";
+        window.currentCompany = currentCompany;
     } else {
         // Non-admin — only their own company, locked
         const opt = document.createElement("option");
@@ -1576,6 +1582,7 @@ function loadCompanies() {
         companySelect.appendChild(opt);
         companySelect.disabled = true;
         currentCompany = userCompany;
+        window.currentCompany = currentCompany;
     }
 
     companySelect.dispatchEvent(new Event("change"));
@@ -1925,6 +1932,7 @@ function resetChartVisibility() {
 async function fetchSummary(company = "All") {
     showLoader("fullscreen-loader", true);
     currentCompany = company;
+    window.currentCompany = currentCompany;
 
     const badge = document.getElementById("company-badge");
     if (badge) {
@@ -2765,6 +2773,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Company dropdown
     document.getElementById("company-select")?.addEventListener("change", e => {
+        currentCompany = e.target.value;
+        window.currentCompany = currentCompany;
         fetchSummary(e.target.value);
     });
 

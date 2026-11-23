@@ -532,12 +532,14 @@ document.addEventListener("DOMContentLoaded", function () {
           <option value="">All Companies</option>
         `;
 
+        const baseCompanies = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
         const uniqueCompanies = [
-          ...new Set(
-            alarmFetchedData
+          ...new Set([
+            ...alarmFetchedData
               .map(item => item.company)
-              .filter(Boolean)
-          )
+              .filter(Boolean),
+            ...baseCompanies
+          ])
         ];
 
         uniqueCompanies.forEach(company => {

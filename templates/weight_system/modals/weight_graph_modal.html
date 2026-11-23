@@ -296,6 +296,9 @@
     if (table)  table.classList.add('d-none');
 
     var company = window.currentCompany || 'All';
+    if (['all', 'center', 'admin'].includes((company || '').toLowerCase().trim())) {
+      company = 'All';
+    }
     var jcoOrFilter = (document.getElementById('jco-or-filter') ? document.getElementById('jco-or-filter').value : 'Fit');
     var jcoSafeOrFilter = (document.getElementById('jco-safe-or-filter') ? document.getElementById('jco-safe-or-filter').value : 'shape');
 
@@ -352,6 +355,12 @@
       }
     });
 
+    var baseCoys = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
+    baseCoys.forEach(function(b) {
+      var k = b.toLowerCase();
+      if (!coyMap[k]) coyMap[k] = b;
+    });
+
     var uniqueCoys = Object.values(coyMap).sort(function(a, b) { return a.localeCompare(b); });
     var optHtml = '<option value="All">All Companies</option>';
     uniqueCoys.forEach(function(c) {
@@ -359,15 +368,20 @@
     });
     coySelect.innerHTML = optHtml;
 
-    var isNonAdminCoy = (window.userCompanyFromTemplate && window.userCompanyFromTemplate !== 'Admin');
+    var uCoy = (window.userCompanyFromTemplate || '').trim();
+    var uRole = (window.userRoleFromTemplate || '').trim().toUpperCase().replace(/[\s_\-]/g, '');
+    var adminCompanies = ['ADMIN', 'CENTER', '2IC', 'CO', 'ALL'];
+    var adminRoles = ['ADMIN', 'CO', '2IC', 'ADJUTANT', 'BNWR', 'SUBEDARMAJOR', 'OCENTRENCO', 'ONCO'];
+
+    var isNonAdminCoy = uCoy && !adminCompanies.includes(uCoy.toUpperCase()) && !adminRoles.includes(uRole);
     if (isNonAdminCoy) {
-      var foundCoy = uniqueCoys.find(function(c) { return c.toLowerCase() === String(window.userCompanyFromTemplate).toLowerCase(); });
-      coySelect.value = foundCoy || window.userCompanyFromTemplate;
+      var foundCoy = uniqueCoys.find(function(c) { return c.toLowerCase() === uCoy.toLowerCase(); });
+      coySelect.value = foundCoy || uCoy;
       coySelect.disabled = true;
     } else {
       coySelect.disabled = false;
       var curCoy = window.currentCompany || 'All';
-      if (curCoy && curCoy !== 'All') {
+      if (curCoy && curCoy !== 'All' && !adminCompanies.includes(curCoy.toUpperCase())) {
         var foundSel = uniqueCoys.find(function(c) { return c.toLowerCase() === curCoy.toLowerCase(); });
         coySelect.value = foundSel || 'All';
       } else {
@@ -482,7 +496,7 @@
 
     wgDisplayedRows = wgRowsData.filter(function(r) {
       var rowCoy = (r.company || '').toLowerCase().trim();
-      var matchesCoy = (coyVal === 'all') || (rowCoy === coyVal);
+      var matchesCoy = (coyVal === 'all') || (rowCoy === coyVal) || (rowCoy.replace(/\s+/g, '') === coyVal.replace(/\s+/g, ''));
 
       if (!matchesCoy) return false;
       if (!q) return true;

@@ -57,8 +57,8 @@ def normalize_question(question: str) -> str:
     question = re.sub(r'\b(\d+)\s*(coy|co|company)\b',
                       lambda m: f"{m.group(1)} Company", question)
 
-    # hq coy / hq co → HQ Company
-    question = re.sub(r'\bhq\s*(coy|co|company)\b', "HQ Company", question)
+    # hq coy / hq co → HQ COY
+    question = re.sub(r'\bhq\s*(coy|co|company)\b', "HQ COY", question)
 
     # rank short forms → normalized
     question = re.sub(r'\b(havl|havaldar)\b', 'hav', question)
@@ -227,9 +227,13 @@ STRICT RULES:
 4. Return ONLY the SQL query, nothing else.
 5. ALWAYS replace placeholders with actual values from the question.
 6. Company names are case sensitive:
-   - 'COMN Company'
-   - '3 Company'
-   - 'HQ Company'
+   - 'A COY'
+   - 'B COY'
+   - 'C COY'
+   - 'D COY'
+   - 'E COY'
+   - 'F COY'
+   - 'HQ COY'
 7. CRITICAL: `rank` is a reserved MySQL word — ALWAYS wrap in backticks: `rank`
 
 Database Information:

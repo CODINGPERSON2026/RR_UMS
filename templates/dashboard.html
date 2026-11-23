@@ -35,13 +35,31 @@
     animation: dotBounce 1.2s ease-in-out infinite;
   }
 
-  .dot-loader span:nth-child(1) { animation-delay: 0s; }
-  .dot-loader span:nth-child(2) { animation-delay: 0.2s; }
-  .dot-loader span:nth-child(3) { animation-delay: 0.4s; }
+  .dot-loader span:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .dot-loader span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .dot-loader span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
 
   @keyframes dotBounce {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-    40%           { transform: scale(1.2); opacity: 1; }
+
+    0%,
+    80%,
+    100% {
+      transform: scale(0.6);
+      opacity: 0.4;
+    }
+
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
   }
 
   .loader-label {
@@ -58,38 +76,106 @@
     transform: translateY(18px);
     transition: opacity 0.45s ease, transform 0.45s ease;
   }
-  .fade-in-up.visible { opacity: 1; transform: translateY(0); }
+
+  .fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   /* stagger children */
-  .stagger-children > * {
+  .stagger-children>* {
     opacity: 0;
     transform: translateY(14px);
     transition: opacity 0.38s ease, transform 0.38s ease;
   }
-  .stagger-children.visible > * { opacity: 1; transform: translateY(0); }
-  .stagger-children.visible > *:nth-child(1)  { transition-delay: 0s; }
-  .stagger-children.visible > *:nth-child(2)  { transition-delay: 0.05s; }
-  .stagger-children.visible > *:nth-child(3)  { transition-delay: 0.1s; }
-  .stagger-children.visible > *:nth-child(4)  { transition-delay: 0.15s; }
-  .stagger-children.visible > *:nth-child(5)  { transition-delay: 0.2s; }
-  .stagger-children.visible > *:nth-child(6)  { transition-delay: 0.25s; }
-  .stagger-children.visible > *:nth-child(7)  { transition-delay: 0.3s; }
-  .stagger-children.visible > *:nth-child(8)  { transition-delay: 0.35s; }
-  .stagger-children.visible > *:nth-child(9)  { transition-delay: 0.4s; }
-  .stagger-children.visible > *:nth-child(10) { transition-delay: 0.45s; }
-  .stagger-children.visible > *:nth-child(11) { transition-delay: 0.5s; }
-  .stagger-children.visible > *:nth-child(12) { transition-delay: 0.55s; }
-  .stagger-children.visible > *:nth-child(13) { transition-delay: 0.6s; }
-  .stagger-children.visible > *:nth-child(14) { transition-delay: 0.65s; }
-  .stagger-children.visible > *:nth-child(15) { transition-delay: 0.7s; }
-  .stagger-children.visible > *:nth-child(16) { transition-delay: 0.75s; }
+
+  .stagger-children.visible>* {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stagger-children.visible>*:nth-child(1) {
+    transition-delay: 0s;
+  }
+
+  .stagger-children.visible>*:nth-child(2) {
+    transition-delay: 0.05s;
+  }
+
+  .stagger-children.visible>*:nth-child(3) {
+    transition-delay: 0.1s;
+  }
+
+  .stagger-children.visible>*:nth-child(4) {
+    transition-delay: 0.15s;
+  }
+
+  .stagger-children.visible>*:nth-child(5) {
+    transition-delay: 0.2s;
+  }
+
+  .stagger-children.visible>*:nth-child(6) {
+    transition-delay: 0.25s;
+  }
+
+  .stagger-children.visible>*:nth-child(7) {
+    transition-delay: 0.3s;
+  }
+
+  .stagger-children.visible>*:nth-child(8) {
+    transition-delay: 0.35s;
+  }
+
+  .stagger-children.visible>*:nth-child(9) {
+    transition-delay: 0.4s;
+  }
+
+  .stagger-children.visible>*:nth-child(10) {
+    transition-delay: 0.45s;
+  }
+
+  .stagger-children.visible>*:nth-child(11) {
+    transition-delay: 0.5s;
+  }
+
+  .stagger-children.visible>*:nth-child(12) {
+    transition-delay: 0.55s;
+  }
+
+  .stagger-children.visible>*:nth-child(13) {
+    transition-delay: 0.6s;
+  }
+
+  .stagger-children.visible>*:nth-child(14) {
+    transition-delay: 0.65s;
+  }
+
+  .stagger-children.visible>*:nth-child(15) {
+    transition-delay: 0.7s;
+  }
+
+  .stagger-children.visible>*:nth-child(16) {
+    transition-delay: 0.75s;
+  }
 
   /* Stat card value pop */
   @keyframes valPop {
-    0%   { transform: scale(0.7); opacity: 0; }
-    70%  { transform: scale(1.12); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
+    0% {
+      transform: scale(0.7);
+      opacity: 0;
+    }
+
+    70% {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
+
   .sc-val.popped {
     animation: valPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
@@ -100,7 +186,11 @@
     transform: translateY(24px) scale(0.98);
     transition: opacity 0.5s ease, transform 0.5s ease;
   }
-  .chart-card-wrap.visible { opacity: 1; transform: translateY(0) scale(1); }
+
+  .chart-card-wrap.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 
   /* ===== MODAL OVERRIDES ===== */
   .modal-fullscreen .modal-dialog {
@@ -108,8 +198,14 @@
     max-width: calc(100vw - 20px);
     max-height: calc(100vh - 20px);
   }
-  .modal-fullscreen .modal-content { height: 100%; }
-  .modal-backdrop { --bs-backdrop-opacity: 0.12; }
+
+  .modal-fullscreen .modal-content {
+    height: 100%;
+  }
+
+  .modal-backdrop {
+    --bs-backdrop-opacity: 0.12;
+  }
 
   /* ===== DASHBOARD WRAPPER ===== */
   .db-wrap {
@@ -132,14 +228,22 @@
     transition: opacity 0.4s ease, transform 0.4s ease;
     overflow: visible;
   }
-  .action-bar.show { opacity: 1; transform: translateY(0); }
-  .action-bar::-webkit-scrollbar { display: none; }
+
+  .action-bar.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .action-bar::-webkit-scrollbar {
+    display: none;
+  }
 
   #moreActionsWrap {
     position: relative !important;
     display: inline-block !important;
     z-index: 105 !important;
   }
+
   .ab-dropdown-menu {
     display: none;
     position: absolute !important;
@@ -159,23 +263,28 @@
     padding: 6px 0;
     z-index: 99999 !important;
   }
+
   .ab-dropdown-menu.show {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
   }
+
   [data-theme="dark"] .ab-dropdown-menu {
     background: #1e293b !important;
     border-color: #334155 !important;
   }
+
   [data-theme="dark"] .ab-dropdown-menu .dropdown-item {
     color: #e2e8f0 !important;
   }
+
   [data-theme="dark"] .ab-dropdown-menu .dropdown-item:hover,
   [data-theme="dark"] .ab-dropdown-menu .dropdown-item:focus {
     background: #334155 !important;
     color: #60a5fa !important;
   }
+
   .ab-dropdown-menu .dropdown-item {
     padding: 9px 16px;
     color: #1e293b;
@@ -193,11 +302,13 @@
     text-align: left;
     text-decoration: none;
   }
+
   .ab-dropdown-menu .dropdown-item:hover,
   .ab-dropdown-menu .dropdown-item:focus {
     background: #eff6ff;
     color: #2563eb;
   }
+
   .ab-dropdown-menu .dropdown-item i {
     width: 18px;
     text-align: center;
@@ -223,7 +334,10 @@
     line-height: 1;
     text-decoration: none;
   }
-  .ab-btn:active { transform: scale(0.96); }
+
+  .ab-btn:active {
+    transform: scale(0.96);
+  }
 
   .ab-btn .bdg {
     min-width: 16px;
@@ -243,37 +357,60 @@
     border-color: rgba(239, 68, 68, 0.35);
     color: var(--danger-color, #ef4444);
   }
-  .ab-danger:hover { background: var(--danger-color, #ef4444); color: #ffffff; }
+
+  .ab-danger:hover {
+    background: var(--danger-color, #ef4444);
+    color: #ffffff;
+  }
 
   .ab-primary {
     background: var(--nav-link-active-bg, rgba(59, 130, 246, 0.12));
     border-color: var(--primary-color, rgba(59, 130, 246, 0.35));
     color: var(--primary-color, #3b82f6);
   }
-  .ab-primary:hover { background: var(--primary-color, #3b82f6); color: #ffffff; }
+
+  .ab-primary:hover {
+    background: var(--primary-color, #3b82f6);
+    color: #ffffff;
+  }
 
   .ab-blue {
     background: var(--nav-link-active-bg, rgba(0, 132, 255, 0.12));
     border-color: var(--primary-color, rgba(0, 132, 255, 0.35));
     color: var(--primary-color, #0084ff);
   }
-  .ab-blue:hover { background: var(--primary-color, #0084ff); color: #ffffff; }
+
+  .ab-blue:hover {
+    background: var(--primary-color, #0084ff);
+    color: #ffffff;
+  }
 
   .ab-amber {
     background: rgba(245, 158, 11, 0.12);
     border-color: rgba(245, 158, 11, 0.35);
     color: var(--text-primary);
   }
-  .ab-amber:hover { background: rgba(245, 158, 11, 0.25); color: var(--text-primary); }
+
+  .ab-amber:hover {
+    background: rgba(245, 158, 11, 0.25);
+    color: var(--text-primary);
+  }
 
   .ab-teal {
     background: rgba(16, 185, 129, 0.12);
     border-color: rgba(16, 185, 129, 0.35);
     color: var(--success-color, #10b981);
   }
-  .ab-teal:hover { background: var(--success-color, #10b981); color: #ffffff; }
 
-  .ab-spacer { flex: 1; min-width: 4px; }
+  .ab-teal:hover {
+    background: var(--success-color, #10b981);
+    color: #ffffff;
+  }
+
+  .ab-spacer {
+    flex: 1;
+    min-width: 4px;
+  }
 
   .ab-messenger {
     width: 28px;
@@ -291,7 +428,10 @@
     position: relative;
     font-size: 13px;
   }
-  .ab-messenger:hover { filter: brightness(1.15); }
+
+  .ab-messenger:hover {
+    filter: brightness(1.15);
+  }
 
   .ab-toggle {
     padding: 5px 8px;
@@ -305,7 +445,10 @@
     line-height: 1;
     transition: background 0.15s;
   }
-  .ab-toggle:hover { background: var(--hover-bg, rgba(0, 0, 0, 0.04)); }
+
+  .ab-toggle:hover {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+  }
 
   .ab-btn .bdg-pos {
     position: absolute;
@@ -329,7 +472,10 @@
     grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
     gap: 7px;
   }
-  .stats-grid.grid-hidden { display: none; }
+
+  .stats-grid.grid-hidden {
+    display: none;
+  }
 
   /* ===== STAT CARD ===== */
   .sc {
@@ -345,13 +491,17 @@
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.15s;
   }
+
   .sc:hover {
     background: var(--nav-link-hover-bg, rgba(59, 130, 246, 0.08));
     border-color: var(--primary-color, #3b82f6);
     box-shadow: 0 4px 14px var(--shadow, rgba(0, 0, 0, 0.12));
     transform: translateY(-1px);
   }
-  .sc:active { transform: translateY(0); }
+
+  .sc:active {
+    transform: translateY(0);
+  }
 
   .sc-label {
     font-size: 11.5px;
@@ -390,6 +540,7 @@
     gap: 4px;
     align-items: center;
   }
+
   .val-dots span {
     width: 5px;
     height: 5px;
@@ -397,9 +548,18 @@
     background: var(--text-secondary, #aaa);
     animation: dotBounce 1.2s ease-in-out infinite;
   }
-  .val-dots span:nth-child(1) { animation-delay: 0s; }
-  .val-dots span:nth-child(2) { animation-delay: 0.18s; }
-  .val-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+  .val-dots span:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .val-dots span:nth-child(2) {
+    animation-delay: 0.18s;
+  }
+
+  .val-dots span:nth-child(3) {
+    animation-delay: 0.36s;
+  }
 
   .sc-sub {
     font-size: 10px;
@@ -415,43 +575,77 @@
     background: #1e293b !important;
     border-color: #334155 !important;
   }
+
   [data-theme="dark"] .sc:hover {
     background: #273449 !important;
     border-color: #60a5fa !important;
   }
-  [data-theme="dark"] .sc-label { color: #cbd5e1 !important; }
-  [data-theme="dark"] .sc-val { color: #ffffff !important; }
+
+  [data-theme="dark"] .sc-label {
+    color: #cbd5e1 !important;
+  }
+
+  [data-theme="dark"] .sc-val {
+    color: #ffffff !important;
+  }
 
   [data-theme="military"] .sc {
     background: #f5f9f4 !important;
     border-color: #b8d4c4 !important;
   }
-  [data-theme="military"] .sc-label { color: #4a7c59 !important; }
-  [data-theme="military"] .sc-val { color: #1a3d2a !important; }
+
+  [data-theme="military"] .sc-label {
+    color: #4a7c59 !important;
+  }
+
+  [data-theme="military"] .sc-val {
+    color: #1a3d2a !important;
+  }
 
   [data-theme="ocean"] .sc {
     background: #f0feff !important;
     border-color: #a5f3fc !important;
   }
-  [data-theme="ocean"] .sc-label { color: #0e7490 !important; }
-  [data-theme="ocean"] .sc-val { color: #164e63 !important; }
+
+  [data-theme="ocean"] .sc-label {
+    color: #0e7490 !important;
+  }
+
+  [data-theme="ocean"] .sc-val {
+    color: #164e63 !important;
+  }
 
   [data-theme="sunset"] .sc {
     background: #fffbeb !important;
     border-color: #fde68a !important;
   }
-  [data-theme="sunset"] .sc-label { color: #b45309 !important; }
-  [data-theme="sunset"] .sc-val { color: #78350f !important; }
+
+  [data-theme="sunset"] .sc-label {
+    color: #b45309 !important;
+  }
+
+  [data-theme="sunset"] .sc-val {
+    color: #78350f !important;
+  }
 
   [data-theme="purple"] .sc {
     background: #faf5ff !important;
     border-color: #e9d5ff !important;
   }
-  [data-theme="purple"] .sc-label { color: #7e22ce !important; }
-  [data-theme="purple"] .sc-val { color: #581c87 !important; }
+
+  [data-theme="purple"] .sc-label {
+    color: #7e22ce !important;
+  }
+
+  [data-theme="purple"] .sc-val {
+    color: #581c87 !important;
+  }
 
   @media (max-width: 768px) {
-    .db-wrap { padding: 10px; }
+    .db-wrap {
+      padding: 10px;
+    }
+
     .stats-grid {
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 5px;
@@ -493,44 +687,61 @@
       {% include 'modals/alarm/attachment_alarm.html' %}
       {% include 'modals/alarm/edit_det_td_modal.html' %}
       {% if role in ['JCO','S/JCO'] %}
-        {% include 'modals/alarm/no_jco_kunba.html' %}
+      {% include 'modals/alarm/no_jco_kunba.html' %}
       {% endif %}
 
       {% if role in ['CO','2IC','ADJUTANT','OC'] %}
-        {% include 'modals/alarm/agniveer_test_alarms.html' %}
-        {% include 'modals/alarm/sensitive_alarm.html' %}
+      {% include 'modals/alarm/sensitive_alarm.html' %}
       {% endif %}
     </div>
+
+    {% set r_upper = (role or '')|upper %}
+    {% set r_clean = r_upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+    {% set is_center_onco = r_clean in ['OCENTRENCO', 'OCENTERNCO'] or r_upper in ['O CENTRE NCO', 'O CENTER NCO', 'ONCO'] %}
 
     <!-- ===== ACTION BAR ===== -->
     <div class="action-bar" id="actionBar">
 
       <!-- 1. ASSIGN PERSONNEL (ALWAYS VISIBLE) -->
-      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#personnelModal" title="Assign Personnel">
+      <button class="ab-btn ab-primary" data-bs-toggle="modal" data-bs-target="#personnelModal"
+        title="Assign Personnel">
         <i class="fas fa-user-plus" style="font-size:11px"></i> ASSIGN PERSONNEL
       </button>
 
       <!-- 2. LEAVE REQUESTS (ALWAYS VISIBLE) -->
-      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn" title="Leave Requests">
+      <button class="ab-btn ab-primary position-relative" id="leaveRequestsBtn" onclick="openLeaveRequestsModal()" title="Leave Requests">
         <i class="fas fa-file-signature" style="font-size:11px"></i> LEAVE REQUESTS
         <span class="bdg" id="leaveRequestBadge" style="display:none">0</span>
       </button>
 
+      <!-- REJECTED LEAVES -->
+      {% if role in ['CO', '2IC', 'BNWR', 'BN WR'] or is_center_onco %}
+      <button class="ab-btn ab-danger position-relative" data-bs-toggle="modal" data-bs-target="#coRejectedModal" id="rejectedBtn" title="Rejected Leaves">
+        <i class="fas fa-times-circle" style="font-size:11px"></i> REJECTED LEAVES
+        <span class="bdg" id="coRejectedCount" style="display: none">0</span>
+      </button>
+      {% endif %}
+
       <!-- 3. ACTIONS DROPDOWN (HOLDS ALL OTHER ROLE-BASED ACTIONS) -->
       <div class="dropdown d-inline-block position-relative" id="moreActionsWrap">
-        <button class="ab-btn ab-primary dropdown-toggle" type="button" id="moreActionsDropdown" onclick="toggleMoreActionsDropdown(event)" aria-expanded="false" title="More Actions">
+        <button class="ab-btn ab-primary dropdown-toggle" type="button" id="moreActionsDropdown"
+          onclick="toggleMoreActionsDropdown(event)" aria-expanded="false" title="More Actions">
           <i class="fas fa-th-large" style="font-size:11px"></i> MORE ACTIONS
         </button>
-        <ul class="dropdown-menu ab-dropdown-menu shadow-lg border-0" id="moreActionsMenu" aria-labelledby="moreActionsDropdown">
-          <li class="no-actions-notice px-3 py-2 text-muted" style="font-size:11.5px; font-style:italic; list-style:none; display:none;" id="moreActionsEmptyNotice">
+        <ul class="dropdown-menu ab-dropdown-menu shadow-lg border-0" id="moreActionsMenu"
+          aria-labelledby="moreActionsDropdown">
+          <li class="no-actions-notice px-3 py-2 text-muted"
+            style="font-size:11.5px; font-style:italic; list-style:none; display:none;" id="moreActionsEmptyNotice">
             No additional actions
           </li>
 
           <!-- AI NEW ARRIVAL RECOMMENDATION -->
           {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-          {% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+          {% if r_clean in ['1coyonco', '2coyonco', 'onco', 'coyonco', 'ocentrenco', 'ocenternco', 'bnwr'] or (role and role|upper in ['1COYONCO',
+          '2COYONCO', '1 COY ONCO', '2 COY ONCO', 'ONCO', 'O CENTRE NCO', 'BNWR', 'BN WR']) or is_center_onco %}
           <li>
-            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#aiRecModal" onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();">
+            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#aiRecModal"
+              onclick="if(typeof openAiRecommendationModal==='function') openAiRecommendationModal();">
               <i class="fas fa-robot text-primary"></i>
               <span>AI NEW ARRIVAL RECOMMENDATION</span>
             </button>
@@ -540,7 +751,8 @@
           <!-- AI COMPANY READINESS -->
           {% if role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] %}
           <li>
-            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal" onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();">
+            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#aiCompanyReadinessModal"
+              onclick="if(typeof openAiCompanyReadinessModal==='function') openAiCompanyReadinessModal();">
               <i class="fas fa-chart-line text-primary"></i>
               <span>AI COMPANY READINESS</span>
             </button>
@@ -558,7 +770,7 @@
           {% endif %}
 
           <!-- ADD DUES IN & OUT -->
-          {% if role in ['O2'] %}
+          {% if role in ['O2'] or is_center_onco %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#add_dues_in">
               <i class="fas fa-arrow-down-left text-success"></i>
@@ -574,9 +786,10 @@
           {% endif %}
 
           <!-- INTERVIEW PENDING -->
-          {% if role == 'Subedar Major' %}
+          {% if role == 'Subedar Major' or is_center_onco %}
           <li>
-            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#view_company_interview_pending">
+            <button class="dropdown-item" type="button" data-bs-toggle="modal"
+              data-bs-target="#companyInterviewModal">
               <i class="fas fa-clipboard-check text-warning"></i>
               <span>INTERVIEW PENDING</span>
             </button>
@@ -584,7 +797,9 @@
           {% endif %}
 
           <!-- ROLL CALL POINTS -->
-          {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO SIGCEN','NCO COMN','NCO MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO FAULT REPAIR','JCO QM','S/JCO','JCO MW','OC','NCO CHQ','JCO CHQ','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] %}
+          {% if role in ['NCO COMN','SEC JCO','Subedar Major','NCO CHQ','NCO LRW','NCO IT','NCO SIGCEN','NCO COMN','NCO
+          MW','NCO MCCS','NCO CHQ','NCO QRT','SEC JCO','JCO MT','JCO FAULT REPAIR','JCO QM','S/JCO','JCO MW','OC','NCO
+          CHQ','JCO CHQ','NCO RHQ','NCO TM','NCO MT','NCO RPNA','NCO QM','O CENTRE NCO'] or is_center_onco %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#rollCallPoints">
               <i class="fas fa-list-ol text-primary"></i>
@@ -594,7 +809,7 @@
           {% endif %}
 
           <!-- MANAGE GALLERY -->
-          {% if role in ['O CENTRE NCO'] %}
+          {% if role in ['O CENTRE NCO'] or is_center_onco %}
           <li>
             <a href="/gallery/manage" class="dropdown-item">
               <i class="fas fa-images text-primary"></i>
@@ -604,7 +819,7 @@
           {% endif %}
 
           <!-- MANAGE COURSE -->
-          {% if role in ['TRGJCO'] %}
+          {% if role in ['TRGJCO'] or is_center_onco %}
           <li>
             <a href="/oncourses/manage_course" class="dropdown-item">
               <i class="fas fa-graduation-cap text-primary"></i>
@@ -614,7 +829,7 @@
           {% endif %}
 
           <!-- ADD TRADE -->
-          {% if role in ['', 'O CENTRE NCO'] %}
+          {% if role in ['', 'O CENTRE NCO'] or is_center_onco %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#tradeModal">
               <i class="fas fa-plus-circle text-primary"></i>
@@ -624,9 +839,10 @@
           {% endif %}
 
           <!-- ALL PENDING LEAVES -->
-          {% if role == 'ONCO' %}
+          {% if role == 'ONCO' or is_center_onco %}
           <li>
-            <button class="dropdown-item justify-content-between" type="button" id="oncoAllPendingLeavesBtn" onclick="openAllPendingLeavesModal()">
+            <button class="dropdown-item justify-content-between" type="button" id="oncoAllPendingLeavesBtn"
+              onclick="openAllPendingLeavesModal()">
               <div class="d-flex align-items-center gap-2">
                 <i class="fas fa-clock-rotate-left text-warning"></i>
                 <span>ALL PENDING LEAVES</span>
@@ -638,7 +854,7 @@
 
           <!-- EDIT DET/TD (ONLY FOR O CENTRE NCO) -->
           {% set r_act_clean = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-          {% if r_act_clean in ['OCENTRENCO', 'OCENTERNCO'] or (role and role|upper in ['O CENTRE NCO', 'O CENTER NCO']) %}
+          {% if r_act_clean in ['OCENTRENCO', 'OCENTERNCO'] or (role and role|upper in ['O CENTRE NCO', 'O CENTER NCO']) or is_center_onco %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#editDetTdModal">
               <i class="fa-solid fa-sliders text-primary"></i>
@@ -648,17 +864,17 @@
           {% endif %}
 
           <!-- PARADE DATA MANAGEMENT -->
-          {% if role in ['O CENTRE NCO','ONCO','SEC NCO','CHM'] %}
+          {% if role in ['O CENTRE NCO','ONCO','SEC NCO','CHM'] or is_center_onco %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#paradeDataModal">
               <i class="fas fa-clipboard-list text-primary"></i>
-              <span>{% if role in ['O CENTRE NCO'] %}PARADE DATA MANAGEMENT{% else %}ENTER PARADE DATA{% endif %}</span>
+              <span>{% if role in ['O CENTRE NCO'] or is_center_onco %}PARADE DATA MANAGEMENT{% else %}ENTER PARADE DATA{% endif %}</span>
             </button>
           </li>
           {% endif %}
 
           <!-- MANAGE LEAVE -->
-          {% if role == 'ONCO' %}
+          {% if role == 'ONCO' or is_center_onco %}
           <li>
             <a href="/onco/manage_leave" class="dropdown-item">
               <i class="fas fa-calendar-times text-warning"></i>
@@ -668,9 +884,10 @@
           {% endif %}
 
           <!-- EDIT DRONE/WPN -->
-          {% if role == 'ONCO' or (role and 'ONCO' in role|upper) %}
+          {% if role == 'ONCO' or (role and 'ONCO' in role|upper) or is_center_onco %}
           <li>
-            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#droneWpnModal" id="editDroneWpnBtn">
+            <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#droneWpnModal"
+              id="editDroneWpnBtn">
               <i class="fas fa-crosshairs text-danger"></i>
               <span>EDIT DRONE/WPN</span>
             </button>
@@ -678,7 +895,8 @@
           {% endif %}
 
           <!-- ADD HONOUR ENTRY -->
-          {% if role in ['ONCO', 'JCO IT', 'jcoit', 'JCOIT', 'NCO IT', 'nco it'] or (role and role|lower in ['jco it', 'jcoit', 'nco it']) %}
+          {% if role in ['ONCO', 'JCO IT', 'jcoit', 'JCOIT', 'NCO IT', 'nco it', 'O CENTRE NCO'] or is_center_onco or (role and role|lower in ['jco it',
+          'jcoit', 'nco it']) %}
           <li>
             <button class="dropdown-item" type="button" data-bs-toggle="modal" data-bs-target="#addHonoursModal">
               <span style="width: 18px; text-align: center; display: inline-block;">🏅</span>
@@ -705,11 +923,14 @@
     <!-- ===== STATS GRID ===== -->
     <div class="stats-grid stagger-children" id="statsGrid">
 
-      {% if role in ['CO', '2IC', 'ADJUTANT','OC','ONCO'] %}
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal">
-        <span class="sc-label">Parade State</span>
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC','ONCO'] or is_center_onco %}
+      <div class="sc" data-bs-toggle="modal" data-bs-target="#paradeStateModal" title="Officers – JCOs – Other Ranks">
+        <span class="sc-label">Parade State
+          <small style="display: block; font-size: 10px; color: #64748b; font-weight: 600; margin-top: 1px;">Offr &ndash; JCO &ndash; OR</small>
+        </span>
         <div class="sc-right">
-          <span class="sc-val" id="mainPower"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="mainPower" title="Officers – JCOs – Other Ranks"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
@@ -717,34 +938,42 @@
       <div class="sc" data-bs-toggle="modal" data-bs-target="#attachmentModalUniqueScope" style="cursor: pointer;">
         <span class="sc-label">TD / Attachment</span>
         <div class="sc-right">
-          <span class="sc-val" id="attachment-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="attachment-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
 
-      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] or is_center_onco %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#dutySearchModal" id="card-duty-search">
         <span class="sc-label">Domain Specialization</span>
         <div class="sc-right">
-          <span class="sc-val" id="duty-search-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="duty-search-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
-      <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal" data-bs-target="#aiFitnessReportsModal" onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();" title="Individual Fitness Reports & Operational Readiness">
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT',
+      'COMMANDING OFFICER']) %}
+      <div class="sc" style="cursor: pointer;" id="viewFitnessDetailsBtn" data-bs-toggle="modal"
+        data-bs-target="#aiFitnessReportsModal"
+        onclick="if(typeof openAiFitnessReportsModal==='function') openAiFitnessReportsModal();"
+        title="Individual Fitness Reports & Operational Readiness">
         <span class="sc-label"><i class="fas fa-heartbeat text-danger me-1"></i> FITNESS REPORTS</span>
         <div class="sc-right">
-          <span class="sc-val" id="dash-fit-total"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="dash-fit-total"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
 
-      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT','OC'] or is_center_onco %}
       <div class="sc" id="openCourses">
         <span class="sc-label">On Course</span>
         <div class="sc-right">
-          <span class="sc-val" id="totalCoursesDone"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="totalCoursesDone"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
@@ -764,16 +993,19 @@
       <div class="sc" id="task-assigned" data-bs-toggle="modal" data-bs-target="#taskModal">
         <span class="sc-label">Task Pending</span>
         <div class="sc-right">
-          <span class="sc-val" id="task-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="task-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub" id="task-pending">&nbsp;</span>
         </div>
       </div>
       {% endif %}
 
-      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope" style="cursor: pointer;">
+      <div class="sc" id="viewDetailsBtn" data-bs-toggle="modal" data-bs-target="#detModalUniqueScope"
+        style="cursor: pointer;">
         <span class="sc-label">Detachment</span>
         <div class="sc-right">
-          <span class="sc-val" id="locationCount"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="locationCount"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
 
@@ -781,7 +1013,8 @@
       <div class="sc" id="openSensitive">
         <span class="sc-label">Sensitive Indl</span>
         <div class="sc-right">
-          <span class="sc-val" id="sensitive-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="sensitive-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
@@ -790,100 +1023,122 @@
       <div class="sc" id="openBoardDetails">
         <span class="sc-label">BOOs</span>
         <div class="sc-right">
-          <span class="sc-val" id="board-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="board-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
-      {%if role in ["ONCO","Subedar Major","S/JCO","NCO COMN","NCO CHQ","NCO IT","NCO MW","NCO FAULT REPAIR","NCO SIGCEN","NCO MCCS","NCO RHQ","NCO LRW","NCO QM","NCO MT","NCO TM","NCO RP","JCO COMN","JCO CHQ","JCO IT","JCO MW","JCO FAULT REPAIR","JCO SIGCEN","JCO MCCS","JCO RHQ","JCO TM","JCO MT","JCO LRW","JCO QM","JCO CHQ","PA"]%}
+      {%if role in ["ONCO","Subedar Major","S/JCO","NCO COMN","NCO CHQ","NCO IT","NCO MW","NCO FAULT REPAIR","NCO
+      SIGCEN","NCO MCCS","NCO RHQ","NCO LRW","NCO QM","NCO MT","NCO TM","NCO RP","JCO COMN","JCO CHQ","JCO IT","JCO
+      MW","JCO FAULT REPAIR","JCO SIGCEN","JCO MCCS","JCO RHQ","JCO TM","JCO MT","JCO LRW","JCO QM","JCO CHQ","PA"] or is_center_onco %}
       <div class="sc" onclick="openLeaveModal()">
         <span class="sc-label">Check Leaves</span>
         <div class="sc-right">
-          <span class="sc-val"><i class="fas fa-calendar-check" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+          <span class="sc-val"><i class="fas fa-calendar-check"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {%endif%}
 
       {% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-      {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
+      {% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or is_center_onco %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#loanModal" id="loanDetailGraph">
         <span class="sc-label">Active Loans</span>
         <div class="sc-right">
-          <span class="sc-val" id="active-loan-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="active-loan-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
-      <div class="sc" style="cursor: pointer" id="card-ai-insights-dash" data-bs-toggle="modal" data-bs-target="#aiJoineeInsightsModal" onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();" title="New Arrival Recommendation Insights">
+      <div class="sc" style="cursor: pointer" id="card-ai-insights-dash" data-bs-toggle="modal"
+        data-bs-target="#aiJoineeInsightsModal"
+        onclick="if(typeof openAiInsightsModal==='function') openAiInsightsModal();"
+        title="New Arrival Recommendation Insights">
         <span class="sc-label"><i class="fas fa-brain text-primary me-1"></i> NEW ARRIVAL</span>
         <div class="sc-right">
-          <span class="sc-val" id="ai-insights-count-dash"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="ai-insights-count-dash"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
-      {% if role in ['PROJECT OFFICER','PROJECT JCO'] %}
+      {% set r_clean_proj = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if role in ['PROJECT OFFICER','PROJECT JCO', 'BNWR', 'BN WR', 'bnwr'] or r_clean_proj in ['BNWR', 'PROJECTOFFICER', 'PROJECTJCO'] or (session.get('username', '')|lower == 'bnwr') or is_center_onco %}
       <div class="sc" id="openProjects">
         <span class="sc-label">Total Projects</span>
         <div class="sc-right">
-          <span class="sc-val" id="get_projects_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="get_projects_count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] %}
+      {% if role in ['CO', '2IC', 'ADJUTANT','Subedar Major','S/JCO'] or is_center_onco %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#centerRollCallModal">
         <span class="sc-label">Roll Call</span>
         <div class="sc-right">
-          <span class="sc-val" id="center-roll-points"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="center-roll-points"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
-      {% if role in ['CO', '2IC', 'ADJUTANT','TRGJCO','OC','HEAD CLK','S/JCO'] %}
-      <div class="sc" data-bs-toggle="modal" data-bs-target="#agni_Modal">
-        <span class="sc-label">Agniveer</span>
-        <div class="sc-right">
-          <span class="sc-val" id="agniveer_count"><span class="val-dots"><span></span><span></span><span></span></span></span>
-        </div>
-      </div>
-      {% endif %}
 
       {% if role in ['TRGJCO'] %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#on_courses_modal">
         <span class="sc-label">Add Indl On Course</span>
         <div class="sc-right">
-          <span class="sc-val"><i class="fas fa-user-graduate" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+          <span class="sc-val"><i class="fas fa-user-graduate"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#fillupdetailsmodal">
         <span class="sc-label">Fill Up Test Details</span>
         <div class="sc-right">
-          <span class="sc-val"><i class="fas fa-clipboard-check" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+          <span class="sc-val"><i class="fas fa-clipboard-check"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {% endif %}
 
-      {% if role in ['O2','OC'] %}
+      {% if role in ['O2','OC'] or is_center_onco %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesInListModal">
         <span class="sc-label">Dues In</span>
         <div class="sc-right">
-          <span class="sc-val" id="count-dues-in"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="count-dues-in"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       <div class="sc" data-bs-toggle="modal" data-bs-target="#duesOutListModal">
         <span class="sc-label">Dues Out</span>
         <div class="sc-right">
-          <span class="sc-val" id="count-dues-out"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="count-dues-out"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
         </div>
       </div>
       {% endif %}
 
       {# ── COMPANY INTERVIEW CARD ── #}
-      {% if role in ['CO','2IC','ADJUTANT','OC','Subedar Major','S/JCO','NCO COMN','NCO CHQ','NCO IT','NCO MW','NCO SIGCEN','NCO MCCS','NCO RHQ','NCO LRW','NCO QM','NCO MT','NCO TM','NCO RPNA','JCO COMN','JCO CHQ','JCO IT','JCO MW','JCO SIGCEN','JCO MCCS','JCO RHQ','JCO TM','JCO MT','JCO LRW','JCO QM','ONCO'] %}
+      {% if role in ['CO','2IC','ADJUTANT','OC','Subedar Major','S/JCO','NCO COMN','NCO CHQ','NCO IT','NCO MW','NCO
+      SIGCEN','NCO MCCS','NCO RHQ','NCO LRW','NCO QM','NCO MT','NCO TM','NCO RPNA','JCO COMN','JCO CHQ','JCO IT','JCO
+      MW','JCO SIGCEN','JCO MCCS','JCO RHQ','JCO TM','JCO MT','JCO LRW','JCO QM','ONCO'] or is_center_onco %}
       <div class="sc" data-bs-toggle="modal" data-bs-target="#companyInterviewModal">
         <span class="sc-label">OC Interview</span>
         <div class="sc-right">
-          <span class="sc-val" id="company-interview-count"><span class="val-dots"><span></span><span></span><span></span></span></span>
+          <span class="sc-val" id="company-interview-count"><span
+              class="val-dots"><span></span><span></span><span></span></span></span>
           <span class="sc-sub">Pending</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if role in ['ACCTJCO', 'ACCOUNT JCO', 'CO', 'ONCO'] or (role and role|upper|replace(' ', '') in
+      ['ACCTJCO','ACCOUNTJCO']) or is_center_onco %}
+      <div class="sc" style="cursor: pointer" onclick="window.location.href='/account/'">
+        <span class="sc-label">Accounts</span>
+        <div class="sc-right">
+          <span class="sc-val"><i class="fa fa-user-circle"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {% endif %}
@@ -891,22 +1146,26 @@
       {% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
       {% set is_docjc = (role and role|upper in ['DOCJC', 'DOC JC', 'DOC_JC']) or r_clean_dash == 'DOCJC' %}
       {% set is_onco = ('ONCO' in (role or '')|upper) or ('ONCO' in r_clean_dash) %}
-      {% set is_auth = (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'SECOND IN COMMAND', 'ADJUTANT']) or r_clean_dash in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] %}
+      {% set is_auth = (role and role|upper in ['CO', 'COMMANDING OFFICER', '2IC', 'SECOND IN COMMAND', 'ADJUTANT']) or
+      r_clean_dash in ['CO', 'COMMANDINGOFFICER', '2IC', 'SECONDINCOMMAND', 'ADJUTANT'] %}
 
-      {% if is_docjc or is_auth or is_onco %}
-      <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal" title="PART-II STATUS">
+      {% if is_docjc or is_auth or is_onco or is_center_onco %}
+      <div class="sc" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#pendingCasesModal"
+        title="PART-II STATUS">
         <span class="sc-label">PART-II STATUS</span>
         <div class="sc-right">
-          <span class="sc-val"><i class="fa fa-folder-open" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+          <span class="sc-val"><i class="fa fa-folder-open"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {% endif %}
 
-      {% if is_docjc or is_onco %}
+      {% if is_docjc or is_onco or is_center_onco %}
       <div class="sc" style="cursor: pointer" onclick="openDocjcLeaveModal()" title="Leave Details">
         <span class="sc-label">Leave Details</span>
         <div class="sc-right">
-          <span class="sc-val"><i class="fas fa-calendar-alt" style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
+          <span class="sc-val"><i class="fas fa-calendar-alt"
+              style="font-size:14px;color:var(--primary-color,#0d6efd)"></i></span>
         </div>
       </div>
       {% endif %}
@@ -967,7 +1226,7 @@
     {% include 'modals/docjc_leave_details_modal.html' %}
     {# {% include 'modals/co_interview/modal.html' %} #}
 
-    {% if role in ['O CENTRE NCO'] %}
+    {% if role in ['O CENTRE NCO'] or is_center_onco %}
     <div class="modal fade" id="tradeModal" tabindex="-1">
       <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">{% include 'modals/trade/trade.html' %}</div>
@@ -975,37 +1234,35 @@
     </div>
     {% endif %}
 
-    {% if role in ['CO','2IC','ADJUTANT','TRGJCO','OC'] %}
-      {% include 'modals/agniveer/modal.html' %}
-      {% include 'modals/agniveer/fill_up_test_details.html' %}
+    {% if role in ['O CENTRE NCO','ONCO'] or is_center_onco %}
+    {% include 'modals/parade_data/index.html' %}
     {% endif %}
 
-    {% if role in ['O CENTRE NCO','ONCO'] %}
-      {% include 'modals/parade_data/index.html' %}
+    {% if role == 'ONCO' or (role and 'ONCO' in role|upper) or is_center_onco %}
+    {% include 'modals/drone_wpn/drone_wpn_modal.html' %}
     {% endif %}
 
-    {% if role == 'ONCO' or (role and 'ONCO' in role|upper) %}
-      {% include 'modals/drone_wpn/drone_wpn_modal.html' %}
+    {% if role in ['O CENTRE NCO','ONCO','JCO IT','jcoit','JCOIT','NCO IT','nco it'] or is_center_onco or (role and role|lower in ['jco
+    it','jcoit','nco it']) %}
+    {% include 'modals/add_honours_entry/h_entry.html' %}
     {% endif %}
 
-    {% if role in ['O CENTRE NCO','ONCO','JCO IT','jcoit','JCOIT','NCO IT','nco it'] or (role and role|lower in ['jco it','jcoit','nco it']) %}
-      {% include 'modals/add_honours_entry/h_entry.html' %}
-    {% endif %}
-
-    {% if role in ['CO', '2IC'] %}
-      {% include 'modals/leaverequest/co-rejected-view.html' %}
+    {% if role in ['CO', '2IC', 'BNWR', 'BN WR'] or is_center_onco %}
+    {% include 'modals/leaverequest/co-rejected-view.html' %}
     {% endif %}
 
     {% if role == 'Subedar Major' %}
-      {% include 'modals/coy_kunba/view_company_kunba.html' %}
+    {% include 'modals/coy_kunba/view_company_kunba.html' %}
     {% endif %}
 
-    {% if role in ['O2','OC'] %}
-      {% include 'modals/ADD-DUES-IN/modal.html' %}
-      {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
-      {% include 'modals/ADD-DUES-OUT/modal.html' %}
-      {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
+    {% if role in ['O2','OC'] or is_center_onco %}
+    {% include 'modals/ADD-DUES-IN/modal.html' %}
+    {% include 'modals/ADD-DUES-IN/list_of_dues_in.html' %}
+    {% include 'modals/ADD-DUES-OUT/modal.html' %}
+    {% include 'modals/ADD-DUES-OUT/list_of_dues_out.html' %}
     {% endif %}
+
+    {% include 'modals/alarm/edit_det_td_modal.html' %}
 
     <!-- Parade State Modal -->
     <div class="modal fade modal-fullscreen" id="paradeStateModal" tabindex="-1">
@@ -1015,9 +1272,12 @@
             <h5 class="modal-title">Parade State</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-          <div class="text-center py-2" style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
-            <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
-              <i class="fa fa-clock me-1"></i> LAST UPDATED: <span class="manpower-last-updated-text" id="manpowerLastUpdatedTimestampDash">--</span>
+          <div class="text-center py-2"
+            style="background: rgba(37, 99, 235, 0.08); border-bottom: 1px solid rgba(37, 99, 235, 0.15);">
+            <span class="badge shadow-sm"
+              style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 18px; border-radius: 30px; letter-spacing: 0.5px;">
+              <i class="fa fa-clock me-1"></i> LAST UPDATED: <span class="manpower-last-updated-text"
+                id="manpowerLastUpdatedTimestampDash">--</span>
             </span>
           </div>
           <div class="modal-body">
@@ -1033,9 +1293,11 @@
 
       <!-- Bar Chart -->
       <div class="col-lg-8 chart-card-wrap" id="barChartWrap" style="transition-delay:0.1s">
-        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+        <div class="card h-100"
+          style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
+            <div
+              style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap;">
               <h6 style="margin:0;font-weight:600;">Posted Strength</h6>
               <span id="rankTotalCount" style="font-weight:600;color:var(--primary-color);">Total: --</span>
             </div>
@@ -1048,7 +1310,8 @@
 
       <!-- Donut Chart -->
       <div class="col-lg-4 chart-card-wrap" id="donutChartWrap" style="transition-delay:0.2s">
-        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+        <div class="card h-100"
+          style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
               <h6 style="margin:0;font-weight:600;">Detachment Stats</h6>
@@ -1068,9 +1331,11 @@
 
       <!-- Unfit Trend -->
       <div class="col-lg-8 chart-card-wrap" style="transition-delay:0.15s">
-        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+        <div class="card h-100"
+          style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+            <div
+              style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
               <h6 style="margin:0;font-weight:600;">Weight Based Monthly Comparison</h6>
               <span style="font-weight:600;color:#dc2626;font-size:13px;">Trend Analysis</span>
             </div>
@@ -1083,9 +1348,11 @@
 
       <!-- Fit / Unfit Bar -->
       <div class="col-lg-4 chart-card-wrap" style="transition-delay:0.25s">
-        <div class="card h-100" style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
+        <div class="card h-100"
+          style="border-radius:10px; border:0.5px solid var(--border-color); background:var(--card-background); box-shadow:none;">
           <div class="card-body" style="padding:14px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
+            <div
+              style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px;">
               <h6 style="margin:0;font-weight:600;">Fit vs UnFit</h6>
               <div style="display:flex;gap:12px;font-size:12px;font-weight:700;">
                 <span style="color:#2563eb;font-weight:900;">Fit: <span id="fitCount">--</span></span>
@@ -1110,8 +1377,20 @@
 
 <!-- ===== SCRIPTS ===== -->
 <script>
+  /* ---- Open Leave Requests Modal ---- */
+  window.openLeaveRequestsModal = function () {
+    var modalEl = document.getElementById("leaveRequestsModal");
+    if (modalEl && window.bootstrap) {
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+    if (typeof loadLeaveRequests === "function") {
+      loadLeaveRequests();
+    }
+  };
+  window.openAllPendingLeavesModal = window.openLeaveRequestsModal;
+
   /* ---- Direct handler for More Actions dropdown ---- */
-  window.toggleMoreActionsDropdown = function(event) {
+  window.toggleMoreActionsDropdown = function (event) {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
@@ -1142,7 +1421,7 @@
   };
 
   // Close dropdown on click outside
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     var wrap = document.getElementById('moreActionsWrap');
     var menu = document.getElementById('moreActionsMenu');
     var btn = document.getElementById('moreActionsDropdown');
@@ -1156,10 +1435,10 @@
   });
 
   // Close dropdown when any item inside it is clicked (e.g. modal triggers or links)
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     var menu = document.getElementById('moreActionsMenu');
     if (menu) {
-      menu.addEventListener('click', function(e) {
+      menu.addEventListener('click', function (e) {
         var item = e.target.closest('.dropdown-item');
         if (item) {
           menu.classList.remove('show');
@@ -1226,7 +1505,7 @@
   /* ---- Toggle grid ---- */
   (function () {
     var grid = document.getElementById("statsGrid");
-    var btn  = document.getElementById("toggleGrid");
+    var btn = document.getElementById("toggleGrid");
     var hidden = false;
     if (btn && grid) {
       btn.addEventListener("click", function () {
@@ -1298,7 +1577,7 @@
       var cnt = (d.data || []).length;
       var bdg = document.getElementById("coRejectedCount");
       if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   /* ---- Load leave request badge ---- */
@@ -1309,7 +1588,7 @@
       var cnt = (d.data || []).length;
       var bdg = document.getElementById("leaveRequestBadge");
       if (bdg) { bdg.textContent = cnt; bdg.style.display = cnt > 0 ? "inline-flex" : "none"; }
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       var r2 = await fetch("/apply_leave/api/leaves");
@@ -1317,7 +1596,7 @@
       var pCnt = (d2.pending || []).length;
       var oncoBdg = document.getElementById("oncoPendingLeaveBadge");
       if (oncoBdg) { oncoBdg.textContent = pCnt; oncoBdg.style.display = pCnt > 0 ? "inline-flex" : "none"; }
-    } catch (e) {}
+    } catch (e) { }
   }
 
   /* ---- Generic single-value card fetcher ---- */
@@ -1355,6 +1634,10 @@
       var r = await fetch("/api/dashboard/manpower");
       var d = await r.json();
       safeSet("mainPower", (d.officerCount || 0) + " – " + (d.jcoCount || 0) + " – " + (d.orCount || 0));
+      var mpEl = document.getElementById("mainPower");
+      if (mpEl) {
+        mpEl.title = "Officers: " + (d.officerCount || 0) + " | JCOs: " + (d.jcoCount || 0) + " | Other Ranks: " + (d.orCount || 0) + " | Total: " + (d.total || 0);
+      }
     } catch (e) { safeSet("mainPower", "—"); }
   }
 
@@ -1382,7 +1665,7 @@
       var r = await fetch("/api/dashboard/tasks");
       var d = await r.json();
       var pending = d.pending || 0;
-      var total   = d.total   || 0;
+      var total = d.total || 0;
       safeSet("task-count", pending + " / " + total);
       var pct = total > 0 ? ((pending / total) * 100).toFixed(1) : 0;
       pe.textContent = "Pending " + pct + "%";
@@ -1396,18 +1679,18 @@
   /* ---- Load all cards ---- */
   async function loadAllDashboardCards() {
     var simpleCards = [
-      { id: "locationCount",           endpoint: "/api/dashboard/detachments",              key: "count" },
-      { id: "dash-fit-total",          endpoint: "/api/dashboard/fitness_reports",          key: "count" },
-      { id: "attachment-count",        endpoint: "/api/dashboard/attachments",               key: "count" },
-      { id: "agniveer_count",          endpoint: "/api/dashboard/agniveers",                key: "count" },
-      { id: "get_projects_count",      endpoint: "/api/dashboard/projects",                 key: "count" },
-      { id: "sensitive-count",         endpoint: "/api/dashboard/sensitive",                key: "count" },
-      { id: "active-loan-count",       endpoint: "/api/dashboard/loans",                   key: "count" },
-      { id: "totalCoursesDone",        endpoint: "/api/dashboard/courses",                  key: "count" },
-      { id: "center-roll-points",      endpoint: "/api/dashboard/rollcall",                 key: "points" },
-      { id: "count-dues-in",           endpoint: "/dues/count-dues-in",                     key: "count_dues_in" },
-      { id: "count-dues-out",          endpoint: "/dues/count-dues-out",                    key: "count_dues_out" },
-      { id: "board-count",             endpoint: "/api/dashboard/boards",                   key: "count" },
+      { id: "locationCount", endpoint: "/api/dashboard/detachments", key: "count" },
+      { id: "dash-fit-total", endpoint: "/api/dashboard/fitness_reports", key: "count" },
+      { id: "attachment-count", endpoint: "/api/dashboard/attachments", key: "count" },
+      { id: "agniveer_count", endpoint: "/api/dashboard/agniveers", key: "count" },
+      { id: "get_projects_count", endpoint: "/api/dashboard/projects", key: "count" },
+      { id: "sensitive-count", endpoint: "/api/dashboard/sensitive", key: "count" },
+      { id: "active-loan-count", endpoint: "/api/dashboard/loans", key: "count" },
+      { id: "totalCoursesDone", endpoint: "/api/dashboard/courses", key: "count" },
+      { id: "center-roll-points", endpoint: "/api/dashboard/rollcall", key: "points" },
+      { id: "count-dues-in", endpoint: "/dues/count-dues-in", key: "count_dues_in" },
+      { id: "count-dues-out", endpoint: "/dues/count-dues-out", key: "count_dues_out" },
+      { id: "board-count", endpoint: "/api/dashboard/boards", key: "count" },
       { id: "company-interview-count", endpoint: "/interview_update/company_interview_count", key: "count" },
       // { id: "co-interview-count",      endpoint: "/interview_update/co_interview_count",      key: "count" },
     ];
@@ -1416,9 +1699,9 @@
     simpleCards.forEach(function (c) {
       if (document.getElementById(c.id)) promises.push(fetchCardData(c.id, c.endpoint, c.key));
     });
-    if (document.getElementById("mainPower"))       promises.push(fetchManpowerData());
+    if (document.getElementById("mainPower")) promises.push(fetchManpowerData());
     if (document.getElementById("interview-Count")) promises.push(fetchInterviewData());
-    if (document.getElementById("task-count"))      promises.push(fetchTasksData());
+    if (document.getElementById("task-count")) promises.push(fetchTasksData());
 
     /* Domain specialisation — separate endpoint */
     if (document.getElementById("duty-search-count")) {
@@ -1426,7 +1709,7 @@
         fetch("/company_based_domain_sp")
           .then(function (r) { return r.json(); })
           .then(function (cnt) { safeSet("duty-search-count", cnt); })
-          .catch(function () {})
+          .catch(function () { })
       );
     }
 
@@ -1485,10 +1768,10 @@
           var payload = {
             army_number: form.army_number.value,
             tests: [
-              { test: "1st", status: form.test1.value,  date: form.test1_date.value },
-              { test: "2nd", status: form.test2.value,  date: form.test2_date.value },
-              { test: "3rd", status: form.test3.value,  date: form.test3_date.value },
-              { test: "4th", status: form.test4.value,  date: form.test4_date.value },
+              { test: "1st", status: form.test1.value, date: form.test1_date.value },
+              { test: "2nd", status: form.test2.value, date: form.test2_date.value },
+              { test: "3rd", status: form.test3.value, date: form.test3_date.value },
+              { test: "4th", status: form.test4.value, date: form.test4_date.value },
             ],
           };
           fetch("/api/fill-up-test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
@@ -1506,10 +1789,10 @@
 
 <script>
   /* ===== CHARTS & THEME SYNC ===== */
-  let rankChartInstance     = null;
+  let rankChartInstance = null;
   let detachmentChartInstance = null;
   let unfitTrendChartInstance = null;
-  let fitUnfitChartInstance   = null;
+  let fitUnfitChartInstance = null;
 
   let currUserCoy = "{{company}}";
   if (currUserCoy === "Center") currUserCoy = "ALL";
@@ -1517,19 +1800,19 @@
   function getThemeChartColors() {
     const theme = document.documentElement.getAttribute('data-theme') || 'light';
     const colors = {
-      light:    { primary: '#3b82f6', border: '#2563eb', bg: 'rgba(59, 130, 246, 0.15)', text: '#1e293b', grid: 'rgba(0, 0, 0, 0.06)' },
-      dark:     { primary: '#60a5fa', border: '#3b82f6', bg: 'rgba(96, 165, 250, 0.2)', text: '#ffffff', grid: 'rgba(255, 255, 255, 0.08)' },
+      light: { primary: '#3b82f6', border: '#2563eb', bg: 'rgba(59, 130, 246, 0.15)', text: '#1e293b', grid: 'rgba(0, 0, 0, 0.06)' },
+      dark: { primary: '#60a5fa', border: '#3b82f6', bg: 'rgba(96, 165, 250, 0.2)', text: '#ffffff', grid: 'rgba(255, 255, 255, 0.08)' },
       military: { primary: '#4a7c59', border: '#2d5a3d', bg: 'rgba(74, 124, 89, 0.22)', text: '#1a3d2a', grid: 'rgba(45, 90, 61, 0.12)' },
-      ocean:    { primary: '#0891b2', border: '#0e7490', bg: 'rgba(8, 145, 178, 0.2)', text: '#164e63', grid: 'rgba(14, 116, 144, 0.12)' },
-      sunset:   { primary: '#f59e0b', border: '#d97706', bg: 'rgba(245, 158, 11, 0.2)', text: '#78350f', grid: 'rgba(217, 119, 6, 0.12)' },
-      purple:   { primary: '#9333ea', border: '#7e22ce', bg: 'rgba(147, 51, 234, 0.2)', text: '#581c87', grid: 'rgba(126, 34, 206, 0.12)' }
+      ocean: { primary: '#0891b2', border: '#0e7490', bg: 'rgba(8, 145, 178, 0.2)', text: '#164e63', grid: 'rgba(14, 116, 144, 0.12)' },
+      sunset: { primary: '#f59e0b', border: '#d97706', bg: 'rgba(245, 158, 11, 0.2)', text: '#78350f', grid: 'rgba(217, 119, 6, 0.12)' },
+      purple: { primary: '#9333ea', border: '#7e22ce', bg: 'rgba(147, 51, 234, 0.2)', text: '#581c87', grid: 'rgba(126, 34, 206, 0.12)' }
     };
     return colors[theme] || colors.light;
   }
 
   async function loadRankChart(company = "ALL") {
     try {
-      const res    = await fetch(`/get_posted_strength?company=${encodeURIComponent(company)}`);
+      const res = await fetch(`/get_posted_strength?company=${encodeURIComponent(company)}`);
       const result = await res.json();
       if (result.status !== "success") return;
 
@@ -1581,7 +1864,7 @@
 
   async function loadDetachmentChart(company = "ALL") {
     try {
-      const res    = await fetch(`/get_detachment_stats_for_graph?company=${encodeURIComponent(company)}`);
+      const res = await fetch(`/get_detachment_stats_for_graph?company=${encodeURIComponent(company)}`);
       const result = await res.json();
       const dataRows = (result && result.data) ? result.data : [];
       const total = (result && result.total != null) ? result.total : dataRows.reduce((a, b) => a + (b.count || 0), 0);
@@ -1612,7 +1895,7 @@
             plugins: {
               legend: { display: false },
               tooltip: {
-                callbacks: { label: function() { return "No active detachments"; } }
+                callbacks: { label: function () { return "No active detachments"; } }
               }
             },
           },
@@ -1658,7 +1941,7 @@
           labels,
           datasets: [{
             data: values,
-            backgroundColor: ["#2563eb","#dc2626","#16a34a","#f59e0b","#7c3aed","#db2777","#0891b2","#65a30d","#ea580c","#4f46e5","#0f766e","#be123c","#4338ca","#15803d","#b45309","#6d28d9","#1d4ed8","#c2410c","#0f172a","#a21caf"],
+            backgroundColor: ["#2563eb", "#dc2626", "#16a34a", "#f59e0b", "#7c3aed", "#db2777", "#0891b2", "#65a30d", "#ea580c", "#4f46e5", "#0f766e", "#be123c", "#4338ca", "#15803d", "#b45309", "#6d28d9", "#1d4ed8", "#c2410c", "#0f172a", "#a21caf"],
             borderWidth: 2, borderColor: isDark ? "#1e293b" : "#fff",
           }],
         },
@@ -1666,7 +1949,7 @@
         options: {
           responsive: true, maintainAspectRatio: false, cutout: "65%",
           animation: { animateRotate: true, duration: 800, easing: "easeOutQuart" },
-          plugins: { legend: { display:false } },
+          plugins: { legend: { display: false } },
         },
       });
     } catch (err) {
@@ -1678,11 +1961,11 @@
 
   async function loadUnfitTrend(company = "All") {
     try {
-      const res    = await fetch(`/api/unfit_trend?company=${encodeURIComponent(company)}`);
+      const res = await fetch(`/api/unfit_trend?company=${encodeURIComponent(company)}`);
       const result = await res.json();
       if (result.status !== "success") return;
 
-      const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const labels = result.data.map(d => `${monthNames[d.month - 1]} ${d.year}`);
       const values = result.data.map(d => d.unfit_count);
 
@@ -1734,10 +2017,10 @@
   async function loadFitUnfitChart(company = "All") {
     if (company === "ALL") company = "All";
     try {
-      const res    = await fetch(`/weight_system/api/summary?company=${encodeURIComponent(company)}`);
+      const res = await fetch(`/weight_system/api/summary?company=${encodeURIComponent(company)}`);
       const result = await res.json();
-      const fit    = result.Fit;
-      const unfit  = result.unFit;
+      const fit = result.Fit;
+      const unfit = result.unFit;
 
       const fc = document.getElementById("fitCount");
       const uc = document.getElementById("unfitCount");
@@ -1768,7 +2051,7 @@
       if (fitUnfitChartInstance) fitUnfitChartInstance.destroy();
       fitUnfitChartInstance = new Chart(canvas.getContext("2d"), {
         type: "bar",
-        data: { labels: ["Fit","UnFit"], datasets: [{ data: [fit, unfit], backgroundColor: [tc.primary,"#dc2626"], borderColor: [tc.border,"#b91c1c"], borderWidth: 1, borderRadius: 8, barThickness: 70 }] },
+        data: { labels: ["Fit", "UnFit"], datasets: [{ data: [fit, unfit], backgroundColor: [tc.primary, "#dc2626"], borderColor: [tc.border, "#b91c1c"], borderWidth: 1, borderRadius: 8, barThickness: 70 }] },
         plugins: [valueLabelPlugin],
         options: {
           responsive: true, maintainAspectRatio: false,
@@ -1803,8 +2086,8 @@
           if (el) el.textContent = d.total_count;
         }
       })
-      .catch(() => {});
-    {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or (role and role|upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
+      .catch(() => { });
+    {% if role in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] or(role and role | upper in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER']) %}
     // Fetch live aggregate stats for executive AI Fitness Reports card
     fetch('/fitness/api/reports/stats')
       .then(r => r.ok ? r.json() : null)
@@ -1824,8 +2107,8 @@
     {% endif %}
 
     fetch('/ai-company-readiness/api/dashboard')
-      .then(function(res) { return res.ok ? res.json() : null; })
-      .then(function(data) {
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
         var d = data ? (data.dashboard || data.data) : null;
         if (d) {
           window.modalReadinessCache = d;
@@ -1835,28 +2118,33 @@
           }
         }
       })
-      .catch(function(err) { console.warn('Could not load AI company readiness stats:', err); });
+      .catch(function (err) { console.warn('Could not load AI company readiness stats:', err); });
   });
 
-  window.addEventListener('themechange', function() {
+  window.addEventListener('themechange', function () {
     reloadDashboardCharts();
   });
 </script>
 
 {% set r_clean_dash = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] %}
+{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN', 'OCENTRENCO', 'OCENTERNCO', 'ONCO', 'BNWR'] or (role and role|upper in ['O CENTRE NCO', 'O CENTER NCO', 'ONCO', 'BNWR', 'BN WR']) or is_center_onco %}
 {% include 'modals/ai_joinee_insights_modal.html' %}
 {% include 'modals/ai_fitness_reports_modal.html' %}
 {% include 'modals/vms/vms_modal.html' %}
 {% endif %}
 
-{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean_dash in ['CO', '2IC', 'ADJUTANT', 'COMMANDINGOFFICER', 'ADMIN', 'SUPERADMIN'] or r_clean in ['1coyonco',
+'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO',
+'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO',
+'ONCO']) or is_center_onco %}
 {% include 'modals/ai_company_readiness_modal.html' %}
 {% include 'modals/company_details_and_gaps_modals.html' %}
 {% endif %}
 
 {% set r_clean = (role or '')|lower|replace(' ', '')|replace('_', '')|replace('-', '') %}
-{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco'] or (role and role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY ONCO', '2 COY ONCO', 'ONCO']) %}
+{% if r_clean in ['1coyonco', 'commcoyonco', 'comncoyonco', '3coyonco', '2coyonco', 'onco', 'coyonco', 'ocentrenco', 'ocenternco', 'bnwr'] or (role and
+role|upper in ['1COYONCO', 'COMMCOYONCO', 'COMNCOYONCO', '3COYONCO', '2COYONCO', '1 COY ONCO', 'COMM COY ONCO', '3 COY
+ONCO', '2 COY ONCO', 'ONCO', 'O CENTRE NCO', 'O CENTER NCO', 'BNWR', 'BN WR']) or is_center_onco %}
 {% include 'modals/ai_new_joinee_recommendation_modal.html' %}
 {% include 'modals/ai_company_readiness_retrain_modal.html' %}
 {% endif %}

@@ -4,12 +4,104 @@
 <style>
   .card-shadow {
     border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  }
+
+  .table {
+    table-layout: fixed;
+    width: 100%;
   }
 
   .table thead {
     background-color: #1f2937;
     color: #fff;
+  }
+
+  .table thead th {
+    white-space: nowrap;
+    padding: 12px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+  }
+
+  .table tbody td {
+    padding: 10px;
+    font-size: 14px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Column widths - total = 100% */
+  .table th:nth-child(1),
+  .table td:nth-child(1) {
+    width: 4%;
+    text-align: center;
+  }
+
+  .table th:nth-child(2),
+  .table td:nth-child(2) {
+    width: 16%;
+    text-align: left;
+  }
+
+  .table th:nth-child(3),
+  .table td:nth-child(3) {
+    width: 12%;
+    text-align: left;
+  }
+
+  .table th:nth-child(4),
+  .table td:nth-child(4) {
+    width: 12%;
+    text-align: right;
+  }
+
+  .table th:nth-child(5),
+  .table td:nth-child(5) {
+    width: 12%;
+    text-align: right;
+  }
+
+  .table th:nth-child(6),
+  .table td:nth-child(6) {
+    width: 12%;
+    text-align: right;
+  }
+
+  .table th:nth-child(7),
+  .table td:nth-child(7) {
+    width: 10%;
+    text-align: center;
+  }
+
+  .table th:nth-child(8),
+  .table td:nth-child(8) {
+    width: 22%;
+    text-align: center;
+  }
+
+  .table td:nth-child(8) {
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+
+  .table td:nth-child(8) .btn {
+    display: inline-block;
+    margin: 0 3px;
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+
+  .action-btns {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: nowrap;
   }
 
   .view-btn.active {
@@ -32,6 +124,7 @@
   .summary-card {
     transition: transform 0.2s;
   }
+
   .summary-card:hover {
     transform: translateY(-3px);
   }
@@ -54,7 +147,8 @@
         <h4 class="mb-0" style="font-weight:600;background:#e3e0dc;padding:6px 12px;border-radius:10px;">
           DETAILS OF GRANTS – FY <span id="fyLabel"></span>
         </h4>
-        <span class="badge shadow-sm" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px;">
+        <span class="badge shadow-sm"
+          style="background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 30px; letter-spacing: 0.5px;">
           <i class="fa-solid fa-user-shield me-1"></i> UPDATED BY ACCTJCO
         </span>
       </div>
@@ -110,7 +204,7 @@
       <button id="tableBtn" class="btn btn-outline-secondary view-btn">📋 Table View</button>
     </div>
 
-    {% if role != 'CO' %}
+    {% if role not in ['CO', '2IC', 'ADJUTANT', 'COMMANDING OFFICER'] and role != 'CO' %}
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#grantModal">
       + Add Grant
     </button>
@@ -125,7 +219,8 @@
         <form id="grantForm">
           <input class="form-control mb-2" id="grant_name" placeholder="Grant Name" required>
           <input class="form-control mb-2" id="code_head" placeholder="Code Head" required>
-          <input class="form-control mb-3" id="allotment" type="number" step="0.01" placeholder="Initial Allotment (₹)" required>
+          <input class="form-control mb-3" id="allotment" type="number" step="0.01" placeholder="Initial Allotment (₹)"
+            required>
           <button type="submit" class="btn btn-success w-100">Save Grant</button>
         </form>
       </div>
@@ -149,7 +244,8 @@
           </div>
           <div class="mb-3">
             <label class="form-label fw-semibold">Allotment (₹)</label>
-            <input class="form-control" id="editAllotment" type="number" step="0.01" placeholder="Allotment Amount" required>
+            <input class="form-control" id="editAllotment" type="number" step="0.01" placeholder="Allotment Amount"
+              required>
           </div>
           <button type="submit" class="btn btn-warning text-dark w-100 fw-semibold">Update Grant</button>
         </form>
@@ -212,7 +308,7 @@
   <div id="tableView" style="display:none;">
     <div class="card card-shadow">
       <div class="table-responsive">
-        <table class="table text-center mb-0 align-middle">
+        <table class="table mb-0 align-middle">
           <thead>
             <tr>
               <th>#</th>
@@ -237,438 +333,440 @@
 <script src="/static/Chart.umd.min.js"></script>
 
 <script>
-// ====================== COUNT UP ANIMATION ======================
-function animateValue(id, start, end, duration, isPercent = false) {
-  const obj = document.getElementById(id);
-  const range = end - start;
-  let startTimestamp = null;
-  let lastValue = start;
+  // ====================== COUNT UP ANIMATION ======================
+  function animateValue(id, start, end, duration, isPercent = false) {
+    const obj = document.getElementById(id);
+    const range = end - start;
+    let startTimestamp = null;
+    let lastValue = start;
 
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const value = Math.floor(start + range * progress);
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const value = Math.floor(start + range * progress);
 
-    if (value !== lastValue) {
-      obj.textContent = isPercent 
-        ? value.toFixed(2) + "%" 
-        : Number(value).toLocaleString("en-IN");
-      lastValue = value;
-    }
+      if (value !== lastValue) {
+        obj.textContent = isPercent
+          ? value.toFixed(2) + "%"
+          : Number(value).toLocaleString("en-IN");
+        lastValue = value;
+      }
 
-    if (progress < 1) {
-      window.requestAnimationFrame(step);
-    } else {
-      // Final exact value
-      obj.textContent = isPercent 
-        ? end.toFixed(2) + "%" 
-        : Number(end).toLocaleString("en-IN");
-    }
-  };
+      if (progress < 1) {
+        window.requestAnimationFrame(step);
+      } else {
+        // Final exact value
+        obj.textContent = isPercent
+          ? end.toFixed(2) + "%"
+          : Number(end).toLocaleString("en-IN");
+      }
+    };
 
-  window.requestAnimationFrame(step);
-}
-
-// ====================== MAIN SCRIPT ======================
-document.addEventListener("DOMContentLoaded", () => {
-
-  const fyFilter = document.getElementById("fyFilter");
-  const fyLabel = document.getElementById("fyLabel");
-
-  const analyticBtn = document.getElementById("analyticBtn");
-  const tableBtn = document.getElementById("tableBtn");
-  const analyticView = document.getElementById("analyticView");
-  const tableView = document.getElementById("tableView");
-  const tableBody = document.getElementById("grantTableBody");
-
-  let barChart, pieChart, lineChart, doughnutChart;
-
-  function format(val) {
-    return Number(val || 0).toLocaleString("en-IN");
+    window.requestAnimationFrame(step);
   }
 
-  function updateFY() {
-    fyLabel.innerText = fyFilter.value;
-  }
+  // ====================== MAIN SCRIPT ======================
+  document.addEventListener("DOMContentLoaded", () => {
 
-  // Toggle Views
-  analyticBtn.onclick = () => {
-    analyticView.style.display = "block";
-    tableView.style.display = "none";
-    analyticBtn.classList.add("active");
-    tableBtn.classList.remove("active");
-    setTimeout(loadGrants, 50);
-  };
+    const fyFilter = document.getElementById("fyFilter");
+    const fyLabel = document.getElementById("fyLabel");
 
-  tableBtn.onclick = () => {
-    analyticView.style.display = "none";
-    tableView.style.display = "block";
-    tableBtn.classList.add("active");
-    analyticBtn.classList.remove("active");
-  };
+    const analyticBtn = document.getElementById("analyticBtn");
+    const tableBtn = document.getElementById("tableBtn");
+    const analyticView = document.getElementById("analyticView");
+    const tableView = document.getElementById("tableView");
+    const tableBody = document.getElementById("grantTableBody");
 
-  function loadGrants() {
-    fetch(`/account/grants/summary?fy=${fyFilter.value}`)
-      .then(r => r.json())
-      .then(data => {
-        tableBody.innerHTML = "";
+    let barChart, pieChart, lineChart, doughnutChart;
 
-        let totalA = 0, totalE = 0;
-        let names = [], allot = [], exp = [], perc = [];
+    function format(val) {
+      return Number(val || 0).toLocaleString("en-IN");
+    }
 
-        data.forEach((g, i) => {
-          const a = +g.total_allotment || 0;
-          const e = +g.total_expenditure || 0;
-          const p = +g.exp_percent || 0;
+    function updateFY() {
+      fyLabel.innerText = fyFilter.value;
+    }
 
-          totalA += a;
-          totalE += e;
+    // Toggle Views
+    analyticBtn.onclick = () => {
+      analyticView.style.display = "block";
+      tableView.style.display = "none";
+      analyticBtn.classList.add("active");
+      tableBtn.classList.remove("active");
+      setTimeout(loadGrants, 50);
+    };
 
-          names.push(g.name);
-          allot.push(a);
-          exp.push(e);
-          perc.push(p);
+    tableBtn.onclick = () => {
+      analyticView.style.display = "none";
+      tableView.style.display = "block";
+      tableBtn.classList.add("active");
+      analyticBtn.classList.remove("active");
+    };
 
-          tableBody.innerHTML += `
+    function loadGrants() {
+      fetch(`/account/grants/summary?fy=${fyFilter.value}`)
+        .then(r => r.json())
+        .then(data => {
+          tableBody.innerHTML = "";
+
+          let totalA = 0, totalE = 0;
+          let names = [], allot = [], exp = [], perc = [];
+
+          data.forEach((g, i) => {
+            const a = +g.total_allotment || 0;
+            const e = +g.total_expenditure || 0;
+            const p = +g.exp_percent || 0;
+
+            totalA += a;
+            totalE += e;
+
+            names.push(g.name);
+            allot.push(a);
+            exp.push(e);
+            perc.push(p);
+
+            tableBody.innerHTML += `
             <tr>
-              <td>${i+1}</td>
-              <td class="text-start">${g.name}</td>
+              <td>${i + 1}</td>
+              <td>${g.name}</td>
               <td>${g.code_head}</td>
-              <td class="text-end">${format(a)}</td>
+              <td>${format(a)}</td>
               <!-- <td>${g.no_of_sos}</td> -->
-              <td class="text-danger text-end">${format(e)}</td>
-              <td class="text-end">${format(g.balance)}</td>
+              <td class="text-danger">${format(e)}</td>
+              <td>${format(g.balance)}</td>
               <td>${p.toFixed(2)}%</td>
               <td>
-                <a href="/account/grants/${g.id}?fy=${fyFilter.value}" class="btn btn-sm btn-outline-primary me-1">View</a>
-                <button class="btn btn-sm btn-outline-warning text-dark" onclick='openEditGrantModal(${JSON.stringify(g)})'>Edit</button>
+                <div class="action-btns">
+                  <a href="/account/grants/${g.id}?fy=${fyFilter.value}" class="btn btn-sm btn-primary">View</a>
+                  <button class="btn btn-sm btn-success" onclick='openEditGrantModal(${JSON.stringify(g)})'>Edit</button>
+                </div>
               </td>
             </tr>`;
-        });
-
-        const overall = totalA ? (totalE / totalA) * 100 : 0;
-
-        // Update summary with count-up animation
-        document.getElementById("totalGrants").textContent = data.length;
-        animateValue("totalAllotment", 0, totalA, 1200);
-        animateValue("totalExpenditure", 0, totalE, 1400);
-        animateValue("overallUtil", 0, overall, 1000, true);
-
-        createCharts(names, allot, exp, perc, overall);
-      })
-      .catch(err => console.error("Error loading grants:", err));
-  }
-
-  function createCharts(n, a, e, p, o) {
-    // Destroy old charts
-    [barChart, pieChart, lineChart, doughnutChart].forEach(chart => chart?.destroy());
-
-    const chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: { mode: 'index', intersect: false }
-      }
-    };
-
-    const barDatalabelsPlugin = {
-      id: 'barDatalabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-          const meta = chart.getDatasetMeta(i);
-          if (meta.hidden) return;
-          meta.data.forEach((bar, idx) => {
-            const val = ds.data[idx];
-            if (val == null || val === 0) return;
-            ctx.save();
-            ctx.font = 'bold 9px sans-serif';
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            const formatted = '₹' + Number(val).toLocaleString('en-IN', { notation: 'compact' });
-            ctx.fillText(formatted, bar.x, bar.y - 5);
-            ctx.restore();
           });
-        });
-      }
-    };
 
-    const pieDatalabelsPlugin = {
-      id: 'pieDatalabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-          const meta = chart.getDatasetMeta(i);
-          meta.data.forEach((arc, j) => {
-            const val = ds.data[j];
-            if (val == null || val === 0) return;
-            const angle = arc.endAngle - arc.startAngle;
-            if (angle < 0.2) return;
-            ctx.save();
-            const midAngle = arc.startAngle + angle / 2;
-            const midRadius = (arc.innerRadius || 0) + (arc.outerRadius - (arc.innerRadius || 0)) / 2;
-            const x = arc.x + Math.cos(midAngle) * midRadius;
-            const y = arc.y + Math.sin(midAngle) * midRadius;
-            ctx.font = 'bold 9px sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            ctx.shadowBlur = 4;
-            const formatted = '₹' + Number(val).toLocaleString('en-IN', { notation: 'compact' });
-            ctx.fillText(formatted, x, y);
-            ctx.restore();
-          });
-        });
-      }
-    };
+          const overall = totalA ? (totalE / totalA) * 100 : 0;
 
-    const doughnutDatalabelsPlugin = {
-      id: 'doughnutDatalabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-          const meta = chart.getDatasetMeta(i);
-          meta.data.forEach((arc, j) => {
-            const val = ds.data[j];
-            if (val == null || val === 0) return;
-            const angle = arc.endAngle - arc.startAngle;
-            if (angle < 0.15) return;
-            ctx.save();
-            const midAngle = arc.startAngle + angle / 2;
-            const midRadius = arc.innerRadius + (arc.outerRadius - arc.innerRadius) / 2;
-            const x = arc.x + Math.cos(midAngle) * midRadius;
-            const y = arc.y + Math.sin(midAngle) * midRadius;
-            ctx.font = 'bold 11px sans-serif';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            ctx.shadowBlur = 4;
-            const formatted = Number(val).toFixed(1) + '%';
-            ctx.fillText(formatted, x, y);
-            ctx.restore();
-          });
-        });
-      }
-    };
+          // Update summary with count-up animation
+          document.getElementById("totalGrants").textContent = data.length;
+          animateValue("totalAllotment", 0, totalA, 1200);
+          animateValue("totalExpenditure", 0, totalE, 1400);
+          animateValue("overallUtil", 0, overall, 1000, true);
 
-    const lineDatalabelsPlugin = {
-      id: 'lineDatalabels',
-      afterDatasetsDraw(chart) {
-        const { ctx } = chart;
-        chart.data.datasets.forEach((ds, i) => {
-          const meta = chart.getDatasetMeta(i);
-          if (meta.hidden) return;
-          meta.data.forEach((point, idx) => {
-            const val = ds.data[idx];
-            if (val == null) return;
-            ctx.save();
-            ctx.font = 'bold 9px sans-serif';
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'bottom';
-            const formatted = Number(val).toFixed(1) + '%';
-            ctx.fillText(formatted, point.x, point.y - 6);
-            ctx.restore();
-          });
-        });
-      }
-    };
+          createCharts(names, allot, exp, perc, overall);
+        })
+        .catch(err => console.error("Error loading grants:", err));
+    }
 
-    // Bar Chart - Allotment (Blue) vs Expenditure (Red)
-    barChart = new Chart(document.getElementById("barChart"), {
-      type: "bar",
-      data: {
-        labels: n,
-        datasets: [
-          { label: "Allotment", data: a, backgroundColor: "#3b82f6" },
-          { label: "Expenditure", data: e, backgroundColor: "#ef4444" }
-        ]
-      },
-      plugins: [barDatalabelsPlugin],
-      options: {
-        ...chartOptions,
-        layout: { padding: { top: 15 } }
-      }
-    });
+    function createCharts(n, a, e, p, o) {
+      // Destroy old charts
+      [barChart, pieChart, lineChart, doughnutChart].forEach(chart => chart?.destroy());
 
-    // Pie Chart - Expenditure Distribution (Rich Vibrant Synced Palette)
-    const expenditureColors = [
-      "#3b82f6", // Royal Blue
-      "#10b981", // Emerald Green
-      "#f59e0b", // Amber Gold
-      "#8b5cf6", // Purple Violet
-      "#ec4899", // Vivid Pink
-      "#06b6d4", // Bright Cyan
-      "#f97316", // Coral Orange
-      "#6366f1", // Deep Indigo
-      "#14b8a6", // Sea Teal
-      "#ef4444"  // Rose Red
-    ];
-
-    pieChart = new Chart(document.getElementById("pieChart"), {
-      type: "pie",
-      data: {
-        labels: n,
-        datasets: [{ 
-          data: e, 
-          backgroundColor: n.map((_, i) => expenditureColors[i % expenditureColors.length]),
-          borderColor: "#ffffff",
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
-      plugins: [pieDatalabelsPlugin],
-      options: { 
-        ...chartOptions, 
-        plugins: { 
-          legend: { 
-            position: 'right',
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-              padding: 12,
-              font: { weight: '600', size: 12 }
-            }
-          } 
-        }
-      }
-    });
-
-    // Line Chart - Utilization Trend (Green - positive)
-    lineChart = new Chart(document.getElementById("lineChart"), {
-      type: "line",
-      data: {
-        labels: n,
-        datasets: [{
-          label: "Utilization %",
-          data: p,
-          borderColor: "#10b981",
-          tension: 0.4,
-          fill: false
-        }]
-      },
-      plugins: [lineDatalabelsPlugin],
-      options: {
-        ...chartOptions,
-        layout: { padding: { top: 15 } }
-      }
-    });
-
-    // Doughnut Chart - Overall Utilization (Red = Utilized, Green = Remaining)
-    doughnutChart = new Chart(document.getElementById("doughnutChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["Utilized", "Remaining"],
-        datasets: [{
-          data: [o, Math.max(0, 100 - o)],
-          backgroundColor: ["#ef4444", "#10b981"],
-          borderColor: "#ffffff",
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
-      plugins: [doughnutDatalabelsPlugin],
-      options: {
-        ...chartOptions,
-        cutout: "65%",
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-              padding: 14,
-              font: { weight: '600', size: 12 }
+          legend: { position: 'top' },
+          tooltip: { mode: 'index', intersect: false }
+        }
+      };
+
+      const barDatalabelsPlugin = {
+        id: 'barDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            if (meta.hidden) return;
+            meta.data.forEach((bar, idx) => {
+              const val = ds.data[idx];
+              if (val == null || val === 0) return;
+              ctx.save();
+              ctx.font = 'bold 9px sans-serif';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              const formatted = '₹' + Number(val).toLocaleString('en-IN', { notation: 'compact' });
+              ctx.fillText(formatted, bar.x, bar.y - 5);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      const pieDatalabelsPlugin = {
+        id: 'pieDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((arc, j) => {
+              const val = ds.data[j];
+              if (val == null || val === 0) return;
+              const angle = arc.endAngle - arc.startAngle;
+              if (angle < 0.2) return;
+              ctx.save();
+              const midAngle = arc.startAngle + angle / 2;
+              const midRadius = (arc.innerRadius || 0) + (arc.outerRadius - (arc.innerRadius || 0)) / 2;
+              const x = arc.x + Math.cos(midAngle) * midRadius;
+              const y = arc.y + Math.sin(midAngle) * midRadius;
+              ctx.font = 'bold 9px sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+              ctx.shadowBlur = 4;
+              const formatted = '₹' + Number(val).toLocaleString('en-IN', { notation: 'compact' });
+              ctx.fillText(formatted, x, y);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      const doughnutDatalabelsPlugin = {
+        id: 'doughnutDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach((arc, j) => {
+              const val = ds.data[j];
+              if (val == null || val === 0) return;
+              const angle = arc.endAngle - arc.startAngle;
+              if (angle < 0.15) return;
+              ctx.save();
+              const midAngle = arc.startAngle + angle / 2;
+              const midRadius = arc.innerRadius + (arc.outerRadius - arc.innerRadius) / 2;
+              const x = arc.x + Math.cos(midAngle) * midRadius;
+              const y = arc.y + Math.sin(midAngle) * midRadius;
+              ctx.font = 'bold 11px sans-serif';
+              ctx.fillStyle = '#ffffff';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+              ctx.shadowBlur = 4;
+              const formatted = Number(val).toFixed(1) + '%';
+              ctx.fillText(formatted, x, y);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      const lineDatalabelsPlugin = {
+        id: 'lineDatalabels',
+        afterDatasetsDraw(chart) {
+          const { ctx } = chart;
+          chart.data.datasets.forEach((ds, i) => {
+            const meta = chart.getDatasetMeta(i);
+            if (meta.hidden) return;
+            meta.data.forEach((point, idx) => {
+              const val = ds.data[idx];
+              if (val == null) return;
+              ctx.save();
+              ctx.font = 'bold 9px sans-serif';
+              const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+              ctx.fillStyle = isDark ? '#cbd5e1' : '#4a5568';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'bottom';
+              const formatted = Number(val).toFixed(1) + '%';
+              ctx.fillText(formatted, point.x, point.y - 6);
+              ctx.restore();
+            });
+          });
+        }
+      };
+
+      // Bar Chart - Allotment (Blue) vs Expenditure (Red)
+      barChart = new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+          labels: n,
+          datasets: [
+            { label: "Allotment", data: a, backgroundColor: "#3b82f6" },
+            { label: "Expenditure", data: e, backgroundColor: "#ef4444" }
+          ]
+        },
+        plugins: [barDatalabelsPlugin],
+        options: {
+          ...chartOptions,
+          layout: { padding: { top: 15 } }
+        }
+      });
+
+      // Pie Chart - Expenditure Distribution (Rich Vibrant Synced Palette)
+      const expenditureColors = [
+        "#3b82f6", // Royal Blue
+        "#10b981", // Emerald Green
+        "#f59e0b", // Amber Gold
+        "#8b5cf6", // Purple Violet
+        "#ec4899", // Vivid Pink
+        "#06b6d4", // Bright Cyan
+        "#f97316", // Coral Orange
+        "#6366f1", // Deep Indigo
+        "#14b8a6", // Sea Teal
+        "#ef4444"  // Rose Red
+      ];
+
+      pieChart = new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+          labels: n,
+          datasets: [{
+            data: e,
+            backgroundColor: n.map((_, i) => expenditureColors[i % expenditureColors.length]),
+            borderColor: "#ffffff",
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        plugins: [pieDatalabelsPlugin],
+        options: {
+          ...chartOptions,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 12,
+                font: { weight: '600', size: 12 }
+              }
             }
           }
         }
-      }
-    });
-  }
+      });
 
-  // Event Listeners
-  fyFilter.addEventListener("change", () => {
+      // Line Chart - Utilization Trend (Green - positive)
+      lineChart = new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+          labels: n,
+          datasets: [{
+            label: "Utilization %",
+            data: p,
+            borderColor: "#10b981",
+            tension: 0.4,
+            fill: false
+          }]
+        },
+        plugins: [lineDatalabelsPlugin],
+        options: {
+          ...chartOptions,
+          layout: { padding: { top: 15 } }
+        }
+      });
+
+      // Doughnut Chart - Overall Utilization (Red = Utilized, Green = Remaining)
+      doughnutChart = new Chart(document.getElementById("doughnutChart"), {
+        type: "doughnut",
+        data: {
+          labels: ["Utilized", "Remaining"],
+          datasets: [{
+            data: [o, Math.max(0, 100 - o)],
+            backgroundColor: ["#ef4444", "#10b981"],
+            borderColor: "#ffffff",
+            borderWidth: 2,
+            hoverOffset: 6
+          }]
+        },
+        plugins: [doughnutDatalabelsPlugin],
+        options: {
+          ...chartOptions,
+          cutout: "65%",
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                pointStyle: 'circle',
+                padding: 14,
+                font: { weight: '600', size: 12 }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Event Listeners
+    fyFilter.addEventListener("change", () => {
+      updateFY();
+      loadGrants();
+    });
+
+    // Initialize
     updateFY();
     loadGrants();
+
+    window.reloadGrants = loadGrants;
   });
 
-  // Initialize
-  updateFY();
-  loadGrants();
+  // ====================== ADD GRANT FORM ======================
+  document.getElementById("grantForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-  window.reloadGrants = loadGrants;
-});
-
-// ====================== ADD GRANT FORM ======================
-document.getElementById("grantForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  fetch("/account/grants/add", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name: grant_name.value,
-      code_head: code_head.value,
-      allotment: parseFloat(allotment.value)
+    fetch("/account/grants/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: grant_name.value,
+        code_head: code_head.value,
+        allotment: parseFloat(allotment.value)
+      })
     })
-  })
-  .then(r => r.json())
-  .then(res => {
-    if (res.success) {
-      bootstrap.Modal.getInstance(document.getElementById("grantModal")).hide();
-      document.getElementById("grantForm").reset();
-      if (typeof window.reloadGrants === 'function') window.reloadGrants();
-    } else {
-      alert(res.message || "Failed to add grant");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Server error while adding grant");
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          bootstrap.Modal.getInstance(document.getElementById("grantModal")).hide();
+          document.getElementById("grantForm").reset();
+          if (typeof window.reloadGrants === 'function') window.reloadGrants();
+        } else {
+          alert(res.message || "Failed to add grant");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Server error while adding grant");
+      });
   });
-});
 
-// ====================== EDIT GRANT FORM ======================
-function openEditGrantModal(g) {
-  document.getElementById("editGrantId").value = g.id;
-  document.getElementById("editGrantName").value = g.name;
-  document.getElementById("editCodeHead").value = g.code_head;
-  document.getElementById("editAllotment").value = g.total_allotment || g.allotment || 0;
-  new bootstrap.Modal(document.getElementById("editGrantModal")).show();
-}
+  // ====================== EDIT GRANT FORM ======================
+  function openEditGrantModal(g) {
+    document.getElementById("editGrantId").value = g.id;
+    document.getElementById("editGrantName").value = g.name;
+    document.getElementById("editCodeHead").value = g.code_head;
+    document.getElementById("editAllotment").value = g.total_allotment || g.allotment || 0;
+    new bootstrap.Modal(document.getElementById("editGrantModal")).show();
+  }
 
-function submitEditGrant(e) {
-  e.preventDefault();
-  const id = document.getElementById("editGrantId").value;
-  const name = document.getElementById("editGrantName").value.trim();
-  const code_head = document.getElementById("editCodeHead").value.trim();
-  const allotment = parseFloat(document.getElementById("editAllotment").value);
+  function submitEditGrant(e) {
+    e.preventDefault();
+    const id = document.getElementById("editGrantId").value;
+    const name = document.getElementById("editGrantName").value.trim();
+    const code_head = document.getElementById("editCodeHead").value.trim();
+    const allotment = parseFloat(document.getElementById("editAllotment").value);
 
-  fetch(`/account/grants/${id}/edit`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, code_head, allotment })
-  })
-  .then(r => r.json())
-  .then(res => {
-    if (res.success) {
-      bootstrap.Modal.getInstance(document.getElementById("editGrantModal")).hide();
-      window.reloadGrants();
-    } else {
-      alert(res.message || "Failed to update grant");
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Server error while updating grant");
-  });
-}
+    fetch(`/account/grants/${id}/edit`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, code_head, allotment })
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          bootstrap.Modal.getInstance(document.getElementById("editGrantModal")).hide();
+          window.reloadGrants();
+        } else {
+          alert(res.message || "Failed to update grant");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Server error while updating grant");
+      });
+  }
 </script>
 
 {% endblock %}

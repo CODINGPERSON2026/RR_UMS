@@ -5,9 +5,12 @@ onco_leave_bp = Blueprint('onco_leave', __name__, url_prefix='/onco')
 
 
 def require_onco():
-    """Return the current user dict if role is ONCO, else return None."""
+    """Return the current user dict if role is ONCO or O CENTRE NCO, else return None."""
     user = require_login()
-    if not user or user.get('role') != 'ONCO':
+    if not user:
+        return None
+    role = (user.get('role') or '').strip().upper().replace(' ', '').replace('_', '').replace('-', '')
+    if role not in ['ONCO', 'OCENTRENCO', 'OCENTERNCO']:
         return None
     return user
 
@@ -34,28 +37,51 @@ def on_leave_persons():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT
-                p.army_number,
-                p.name,
-                p.rank,
-                p.company,
-                l.leave_type,
-                l.from_date,
-                l.to_date,
-                l.suffix_days,
-                l.prefix_days,
-                l.suffix_date,
-                l.prefix_date,
-                l.leave_days,
-                l.id AS leave_id
-            FROM personnel p
-            JOIN leave_status_info l ON p.army_number = l.army_number
-            WHERE p.onleave_status = 1
-              AND p.company = %s
-              AND l.request_status = 'Approved'
-            ORDER BY l.to_date
-        """, (company,))
+        if company and company.strip().upper() not in ['CENTER', 'ADMIN', 'ALL']:
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.name,
+                    p.rank,
+                    p.company,
+                    l.leave_type,
+                    l.from_date,
+                    l.to_date,
+                    l.suffix_days,
+                    l.prefix_days,
+                    l.suffix_date,
+                    l.prefix_date,
+                    l.leave_days,
+                    l.id AS leave_id
+                FROM personnel p
+                JOIN leave_status_info l ON p.army_number = l.army_number
+                WHERE p.onleave_status = 1
+                  AND p.company = %s
+                  AND l.request_status = 'Approved'
+                ORDER BY l.to_date
+            """, (company,))
+        else:
+            cursor.execute("""
+                SELECT
+                    p.army_number,
+                    p.name,
+                    p.rank,
+                    p.company,
+                    l.leave_type,
+                    l.from_date,
+                    l.to_date,
+                    l.suffix_days,
+                    l.prefix_days,
+                    l.suffix_date,
+                    l.prefix_date,
+                    l.leave_days,
+                    l.id AS leave_id
+                FROM personnel p
+                JOIN leave_status_info l ON p.army_number = l.army_number
+                WHERE p.onleave_status = 1
+                  AND l.request_status = 'Approved'
+                ORDER BY l.to_date
+            """)
 
         rows = cursor.fetchall()
 

@@ -42,7 +42,7 @@ def api_get_all_projects():
         params = []
 
         # Apply filters based on role
-        if company != "Admin" and role != 'PROJECT JCO' and role != 'PROJECT OFFICER':
+        if company != "Admin" and role not in ('PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR') and (user.get('username') or '').lower() != 'bnwr':
             query += " WHERE company = %s"
             params.append(company)
 
@@ -334,7 +334,7 @@ def api_get_project_stats():
         where_clause = ""
         params = []
 
-        if company != "Admin" and role != 'PROJECT JCO' and role != 'PROJECT OFFICER':
+        if company != "Admin" and role not in ('PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR') and (user.get('username') or '').lower() != 'bnwr':
             where_clause = "WHERE company = %s"
             params.append(company)
 
@@ -440,7 +440,7 @@ def api_search_projects():
             params.append(company_filter)
 
         # Apply company restriction for non-admin users
-        if user['company'] != "Admin" and user['role'] not in ['PROJECT JCO', 'PROJECT OFFICER']:
+        if user['company'] != "Admin" and user['role'] not in ['PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR'] and (user.get('username') or '').lower() != 'bnwr':
             query += " AND company = %s"
             params.append(user['company'])
 
@@ -493,7 +493,7 @@ def api_delete_project(project_id):
 
     try:
         # Check authorization
-        if user['role'] not in ['Admin', 'PROJECT JCO', 'PROJECT OFFICER']:
+        if user['role'] not in ['Admin', 'PROJECT JCO', 'PROJECT OFFICER', 'BNWR', 'BN WR'] and (user.get('username') or '').lower() != 'bnwr':
             return jsonify({
                 'status': 'error',
                 'message': 'Unauthorized to delete projects'

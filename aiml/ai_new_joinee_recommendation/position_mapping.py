@@ -62,9 +62,9 @@ DB_TO_CANONICAL_COMPANY = {
     "3 Coy": "3 COY"
 }
 
-VALID_COMPANIES = ["HQ COY", "COMN COY", "3 COY"]
+VALID_COMPANIES = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"]
 CANONICAL_COMPANIES = VALID_COMPANIES
-VALID_DB_COMPANIES = ["HQ company", "COMN Company", "3 Company"]
+VALID_DB_COMPANIES = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"]
 
 
 def normalize_company_name(coy_str: Optional[str]) -> str:

@@ -87,9 +87,13 @@
               <label class="input-group-text bg-light text-muted" style="font-size: 0.76rem;"><i class="fas fa-building me-1"></i> Coy</label>
               <select id="insightsCompanyFilter" class="form-select form-select-sm" onchange="onInsightsFilterChange()">
                 <option value="ALL">All Companies</option>
-                <option value="HQ Coy">HQ Coy</option>
-                <option value="Comn Coy">Comn Coy</option>
-                <option value="3 Coy">3 Coy</option>
+                <option value="A COY">A COY</option>
+                <option value="B COY">B COY</option>
+                <option value="C COY">C COY</option>
+                <option value="D COY">D COY</option>
+                <option value="E COY">E COY</option>
+                <option value="F COY">F COY</option>
+                <option value="HQ COY">HQ COY</option>
               </select>
             </div>
           </div>
@@ -533,9 +537,13 @@
                 <label class="form-label text-muted small fw-semibold mb-1">Assigned Company</label>
                 <div>
                   <select id="detailFinalCompanySelect" class="form-select form-select-sm" onchange="onDetailCompanyChange()">
+                    <option value="A COY">A COY</option>
+                    <option value="B COY">B COY</option>
+                    <option value="C COY">C COY</option>
+                    <option value="D COY">D COY</option>
+                    <option value="E COY">E COY</option>
+                    <option value="F COY">F COY</option>
                     <option value="HQ COY">HQ COY</option>
-                    <option value="COMN COY">COMN COY</option>
-                    <option value="3 COY">3 COY</option>
                   </select>
                 </div>
               </div>
@@ -744,7 +752,7 @@
 
         canUserAddRemarks = isAdjutant || is2IC;
         canUserAssignCompany = is2IC; // Only 2IC / Admin can assign
-        isUserReadOnly = isCO;
+        isUserReadOnly = isCO || (!canUserAddRemarks && !canUserAssignCompany);
 
         const mainTable = document.getElementById('insightsMainTable');
         if (mainTable) {

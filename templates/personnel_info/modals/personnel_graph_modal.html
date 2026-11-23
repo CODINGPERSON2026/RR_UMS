@@ -334,6 +334,12 @@
       }
     });
 
+    var baseCoys = ["A COY", "B COY", "C COY", "D COY", "E COY", "F COY", "HQ COY"];
+    baseCoys.forEach(function(b) {
+      var k = b.toLowerCase();
+      if (!coyMap[k]) coyMap[k] = b;
+    });
+
     var uniqueCoys = Object.values(coyMap).sort(function(a, b) { return a.localeCompare(b); });
     var optHtml = '<option value="All">All Companies</option>';
     uniqueCoys.forEach(function(c) {

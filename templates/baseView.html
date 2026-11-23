@@ -1215,12 +1215,12 @@
       {% endif %}
 
       <!-- Finance Section -->
-      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO'] or role in ['2IC', 'ADJUTANT',
-      'PROJECT OFFICER', 'PROJECT JCO'] %}
+      {% set r_clean_proj = (role or '')|upper|replace(' ', '')|replace('_', '')|replace('-', '') %}
+      {% if role in ['CO', '2IC', 'ADJUTANT', 'JCO', 'ACCOUNT OFFICER', 'ACCOUNT JCO', 'PROJECT OFFICER', 'PROJECT JCO', 'BNWR', 'BN WR', 'bnwr'] or r_clean_proj in ['BNWR', 'PROJECTOFFICER', 'PROJECTJCO'] or (session.get('username', '')|lower == 'bnwr') %}
       <div class="nav-section-label">Finance &amp; Projects</div>
       {% endif %}
 
-      {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO'] %}
+      {% if role in ['2IC', 'ADJUTANT', 'PROJECT OFFICER', 'PROJECT JCO', 'BNWR', 'BN WR', 'bnwr'] or r_clean_proj in ['BNWR', 'PROJECTOFFICER', 'PROJECTJCO'] or (session.get('username', '')|lower == 'bnwr') %}
       <a class="nav-link {% if '/projects' in request.path %}active{% endif %}"
         href="{{ url_for('projects_dashboard') }}" data-tiptext="Project Management">
         <span class="nav-icon"><i class="fas fa-project-diagram"></i></span>

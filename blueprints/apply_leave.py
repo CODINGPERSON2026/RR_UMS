@@ -1098,7 +1098,7 @@ def recommend_leave():
                 # Once OC sanctions leave, ensure it is added to doc_leave_details for the respective company ONCO
                 cursor.execute("SELECT company, `rank` FROM personnel WHERE army_number = %s", (leave['army_number'],))
                 p_info = cursor.fetchone()
-                p_coy = (p_info.get('company') if p_info else None) or leave.get('company') or 'HQ Company'
+                p_coy = (p_info.get('company') if p_info else None) or leave.get('company') or 'HQ COY'
                 p_rnk = (p_info.get('rank') if p_info else None) or 'Personnel'
 
                 cursor.execute("""
@@ -3305,7 +3305,7 @@ def add_doc_leave():
             army_number,
             rank or 'Personnel',
             name,
-            company or 'HQ Company',
+            company or 'HQ COY',
             leave_type,
             leave_days,
             from_date or None,
